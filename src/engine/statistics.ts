@@ -34,7 +34,7 @@ export function computeFrequencyStats(draws: DrawResult[], totalNumbers: number)
   // Consecutive pair tracking
   const consecutivePairCount = new Array(totalNumbers + 1).fill(0);
 
-  draws.forEach((draw, i) => {
+  draws.filter(d => d && Array.isArray(d.numbers)).forEach((draw, i) => {
     const numSet = new Set(draw.numbers);
     draw.numbers.forEach(n => {
       freq[n]++;
