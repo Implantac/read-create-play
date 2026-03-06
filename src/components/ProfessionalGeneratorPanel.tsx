@@ -413,9 +413,14 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
                   Gerar Fechamento
                 </Button>
                 {closureResult && (
-                  <Button size="sm" variant="outline" onClick={copyAllClosure} className="text-xs gap-1">
-                    <Copy className="w-3 h-3" /> Copiar todos
-                  </Button>
+                  <>
+                    <Button size="sm" variant="outline" onClick={copyAllClosure} className="text-xs gap-1">
+                      <Copy className="w-3 h-3" /> Copiar todos
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={handleExportClosure} className="text-xs gap-1">
+                      <Download className="w-3 h-3" /> PDF
+                    </Button>
+                  </>
                 )}
               </div>
 
