@@ -61,7 +61,7 @@ const Index = () => {
               </div>
               <div>
                 <h1 className="text-lg font-bold text-foreground tracking-tight">
-                  Prompt Titan <span className="text-primary text-glow-green">Loterias</span>
+                  Titan <span className="text-primary text-glow-green">Loterias</span>
                 </h1>
                 <p className="text-xs text-muted-foreground">Análise estatística avançada + IA</p>
               </div>
