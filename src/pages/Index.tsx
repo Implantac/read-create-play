@@ -7,6 +7,7 @@ import { StatsCard } from "@/components/StatsCard";
 import { FrequencyChart } from "@/components/FrequencyChart";
 import { HeatmapGrid } from "@/components/HeatmapGrid";
 import { EnhancedBetGenerator } from "@/components/EnhancedBetGenerator";
+import { ProfessionalGeneratorPanel } from "@/components/ProfessionalGeneratorPanel";
 import { MonteCarloPanel } from "@/components/MonteCarloPanel";
 import { RecentDraws } from "@/components/RecentDraws";
 import { SumChart } from "@/components/SumChart";
@@ -196,6 +197,9 @@ const Index = () => {
           <BetOptimizerPanel stats={stats} config={config} draws={draws} />
           <BacktestPanel stats={stats} config={config} draws={draws} />
         </div>
+
+        {/* Professional Generator - Full Width */}
+        <ProfessionalGeneratorPanel stats={stats} config={config} draws={draws} />
 
         {/* Enhanced Generator & Monte Carlo */}
         <div className="grid lg:grid-cols-2 gap-6">
