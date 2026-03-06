@@ -98,6 +98,29 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
     toast.success("Todas as apostas copiadas!");
   };
 
+  const handleExportBets = () => {
+    if (bets.length === 0) return;
+    exportToPdf({
+      title: `Apostas Profissionais - ${config.name}`,
+      subtitle: `${bets.length} apostas geradas com ${betsPerStrategy} jogos por estratégia`,
+      config,
+      bets: bets.map(b => ({ numbers: b.numbers, strategy: b.strategyLabel, score: b.statisticalScore, grade: b.quality.grade })),
+      type: "apostas",
+    });
+  };
+
+  const handleExportClosure = () => {
+    if (!closureResult) return;
+    const preset = closurePresets[selectedPreset];
+    exportToPdf({
+      title: `Fechamento ${preset.name} - ${config.name}`,
+      subtitle: `${preset.baseNumbers} dezenas base → ${closureResult.length} jogos`,
+      config,
+      bets: closureResult.map(c => ({ numbers: c })),
+      type: "fechamento",
+    });
+  };
+
   const copyAllClosure = () => {
     if (!closureResult) return;
     const text = closureResult.map((c, i) => `Jogo ${i + 1}: ${c.join(" - ")}`).join("\n");
