@@ -149,6 +149,9 @@ const Index = () => {
           <GameSimulator stats={stats} config={config} draws={draws} />
         </div>
 
+        {/* Massive Simulator - Full Width */}
+        <MassiveSimulatorPanel stats={stats} config={config} draws={draws} />
+
         {/* Enhanced Generator & Monte Carlo */}
         <div className="grid lg:grid-cols-2 gap-6">
           <EnhancedBetGenerator stats={stats} config={config} />
