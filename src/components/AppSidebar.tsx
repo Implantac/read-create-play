@@ -48,7 +48,7 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup defaultOpen>
+        <SidebarGroup>
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
