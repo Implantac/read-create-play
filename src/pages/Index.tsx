@@ -209,7 +209,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border py-4 mt-8">
         <div className="container mx-auto px-4 text-center text-xs text-muted-foreground">
-          Prompt Titan Loterias — Motor estatístico v4.0 + Machine Learning + Banco de Dados + API Caixa
+          Titan Loterias — Motor estatístico v4.0 + Machine Learning + Banco de Dados + API Caixa
         </div>
       </footer>
     </div>
