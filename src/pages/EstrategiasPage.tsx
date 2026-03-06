@@ -3,6 +3,7 @@ import { MLPanel } from "@/components/MLPanel";
 import { AdvancedAnalyticsPanel } from "@/components/AdvancedAnalyticsPanel";
 import { ConditionalProbabilityPanel } from "@/components/ConditionalProbabilityPanel";
 import { HPEnginePanel } from "@/components/HPEnginePanel";
+import { OptimizationPanel } from "@/components/OptimizationPanel";
 
 const EstrategiasPage = () => {
   const { config, draws, stats } = useLotteryContext();
@@ -17,6 +18,7 @@ const EstrategiasPage = () => {
 
   return (
     <div className="space-y-6">
+      <OptimizationPanel stats={stats} config={config} draws={draws} />
       <MLPanel stats={stats} config={config} />
       <AdvancedAnalyticsPanel stats={stats} draws={draws} config={config} />
       <ConditionalProbabilityPanel draws={draws} config={config} />

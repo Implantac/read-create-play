@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { NumberStats } from "@/engine/statistics";
+import { exportToPdf } from "@/engine/pdf-export";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import {
   generateProfessionalBets,
@@ -11,7 +12,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Trophy, Sparkles, Target, Layers, Copy, Check, ChevronDown, ChevronUp,
-  Zap, Brain, TrendingUp, Clock, Shuffle, Grid3X3, BarChart3, Loader2,
+  Zap, Brain, TrendingUp, Clock, Shuffle, Grid3X3, BarChart3, Loader2, Download,
   Shield, Star, Award
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -97,6 +98,29 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
     toast.success("Todas as apostas copiadas!");
   };
 
+  const handleExportBets = () => {
+    if (bets.length === 0) return;
+    exportToPdf({
+      title: `Apostas Profissionais - ${config.name}`,
+      subtitle: `${bets.length} apostas geradas com ${betsPerStrategy} jogos por estratégia`,
+      config,
+      bets: bets.map(b => ({ numbers: b.numbers, strategy: b.strategyLabel, score: b.statisticalScore, grade: b.quality.grade })),
+      type: "apostas",
+    });
+  };
+
+  const handleExportClosure = () => {
+    if (!closureResult) return;
+    const preset = closurePresets[selectedPreset];
+    exportToPdf({
+      title: `Fechamento ${preset.name} - ${config.name}`,
+      subtitle: `${preset.baseNumbers} dezenas base → ${closureResult.length} jogos`,
+      config,
+      bets: closureResult.map(c => ({ numbers: c })),
+      type: "fechamento",
+    });
+  };
+
   const copyAllClosure = () => {
     if (!closureResult) return;
     const text = closureResult.map((c, i) => `Jogo ${i + 1}: ${c.join(" - ")}`).join("\n");
@@ -167,9 +191,14 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
               Gerar Apostas Profissionais
             </Button>
             {bets.length > 0 && (
-              <Button size="sm" variant="outline" onClick={copyAllBets} className="text-xs gap-1">
-                <Copy className="w-3 h-3" /> Copiar todas
-              </Button>
+              <>
+                <Button size="sm" variant="outline" onClick={copyAllBets} className="text-xs gap-1">
+                  <Copy className="w-3 h-3" /> Copiar todas
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleExportBets} className="text-xs gap-1">
+                  <Download className="w-3 h-3" /> PDF
+                </Button>
+              </>
             )}
           </div>
 
@@ -384,9 +413,14 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
                   Gerar Fechamento
                 </Button>
                 {closureResult && (
-                  <Button size="sm" variant="outline" onClick={copyAllClosure} className="text-xs gap-1">
-                    <Copy className="w-3 h-3" /> Copiar todos
-                  </Button>
+                  <>
+                    <Button size="sm" variant="outline" onClick={copyAllClosure} className="text-xs gap-1">
+                      <Copy className="w-3 h-3" /> Copiar todos
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={handleExportClosure} className="text-xs gap-1">
+                      <Download className="w-3 h-3" /> PDF
+                    </Button>
+                  </>
                 )}
               </div>
 
