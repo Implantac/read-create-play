@@ -25,7 +25,7 @@ export function MLPanel({ stats, config }: Props) {
       setModels(results);
       setConsensus(getConsensusRanking(results));
       setRunning(false);
-    }, 1500);
+    }, 1800);
   };
 
   const renderChart = (predictions: MLPrediction[], color: string) => {
@@ -66,7 +66,7 @@ export function MLPanel({ stats, config }: Props) {
             Modelos de Machine Learning
           </h3>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Random Forest, XGBoost e LSTM para ranking probabilístico
+            6 modelos: Random Forest, XGBoost, LSTM, Bayes, Markov e Ensemble
           </p>
         </div>
         <Button
@@ -83,24 +83,24 @@ export function MLPanel({ stats, config }: Props) {
       {running && (
         <div className="flex flex-col items-center py-12 gap-3">
           <div className="w-8 h-8 border-2 border-neon-purple border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-muted-foreground">Treinando modelos...</p>
+          <p className="text-sm text-muted-foreground">Treinando 6 modelos de IA...</p>
         </div>
       )}
 
       {models && !running && (
         <AnimatePresence>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            {/* Model stats cards */}
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              {models.map((model, i) => (
+            {/* Model stats cards - 2 rows of 3 */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+              {models.map((model) => (
                 <div key={model.name} className="rounded-lg bg-secondary/50 border border-border p-3">
-                  <p className="text-xs font-semibold text-foreground mb-2">{model.name}</p>
+                  <p className="text-xs font-semibold text-foreground mb-2 truncate">{model.name}</p>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
-                    <Target className="w-3 h-3" />
+                    <Target className="w-3 h-3 shrink-0" />
                     Acurácia: <span className="text-foreground font-mono">{model.accuracy.toFixed(1)}%</span>
                   </div>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Percent className="w-3 h-3" />
+                    <Percent className="w-3 h-3 shrink-0" />
                     Confiança: <span className="text-foreground font-mono">{model.confidence.toFixed(1)}%</span>
                   </div>
                 </div>
@@ -108,26 +108,26 @@ export function MLPanel({ stats, config }: Props) {
             </div>
 
             <Tabs defaultValue="consensus" className="w-full">
-              <TabsList className="w-full bg-secondary/50 border border-border">
-                <TabsTrigger value="consensus" className="flex-1 text-xs">
+              <TabsList className="w-full bg-secondary/50 border border-border flex-wrap h-auto gap-1 p-1">
+                <TabsTrigger value="consensus" className="text-xs">
                   <Trophy className="w-3 h-3 mr-1" /> Consenso
                 </TabsTrigger>
                 {models.map(m => (
-                  <TabsTrigger key={m.name} value={m.name} className="flex-1 text-xs">
-                    {m.name}
+                  <TabsTrigger key={m.name} value={m.name} className="text-xs">
+                    {m.name.length > 12 ? m.name.slice(0, 12) + "…" : m.name}
                   </TabsTrigger>
                 ))}
               </TabsList>
 
               <TabsContent value="consensus" className="mt-4">
                 <p className="text-xs text-muted-foreground mb-3">
-                  Top 20 números por média ponderada de todos os modelos:
+                  Top 20 números por média ponderada de todos os 6 modelos:
                 </p>
                 {consensus && renderChart(consensus, "270, 70%")}
               </TabsContent>
 
               {models.map((model, mi) => {
-                const colors = ["142, 70%", "200, 90%", "0, 72%"];
+                const colors = ["142, 70%", "200, 90%", "0, 72%", "45, 80%", "180, 60%", "300, 70%"];
                 return (
                   <TabsContent key={model.name} value={model.name} className="mt-4">
                     <p className="text-xs text-muted-foreground mb-1">{model.description}</p>
@@ -143,7 +143,7 @@ export function MLPanel({ stats, config }: Props) {
 
       {!models && !running && (
         <div className="text-center py-8 text-muted-foreground text-sm">
-          Clique em "Executar Modelos" para rodar os algoritmos de ML
+          Clique em "Executar Modelos" para rodar os 6 algoritmos de ML
         </div>
       )}
     </div>
