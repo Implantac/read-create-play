@@ -134,6 +134,9 @@ const Index = () => {
         {/* Advanced Analytics - Full Width */}
         <AdvancedAnalyticsPanel stats={stats} draws={draws} config={config} />
 
+        {/* Conditional Probability - Full Width */}
+        <ConditionalProbabilityPanel draws={draws} config={config} />
+
         {/* Game Checker & Simulator */}
         <div className="grid lg:grid-cols-2 gap-6">
           <BetChecker
