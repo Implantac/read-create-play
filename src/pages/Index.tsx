@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
-import { LOTTERIES, getMockDraws, DrawResult } from "@/data/lotteries";
+import { LOTTERIES, DrawResult } from "@/data/lotteries";
 import { computeFrequencyStats, computeSumDistribution } from "@/engine/statistics";
+import { useLotteryDraws } from "@/hooks/useLotteryDraws";
 import { LotterySelector } from "@/components/LotterySelector";
 import { StatsCard } from "@/components/StatsCard";
 import { FrequencyChart } from "@/components/FrequencyChart";
@@ -24,25 +25,14 @@ import { BetOptimizerPanel } from "@/components/BetOptimizerPanel";
 import { BacktestPanel } from "@/components/BacktestPanel";
 import { HPEnginePanel } from "@/components/HPEnginePanel";
 import { motion } from "framer-motion";
-import { BarChart3, TrendingUp, Flame, Snowflake, Zap } from "lucide-react";
+import { BarChart3, TrendingUp, Flame, Snowflake, Zap, Database, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [selectedLottery, setSelectedLottery] = useState("megasena");
-  const [extraDraws, setExtraDraws] = useState<DrawResult[]>([]);
 
   const config = LOTTERIES.find(l => l.id === selectedLottery)!;
-  const mockDraws = useMemo(() => getMockDraws(selectedLottery), [selectedLottery]);
-
-  const draws = useMemo(() => {
-    const all = [...extraDraws, ...mockDraws];
-    // Deduplicate by concurso
-    const seen = new Set<number>();
-    return all.filter(d => {
-      if (seen.has(d.concurso)) return false;
-      seen.add(d.concurso);
-      return true;
-    }).sort((a, b) => b.concurso - a.concurso);
-  }, [mockDraws, extraDraws]);
+  const { draws, loading, syncing, count, syncDraws, syncAllLotteries, addDraw } = useLotteryDraws(selectedLottery);
 
   const stats = useMemo(() => computeFrequencyStats(draws, config.numbers), [draws, config.numbers]);
   const sumData = useMemo(() => computeSumDistribution(draws), [draws]);
@@ -52,12 +42,11 @@ const Index = () => {
   const avgDelay = Math.round(stats.reduce((a, s) => a + s.lastSeen, 0) / stats.length);
 
   const handleNewDraw = useCallback((draw: DrawResult) => {
-    setExtraDraws(prev => [draw, ...prev]);
-  }, []);
+    addDraw(draw);
+  }, [addDraw]);
 
   const handleLotteryChange = useCallback((id: string) => {
     setSelectedLottery(id);
-    setExtraDraws([]);
   }, []);
 
   return (
@@ -77,9 +66,23 @@ const Index = () => {
                 <p className="text-xs text-muted-foreground">Análise estatística avançada + IA</p>
               </div>
             </div>
-            <div className="text-right hidden sm:block">
-              <p className="text-xs text-muted-foreground">Concursos analisados</p>
-              <p className="text-sm font-mono font-bold text-foreground">{draws.length}</p>
+            <div className="flex items-center gap-3">
+              <div className="text-right hidden sm:block">
+                <p className="text-xs text-muted-foreground">Concursos no banco</p>
+                <p className="text-sm font-mono font-bold text-foreground">
+                  {loading ? <Loader2 className="w-3 h-3 animate-spin inline" /> : count}
+                </p>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={syncDraws}
+                disabled={syncing}
+                className="hidden sm:flex gap-1 text-xs"
+              >
+                {syncing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Database className="w-3 h-3" />}
+                {syncing ? "Sincronizando..." : "Sincronizar"}
+              </Button>
             </div>
           </div>
           <LotterySelector selected={selectedLottery} onSelect={handleLotteryChange} />
@@ -88,6 +91,36 @@ const Index = () => {
 
       {/* Content */}
       <main className="container mx-auto px-4 py-6 space-y-6">
+        {/* Sync notice when no data */}
+        {!loading && draws.length === 0 && (
+          <div className="rounded-xl bg-card border border-border p-6 text-center space-y-3">
+            <Database className="w-8 h-8 mx-auto text-primary" />
+            <h3 className="text-sm font-semibold text-foreground">Banco de dados vazio</h3>
+            <p className="text-xs text-muted-foreground">
+              Clique para importar todos os sorteios históricos da API da Caixa
+            </p>
+            <div className="flex gap-2 justify-center">
+              <Button onClick={syncDraws} disabled={syncing} className="gap-1">
+                {syncing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Database className="w-3 h-3" />}
+                Importar {config.name}
+              </Button>
+              <Button onClick={syncAllLotteries} disabled={syncing} variant="outline" className="gap-1">
+                {syncing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Database className="w-3 h-3" />}
+                Importar Todas
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {loading && (
+          <div className="flex items-center justify-center py-12 gap-2 text-muted-foreground">
+            <Loader2 className="w-5 h-5 animate-spin" />
+            <span className="text-sm">Carregando resultados...</span>
+          </div>
+        )}
+
+        {draws.length > 0 && (
+          <>
         {/* Auto Updater */}
         <AutoUpdater
           lotteryId={selectedLottery}
@@ -169,12 +202,14 @@ const Index = () => {
           <EnhancedBetGenerator stats={stats} config={config} />
           <MonteCarloPanel stats={stats} config={config} />
         </div>
+          </>
+        )}
       </main>
 
       {/* Footer */}
       <footer className="border-t border-border py-4 mt-8">
         <div className="container mx-auto px-4 text-center text-xs text-muted-foreground">
-          Prompt Titan Loterias — Motor estatístico v3.0 + Machine Learning + API Caixa
+          Prompt Titan Loterias — Motor estatístico v4.0 + Machine Learning + Banco de Dados + API Caixa
         </div>
       </footer>
     </div>
