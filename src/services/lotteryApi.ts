@@ -166,6 +166,36 @@ export function getPrizeTiers(lotteryId: string): { hits: number; label: string 
         { hits: 15, label: "15 acertos" },
         { hits: 0, label: "0 acertos" },
       ];
+    case "duplasena":
+      return [
+        { hits: 6, label: "Sena (6 acertos)" },
+        { hits: 5, label: "Quina (5 acertos)" },
+        { hits: 4, label: "Quadra (4 acertos)" },
+        { hits: 3, label: "Terno (3 acertos)" },
+      ];
+    case "timemania":
+      return [
+        { hits: 7, label: "7 acertos" },
+        { hits: 6, label: "6 acertos" },
+        { hits: 5, label: "5 acertos" },
+        { hits: 4, label: "4 acertos" },
+        { hits: 3, label: "3 acertos" },
+      ];
+    case "diadesorte":
+      return [
+        { hits: 7, label: "7 acertos" },
+        { hits: 6, label: "6 acertos" },
+        { hits: 5, label: "5 acertos" },
+        { hits: 4, label: "4 acertos" },
+      ];
+    case "supersete":
+      return [
+        { hits: 7, label: "7 acertos" },
+        { hits: 6, label: "6 acertos" },
+        { hits: 5, label: "5 acertos" },
+        { hits: 4, label: "4 acertos" },
+        { hits: 3, label: "3 acertos" },
+      ];
     default:
       return [
         { hits: 6, label: "Primeira faixa" },
