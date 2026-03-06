@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { NumberStats, generateSmartBet } from "@/engine/statistics";
+import { NumberStats } from "@/engine/statistics";
 import { LotteryConfig } from "@/data/lotteries";
-import { getConsensusRanking, runAllModels } from "@/engine/ml-models";
+import { STRATEGIES, Strategy, generateByStrategy } from "@/engine/strategies";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, RefreshCw, Copy, Check, Brain, Flame, Snowflake, Shuffle } from "lucide-react";
+import { Sparkles, RefreshCw, Copy, Check, Brain, Flame, Snowflake, Shuffle, Hash, Sigma, Ratio, Grid3X3, Clock, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -12,84 +12,21 @@ interface Props {
   config: LotteryConfig;
 }
 
-type Strategy = "smart" | "hot" | "cold" | "balanced" | "ml";
+const ICON_MAP: Record<Strategy, typeof Sparkles> = {
+  smart: Sparkles,
+  hot: Flame,
+  cold: Snowflake,
+  balanced: Shuffle,
+  fibonacci: Sigma,
+  primes: Hash,
+  golden: Ratio,
+  sectors: Grid3X3,
+  lowDelay: Clock,
+  pattern: BarChart3,
+  ml: Brain,
+};
 
-const STRATEGIES: { id: Strategy; label: string; icon: typeof Sparkles; desc: string }[] = [
-  { id: "smart", label: "Inteligente", icon: Sparkles, desc: "Ponderação por frequência e recência" },
-  { id: "hot", label: "Quentes", icon: Flame, desc: "Prioriza dezenas com alta frequência" },
-  { id: "cold", label: "Frias", icon: Snowflake, desc: "Dezenas atrasadas prontas para sair" },
-  { id: "balanced", label: "Equilibrada", icon: Shuffle, desc: "Mix de quentes, frias e normais" },
-  { id: "ml", label: "IA/ML", icon: Brain, desc: "Baseada no consenso dos modelos de ML" },
-];
-
-function generateByStrategy(
-  strategy: Strategy,
-  stats: NumberStats[],
-  config: LotteryConfig
-): number[] {
-  const pick = config.pick;
-
-  switch (strategy) {
-    case "hot": {
-      const hot = stats.filter(s => s.status === "hot").sort((a, b) => b.frequency - a.frequency);
-      const normal = stats.filter(s => s.status === "normal").sort((a, b) => b.frequency - a.frequency);
-      const pool = [...hot, ...normal];
-      const selected = pool.slice(0, pick).map(s => s.number);
-      // Add randomness
-      while (selected.length < pick) {
-        const n = Math.floor(Math.random() * config.numbers) + 1;
-        if (!selected.includes(n)) selected.push(n);
-      }
-      return selected.sort((a, b) => a - b);
-    }
-    case "cold": {
-      const cold = stats.filter(s => s.status === "cold").sort((a, b) => b.lastSeen - a.lastSeen);
-      const normal = stats.filter(s => s.status === "normal").sort((a, b) => b.lastSeen - a.lastSeen);
-      const pool = [...cold, ...normal];
-      const selected = pool.slice(0, pick).map(s => s.number);
-      while (selected.length < pick) {
-        const n = Math.floor(Math.random() * config.numbers) + 1;
-        if (!selected.includes(n)) selected.push(n);
-      }
-      return selected.sort((a, b) => a - b);
-    }
-    case "balanced": {
-      const hot = stats.filter(s => s.status === "hot");
-      const cold = stats.filter(s => s.status === "cold");
-      const normal = stats.filter(s => s.status === "normal");
-
-      const hotPick = Math.floor(pick * 0.4);
-      const coldPick = Math.floor(pick * 0.3);
-      const normalPick = pick - hotPick - coldPick;
-
-      const shuffled = (arr: NumberStats[]) => [...arr].sort(() => Math.random() - 0.5);
-      const selected = [
-        ...shuffled(hot).slice(0, hotPick),
-        ...shuffled(cold).slice(0, coldPick),
-        ...shuffled(normal).slice(0, normalPick),
-      ].map(s => s.number);
-
-      while (selected.length < pick) {
-        const n = Math.floor(Math.random() * config.numbers) + 1;
-        if (!selected.includes(n)) selected.push(n);
-      }
-      return selected.sort((a, b) => a - b);
-    }
-    case "ml": {
-      const models = runAllModels(stats, config);
-      const consensus = getConsensusRanking(models);
-      // Pick top N with some randomness
-      const topPool = consensus.slice(0, Math.min(pick * 2, consensus.length));
-      const shuffled = [...topPool].sort(() => Math.random() - 0.5);
-      return shuffled
-        .slice(0, pick)
-        .map(p => p.number)
-        .sort((a, b) => a - b);
-    }
-    default:
-      return generateSmartBet(stats, pick);
-  }
-}
+const CATEGORY_LABELS = { basic: "Básicas", math: "Matemáticas", ai: "Inteligência Artificial" };
 
 export function EnhancedBetGenerator({ stats, config }: Props) {
   const [strategy, setStrategy] = useState<Strategy>("smart");
@@ -119,6 +56,12 @@ export function EnhancedBetGenerator({ stats, config }: Props) {
 
   const currentStrategy = STRATEGIES.find(s => s.id === strategy)!;
 
+  // Group strategies by category
+  const grouped = (["basic", "math", "ai"] as const).map(cat => ({
+    label: CATEGORY_LABELS[cat],
+    items: STRATEGIES.filter(s => s.category === cat),
+  }));
+
   return (
     <div className="rounded-xl bg-card border border-border p-5">
       <div className="flex items-center justify-between mb-4">
@@ -136,25 +79,32 @@ export function EnhancedBetGenerator({ stats, config }: Props) {
         )}
       </div>
 
-      {/* Strategy selector */}
-      <div className="flex flex-wrap gap-1.5 mb-4">
-        {STRATEGIES.map(s => {
-          const Icon = s.icon;
-          return (
-            <button
-              key={s.id}
-              onClick={() => setStrategy(s.id)}
-              className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border transition-all ${
-                strategy === s.id
-                  ? "border-neon-amber text-neon-amber bg-neon-amber/10"
-                  : "border-border text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Icon className="w-3 h-3" />
-              {s.label}
-            </button>
-          );
-        })}
+      {/* Strategy selector grouped */}
+      <div className="space-y-2 mb-4">
+        {grouped.map(group => (
+          <div key={group.label}>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">{group.label}</p>
+            <div className="flex flex-wrap gap-1.5">
+              {group.items.map(s => {
+                const Icon = ICON_MAP[s.id];
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => setStrategy(s.id)}
+                    className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border transition-all ${
+                      strategy === s.id
+                        ? "border-neon-amber text-neon-amber bg-neon-amber/10"
+                        : "border-border text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Icon className="w-3 h-3" />
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Generate buttons */}
