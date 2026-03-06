@@ -9,6 +9,11 @@ import { BetGenerator } from "@/components/BetGenerator";
 import { MonteCarloPanel } from "@/components/MonteCarloPanel";
 import { RecentDraws } from "@/components/RecentDraws";
 import { SumChart } from "@/components/SumChart";
+import { ParityChart } from "@/components/ParityChart";
+import { ConsecutiveChart } from "@/components/ConsecutiveChart";
+import { RangeDistribution } from "@/components/RangeDistribution";
+import { DelayChart } from "@/components/DelayChart";
+import { MLPanel } from "@/components/MLPanel";
 import { motion } from "framer-motion";
 import { BarChart3, TrendingUp, Flame, Snowflake, Zap } from "lucide-react";
 
@@ -38,7 +43,7 @@ const Index = () => {
                 <h1 className="text-lg font-bold text-foreground tracking-tight">
                   Prompt Titan <span className="text-primary text-glow-green">Loterias</span>
                 </h1>
-                <p className="text-xs text-muted-foreground">Análise estatística avançada</p>
+                <p className="text-xs text-muted-foreground">Análise estatística avançada + IA</p>
               </div>
             </div>
             <div className="text-right hidden sm:block">
@@ -65,10 +70,22 @@ const Index = () => {
           <StatsCard title="Atraso Médio" value={`${avgDelay}d`} icon={TrendingUp} color="amber" subtitle="Concursos sem aparecer" />
         </motion.div>
 
-        {/* Charts Row */}
+        {/* Frequency & Heatmap */}
         <div className="grid lg:grid-cols-2 gap-6">
           <FrequencyChart stats={stats} />
           <HeatmapGrid stats={stats} totalNumbers={config.numbers} />
+        </div>
+
+        {/* Parity & Consecutive */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          <ParityChart draws={draws} />
+          <ConsecutiveChart draws={draws} />
+        </div>
+
+        {/* Range & Delay */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          <RangeDistribution draws={draws} config={config} />
+          <DelayChart stats={stats} />
         </div>
 
         {/* Sum & Recent */}
@@ -76,6 +93,9 @@ const Index = () => {
           <SumChart data={sumData} />
           <RecentDraws draws={draws} />
         </div>
+
+        {/* ML Panel - Full Width */}
+        <MLPanel stats={stats} config={config} />
 
         {/* Generator & Monte Carlo */}
         <div className="grid lg:grid-cols-2 gap-6">
@@ -87,7 +107,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border py-4 mt-8">
         <div className="container mx-auto px-4 text-center text-xs text-muted-foreground">
-          Prompt Titan Loterias — Motor estatístico v1.0
+          Prompt Titan Loterias — Motor estatístico v2.0 + Machine Learning
         </div>
       </footer>
     </div>
