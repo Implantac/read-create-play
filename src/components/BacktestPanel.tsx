@@ -43,7 +43,11 @@ export function BacktestPanel({ stats, config, draws }: Props) {
     setRunning(true);
     setResults(null);
     setTimeout(() => {
-      const minPrize = config.pick <= 6 ? 4 : config.pick <= 10 ? 5 : config.pick - 4;
+      const minPrizeMap: Record<string, number> = {
+        megasena: 4, lotofacil: 11, quina: 2, lotomania: 15,
+        duplasena: 3, timemania: 3, diadesorte: 4, supersete: 3,
+      };
+      const minPrize = minPrizeMap[config.id] || (config.pick <= 6 ? 4 : config.pick <= 10 ? 5 : config.pick - 4);
       const res = runBacktest(stats, config, draws, {
         strategies: selectedStrategies,
         testWindow,
