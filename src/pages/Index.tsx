@@ -18,6 +18,7 @@ import { AdvancedAnalyticsPanel } from "@/components/AdvancedAnalyticsPanel";
 import { BetChecker } from "@/components/BetChecker";
 import { GameSimulator } from "@/components/GameSimulator";
 import { AutoUpdater } from "@/components/AutoUpdater";
+import { ConditionalProbabilityPanel } from "@/components/ConditionalProbabilityPanel";
 import { motion } from "framer-motion";
 import { BarChart3, TrendingUp, Flame, Snowflake, Zap } from "lucide-react";
 
@@ -132,6 +133,9 @@ const Index = () => {
 
         {/* Advanced Analytics - Full Width */}
         <AdvancedAnalyticsPanel stats={stats} draws={draws} config={config} />
+
+        {/* Conditional Probability - Full Width */}
+        <ConditionalProbabilityPanel draws={draws} config={config} />
 
         {/* Game Checker & Simulator */}
         <div className="grid lg:grid-cols-2 gap-6">
