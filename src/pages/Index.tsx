@@ -42,12 +42,11 @@ const Index = () => {
   const avgDelay = Math.round(stats.reduce((a, s) => a + s.lastSeen, 0) / stats.length);
 
   const handleNewDraw = useCallback((draw: DrawResult) => {
-    setExtraDraws(prev => [draw, ...prev]);
-  }, []);
+    addDraw(draw);
+  }, [addDraw]);
 
   const handleLotteryChange = useCallback((id: string) => {
     setSelectedLottery(id);
-    setExtraDraws([]);
   }, []);
 
   return (
