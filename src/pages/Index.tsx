@@ -61,7 +61,7 @@ const Index = () => {
               </div>
               <div>
                 <h1 className="text-lg font-bold text-foreground tracking-tight">
-                  Prompt Titan <span className="text-primary text-glow-green">Loterias</span>
+                  Titan <span className="text-primary text-glow-green">Loterias</span>
                 </h1>
                 <p className="text-xs text-muted-foreground">Análise estatística avançada + IA</p>
               </div>
@@ -209,7 +209,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border py-4 mt-8">
         <div className="container mx-auto px-4 text-center text-xs text-muted-foreground">
-          Prompt Titan Loterias — Motor estatístico v4.0 + Machine Learning + Banco de Dados + API Caixa
+          Titan Loterias — Motor estatístico v4.0 + Machine Learning + Banco de Dados + API Caixa
         </div>
       </footer>
     </div>
