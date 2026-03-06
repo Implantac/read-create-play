@@ -191,9 +191,14 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
               Gerar Apostas Profissionais
             </Button>
             {bets.length > 0 && (
-              <Button size="sm" variant="outline" onClick={copyAllBets} className="text-xs gap-1">
-                <Copy className="w-3 h-3" /> Copiar todas
-              </Button>
+              <>
+                <Button size="sm" variant="outline" onClick={copyAllBets} className="text-xs gap-1">
+                  <Copy className="w-3 h-3" /> Copiar todas
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleExportBets} className="text-xs gap-1">
+                  <Download className="w-3 h-3" /> PDF
+                </Button>
+              </>
             )}
           </div>
 
