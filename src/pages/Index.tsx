@@ -22,8 +22,6 @@ import { ConditionalProbabilityPanel } from "@/components/ConditionalProbability
 import { MassiveSimulatorPanel } from "@/components/MassiveSimulatorPanel";
 import { BetOptimizerPanel } from "@/components/BetOptimizerPanel";
 import { BacktestPanel } from "@/components/BacktestPanel";
-import { BetOptimizerPanel } from "@/components/BetOptimizerPanel";
-import { BacktestPanel } from "@/components/BacktestPanel";
 import { motion } from "framer-motion";
 import { BarChart3, TrendingUp, Flame, Snowflake, Zap } from "lucide-react";
 
