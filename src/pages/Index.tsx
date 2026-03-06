@@ -198,6 +198,9 @@ const Index = () => {
           <BacktestPanel stats={stats} config={config} draws={draws} />
         </div>
 
+        {/* Professional Generator - Full Width */}
+        <ProfessionalGeneratorPanel stats={stats} config={config} draws={draws} />
+
         {/* Enhanced Generator & Monte Carlo */}
         <div className="grid lg:grid-cols-2 gap-6">
           <EnhancedBetGenerator stats={stats} config={config} />
