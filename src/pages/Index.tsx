@@ -1,11 +1,11 @@
-import { useState, useMemo } from "react";
-import { LOTTERIES, getMockDraws } from "@/data/lotteries";
+import { useState, useMemo, useCallback } from "react";
+import { LOTTERIES, getMockDraws, DrawResult } from "@/data/lotteries";
 import { computeFrequencyStats, computeSumDistribution } from "@/engine/statistics";
 import { LotterySelector } from "@/components/LotterySelector";
 import { StatsCard } from "@/components/StatsCard";
 import { FrequencyChart } from "@/components/FrequencyChart";
 import { HeatmapGrid } from "@/components/HeatmapGrid";
-import { BetGenerator } from "@/components/BetGenerator";
+import { EnhancedBetGenerator } from "@/components/EnhancedBetGenerator";
 import { MonteCarloPanel } from "@/components/MonteCarloPanel";
 import { RecentDraws } from "@/components/RecentDraws";
 import { SumChart } from "@/components/SumChart";
@@ -14,20 +14,45 @@ import { ConsecutiveChart } from "@/components/ConsecutiveChart";
 import { RangeDistribution } from "@/components/RangeDistribution";
 import { DelayChart } from "@/components/DelayChart";
 import { MLPanel } from "@/components/MLPanel";
+import { BetChecker } from "@/components/BetChecker";
+import { GameSimulator } from "@/components/GameSimulator";
+import { AutoUpdater } from "@/components/AutoUpdater";
 import { motion } from "framer-motion";
 import { BarChart3, TrendingUp, Flame, Snowflake, Zap } from "lucide-react";
 
 const Index = () => {
   const [selectedLottery, setSelectedLottery] = useState("megasena");
+  const [extraDraws, setExtraDraws] = useState<DrawResult[]>([]);
 
   const config = LOTTERIES.find(l => l.id === selectedLottery)!;
-  const draws = useMemo(() => getMockDraws(selectedLottery), [selectedLottery]);
+  const mockDraws = useMemo(() => getMockDraws(selectedLottery), [selectedLottery]);
+
+  const draws = useMemo(() => {
+    const all = [...extraDraws, ...mockDraws];
+    // Deduplicate by concurso
+    const seen = new Set<number>();
+    return all.filter(d => {
+      if (seen.has(d.concurso)) return false;
+      seen.add(d.concurso);
+      return true;
+    }).sort((a, b) => b.concurso - a.concurso);
+  }, [mockDraws, extraDraws]);
+
   const stats = useMemo(() => computeFrequencyStats(draws, config.numbers), [draws, config.numbers]);
   const sumData = useMemo(() => computeSumDistribution(draws), [draws]);
 
   const hotNumbers = stats.filter(s => s.status === "hot").length;
   const coldNumbers = stats.filter(s => s.status === "cold").length;
   const avgDelay = Math.round(stats.reduce((a, s) => a + s.lastSeen, 0) / stats.length);
+
+  const handleNewDraw = useCallback((draw: DrawResult) => {
+    setExtraDraws(prev => [draw, ...prev]);
+  }, []);
+
+  const handleLotteryChange = useCallback((id: string) => {
+    setSelectedLottery(id);
+    setExtraDraws([]);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background gradient-mesh">
@@ -51,12 +76,19 @@ const Index = () => {
               <p className="text-sm font-mono font-bold text-foreground">{draws.length}</p>
             </div>
           </div>
-          <LotterySelector selected={selectedLottery} onSelect={setSelectedLottery} />
+          <LotterySelector selected={selectedLottery} onSelect={handleLotteryChange} />
         </div>
       </header>
 
       {/* Content */}
       <main className="container mx-auto px-4 py-6 space-y-6">
+        {/* Auto Updater */}
+        <AutoUpdater
+          lotteryId={selectedLottery}
+          onNewDraw={handleNewDraw}
+          latestConcurso={draws[0]?.concurso || 0}
+        />
+
         {/* Stats Cards */}
         <motion.div
           key={selectedLottery}
@@ -97,9 +129,20 @@ const Index = () => {
         {/* ML Panel - Full Width */}
         <MLPanel stats={stats} config={config} />
 
-        {/* Generator & Monte Carlo */}
+        {/* Game Checker & Simulator */}
         <div className="grid lg:grid-cols-2 gap-6">
-          <BetGenerator stats={stats} config={config} />
+          <BetChecker
+            draws={draws}
+            lotteryId={selectedLottery}
+            maxNumbers={config.numbers}
+            pick={config.pick}
+          />
+          <GameSimulator stats={stats} config={config} draws={draws} />
+        </div>
+
+        {/* Enhanced Generator & Monte Carlo */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          <EnhancedBetGenerator stats={stats} config={config} />
           <MonteCarloPanel stats={stats} config={config} />
         </div>
       </main>
@@ -107,7 +150,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border py-4 mt-8">
         <div className="container mx-auto px-4 text-center text-xs text-muted-foreground">
-          Prompt Titan Loterias — Motor estatístico v2.0 + Machine Learning
+          Prompt Titan Loterias — Motor estatístico v3.0 + Machine Learning + API Caixa
         </div>
       </footer>
     </div>
