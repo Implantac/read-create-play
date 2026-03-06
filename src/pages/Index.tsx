@@ -66,9 +66,23 @@ const Index = () => {
                 <p className="text-xs text-muted-foreground">Análise estatística avançada + IA</p>
               </div>
             </div>
-            <div className="text-right hidden sm:block">
-              <p className="text-xs text-muted-foreground">Concursos analisados</p>
-              <p className="text-sm font-mono font-bold text-foreground">{draws.length}</p>
+            <div className="flex items-center gap-3">
+              <div className="text-right hidden sm:block">
+                <p className="text-xs text-muted-foreground">Concursos no banco</p>
+                <p className="text-sm font-mono font-bold text-foreground">
+                  {loading ? <Loader2 className="w-3 h-3 animate-spin inline" /> : count}
+                </p>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={syncDraws}
+                disabled={syncing}
+                className="hidden sm:flex gap-1 text-xs"
+              >
+                {syncing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Database className="w-3 h-3" />}
+                {syncing ? "Sincronizando..." : "Sincronizar"}
+              </Button>
             </div>
           </div>
           <LotterySelector selected={selectedLottery} onSelect={handleLotteryChange} />
