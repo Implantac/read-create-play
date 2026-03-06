@@ -19,6 +19,7 @@ import { BetChecker } from "@/components/BetChecker";
 import { GameSimulator } from "@/components/GameSimulator";
 import { AutoUpdater } from "@/components/AutoUpdater";
 import { ConditionalProbabilityPanel } from "@/components/ConditionalProbabilityPanel";
+import { MassiveSimulatorPanel } from "@/components/MassiveSimulatorPanel";
 import { motion } from "framer-motion";
 import { BarChart3, TrendingUp, Flame, Snowflake, Zap } from "lucide-react";
 
@@ -147,6 +148,9 @@ const Index = () => {
           />
           <GameSimulator stats={stats} config={config} draws={draws} />
         </div>
+
+        {/* Massive Simulator - Full Width */}
+        <MassiveSimulatorPanel stats={stats} config={config} draws={draws} />
 
         {/* Enhanced Generator & Monte Carlo */}
         <div className="grid lg:grid-cols-2 gap-6">
