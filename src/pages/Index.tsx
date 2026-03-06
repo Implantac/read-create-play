@@ -7,6 +7,7 @@ import { StatsCard } from "@/components/StatsCard";
 import { FrequencyChart } from "@/components/FrequencyChart";
 import { HeatmapGrid } from "@/components/HeatmapGrid";
 import { EnhancedBetGenerator } from "@/components/EnhancedBetGenerator";
+import { ProfessionalGeneratorPanel } from "@/components/ProfessionalGeneratorPanel";
 import { MonteCarloPanel } from "@/components/MonteCarloPanel";
 import { RecentDraws } from "@/components/RecentDraws";
 import { SumChart } from "@/components/SumChart";
