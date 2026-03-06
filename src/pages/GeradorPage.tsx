@@ -4,6 +4,7 @@ import { ProfessionalGeneratorPanel } from "@/components/ProfessionalGeneratorPa
 import { MonteCarloPanel } from "@/components/MonteCarloPanel";
 import { BetOptimizerPanel } from "@/components/BetOptimizerPanel";
 import { BetChecker } from "@/components/BetChecker";
+import { PlanGate } from "@/components/PlanGate";
 
 const GeradorPage = () => {
   const { config, draws, stats, selectedLottery } = useLotteryContext();
@@ -18,7 +19,9 @@ const GeradorPage = () => {
 
   return (
     <div className="space-y-6">
-      <ProfessionalGeneratorPanel stats={stats} config={config} draws={draws} />
+      <PlanGate feature="gerador_profissional" fallbackMessage="Gerador Profissional com filtros avançados">
+        <ProfessionalGeneratorPanel stats={stats} config={config} draws={draws} />
+      </PlanGate>
 
       <div className="grid lg:grid-cols-2 gap-6">
         <EnhancedBetGenerator stats={stats} config={config} />
