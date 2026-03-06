@@ -202,12 +202,14 @@ const Index = () => {
           <EnhancedBetGenerator stats={stats} config={config} />
           <MonteCarloPanel stats={stats} config={config} />
         </div>
+          </>
+        )}
       </main>
 
       {/* Footer */}
       <footer className="border-t border-border py-4 mt-8">
         <div className="container mx-auto px-4 text-center text-xs text-muted-foreground">
-          Prompt Titan Loterias — Motor estatístico v3.0 + Machine Learning + API Caixa
+          Prompt Titan Loterias — Motor estatístico v4.0 + Machine Learning + Banco de Dados + API Caixa
         </div>
       </footer>
     </div>
