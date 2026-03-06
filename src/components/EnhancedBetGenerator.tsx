@@ -3,7 +3,7 @@ import { NumberStats } from "@/engine/statistics";
 import { LotteryConfig } from "@/data/lotteries";
 import { STRATEGIES, Strategy, generateByStrategy } from "@/engine/strategies";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, RefreshCw, Copy, Check, Brain, Flame, Snowflake, Shuffle, Hash, Sigma, Ratio, Grid3X3, Clock, BarChart3 } from "lucide-react";
+import { Sparkles, RefreshCw, Copy, Check, Brain, Flame, Snowflake, Shuffle, Hash, Sigma, Ratio, Grid3X3, Clock, BarChart3, TrendingUp, Repeat, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -17,13 +17,16 @@ const ICON_MAP: Record<Strategy, typeof Sparkles> = {
   hot: Flame,
   cold: Snowflake,
   balanced: Shuffle,
+  trend: TrendingUp,
   fibonacci: Sigma,
   primes: Hash,
   golden: Ratio,
   sectors: Grid3X3,
   lowDelay: Clock,
   pattern: BarChart3,
+  cycle: Repeat,
   ml: Brain,
+  hybrid: Layers,
 };
 
 const CATEGORY_LABELS = { basic: "Básicas", math: "Matemáticas", ai: "Inteligência Artificial" };
