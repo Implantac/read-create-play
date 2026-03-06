@@ -155,6 +155,9 @@ const Index = () => {
         {/* Massive Simulator - Full Width */}
         <MassiveSimulatorPanel stats={stats} config={config} draws={draws} />
 
+        {/* High-Performance Engine */}
+        <HPEnginePanel stats={stats} config={config} draws={draws} />
+
         {/* Bet Optimizer & Backtesting */}
         <div className="grid lg:grid-cols-2 gap-6">
           <BetOptimizerPanel stats={stats} config={config} draws={draws} />
