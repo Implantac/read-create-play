@@ -91,6 +91,36 @@ const Index = () => {
 
       {/* Content */}
       <main className="container mx-auto px-4 py-6 space-y-6">
+        {/* Sync notice when no data */}
+        {!loading && draws.length === 0 && (
+          <div className="rounded-xl bg-card border border-border p-6 text-center space-y-3">
+            <Database className="w-8 h-8 mx-auto text-primary" />
+            <h3 className="text-sm font-semibold text-foreground">Banco de dados vazio</h3>
+            <p className="text-xs text-muted-foreground">
+              Clique para importar todos os sorteios históricos da API da Caixa
+            </p>
+            <div className="flex gap-2 justify-center">
+              <Button onClick={syncDraws} disabled={syncing} className="gap-1">
+                {syncing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Database className="w-3 h-3" />}
+                Importar {config.name}
+              </Button>
+              <Button onClick={syncAllLotteries} disabled={syncing} variant="outline" className="gap-1">
+                {syncing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Database className="w-3 h-3" />}
+                Importar Todas
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {loading && (
+          <div className="flex items-center justify-center py-12 gap-2 text-muted-foreground">
+            <Loader2 className="w-5 h-5 animate-spin" />
+            <span className="text-sm">Carregando resultados...</span>
+          </div>
+        )}
+
+        {draws.length > 0 && (
+          <>
         {/* Auto Updater */}
         <AutoUpdater
           lotteryId={selectedLottery}
