@@ -17,13 +17,16 @@ const ICON_MAP: Record<Strategy, typeof Sparkles> = {
   hot: Flame,
   cold: Snowflake,
   balanced: Shuffle,
+  trend: TrendingUp,
   fibonacci: Sigma,
   primes: Hash,
   golden: Ratio,
   sectors: Grid3X3,
   lowDelay: Clock,
   pattern: BarChart3,
+  cycle: Repeat,
   ml: Brain,
+  hybrid: Layers,
 };
 
 const CATEGORY_LABELS = { basic: "Básicas", math: "Matemáticas", ai: "Inteligência Artificial" };
