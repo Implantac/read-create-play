@@ -36,7 +36,7 @@ export function computeFrequencyStats(draws: DrawResult[], totalNumbers: number)
 
   draws.filter(d => d && Array.isArray(d.numbers)).forEach((draw, i) => {
     const numSet = new Set(draw.numbers);
-    draw.numbers.forEach(n => {
+    draw.numbers.filter(n => n >= 1 && n <= totalNumbers).forEach(n => {
       freq[n]++;
       if (i < lastSeen[n]) lastSeen[n] = i;
       if (i < recent) recentFreq[n]++;
