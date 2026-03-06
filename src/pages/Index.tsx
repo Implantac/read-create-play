@@ -14,6 +14,7 @@ import { ConsecutiveChart } from "@/components/ConsecutiveChart";
 import { RangeDistribution } from "@/components/RangeDistribution";
 import { DelayChart } from "@/components/DelayChart";
 import { MLPanel } from "@/components/MLPanel";
+import { AdvancedAnalyticsPanel } from "@/components/AdvancedAnalyticsPanel";
 import { BetChecker } from "@/components/BetChecker";
 import { GameSimulator } from "@/components/GameSimulator";
 import { AutoUpdater } from "@/components/AutoUpdater";
@@ -128,6 +129,9 @@ const Index = () => {
 
         {/* ML Panel - Full Width */}
         <MLPanel stats={stats} config={config} />
+
+        {/* Advanced Analytics - Full Width */}
+        <AdvancedAnalyticsPanel stats={stats} draws={draws} config={config} />
 
         {/* Game Checker & Simulator */}
         <div className="grid lg:grid-cols-2 gap-6">
