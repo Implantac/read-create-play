@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
-import { LOTTERIES, getMockDraws, DrawResult } from "@/data/lotteries";
+import { LOTTERIES, DrawResult } from "@/data/lotteries";
 import { computeFrequencyStats, computeSumDistribution } from "@/engine/statistics";
+import { useLotteryDraws } from "@/hooks/useLotteryDraws";
 import { LotterySelector } from "@/components/LotterySelector";
 import { StatsCard } from "@/components/StatsCard";
 import { FrequencyChart } from "@/components/FrequencyChart";
@@ -24,25 +25,14 @@ import { BetOptimizerPanel } from "@/components/BetOptimizerPanel";
 import { BacktestPanel } from "@/components/BacktestPanel";
 import { HPEnginePanel } from "@/components/HPEnginePanel";
 import { motion } from "framer-motion";
-import { BarChart3, TrendingUp, Flame, Snowflake, Zap } from "lucide-react";
+import { BarChart3, TrendingUp, Flame, Snowflake, Zap, Database, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [selectedLottery, setSelectedLottery] = useState("megasena");
-  const [extraDraws, setExtraDraws] = useState<DrawResult[]>([]);
 
   const config = LOTTERIES.find(l => l.id === selectedLottery)!;
-  const mockDraws = useMemo(() => getMockDraws(selectedLottery), [selectedLottery]);
-
-  const draws = useMemo(() => {
-    const all = [...extraDraws, ...mockDraws];
-    // Deduplicate by concurso
-    const seen = new Set<number>();
-    return all.filter(d => {
-      if (seen.has(d.concurso)) return false;
-      seen.add(d.concurso);
-      return true;
-    }).sort((a, b) => b.concurso - a.concurso);
-  }, [mockDraws, extraDraws]);
+  const { draws, loading, syncing, count, syncDraws, syncAllLotteries, addDraw } = useLotteryDraws(selectedLottery);
 
   const stats = useMemo(() => computeFrequencyStats(draws, config.numbers), [draws, config.numbers]);
   const sumData = useMemo(() => computeSumDistribution(draws), [draws]);
