@@ -130,6 +130,9 @@ const Index = () => {
         {/* ML Panel - Full Width */}
         <MLPanel stats={stats} config={config} />
 
+        {/* Advanced Analytics - Full Width */}
+        <AdvancedAnalyticsPanel stats={stats} draws={draws} config={config} />
+
         {/* Game Checker & Simulator */}
         <div className="grid lg:grid-cols-2 gap-6">
           <BetChecker
