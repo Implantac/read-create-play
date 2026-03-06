@@ -12,7 +12,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Trophy, Sparkles, Target, Layers, Copy, Check, ChevronDown, ChevronUp,
-  Zap, Brain, TrendingUp, Clock, Shuffle, Grid3X3, BarChart3, Loader2,
+  Zap, Brain, TrendingUp, Clock, Shuffle, Grid3X3, BarChart3, Loader2, Download,
   Shield, Star, Award
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
