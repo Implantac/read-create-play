@@ -25,6 +25,33 @@ interface CaixaResult {
   data?: string;
   dezenas?: string[];
   listaDezenas?: string[];
+  dezenasSorteioMunicipioMae?: string[];
+  colunas?: string[][];
+}
+
+async function fetchWithRetry(url: string, retries = 3): Promise<Response | null> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const res = await fetch(url);
+      if (res.ok) return res;
+      if (res.status === 404) return null; // concurso doesn't exist
+    } catch {
+      // retry
+    }
+    if (i < retries - 1) {
+      await new Promise((r) => setTimeout(r, 300 * (i + 1)));
+    }
+  }
+  return null;
+}
+
+function extractNumbers(raw: CaixaResult): number[] {
+  // Super Sete has columns format
+  if (raw.colunas && Array.isArray(raw.colunas)) {
+    return raw.colunas.flat().map((d: string) => parseInt(d, 10)).filter((n: number) => !isNaN(n));
+  }
+  const dezenas = raw.dezenas || raw.listaDezenas || [];
+  return dezenas.map((d: string) => parseInt(d, 10)).filter((n: number) => !isNaN(n));
 }
 
 serve(async (req) => {
@@ -38,7 +65,7 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const body = await req.json().catch(() => ({}));
-    const targetLottery = body.lottery_id || null; // null = all
+    const targetLottery = body.lottery_id || null;
     const fromConcurso = body.from_concurso || 1;
     const toConcurso = body.to_concurso || null;
 
@@ -55,9 +82,9 @@ serve(async (req) => {
 
       try {
         // Get latest concurso from API
-        const latestRes = await fetch(`${API_BASE}/${lottery.apiName}/latest`);
-        if (!latestRes.ok) {
-          console.error(`Failed to fetch latest for ${lottery.id}: ${latestRes.status}`);
+        const latestRes = await fetchWithRetry(`${API_BASE}/${lottery.apiName}/latest`);
+        if (!latestRes) {
+          console.error(`Failed to fetch latest for ${lottery.id}`);
           results.push({ lottery: lottery.id, inserted: 0, errors: 1, latest: 0 });
           continue;
         }
@@ -87,11 +114,11 @@ serve(async (req) => {
         // Fetch in batches of 10
         const batchSize = 10;
         for (let batch = startFrom; batch <= endAt; batch += batchSize) {
-          const promises: Promise<any>[] = [];
+          const promises: Promise<CaixaResult | null>[] = [];
           for (let c = batch; c < Math.min(batch + batchSize, endAt + 1); c++) {
             promises.push(
-              fetch(`${API_BASE}/${lottery.apiName}/${c}`)
-                .then((r) => (r.ok ? r.json() : null))
+              fetchWithRetry(`${API_BASE}/${lottery.apiName}/${c}`)
+                .then((r) => r ? r.json() : null)
                 .catch(() => null)
             );
           }
@@ -99,14 +126,14 @@ serve(async (req) => {
           const batchResults = await Promise.all(promises);
 
           const rows = batchResults
-            .filter((r): r is CaixaResult => r !== null && r.concurso)
+            .filter((r): r is CaixaResult => r !== null && !!r.concurso)
             .map((r) => {
-              const dezenas = r.dezenas || r.listaDezenas || [];
+              const numbers = extractNumbers(r);
               return {
                 lottery_id: lottery.id,
                 concurso: r.concurso,
                 draw_date: r.data || null,
-                numbers: dezenas.map((d: string) => parseInt(d, 10)).filter((n: number) => !isNaN(n)),
+                numbers,
               };
             })
             .filter((r) => r.numbers.length > 0);
@@ -124,8 +151,8 @@ serve(async (req) => {
             }
           }
 
-          // Small delay between batches
-          await new Promise((r) => setTimeout(r, 150));
+          // Delay between batches to avoid rate limiting
+          await new Promise((r) => setTimeout(r, 200));
         }
       } catch (e) {
         console.error(`Error syncing ${lottery.id}:`, e);
