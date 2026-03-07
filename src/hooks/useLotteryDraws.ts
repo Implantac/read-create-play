@@ -15,11 +15,30 @@ export function useLotteryDraws(lotteryId: string) {
   const fetchDraws = useCallback(async () => {
     setLoading(true);
     try {
-      const { data, error, count: totalCount } = await supabase
-        .from("lottery_draws")
-        .select("concurso, draw_date, numbers", { count: "exact" })
-        .eq("lottery_id", lotteryId)
-        .order("concurso", { ascending: false });
+      // Fetch all draws - paginate to avoid 1000-row default limit
+      let allData: any[] = [];
+      let from = 0;
+      const pageSize = 1000;
+      let totalCount = 0;
+
+      while (true) {
+        const { data, error: pageError, count } = await supabase
+          .from("lottery_draws")
+          .select("concurso, draw_date, numbers", { count: "exact" })
+          .eq("lottery_id", lotteryId)
+          .order("concurso", { ascending: false })
+          .range(from, from + pageSize - 1);
+
+        if (pageError) throw pageError;
+        if (count !== null) totalCount = count;
+        if (!data || data.length === 0) break;
+        allData = allData.concat(data);
+        if (data.length < pageSize) break;
+        from += pageSize;
+      }
+
+      const data = allData;
+      const error = null;
 
       if (error) throw error;
 
