@@ -1,4 +1,4 @@
-import { LOTTERIES, LotteryConfig } from "@/data/lotteries";
+import { LOTTERIES } from "@/data/lotteries";
 import { motion } from "framer-motion";
 
 interface Props {
@@ -8,21 +8,22 @@ interface Props {
 
 export function LotterySelector({ selected, onSelect }: Props) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-1.5">
       {LOTTERIES.map((lottery) => (
         <motion.button
           key={lottery.id}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
           onClick={() => onSelect(lottery.id)}
-          className={`px-4 py-2 rounded-lg font-medium text-sm transition-all border ${
+          className={`px-3 py-1.5 rounded-lg font-medium text-xs transition-all border ${
             selected === lottery.id
-              ? "bg-primary/20 border-primary text-primary glow-green"
-              : "bg-secondary border-border text-muted-foreground hover:text-foreground hover:border-muted-foreground"
+              ? "bg-primary/15 border-primary/40 text-primary glow-green shadow-sm"
+              : "bg-secondary/40 border-border/30 text-muted-foreground hover:text-foreground hover:border-border/60 hover:bg-secondary/60"
           }`}
         >
           <span className="mr-1.5">{lottery.icon}</span>
-          {lottery.name}
+          <span className="hidden sm:inline">{lottery.name}</span>
+          <span className="sm:hidden">{lottery.name.split(' ')[0]}</span>
         </motion.button>
       ))}
     </div>

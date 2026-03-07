@@ -1,6 +1,8 @@
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { CHART_TOOLTIP_STYLE, CHART_AXIS_TICK, CHART_COLORS } from "@/lib/chart-theme";
 import { useMemo } from "react";
+import { Layers } from "lucide-react";
 
 interface Props {
   draws: DrawResult[];
@@ -16,14 +18,12 @@ export function RangeDistribution({ draws, config }: Props) {
       max: Math.min((i + 1) * rangeSize, config.numbers),
       count: 0,
     }));
-
     draws.forEach(d => {
       d.numbers.forEach(n => {
         const range = ranges.find(r => n >= r.min && n <= r.max);
         if (range) range.count++;
       });
     });
-
     const total = draws.length * draws[0]?.numbers.length || 1;
     return ranges.map(r => ({
       faixa: r.label,
@@ -32,31 +32,26 @@ export function RangeDistribution({ draws, config }: Props) {
     }));
   }, [draws, config]);
 
-  const colors = [
-    "hsl(142, 70%, 45%)",
-    "hsl(200, 90%, 50%)",
-    "hsl(45, 95%, 55%)",
-    "hsl(270, 70%, 60%)",
-    "hsl(0, 72%, 55%)",
-  ];
+  const colors = [CHART_COLORS.green, CHART_COLORS.blue, CHART_COLORS.amber, CHART_COLORS.purple, CHART_COLORS.red];
 
   return (
-    <div className="rounded-xl bg-card border border-border p-5">
-      <h3 className="text-sm font-semibold text-foreground mb-1">Distribuição por Faixa</h3>
-      <p className="text-xs text-muted-foreground mb-4">Frequência de números por intervalo</p>
+    <div className="rounded-xl glass-card p-5 space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
+          <Layers className="w-4 h-4 text-primary" />
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-foreground">Distribuição por Faixa</h3>
+          <p className="text-[10px] text-muted-foreground mt-0.5">Frequência por intervalo numérico</p>
+        </div>
+      </div>
       <div className="h-56">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
-            <XAxis dataKey="faixa" tick={{ fontSize: 10, fill: "hsl(215, 12%, 50%)" }} />
-            <YAxis tick={{ fontSize: 10, fill: "hsl(215, 12%, 50%)" }} />
+            <XAxis dataKey="faixa" tick={CHART_AXIS_TICK} />
+            <YAxis tick={CHART_AXIS_TICK} />
             <Tooltip
-              contentStyle={{
-                backgroundColor: "hsl(220, 18%, 10%)",
-                border: "1px solid hsl(220, 14%, 18%)",
-                borderRadius: "8px",
-                fontSize: "12px",
-                color: "hsl(210, 20%, 92%)",
-              }}
+              contentStyle={CHART_TOOLTIP_STYLE}
               formatter={(value: number, _name: string, props: any) => [
                 `${value} (${props.payload.percentual}%)`,
                 "Aparições",
