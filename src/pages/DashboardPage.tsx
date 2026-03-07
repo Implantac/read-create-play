@@ -12,6 +12,7 @@ import { DelayChart } from "@/components/DelayChart";
 import { AutoUpdater } from "@/components/AutoUpdater";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
+import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { motion } from "framer-motion";
 import { BarChart3, Flame, Snowflake, TrendingUp, Loader2 } from "lucide-react";
 
@@ -41,6 +42,7 @@ const DashboardPage = () => {
         icon={BarChart3}
         badge={draws.length > 0 ? `${draws.length} sorteios` : undefined}
       />
+      <LotteryContextBanner />
 
       {loading && (
         <div className="flex items-center justify-center py-16 gap-3 text-muted-foreground">

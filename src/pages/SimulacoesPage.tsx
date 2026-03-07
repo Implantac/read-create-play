@@ -5,6 +5,7 @@ import { BacktestPanel } from "@/components/BacktestPanel";
 import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
+import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { FlaskConical } from "lucide-react";
 
 const SimulacoesPage = () => {
@@ -17,6 +18,7 @@ const SimulacoesPage = () => {
         description="Teste estratégias com simulações Monte Carlo e backtesting"
         icon={FlaskConical}
       />
+      <LotteryContextBanner />
 
       {draws.length === 0 ? (
         <EmptyState description="Importe os sorteios primeiro no Dashboard para rodar simulações." />

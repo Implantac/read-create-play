@@ -7,6 +7,7 @@ import { OptimizationPanel } from "@/components/OptimizationPanel";
 import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
+import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { Brain } from "lucide-react";
 
 const EstrategiasPage = () => {
@@ -20,6 +21,7 @@ const EstrategiasPage = () => {
         icon={Brain}
         badge="ML"
       />
+      <LotteryContextBanner />
 
       {draws.length === 0 ? (
         <EmptyState description="Importe os sorteios primeiro no Dashboard para usar as estratégias." />
