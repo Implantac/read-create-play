@@ -42,6 +42,7 @@ const DashboardPage = () => {
         icon={BarChart3}
         badge={draws.length > 0 ? `${draws.length} sorteios` : undefined}
       />
+      <LotteryContextBanner />
 
       {loading && (
         <div className="flex items-center justify-center py-16 gap-3 text-muted-foreground">
