@@ -7,6 +7,7 @@ import { BetChecker } from "@/components/BetChecker";
 import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
+import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { Sparkles } from "lucide-react";
 
 const GeradorPage = () => {
