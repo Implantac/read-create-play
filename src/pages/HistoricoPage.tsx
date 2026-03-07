@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
+import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { motion } from "framer-motion";
 
 const HistoricoPage = () => {
@@ -44,6 +45,7 @@ const HistoricoPage = () => {
         icon={History}
         badge={draws.length > 0 ? `${filtered.length} resultados` : undefined}
       />
+      <LotteryContextBanner />
 
       {draws.length === 0 ? (
         <EmptyState description="Importe os sorteios primeiro no Dashboard." />

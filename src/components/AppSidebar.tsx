@@ -6,6 +6,8 @@ import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { usePlanAccess } from "@/hooks/usePlanAccess";
+import { useLotteryContext } from "@/contexts/LotteryContext";
+import { LOTTERIES } from "@/data/lotteries";
 import {
   Sidebar,
   SidebarContent,
@@ -35,6 +37,7 @@ export function AppSidebar() {
   const location = useLocation();
   const { isAdmin } = useAdminCheck();
   const { currentPlan } = usePlanAccess();
+  const { config } = useLotteryContext();
 
   return (
     <Sidebar collapsible="icon">
@@ -57,6 +60,21 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="px-2 py-3">
+        {/* Active lottery indicator */}
+        <div className={`mx-1 mb-3 rounded-lg bg-primary/5 border border-primary/15 transition-all ${collapsed ? "p-2 flex justify-center" : "px-3 py-2"}`}>
+          {collapsed ? (
+            <span className="text-lg" title={config.name}>{config.icon}</span>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="text-base">{config.icon}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-semibold text-primary truncate">{config.name}</p>
+                <p className="text-[9px] text-muted-foreground font-mono">{config.pick}/{config.numbers}</p>
+              </div>
+            </div>
+          )}
+        </div>
+
         <SidebarGroup>
           <SidebarGroupLabel className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground/60 mb-1">
             Análise
