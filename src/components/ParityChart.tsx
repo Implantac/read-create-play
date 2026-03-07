@@ -1,6 +1,8 @@
 import { DrawResult } from "@/data/lotteries";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { CHART_TOOLTIP_STYLE, CHART_AXIS_TICK, CHART_COLORS } from "@/lib/chart-theme";
 import { useMemo } from "react";
+import { Split } from "lucide-react";
 
 interface Props {
   draws: DrawResult[];
@@ -16,26 +18,25 @@ export function ParityChart({ draws }: Props) {
   }, [draws]);
 
   return (
-    <div className="rounded-xl bg-card border border-border p-5">
-      <h3 className="text-sm font-semibold text-foreground mb-1">Distribuição Par/Ímpar</h3>
-      <p className="text-xs text-muted-foreground mb-4">Últimos 50 concursos</p>
+    <div className="rounded-xl glass-card p-5 space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-lg bg-neon-blue/10 border border-neon-blue/20 flex items-center justify-center">
+          <Split className="w-4 h-4 text-neon-blue" />
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-foreground">Distribuição Par/Ímpar</h3>
+          <p className="text-[10px] text-muted-foreground mt-0.5">Últimos 50 concursos</p>
+        </div>
+      </div>
       <div className="h-56">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
-            <XAxis dataKey="concurso" tick={{ fontSize: 8, fill: "hsl(215, 12%, 50%)" }} interval="preserveStartEnd" />
-            <YAxis tick={{ fontSize: 10, fill: "hsl(215, 12%, 50%)" }} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "hsl(220, 18%, 10%)",
-                border: "1px solid hsl(220, 14%, 18%)",
-                borderRadius: "8px",
-                fontSize: "12px",
-                color: "hsl(210, 20%, 92%)",
-              }}
-            />
-            <Legend wrapperStyle={{ fontSize: "11px" }} />
-            <Bar dataKey="pares" stackId="a" fill="hsl(200, 90%, 50%)" radius={[0, 0, 0, 0]} />
-            <Bar dataKey="ímpares" stackId="a" fill="hsl(142, 70%, 45%)" radius={[3, 3, 0, 0]} />
+            <XAxis dataKey="concurso" tick={{ ...CHART_AXIS_TICK, fontSize: 8 }} interval="preserveStartEnd" />
+            <YAxis tick={CHART_AXIS_TICK} />
+            <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
+            <Legend wrapperStyle={{ fontSize: "11px", fontFamily: "'Space Grotesk', sans-serif" }} />
+            <Bar dataKey="pares" stackId="a" fill={CHART_COLORS.blue} radius={[0, 0, 0, 0]} />
+            <Bar dataKey="ímpares" stackId="a" fill={CHART_COLORS.green} radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
