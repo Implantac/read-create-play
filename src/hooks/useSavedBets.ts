@@ -71,6 +71,17 @@ export function useSavedBets(lotteryId: string) {
     return true;
   }, [lotteryId, fetchBets]);
 
+  const updateBet = useCallback(async (id: string, updates: { label?: string; strategy?: string }) => {
+    const { error } = await supabase.from("saved_bets").update(updates).eq("id", id);
+    if (error) {
+      toast.error("Erro ao atualizar aposta");
+      return false;
+    }
+    toast.success("Aposta atualizada");
+    setSavedBets(prev => prev.map(b => b.id === id ? { ...b, ...updates } : b));
+    return true;
+  }, []);
+
   const deleteBet = useCallback(async (id: string) => {
     const { error } = await supabase.from("saved_bets").delete().eq("id", id);
     if (error) {
@@ -81,5 +92,5 @@ export function useSavedBets(lotteryId: string) {
     setSavedBets(prev => prev.filter(b => b.id !== id));
   }, []);
 
-  return { savedBets, loading, saveBet, deleteBet, refetch: fetchBets };
+  return { savedBets, loading, saveBet, updateBet, deleteBet, refetch: fetchBets };
 }
