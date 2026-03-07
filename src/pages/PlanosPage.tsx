@@ -1,8 +1,10 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, Crown, Zap, Sparkles } from "lucide-react";
+import { Check, Crown, Zap, Sparkles, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/PageHeader";
+import { motion } from "framer-motion";
 
 const plans = [
   {
@@ -63,49 +65,55 @@ export default function PlanosPage() {
   const currentPlan = profile?.plan ?? "free";
 
   return (
-    <div className="min-h-screen bg-background gradient-mesh py-16 px-4">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-foreground mb-3">
-            Escolha seu plano
-          </h1>
-          <p className="text-muted-foreground max-w-lg mx-auto">
-            Desbloqueie todo o poder do motor estatístico e algoritmos de IA para maximizar suas chances.
-          </p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          {plans.map((plan) => {
-            const isCurrent = currentPlan === plan.id;
-            return (
+    <div className="space-y-6">
+      <PageHeader
+        title="Planos"
+        description="Desbloqueie todo o poder do motor estatístico e algoritmos de IA"
+        icon={Crown}
+      />
+
+      <div className="grid md:grid-cols-3 gap-6">
+        {plans.map((plan, i) => {
+          const isCurrent = currentPlan === plan.id;
+          return (
+            <motion.div
+              key={plan.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+            >
               <Card
-                key={plan.id}
-                className={`relative flex flex-col ${
+                className={`relative flex flex-col h-full transition-all duration-300 hover:translate-y-[-2px] ${
                   plan.highlight
-                    ? "border-primary/50 glow-green bg-card/90"
-                    : "border-border/50 bg-card/60"
+                    ? "border-primary/40 glow-green glass-card"
+                    : "border-border/30 glass-card"
                 }`}
               >
                 {plan.highlight && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground">
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 gradient-brand text-primary-foreground border-0 shadow-lg shadow-primary/20">
                     Mais popular
                   </Badge>
                 )}
-                <CardHeader className="text-center">
-                  <div className="mx-auto w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-2">
-                    <plan.icon className="w-5 h-5 text-primary" />
+                <CardHeader className="text-center pb-4">
+                  <div className={`mx-auto w-12 h-12 rounded-xl flex items-center justify-center mb-3 ${
+                    plan.highlight ? "gradient-brand shadow-lg shadow-primary/20" : "bg-muted/50 border border-border/30"
+                  }`}>
+                    <plan.icon className={`w-6 h-6 ${plan.highlight ? "text-primary-foreground" : "text-primary"}`} />
                   </div>
-                  <CardTitle className="text-xl">{plan.name}</CardTitle>
-                  <CardDescription>{plan.description}</CardDescription>
+                  <CardTitle className="text-lg">{plan.name}</CardTitle>
+                  <CardDescription className="text-xs">{plan.description}</CardDescription>
                   <div className="mt-3">
-                    <span className="text-3xl font-bold text-foreground">{plan.price}</span>
+                    <span className="text-3xl font-bold text-foreground font-mono">{plan.price}</span>
                     <span className="text-muted-foreground text-sm">{plan.period}</span>
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1">
-                  <ul className="space-y-2.5">
+                  <ul className="space-y-3">
                     {plan.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2 text-sm text-foreground">
-                        <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                      <li key={f} className="flex items-start gap-2.5 text-sm text-foreground">
+                        <div className="w-4 h-4 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                          <Check className="w-2.5 h-2.5 text-primary" />
+                        </div>
                         {f}
                       </li>
                     ))}
@@ -113,17 +121,22 @@ export default function PlanosPage() {
                 </CardContent>
                 <CardFooter>
                   <Button
-                    className="w-full"
+                    className={`w-full gap-2 ${
+                      plan.highlight && !isCurrent
+                        ? "gradient-brand text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-primary/30"
+                        : ""
+                    }`}
                     variant={isCurrent ? "secondary" : plan.highlight ? "default" : "outline"}
                     disabled={isCurrent}
                   >
                     {isCurrent ? "Plano atual" : plan.cta}
+                    {!isCurrent && <ArrowRight className="w-4 h-4" />}
                   </Button>
                 </CardFooter>
               </Card>
-            );
-          })}
-        </div>
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );
