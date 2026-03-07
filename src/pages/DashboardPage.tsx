@@ -12,6 +12,7 @@ import { DelayChart } from "@/components/DelayChart";
 import { AutoUpdater } from "@/components/AutoUpdater";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
+import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { motion } from "framer-motion";
 import { BarChart3, Flame, Snowflake, TrendingUp, Loader2 } from "lucide-react";
 
