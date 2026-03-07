@@ -57,7 +57,7 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso }: Props) {
     <div className="rounded-xl bg-card border border-border p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className={`w-2 h-2 rounded-full ${isOnline ? "bg-neon-green animate-pulse-glow" : "bg-destructive"}`} />
+          <div className={`w-2 h-2 rounded-full ${isOnline ? "bg-primary animate-pulse" : "bg-destructive"}`} />
           <div>
             <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
               {isOnline ? <Wifi className="w-3.5 h-3.5 text-neon-green" /> : <WifiOff className="w-3.5 h-3.5 text-destructive" />}
