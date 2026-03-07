@@ -75,7 +75,7 @@ const colorMap = {
   cyan: "from-neon-cyan/20 to-neon-cyan/5 border-neon-cyan/20 text-neon-cyan",
 };
 
-const lotteries = ["Mega-Sena", "Lotofácil", "Quina", "Lotomania", "Dupla Sena", "Timemania"];
+const lotteries = ["Mega-Sena", "Lotofácil", "Quina", "Lotomania", "Dupla Sena", "Timemania", "Dia de Sorte", "Super Sete"];
 
 const stats = [
   { value: "10.000+", label: "Sorteios analisados" },
