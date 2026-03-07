@@ -7,6 +7,7 @@ import { OptimizationPanel } from "@/components/OptimizationPanel";
 import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
+import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { Brain } from "lucide-react";
 
 const EstrategiasPage = () => {
