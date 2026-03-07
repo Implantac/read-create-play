@@ -79,8 +79,8 @@ const lotteries = ["Mega-Sena", "Lotofácil", "Quina", "Lotomania", "Dupla Sena"
 
 const stats = [
   { value: "10.000+", label: "Sorteios analisados" },
-  { value: "6", label: "Loterias suportadas" },
-  { value: "12+", label: "Algoritmos de IA" },
+  { value: "8", label: "Loterias suportadas" },
+  { value: "14+", label: "Algoritmos de IA" },
   { value: "99.9%", label: "Uptime" },
 ];
 
