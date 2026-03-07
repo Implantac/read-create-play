@@ -2,7 +2,7 @@ import { useState } from "react";
 import { DrawResult } from "@/data/lotteries";
 import { checkBetAgainstDraws, MatchResult, getPrizeTiers } from "@/services/lotteryApi";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Trophy, X, Plus } from "lucide-react";
+import { Search, Trophy, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -19,22 +19,40 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
   const [results, setResults] = useState<MatchResult[] | null>(null);
 
-  const addNumber = () => {
-    const n = parseInt(inputValue, 10);
-    if (isNaN(n) || n < 1 || n > maxNumbers) {
-      toast.error(`Número deve estar entre 1 e ${maxNumbers}`);
-      return;
+  const handleInput = (val: string) => {
+    setInputValue(val);
+    // Try to parse comma/space/dash separated numbers
+    const nums = val
+      .split(/[,\s\-]+/)
+      .map(n => parseInt(n.trim(), 10))
+      .filter(n => !isNaN(n) && n >= 1 && n <= maxNumbers);
+    
+    if (nums.length > 0 && (val.endsWith(" ") || val.endsWith(",") || val.endsWith("-"))) {
+      const unique = [...new Set([...selectedNumbers, ...nums])].sort((a, b) => a - b);
+      if (unique.length <= pick) {
+        setSelectedNumbers(unique);
+        setInputValue("");
+        setResults(null);
+      }
     }
-    if (selectedNumbers.includes(n)) {
-      toast.error("Número já adicionado");
-      return;
-    }
-    if (selectedNumbers.length >= pick) {
+  };
+
+  const addFromInput = () => {
+    const nums = inputValue
+      .split(/[,\s\-]+/)
+      .map(n => parseInt(n.trim(), 10))
+      .filter(n => !isNaN(n) && n >= 1 && n <= maxNumbers);
+    
+    if (nums.length === 0) return;
+    
+    const unique = [...new Set([...selectedNumbers, ...nums])].sort((a, b) => a - b);
+    if (unique.length > pick) {
       toast.error(`Máximo de ${pick} números`);
       return;
     }
-    setSelectedNumbers(prev => [...prev, n].sort((a, b) => a - b));
+    setSelectedNumbers(unique);
     setInputValue("");
+    setResults(null);
   };
 
   const removeNumber = (n: number) => {
@@ -50,6 +68,12 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
     const matches = checkBetAgainstDraws(selectedNumbers, draws);
     setResults(matches);
     toast.success(`${matches.length} concursos com acertos encontrados`);
+  };
+
+  const clear = () => {
+    setSelectedNumbers([]);
+    setResults(null);
+    setInputValue("");
   };
 
   const prizeTiers = getPrizeTiers(lotteryId);
@@ -68,37 +92,33 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
         </div>
         <div>
           <h3 className="text-sm font-semibold text-foreground">Conferência de Jogos</h3>
-          <p className="text-[10px] text-muted-foreground mt-0.5">Insira seus números e confira contra os resultados</p>
+          <p className="text-[10px] text-muted-foreground mt-0.5">
+            Cole ou digite seus números separados por vírgula ou espaço
+          </p>
         </div>
       </div>
 
-      {/* Number input */}
+      {/* Number input - improved */}
       <div className="flex gap-2">
         <Input
-          type="number"
-          min={1}
-          max={maxNumbers}
           value={inputValue}
-          onChange={e => setInputValue(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && addNumber()}
-          placeholder={`1 a ${maxNumbers}`}
-          className="w-24 bg-secondary/50 border-border/50 text-sm focus:border-primary/50"
+          onChange={e => handleInput(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && addFromInput()}
+          placeholder={`Ex: 5, 12, 23, 34, 45, 60`}
+          className="flex-1 bg-secondary/50 border-border/50 text-sm focus:border-primary/50"
         />
-        <Button size="sm" variant="outline" onClick={addNumber} className="border-border/50 hover:border-primary/30 hover:text-primary">
-          <Plus className="w-3 h-3 mr-1" /> Adicionar
-        </Button>
         <Button
           size="sm"
           onClick={check}
           disabled={selectedNumbers.length < 1}
-          className="ml-auto gradient-brand text-primary-foreground shadow-md shadow-primary/10"
+          className="gradient-brand text-primary-foreground shadow-md shadow-primary/10"
         >
           <Search className="w-3 h-3 mr-1" /> Conferir
         </Button>
       </div>
 
       {/* Selected numbers */}
-      <div className="flex flex-wrap gap-1.5 min-h-[40px]">
+      <div className="flex flex-wrap gap-1.5 min-h-[40px] items-center">
         {selectedNumbers.map(n => (
           <motion.button
             key={n}
@@ -113,6 +133,11 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
             </span>
           </motion.button>
         ))}
+        {selectedNumbers.length > 0 && (
+          <button onClick={clear} className="text-[10px] text-muted-foreground hover:text-destructive ml-1">
+            Limpar
+          </button>
+        )}
         {selectedNumbers.length === 0 && (
           <span className="text-xs text-muted-foreground py-2">Nenhum número selecionado</span>
         )}

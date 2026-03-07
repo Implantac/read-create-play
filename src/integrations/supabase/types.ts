@@ -71,6 +71,42 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_bets: {
+        Row: {
+          created_at: string
+          grade: string | null
+          id: string
+          label: string | null
+          lottery_id: string
+          numbers: number[]
+          score: number | null
+          strategy: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          grade?: string | null
+          id?: string
+          label?: string | null
+          lottery_id: string
+          numbers: number[]
+          score?: number | null
+          strategy?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          grade?: string | null
+          id?: string
+          label?: string | null
+          lottery_id?: string
+          numbers?: number[]
+          score?: number | null
+          strategy?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
