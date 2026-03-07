@@ -21,6 +21,7 @@ const EstrategiasPage = () => {
         icon={Brain}
         badge="ML"
       />
+      <LotteryContextBanner />
 
       {draws.length === 0 ? (
         <EmptyState description="Importe os sorteios primeiro no Dashboard para usar as estratégias." />

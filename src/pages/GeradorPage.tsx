@@ -20,6 +20,7 @@ const GeradorPage = () => {
         description="Gere combinações inteligentes com algoritmos estatísticos e IA"
         icon={Sparkles}
       />
+      <LotteryContextBanner />
 
       {draws.length === 0 ? (
         <EmptyState description="Importe os sorteios primeiro no Dashboard para usar o gerador." />

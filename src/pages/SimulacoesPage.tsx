@@ -18,6 +18,7 @@ const SimulacoesPage = () => {
         description="Teste estratégias com simulações Monte Carlo e backtesting"
         icon={FlaskConical}
       />
+      <LotteryContextBanner />
 
       {draws.length === 0 ? (
         <EmptyState description="Importe os sorteios primeiro no Dashboard para rodar simulações." />
