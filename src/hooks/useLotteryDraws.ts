@@ -37,12 +37,7 @@ export function useLotteryDraws(lotteryId: string) {
         from += pageSize;
       }
 
-      const data = allData;
-      const error = null;
-
-      if (error) throw error;
-
-      const mapped: DrawResult[] = (data || []).map((row: any) => ({
+      const mapped: DrawResult[] = allData.map((row: any) => ({
         concurso: row.concurso,
         date: row.draw_date || "",
         numbers: row.numbers || [],
