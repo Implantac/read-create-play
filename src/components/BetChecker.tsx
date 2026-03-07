@@ -53,7 +53,6 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
   };
 
   const prizeTiers = getPrizeTiers(lotteryId);
-
   const tierSummary = results
     ? prizeTiers.map(tier => ({
         ...tier,
@@ -62,19 +61,19 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
     : [];
 
   return (
-    <div className="rounded-xl bg-card border border-border p-5">
-      <div className="mb-4">
-        <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+    <div className="rounded-xl glass-card p-5 space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-lg bg-neon-amber/10 border border-neon-amber/20 flex items-center justify-center">
           <Search className="w-4 h-4 text-neon-amber" />
-          Conferência de Jogos
-        </h3>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          Insira seus números e confira contra os resultados históricos
-        </p>
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-foreground">Conferência de Jogos</h3>
+          <p className="text-[10px] text-muted-foreground mt-0.5">Insira seus números e confira contra os resultados</p>
+        </div>
       </div>
 
       {/* Number input */}
-      <div className="flex gap-2 mb-3">
+      <div className="flex gap-2">
         <Input
           type="number"
           min={1}
@@ -83,23 +82,23 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
           onChange={e => setInputValue(e.target.value)}
           onKeyDown={e => e.key === "Enter" && addNumber()}
           placeholder={`1 a ${maxNumbers}`}
-          className="w-24 bg-secondary border-border text-foreground text-sm"
+          className="w-24 bg-secondary/50 border-border/50 text-sm focus:border-primary/50"
         />
-        <Button size="sm" variant="outline" onClick={addNumber} className="border-border hover:border-primary">
+        <Button size="sm" variant="outline" onClick={addNumber} className="border-border/50 hover:border-primary/30 hover:text-primary">
           <Plus className="w-3 h-3 mr-1" /> Adicionar
         </Button>
         <Button
           size="sm"
           onClick={check}
           disabled={selectedNumbers.length < 1}
-          className="ml-auto bg-neon-amber/20 text-neon-amber border border-neon-amber/30 hover:bg-neon-amber/30"
+          className="ml-auto gradient-brand text-primary-foreground shadow-md shadow-primary/10"
         >
           <Search className="w-3 h-3 mr-1" /> Conferir
         </Button>
       </div>
 
       {/* Selected numbers */}
-      <div className="flex flex-wrap gap-1.5 mb-4 min-h-[40px]">
+      <div className="flex flex-wrap gap-1.5 min-h-[40px]">
         {selectedNumbers.map(n => (
           <motion.button
             key={n}
@@ -121,10 +120,10 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
 
       {/* Prize tier summary */}
       {results && tierSummary.length > 0 && (
-        <div className="grid grid-cols-3 gap-2 mb-4">
+        <div className="grid grid-cols-3 gap-2">
           {tierSummary.filter(t => t.count > 0).map(tier => (
-            <div key={tier.label} className="rounded-lg bg-neon-amber/10 border border-neon-amber/20 p-2 text-center">
-              <p className="text-xs text-muted-foreground">{tier.label}</p>
+            <div key={tier.label} className="rounded-lg bg-neon-amber/5 border border-neon-amber/20 p-2.5 text-center">
+              <p className="text-[10px] text-muted-foreground">{tier.label}</p>
               <p className="text-lg font-bold font-mono text-neon-amber">{tier.count}x</p>
             </div>
           ))}
@@ -134,21 +133,14 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
       {/* Results list */}
       <AnimatePresence>
         {results && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-2 max-h-60 overflow-y-auto"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2 max-h-60 overflow-y-auto pr-1">
             {results.length === 0 && (
               <p className="text-xs text-muted-foreground text-center py-4">
                 Nenhum acerto encontrado nos {draws.length} concursos analisados
               </p>
             )}
             {results.slice(0, 20).map(r => (
-              <div
-                key={r.concurso}
-                className="flex items-center gap-2 p-2 rounded-lg bg-secondary/50 border border-border"
-              >
+              <div key={r.concurso} className="flex items-center gap-2 p-2 rounded-lg bg-secondary/30 border border-border/30">
                 <div className="text-xs">
                   <span className="font-mono text-foreground">#{r.concurso}</span>
                   <span className="text-muted-foreground ml-2">{r.date}</span>
