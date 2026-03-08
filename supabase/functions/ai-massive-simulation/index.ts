@@ -18,50 +18,123 @@ serve(async (req) => {
     const { topGames, patternInsights, distributionSummary, lotteryName, lotteryPick, lotteryNumbers, totalGenerated, totalEvaluated } = await req.json();
     if (!topGames || topGames.length === 0) throw new Error("topGames required");
 
-    const systemPrompt = `Você é um analista estatístico de elite especializado em loterias brasileiras.
-Analise os resultados de uma simulação massiva de apostas e forneça insights acionáveis.
-Seja extremamente direto e técnico. Responda em português do Brasil com markdown.
+    // Deep analysis of number frequency across top games
+    const numFreq: Record<number, number> = {};
+    const numScoreAvg: Record<number, { total: number; count: number }> = {};
+    topGames.forEach((g: any) => {
+      (g.numbers || []).forEach((n: number) => {
+        numFreq[n] = (numFreq[n] || 0) + 1;
+        if (!numScoreAvg[n]) numScoreAvg[n] = { total: 0, count: 0 };
+        numScoreAvg[n].total += g.score || 0;
+        numScoreAvg[n].count++;
+      });
+    });
+
+    const topNumbers = Object.entries(numFreq)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 20)
+      .map(([n, freq]) => {
+        const avg = numScoreAvg[Number(n)] ? (numScoreAvg[Number(n)].total / numScoreAvg[Number(n)].count).toFixed(1) : "0";
+        return `${n}(${freq}x,scoreM:${avg})`;
+      });
+
+    // Analyze distribution patterns of top 5 vs bottom 5 in top games
+    const top5 = topGames.slice(0, 5);
+    const bottom5 = topGames.slice(-5);
+
+    const getProfile = (games: any[]) => {
+      const avgSum = games.reduce((s: number, g: any) => s + (g.sum || 0), 0) / games.length;
+      const avgEven = games.reduce((s: number, g: any) => s + (g.evenCount || 0), 0) / games.length;
+      const avgConsec = games.reduce((s: number, g: any) => s + (g.consecutivePairs || 0), 0) / games.length;
+      const avgSpread = games.reduce((s: number, g: any) => s + (g.rangeSpread || 0), 0) / games.length;
+      const avgScore = games.reduce((s: number, g: any) => s + (g.score || 0), 0) / games.length;
+      return { avgSum: avgSum.toFixed(0), avgEven: avgEven.toFixed(1), avgConsec: avgConsec.toFixed(1), avgSpread: avgSpread.toFixed(0), avgScore: avgScore.toFixed(1) };
+    };
+
+    const top5Profile = getProfile(top5);
+    const bottom5Profile = getProfile(bottom5);
+
+    const systemPrompt = `Você é um analista quantitativo de elite especializado em simulação massiva de loterias brasileiras.
+Analise os resultados de uma simulação de larga escala e forneça insights acionáveis.
+Sua análise deve ser rigorosa, técnica e baseada em evidências numéricas.
+Responda em português do Brasil com markdown formatado.
 
 REGRAS:
-- Cite números específicos e porcentagens
-- Identifique padrões recorrentes nos melhores jogos
-- Sugira 3 combinações otimizadas baseadas nos padrões encontrados
-- Compare os padrões encontrados com as distribuições ideais para esta loteria
-- Dê um score de confiança (0-100) para suas recomendações`;
+- Cite números específicos e porcentagens com precisão
+- Compare top performers vs bottom performers para identificar diferenciais
+- Identifique padrões recorrentes nas melhores combinações
+- Sugira 3 combinações otimizadas com justificativa número a número
+- Compare os padrões encontrados com as distribuições ideais para ${lotteryName}
+- Dê um score de confiança (0-100) com fundamentação`;
 
-    const gamesReport = topGames.slice(0, 15).map((g: any, i: number) => 
-      `#${i + 1} [${g.numbers.join(",")}] Score:${g.score} Avg:${g.avgHits} Best:${g.bestHit} Prêmios:${g.prizeCount} Par/Ímpar:${g.evenCount}/${g.oddCount} Soma:${g.sum} Consec:${g.consecutivePairs} Spread:${g.rangeSpread}`
-    ).join("\n");
+    const gamesReport = topGames.slice(0, 20).map((g: any, i: number) => {
+      const nums = (g.numbers || []).join(",");
+      return `#${i + 1} [${nums}] Score:${g.score} Avg:${g.avgHits} Best:${g.bestHit} Prêmios:${g.prizeCount} Par:${g.evenCount} Ímpar:${g.oddCount} Soma:${g.sum} Consec:${g.consecutivePairs} Spread:${g.rangeSpread}`;
+    }).join("\n");
 
-    const insightsReport = patternInsights.map((p: any) =>
+    const insightsReport = (patternInsights || []).map((p: any) =>
       `- ${p.label}: ${p.value} (${p.description})`
     ).join("\n");
 
-    const userPrompt = `SIMULAÇÃO MASSIVA — ${lotteryName} (${lotteryPick}/${lotteryNumbers})
+    const userPrompt = `═══ SIMULAÇÃO MASSIVA — ${lotteryName} (${lotteryPick}/${lotteryNumbers}) ═══
 
-ESCALA: ${totalGenerated.toLocaleString()} jogos gerados, ${totalEvaluated.toLocaleString()} comparações realizadas
+ESCALA: ${totalGenerated.toLocaleString()} jogos gerados | ${totalEvaluated.toLocaleString()} comparações realizadas
 
-DISTRIBUIÇÃO GERAL DOS TOP GAMES:
-- Soma média: ${distributionSummary.avgSum}
-- Razão par/total: ${distributionSummary.avgEvenRatio}
-- Consecutivos médios: ${distributionSummary.avgConsecutive}
-- Spread médio: ${distributionSummary.avgSpread}
-- Melhor acerto geral: ${distributionSummary.bestHitOverall}
-- Taxa média de premiação: ${distributionSummary.avgPrizeRate}%
+═══ PERFIL COMPARATIVO: TOP 5 vs BOTTOM 5 ═══
+              | TOP 5         | BOTTOM 5      | DELTA
+Soma média    | ${top5Profile.avgSum}           | ${bottom5Profile.avgSum}           | ${(Number(top5Profile.avgSum) - Number(bottom5Profile.avgSum)).toFixed(0)}
+Par médio     | ${top5Profile.avgEven}          | ${bottom5Profile.avgEven}          | ${(Number(top5Profile.avgEven) - Number(bottom5Profile.avgEven)).toFixed(1)}
+Consec médio  | ${top5Profile.avgConsec}        | ${bottom5Profile.avgConsec}        | ${(Number(top5Profile.avgConsec) - Number(bottom5Profile.avgConsec)).toFixed(1)}
+Spread médio  | ${top5Profile.avgSpread}        | ${bottom5Profile.avgSpread}        | ${(Number(top5Profile.avgSpread) - Number(bottom5Profile.avgSpread)).toFixed(0)}
+Score médio   | ${top5Profile.avgScore}         | ${bottom5Profile.avgScore}         | ${(Number(top5Profile.avgScore) - Number(bottom5Profile.avgScore)).toFixed(1)}
 
-PADRÕES DETECTADOS:
+═══ DISTRIBUIÇÃO GERAL DO UNIVERSO ELITE ═══
+Soma média: ${distributionSummary.avgSum}
+Razão par/total: ${distributionSummary.avgEvenRatio}
+Consecutivos médios: ${distributionSummary.avgConsecutive}
+Spread médio: ${distributionSummary.avgSpread}
+Melhor acerto geral: ${distributionSummary.bestHitOverall}
+Taxa média de premiação: ${distributionSummary.avgPrizeRate}%
+
+═══ DEZENAS MAIS RECORRENTES NOS TOP GAMES ═══
+${topNumbers.join(", ")}
+
+═══ PADRÕES DETECTADOS PELO MOTOR ═══
 ${insightsReport}
 
-TOP 15 JOGOS:
+═══ TOP 20 JOGOS DETALHADOS ═══
 ${gamesReport}
 
-Analise profundamente e forneça:
-1. **Padrões dominantes** — O que os melhores jogos têm em comum?
-2. **Distribuição ideal** — Par/ímpar, soma, faixas, consecutivos ideais para esta loteria
-3. **Dezenas-chave** — Quais números aparecem consistentemente nos melhores?
-4. **3 jogos otimizados** — Combinações sugeridas baseadas nos padrões (com números concretos)
-5. **Score de confiança** — De 0 a 100, quão confiáveis são esses padrões?
-6. **Estratégia recomendada** — Como o jogador deve usar esses resultados?`;
+═══ SOLICITAÇÃO DE ANÁLISE PROFUNDA ═══
+
+## 1. PADRÕES DOMINANTES
+O que diferencia estatisticamente os melhores jogos dos piores? Use a comparação TOP 5 vs BOTTOM 5.
+
+## 2. PERFIL IDEAL DE JOGO
+- Par/ímpar exato
+- Faixa de soma (intervalo numérico)
+- Consecutivos ideais
+- Spread mínimo e máximo
+- Distribuição por faixas numéricas
+
+## 3. DEZENAS-CHAVE
+- Quais números são "must-have" (aparecem em ≥60% dos top games)?
+- Quais são "nice-to-have" (40-60%)?
+- Quais são "tóxicos" (nunca ou raramente nos melhores)?
+
+## 4. TRÊS JOGOS OTIMIZADOS
+Para cada jogo:
+- ${lotteryPick} dezenas em ordem crescente
+- Justificativa para cada dezena (hot, overdue, cobertura, etc.)
+- Score estimado e par/ímpar/soma/spread
+
+## 5. SCORE DE CONFIANÇA
+- De 0 a 100, quão confiáveis são esses padrões?
+- Tamanho amostral é suficiente?
+- Quais padrões são mais robustos?
+
+## 6. ESTRATÉGIA DE USO
+Como o jogador deve usar esses resultados na prática?`;
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -70,12 +143,12 @@ Analise profundamente e forneça:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        temperature: 0.4,
+        temperature: 0.35,
       }),
     });
 
@@ -85,6 +158,11 @@ Analise profundamente e forneça:
       if (status === 429) {
         return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente." }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (status === 402) {
+        return new Response(JSON.stringify({ error: "Créditos de IA esgotados." }), {
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       throw new Error(`AI response error: ${status}`);
