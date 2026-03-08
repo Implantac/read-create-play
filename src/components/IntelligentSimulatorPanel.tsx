@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Brain, Play, Plus, Trash2, Trophy, BarChart3, Sparkles, Loader2, Target } from "lucide-react";
+import { Brain, Play, Plus, Trash2, Trophy, BarChart3, Sparkles, Loader2, Target, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { NumberStats } from "@/engine/statistics";
@@ -16,7 +16,10 @@ import {
   runSimulation, parseBetsFromText, generateRandomBets, getMinPrizeHits,
 } from "@/engine/intelligent-simulator";
 import { supabase } from "@/integrations/supabase/client";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart, Line, Legend,
+} from "recharts";
 
 interface Props {
   config: LotteryConfig;
@@ -95,7 +98,6 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
     setRunning(true);
     setAiAnalysis("");
 
-    // Use setTimeout to not block the UI
     setTimeout(() => {
       try {
         const result = runSimulation(bets, draws, parseInt(drawCount), config.id);
@@ -116,7 +118,18 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
     try {
       const { data, error } = await supabase.functions.invoke("ai-simulation-analysis", {
         body: {
-          simulationData: simulation,
+          simulationData: {
+            bets: simulation.bets.map(b => ({
+              bet: b.bet,
+              bestHit: b.bestHit,
+              avgHits: b.avgHits,
+              hitDistribution: b.hitDistribution,
+              prizeCount: b.prizeCount,
+              stability: b.stability,
+            })),
+            totalDraws: simulation.totalDraws,
+            ranking: simulation.ranking,
+          },
           lotteryName: config.name,
           lotteryPick: config.pick,
           lotteryNumbers: config.numbers,
@@ -140,11 +153,25 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
       Object.keys(b.hitDistribution).forEach(k => allHits.add(Number(k)));
     });
     const sorted = [...allHits].sort((a, b) => b - a);
-
     return sorted.map(hit => {
       const row: any = { acertos: `${hit}` };
-      simulation.bets.forEach((b, i) => {
+      simulation.bets.forEach((b) => {
         row[`Jogo ${b.bet.id}`] = b.hitDistribution[hit] || 0;
+      });
+      return row;
+    });
+  }, [simulation]);
+
+  // Timeline data for performance over time
+  const timelineData = useMemo(() => {
+    if (!simulation || simulation.bets.length === 0) return [];
+    const firstBet = simulation.bets[0];
+    if (!firstBet.timeline || firstBet.timeline.length === 0) return [];
+
+    return firstBet.timeline.map((pt, idx) => {
+      const row: any = { concurso: pt.concurso };
+      simulation.bets.forEach(b => {
+        row[`Jogo ${b.bet.id}`] = b.timeline[idx]?.hits ?? 0;
       });
       return row;
     });
@@ -158,9 +185,9 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
             <Brain className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <CardTitle className="text-xl text-foreground">Simulador Inteligente de Apostas</CardTitle>
+            <CardTitle className="text-xl text-foreground">Simulador Inteligente de Estratégias</CardTitle>
             <CardDescription>
-              Teste jogos contra o histórico de {config.name} e receba análises por IA
+              Teste jogos contra o histórico de {config.name} e receba análises e sugestões da IA
             </CardDescription>
           </div>
         </div>
@@ -168,7 +195,6 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
       <CardContent className="space-y-6">
         {/* Input Section */}
         <div className="grid lg:grid-cols-2 gap-4">
-          {/* Manual input */}
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
               <Target className="h-4 w-4 text-primary" /> Adicionar Jogos
@@ -184,16 +210,13 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
             </Button>
           </div>
 
-          {/* Auto + Config */}
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-accent" /> Geração Automática
             </h3>
             <div className="flex gap-2">
               <Input
-                type="number"
-                min={1}
-                max={20}
+                type="number" min={1} max={20}
                 value={autoCount}
                 onChange={e => setAutoCount(e.target.value)}
                 className="w-20 bg-muted/50"
@@ -264,10 +287,11 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
         {/* Results */}
         {simulation && (
           <Tabs defaultValue="ranking" className="space-y-4">
-            <TabsList className="bg-muted/50">
+            <TabsList className="bg-muted/50 flex-wrap h-auto gap-1">
               <TabsTrigger value="ranking"><Trophy className="h-3.5 w-3.5 mr-1.5" />Ranking</TabsTrigger>
               <TabsTrigger value="details"><BarChart3 className="h-3.5 w-3.5 mr-1.5" />Detalhes</TabsTrigger>
-              <TabsTrigger value="chart"><BarChart3 className="h-3.5 w-3.5 mr-1.5" />Gráfico</TabsTrigger>
+              <TabsTrigger value="chart"><BarChart3 className="h-3.5 w-3.5 mr-1.5" />Distribuição</TabsTrigger>
+              <TabsTrigger value="timeline"><TrendingUp className="h-3.5 w-3.5 mr-1.5" />Desempenho</TabsTrigger>
               <TabsTrigger value="ai"><Brain className="h-3.5 w-3.5 mr-1.5" />Análise IA</TabsTrigger>
             </TabsList>
 
@@ -379,21 +403,21 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
               ))}
             </TabsContent>
 
-            {/* Chart Tab */}
+            {/* Distribution Chart Tab */}
             <TabsContent value="chart">
               {chartData.length > 0 && (
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(225, 16%, 15%)" />
-                      <XAxis dataKey="acertos" stroke="hsl(215, 12%, 48%)" tick={{ fontSize: 11 }} label={{ value: "Acertos", position: "insideBottom", offset: -5, fill: "hsl(215, 12%, 48%)" }} />
-                      <YAxis stroke="hsl(215, 12%, 48%)" tick={{ fontSize: 11 }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="acertos" stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 11 }} label={{ value: "Acertos", position: "insideBottom", offset: -5, fill: "hsl(var(--muted-foreground))" }} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 11 }} />
                       <Tooltip
                         contentStyle={{
-                          background: "hsl(225, 22%, 9%)",
-                          border: "1px solid hsl(225, 16%, 15%)",
+                          background: "hsl(var(--card))",
+                          border: "1px solid hsl(var(--border))",
                           borderRadius: "8px",
-                          color: "hsl(210, 20%, 92%)",
+                          color: "hsl(var(--foreground))",
                         }}
                       />
                       {simulation!.bets.map((b, i) => (
@@ -405,19 +429,58 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
               )}
             </TabsContent>
 
+            {/* Timeline Chart Tab */}
+            <TabsContent value="timeline">
+              {timelineData.length > 0 ? (
+                <div className="space-y-2">
+                  <p className="text-xs text-muted-foreground">Desempenho dos jogos ao longo dos concursos</p>
+                  <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={timelineData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis dataKey="concurso" stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 10 }} />
+                        <YAxis stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 11 }} label={{ value: "Acertos", angle: -90, position: "insideLeft", fill: "hsl(var(--muted-foreground))" }} />
+                        <Tooltip
+                          contentStyle={{
+                            background: "hsl(var(--card))",
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: "8px",
+                            color: "hsl(var(--foreground))",
+                          }}
+                        />
+                        <Legend />
+                        {simulation!.bets.map((b, i) => (
+                          <Line
+                            key={b.bet.id}
+                            type="monotone"
+                            dataKey={`Jogo ${b.bet.id}`}
+                            stroke={CHART_COLORS[i % CHART_COLORS.length]}
+                            strokeWidth={2}
+                            dot={false}
+                          />
+                        ))}
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-center text-sm text-muted-foreground py-8">Dados de timeline não disponíveis</p>
+              )}
+            </TabsContent>
+
             {/* AI Tab */}
             <TabsContent value="ai" className="space-y-3">
               {!aiAnalysis && (
                 <div className="text-center py-8 space-y-3">
                   <Brain className="h-10 w-10 text-muted-foreground mx-auto" />
                   <p className="text-sm text-muted-foreground">
-                    Clique para que a IA analise os resultados da simulação
+                    A IA analisará seus resultados e sugerirá melhorias nos jogos
                   </p>
                   <Button onClick={handleAiAnalysis} disabled={loadingAi} className="bg-primary text-primary-foreground">
                     {loadingAi ? (
                       <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Analisando...</>
                     ) : (
-                      <><Brain className="h-4 w-4 mr-2" /> Gerar Análise com IA</>
+                      <><Brain className="h-4 w-4 mr-2" /> Gerar Análise e Sugestões com IA</>
                     )}
                   </Button>
                 </div>

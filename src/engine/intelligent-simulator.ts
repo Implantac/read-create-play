@@ -12,6 +12,11 @@ export interface BetResult {
   matchedNumbers: number[];
 }
 
+export interface TimelinePoint {
+  concurso: number;
+  hits: number;
+}
+
 export interface BetSimulationResult {
   bet: SimulationBet;
   results: BetResult[];
@@ -19,20 +24,18 @@ export interface BetSimulationResult {
   avgHits: number;
   hitDistribution: Record<number, number>;
   prizeCount: number;
-  stability: number; // std deviation of hits
+  stability: number;
+  timeline: TimelinePoint[];
 }
 
 export interface SimulationOutput {
   bets: BetSimulationResult[];
   totalDraws: number;
-  ranking: number[]; // bet ids sorted by score
+  ranking: number[];
 }
 
-/**
- * High-performance simulation using bitsets for intersection
- */
 function toBitset(numbers: number[]): Uint32Array {
-  const bs = new Uint32Array(4); // supports up to 128
+  const bs = new Uint32Array(4);
   for (const n of numbers) {
     bs[n >>> 5] |= 1 << (n & 31);
   }
@@ -67,7 +70,6 @@ export function runSimulation(
   const selectedDraws = draws.slice(0, Math.min(drawCount, draws.length));
   const minPrize = getMinPrizeHits(lotteryId);
 
-  // Pre-compute draw bitsets
   const drawBitsets = selectedDraws.map(d => toBitset(d.numbers));
 
   const betResults: BetSimulationResult[] = bets.map(bet => {
@@ -78,6 +80,7 @@ export function runSimulation(
     let bestHit = 0;
     let prizeCount = 0;
     const hitsArr: number[] = [];
+    const timeline: TimelinePoint[] = [];
 
     for (let i = 0; i < selectedDraws.length; i++) {
       const hits = intersectionCount(betBs, drawBitsets[i]);
@@ -87,7 +90,11 @@ export function runSimulation(
       hitDist[hits] = (hitDist[hits] || 0) + 1;
       if (hits >= minPrize) prizeCount++;
 
-      // Only store notable results (hits >= minPrize - 2) to save memory
+      // Store timeline data (sample max 200 points for perf)
+      if (selectedDraws.length <= 200 || i % Math.ceil(selectedDraws.length / 200) === 0) {
+        timeline.push({ concurso: selectedDraws[i].concurso, hits });
+      }
+
       if (hits >= Math.max(minPrize - 2, 1)) {
         const matched = bet.numbers.filter(n => selectedDraws[i].numbers.includes(n));
         results.push({
@@ -110,10 +117,10 @@ export function runSimulation(
       hitDistribution: hitDist,
       prizeCount,
       stability: Math.round(Math.sqrt(variance) * 100) / 100,
+      timeline: timeline.reverse(), // chronological order
     };
   });
 
-  // Rank: weighted score (avg*3 + bestHit*2 + prizeCount*5 - stability)
   const scored = betResults.map((r, i) => ({
     idx: i,
     score: r.avgHits * 3 + r.bestHit * 2 + r.prizeCount * 5 - r.stability,
