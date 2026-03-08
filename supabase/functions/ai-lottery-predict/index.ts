@@ -50,6 +50,15 @@ serve(async (req) => {
     const cfg = configs[lottery_id];
     if (!cfg) throw new Error("Loteria não suportada");
 
+    // Check cache (key = lottery_id + last concurso + count)
+    const cacheInput = { lottery_id, count, lastConcurso: draws[0]?.concurso };
+    const cached = await getCachedAnalysis(supabase, lottery_id, "ai-lottery-predict", cacheInput, 4);
+    if (cached) {
+      return new Response(JSON.stringify({ ...cached, fromCache: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // === COMPUTE DEEP STATISTICS ===
     const allNums = Array.from({ length: cfg.numbers }, (_, i) => i + 1);
     const freq: Record<number, number> = {};
