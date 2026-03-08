@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { FrequencyChart } from "@/components/FrequencyChart";
 import { HeatmapGrid } from "@/components/HeatmapGrid";
@@ -10,8 +11,19 @@ import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { StatsCard } from "@/components/StatsCard";
+import { computeFrequencyStats, computeSumDistribution } from "@/engine/statistics";
 import { motion } from "framer-motion";
-import { PieChart, Flame, Snowflake, TrendingUp, BarChart3, Clock, Target, Sigma } from "lucide-react";
+import { PieChart, Flame, Snowflake, TrendingUp, BarChart3, Clock, Target, Sigma, Filter } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+const PERIOD_OPTIONS = [
+  { label: "Todos", value: 0 },
+  { label: "Últimos 30", value: 30 },
+  { label: "Últimos 90", value: 90 },
+  { label: "Últimos 180", value: 180 },
+  { label: "Últimos 365", value: 365 },
+  { label: "Últimos 500", value: 500 },
+] as const;
 
 const container = {
   hidden: { opacity: 0 },
