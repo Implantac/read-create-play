@@ -8,6 +8,7 @@ import { BetChecker } from "@/components/BetChecker";
 import { NumberPickerGrid } from "@/components/NumberPickerGrid";
 import { SavedBetsPanel } from "@/components/SavedBetsPanel";
 import { EvolutiveGeneratorPanel } from "@/components/EvolutiveGeneratorPanel";
+import { IntelligentGeneratorPanel } from "@/components/IntelligentGeneratorPanel";
 import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
