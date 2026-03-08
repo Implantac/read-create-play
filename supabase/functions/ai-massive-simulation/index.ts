@@ -19,6 +19,16 @@ serve(async (req) => {
     const { topGames, patternInsights, distributionSummary, lotteryName, lotteryPick, lotteryNumbers, totalGenerated, totalEvaluated } = await req.json();
     if (!topGames || topGames.length === 0) throw new Error("topGames required");
 
+    const supabase = await getSupabaseAdmin();
+    const lotteryId = lotteryName?.toLowerCase().replace(/\s+/g, "").replace(/á/g, "a") || "unknown";
+    const cacheInput = { lotteryName, totalGenerated, totalEvaluated, topScore: topGames[0]?.score };
+    const cached = await getCachedAnalysis(supabase, lotteryId, "ai-massive-simulation", cacheInput, 6);
+    if (cached) {
+      return new Response(JSON.stringify({ ...cached, fromCache: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Deep analysis of number frequency across top games
     const numFreq: Record<number, number> = {};
     const numScoreAvg: Record<number, { total: number; count: number }> = {};
