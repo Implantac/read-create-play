@@ -19,6 +19,16 @@ serve(async (req) => {
     const { patternReport, lotteryName, lotteryPick, lotteryNumbers, drawCount } = await req.json();
     if (!patternReport) throw new Error("patternReport required");
 
+    const supabase = await getSupabaseAdmin();
+    const lotteryId = lotteryName?.toLowerCase().replace(/\s+/g, "").replace(/á/g, "a") || "unknown";
+    const cacheInput = { lotteryName, drawCount, avgSum: patternReport.summary?.avgSum };
+    const cached = await getCachedAnalysis(supabase, lotteryId, "ai-pattern-analysis", cacheInput, 6);
+    if (cached) {
+      return new Response(JSON.stringify({ ...cached, fromCache: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { summary, parityPatterns, sumPatterns, consecutivePatterns, spatialDistribution, hotStreaks, frequencyTrends } = patternReport;
 
     const top15Trending = (frequencyTrends || []).slice(0, 15);
