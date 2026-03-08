@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_analysis_cache: {
+        Row: {
+          cache_key: string
+          created_at: string
+          expires_at: string
+          function_name: string
+          id: string
+          lottery_id: string
+          result: Json
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string
+          expires_at?: string
+          function_name: string
+          id?: string
+          lottery_id: string
+          result: Json
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string
+          expires_at?: string
+          function_name?: string
+          id?: string
+          lottery_id?: string
+          result?: Json
+        }
+        Relationships: []
+      }
       lottery_draws: {
         Row: {
           concurso: number
