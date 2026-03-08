@@ -8,6 +8,7 @@ import { BetChecker } from "@/components/BetChecker";
 import { NumberPickerGrid } from "@/components/NumberPickerGrid";
 import { SavedBetsPanel } from "@/components/SavedBetsPanel";
 import { EvolutiveGeneratorPanel } from "@/components/EvolutiveGeneratorPanel";
+import { IntelligentGeneratorPanel } from "@/components/IntelligentGeneratorPanel";
 import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
@@ -46,6 +47,9 @@ const GeradorPage = () => {
           </div>
 
           <AIPredictionPanel config={config} stats={stats} onSaveBet={handleSaveBet} />
+
+          {/* Gerador Inteligente */}
+          <IntelligentGeneratorPanel stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
 
           {/* Gerador Evolutivo */}
           <EvolutiveGeneratorPanel stats={stats} config={config} draws={draws} lotteryId={selectedLottery} />
