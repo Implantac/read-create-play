@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getCachedAnalysis, setCachedAnalysis } from "../_shared/ai-cache.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -48,6 +49,15 @@ serve(async (req) => {
 
     const cfg = configs[lottery_id];
     if (!cfg) throw new Error("Loteria não suportada");
+
+    // Check cache (key = lottery_id + last concurso + count)
+    const cacheInput = { lottery_id, count, lastConcurso: draws[0]?.concurso };
+    const cached = await getCachedAnalysis(supabase, lottery_id, "ai-lottery-predict", cacheInput, 4);
+    if (cached) {
+      return new Response(JSON.stringify({ ...cached, fromCache: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // === COMPUTE DEEP STATISTICS ===
     const allNums = Array.from({ length: cfg.numbers }, (_, i) => i + 1);
@@ -286,13 +296,18 @@ Gere ${Math.min(count, 10)} apostas otimizadas usando a metodologia descrita.`;
       throw new Error("IA não gerou apostas válidas. Tente novamente.");
     }
 
-    return new Response(JSON.stringify({
+    const responseData = {
       success: true,
       bets: validBets,
       analysis: parsed.analysis || "Análise baseada em padrões estatísticos avançados.",
       lottery: cfg.name,
       count: validBets.length,
-    }), {
+    };
+
+    // Store in cache
+    await setCachedAnalysis(supabase, lottery_id, "ai-lottery-predict", cacheInput, responseData, 4);
+
+    return new Response(JSON.stringify(responseData), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 

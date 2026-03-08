@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getSupabaseAdmin, getCachedAnalysis, setCachedAnalysis } from "../_shared/ai-cache.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,6 +18,16 @@ serve(async (req) => {
 
     const { simulationData, lotteryName, lotteryPick, lotteryNumbers } = await req.json();
     if (!simulationData) throw new Error("simulationData required");
+
+    const supabase = await getSupabaseAdmin();
+    const lotteryId = lotteryName?.toLowerCase().replace(/\s+/g, "").replace(/á/g, "a") || "unknown";
+    const cacheInput = { lotteryName, totalDraws: simulationData.totalDraws, betsCount: simulationData.bets?.length };
+    const cached = await getCachedAnalysis(supabase, lotteryId, "ai-simulation-analysis", cacheInput, 6);
+    if (cached) {
+      return new Response(JSON.stringify({ ...cached, fromCache: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const lotteryStrategies: Record<string, string> = {
       "Lotofácil": "Lotofácil (15/25): Cobertura por quintil (1-5, 6-10, 11-15, 16-20, 21-25) com 3 números cada. Par/ímpar entre 7/8 e 8/7. Soma ideal: 170-210. Máximo 3 consecutivos.",
@@ -162,7 +173,10 @@ Para cada jogo, identifique:
     const aiData = await aiResponse.json();
     const analysis = aiData.choices?.[0]?.message?.content || "Análise não disponível.";
 
-    return new Response(JSON.stringify({ success: true, analysis }), {
+    const responseData = { success: true, analysis };
+    await setCachedAnalysis(supabase, lotteryId, "ai-simulation-analysis", cacheInput, responseData, 6);
+
+    return new Response(JSON.stringify(responseData), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 

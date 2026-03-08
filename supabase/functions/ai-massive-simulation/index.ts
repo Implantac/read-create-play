@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getSupabaseAdmin, getCachedAnalysis, setCachedAnalysis } from "../_shared/ai-cache.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,6 +18,16 @@ serve(async (req) => {
 
     const { topGames, patternInsights, distributionSummary, lotteryName, lotteryPick, lotteryNumbers, totalGenerated, totalEvaluated } = await req.json();
     if (!topGames || topGames.length === 0) throw new Error("topGames required");
+
+    const supabase = await getSupabaseAdmin();
+    const lotteryId = lotteryName?.toLowerCase().replace(/\s+/g, "").replace(/á/g, "a") || "unknown";
+    const cacheInput = { lotteryName, totalGenerated, totalEvaluated, topScore: topGames[0]?.score };
+    const cached = await getCachedAnalysis(supabase, lotteryId, "ai-massive-simulation", cacheInput, 6);
+    if (cached) {
+      return new Response(JSON.stringify({ ...cached, fromCache: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // Deep analysis of number frequency across top games
     const numFreq: Record<number, number> = {};
@@ -171,7 +182,10 @@ Como o jogador deve usar esses resultados na prática?`;
     const aiData = await aiResponse.json();
     const analysis = aiData.choices?.[0]?.message?.content || "Análise não disponível.";
 
-    return new Response(JSON.stringify({ success: true, analysis }), {
+    const responseData = { success: true, analysis };
+    await setCachedAnalysis(supabase, lotteryId, "ai-massive-simulation", cacheInput, responseData, 6);
+
+    return new Response(JSON.stringify(responseData), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
