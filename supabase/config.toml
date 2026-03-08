@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.ai-autonomous-learning]
 verify_jwt = false
+
+[functions.ai-massive-simulation]
+verify_jwt = false

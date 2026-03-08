@@ -1,6 +1,7 @@
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { GameSimulator } from "@/components/GameSimulator";
 import { MassiveSimulatorPanel } from "@/components/MassiveSimulatorPanel";
+import { MassiveSimulationDashboard } from "@/components/MassiveSimulationDashboard";
 import { BacktestPanel } from "@/components/BacktestPanel";
 import { IntelligentSimulatorPanel } from "@/components/IntelligentSimulatorPanel";
 import { PlanGate } from "@/components/PlanGate";
@@ -16,7 +17,7 @@ const SimulacoesPage = () => {
     <div className="space-y-6">
       <PageHeader
         title="Simulações"
-        description="Teste estratégias com simulações Monte Carlo e backtesting"
+        description="Teste estratégias com simulações Monte Carlo, backtesting e simulação massiva com IA"
         icon={FlaskConical}
       />
       <LotteryContextBanner />
@@ -25,10 +26,13 @@ const SimulacoesPage = () => {
         <EmptyState description="Importe os sorteios primeiro no Dashboard para rodar simulações." />
       ) : (
         <>
-          {/* Simulador Inteligente com IA - Destaque */}
+          {/* Motor de Simulação Massiva v2 - Destaque principal */}
+          <MassiveSimulationDashboard stats={stats} config={config} draws={draws} />
+
+          {/* Simulador Inteligente com IA */}
           <IntelligentSimulatorPanel config={config} draws={draws} stats={stats} />
 
-          <PlanGate feature="simulacoes" fallbackMessage="Simulador Massivo de Apostas">
+          <PlanGate feature="simulacoes" fallbackMessage="Simulador Massivo Monte Carlo">
             <MassiveSimulatorPanel stats={stats} config={config} draws={draws} />
           </PlanGate>
           <PlanGate feature="simulacoes" fallbackMessage="Simulações de Jogos">
