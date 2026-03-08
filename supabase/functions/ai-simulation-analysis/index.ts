@@ -18,13 +18,29 @@ serve(async (req) => {
     const { simulationData, lotteryName, lotteryPick, lotteryNumbers } = await req.json();
     if (!simulationData) throw new Error("simulationData required");
 
+    const lotteryStrategies: Record<string, string> = {
+      "Lotofácil": "Na Lotofácil (15/25), foque em cobertura de faixas (1-5, 6-10, 11-15, 16-20, 21-25), equilíbrio par/ímpar próximo de 7/8 ou 8/7, e soma total entre 170-210.",
+      "Mega Sena": "Na Mega Sena (6/60), priorize distribuição em 3+ dezenas, evite clusters >2 consecutivos, equilíbrio par/ímpar 3/3 e soma entre 120-220.",
+      "Quina": "Na Quina (5/80), distribua em faixas amplas, evite concentração, equilíbrio par/ímpar 2/3 ou 3/2, soma entre 100-250.",
+      "Lotomania": "Na Lotomania (50/100), cobertura mínima de 85% das dezenas por faixa, equilíbrio par/ímpar próximo de 25/25, soma entre 2400-2600.",
+      "Dupla Sena": "Na Dupla Sena (6/50), estratégia similar à Mega mas universo menor. Distribuição em faixas de 10, equilíbrio par/ímpar 3/3.",
+      "Dia de Sorte": "No Dia de Sorte (7/31), cobertura de todas as faixas (1-10, 11-20, 21-31), equilíbrio par/ímpar 3/4 ou 4/3.",
+      "Super Sete": "No Super Sete (7 colunas de 0-9), analise frequência por coluna independentemente.",
+      "Timemania": "Na Timemania (10/80), distribuição ampla em 8+ faixas, equilíbrio par/ímpar 5/5, soma entre 350-450.",
+    };
+
+    const strategyContext = lotteryStrategies[lotteryName] || "";
+
     const systemPrompt = `Você é um analista estatístico especialista em loterias brasileiras.
 Analise os resultados de simulação de apostas e forneça insights acionáveis.
 Seja direto, use dados e linguagem clara. Responda em português do Brasil.
 Formate sua resposta com seções usando markdown (##, ###, **negrito**, etc).
 
+ESTRATÉGIA ESPECÍFICA PARA ESTA LOTERIA:
+${strategyContext}
+
 IMPORTANTE: Além de analisar, você DEVE sugerir melhorias concretas nos jogos.
-Identifique dezenas pouco eficientes e sugira substituições específicas.`;
+Identifique dezenas pouco eficientes e sugira substituições específicas baseadas nas regras desta loteria.`;
 
     const userPrompt = `Loteria: ${lotteryName} (${lotteryPick} números de 1 a ${lotteryNumbers})
 
