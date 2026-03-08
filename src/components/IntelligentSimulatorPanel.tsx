@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -52,6 +52,18 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
   const [running, setRunning] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState("");
   const [loadingAi, setLoadingAi] = useState(false);
+
+  // Reset all state when lottery changes
+  const prevLotteryId = useRef(config.id);
+  useEffect(() => {
+    if (prevLotteryId.current !== config.id) {
+      prevLotteryId.current = config.id;
+      setBets([]);
+      setTextInput("");
+      setSimulation(null);
+      setAiAnalysis("");
+    }
+  }, [config.id]);
 
   const minPrize = getMinPrizeHits(config.id);
 
