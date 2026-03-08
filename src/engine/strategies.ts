@@ -108,8 +108,9 @@ export function generateByStrategy(
     case "hot": {
       const pool = [...stats]
         .filter(s => s.status === "hot" || (s.status === "normal" && s.trend > 0))
-        .sort((a, b) => (b.recentFreq + b.trend * 0.5 + b.momentum * 0.2) - (a.recentFreq + a.trend * 0.5 + a.momentum * 0.2));
-      const selected = pool.slice(0, pick).map(s => s.number);
+        .map(s => ({ ...s, weight: Math.max(0.1, s.recentFreq * 2 + s.trend * 0.5 + s.momentum * 0.2 + Math.random() * 3) }));
+      const shuffled = weightedShuffle(pool);
+      const selected = shuffled.slice(0, pick).map(s => s.number);
       while (selected.length < pick) {
         const n = Math.floor(Math.random() * config.numbers) + 1;
         if (!selected.includes(n)) selected.push(n);
