@@ -40,8 +40,17 @@ export function EnhancedBetGenerator({ stats, config, onSaveBet }: Props) {
 
   const generate = (count: number) => {
     const newBets: number[][] = [];
-    for (let i = 0; i < count; i++) {
-      newBets.push(generateByStrategy(strategy, stats, config));
+    const seen = new Set<string>();
+    const maxAttempts = count * 20;
+    let attempts = 0;
+    while (newBets.length < count && attempts < maxAttempts) {
+      attempts++;
+      const bet = generateByStrategy(strategy, stats, config);
+      const key = bet.join(",");
+      if (!seen.has(key)) {
+        seen.add(key);
+        newBets.push(bet);
+      }
     }
     setBets(newBets);
     setSaved(new Set());
