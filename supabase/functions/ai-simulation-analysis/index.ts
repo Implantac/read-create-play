@@ -19,6 +19,16 @@ serve(async (req) => {
     const { simulationData, lotteryName, lotteryPick, lotteryNumbers } = await req.json();
     if (!simulationData) throw new Error("simulationData required");
 
+    const supabase = await getSupabaseAdmin();
+    const lotteryId = lotteryName?.toLowerCase().replace(/\s+/g, "").replace(/á/g, "a") || "unknown";
+    const cacheInput = { lotteryName, totalDraws: simulationData.totalDraws, betsCount: simulationData.bets?.length };
+    const cached = await getCachedAnalysis(supabase, lotteryId, "ai-simulation-analysis", cacheInput, 6);
+    if (cached) {
+      return new Response(JSON.stringify({ ...cached, fromCache: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const lotteryStrategies: Record<string, string> = {
       "Lotofácil": "Lotofácil (15/25): Cobertura por quintil (1-5, 6-10, 11-15, 16-20, 21-25) com 3 números cada. Par/ímpar entre 7/8 e 8/7. Soma ideal: 170-210. Máximo 3 consecutivos.",
       "Mega Sena": "Mega Sena (6/60): Distribuição em ≥3 dezenas de 10. Par/ímpar 3/3. Soma 120-220. Máximo 1 par consecutivo. Evitar clusters.",
