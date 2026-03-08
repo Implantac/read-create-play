@@ -9,7 +9,7 @@ import {
   runHistoricalSimulation,
 } from "@/engine/historical-simulator";
 import { motion, AnimatePresence } from "framer-motion";
-import { History, Play, Trophy, BarChart3, Lightbulb, Plus, Trash2, Shuffle } from "lucide-react";
+import { History, Play, Trophy, BarChart3, Lightbulb, Plus, Trash2, Shuffle, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
