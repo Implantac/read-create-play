@@ -1,0 +1,449 @@
+import { useState, useMemo } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Brain, Play, Plus, Trash2, Trophy, BarChart3, Sparkles, Loader2, Target } from "lucide-react";
+import { toast } from "sonner";
+import { DrawResult, LotteryConfig } from "@/data/lotteries";
+import { NumberStats } from "@/engine/statistics";
+import {
+  SimulationBet, SimulationOutput, BetSimulationResult,
+  runSimulation, parseBetsFromText, generateRandomBets, getMinPrizeHits,
+} from "@/engine/intelligent-simulator";
+import { supabase } from "@/integrations/supabase/client";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+
+interface Props {
+  config: LotteryConfig;
+  draws: DrawResult[];
+  stats: NumberStats[];
+}
+
+const DRAW_OPTIONS = [
+  { label: "Últimos 10", value: 10 },
+  { label: "Últimos 25", value: 25 },
+  { label: "Últimos 50", value: 50 },
+  { label: "Últimos 100", value: 100 },
+  { label: "Últimos 200", value: 200 },
+  { label: "Últimos 500", value: 500 },
+  { label: "Todo histórico", value: 99999 },
+];
+
+const CHART_COLORS = [
+  "hsl(145, 72%, 42%)", "hsl(195, 95%, 48%)", "hsl(48, 100%, 52%)",
+  "hsl(265, 75%, 58%)", "hsl(0, 72%, 55%)", "hsl(180, 85%, 48%)",
+  "hsl(30, 90%, 55%)", "hsl(320, 70%, 55%)",
+];
+
+export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
+  const [bets, setBets] = useState<SimulationBet[]>([]);
+  const [textInput, setTextInput] = useState("");
+  const [drawCount, setDrawCount] = useState("100");
+  const [autoCount, setAutoCount] = useState("3");
+  const [simulation, setSimulation] = useState<SimulationOutput | null>(null);
+  const [running, setRunning] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState("");
+  const [loadingAi, setLoadingAi] = useState(false);
+
+  const minPrize = getMinPrizeHits(config.id);
+
+  const handleParseText = () => {
+    if (!textInput.trim()) return;
+    const parsed = parseBetsFromText(textInput, config);
+    if (parsed.length === 0) {
+      toast.error(`Nenhum jogo válido encontrado. Cada linha deve ter exatamente ${config.pick} números de 1 a ${config.numbers}.`);
+      return;
+    }
+    const newBets = [...bets, ...parsed.map((b, i) => ({ ...b, id: bets.length + i + 1 }))];
+    setBets(newBets);
+    setTextInput("");
+    toast.success(`${parsed.length} jogo(s) adicionado(s)`);
+  };
+
+  const handleAutoGenerate = () => {
+    const count = parseInt(autoCount) || 3;
+    const generated = generateRandomBets(count, config);
+    const newBets = [...bets, ...generated.map((b, i) => ({ ...b, id: bets.length + i + 1 }))];
+    setBets(newBets);
+    toast.success(`${count} jogo(s) gerado(s) automaticamente`);
+  };
+
+  const removeBet = (id: number) => {
+    setBets(prev => prev.filter(b => b.id !== id));
+  };
+
+  const clearAll = () => {
+    setBets([]);
+    setSimulation(null);
+    setAiAnalysis("");
+  };
+
+  const handleRunSimulation = () => {
+    if (bets.length === 0) {
+      toast.error("Adicione pelo menos 1 jogo para simular.");
+      return;
+    }
+    if (draws.length === 0) {
+      toast.error("Sincronize os sorteios primeiro no Dashboard.");
+      return;
+    }
+    setRunning(true);
+    setAiAnalysis("");
+
+    // Use setTimeout to not block the UI
+    setTimeout(() => {
+      try {
+        const result = runSimulation(bets, draws, parseInt(drawCount), config.id);
+        setSimulation(result);
+        toast.success(`Simulação concluída: ${bets.length} jogos × ${result.totalDraws} concursos`);
+      } catch (e) {
+        toast.error("Erro na simulação");
+        console.error(e);
+      } finally {
+        setRunning(false);
+      }
+    }, 50);
+  };
+
+  const handleAiAnalysis = async () => {
+    if (!simulation) return;
+    setLoadingAi(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-simulation-analysis", {
+        body: {
+          simulationData: simulation,
+          lotteryName: config.name,
+          lotteryPick: config.pick,
+          lotteryNumbers: config.numbers,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setAiAnalysis(data.analysis || "Análise indisponível.");
+    } catch (e: any) {
+      toast.error(e.message || "Erro na análise de IA");
+    } finally {
+      setLoadingAi(false);
+    }
+  };
+
+  // Chart data for hit distribution
+  const chartData = useMemo(() => {
+    if (!simulation) return [];
+    const allHits = new Set<number>();
+    simulation.bets.forEach(b => {
+      Object.keys(b.hitDistribution).forEach(k => allHits.add(Number(k)));
+    });
+    const sorted = [...allHits].sort((a, b) => b - a);
+
+    return sorted.map(hit => {
+      const row: any = { acertos: `${hit}` };
+      simulation.bets.forEach((b, i) => {
+        row[`Jogo ${b.bet.id}`] = b.hitDistribution[hit] || 0;
+      });
+      return row;
+    });
+  }, [simulation]);
+
+  return (
+    <Card className="border-primary/20 bg-card/80 backdrop-blur">
+      <CardHeader>
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-primary/10">
+            <Brain className="h-6 w-6 text-primary" />
+          </div>
+          <div>
+            <CardTitle className="text-xl text-foreground">Simulador Inteligente de Apostas</CardTitle>
+            <CardDescription>
+              Teste jogos contra o histórico de {config.name} e receba análises por IA
+            </CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Input Section */}
+        <div className="grid lg:grid-cols-2 gap-4">
+          {/* Manual input */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <Target className="h-4 w-4 text-primary" /> Adicionar Jogos
+            </h3>
+            <Textarea
+              placeholder={`Cole seus jogos (um por linha, ${config.pick} números de 1 a ${config.numbers}):\nEx: 01 02 03 04 05 06${config.pick > 6 ? " 07 08 09 10 11 12 13 14 15" : ""}`}
+              value={textInput}
+              onChange={e => setTextInput(e.target.value)}
+              className="h-28 font-mono text-xs bg-muted/50 border-border"
+            />
+            <Button onClick={handleParseText} variant="outline" size="sm" className="w-full">
+              <Plus className="h-4 w-4 mr-2" /> Adicionar da lista
+            </Button>
+          </div>
+
+          {/* Auto + Config */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-accent" /> Geração Automática
+            </h3>
+            <div className="flex gap-2">
+              <Input
+                type="number"
+                min={1}
+                max={20}
+                value={autoCount}
+                onChange={e => setAutoCount(e.target.value)}
+                className="w-20 bg-muted/50"
+              />
+              <Button onClick={handleAutoGenerate} variant="outline" size="sm" className="flex-1">
+                <Sparkles className="h-4 w-4 mr-2" /> Gerar jogos aleatórios
+              </Button>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs text-muted-foreground font-medium">Concursos para análise</label>
+              <Select value={drawCount} onValueChange={setDrawCount}>
+                <SelectTrigger className="bg-muted/50">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {DRAW_OPTIONS.map(opt => (
+                    <SelectItem key={opt.value} value={String(opt.value)}>
+                      {opt.label} {opt.value <= draws.length ? "" : `(${draws.length} disponíveis)`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                onClick={handleRunSimulation}
+                disabled={bets.length === 0 || running}
+                className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                {running ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Play className="h-4 w-4 mr-2" />}
+                {running ? "Simulando..." : "Executar Simulação"}
+              </Button>
+              <Button onClick={clearAll} variant="destructive" size="icon" title="Limpar tudo">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Current bets list */}
+        {bets.length > 0 && (
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold text-foreground">
+              Jogos Adicionados ({bets.length})
+            </h3>
+            <div className="grid gap-2 max-h-40 overflow-y-auto">
+              {bets.map(bet => (
+                <div key={bet.id} className="flex items-center gap-2 bg-muted/30 rounded-lg px-3 py-2">
+                  <Badge variant="outline" className="text-xs shrink-0">#{bet.id}</Badge>
+                  <div className="flex flex-wrap gap-1 flex-1">
+                    {bet.numbers.map(n => (
+                      <span key={n} className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-primary/15 text-primary text-xs font-bold">
+                        {String(n).padStart(2, "0")}
+                      </span>
+                    ))}
+                  </div>
+                  <Button onClick={() => removeBet(bet.id)} variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-destructive">
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Results */}
+        {simulation && (
+          <Tabs defaultValue="ranking" className="space-y-4">
+            <TabsList className="bg-muted/50">
+              <TabsTrigger value="ranking"><Trophy className="h-3.5 w-3.5 mr-1.5" />Ranking</TabsTrigger>
+              <TabsTrigger value="details"><BarChart3 className="h-3.5 w-3.5 mr-1.5" />Detalhes</TabsTrigger>
+              <TabsTrigger value="chart"><BarChart3 className="h-3.5 w-3.5 mr-1.5" />Gráfico</TabsTrigger>
+              <TabsTrigger value="ai"><Brain className="h-3.5 w-3.5 mr-1.5" />Análise IA</TabsTrigger>
+            </TabsList>
+
+            {/* Ranking Tab */}
+            <TabsContent value="ranking" className="space-y-3">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12">#</TableHead>
+                    <TableHead>Jogo</TableHead>
+                    <TableHead className="text-center">Melhor</TableHead>
+                    <TableHead className="text-center">Média</TableHead>
+                    <TableHead className="text-center">Premiações</TableHead>
+                    <TableHead className="text-center">Estabilidade</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {simulation.ranking.map((betIdx, rank) => {
+                    const b = simulation.bets[betIdx];
+                    return (
+                      <TableRow key={b.bet.id} className={rank === 0 ? "bg-primary/5" : ""}>
+                        <TableCell>
+                          <Badge variant={rank === 0 ? "default" : "outline"} className="text-xs">
+                            {rank === 0 ? "🏆" : `${rank + 1}º`}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-0.5">
+                            {b.bet.numbers.slice(0, 8).map(n => (
+                              <span key={n} className="text-[10px] font-mono text-muted-foreground">
+                                {String(n).padStart(2, "0")}{" "}
+                              </span>
+                            ))}
+                            {b.bet.numbers.length > 8 && (
+                              <span className="text-[10px] text-muted-foreground">+{b.bet.numbers.length - 8}</span>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center font-bold text-primary">{b.bestHit}</TableCell>
+                        <TableCell className="text-center">{b.avgHits}</TableCell>
+                        <TableCell className="text-center">
+                          <Badge variant="secondary" className="text-xs">
+                            {b.prizeCount}/{simulation.totalDraws}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-center text-muted-foreground text-xs">σ {b.stability}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+              <p className="text-xs text-muted-foreground text-center">
+                {simulation.totalDraws} concursos analisados • Premiação: ≥{minPrize} acertos
+              </p>
+            </TabsContent>
+
+            {/* Details Tab */}
+            <TabsContent value="details" className="space-y-4">
+              {simulation.bets.map((b, i) => (
+                <div key={b.bet.id} className="border border-border/50 rounded-lg p-4 space-y-2 bg-muted/20">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold text-sm text-foreground">
+                      Jogo {b.bet.id}
+                      <Badge variant="outline" className="ml-2 text-xs">
+                        Ranking #{simulation.ranking.indexOf(i) + 1}
+                      </Badge>
+                    </h4>
+                  </div>
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {b.bet.numbers.map(n => (
+                      <span key={n} className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-primary/15 text-primary text-xs font-bold">
+                        {String(n).padStart(2, "0")}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    <div className="bg-muted/50 rounded p-2">
+                      <p className="text-muted-foreground">Concursos</p>
+                      <p className="font-bold text-foreground">{simulation.totalDraws}</p>
+                    </div>
+                    <div className="bg-muted/50 rounded p-2">
+                      <p className="text-muted-foreground">Melhor acerto</p>
+                      <p className="font-bold text-primary">{b.bestHit}</p>
+                    </div>
+                    <div className="bg-muted/50 rounded p-2">
+                      <p className="text-muted-foreground">Média acertos</p>
+                      <p className="font-bold text-foreground">{b.avgHits}</p>
+                    </div>
+                    <div className="bg-muted/50 rounded p-2">
+                      <p className="text-muted-foreground">Premiações</p>
+                      <p className="font-bold text-accent">{b.prizeCount}</p>
+                    </div>
+                  </div>
+                  <div className="text-xs space-y-1">
+                    <p className="text-muted-foreground font-medium">Distribuição de acertos:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {Object.entries(b.hitDistribution)
+                        .sort((a, b) => Number(b[0]) - Number(a[0]))
+                        .map(([hits, count]) => (
+                          <span key={hits} className={`px-2 py-0.5 rounded text-xs font-mono ${
+                            Number(hits) >= minPrize ? "bg-primary/20 text-primary font-bold" : "bg-muted/50 text-muted-foreground"
+                          }`}>
+                            {hits}ac → {count as number}x
+                          </span>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </TabsContent>
+
+            {/* Chart Tab */}
+            <TabsContent value="chart">
+              {chartData.length > 0 && (
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(225, 16%, 15%)" />
+                      <XAxis dataKey="acertos" stroke="hsl(215, 12%, 48%)" tick={{ fontSize: 11 }} label={{ value: "Acertos", position: "insideBottom", offset: -5, fill: "hsl(215, 12%, 48%)" }} />
+                      <YAxis stroke="hsl(215, 12%, 48%)" tick={{ fontSize: 11 }} />
+                      <Tooltip
+                        contentStyle={{
+                          background: "hsl(225, 22%, 9%)",
+                          border: "1px solid hsl(225, 16%, 15%)",
+                          borderRadius: "8px",
+                          color: "hsl(210, 20%, 92%)",
+                        }}
+                      />
+                      {simulation!.bets.map((b, i) => (
+                        <Bar key={b.bet.id} dataKey={`Jogo ${b.bet.id}`} fill={CHART_COLORS[i % CHART_COLORS.length]} opacity={0.8} />
+                      ))}
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* AI Tab */}
+            <TabsContent value="ai" className="space-y-3">
+              {!aiAnalysis && (
+                <div className="text-center py-8 space-y-3">
+                  <Brain className="h-10 w-10 text-muted-foreground mx-auto" />
+                  <p className="text-sm text-muted-foreground">
+                    Clique para que a IA analise os resultados da simulação
+                  </p>
+                  <Button onClick={handleAiAnalysis} disabled={loadingAi} className="bg-primary text-primary-foreground">
+                    {loadingAi ? (
+                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Analisando...</>
+                    ) : (
+                      <><Brain className="h-4 w-4 mr-2" /> Gerar Análise com IA</>
+                    )}
+                  </Button>
+                </div>
+              )}
+              {aiAnalysis && (
+                <div className="prose prose-sm prose-invert max-w-none">
+                  <div className="bg-muted/30 rounded-lg p-4 border border-primary/10 text-sm text-foreground whitespace-pre-wrap leading-relaxed">
+                    {aiAnalysis.split("\n").map((line, i) => {
+                      if (line.startsWith("## ")) return <h2 key={i} className="text-lg font-bold text-primary mt-4 mb-2">{line.replace("## ", "")}</h2>;
+                      if (line.startsWith("### ")) return <h3 key={i} className="text-base font-semibold text-accent mt-3 mb-1">{line.replace("### ", "")}</h3>;
+                      if (line.startsWith("**") && line.endsWith("**")) return <p key={i} className="font-bold text-foreground">{line.replace(/\*\*/g, "")}</p>;
+                      if (line.startsWith("- ") || line.startsWith("* ")) return <p key={i} className="ml-3 text-muted-foreground">• {line.slice(2)}</p>;
+                      if (line.trim() === "") return <br key={i} />;
+                      return <p key={i} className="text-muted-foreground">{line}</p>;
+                    })}
+                  </div>
+                  <Button onClick={handleAiAnalysis} variant="outline" size="sm" className="mt-3" disabled={loadingAi}>
+                    {loadingAi ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Brain className="h-3 w-3 mr-1" />}
+                    Regenerar análise
+                  </Button>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
