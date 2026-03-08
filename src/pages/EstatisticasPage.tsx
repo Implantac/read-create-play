@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { FrequencyChart } from "@/components/FrequencyChart";
 import { HeatmapGrid } from "@/components/HeatmapGrid";
@@ -10,8 +11,19 @@ import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { StatsCard } from "@/components/StatsCard";
+import { computeFrequencyStats, computeSumDistribution } from "@/engine/statistics";
 import { motion } from "framer-motion";
-import { PieChart, Flame, Snowflake, TrendingUp, BarChart3, Clock, Target, Sigma } from "lucide-react";
+import { PieChart, Flame, Snowflake, TrendingUp, BarChart3, Clock, Target, Sigma, Filter } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+const PERIOD_OPTIONS = [
+  { label: "Todos", value: 0 },
+  { label: "Últimos 30", value: 30 },
+  { label: "Últimos 90", value: 90 },
+  { label: "Últimos 180", value: 180 },
+  { label: "Últimos 365", value: 365 },
+  { label: "Últimos 500", value: 500 },
+] as const;
 
 const container = {
   hidden: { opacity: 0 },
@@ -23,7 +35,16 @@ const item = {
 };
 
 const EstatisticasPage = () => {
-  const { config, draws, stats, sumData, syncing, syncDraws, syncAllLotteries } = useLotteryContext();
+  const { config, draws, syncing, syncDraws, syncAllLotteries } = useLotteryContext();
+  const [period, setPeriod] = useState(0);
+
+  const filteredDraws = useMemo(() => {
+    if (period === 0) return draws;
+    return draws.slice(0, period);
+  }, [draws, period]);
+
+  const stats = useMemo(() => computeFrequencyStats(filteredDraws, config.numbers), [filteredDraws, config.numbers]);
+  const sumData = useMemo(() => computeSumDistribution(filteredDraws), [filteredDraws]);
 
   const hotNumbers = stats.filter(s => s.status === "hot").length;
   const coldNumbers = stats.filter(s => s.status === "cold").length;
@@ -59,9 +80,29 @@ const EstatisticasPage = () => {
         title="Estatísticas Avançadas"
         description={`Visão consolidada de todas as métricas — ${config.name}`}
         icon={PieChart}
-        badge={`${draws.length} sorteios`}
+        badge={`${filteredDraws.length} sorteios${period > 0 ? ` (últimos ${period})` : ''}`}
       />
       <LotteryContextBanner />
+
+      {/* Period Filter */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-1.5 text-muted-foreground">
+          <Filter className="w-4 h-4" />
+          <span className="text-xs font-medium">Período:</span>
+        </div>
+        {PERIOD_OPTIONS.map(opt => (
+          <Button
+            key={opt.value}
+            size="sm"
+            variant={period === opt.value ? "default" : "outline"}
+            onClick={() => setPeriod(opt.value)}
+            className="h-7 text-xs px-3"
+            disabled={opt.value > draws.length && opt.value !== 0}
+          >
+            {opt.label}
+          </Button>
+        ))}
+      </div>
 
       {/* Overview Cards */}
       <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -86,13 +127,13 @@ const EstatisticasPage = () => {
 
       {/* Parity + Consecutive */}
       <div className="grid lg:grid-cols-2 gap-6">
-        <ParityChart draws={draws} />
-        <ConsecutiveChart draws={draws} />
+        <ParityChart draws={filteredDraws} />
+        <ConsecutiveChart draws={filteredDraws} />
       </div>
 
       {/* Range + Delay */}
       <div className="grid lg:grid-cols-2 gap-6">
-        <RangeDistribution draws={draws} config={config} />
+        <RangeDistribution draws={filteredDraws} config={config} />
         <DelayChart stats={stats} />
       </div>
 
