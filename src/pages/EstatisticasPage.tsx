@@ -35,7 +35,16 @@ const item = {
 };
 
 const EstatisticasPage = () => {
-  const { config, draws, stats, sumData, syncing, syncDraws, syncAllLotteries } = useLotteryContext();
+  const { config, draws, syncing, syncDraws, syncAllLotteries } = useLotteryContext();
+  const [period, setPeriod] = useState(0);
+
+  const filteredDraws = useMemo(() => {
+    if (period === 0) return draws;
+    return draws.slice(0, period);
+  }, [draws, period]);
+
+  const stats = useMemo(() => computeFrequencyStats(filteredDraws, config.numbers), [filteredDraws, config.numbers]);
+  const sumData = useMemo(() => computeSumDistribution(filteredDraws), [filteredDraws]);
 
   const hotNumbers = stats.filter(s => s.status === "hot").length;
   const coldNumbers = stats.filter(s => s.status === "cold").length;
