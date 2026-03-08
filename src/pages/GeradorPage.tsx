@@ -1,5 +1,6 @@
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { EnhancedBetGenerator } from "@/components/EnhancedBetGenerator";
+import { AIPredictionPanel } from "@/components/AIPredictionPanel";
 import { ProfessionalGeneratorPanel } from "@/components/ProfessionalGeneratorPanel";
 import { MonteCarloPanel } from "@/components/MonteCarloPanel";
 import { BetOptimizerPanel } from "@/components/BetOptimizerPanel";
