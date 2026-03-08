@@ -4,6 +4,7 @@ import { AdvancedAnalyticsPanel } from "@/components/AdvancedAnalyticsPanel";
 import { ConditionalProbabilityPanel } from "@/components/ConditionalProbabilityPanel";
 import { HPEnginePanel } from "@/components/HPEnginePanel";
 import { OptimizationPanel } from "@/components/OptimizationPanel";
+import { PatternDetectorPanel } from "@/components/PatternDetectorPanel";
 import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
@@ -27,6 +28,9 @@ const EstrategiasPage = () => {
         <EmptyState description="Importe os sorteios primeiro no Dashboard para usar as estratégias." />
       ) : (
         <>
+          {/* Detector de Padrões com IA */}
+          <PatternDetectorPanel config={config} draws={draws} stats={stats} />
+
           <PlanGate feature="otimizacao" fallbackMessage="Otimização com Algoritmo Genético + SA">
             <OptimizationPanel stats={stats} config={config} draws={draws} />
           </PlanGate>
