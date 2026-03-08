@@ -2,6 +2,7 @@ import { useLotteryContext } from "@/contexts/LotteryContext";
 import { GameSimulator } from "@/components/GameSimulator";
 import { MassiveSimulatorPanel } from "@/components/MassiveSimulatorPanel";
 import { BacktestPanel } from "@/components/BacktestPanel";
+import { IntelligentSimulatorPanel } from "@/components/IntelligentSimulatorPanel";
 import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
@@ -24,6 +25,9 @@ const SimulacoesPage = () => {
         <EmptyState description="Importe os sorteios primeiro no Dashboard para rodar simulações." />
       ) : (
         <>
+          {/* Simulador Inteligente com IA - Destaque */}
+          <IntelligentSimulatorPanel config={config} draws={draws} stats={stats} />
+
           <PlanGate feature="simulacoes" fallbackMessage="Simulador Massivo de Apostas">
             <MassiveSimulatorPanel stats={stats} config={config} draws={draws} />
           </PlanGate>
