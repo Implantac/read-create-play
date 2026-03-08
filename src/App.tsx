@@ -20,6 +20,7 @@ import SignupPage from "@/pages/SignupPage";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import IAAutonomaPage from "@/pages/IAAutonomaPage";
+import EstatisticasPage from "@/pages/EstatisticasPage";
 import LandingPage from "./pages/LandingPage";
 import NotFound from "./pages/NotFound";
 
@@ -47,6 +48,7 @@ function App() {
               <Route path="/estrategias" element={<EstrategiasPage />} />
               <Route path="/simulacoes" element={<SimulacoesPage />} />
               <Route path="/ia-autonoma" element={<IAAutonomaPage />} />
+              <Route path="/estatisticas" element={<EstatisticasPage />} />
               <Route path="/historico" element={<HistoricoPage />} />
               <Route path="/planos" element={<PlanosPage />} />
               <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />

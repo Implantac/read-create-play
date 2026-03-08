@@ -1,6 +1,6 @@
 import {
   BarChart3, Sparkles, FlaskConical, History, Zap,
-  Brain, ShieldCheck, Crown,
+  Brain, ShieldCheck, Crown, PieChart,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -29,6 +29,7 @@ const mainItems = [
   { title: "IA Autônoma", url: "/ia-autonoma", icon: Zap },
   { title: "Estratégias IA", url: "/estrategias", icon: Brain },
   { title: "Simulações", url: "/simulacoes", icon: FlaskConical },
+  { title: "Estatísticas", url: "/estatisticas", icon: PieChart },
   { title: "Histórico", url: "/historico", icon: History },
 ];
 

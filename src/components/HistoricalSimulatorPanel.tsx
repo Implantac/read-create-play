@@ -9,7 +9,7 @@ import {
   runHistoricalSimulation,
 } from "@/engine/historical-simulator";
 import { motion, AnimatePresence } from "framer-motion";
-import { History, Play, Trophy, BarChart3, Lightbulb, Plus, Trash2, Shuffle } from "lucide-react";
+import { History, Play, Trophy, BarChart3, Lightbulb, Plus, Trash2, Shuffle, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +21,60 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell,
 } from "recharts";
 import { toast } from "sonner";
+
+function exportSimulationPdf(simResults: { results: GameResult[]; summary: SimulationSummary }, config: LotteryConfig) {
+  const date = new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  const top = simResults.results.slice(0, 50);
+  const rows = top.map((r, i) => `
+    <tr style="border-bottom:1px solid #e5e7eb;">
+      <td style="padding:8px;text-align:center;font-family:monospace;font-size:12px;color:#6b7280;">${i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}</td>
+      <td style="padding:8px;font-size:12px;">${r.label}</td>
+      <td style="padding:8px;font-family:monospace;font-size:11px;color:#16a34a;">${r.gameNumbers.map(n => String(n).padStart(2, "0")).join(" ")}</td>
+      <td style="padding:8px;text-align:center;font-weight:700;font-size:13px;">${r.bestHits}</td>
+      <td style="padding:8px;text-align:center;font-size:12px;">${r.averageHits}</td>
+      <td style="padding:8px;text-align:center;font-size:12px;"><span style="background:${r.score >= 70 ? '#dcfce7' : r.score >= 40 ? '#fef9c3' : '#f3f4f6'};padding:2px 8px;border-radius:10px;font-weight:600;">${r.score}</span></td>
+    </tr>
+  `).join("");
+
+  const prizeRows = Object.entries(simResults.summary.prizeDistribution).filter(([, v]) => v > 0).map(([label, count]) =>
+    `<tr><td style="padding:6px 12px;font-size:12px;">${label}</td><td style="padding:6px 12px;font-size:12px;font-weight:600;text-align:right;">${count}x</td></tr>`
+  ).join("");
+
+  const insightsHtml = simResults.summary.insights.map(i => `<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:6px;">${i}</div>`).join("");
+
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Simulação - ${config.name}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Inter',sans-serif;background:#fff;color:#111}
+  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.no-print{display:none!important}@page{margin:12mm}}
+</style></head><body>
+<div style="max-width:900px;margin:0 auto;padding:24px 16px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #22c55e;padding-bottom:14px;margin-bottom:20px;">
+    <div><h1 style="font-size:20px;font-weight:800;">⚡ Titan <span style="color:#22c55e;">Loterias</span></h1><p style="font-size:10px;color:#6b7280;">Motor Estatístico v4.0 • Simulação Histórica</p></div>
+    <div style="text-align:right;"><p style="font-size:12px;font-weight:600;">${config.name} ${config.icon}</p><p style="font-size:10px;color:#6b7280;">${date}</p></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;">
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px;text-align:center;"><p style="font-size:10px;color:#6b7280;">Jogos</p><p style="font-size:22px;font-weight:800;color:#16a34a;">${simResults.summary.totalGames}</p></div>
+    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px;text-align:center;"><p style="font-size:10px;color:#6b7280;">Concursos</p><p style="font-size:22px;font-weight:800;color:#2563eb;">${simResults.summary.totalConcursos}</p></div>
+    <div style="background:#fefce8;border:1px solid #fde68a;border-radius:10px;padding:12px;text-align:center;"><p style="font-size:10px;color:#6b7280;">Comparações</p><p style="font-size:22px;font-weight:800;color:#ca8a04;">${simResults.summary.totalComparisons.toLocaleString()}</p></div>
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px;text-align:center;"><p style="font-size:10px;color:#6b7280;">Score Médio</p><p style="font-size:22px;font-weight:800;color:#16a34a;">${simResults.summary.averageScore}/100</p></div>
+  </div>
+  <h2 style="font-size:15px;font-weight:700;margin-bottom:10px;">🏆 Ranking dos Melhores Jogos</h2>
+  <table style="width:100%;border-collapse:collapse;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:20px;">
+    <thead><tr style="background:#f9fafb;"><th style="padding:8px;font-size:10px;color:#6b7280;text-align:center;">#</th><th style="padding:8px;font-size:10px;color:#6b7280;text-align:left;">Jogo</th><th style="padding:8px;font-size:10px;color:#6b7280;text-align:left;">Números</th><th style="padding:8px;font-size:10px;color:#6b7280;text-align:center;">Melhor</th><th style="padding:8px;font-size:10px;color:#6b7280;text-align:center;">Média</th><th style="padding:8px;font-size:10px;color:#6b7280;text-align:center;">Score</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  ${prizeRows ? `<h2 style="font-size:15px;font-weight:700;margin-bottom:10px;">🎰 Distribuição de Premiações</h2><table style="width:100%;max-width:400px;border-collapse:collapse;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:20px;"><tbody>${prizeRows}</tbody></table>` : ''}
+  ${insightsHtml ? `<h2 style="font-size:15px;font-weight:700;margin-bottom:10px;">💡 Insights</h2>${insightsHtml}` : ''}
+  <div style="margin-top:20px;padding-top:14px;border-top:1px solid #e5e7eb;"><p style="font-size:8px;color:#9ca3af;">Gerado por Titan Loterias • Os resultados são baseados em análise estatística e não garantem premiação.</p></div>
+  <div class="no-print" style="text-align:center;margin-top:24px;"><button onclick="window.print()" style="background:#22c55e;color:#fff;border:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">🖨️ Imprimir / Salvar PDF</button></div>
+</div></body></html>`;
+
+  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const w = window.open(url, "_blank");
+  if (w) w.onload = () => URL.revokeObjectURL(url);
+}
 
 interface Props {
   config: LotteryConfig;
@@ -38,7 +92,7 @@ const CONCURSO_OPTIONS = [
   { value: "all" as const, label: "Todos" },
 ];
 
-const GAME_COUNT_OPTIONS = [10, 50, 100, 500];
+const GAME_COUNT_OPTIONS = [10, 50, 100, 500, 1000];
 
 const MODES = [
   { value: "random" as const, label: "Aleatório", icon: "🎲" },
@@ -260,6 +314,13 @@ export function HistoricalSimulatorPanel({ config, draws, stats }: Props) {
         <AnimatePresence>
           {simResults && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+              {/* Export button */}
+              <div className="flex justify-end mb-3">
+                <Button size="sm" variant="outline" onClick={() => exportSimulationPdf(simResults, config)} className="text-xs">
+                  <FileDown className="w-3 h-3 mr-1" />
+                  Exportar PDF
+                </Button>
+              </div>
               {/* Summary cards */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
                 <SummaryCard label="Jogos" value={simResults.summary.totalGames} color="text-primary" />

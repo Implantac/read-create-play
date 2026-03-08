@@ -14,7 +14,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { motion } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2 } from "lucide-react";
+import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const container = {
   hidden: { opacity: 0 },
@@ -24,6 +25,13 @@ const item = {
   hidden: { opacity: 0, y: 16 },
   show: { opacity: 1, y: 0 },
 };
+
+const quickLinks = [
+  { title: "Gerador", description: "Gerar jogos inteligentes", icon: Sparkles, url: "/gerador", color: "text-primary" },
+  { title: "Simulações", description: "Testar contra o histórico", icon: FlaskConical, url: "/simulacoes", color: "text-neon-blue" },
+  { title: "Estatísticas", description: "Análise consolidada", icon: PieChart, url: "/estatisticas", color: "text-accent" },
+  { title: "Estratégias IA", description: "Machine Learning e IA", icon: Brain, url: "/estrategias", color: "text-neon-purple" },
+];
 
 const DashboardPage = () => {
   const { config, draws, loading, syncing, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery } = useLotteryContext();
@@ -63,6 +71,26 @@ const DashboardPage = () => {
       {draws.length > 0 && (
         <>
           <AutoUpdater lotteryId={selectedLottery} onNewDraw={handleNewDraw} latestConcurso={draws[0]?.concurso || 0} />
+
+          {/* Quick access cards */}
+          <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {quickLinks.map(link => (
+              <motion.div key={link.url} variants={item}>
+                <Link
+                  to={link.url}
+                  className="flex items-center gap-3 rounded-xl glass-card p-4 border border-border hover:border-primary/30 transition-all duration-300 hover:translate-y-[-2px] group"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-primary/5 border border-primary/10 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                    <link.icon className={`w-5 h-5 ${link.color}`} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground">{link.title}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">{link.description}</p>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
 
           <motion.div
             key={selectedLottery}
