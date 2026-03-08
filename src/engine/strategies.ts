@@ -108,8 +108,9 @@ export function generateByStrategy(
     case "hot": {
       const pool = [...stats]
         .filter(s => s.status === "hot" || (s.status === "normal" && s.trend > 0))
-        .sort((a, b) => (b.recentFreq + b.trend * 0.5 + b.momentum * 0.2) - (a.recentFreq + a.trend * 0.5 + a.momentum * 0.2));
-      const selected = pool.slice(0, pick).map(s => s.number);
+        .map(s => ({ ...s, weight: Math.max(0.1, s.recentFreq * 2 + s.trend * 0.5 + s.momentum * 0.2 + Math.random() * 3) }));
+      const shuffled = weightedShuffle(pool);
+      const selected = shuffled.slice(0, pick).map(s => s.number);
       while (selected.length < pick) {
         const n = Math.floor(Math.random() * config.numbers) + 1;
         if (!selected.includes(n)) selected.push(n);
@@ -120,8 +121,9 @@ export function generateByStrategy(
     case "cold": {
       const pool = [...stats]
         .filter(s => s.status === "cold" || s.cycleScore > 1.2)
-        .sort((a, b) => (b.cycleScore + b.lastSeen * 0.1) - (a.cycleScore + a.lastSeen * 0.1));
-      const selected = pool.slice(0, pick).map(s => s.number);
+        .map(s => ({ ...s, weight: Math.max(0.1, s.cycleScore * 3 + s.lastSeen * 0.1 + Math.random() * 3) }));
+      const shuffled = weightedShuffle(pool);
+      const selected = shuffled.slice(0, pick).map(s => s.number);
       while (selected.length < pick) {
         const n = Math.floor(Math.random() * config.numbers) + 1;
         if (!selected.includes(n)) selected.push(n);
@@ -250,24 +252,25 @@ export function generateByStrategy(
 
     case "pattern": {
       const mid = Math.ceil(config.numbers / 2);
-      const evens = stats.filter(s => s.number % 2 === 0).sort((a, b) => (b.recentFreq + b.trend) - (a.recentFreq + a.trend));
-      const odds = stats.filter(s => s.number % 2 !== 0).sort((a, b) => (b.recentFreq + b.trend) - (a.recentFreq + a.trend));
+      const evens = stats.filter(s => s.number % 2 === 0)
+        .map(s => ({ ...s, weight: Math.max(0.1, s.recentFreq + s.trend + Math.random() * 3) }));
+      const odds = stats.filter(s => s.number % 2 !== 0)
+        .map(s => ({ ...s, weight: Math.max(0.1, s.recentFreq + s.trend + Math.random() * 3) }));
 
       const evenPick = Math.ceil(pick / 2);
       const oddPick = pick - evenPick;
       const lowPick = Math.ceil(pick / 2);
 
+      const shuffledEvens = weightedShuffle(evens);
+      const shuffledOdds = weightedShuffle(odds);
+
       const candidates = new Set<number>();
-      evens.slice(0, evenPick * 2).forEach(s => candidates.add(s.number));
-      odds.slice(0, oddPick * 2).forEach(s => candidates.add(s.number));
+      shuffledEvens.slice(0, evenPick * 2).forEach(s => candidates.add(s.number));
+      shuffledOdds.slice(0, oddPick * 2).forEach(s => candidates.add(s.number));
 
       const selected: number[] = [];
       let lowCount = 0;
-      const candidateArr = [...candidates].sort((a, b) => {
-        const sa = stats.find(s => s.number === a)!;
-        const sb = stats.find(s => s.number === b)!;
-        return (sb.trend + sb.cycleScore) - (sa.trend + sa.cycleScore);
-      });
+      const candidateArr = [...candidates].sort(() => Math.random() - 0.5);
 
       for (const n of candidateArr) {
         if (selected.length >= pick) break;
