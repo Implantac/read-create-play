@@ -127,13 +127,13 @@ const EstatisticasPage = () => {
 
       {/* Parity + Consecutive */}
       <div className="grid lg:grid-cols-2 gap-6">
-        <ParityChart draws={draws} />
-        <ConsecutiveChart draws={draws} />
+        <ParityChart draws={filteredDraws} />
+        <ConsecutiveChart draws={filteredDraws} />
       </div>
 
       {/* Range + Delay */}
       <div className="grid lg:grid-cols-2 gap-6">
-        <RangeDistribution draws={draws} config={config} />
+        <RangeDistribution draws={filteredDraws} config={config} />
         <DelayChart stats={stats} />
       </div>
 
