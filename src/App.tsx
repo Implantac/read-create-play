@@ -46,6 +46,7 @@ function App() {
               <Route path="/gerador" element={<GeradorPage />} />
               <Route path="/estrategias" element={<EstrategiasPage />} />
               <Route path="/simulacoes" element={<SimulacoesPage />} />
+              <Route path="/ia-autonoma" element={<IAAutonomaPage />} />
               <Route path="/historico" element={<HistoricoPage />} />
               <Route path="/planos" element={<PlanosPage />} />
               <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
