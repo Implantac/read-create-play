@@ -1,6 +1,6 @@
 import {
   BarChart3, Sparkles, FlaskConical, History, Zap,
-  Brain, ShieldCheck, Crown,
+  Brain, ShieldCheck, Crown, PieChart,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
