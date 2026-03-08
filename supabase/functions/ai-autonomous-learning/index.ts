@@ -14,31 +14,55 @@ serve(async (req) => {
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
     const topRankings = report.rankings?.slice(0, 30) || [];
-    const shifts = report.shifts?.slice(0, 20) || [];
+    const shifts = report.shifts?.slice(0, 25) || [];
     const patterns = report.patterns || [];
     const strategies = report.strategies || [];
-    const markov = report.markovTransitions?.slice(0, 25) || [];
-    const cooccurrences = report.topCooccurrences?.slice(0, 20) || [];
+    const markov = report.markovTransitions?.slice(0, 30) || [];
+    const cooccurrences = report.topCooccurrences?.slice(0, 25) || [];
     const gaps = report.gapAnalysis?.slice(0, 20) || [];
     const momentum = report.momentumTimeline?.slice(0, 15) || [];
+    const entropy = report.entropyAnalysis || {};
+    const chiSquare = report.chiSquareResult || {};
+    const triplets = report.topTriplets?.slice(0, 10) || [];
 
     const tierS = topRankings.filter((r: any) => r.compositeScore >= 80).map((r: any) => r.number);
     const tierA = topRankings.filter((r: any) => r.compositeScore >= 60 && r.compositeScore < 80).map((r: any) => r.number);
     const tierB = topRankings.filter((r: any) => r.compositeScore >= 40 && r.compositeScore < 60).map((r: any) => r.number);
 
-    const prompt = `Você é um cientista de dados de elite com PhD em estatística aplicada, especializado em séries temporais e modelagem probabilística de loterias brasileiras.
+    const prompt = `Você é um cientista de dados de elite com PhD em estatística aplicada, especializado em séries temporais, teoria da informação e modelagem probabilística de loterias brasileiras.
 
 Realize uma análise PROFUNDA e ESTRATÉGICA do relatório do sistema de aprendizado autônomo para "${lotteryName}" (${pick} de ${totalNumbers}).
 
 ═══════════════════════════════════════════
-RANKING TOP 30 (Score Composto Multi-dimensional)
+RANKING TOP 30 (Score Composto Multi-dimensional com Entropia)
 ═══════════════════════════════════════════
-${topRankings.map((r: any) => `Nº${String(r.number).padStart(2, '0')}: Score=${r.compositeScore} | Freq=${r.frequencyScore} Rec=${r.recencyScore} Tend=${r.trendScore} Ciclo=${r.cycleScore} Markov=${r.markovScore || 0} Cooc=${r.cooccurrenceScore || 0} | [${r.classification}] [${r.trend}] Mom=${r.momentum?.toFixed?.(1) || 0}`).join("\n")}
+${topRankings.map((r: any) => `Nº${String(r.number).padStart(2, '0')}: Score=${r.compositeScore} | Freq=${r.frequencyScore} Rec=${r.recencyScore} Tend=${r.trendScore} Ciclo=${r.cycleScore} Markov=${r.markovScore || 0} Cooc=${r.cooccurrenceScore || 0} Entropia=${r.entropyScore || 0} | [${r.classification}] [${r.trend}] Mom=${r.momentum?.toFixed?.(1) || 0}`).join("\n")}
 
 CLASSIFICAÇÃO POR TIER:
 - Tier S (≥80): [${tierS.join(", ") || "nenhum"}]
 - Tier A (60-79): [${tierA.join(", ") || "nenhum"}]
 - Tier B (40-59): [${tierB.join(", ") || "nenhum"}]
+
+═══════════════════════════════════════════
+ANÁLISE DE ENTROPIA (Teoria da Informação)
+═══════════════════════════════════════════
+Entropia Global: ${entropy.globalEntropy || "N/A"} bits (Max: ${entropy.maxEntropy || "N/A"} bits)
+Entropia Normalizada: ${entropy.normalizedEntropy || "N/A"} (1.0 = perfeitamente uniforme)
+Entropia por Zona: ${entropy.entropyByZone?.map((z: any) => `${z.zone}: ${z.entropy} (norm=${z.normalized})`).join(" | ") || "N/A"}
+Dezenas Anômalas (alta variabilidade): ${entropy.numberEntropy?.filter((e: any) => e.isAnomaly).slice(0, 10).map((e: any) => `Nº${String(e.number).padStart(2, '0')}(cv=${e.entropy})`).join(", ") || "Nenhuma"}
+
+═══════════════════════════════════════════
+TESTE χ² (Chi-Quadrado de Aderência)
+═══════════════════════════════════════════
+χ² = ${chiSquare.chiSquare || "N/A"} | GL = ${chiSquare.degreesOfFreedom || "N/A"} | p-valor = ${chiSquare.pValue || "N/A"}
+Resultado: ${chiSquare.significanceLevel || "N/A"} | Distribuição uniforme: ${chiSquare.isUniform ? "SIM" : "NÃO"}
+Top Desvios (resíduos padronizados):
+${chiSquare.topDeviations?.slice(0, 10).map((d: any) => `Nº${String(d.number).padStart(2, '0')}: obs=${d.observed} esp=${d.expected} res=${d.residual > 0 ? "+" : ""}${d.residual}`).join("\n") || "N/A"}
+
+═══════════════════════════════════════════
+TRIOS RECORRENTES (Triplets com Lift)
+═══════════════════════════════════════════
+${triplets.map((t: any) => `(${t.numbers.map((n: number) => String(n).padStart(2, '0')).join(",")}) ${t.count}x lift=${t.lift} últ.visto=${t.lastSeen}conc.`).join("\n") || "Nenhum trio significativo"}
 
 ═══════════════════════════════════════════
 TRANSIÇÕES DE MARKOV (do último sorteio)
@@ -93,49 +117,55 @@ Evitar: ${report.avoidNumbers?.map((n: number) => String(n).padStart(2, '0')).jo
 INSTRUÇÃO DE ANÁLISE
 ═══════════════════════════════════════════
 
-Forneça uma análise COMPLETA com as seções abaixo. Seja TÉCNICO, use NÚMEROS CONCRETOS e JUSTIFICATIVAS.
+Forneça uma análise COMPLETA com as seções abaixo. Seja TÉCNICO, use NÚMEROS CONCRETOS e JUSTIFICATIVAS baseadas nos dados acima.
 
 ## 1. DIAGNÓSTICO DO REGIME ATUAL
-- Estado do sistema: estável, transição ou anomalia?
-- Análise do momentum global (mais dezenas acelerando ou desacelerando?)
-- Qualidade dos dados e confiança geral
+- Estado do sistema: estável, transição ou anomalia? Baseie-se na entropia e chi-quadrado
+- Interpretação do teste χ²: a distribuição é uniforme ou há viés explorável?
+- Análise do momentum global e qualidade dos dados
 
-## 2. MAPA ESTRATÉGICO DE DEZENAS
-- **DEZENAS PRIME (núcleo obrigatório):** 5-7 com justificativa baseada em score, Markov e momentum
-- **DEZENAS DE SUPORTE:** 5-8 complementares com base em coocorrência e ciclos
+## 2. ANÁLISE DE ENTROPIA E TEORIA DA INFORMAÇÃO
+- Interpretação da entropia normalizada e o que significa para apostas
+- Zonas com maior/menor entropia e impacto prático
+- Dezenas anômalas: por que são instáveis e se devem ser incluídas ou evitadas
+
+## 3. MAPA ESTRATÉGICO DE DEZENAS
+- **DEZENAS PRIME (núcleo obrigatório):** 5-7 com justificativa baseada em score, Markov, entropia e chi-quadrado
+- **DEZENAS DE SUPORTE:** 5-8 complementares com base em coocorrência, trios e ciclos
 - **DEZENAS OVERDUE (retorno iminente):** 3-5 com base na análise de gap
-- **DEZENAS TÓXICAS:** 3-5 para evitar com justificativa específica
+- **DEZENAS TÓXICAS:** 3-5 para evitar com justificativa estatística
 
-## 3. ANÁLISE DE MARKOV E TRANSIÇÕES
-- Padrões de transição mais fortes detectados
-- Clusters de números que se seguem com frequência
-- Impacto prático para a próxima aposta
+## 4. ANÁLISE DE MARKOV E TRANSIÇÕES
+- Padrões de transição mais fortes e clusters
+- Impacto dos trios recorrentes (triplets) na seleção
+- Combinações implícitas para a próxima aposta
 
-## 4. ANÁLISE DE COOCORRÊNCIA
-- Pares mais fortes (alto Lift) e o que significam
-- Trios ou combinações implícitas
-- Como usar na construção de apostas
+## 5. ANÁLISE DE COOCORRÊNCIA E TRIOS
+- Pares mais fortes e trios significativos
+- Como montar apostas usando as associações detectadas
+- Lift como indicador de dependência estatística
 
-## 5. TENDÊNCIAS E PREVISÃO
+## 6. TENDÊNCIAS E PREVISÃO
 - Direção do sistema nos próximos 5-10 concursos
-- Mudanças estatísticas detectadas e impacto prático
-- Dezenas em fase de aceleração vs desaceleração
+- Mudanças estatísticas (change-points) e impacto
+- Dezenas em aceleração vs desaceleração
 
-## 6. ESTRATÉGIA ÓTIMA
+## 7. ESTRATÉGIA ÓTIMA
 - Melhor estratégia do backtesting e por quê
-- Ajustes concretos sugeridos (substituições específicas)
+- Ajustes baseados em entropia e chi-quadrado
 - Configuração ideal de paridade, soma e distribuição
 
-## 7. JOGOS SUGERIDOS
-- 3 apostas de ${pick} dezenas cada, com justificativa
-- Score de confiança de 0-100 para cada
-- Uma aposta conservadora, uma equilibrada, uma agressiva
+## 8. JOGOS SUGERIDOS
+- 3 apostas de ${pick} dezenas cada, com justificativa técnica detalhada
+- Score de confiança 0-100 para cada
+- Uma conservadora (baseada em frequência), uma equilibrada (multi-critério), uma agressiva (Markov + gaps + trios)
 
-## 8. ALERTAS E RED FLAGS
-- Anomalias detectadas
+## 9. ALERTAS, ANOMALIAS E RED FLAGS
+- Anomalias de entropia detectadas
+- Dezenas com comportamento estatisticamente anormal (resíduos χ² altos)
 - Riscos e precauções
 
-Responda em português. Seja extremamente técnico e acionável.`;
+Responda em português. Seja extremamente técnico, use dados concretos e justificativas numéricas em cada recomendação.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -146,10 +176,10 @@ Responda em português. Seja extremamente técnico e acionável.`;
       body: JSON.stringify({
         model: "google/gemini-2.5-pro",
         messages: [
-          { role: "system", content: "Você é um cientista de dados de elite com PhD em estatística aplicada e experiência em modelagem probabilística de séries temporais. Sua análise é rigorosa, técnica, baseada em evidências numéricas e sempre acionável. Você combina análise frequentista, bayesiana e cadeias de Markov para fundamentar suas recomendações." },
+          { role: "system", content: "Você é um cientista de dados de elite com PhD em estatística aplicada, teoria da informação e modelagem probabilística. Sua análise combina entropia de Shannon, testes chi-quadrado, cadeias de Markov, análise de coocorrência e detecção de change-points para fundamentar recomendações rigorosas e acionáveis." },
           { role: "user", content: prompt },
         ],
-        temperature: 0.35,
+        temperature: 0.3,
       }),
     });
 

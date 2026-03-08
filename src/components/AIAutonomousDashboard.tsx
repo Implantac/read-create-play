@@ -12,12 +12,12 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Brain, TrendingUp, TrendingDown, Zap, Target, RefreshCw, Sparkles,
   AlertTriangle, CheckCircle, ArrowUp, ArrowDown, Minus, Loader2,
-  Activity, Trophy, GitBranch, Link2, Timer, Gauge
+  Activity, Trophy, GitBranch, Link2, Timer, Gauge, Dice1, TriangleAlert, FlaskConical
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
-  PieChart, Pie, Cell, Legend, ScatterChart, Scatter, ZAxis
+  PieChart, Pie, Cell, Legend, ScatterChart, Scatter, ZAxis, LineChart, Line
 } from "recharts";
 
 interface Props {
@@ -90,7 +90,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
     score: r.compositeScore,
     freq: r.frequencyScore,
     markov: r.markovScore,
-    trend: r.trendScore,
+    entropy: r.entropyScore,
   }));
 
   const parityData = [
@@ -104,15 +104,10 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
     esperado: z.expected,
   }));
 
-  // Scatter data for Markov transitions
   const markovScatterData = report.markovTransitions.slice(0, 30).map(t => ({
-    x: t.from,
-    y: t.to,
-    z: t.probability * 100,
-    label: `${t.from}→${t.to}`,
+    x: t.from, y: t.to, z: t.probability * 100, label: `${t.from}→${t.to}`,
   }));
 
-  // Gap analysis chart data
   const gapChartData = report.gapAnalysis
     .filter(g => g.predictedReturn <= 5)
     .slice(0, 15)
@@ -123,11 +118,24 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
       retorno: g.predictedReturn,
     }));
 
-  // Momentum chart data
   const momentumChartData = report.momentumTimeline.slice(0, 15).map(m => ({
     name: String(m.number).padStart(2, "0"),
     aceleracao: m.acceleration,
     fill: m.acceleration > 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 60%)",
+  }));
+
+  // Entropy chart data
+  const entropyZoneData = report.entropyAnalysis.entropyByZone.map(z => ({
+    name: z.zone,
+    entropia: z.entropy,
+    normalizada: Math.round(z.normalized * 100),
+  }));
+
+  // Chi-square deviation chart
+  const chiDeviationData = report.chiSquareResult.topDeviations.slice(0, 12).map(d => ({
+    name: String(d.number).padStart(2, "0"),
+    residual: d.residual,
+    fill: d.residual > 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 60%)",
   }));
 
   return (
@@ -162,7 +170,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
       </Card>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
         <Card className="border-primary/15">
           <CardContent className="pt-3 pb-2 px-3">
             <div className="flex items-center gap-2 mb-1">
@@ -193,19 +201,28 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
         <Card className="border-green-500/15">
           <CardContent className="pt-3 pb-2 px-3">
             <div className="flex items-center gap-2 mb-1">
-              <GitBranch className="h-3.5 w-3.5 text-green-500" />
-              <span className="text-[10px] text-muted-foreground">Transições</span>
+              <Dice1 className="h-3.5 w-3.5 text-green-500" />
+              <span className="text-[10px] text-muted-foreground">Entropia</span>
             </div>
-            <p className="text-xl font-bold text-green-500">{report.markovTransitions.length}</p>
+            <p className="text-xl font-bold text-green-500">{report.entropyAnalysis.normalizedEntropy.toFixed(2)}</p>
           </CardContent>
         </Card>
         <Card className="border-yellow-500/15">
           <CardContent className="pt-3 pb-2 px-3">
             <div className="flex items-center gap-2 mb-1">
-              <Gauge className="h-3.5 w-3.5 text-yellow-500" />
+              <FlaskConical className="h-3.5 w-3.5 text-yellow-500" />
+              <span className="text-[10px] text-muted-foreground">χ² p-valor</span>
+            </div>
+            <p className="text-xl font-bold text-yellow-500">{report.chiSquareResult.pValue.toFixed(3)}</p>
+          </CardContent>
+        </Card>
+        <Card className="border-purple-500/15">
+          <CardContent className="pt-3 pb-2 px-3">
+            <div className="flex items-center gap-2 mb-1">
+              <Gauge className="h-3.5 w-3.5 text-purple-500" />
               <span className="text-[10px] text-muted-foreground">Confiança</span>
             </div>
-            <p className="text-xl font-bold text-yellow-500">{report.confidenceScore}%</p>
+            <p className="text-xl font-bold text-purple-500">{report.confidenceScore}%</p>
           </CardContent>
         </Card>
       </div>
@@ -216,7 +233,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
           <CardTitle className="text-base flex items-center gap-2">
             <Zap className="h-5 w-5 text-primary" />
             Jogo Sugerido pela IA ({config.pick} dezenas)
-            <Badge variant="secondary" className="text-[10px]">Multi-critério</Badge>
+            <Badge variant="secondary" className="text-[10px]">Multi-critério + Entropia + χ²</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -246,9 +263,12 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
 
       {/* Main Tabs */}
       <Tabs defaultValue="ranking" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4 md:grid-cols-7">
+        <TabsList className="flex flex-wrap h-auto gap-1">
           <TabsTrigger value="ranking">Ranking</TabsTrigger>
+          <TabsTrigger value="entropy">Entropia</TabsTrigger>
+          <TabsTrigger value="chisquare">χ² Test</TabsTrigger>
           <TabsTrigger value="markov">Markov</TabsTrigger>
+          <TabsTrigger value="triplets">Trios</TabsTrigger>
           <TabsTrigger value="gaps">Gaps</TabsTrigger>
           <TabsTrigger value="patterns">Padrões</TabsTrigger>
           <TabsTrigger value="strategies">Estratégias</TabsTrigger>
@@ -260,7 +280,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
         <TabsContent value="ranking" className="space-y-4">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">Ranking Probabilístico — Top 20 (com Markov & Coocorrência)</CardTitle>
+              <CardTitle className="text-base">Ranking Probabilístico — Top 20 (com Entropia & Markov)</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={350}>
@@ -273,7 +293,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                   <Bar dataKey="score" name="Score" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="freq" name="Frequência" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="markov" name="Markov" fill="hsl(142, 76%, 36%)" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="trend" name="Tendência" fill="hsl(45, 93%, 47%)" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="entropy" name="Entropia" fill="hsl(280, 70%, 50%)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -292,9 +312,8 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                       <th className="text-left py-2 px-1">Nº</th>
                       <th className="text-center py-2 px-1">Score</th>
                       <th className="text-center py-2 px-1">Freq</th>
-                      <th className="text-center py-2 px-1">Rec.</th>
-                      <th className="text-center py-2 px-1">Tend.</th>
                       <th className="text-center py-2 px-1">Markov</th>
+                      <th className="text-center py-2 px-1">Entropia</th>
                       <th className="text-center py-2 px-1">Cooc.</th>
                       <th className="text-center py-2 px-1">Class.</th>
                       <th className="text-center py-2 px-1">Dir.</th>
@@ -312,9 +331,8 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                           </div>
                         </td>
                         <td className="py-1.5 px-1 text-center font-mono">{r.frequencyScore}</td>
-                        <td className="py-1.5 px-1 text-center font-mono">{r.recencyScore}</td>
-                        <td className="py-1.5 px-1 text-center font-mono">{r.trendScore}</td>
                         <td className="py-1.5 px-1 text-center font-mono">{r.markovScore}</td>
+                        <td className="py-1.5 px-1 text-center font-mono">{r.entropyScore}</td>
                         <td className="py-1.5 px-1 text-center font-mono">{r.cooccurrenceScore}</td>
                         <td className="py-1.5 px-1 text-center">
                           <Badge variant={r.classification === "forte" ? "default" : r.classification === "moderado" ? "secondary" : "outline"} className="text-[10px] px-1">
@@ -325,6 +343,183 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                           {r.trend === "subindo" ? <ArrowUp className="h-3 w-3 text-green-500 mx-auto" /> :
                            r.trend === "descendo" ? <ArrowDown className="h-3 w-3 text-destructive mx-auto" /> :
                            <Minus className="h-3 w-3 text-muted-foreground mx-auto" />}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Entropy Tab */}
+        <TabsContent value="entropy" className="space-y-4">
+          <div className="grid md:grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="pt-4 pb-3">
+                <p className="text-xs text-muted-foreground mb-1">Entropia Global</p>
+                <p className="text-2xl font-bold">{report.entropyAnalysis.globalEntropy.toFixed(3)}</p>
+                <p className="text-[10px] text-muted-foreground">de {report.entropyAnalysis.maxEntropy.toFixed(3)} bits (max)</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-4 pb-3">
+                <p className="text-xs text-muted-foreground mb-1">Entropia Normalizada</p>
+                <p className="text-2xl font-bold">{report.entropyAnalysis.normalizedEntropy.toFixed(4)}</p>
+                <Progress value={report.entropyAnalysis.normalizedEntropy * 100} className="h-2 mt-2" />
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  {report.entropyAnalysis.normalizedEntropy > 0.95 ? "🎲 Quase uniforme" : report.entropyAnalysis.normalizedEntropy > 0.85 ? "⚠️ Levemente enviesada" : "🔥 Significativamente enviesada"}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-4 pb-3">
+                <p className="text-xs text-muted-foreground mb-1">Dezenas Anômalas</p>
+                <p className="text-2xl font-bold text-destructive">{report.entropyAnalysis.numberEntropy.filter(e => e.isAnomaly).length}</p>
+                <p className="text-[10px] text-muted-foreground">Alta variabilidade entre janelas</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Dice1 className="h-4 w-4 text-primary" />
+                Entropia por Zona
+              </CardTitle>
+              <CardDescription>Distribuição de incerteza por faixa numérica</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={entropyZoneData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                  <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "hsl(var(--foreground))" }} />
+                  <Legend />
+                  <Bar dataKey="entropia" name="Entropia (bits)" fill="hsl(280, 70%, 50%)" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="normalizada" name="Normalizada (%)" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Dezenas com Maior Variabilidade</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="max-h-[250px] overflow-y-auto">
+                <div className="flex flex-wrap gap-2">
+                  {report.entropyAnalysis.numberEntropy.slice(0, 20).map(e => (
+                    <div key={e.number} className={`text-center p-2 rounded-lg border ${e.isAnomaly ? "border-destructive/30 bg-destructive/5" : "border-border bg-muted/20"}`}>
+                      <span className="font-bold text-sm block">{String(e.number).padStart(2, "0")}</span>
+                      <span className={`text-[10px] ${e.isAnomaly ? "text-destructive" : "text-muted-foreground"}`}>cv={e.entropy}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Chi-Square Tab */}
+        <TabsContent value="chisquare" className="space-y-4">
+          <div className="grid md:grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="pt-4 pb-3">
+                <p className="text-xs text-muted-foreground mb-1">Estatística χ²</p>
+                <p className="text-2xl font-bold">{report.chiSquareResult.chiSquare.toFixed(2)}</p>
+                <p className="text-[10px] text-muted-foreground">GL = {report.chiSquareResult.degreesOfFreedom}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-4 pb-3">
+                <p className="text-xs text-muted-foreground mb-1">p-valor</p>
+                <p className={`text-2xl font-bold ${report.chiSquareResult.isUniform ? "text-green-500" : "text-destructive"}`}>
+                  {report.chiSquareResult.pValue.toFixed(4)}
+                </p>
+                <p className="text-[10px] text-muted-foreground">{report.chiSquareResult.significanceLevel}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-4 pb-3">
+                <p className="text-xs text-muted-foreground mb-1">Distribuição</p>
+                <div className="flex items-center gap-2">
+                  {report.chiSquareResult.isUniform ? (
+                    <>
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <span className="text-sm font-semibold text-green-500">Uniforme</span>
+                    </>
+                  ) : (
+                    <>
+                      <TriangleAlert className="h-5 w-5 text-destructive" />
+                      <span className="text-sm font-semibold text-destructive">Não uniforme</span>
+                    </>
+                  )}
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  {report.chiSquareResult.isUniform ? "Sem viés estatístico significativo" : "Viés detectado — explorável para apostas"}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <FlaskConical className="h-4 w-4 text-primary" />
+                Resíduos Padronizados (Top Desvios)
+              </CardTitle>
+              <CardDescription>Positivo = acima do esperado | Negativo = abaixo do esperado</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={chiDeviationData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                  <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "hsl(var(--foreground))" }} />
+                  <Bar dataKey="residual" name="Resíduo">
+                    {chiDeviationData.map((entry, i) => (
+                      <Cell key={i} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Tabela de Desvios</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="max-h-[300px] overflow-y-auto">
+                <table className="w-full text-xs">
+                  <thead className="sticky top-0 bg-card z-10">
+                    <tr className="border-b border-border">
+                      <th className="text-left py-2 px-2">Nº</th>
+                      <th className="text-center py-2 px-2">Observado</th>
+                      <th className="text-center py-2 px-2">Esperado</th>
+                      <th className="text-center py-2 px-2">Resíduo</th>
+                      <th className="text-center py-2 px-2">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {report.chiSquareResult.topDeviations.map(d => (
+                      <tr key={d.number} className="border-b border-border/50 hover:bg-muted/30">
+                        <td className="py-1.5 px-2 font-bold">{String(d.number).padStart(2, "0")}</td>
+                        <td className="py-1.5 px-2 text-center font-mono">{d.observed}</td>
+                        <td className="py-1.5 px-2 text-center font-mono">{d.expected}</td>
+                        <td className={`py-1.5 px-2 text-center font-mono font-bold ${d.residual > 0 ? "text-green-500" : "text-destructive"}`}>
+                          {d.residual > 0 ? "+" : ""}{d.residual}
+                        </td>
+                        <td className="py-1.5 px-2 text-center">
+                          <Badge variant={Math.abs(d.residual) > 2 ? "destructive" : Math.abs(d.residual) > 1 ? "secondary" : "outline"} className="text-[10px] px-1">
+                            {Math.abs(d.residual) > 2 ? "⚠️ Anormal" : Math.abs(d.residual) > 1 ? "Desvio" : "Normal"}
+                          </Badge>
                         </td>
                       </tr>
                     ))}
@@ -351,8 +546,8 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                   <ResponsiveContainer width="100%" height={300}>
                     <ScatterChart>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                      <XAxis dataKey="x" name="De" stroke="hsl(var(--muted-foreground))" fontSize={10} label={{ value: "De", position: "bottom" }} />
-                      <YAxis dataKey="y" name="Para" stroke="hsl(var(--muted-foreground))" fontSize={10} label={{ value: "Para", angle: -90, position: "left" }} />
+                      <XAxis dataKey="x" name="De" stroke="hsl(var(--muted-foreground))" fontSize={10} />
+                      <YAxis dataKey="y" name="Para" stroke="hsl(var(--muted-foreground))" fontSize={10} />
                       <ZAxis dataKey="z" range={[30, 300]} name="Prob%" />
                       <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "hsl(var(--foreground))" }} />
                       <Scatter data={markovScatterData} fill="hsl(var(--primary))" fillOpacity={0.7} />
@@ -370,7 +565,6 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                   <Link2 className="h-4 w-4 text-accent" />
                   Top Pares Coocorrentes
                 </CardTitle>
-                <CardDescription>Pares que aparecem juntos com frequência (Lift)</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="max-h-[300px] overflow-y-auto space-y-1.5">
@@ -390,14 +584,12 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
             </Card>
           </div>
 
-          {/* Momentum */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <Activity className="h-4 w-4" />
                 Momentum (Aceleração/Desaceleração)
               </CardTitle>
-              <CardDescription>Dezenas que estão acelerando (verde) ou desacelerando (vermelho)</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={250}>
@@ -417,6 +609,47 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
           </Card>
         </TabsContent>
 
+        {/* Triplets Tab */}
+        <TabsContent value="triplets" className="space-y-4">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                🔺 Trios Recorrentes
+              </CardTitle>
+              <CardDescription>Combinações de 3 números que aparecem juntos com frequência significativa (Lift)</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {report.topTriplets.length > 0 ? (
+                <div className="space-y-2">
+                  {report.topTriplets.map((t, i) => (
+                    <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${i < 3 ? "border-primary/20 bg-primary/5" : "border-border bg-muted/20"}`}>
+                      <span className="text-xs text-muted-foreground font-mono w-6">#{i + 1}</span>
+                      <div className="flex gap-1.5">
+                        {t.numbers.map(n => (
+                          <span key={n} className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/15 text-primary font-bold text-sm border border-primary/30">
+                            {String(n).padStart(2, "0")}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <Badge variant={t.lift > 3 ? "default" : "secondary"} className="text-[10px]">
+                            lift={t.lift}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">{t.count}x aparições</span>
+                          <span className="text-[10px] text-muted-foreground">· visto há {t.lastSeen} conc.</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-8">Nenhum trio significativo detectado</p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         {/* Gaps Tab */}
         <TabsContent value="gaps" className="space-y-4">
           <Card>
@@ -425,7 +658,6 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                 <Timer className="h-4 w-4 text-primary" />
                 Análise de Gap — Retorno Iminente
               </CardTitle>
-              <CardDescription>Dezenas cujo retorno está previsto para os próximos concursos</CardDescription>
             </CardHeader>
             <CardContent>
               {gapChartData.length > 0 ? (
@@ -449,7 +681,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
 
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">Tabela de Gaps Completa</CardTitle>
+              <CardTitle className="text-base">Tabela de Gaps</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="max-h-[300px] overflow-y-auto">
@@ -501,9 +733,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                         {p.actionable && <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">Acionável</Badge>}
                       </div>
                       <p className="text-xs text-muted-foreground mb-1">{p.description}</p>
-                      {p.suggestion && (
-                        <p className="text-xs text-primary font-medium">💡 {p.suggestion}</p>
-                      )}
+                      {p.suggestion && <p className="text-xs text-primary font-medium">💡 {p.suggestion}</p>}
                       <div className="flex items-center gap-2 mt-2">
                         <Progress value={p.confidence} className="h-1.5 flex-1" />
                         <span className="text-[10px] font-mono text-muted-foreground">{p.confidence}%</span>
@@ -664,7 +894,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                 Análise da IA Autônoma
               </CardTitle>
               <CardDescription>
-                Análise profunda com Markov, coocorrência, gaps e momentum
+                Análise profunda com Entropia, χ², Markov, Trios, Coocorrência e Gaps
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -678,7 +908,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                 <div className="text-center py-8">
                   <Brain className="mx-auto h-12 w-12 text-muted-foreground/30 mb-4" />
                   <p className="text-muted-foreground mb-4">
-                    Clique abaixo para a IA analisar todos os dados — Markov, coocorrência, gaps, momentum e estratégias.
+                    Clique abaixo para a IA analisar todos os dados — Entropia, χ², Markov, Trios, Gaps e Estratégias.
                   </p>
                   <Button onClick={runAIAnalysis} disabled={aiLoading} className="gap-2">
                     {aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
