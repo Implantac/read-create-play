@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.ai-pattern-analysis]
 verify_jwt = false
+
+[functions.ai-autonomous-learning]
+verify_jwt = false
