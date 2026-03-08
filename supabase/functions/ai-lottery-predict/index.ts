@@ -296,13 +296,18 @@ Gere ${Math.min(count, 10)} apostas otimizadas usando a metodologia descrita.`;
       throw new Error("IA não gerou apostas válidas. Tente novamente.");
     }
 
-    return new Response(JSON.stringify({
+    const responseData = {
       success: true,
       bets: validBets,
       analysis: parsed.analysis || "Análise baseada em padrões estatísticos avançados.",
       lottery: cfg.name,
       count: validBets.length,
-    }), {
+    };
+
+    // Store in cache
+    await setCachedAnalysis(supabase, lottery_id, "ai-lottery-predict", cacheInput, responseData, 4);
+
+    return new Response(JSON.stringify(responseData), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 

@@ -173,7 +173,10 @@ Para cada jogo, identifique:
     const aiData = await aiResponse.json();
     const analysis = aiData.choices?.[0]?.message?.content || "Análise não disponível.";
 
-    return new Response(JSON.stringify({ success: true, analysis }), {
+    const responseData = { success: true, analysis };
+    await setCachedAnalysis(supabase, lotteryId, "ai-simulation-analysis", cacheInput, responseData, 6);
+
+    return new Response(JSON.stringify(responseData), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 

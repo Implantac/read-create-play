@@ -213,7 +213,10 @@ Responda em português. Seja extremamente técnico, use dados concretos e justif
     const data = await response.json();
     const aiAnalysis = data.choices?.[0]?.message?.content || "Análise não disponível.";
 
-    return new Response(JSON.stringify({ analysis: aiAnalysis }), {
+    const responseData = { analysis: aiAnalysis };
+    await setCachedAnalysis(supabase, lotteryId, "ai-autonomous-learning", cacheInput, responseData, 6);
+
+    return new Response(JSON.stringify(responseData), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
