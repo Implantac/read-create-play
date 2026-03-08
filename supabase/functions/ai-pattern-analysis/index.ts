@@ -20,52 +20,94 @@ serve(async (req) => {
 
     const { summary, parityPatterns, sumPatterns, consecutivePatterns, spatialDistribution, hotStreaks, frequencyTrends } = patternReport;
 
-    const top10Trending = (frequencyTrends || []).slice(0, 10);
-    const bottom10 = [...(frequencyTrends || [])].sort((a: any, b: any) => a.momentum - b.momentum).slice(0, 10);
+    const top15Trending = (frequencyTrends || []).slice(0, 15);
+    const bottom15 = [...(frequencyTrends || [])].sort((a: any, b: any) => a.momentum - b.momentum).slice(0, 15);
 
-    const systemPrompt = `Você é um analista estatístico especialista em loterias brasileiras.
-Analise os padrões detectados nos concursos históricos e gere insights acionáveis.
+    // Compute acceleration (change in momentum)
+    const accelerating = top15Trending.filter((f: any) => f.last10Freq > f.last30Freq / 3);
+    const decelerating = bottom15.filter((f: any) => f.last10Freq < f.last30Freq / 6);
+
+    const systemPrompt = `Você é um analista quantitativo de elite especializado em detecção de padrões em séries temporais de loterias brasileiras.
+Sua análise combina técnicas de:
+- Análise de frequência espectral
+- Detecção de regime (estável vs transição)
+- Modelagem de ciclos via autocorrelação
+- Análise de distribuição espacial e clustering
+- Identificação de anomalias estatísticas
+
 Responda em português do Brasil com markdown formatado (##, ###, **negrito**, listas).
-Seja específico com números, porcentagens e recomendações concretas.`;
+Seja EXTREMAMENTE específico: cite números, porcentagens, comparações e intervalos de confiança.
+Cada recomendação deve ter um "porquê" numérico.`;
 
-    const userPrompt = `Loteria: ${lotteryName} (${lotteryPick} números de 1 a ${lotteryNumbers})
+    const userPrompt = `═══ ANÁLISE DE PADRÕES — ${lotteryName} (${lotteryPick}/${lotteryNumbers}) ═══
 Concursos analisados: ${drawCount}
 
-📊 PADRÕES DE PARIDADE (Par/Ímpar):
-${parityPatterns.slice(0, 8).map((p: any) => `${p.evens}P/${p.odds}I: ${p.count}x (${p.percentage}%)`).join("\n")}
-Mais comum: ${summary.mostCommonParity}
+━━━ 1. PADRÕES DE PARIDADE (Par/Ímpar) ━━━
+${parityPatterns.slice(0, 10).map((p: any) => `${p.evens}P/${p.odds}I: ${p.count}x (${p.percentage}%) ${p.percentage > 20 ? "★ DOMINANTE" : ""}`).join("\n")}
+Configuração mais comum: ${summary.mostCommonParity}
+Desvio da distribuição uniforme: ${summary.parityDeviation || "N/A"}
 
-📊 PADRÕES DE SOMA:
-Média: ${summary.avgSum} | Desvio: ${summary.sumStdDev}
-${sumPatterns.map((s: any) => `Faixa ${s.rangeLabel}: ${s.count}x (${s.percentage}%)`).join("\n")}
+━━━ 2. PADRÕES DE SOMA ━━━
+Média: ${summary.avgSum} | Mediana: ${summary.medianSum || "N/A"} | Desvio: ${summary.sumStdDev}
+Faixa 1σ: [${Math.round(summary.avgSum - summary.sumStdDev)}, ${Math.round(summary.avgSum + parseFloat(summary.sumStdDev))}]
+${sumPatterns.map((s: any) => `Faixa ${s.rangeLabel}: ${s.count}x (${s.percentage}%) ${s.percentage > 25 ? "★ CONCENTRADA" : ""}`).join("\n")}
 
-📊 CONSECUTIVOS:
-Média de consecutivos por sorteio: ${summary.avgConsecutives}
+━━━ 3. CONSECUTIVOS ━━━
+Média de pares consecutivos: ${summary.avgConsecutives}
 ${consecutivePatterns.map((c: any) => `${c.consecutiveCount} consecutivos: ${c.occurrences}x (${c.percentage}%)`).join("\n")}
 
-📊 DISTRIBUIÇÃO ESPACIAL:
-Equilíbrio: ${spatialDistribution.balance}/100
-${spatialDistribution.sectors.map((s: any) => `Setor ${s.label}: média ${s.avgCount} (σ ${s.stdDev})`).join("\n")}
+━━━ 4. DISTRIBUIÇÃO ESPACIAL ━━━
+Equilíbrio geral: ${spatialDistribution.balance}/100
+${spatialDistribution.sectors.map((s: any) => `Setor ${s.label}: média=${s.avgCount} σ=${s.stdDev} ${s.avgCount > (lotteryPick / spatialDistribution.sectors.length) * 1.3 ? "⬆️ SOBRECARREGADO" : s.avgCount < (lotteryPick / spatialDistribution.sectors.length) * 0.7 ? "⬇️ SUBEXPLORADO" : "→ NORMAL"}`).join("\n")}
 
-📊 TOP 10 DEZENAS EM TENDÊNCIA DE ALTA:
-${top10Trending.map((f: any) => `Nº ${f.number}: últimos10=${f.last10Freq} últimos30=${f.last30Freq} momentum=${f.momentum}`).join("\n")}
+━━━ 5. TOP 15 EM ALTA (momentum positivo) ━━━
+${top15Trending.map((f: any) => `Nº${String(f.number).padStart(2, '0')}: f10=${f.last10Freq} f30=${f.last30Freq} momentum=${f.momentum > 0 ? "+" : ""}${f.momentum} ${accelerating.includes(f) ? "🚀 ACELERANDO" : ""}`).join("\n")}
 
-📊 TOP 10 DEZENAS EM QUEDA:
-${bottom10.map((f: any) => `Nº ${f.number}: últimos10=${f.last10Freq} últimos30=${f.last30Freq} momentum=${f.momentum}`).join("\n")}
+━━━ 6. TOP 15 EM QUEDA (momentum negativo) ━━━
+${bottom15.map((f: any) => `Nº${String(f.number).padStart(2, '0')}: f10=${f.last10Freq} f30=${f.last30Freq} momentum=${f.momentum} ${decelerating.includes(f) ? "📉 DESACELERANDO" : ""}`).join("\n")}
 
-📊 DEZENAS MAIS CONSISTENTES (menor variação): ${summary.mostConsistent.join(", ")}
-📊 DEZENAS ATRASADAS (overdue): ${summary.overdueNumbers.join(", ")}
+━━━ 7. DEZENAS MAIS CONSISTENTES ━━━
+${summary.mostConsistent.join(", ")}
 
-📊 MAIORES SEQUÊNCIAS QUENTES:
-${hotStreaks.slice(0, 8).map((h: any) => `Nº ${h.number}: ${h.streakLength} sorteios consecutivos`).join("\n")}
+━━━ 8. OVERDUE (atrasadas além do ciclo médio) ━━━
+${summary.overdueNumbers.join(", ")}
 
-Gere uma análise completa com:
-1. **Resumo dos padrões dominantes** — quais padrões são mais relevantes
-2. **Dezenas recomendadas** — baseado nos padrões, quais dezenas priorizar
-3. **Dezenas a evitar** — quais estão em declínio
-4. **Padrão ideal de jogo** — par/ímpar, soma, consecutivos, distribuição recomendada
-5. **Insights surpresa** — padrões não óbvios detectados nos dados
-6. **Estratégia sugerida** — como montar jogos usando esses padrões`;
+━━━ 9. MAIORES HOT STREAKS ━━━
+${hotStreaks.slice(0, 10).map((h: any) => `Nº${h.number}: ${h.streakLength} sorteios consecutivos presentes`).join("\n")}
+
+═══ SOLICITAÇÃO DE ANÁLISE ═══
+
+Forneça uma análise completa e acionável em 6 seções:
+
+## 1. MAPA DE REGIMES
+- Classificar o estado atual: regime estável, transição ou caótico
+- Fundamentar com evidências numéricas dos padrões acima
+
+## 2. ANÁLISE MULTIDIMENSIONAL DE DEZENAS
+Para as 10 melhores e 5 piores dezenas:
+- Citar o número, momentum, frequência recente, e classificação
+- Dizer se é candidata para inclusão ou exclusão e por quê
+
+## 3. PADRÃO IDEAL DE JOGO
+- Par/ímpar exato recomendado
+- Faixa de soma ideal (intervalo numérico)
+- Máximo de consecutivos
+- Distribuição por setores
+
+## 4. DETECÇÃO DE ANOMALIAS
+- Padrões não-óbvios ou contra-intuitivos nos dados
+- Setores com comportamento anômalo
+- Dezenas com ciclos irregulares
+
+## 5. ESTRATÉGIA TÁTICA (próximos 5-10 concursos)
+- Dezenas para priorizar e evitar com score de urgência
+- Configurações de jogo recomendadas
+- 2 jogos sugeridos com ${lotteryPick} dezenas e justificativa
+
+## 6. CONFIANÇA E RESSALVAS
+- Score de confiança geral (0-100)
+- Limitações da análise
+- Cenários que invalidariam as recomendações`;
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -74,12 +116,12 @@ Gere uma análise completa com:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        temperature: 0.5,
+        temperature: 0.4,
       }),
     });
 
