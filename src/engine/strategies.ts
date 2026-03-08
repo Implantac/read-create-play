@@ -252,24 +252,25 @@ export function generateByStrategy(
 
     case "pattern": {
       const mid = Math.ceil(config.numbers / 2);
-      const evens = stats.filter(s => s.number % 2 === 0).sort((a, b) => (b.recentFreq + b.trend) - (a.recentFreq + a.trend));
-      const odds = stats.filter(s => s.number % 2 !== 0).sort((a, b) => (b.recentFreq + b.trend) - (a.recentFreq + a.trend));
+      const evens = stats.filter(s => s.number % 2 === 0)
+        .map(s => ({ ...s, weight: Math.max(0.1, s.recentFreq + s.trend + Math.random() * 3) }));
+      const odds = stats.filter(s => s.number % 2 !== 0)
+        .map(s => ({ ...s, weight: Math.max(0.1, s.recentFreq + s.trend + Math.random() * 3) }));
 
       const evenPick = Math.ceil(pick / 2);
       const oddPick = pick - evenPick;
       const lowPick = Math.ceil(pick / 2);
 
+      const shuffledEvens = weightedShuffle(evens);
+      const shuffledOdds = weightedShuffle(odds);
+
       const candidates = new Set<number>();
-      evens.slice(0, evenPick * 2).forEach(s => candidates.add(s.number));
-      odds.slice(0, oddPick * 2).forEach(s => candidates.add(s.number));
+      shuffledEvens.slice(0, evenPick * 2).forEach(s => candidates.add(s.number));
+      shuffledOdds.slice(0, oddPick * 2).forEach(s => candidates.add(s.number));
 
       const selected: number[] = [];
       let lowCount = 0;
-      const candidateArr = [...candidates].sort((a, b) => {
-        const sa = stats.find(s => s.number === a)!;
-        const sb = stats.find(s => s.number === b)!;
-        return (sb.trend + sb.cycleScore) - (sa.trend + sa.cycleScore);
-      });
+      const candidateArr = [...candidates].sort(() => Math.random() - 0.5);
 
       for (const n of candidateArr) {
         if (selected.length >= pick) break;
