@@ -38,7 +38,7 @@ const CONCURSO_OPTIONS = [
   { value: "all" as const, label: "Todos" },
 ];
 
-const GAME_COUNT_OPTIONS = [10, 50, 100, 500];
+const GAME_COUNT_OPTIONS = [10, 50, 100, 500, 1000];
 
 const MODES = [
   { value: "random" as const, label: "Aleatório", icon: "🎲" },

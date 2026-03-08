@@ -29,6 +29,7 @@ const mainItems = [
   { title: "IA Autônoma", url: "/ia-autonoma", icon: Zap },
   { title: "Estratégias IA", url: "/estrategias", icon: Brain },
   { title: "Simulações", url: "/simulacoes", icon: FlaskConical },
+  { title: "Estatísticas", url: "/estatisticas", icon: PieChart },
   { title: "Histórico", url: "/historico", icon: History },
 ];
 
