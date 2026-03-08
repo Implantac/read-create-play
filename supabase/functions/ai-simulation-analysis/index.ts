@@ -21,7 +21,10 @@ serve(async (req) => {
     const systemPrompt = `Você é um analista estatístico especialista em loterias brasileiras.
 Analise os resultados de simulação de apostas e forneça insights acionáveis.
 Seja direto, use dados e linguagem clara. Responda em português do Brasil.
-Formate sua resposta com seções usando markdown (##, ###, **negrito**, etc).`;
+Formate sua resposta com seções usando markdown (##, ###, **negrito**, etc).
+
+IMPORTANTE: Além de analisar, você DEVE sugerir melhorias concretas nos jogos.
+Identifique dezenas pouco eficientes e sugira substituições específicas.`;
 
     const userPrompt = `Loteria: ${lotteryName} (${lotteryPick} números de 1 a ${lotteryNumbers})
 
@@ -45,13 +48,14 @@ ${simulationData.bets.map((b: any, i: number) => {
 }).join("\n\n")}
 
 Analise os resultados e forneça:
-1. **Ranking comentado** dos jogos do melhor ao pior
-2. **Padrões identificados** nas combinações mais eficientes
-3. **Insights estratégicos** sobre distribuição de dezenas
-4. **Recomendações** para otimizar os jogos
-5. **Conclusão** com veredicto final
+1. **Ranking comentado** dos jogos do melhor ao pior, com explicação do porquê
+2. **Padrões identificados** nas combinações mais eficientes (distribuição par/ímpar, faixas, consecutivos)
+3. **Dezenas ineficientes** — para cada jogo, identifique 2-4 números que provavelmente prejudicam o desempenho e sugira substituições concretas
+4. **Sugestões de novos jogos** — crie 1-2 combinações otimizadas baseadas nos padrões dos jogos de melhor desempenho
+5. **Insights estratégicos** sobre distribuição de dezenas, equilíbrio e cobertura
+6. **Conclusão** com veredicto final e recomendação de ação
 
-Seja específico com números e porcentagens.`;
+Seja específico com números e porcentagens. Inclua exemplos de jogos sugeridos com números concretos.`;
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
