@@ -1,5 +1,6 @@
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { EnhancedBetGenerator } from "@/components/EnhancedBetGenerator";
+import { AIPredictionPanel } from "@/components/AIPredictionPanel";
 import { ProfessionalGeneratorPanel } from "@/components/ProfessionalGeneratorPanel";
 import { MonteCarloPanel } from "@/components/MonteCarloPanel";
 import { BetOptimizerPanel } from "@/components/BetOptimizerPanel";
@@ -43,6 +44,9 @@ const GeradorPage = () => {
             />
             <SavedBetsPanel />
           </div>
+
+          {/* AI Prediction - Destaque principal */}
+          <AIPredictionPanel config={config} stats={stats} onSaveBet={handleSaveBet} />
 
           <PlanGate feature="gerador_profissional" fallbackMessage="Gerador Profissional com filtros avançados">
             <ProfessionalGeneratorPanel stats={stats} config={config} draws={draws} />
