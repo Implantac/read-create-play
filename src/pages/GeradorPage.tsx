@@ -48,6 +48,9 @@ const GeradorPage = () => {
 
           <AIPredictionPanel config={config} stats={stats} onSaveBet={handleSaveBet} />
 
+          {/* Gerador Inteligente */}
+          <IntelligentGeneratorPanel stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
+
           {/* Gerador Evolutivo */}
           <EvolutiveGeneratorPanel stats={stats} config={config} draws={draws} lotteryId={selectedLottery} />
 
