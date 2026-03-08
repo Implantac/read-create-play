@@ -4,6 +4,7 @@ import { MassiveSimulatorPanel } from "@/components/MassiveSimulatorPanel";
 import { MassiveSimulationDashboard } from "@/components/MassiveSimulationDashboard";
 import { BacktestPanel } from "@/components/BacktestPanel";
 import { IntelligentSimulatorPanel } from "@/components/IntelligentSimulatorPanel";
+import { HistoricalSimulatorPanel } from "@/components/HistoricalSimulatorPanel";
 import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
@@ -26,7 +27,10 @@ const SimulacoesPage = () => {
         <EmptyState description="Importe os sorteios primeiro no Dashboard para rodar simulações." />
       ) : (
         <>
-          {/* Motor de Simulação Massiva v2 - Destaque principal */}
+          {/* Simulador Histórico de Jogos - NOVO */}
+          <HistoricalSimulatorPanel config={config} draws={draws} stats={stats} />
+
+          {/* Motor de Simulação Massiva v2 */}
           <MassiveSimulationDashboard stats={stats} config={config} draws={draws} />
 
           {/* Simulador Inteligente com IA */}
