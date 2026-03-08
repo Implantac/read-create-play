@@ -20,6 +20,7 @@ import SignupPage from "@/pages/SignupPage";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import IAAutonomaPage from "@/pages/IAAutonomaPage";
+import EstatisticasPage from "@/pages/EstatisticasPage";
 import LandingPage from "./pages/LandingPage";
 import NotFound from "./pages/NotFound";
 
