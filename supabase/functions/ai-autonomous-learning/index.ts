@@ -14,6 +14,16 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
+    const supabase = await getSupabaseAdmin();
+    const lotteryId = lotteryName?.toLowerCase().replace(/\s+/g, "").replace(/á/g, "a") || "unknown";
+    const cacheInput = { lotteryName, confidenceScore: report.confidenceScore, rankingsCount: report.rankings?.length };
+    const cached = await getCachedAnalysis(supabase, lotteryId, "ai-autonomous-learning", cacheInput, 6);
+    if (cached) {
+      return new Response(JSON.stringify({ ...cached, fromCache: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const topRankings = report.rankings?.slice(0, 30) || [];
     const shifts = report.shifts?.slice(0, 25) || [];
     const patterns = report.patterns || [];
