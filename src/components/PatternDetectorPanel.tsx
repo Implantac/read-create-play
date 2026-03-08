@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Brain, Loader2, TrendingUp, TrendingDown, BarChart3, Zap, Target } from "lucide-react";
+import { Search, Brain, Loader2, TrendingUp, TrendingDown, BarChart3, Zap, Target, GitBranch, Layers, RefreshCw, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { NumberStats } from "@/engine/statistics";
@@ -70,7 +70,12 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
     try {
       const { data, error } = await supabase.functions.invoke("ai-pattern-analysis", {
         body: {
-          patternReport: report,
+          patternReport: {
+            ...report,
+            // Send compact versions
+            cooccurrenceMatrix: report.cooccurrenceMatrix.slice(0, 15),
+            cycleDetection: report.cycleDetection.slice(0, 10),
+          },
           lotteryName: config.name,
           lotteryPick: config.pick,
           lotteryNumbers: config.numbers,
@@ -90,29 +95,29 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
   const parityChartData = useMemo(() => {
     if (!report) return [];
     return report.parityPatterns.slice(0, 6).map(p => ({
-      name: `${p.evens}P/${p.odds}I`,
-      value: p.count,
-      percentage: p.percentage,
+      name: `${p.evens}P/${p.odds}I`, value: p.count, percentage: p.percentage,
     }));
   }, [report]);
 
   const sumChartData = useMemo(() => {
     if (!report) return [];
-    return report.sumPatterns.map(s => ({
-      faixa: s.rangeLabel,
-      concursos: s.count,
-      percentual: s.percentage,
-    }));
+    return report.sumPatterns.map(s => ({ faixa: s.rangeLabel, concursos: s.count, percentual: s.percentage }));
   }, [report]);
 
   const spatialRadarData = useMemo(() => {
     if (!report) return [];
     return report.spatialDistribution.sectors.map(s => ({
-      setor: s.label,
-      media: s.avgCount,
+      setor: s.label, media: s.avgCount,
       fullMark: Math.ceil(config.pick / report.spatialDistribution.sectors.length * 2),
     }));
   }, [report, config.pick]);
+
+  const transitionChartData = useMemo(() => {
+    if (!report) return [];
+    return report.transitionAnalysis.repeatDistribution.map(r => ({
+      repeats: `${r.repeats} repet.`, count: r.count, percentage: r.percentage,
+    }));
+  }, [report]);
 
   return (
     <Card className="border-primary/20 bg-card/80 backdrop-blur">
@@ -121,12 +126,15 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
           <div className="p-2 rounded-lg bg-primary/10">
             <Search className="h-6 w-6 text-primary" />
           </div>
-          <div>
-            <CardTitle className="text-xl text-foreground">Detector de Padrões Estatísticos</CardTitle>
+          <div className="flex-1">
+            <CardTitle className="text-xl text-foreground">Detector de Padrões Estatísticos v2.0</CardTitle>
             <CardDescription>
-              IA analisa o histórico de {config.name} e identifica padrões relevantes
+              Análise profunda com ciclos, transições, coocorrência e clusterização
             </CardDescription>
           </div>
+          <Badge variant="outline" className="text-[10px] border-primary/30 text-primary hidden sm:inline-flex">
+            DEEP ANALYSIS
+          </Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-5">
@@ -152,89 +160,61 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
         {report && (
           <Tabs defaultValue="overview" className="space-y-4">
             <TabsList className="bg-muted/50 flex-wrap h-auto gap-1">
-              <TabsTrigger value="overview"><Zap className="h-3.5 w-3.5 mr-1.5" />Resumo</TabsTrigger>
-              <TabsTrigger value="charts"><BarChart3 className="h-3.5 w-3.5 mr-1.5" />Gráficos</TabsTrigger>
-              <TabsTrigger value="trends"><TrendingUp className="h-3.5 w-3.5 mr-1.5" />Tendências</TabsTrigger>
-              <TabsTrigger value="ai"><Brain className="h-3.5 w-3.5 mr-1.5" />Análise IA</TabsTrigger>
+              <TabsTrigger value="overview" className="text-xs"><Zap className="h-3 w-3 mr-1" />Resumo</TabsTrigger>
+              <TabsTrigger value="charts" className="text-xs"><BarChart3 className="h-3 w-3 mr-1" />Gráficos</TabsTrigger>
+              <TabsTrigger value="trends" className="text-xs"><TrendingUp className="h-3 w-3 mr-1" />Tendências</TabsTrigger>
+              <TabsTrigger value="transitions" className="text-xs"><RefreshCw className="h-3 w-3 mr-1" />Transições</TabsTrigger>
+              <TabsTrigger value="clusters" className="text-xs"><Layers className="h-3 w-3 mr-1" />Clusters</TabsTrigger>
+              <TabsTrigger value="cycles" className="text-xs"><GitBranch className="h-3 w-3 mr-1" />Ciclos</TabsTrigger>
+              <TabsTrigger value="rare" className="text-xs"><AlertTriangle className="h-3 w-3 mr-1" />Raros</TabsTrigger>
+              <TabsTrigger value="ai" className="text-xs"><Brain className="h-3 w-3 mr-1" />IA</TabsTrigger>
             </TabsList>
 
             {/* Overview */}
             <TabsContent value="overview" className="space-y-4">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[
+                  { label: "Paridade dominante", value: report.summary.mostCommonParity },
+                  { label: "Soma média", value: report.summary.avgSum },
+                  { label: "Consecutivos médios", value: report.summary.avgConsecutives },
+                  { label: "Equilíbrio espacial", value: `${report.spatialDistribution.balance}%`, primary: true },
+                ].map((item, i) => (
+                  <div key={i} className="bg-muted/30 rounded-lg p-3 text-center">
+                    <p className="text-xs text-muted-foreground">{item.label}</p>
+                    <p className={`text-lg font-bold ${item.primary ? "text-primary" : "text-foreground"}`}>{item.value}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="bg-muted/30 rounded-lg p-3 text-center">
-                  <p className="text-xs text-muted-foreground">Paridade dominante</p>
-                  <p className="text-lg font-bold text-foreground">{report.summary.mostCommonParity}</p>
+                  <p className="text-xs text-muted-foreground">Repetições médias</p>
+                  <p className="text-lg font-bold text-primary">{report.summary.avgRepeatsBetweenDraws}</p>
                 </div>
                 <div className="bg-muted/30 rounded-lg p-3 text-center">
-                  <p className="text-xs text-muted-foreground">Soma média</p>
-                  <p className="text-lg font-bold text-foreground">{report.summary.avgSum}</p>
+                  <p className="text-xs text-muted-foreground">Clusters</p>
+                  <p className="text-lg font-bold text-foreground">{report.numberClusters.length}</p>
                 </div>
                 <div className="bg-muted/30 rounded-lg p-3 text-center">
-                  <p className="text-xs text-muted-foreground">Consecutivos médios</p>
-                  <p className="text-lg font-bold text-foreground">{report.summary.avgConsecutives}</p>
+                  <p className="text-xs text-muted-foreground">Padrões raros</p>
+                  <p className="text-lg font-bold text-foreground">{report.rarePatterns.length}</p>
                 </div>
                 <div className="bg-muted/30 rounded-lg p-3 text-center">
-                  <p className="text-xs text-muted-foreground">Equilíbrio espacial</p>
-                  <p className="text-lg font-bold text-primary">{report.spatialDistribution.balance}%</p>
+                  <p className="text-xs text-muted-foreground">Coocorrências</p>
+                  <p className="text-lg font-bold text-foreground">{report.cooccurrenceMatrix.length}</p>
                 </div>
               </div>
 
               {/* Trending numbers */}
               <div className="grid sm:grid-cols-2 gap-4">
-                <div className="bg-muted/20 rounded-lg p-3 border border-border/30">
-                  <h4 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2">
-                    <TrendingUp className="h-4 w-4 text-green-400" /> Em Alta
-                  </h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {report.summary.trendingUp.map(n => (
-                      <span key={n} className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-green-500/15 text-green-400 text-xs font-bold">
-                        {String(n).padStart(2, "0")}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <div className="bg-muted/20 rounded-lg p-3 border border-border/30">
-                  <h4 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2">
-                    <TrendingDown className="h-4 w-4 text-red-400" /> Em Queda
-                  </h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {report.summary.trendingDown.map(n => (
-                      <span key={n} className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-red-500/15 text-red-400 text-xs font-bold">
-                        {String(n).padStart(2, "0")}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                <NumberBadgeGrid title="Em Alta" icon={<TrendingUp className="h-4 w-4 text-green-400" />} numbers={report.summary.trendingUp} colorClass="bg-green-500/15 text-green-400" />
+                <NumberBadgeGrid title="Em Queda" icon={<TrendingDown className="h-4 w-4 text-red-400" />} numbers={report.summary.trendingDown} colorClass="bg-red-500/15 text-red-400" />
               </div>
-
               <div className="grid sm:grid-cols-2 gap-4">
-                <div className="bg-muted/20 rounded-lg p-3 border border-border/30">
-                  <h4 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2">
-                    <Target className="h-4 w-4 text-primary" /> Mais Consistentes
-                  </h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {report.summary.mostConsistent.map(n => (
-                      <span key={n} className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-primary/15 text-primary text-xs font-bold">
-                        {String(n).padStart(2, "0")}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <div className="bg-muted/20 rounded-lg p-3 border border-border/30">
-                  <h4 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2">
-                    <Zap className="h-4 w-4 text-yellow-400" /> Atrasadas (Overdue)
-                  </h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {report.summary.overdueNumbers.map(n => (
-                      <span key={n} className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-yellow-500/15 text-yellow-400 text-xs font-bold">
-                        {String(n).padStart(2, "0")}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                <NumberBadgeGrid title="Mais Consistentes" icon={<Target className="h-4 w-4 text-primary" />} numbers={report.summary.mostConsistent} colorClass="bg-primary/15 text-primary" />
+                <NumberBadgeGrid title="Atrasadas (Overdue)" icon={<Zap className="h-4 w-4 text-yellow-400" />} numbers={report.summary.overdueNumbers} colorClass="bg-yellow-500/15 text-yellow-400" />
               </div>
 
-              {/* Hot streaks */}
               {report.hotStreaks.length > 0 && (
                 <div className="bg-muted/20 rounded-lg p-3 border border-border/30">
                   <h4 className="text-sm font-semibold text-foreground mb-2">🔥 Maiores Sequências Quentes</h4>
@@ -252,7 +232,6 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
             {/* Charts */}
             <TabsContent value="charts" className="space-y-5">
               <div className="grid lg:grid-cols-2 gap-4">
-                {/* Parity pie */}
                 <div className="space-y-2">
                   <h4 className="text-sm font-semibold text-foreground">Distribuição Par/Ímpar</h4>
                   <div className="h-56">
@@ -266,8 +245,6 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
                     </ResponsiveContainer>
                   </div>
                 </div>
-
-                {/* Sum distribution */}
                 <div className="space-y-2">
                   <h4 className="text-sm font-semibold text-foreground">Distribuição de Soma</h4>
                   <div className="h-56">
@@ -283,8 +260,6 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
                   </div>
                 </div>
               </div>
-
-              {/* Spatial radar */}
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold text-foreground">Distribuição Espacial (Radar)</h4>
                 <div className="h-64">
@@ -298,14 +273,12 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
                   </ResponsiveContainer>
                 </div>
               </div>
-
-              {/* Consecutive patterns */}
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold text-foreground">Padrão de Consecutivos</h4>
                 <div className="flex flex-wrap gap-3">
                   {report.consecutivePatterns.map(c => (
                     <div key={c.consecutiveCount} className="bg-muted/30 rounded-lg p-3 text-center min-w-[100px]">
-                      <p className="text-xs text-muted-foreground">{c.consecutiveCount} consecutivos</p>
+                      <p className="text-xs text-muted-foreground">{c.consecutiveCount} consec.</p>
                       <p className="text-lg font-bold text-foreground">{c.occurrences}x</p>
                       <p className="text-xs text-muted-foreground">{c.percentage}%</p>
                     </div>
@@ -330,7 +303,7 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
                     </tr>
                   </thead>
                   <tbody>
-                    {report.frequencyTrends.slice(0, 20).map(f => (
+                    {report.frequencyTrends.slice(0, 25).map(f => (
                       <tr key={f.number} className="border-b border-border/30">
                         <td className="p-2 font-bold text-foreground">{String(f.number).padStart(2, "0")}</td>
                         <td className="p-2 text-center font-mono">{f.last10Freq}</td>
@@ -346,9 +319,7 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
                             {f.trendDirection === "up" ? "↑ Alta" : f.trendDirection === "down" ? "↓ Queda" : "→ Estável"}
                           </Badge>
                         </td>
-                        <td className={`p-2 text-center font-mono font-bold ${
-                          f.momentum > 0 ? "text-green-400" : f.momentum < 0 ? "text-red-400" : "text-muted-foreground"
-                        }`}>
+                        <td className={`p-2 text-center font-mono font-bold ${f.momentum > 0 ? "text-green-400" : f.momentum < 0 ? "text-red-400" : "text-muted-foreground"}`}>
                           {f.momentum > 0 ? "+" : ""}{f.momentum}
                         </td>
                       </tr>
@@ -358,39 +329,209 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
               </div>
             </TabsContent>
 
+            {/* Transitions Tab (v2) */}
+            <TabsContent value="transitions" className="space-y-4">
+              <div className="bg-muted/20 rounded-lg p-4 border border-border/30">
+                <h4 className="text-sm font-semibold text-foreground mb-1">Análise de Transição entre Concursos</h4>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Em média, <strong className="text-primary">{report.transitionAnalysis.avgRepeatBetweenDraws}</strong> números se repetem de um concurso para o seguinte.
+                </p>
+              </div>
+
+              {transitionChartData.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-foreground">Distribuição de Repetições</h4>
+                  <div className="h-48">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={transitionChartData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis dataKey="repeats" stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 10 }} />
+                        <YAxis stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 10 }} />
+                        <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", color: "hsl(var(--foreground))" }} />
+                        <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
+
+              {report.transitionAnalysis.mostRepeatedPairs.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-foreground">Dezenas que Mais se Repetem entre Concursos</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {report.transitionAnalysis.mostRepeatedPairs.map((p, i) => (
+                      <Badge key={i} variant="outline" className="border-primary/30 text-primary">
+                        {String(p.from).padStart(2, "0")} — {p.count}x
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* Clusters Tab (v2) */}
+            <TabsContent value="clusters" className="space-y-4">
+              {report.numberClusters.length > 0 ? (
+                <>
+                  <p className="text-xs text-muted-foreground">
+                    Grupos de dezenas que aparecem juntas com frequência acima do esperado (Lift &gt; 1.0)
+                  </p>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {report.numberClusters.map(cl => (
+                      <div key={cl.id} className="bg-muted/20 rounded-lg p-3 border border-border/30">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Layers className="h-4 w-4 text-primary" />
+                          <span className="text-xs font-semibold text-foreground">Cluster #{cl.id + 1}</span>
+                          <Badge variant="outline" className="text-[10px] border-primary/30 text-primary ml-auto">
+                            Lift: {cl.avgCooccurrence}
+                          </Badge>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {cl.numbers.map(n => (
+                            <span key={n} className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-primary/15 text-primary text-xs font-bold">
+                              {String(n).padStart(2, "0")}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="mt-2">
+                          <div className="h-1.5 bg-muted/50 rounded-full overflow-hidden">
+                            <div className="h-full bg-primary rounded-full" style={{ width: `${cl.strength * 100}%` }} />
+                          </div>
+                          <p className="text-[10px] text-muted-foreground mt-1">Força: {(cl.strength * 100).toFixed(0)}%</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Top co-occurrences */}
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold text-foreground">Top Coocorrências (Lift mais alto)</h4>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="border-b border-border text-muted-foreground">
+                            <th className="text-left p-2">Par</th>
+                            <th className="text-center p-2">Juntos</th>
+                            <th className="text-center p-2">Lift</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {report.cooccurrenceMatrix.slice(0, 15).map((co, i) => (
+                            <tr key={i} className="border-b border-border/30">
+                              <td className="p-2 font-bold text-foreground">
+                                {String(co.numA).padStart(2, "0")} + {String(co.numB).padStart(2, "0")}
+                              </td>
+                              <td className="p-2 text-center font-mono">{co.count}x</td>
+                              <td className={`p-2 text-center font-mono font-bold ${co.lift > 1.2 ? "text-primary" : co.lift > 1 ? "text-foreground" : "text-muted-foreground"}`}>
+                                {co.lift}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-6">Nenhum cluster significativo detectado neste período.</p>
+              )}
+            </TabsContent>
+
+            {/* Cycles Tab (v2) */}
+            <TabsContent value="cycles" className="space-y-3">
+              <p className="text-xs text-muted-foreground">
+                Análise de ciclos de aparição — previsão de retorno baseada na regularidade histórica
+              </p>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-border text-muted-foreground">
+                      <th className="text-left p-2">Nº</th>
+                      <th className="text-center p-2">Ciclo Médio</th>
+                      <th className="text-center p-2">Atraso Atual</th>
+                      <th className="text-center p-2">Retorno Prev.</th>
+                      <th className="text-center p-2">Regularidade</th>
+                      <th className="text-center p-2">Confiança</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {report.cycleDetection.slice(0, 20).map(c => (
+                      <tr key={c.number} className="border-b border-border/30">
+                        <td className="p-2 font-bold text-foreground">{String(c.number).padStart(2, "0")}</td>
+                        <td className="p-2 text-center font-mono">{c.avgCycleLength}</td>
+                        <td className={`p-2 text-center font-mono ${c.currentDelay > c.avgCycleLength ? "text-yellow-400" : "text-foreground"}`}>
+                          {c.currentDelay}
+                        </td>
+                        <td className={`p-2 text-center font-mono font-bold ${c.predictedReturn <= 2 ? "text-primary" : "text-foreground"}`}>
+                          {c.predictedReturn === 0 ? "Agora!" : `~${c.predictedReturn} sorteios`}
+                        </td>
+                        <td className="p-2 text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            <div className="w-12 h-1.5 bg-muted/50 rounded-full overflow-hidden">
+                              <div className="h-full bg-primary rounded-full" style={{ width: `${c.cycleRegularity * 100}%` }} />
+                            </div>
+                            <span className="text-[10px] text-muted-foreground">{(c.cycleRegularity * 100).toFixed(0)}%</span>
+                          </div>
+                        </td>
+                        <td className={`p-2 text-center font-mono ${c.confidence > 0.5 ? "text-primary" : "text-muted-foreground"}`}>
+                          {(c.confidence * 100).toFixed(0)}%
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </TabsContent>
+
+            {/* Rare Patterns Tab (v2) */}
+            <TabsContent value="rare" className="space-y-3">
+              {report.rarePatterns.length > 0 ? (
+                <div className="space-y-3">
+                  {report.rarePatterns.map((r, i) => (
+                    <div key={i} className="bg-muted/20 rounded-lg p-3 border border-border/30">
+                      <div className="flex items-center gap-2 mb-1">
+                        <AlertTriangle className={`h-4 w-4 ${r.rarity > 0.99 ? "text-red-400" : r.rarity > 0.95 ? "text-yellow-400" : "text-muted-foreground"}`} />
+                        <span className="text-xs font-semibold text-foreground capitalize">{r.type.replace(/_/g, " ")}</span>
+                        <Badge variant="outline" className="text-[10px] ml-auto">
+                          Raridade: {(r.rarity * 100).toFixed(1)}%
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{r.description}</p>
+                      <div className="flex gap-4 mt-1 text-[10px] text-muted-foreground">
+                        <span>Ocorrências: <strong className="text-foreground">{r.occurrences}</strong></span>
+                        {r.lastSeen > 0 && <span>Último: <strong className="text-foreground">Concurso {r.lastSeen}</strong></span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-6">Nenhum padrão raro detectado.</p>
+              )}
+            </TabsContent>
+
             {/* AI Analysis */}
             <TabsContent value="ai" className="space-y-3">
               {!aiAnalysis && (
                 <div className="text-center py-8 space-y-3">
                   <Brain className="h-10 w-10 text-muted-foreground mx-auto" />
-                  <p className="text-sm text-muted-foreground">
-                    A IA interpretará os padrões detectados e sugerirá estratégias
-                  </p>
-                  <Button onClick={handleAiAnalysis} disabled={loadingAi} className="bg-primary text-primary-foreground">
-                    {loadingAi ? (
-                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Analisando padrões...</>
-                    ) : (
-                      <><Brain className="h-4 w-4 mr-2" /> Gerar Análise Inteligente</>
-                    )}
+                  <p className="text-sm text-muted-foreground">Envie os padrões para análise profunda com IA</p>
+                  <Button onClick={handleAiAnalysis} disabled={loadingAi} className="gap-2">
+                    {loadingAi ? <Loader2 className="w-4 h-4 animate-spin" /> : <Brain className="w-4 h-4" />}
+                    {loadingAi ? "Analisando..." : "Análise IA dos Padrões"}
                   </Button>
                 </div>
               )}
               {aiAnalysis && (
-                <div className="prose prose-sm prose-invert max-w-none">
-                  <div className="bg-muted/30 rounded-lg p-4 border border-primary/10 text-sm text-foreground whitespace-pre-wrap leading-relaxed">
-                    {aiAnalysis.split("\n").map((line, i) => {
-                      if (line.startsWith("## ")) return <h2 key={i} className="text-lg font-bold text-primary mt-4 mb-2">{line.replace("## ", "")}</h2>;
-                      if (line.startsWith("### ")) return <h3 key={i} className="text-base font-semibold text-accent mt-3 mb-1">{line.replace("### ", "")}</h3>;
-                      if (line.startsWith("**") && line.endsWith("**")) return <p key={i} className="font-bold text-foreground">{line.replace(/\*\*/g, "")}</p>;
-                      if (line.startsWith("- ") || line.startsWith("* ")) return <p key={i} className="ml-3 text-muted-foreground">• {line.slice(2)}</p>;
-                      if (line.trim() === "") return <br key={i} />;
-                      return <p key={i} className="text-muted-foreground">{line}</p>;
-                    })}
-                  </div>
-                  <Button onClick={handleAiAnalysis} variant="outline" size="sm" className="mt-3" disabled={loadingAi}>
-                    {loadingAi ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Brain className="h-3 w-3 mr-1" />}
-                    Regenerar análise
-                  </Button>
+                <div className="prose prose-sm prose-invert max-w-none p-4 rounded-lg bg-muted/20 border border-border">
+                  <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed"
+                    dangerouslySetInnerHTML={{
+                      __html: aiAnalysis
+                        .replace(/\*\*(.*?)\*\*/g, '<strong class="text-primary">$1</strong>')
+                        .replace(/#{3}\s(.*)/g, '<h4 class="text-foreground font-semibold mt-3 mb-1 text-sm">$1</h4>')
+                        .replace(/#{2}\s(.*)/g, '<h3 class="text-foreground font-bold mt-4 mb-2 text-base">$1</h3>')
+                        .replace(/- (.*)/g, '<li class="text-muted-foreground text-xs ml-4">$1</li>')
+                    }}
+                  />
                 </div>
               )}
             </TabsContent>
@@ -398,5 +539,26 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
         )}
       </CardContent>
     </Card>
+  );
+}
+
+// Helper component
+function NumberBadgeGrid({ title, icon, numbers, colorClass }: {
+  title: string; icon: React.ReactNode; numbers: number[]; colorClass: string;
+}) {
+  return (
+    <div className="bg-muted/20 rounded-lg p-3 border border-border/30">
+      <h4 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2">
+        {icon} {title}
+      </h4>
+      <div className="flex flex-wrap gap-1.5">
+        {numbers.map(n => (
+          <span key={n} className={`inline-flex items-center justify-center w-8 h-8 rounded-md ${colorClass} text-xs font-bold`}>
+            {String(n).padStart(2, "0")}
+          </span>
+        ))}
+        {numbers.length === 0 && <span className="text-xs text-muted-foreground">Nenhuma</span>}
+      </div>
+    </div>
   );
 }
