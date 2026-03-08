@@ -7,6 +7,7 @@ import { BetOptimizerPanel } from "@/components/BetOptimizerPanel";
 import { BetChecker } from "@/components/BetChecker";
 import { NumberPickerGrid } from "@/components/NumberPickerGrid";
 import { SavedBetsPanel } from "@/components/SavedBetsPanel";
+import { EvolutiveGeneratorPanel } from "@/components/EvolutiveGeneratorPanel";
 import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
@@ -35,7 +36,6 @@ const GeradorPage = () => {
         <EmptyState description="Importe os sorteios primeiro no Dashboard para usar o gerador." />
       ) : (
         <>
-          {/* Visual number picker + Saved bets side by side */}
           <div className="grid lg:grid-cols-2 gap-6">
             <NumberPickerGrid
               config={config}
@@ -45,8 +45,10 @@ const GeradorPage = () => {
             <SavedBetsPanel />
           </div>
 
-          {/* AI Prediction - Destaque principal */}
           <AIPredictionPanel config={config} stats={stats} onSaveBet={handleSaveBet} />
+
+          {/* Gerador Evolutivo */}
+          <EvolutiveGeneratorPanel stats={stats} config={config} draws={draws} lotteryId={selectedLottery} />
 
           <PlanGate feature="gerador_profissional" fallbackMessage="Gerador Profissional com filtros avançados">
             <ProfessionalGeneratorPanel stats={stats} config={config} draws={draws} />
