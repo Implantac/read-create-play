@@ -80,9 +80,29 @@ const EstatisticasPage = () => {
         title="Estatísticas Avançadas"
         description={`Visão consolidada de todas as métricas — ${config.name}`}
         icon={PieChart}
-        badge={`${draws.length} sorteios`}
+        badge={`${filteredDraws.length} sorteios${period > 0 ? ` (últimos ${period})` : ''}`}
       />
       <LotteryContextBanner />
+
+      {/* Period Filter */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-1.5 text-muted-foreground">
+          <Filter className="w-4 h-4" />
+          <span className="text-xs font-medium">Período:</span>
+        </div>
+        {PERIOD_OPTIONS.map(opt => (
+          <Button
+            key={opt.value}
+            size="sm"
+            variant={period === opt.value ? "default" : "outline"}
+            onClick={() => setPeriod(opt.value)}
+            className="h-7 text-xs px-3"
+            disabled={opt.value > draws.length && opt.value !== 0}
+          >
+            {opt.label}
+          </Button>
+        ))}
+      </div>
 
       {/* Overview Cards */}
       <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 lg:grid-cols-4 gap-4">
