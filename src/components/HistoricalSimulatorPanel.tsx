@@ -260,6 +260,13 @@ export function HistoricalSimulatorPanel({ config, draws, stats }: Props) {
         <AnimatePresence>
           {simResults && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+              {/* Export button */}
+              <div className="flex justify-end mb-3">
+                <Button size="sm" variant="outline" onClick={() => exportSimulationPdf(simResults, config)} className="text-xs">
+                  <FileDown className="w-3 h-3 mr-1" />
+                  Exportar PDF
+                </Button>
+              </div>
               {/* Summary cards */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
                 <SummaryCard label="Jogos" value={simResults.summary.totalGames} color="text-primary" />
