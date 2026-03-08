@@ -121,8 +121,9 @@ export function generateByStrategy(
     case "cold": {
       const pool = [...stats]
         .filter(s => s.status === "cold" || s.cycleScore > 1.2)
-        .sort((a, b) => (b.cycleScore + b.lastSeen * 0.1) - (a.cycleScore + a.lastSeen * 0.1));
-      const selected = pool.slice(0, pick).map(s => s.number);
+        .map(s => ({ ...s, weight: Math.max(0.1, s.cycleScore * 3 + s.lastSeen * 0.1 + Math.random() * 3) }));
+      const shuffled = weightedShuffle(pool);
+      const selected = shuffled.slice(0, pick).map(s => s.number);
       while (selected.length < pick) {
         const n = Math.floor(Math.random() * config.numbers) + 1;
         if (!selected.includes(n)) selected.push(n);
