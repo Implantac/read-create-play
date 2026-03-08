@@ -27,7 +27,10 @@ const SimulacoesPage = () => {
         <EmptyState description="Importe os sorteios primeiro no Dashboard para rodar simulações." />
       ) : (
         <>
-          {/* Motor de Simulação Massiva v2 - Destaque principal */}
+          {/* Simulador Histórico de Jogos - NOVO */}
+          <HistoricalSimulatorPanel config={config} draws={draws} stats={stats} />
+
+          {/* Motor de Simulação Massiva v2 */}
           <MassiveSimulationDashboard stats={stats} config={config} draws={draws} />
 
           {/* Simulador Inteligente com IA */}
