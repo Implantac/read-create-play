@@ -466,3 +466,118 @@ function SummaryCard({ label, value, color }: { label: string; value: string | n
     </div>
   );
 }
+
+function GameDetailsList({ results, config }: { results: GameResult[]; config: LotteryConfig }) {
+  const [expandedGame, setExpandedGame] = useState<number | null>(null);
+  const prizeTiers = getPrizeTiers(config.id);
+
+  const getPrizeForHits = (hits: number) => {
+    return prizeTiers.find(t => t.hits === hits);
+  };
+
+  return (
+    <div className="max-h-[500px] overflow-auto space-y-2">
+      {results.slice(0, 30).map((r, i) => {
+        const isExpanded = expandedGame === r.gameId;
+        const prizeDraws = r.results.filter(cr => prizeTiers.some(t => cr.hits >= t.hits));
+        const totalPrizes = Object.values(r.totalPrizes).reduce((s, v) => s + v, 0);
+
+        return (
+          <div key={r.gameId} className="border border-border rounded-lg overflow-hidden">
+            {/* Game header */}
+            <button
+              onClick={() => setExpandedGame(isExpanded ? null : r.gameId)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-secondary/30 transition-colors"
+            >
+              <span className="text-xs font-mono text-muted-foreground w-6 shrink-0">
+                {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`}
+              </span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-medium text-foreground">{r.label}</span>
+                  <span className="text-xs font-mono text-primary">
+                    {r.gameNumbers.map(n => String(n).padStart(2, "0")).join(" ")}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 mt-0.5">
+                  <span className="text-[10px] text-muted-foreground">Melhor: <strong className="text-foreground">{r.bestHits}</strong></span>
+                  <span className="text-[10px] text-muted-foreground">Média: <strong className="text-foreground">{r.averageHits}</strong></span>
+                  {totalPrizes > 0 && (
+                    <span className="text-[10px] text-primary font-semibold">🏆 {totalPrizes} premiações</span>
+                  )}
+                  <Badge variant={r.score >= 70 ? "default" : r.score >= 40 ? "secondary" : "outline"} className="text-[10px] h-4 px-1.5">
+                    Score {r.score}
+                  </Badge>
+                </div>
+              </div>
+              {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" /> : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
+            </button>
+
+            {/* Expanded details */}
+            {isExpanded && (
+              <div className="border-t border-border bg-secondary/20 px-3 py-2">
+                {/* Prize summary */}
+                {totalPrizes > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {Object.entries(r.totalPrizes)
+                      .filter(([, v]) => v > 0)
+                      .map(([label, count]) => {
+                        const tier = prizeTiers.find(t => t.label === label);
+                        return (
+                          <div key={label} className="bg-primary/10 border border-primary/20 rounded-md px-2.5 py-1.5 text-xs">
+                            <span className="font-semibold text-primary">{count}x</span>
+                            <span className="text-foreground ml-1">{label}</span>
+                            {tier?.estimatedPrize && (
+                              <span className="text-muted-foreground ml-1">≈ {tier.estimatedPrize}</span>
+                            )}
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+
+                {/* Draw-by-draw results with prizes */}
+                <p className="text-[10px] text-muted-foreground mb-1 font-medium">Concursos com melhor desempenho:</p>
+                <div className="max-h-48 overflow-auto space-y-1">
+                  {r.results
+                    .filter(cr => cr.hits >= Math.max(2, r.bestHits - 2))
+                    .sort((a, b) => b.hits - a.hits)
+                    .slice(0, 20)
+                    .map(cr => {
+                      const prize = getPrizeForHits(cr.hits);
+                      return (
+                        <div key={cr.concurso} className="flex items-center gap-2 text-xs py-1 px-2 rounded bg-card border border-border">
+                          <span className="font-mono text-muted-foreground w-16 shrink-0">#{cr.concurso}</span>
+                          <span className="text-muted-foreground w-20 shrink-0">{cr.date}</span>
+                          <span className={`font-bold w-20 shrink-0 ${prize ? "text-primary" : "text-foreground"}`}>
+                            {cr.hits} acertos
+                          </span>
+                          <span className="font-mono text-primary/80 text-[10px] flex-1">
+                            {cr.matchedNumbers.map(n => String(n).padStart(2, "0")).join(" ")}
+                          </span>
+                          {prize && (
+                            <Badge variant="default" className="text-[10px] h-4 px-1.5 shrink-0">
+                              {prize.label} {prize.estimatedPrize ? `≈ ${prize.estimatedPrize}` : ""}
+                            </Badge>
+                          )}
+                        </div>
+                      );
+                    })}
+                </div>
+
+                {r.results.filter(cr => cr.hits >= Math.max(2, r.bestHits - 2)).length === 0 && (
+                  <p className="text-xs text-muted-foreground text-center py-3">Nenhum acerto significativo neste jogo</p>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+      {results.length > 30 && (
+        <p className="text-xs text-muted-foreground text-center py-2">
+          Mostrando os 30 melhores de {results.length} jogos
+        </p>
+      )}
+    </div>
+  );
+}
