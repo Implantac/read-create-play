@@ -136,6 +136,7 @@ export default function AdminPage() {
                   className={`h-full flex items-center justify-center text-[10px] font-bold transition-all ${
                     plan === "free" ? "bg-muted-foreground/30 text-foreground" :
                     plan === "premium" ? "bg-primary text-primary-foreground" :
+                    plan === "lifetime" ? "bg-yellow-500 text-yellow-950" :
                     "bg-accent text-accent-foreground"
                   }`}
                   style={{ width: `${pct}%` }}
