@@ -344,6 +344,9 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
                 <p className="text-sm font-medium text-foreground">
                   {simulation.totalDraws} concursos analisados • Premiação: ≥{minPrize} acertos
                 </p>
+                <Button onClick={handleSaveTop} variant="outline" size="sm" className="text-xs">
+                  <Bookmark className="h-3.5 w-3.5 mr-1.5" /> Salvar Top 3
+                </Button>
               </div>
 
               <div className="space-y-2">
