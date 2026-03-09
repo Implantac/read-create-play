@@ -143,11 +143,11 @@ export function getPrizeTiers(lotteryId: string): { hits: number; label: string;
       ];
     case "lotofacil":
       return [
-        { hits: 15, label: "15 acertos", estimatedPrize: "R$ 1.500.000+" },
-        { hits: 14, label: "14 acertos", estimatedPrize: "R$ 1.500~3.000" },
-        { hits: 13, label: "13 acertos", estimatedPrize: "R$ 30~50" },
-        { hits: 12, label: "12 acertos", estimatedPrize: "R$ 12~20" },
-        { hits: 11, label: "11 acertos", estimatedPrize: "R$ 6~10" },
+        { hits: 15, label: "15 acertos", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 14, label: "14 acertos", estimatedPrize: "Valor variável (R$ 2.000+)" },
+        { hits: 13, label: "13 acertos", estimatedPrize: "R$ 35,00 (fixo)" },
+        { hits: 12, label: "12 acertos", estimatedPrize: "R$ 14,00 (fixo)" },
+        { hits: 11, label: "11 acertos", estimatedPrize: "R$ 7,00 (fixo)" },
       ];
     case "quina":
       return [
