@@ -132,75 +132,75 @@ export function checkBetAgainstDraws(
     .sort((a, b) => b.matchCount - a.matchCount);
 }
 
-// Prize tiers for each lottery
-export function getPrizeTiers(lotteryId: string): { hits: number; label: string }[] {
+// Prize tiers for each lottery with estimated values
+export function getPrizeTiers(lotteryId: string): { hits: number; label: string; estimatedPrize?: string }[] {
   switch (lotteryId) {
     case "megasena":
       return [
-        { hits: 6, label: "Sena (6 acertos)" },
-        { hits: 5, label: "Quina (5 acertos)" },
-        { hits: 4, label: "Quadra (4 acertos)" },
+        { hits: 6, label: "Sena (6 acertos)", estimatedPrize: "R$ 50.000.000+" },
+        { hits: 5, label: "Quina (5 acertos)", estimatedPrize: "R$ 40.000~80.000" },
+        { hits: 4, label: "Quadra (4 acertos)", estimatedPrize: "R$ 800~1.200" },
       ];
     case "lotofacil":
       return [
-        { hits: 15, label: "15 acertos" },
-        { hits: 14, label: "14 acertos" },
-        { hits: 13, label: "13 acertos" },
-        { hits: 12, label: "12 acertos" },
-        { hits: 11, label: "11 acertos" },
+        { hits: 15, label: "15 acertos", estimatedPrize: "R$ 1.500.000+" },
+        { hits: 14, label: "14 acertos", estimatedPrize: "R$ 1.500~3.000" },
+        { hits: 13, label: "13 acertos", estimatedPrize: "R$ 30~50" },
+        { hits: 12, label: "12 acertos", estimatedPrize: "R$ 12~20" },
+        { hits: 11, label: "11 acertos", estimatedPrize: "R$ 6~10" },
       ];
     case "quina":
       return [
-        { hits: 5, label: "Quina (5 acertos)" },
-        { hits: 4, label: "Quadra (4 acertos)" },
-        { hits: 3, label: "Terno (3 acertos)" },
-        { hits: 2, label: "Duque (2 acertos)" },
+        { hits: 5, label: "Quina (5 acertos)", estimatedPrize: "R$ 5.000.000+" },
+        { hits: 4, label: "Quadra (4 acertos)", estimatedPrize: "R$ 5.000~10.000" },
+        { hits: 3, label: "Terno (3 acertos)", estimatedPrize: "R$ 50~150" },
+        { hits: 2, label: "Duque (2 acertos)", estimatedPrize: "R$ 3~6" },
       ];
     case "lotomania":
       return [
-        { hits: 20, label: "20 acertos" },
-        { hits: 19, label: "19 acertos" },
-        { hits: 18, label: "18 acertos" },
-        { hits: 17, label: "17 acertos" },
-        { hits: 16, label: "16 acertos" },
-        { hits: 15, label: "15 acertos" },
-        { hits: 0, label: "0 acertos" },
+        { hits: 20, label: "20 acertos", estimatedPrize: "R$ 5.000.000+" },
+        { hits: 19, label: "19 acertos", estimatedPrize: "R$ 50.000~150.000" },
+        { hits: 18, label: "18 acertos", estimatedPrize: "R$ 1.500~5.000" },
+        { hits: 17, label: "17 acertos", estimatedPrize: "R$ 200~500" },
+        { hits: 16, label: "16 acertos", estimatedPrize: "R$ 30~80" },
+        { hits: 15, label: "15 acertos", estimatedPrize: "R$ 6~15" },
+        { hits: 0, label: "0 acertos", estimatedPrize: "R$ 6~15" },
       ];
     case "duplasena":
       return [
-        { hits: 6, label: "Sena (6 acertos)" },
-        { hits: 5, label: "Quina (5 acertos)" },
-        { hits: 4, label: "Quadra (4 acertos)" },
-        { hits: 3, label: "Terno (3 acertos)" },
+        { hits: 6, label: "Sena (6 acertos)", estimatedPrize: "R$ 3.000.000+" },
+        { hits: 5, label: "Quina (5 acertos)", estimatedPrize: "R$ 5.000~15.000" },
+        { hits: 4, label: "Quadra (4 acertos)", estimatedPrize: "R$ 80~200" },
+        { hits: 3, label: "Terno (3 acertos)", estimatedPrize: "R$ 3~8" },
       ];
     case "timemania":
       return [
-        { hits: 7, label: "7 acertos" },
-        { hits: 6, label: "6 acertos" },
-        { hits: 5, label: "5 acertos" },
-        { hits: 4, label: "4 acertos" },
-        { hits: 3, label: "3 acertos" },
+        { hits: 7, label: "7 acertos", estimatedPrize: "R$ 5.000.000+" },
+        { hits: 6, label: "6 acertos", estimatedPrize: "R$ 30.000~80.000" },
+        { hits: 5, label: "5 acertos", estimatedPrize: "R$ 500~1.500" },
+        { hits: 4, label: "4 acertos", estimatedPrize: "R$ 8~20" },
+        { hits: 3, label: "3 acertos", estimatedPrize: "R$ 3~5" },
       ];
     case "diadesorte":
       return [
-        { hits: 7, label: "7 acertos" },
-        { hits: 6, label: "6 acertos" },
-        { hits: 5, label: "5 acertos" },
-        { hits: 4, label: "4 acertos" },
+        { hits: 7, label: "7 acertos", estimatedPrize: "R$ 1.000.000+" },
+        { hits: 6, label: "6 acertos", estimatedPrize: "R$ 5.000~15.000" },
+        { hits: 5, label: "5 acertos", estimatedPrize: "R$ 30~80" },
+        { hits: 4, label: "4 acertos", estimatedPrize: "R$ 5~10" },
       ];
     case "supersete":
       return [
-        { hits: 7, label: "7 acertos" },
-        { hits: 6, label: "6 acertos" },
-        { hits: 5, label: "5 acertos" },
-        { hits: 4, label: "4 acertos" },
-        { hits: 3, label: "3 acertos" },
+        { hits: 7, label: "7 acertos", estimatedPrize: "R$ 1.000.000+" },
+        { hits: 6, label: "6 acertos", estimatedPrize: "R$ 30.000~80.000" },
+        { hits: 5, label: "5 acertos", estimatedPrize: "R$ 500~1.500" },
+        { hits: 4, label: "4 acertos", estimatedPrize: "R$ 10~30" },
+        { hits: 3, label: "3 acertos", estimatedPrize: "R$ 3~5" },
       ];
     default:
       return [
-        { hits: 6, label: "Primeira faixa" },
-        { hits: 5, label: "Segunda faixa" },
-        { hits: 4, label: "Terceira faixa" },
+        { hits: 6, label: "Primeira faixa", estimatedPrize: "Variável" },
+        { hits: 5, label: "Segunda faixa", estimatedPrize: "Variável" },
+        { hits: 4, label: "Terceira faixa", estimatedPrize: "Variável" },
       ];
   }
 }

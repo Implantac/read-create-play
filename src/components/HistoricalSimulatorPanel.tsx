@@ -9,7 +9,9 @@ import {
   runHistoricalSimulation,
 } from "@/engine/historical-simulator";
 import { motion, AnimatePresence } from "framer-motion";
-import { History, Play, Trophy, BarChart3, Lightbulb, Plus, Trash2, Shuffle, FileDown } from "lucide-react";
+import { History, Play, Trophy, BarChart3, Lightbulb, Plus, Trash2, Shuffle, FileDown, ChevronDown, ChevronUp, Eye } from "lucide-react";
+import { getPrizeTiers } from "@/services/lotteryApi";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -347,7 +349,7 @@ export function HistoricalSimulatorPanel({ config, draws, stats }: Props) {
               <Tabs defaultValue="ranking" className="w-full">
                 <TabsList className="w-full grid grid-cols-4 h-8">
                   <TabsTrigger value="ranking" className="text-xs"><Trophy className="w-3 h-3 mr-1" />Ranking</TabsTrigger>
-                  <TabsTrigger value="prizes" className="text-xs"><BarChart3 className="w-3 h-3 mr-1" />Premiações</TabsTrigger>
+                  <TabsTrigger value="details" className="text-xs"><Eye className="w-3 h-3 mr-1" />Detalhes</TabsTrigger>
                   <TabsTrigger value="distribution" className="text-xs">📊 Distribuição</TabsTrigger>
                   <TabsTrigger value="insights" className="text-xs"><Lightbulb className="w-3 h-3 mr-1" />Insights</TabsTrigger>
                 </TabsList>
@@ -362,65 +364,49 @@ export function HistoricalSimulatorPanel({ config, draws, stats }: Props) {
                           <TableHead className="text-xs">Números</TableHead>
                           <TableHead className="text-xs text-center">Melhor</TableHead>
                           <TableHead className="text-xs text-center">Média</TableHead>
+                          <TableHead className="text-xs text-center">Prêmios</TableHead>
                           <TableHead className="text-xs text-center">Score</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {simResults.results.slice(0, 50).map((r, i) => (
-                          <TableRow key={r.gameId} className={i < 3 ? "bg-primary/5" : ""}>
-                            <TableCell className="text-xs font-mono">
-                              {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
-                            </TableCell>
-                            <TableCell className="text-xs">{r.label}</TableCell>
-                            <TableCell className="text-xs font-mono text-primary">
-                              {r.gameNumbers.map(n => String(n).padStart(2, "0")).join(" ")}
-                            </TableCell>
-                            <TableCell className="text-xs text-center font-bold">{r.bestHits}</TableCell>
-                            <TableCell className="text-xs text-center">{r.averageHits}</TableCell>
-                            <TableCell className="text-xs text-center">
-                              <Badge
-                                variant={r.score >= 70 ? "default" : r.score >= 40 ? "secondary" : "outline"}
-                                className="text-xs"
-                              >
-                                {r.score}
-                              </Badge>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                        {simResults.results.slice(0, 50).map((r, i) => {
+                          const totalPrizes = Object.values(r.totalPrizes).reduce((s, v) => s + v, 0);
+                          return (
+                            <TableRow key={r.gameId} className={i < 3 ? "bg-primary/5" : ""}>
+                              <TableCell className="text-xs font-mono">
+                                {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
+                              </TableCell>
+                              <TableCell className="text-xs">{r.label}</TableCell>
+                              <TableCell className="text-xs font-mono text-primary">
+                                {r.gameNumbers.map(n => String(n).padStart(2, "0")).join(" ")}
+                              </TableCell>
+                              <TableCell className="text-xs text-center font-bold">{r.bestHits}</TableCell>
+                              <TableCell className="text-xs text-center">{r.averageHits}</TableCell>
+                              <TableCell className="text-xs text-center">
+                                {totalPrizes > 0 ? (
+                                  <span className="text-primary font-bold">{totalPrizes}x</span>
+                                ) : (
+                                  <span className="text-muted-foreground">-</span>
+                                )}
+                              </TableCell>
+                              <TableCell className="text-xs text-center">
+                                <Badge
+                                  variant={r.score >= 70 ? "default" : r.score >= 40 ? "secondary" : "outline"}
+                                  className="text-xs"
+                                >
+                                  {r.score}
+                                </Badge>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
                       </TableBody>
                     </Table>
                   </div>
                 </TabsContent>
 
-                <TabsContent value="prizes" className="mt-2">
-                  {prizeChartData.length > 0 ? (
-                    <div className="h-52">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={prizeChartData}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                          <XAxis dataKey="label" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
-                          <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
-                          <Tooltip
-                            contentStyle={{
-                              backgroundColor: "hsl(var(--card))",
-                              border: "1px solid hsl(var(--border))",
-                              borderRadius: "8px",
-                              fontSize: "12px",
-                            }}
-                          />
-                          <Bar dataKey="count" name="Ocorrências" radius={[4, 4, 0, 0]}>
-                            {prizeChartData.map((_, i) => (
-                              <Cell key={i} fill={`hsl(var(--primary) / ${1 - i * 0.15})`} />
-                            ))}
-                          </Bar>
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground text-center py-8">
-                      Nenhuma premiação detectada nesta simulação
-                    </p>
-                  )}
+                <TabsContent value="details" className="mt-2">
+                  <GameDetailsList results={simResults.results} config={config} />
                 </TabsContent>
 
                 <TabsContent value="distribution" className="mt-2">
@@ -477,6 +463,121 @@ function SummaryCard({ label, value, color }: { label: string; value: string | n
     <div className="rounded-lg bg-secondary/50 border border-border p-3 text-center">
       <p className="text-xs text-muted-foreground">{label}</p>
       <p className={`text-lg font-bold font-mono ${color}`}>{value}</p>
+    </div>
+  );
+}
+
+function GameDetailsList({ results, config }: { results: GameResult[]; config: LotteryConfig }) {
+  const [expandedGame, setExpandedGame] = useState<number | null>(null);
+  const prizeTiers = getPrizeTiers(config.id);
+
+  const getPrizeForHits = (hits: number) => {
+    return prizeTiers.find(t => t.hits === hits);
+  };
+
+  return (
+    <div className="max-h-[500px] overflow-auto space-y-2">
+      {results.slice(0, 30).map((r, i) => {
+        const isExpanded = expandedGame === r.gameId;
+        const prizeDraws = r.results.filter(cr => prizeTiers.some(t => cr.hits >= t.hits));
+        const totalPrizes = Object.values(r.totalPrizes).reduce((s, v) => s + v, 0);
+
+        return (
+          <div key={r.gameId} className="border border-border rounded-lg overflow-hidden">
+            {/* Game header */}
+            <button
+              onClick={() => setExpandedGame(isExpanded ? null : r.gameId)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-secondary/30 transition-colors"
+            >
+              <span className="text-xs font-mono text-muted-foreground w-6 shrink-0">
+                {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`}
+              </span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-medium text-foreground">{r.label}</span>
+                  <span className="text-xs font-mono text-primary">
+                    {r.gameNumbers.map(n => String(n).padStart(2, "0")).join(" ")}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 mt-0.5">
+                  <span className="text-[10px] text-muted-foreground">Melhor: <strong className="text-foreground">{r.bestHits}</strong></span>
+                  <span className="text-[10px] text-muted-foreground">Média: <strong className="text-foreground">{r.averageHits}</strong></span>
+                  {totalPrizes > 0 && (
+                    <span className="text-[10px] text-primary font-semibold">🏆 {totalPrizes} premiações</span>
+                  )}
+                  <Badge variant={r.score >= 70 ? "default" : r.score >= 40 ? "secondary" : "outline"} className="text-[10px] h-4 px-1.5">
+                    Score {r.score}
+                  </Badge>
+                </div>
+              </div>
+              {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" /> : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
+            </button>
+
+            {/* Expanded details */}
+            {isExpanded && (
+              <div className="border-t border-border bg-secondary/20 px-3 py-2">
+                {/* Prize summary */}
+                {totalPrizes > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {Object.entries(r.totalPrizes)
+                      .filter(([, v]) => v > 0)
+                      .map(([label, count]) => {
+                        const tier = prizeTiers.find(t => t.label === label);
+                        return (
+                          <div key={label} className="bg-primary/10 border border-primary/20 rounded-md px-2.5 py-1.5 text-xs">
+                            <span className="font-semibold text-primary">{count}x</span>
+                            <span className="text-foreground ml-1">{label}</span>
+                            {tier?.estimatedPrize && (
+                              <span className="text-muted-foreground ml-1">≈ {tier.estimatedPrize}</span>
+                            )}
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+
+                {/* Draw-by-draw results with prizes */}
+                <p className="text-[10px] text-muted-foreground mb-1 font-medium">Concursos com melhor desempenho:</p>
+                <div className="max-h-48 overflow-auto space-y-1">
+                  {r.results
+                    .filter(cr => cr.hits >= Math.max(2, r.bestHits - 2))
+                    .sort((a, b) => b.hits - a.hits)
+                    .slice(0, 20)
+                    .map(cr => {
+                      const prize = getPrizeForHits(cr.hits);
+                      return (
+                        <div key={cr.concurso} className="flex items-center gap-2 text-xs py-1 px-2 rounded bg-card border border-border">
+                          <span className="font-mono text-muted-foreground w-16 shrink-0">#{cr.concurso}</span>
+                          <span className="text-muted-foreground w-20 shrink-0">{cr.date}</span>
+                          <span className={`font-bold w-20 shrink-0 ${prize ? "text-primary" : "text-foreground"}`}>
+                            {cr.hits} acertos
+                          </span>
+                          <span className="font-mono text-primary/80 text-[10px] flex-1">
+                            {cr.matchedNumbers.map(n => String(n).padStart(2, "0")).join(" ")}
+                          </span>
+                          {prize && (
+                            <Badge variant="default" className="text-[10px] h-4 px-1.5 shrink-0">
+                              {prize.label} {prize.estimatedPrize ? `≈ ${prize.estimatedPrize}` : ""}
+                            </Badge>
+                          )}
+                        </div>
+                      );
+                    })}
+                </div>
+
+                {r.results.filter(cr => cr.hits >= Math.max(2, r.bestHits - 2)).length === 0 && (
+                  <p className="text-xs text-muted-foreground text-center py-3">Nenhum acerto significativo neste jogo</p>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+      {results.length > 30 && (
+        <p className="text-xs text-muted-foreground text-center py-2">
+          Mostrando os 30 melhores de {results.length} jogos
+        </p>
+      )}
     </div>
   );
 }
