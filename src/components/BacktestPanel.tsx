@@ -33,6 +33,15 @@ export function BacktestPanel({ stats, config, draws }: Props) {
   const [running, setRunning] = useState(false);
   const [results, setResults] = useState<BacktestResult[] | null>(null);
 
+  // Reset state when lottery changes
+  const prevLotteryId = useRef(config.id);
+  useEffect(() => {
+    if (prevLotteryId.current !== config.id) {
+      prevLotteryId.current = config.id;
+      setResults(null);
+    }
+  }, [config.id]);
+
   const toggleStrategy = (s: Strategy) => {
     setSelectedStrategies(prev =>
       prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]

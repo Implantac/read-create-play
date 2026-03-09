@@ -27,6 +27,15 @@ export function GameSimulator({ stats, config, draws }: Props) {
   const [rounds, setRounds] = useState(100);
   const [strategy, setStrategy] = useState<"smart" | "random">("smart");
 
+  // Reset state when lottery changes
+  const prevLotteryId = useRef(config.id);
+  useEffect(() => {
+    if (prevLotteryId.current !== config.id) {
+      prevLotteryId.current = config.id;
+      setSimResults(null);
+    }
+  }, [config.id]);
+
   const prizeTiers = getPrizeTiers(config.id);
 
   const runSimulation = () => {

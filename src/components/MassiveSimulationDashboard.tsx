@@ -61,6 +61,17 @@ export function MassiveSimulationDashboard({ stats, config, draws }: Props) {
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
 
+  // Reset state when lottery changes
+  const prevLotteryId = useRef(config.id);
+  useEffect(() => {
+    if (prevLotteryId.current !== config.id) {
+      prevLotteryId.current = config.id;
+      setResult(null);
+      setAiAnalysis(null);
+      setProgress(null);
+    }
+  }, [config.id]);
+
   const handleProgress = useCallback((p: MassiveSimProgress) => {
     setProgress(p);
   }, []);

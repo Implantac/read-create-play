@@ -52,6 +52,16 @@ export function MassiveSimulatorPanel({ stats, config, draws }: Props) {
   const [result, setResult] = useState<MassiveSimResult | null>(null);
   const cancelRef = useRef(false);
 
+  // Reset state when lottery changes
+  const prevLotteryId = useRef(config.id);
+  useEffect(() => {
+    if (prevLotteryId.current !== config.id) {
+      prevLotteryId.current = config.id;
+      setResult(null);
+      setProgress(0);
+    }
+  }, [config.id]);
+
   const toggleStrategy = (s: Strategy) => {
     setSelectedStrategies(prev =>
       prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]

@@ -111,6 +111,17 @@ export function HistoricalSimulatorPanel({ config, draws, stats }: Props) {
   const [running, setRunning] = useState(false);
   const [simResults, setSimResults] = useState<{ results: GameResult[]; summary: SimulationSummary } | null>(null);
 
+  // Reset state when lottery changes
+  const prevLotteryId = useRef(config.id);
+  useEffect(() => {
+    if (prevLotteryId.current !== config.id) {
+      prevLotteryId.current = config.id;
+      setGames([]);
+      setManualInput("");
+      setSimResults(null);
+    }
+  }, [config.id]);
+
   const handleGenerate = () => {
     const generated = generateGames(gameCount, config, stats, mode);
     setGames(generated);
