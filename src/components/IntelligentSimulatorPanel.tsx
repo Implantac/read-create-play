@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Brain, Play, Plus, Trash2, Trophy, BarChart3, Sparkles, Loader2, Target, TrendingUp } from "lucide-react";
+import { Brain, Play, Plus, Trash2, Trophy, BarChart3, Sparkles, Loader2, Target, TrendingUp, Bookmark, BookmarkCheck } from "lucide-react";
+import { useSavedBets } from "@/hooks/useSavedBets";
 import { toast } from "sonner";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { NumberStats } from "@/engine/statistics";
@@ -52,6 +53,9 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
   const [running, setRunning] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState("");
   const [loadingAi, setLoadingAi] = useState(false);
+  const [savedIds, setSavedIds] = useState<Set<number>>(new Set());
+
+  const { saveBet } = useSavedBets(config.id);
 
   // Reset all state when lottery changes
   const prevLotteryId = useRef(config.id);
@@ -92,10 +96,40 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
     setBets(prev => prev.filter(b => b.id !== id));
   };
 
+  const handleSaveBet = async (b: BetSimulationResult) => {
+    const success = await saveBet({
+      numbers: b.bet.numbers,
+      strategy: `Simulador Inteligente (Avg: ${b.avgHits}, Best: ${b.bestHit})`,
+      score: Math.round(b.avgHits * 3 + b.bestHit * 2 + b.prizeCount * 5 - b.stability),
+      grade: b.bestHit >= config.pick - 1 ? "S" : b.bestHit >= config.pick - 3 ? "A" : "B",
+    });
+    if (success) setSavedIds(prev => new Set(prev).add(b.bet.id));
+  };
+
+  const handleSaveTop = async () => {
+    if (!simulation) return;
+    const top = simulation.ranking.slice(0, Math.min(3, simulation.ranking.length));
+    let count = 0;
+    for (const idx of top) {
+      const b = simulation.bets[idx];
+      if (!savedIds.has(b.bet.id)) {
+        const ok = await saveBet({
+          numbers: b.bet.numbers,
+          strategy: `Top Simulação (Avg: ${b.avgHits}, Best: ${b.bestHit})`,
+          score: Math.round(b.avgHits * 3 + b.bestHit * 2 + b.prizeCount * 5 - b.stability),
+          grade: b.bestHit >= config.pick - 1 ? "S" : b.bestHit >= config.pick - 3 ? "A" : "B",
+        });
+        if (ok) { setSavedIds(prev => new Set(prev).add(b.bet.id)); count++; }
+      }
+    }
+    if (count === 0) toast.info("Os melhores jogos já foram salvos");
+  };
+
   const clearAll = () => {
     setBets([]);
     setSimulation(null);
     setAiAnalysis("");
+    setSavedIds(new Set());
   };
 
   const handleRunSimulation = () => {
@@ -311,6 +345,9 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
                 <p className="text-sm font-medium text-foreground">
                   {simulation.totalDraws} concursos analisados • Premiação: ≥{minPrize} acertos
                 </p>
+                <Button onClick={handleSaveTop} variant="outline" size="sm" className="text-xs">
+                  <Bookmark className="h-3.5 w-3.5 mr-1.5" /> Salvar Top 3
+                </Button>
               </div>
 
               <div className="space-y-2">
@@ -330,7 +367,7 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
                           : "border-border bg-card/50"
                       }`}
                     >
-                      {/* Header: Position + Stats */}
+                      {/* Header: Position + Stats + Save */}
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <span className="text-xl font-bold min-w-[2rem] text-center">
@@ -345,6 +382,19 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
                             )}
                           </div>
                         </div>
+                        <Button
+                          onClick={() => handleSaveBet(b)}
+                          variant="ghost"
+                          size="sm"
+                          disabled={savedIds.has(b.bet.id)}
+                          className="text-xs h-8"
+                        >
+                          {savedIds.has(b.bet.id) ? (
+                            <><BookmarkCheck className="h-3.5 w-3.5 mr-1 text-primary" /> Salvo</>
+                          ) : (
+                            <><Bookmark className="h-3.5 w-3.5 mr-1" /> Salvar</>
+                          )}
+                        </Button>
                       </div>
 
                       {/* Numbers as lottery balls */}
