@@ -4,6 +4,7 @@ const PLAN_HIERARCHY: Record<PlanType, number> = {
   free: 0,
   premium: 1,
   professional: 2,
+  lifetime: 3,
 };
 
 export type Feature =

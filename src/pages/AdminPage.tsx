@@ -27,12 +27,14 @@ const PLAN_COLORS: Record<string, string> = {
   free: "bg-muted text-muted-foreground",
   premium: "bg-primary/20 text-primary",
   professional: "bg-accent/20 text-accent",
+  lifetime: "bg-yellow-500/20 text-yellow-400",
 };
 
 const PLAN_LABELS: Record<string, string> = {
   free: "Gratuito",
   premium: "Premium",
   professional: "Profissional",
+  lifetime: "Vitalício",
 };
 
 export default function AdminPage() {
@@ -125,7 +127,7 @@ export default function AdminPage() {
         </CardHeader>
         <CardContent>
           <div className="flex gap-2 h-6 rounded-full overflow-hidden bg-muted">
-            {["free", "premium", "professional"].map(plan => {
+            {["free", "premium", "professional", "lifetime"].map(plan => {
               const pct = profiles.length > 0 ? ((planCounts[plan] || 0) / profiles.length) * 100 : 0;
               if (pct === 0) return null;
               return (
@@ -134,6 +136,7 @@ export default function AdminPage() {
                   className={`h-full flex items-center justify-center text-[10px] font-bold transition-all ${
                     plan === "free" ? "bg-muted-foreground/30 text-foreground" :
                     plan === "premium" ? "bg-primary text-primary-foreground" :
+                    plan === "lifetime" ? "bg-yellow-500 text-yellow-950" :
                     "bg-accent text-accent-foreground"
                   }`}
                   style={{ width: `${pct}%` }}
@@ -216,6 +219,7 @@ export default function AdminPage() {
                             <SelectItem value="free">Gratuito</SelectItem>
                             <SelectItem value="premium">Premium</SelectItem>
                             <SelectItem value="professional">Profissional</SelectItem>
+                            <SelectItem value="lifetime">Vitalício</SelectItem>
                           </SelectContent>
                         </Select>
                       </TableCell>
