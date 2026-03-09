@@ -4,7 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Brain, Loader2, TrendingUp, TrendingDown, BarChart3, Zap, Target, GitBranch, Layers, RefreshCw, AlertTriangle } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import {
+  Search, Brain, Loader2, TrendingUp, TrendingDown, BarChart3, Zap, Target,
+  GitBranch, Layers, RefreshCw, AlertTriangle, Sparkles, ArrowRight, Clock, Hash,
+} from "lucide-react";
 import { toast } from "sonner";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { NumberStats } from "@/engine/statistics";
@@ -13,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+  ScatterChart, Scatter, ZAxis, LineChart, Line,
 } from "recharts";
 
 interface Props {
@@ -72,7 +77,6 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
         body: {
           patternReport: {
             ...report,
-            // Send compact versions
             cooccurrenceMatrix: report.cooccurrenceMatrix.slice(0, 15),
             cycleDetection: report.cycleDetection.slice(0, 10),
           },
@@ -85,6 +89,7 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       setAiAnalysis(data.analysis || "Análise indisponível.");
+      if (data?.fromCache) toast.info("Análise carregada do cache (atualizada periodicamente)");
     } catch (e: any) {
       toast.error(e.message || "Erro na análise de IA");
     } finally {
@@ -119,6 +124,27 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
     }));
   }, [report]);
 
+  const momentumChartData = useMemo(() => {
+    if (!report) return [];
+    return report.frequencyTrends.slice(0, 20).map(f => ({
+      name: String(f.number).padStart(2, "0"),
+      momentum: f.momentum,
+      score: f.score,
+      fill: f.momentum > 0 ? "hsl(145, 72%, 42%)" : "hsl(0, 72%, 55%)",
+    }));
+  }, [report]);
+
+  const cycleScatterData = useMemo(() => {
+    if (!report) return [];
+    return report.cycleDetection.slice(0, 25).map(c => ({
+      name: String(c.number).padStart(2, "0"),
+      x: c.avgCycleLength,
+      y: c.currentDelay,
+      z: c.confidence * 100,
+      status: c.status,
+    }));
+  }, [report]);
+
   return (
     <Card className="border-primary/20 bg-card/80 backdrop-blur">
       <CardHeader>
@@ -127,11 +153,19 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
             <Search className="h-6 w-6 text-primary" />
           </div>
           <div className="flex-1">
-            <CardTitle className="text-xl text-foreground">Detector de Padrões Estatísticos v2.0</CardTitle>
+            <CardTitle className="text-xl text-foreground">Detector de Padrões v2.1</CardTitle>
             <CardDescription>
-              Análise profunda com ciclos, transições, coocorrência e clusterização
+              Ciclos, transições, coocorrência, primos, Fibonacci e clusterização
             </CardDescription>
           </div>
+          {report && (
+            <div className="flex items-center gap-2">
+              <div className="text-right hidden sm:block">
+                <p className="text-[10px] text-muted-foreground">Score Geral</p>
+                <p className="text-lg font-bold text-primary">{report.summary.overallScore}%</p>
+              </div>
+            </div>
+          )}
           <Badge variant="outline" className="text-[10px] border-primary/30 text-primary hidden sm:inline-flex">
             DEEP ANALYSIS
           </Badge>
@@ -172,21 +206,36 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
 
             {/* Overview */}
             <TabsContent value="overview" className="space-y-4">
+              {/* Score bar */}
+              <div className="bg-muted/20 rounded-lg p-4 border border-border/30">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-primary" /> Qualidade da Análise
+                  </span>
+                  <span className="text-sm font-bold text-primary">{report.summary.overallScore}/100</span>
+                </div>
+                <Progress value={report.summary.overallScore} className="h-2" />
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  Baseado na quantidade de dados, regularidade de ciclos, clusters e equilíbrio espacial
+                </p>
+              </div>
+
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
-                  { label: "Paridade dominante", value: report.summary.mostCommonParity },
-                  { label: "Soma média", value: report.summary.avgSum },
+                  { label: "Paridade dominante", value: report.summary.mostCommonParity, sub: `Desvio: ${report.summary.parityDeviation}%` },
+                  { label: "Soma média", value: report.summary.avgSum, sub: `Mediana: ${report.summary.medianSum}` },
                   { label: "Consecutivos médios", value: report.summary.avgConsecutives },
                   { label: "Equilíbrio espacial", value: `${report.spatialDistribution.balance}%`, primary: true },
                 ].map((item, i) => (
                   <div key={i} className="bg-muted/30 rounded-lg p-3 text-center">
                     <p className="text-xs text-muted-foreground">{item.label}</p>
                     <p className={`text-lg font-bold ${item.primary ? "text-primary" : "text-foreground"}`}>{item.value}</p>
+                    {item.sub && <p className="text-[10px] text-muted-foreground">{item.sub}</p>}
                   </div>
                 ))}
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                 <div className="bg-muted/30 rounded-lg p-3 text-center">
                   <p className="text-xs text-muted-foreground">Repetições médias</p>
                   <p className="text-lg font-bold text-primary">{report.summary.avgRepeatsBetweenDraws}</p>
@@ -203,6 +252,10 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
                   <p className="text-xs text-muted-foreground">Coocorrências</p>
                   <p className="text-lg font-bold text-foreground">{report.cooccurrenceMatrix.length}</p>
                 </div>
+                <div className="bg-muted/30 rounded-lg p-3 text-center">
+                  <p className="text-xs text-muted-foreground">% Primos</p>
+                  <p className="text-lg font-bold text-foreground">{report.summary.primeRatio}%</p>
+                </div>
               </div>
 
               {/* Trending numbers */}
@@ -212,7 +265,7 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 <NumberBadgeGrid title="Mais Consistentes" icon={<Target className="h-4 w-4 text-primary" />} numbers={report.summary.mostConsistent} colorClass="bg-primary/15 text-primary" />
-                <NumberBadgeGrid title="Atrasadas (Overdue)" icon={<Zap className="h-4 w-4 text-yellow-400" />} numbers={report.summary.overdueNumbers} colorClass="bg-yellow-500/15 text-yellow-400" />
+                <NumberBadgeGrid title="Atrasadas (Overdue)" icon={<Clock className="h-4 w-4 text-yellow-400" />} numbers={report.summary.overdueNumbers} colorClass="bg-yellow-500/15 text-yellow-400" />
               </div>
 
               {report.hotStreaks.length > 0 && (
@@ -260,34 +313,62 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
                   </div>
                 </div>
               </div>
+
+              {/* Momentum chart */}
               <div className="space-y-2">
-                <h4 className="text-sm font-semibold text-foreground">Distribuição Espacial (Radar)</h4>
-                <div className="h-64">
+                <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-primary" /> Momentum das Top 20 Dezenas
+                </h4>
+                <div className="h-56">
                   <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart data={spatialRadarData}>
-                      <PolarGrid stroke="hsl(var(--border))" />
-                      <PolarAngleAxis dataKey="setor" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} />
-                      <PolarRadiusAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} />
-                      <Radar name="Média" dataKey="media" stroke="hsl(145, 72%, 42%)" fill="hsl(145, 72%, 42%)" fillOpacity={0.3} />
-                    </RadarChart>
+                    <BarChart data={momentumChartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 10 }} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 10 }} />
+                      <Tooltip
+                        contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", color: "hsl(var(--foreground))" }}
+                        formatter={(value: number, name: string) => [value, name === "momentum" ? "Momentum" : "Score"]}
+                      />
+                      <Bar dataKey="momentum" radius={[4, 4, 0, 0]}>
+                        {momentumChartData.map((entry, i) => (
+                          <Cell key={i} fill={entry.fill} />
+                        ))}
+                      </Bar>
+                    </BarChart>
                   </ResponsiveContainer>
                 </div>
               </div>
-              <div className="space-y-2">
-                <h4 className="text-sm font-semibold text-foreground">Padrão de Consecutivos</h4>
-                <div className="flex flex-wrap gap-3">
-                  {report.consecutivePatterns.map(c => (
-                    <div key={c.consecutiveCount} className="bg-muted/30 rounded-lg p-3 text-center min-w-[100px]">
-                      <p className="text-xs text-muted-foreground">{c.consecutiveCount} consec.</p>
-                      <p className="text-lg font-bold text-foreground">{c.occurrences}x</p>
-                      <p className="text-xs text-muted-foreground">{c.percentage}%</p>
-                    </div>
-                  ))}
+
+              <div className="grid lg:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-foreground">Distribuição Espacial (Radar)</h4>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RadarChart data={spatialRadarData}>
+                        <PolarGrid stroke="hsl(var(--border))" />
+                        <PolarAngleAxis dataKey="setor" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} />
+                        <PolarRadiusAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} />
+                        <Radar name="Média" dataKey="media" stroke="hsl(145, 72%, 42%)" fill="hsl(145, 72%, 42%)" fillOpacity={0.3} />
+                      </RadarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-foreground">Padrão de Consecutivos</h4>
+                  <div className="flex flex-wrap gap-3">
+                    {report.consecutivePatterns.map(c => (
+                      <div key={c.consecutiveCount} className="bg-muted/30 rounded-lg p-3 text-center min-w-[100px]">
+                        <p className="text-xs text-muted-foreground">{c.consecutiveCount} consec.</p>
+                        <p className="text-lg font-bold text-foreground">{c.occurrences}x</p>
+                        <p className="text-xs text-muted-foreground">{c.percentage}%</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </TabsContent>
 
-            {/* Trends */}
+            {/* Trends with score */}
             <TabsContent value="trends" className="space-y-3">
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
@@ -300,10 +381,11 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
                       <th className="text-center p-2">Total</th>
                       <th className="text-center p-2">Tendência</th>
                       <th className="text-center p-2">Momentum</th>
+                      <th className="text-center p-2">Score</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {report.frequencyTrends.slice(0, 25).map(f => (
+                    {report.frequencyTrends.slice(0, 30).map(f => (
                       <tr key={f.number} className="border-b border-border/30">
                         <td className="p-2 font-bold text-foreground">{String(f.number).padStart(2, "0")}</td>
                         <td className="p-2 text-center font-mono">{f.last10Freq}</td>
@@ -322,6 +404,20 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
                         <td className={`p-2 text-center font-mono font-bold ${f.momentum > 0 ? "text-green-400" : f.momentum < 0 ? "text-red-400" : "text-muted-foreground"}`}>
                           {f.momentum > 0 ? "+" : ""}{f.momentum}
                         </td>
+                        <td className="p-2 text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            <div className="w-10 h-1.5 bg-muted/50 rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full"
+                                style={{
+                                  width: `${f.score}%`,
+                                  backgroundColor: f.score > 70 ? "hsl(145, 72%, 42%)" : f.score > 40 ? "hsl(48, 100%, 52%)" : "hsl(0, 72%, 55%)",
+                                }}
+                              />
+                            </div>
+                            <span className="text-[10px] text-muted-foreground w-6">{f.score}</span>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -329,7 +425,7 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
               </div>
             </TabsContent>
 
-            {/* Transitions Tab (v2) */}
+            {/* Transitions Tab */}
             <TabsContent value="transitions" className="space-y-4">
               <div className="bg-muted/20 rounded-lg p-4 border border-border/30">
                 <h4 className="text-sm font-semibold text-foreground mb-1">Análise de Transição entre Concursos</h4>
@@ -367,9 +463,32 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
                   </div>
                 </div>
               )}
+
+              {/* Transition matrix */}
+              {report.transitionAnalysis.transitionMatrix.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <ArrowRight className="h-4 w-4 text-primary" /> Padrões de Substituição (A sai → B entra)
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                    {report.transitionAnalysis.transitionMatrix.slice(0, 12).map((t, i) => (
+                      <div key={i} className="flex items-center gap-2 bg-muted/20 rounded-lg px-3 py-2 border border-border/20">
+                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-red-500/15 text-red-400 text-xs font-bold">
+                          {String(t.numberA).padStart(2, "0")}
+                        </span>
+                        <ArrowRight className="h-3 w-3 text-muted-foreground" />
+                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-green-500/15 text-green-400 text-xs font-bold">
+                          {String(t.numberB).padStart(2, "0")}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground ml-auto">{t.count}x</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </TabsContent>
 
-            {/* Clusters Tab (v2) */}
+            {/* Clusters Tab */}
             <TabsContent value="clusters" className="space-y-4">
               {report.numberClusters.length > 0 ? (
                 <>
@@ -403,7 +522,6 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
                     ))}
                   </div>
 
-                  {/* Top co-occurrences */}
                   <div className="space-y-2">
                     <h4 className="text-sm font-semibold text-foreground">Top Coocorrências (Lift mais alto)</h4>
                     <div className="overflow-x-auto">
@@ -437,33 +555,89 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
               )}
             </TabsContent>
 
-            {/* Cycles Tab (v2) */}
-            <TabsContent value="cycles" className="space-y-3">
+            {/* Cycles Tab with scatter plot */}
+            <TabsContent value="cycles" className="space-y-4">
               <p className="text-xs text-muted-foreground">
                 Análise de ciclos de aparição — previsão de retorno baseada na regularidade histórica
               </p>
+
+              {/* Cycle scatter visualization */}
+              {cycleScatterData.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-foreground">Mapa de Ciclos (Ciclo Médio vs Atraso Atual)</h4>
+                  <p className="text-[10px] text-muted-foreground">Acima da diagonal = overdue | Tamanho = confiança</p>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ScatterChart>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis dataKey="x" name="Ciclo Médio" stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 10 }} label={{ value: "Ciclo Médio", position: "bottom", fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                        <YAxis dataKey="y" name="Atraso Atual" stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 10 }} label={{ value: "Atraso", angle: -90, position: "insideLeft", fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                        <ZAxis dataKey="z" range={[30, 200]} />
+                        <Tooltip
+                          contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", color: "hsl(var(--foreground))" }}
+                          formatter={(value: number, name: string) => {
+                            if (name === "Ciclo Médio") return [`${value} sorteios`, name];
+                            if (name === "Atraso Atual") return [`${value} sorteios`, name];
+                            return [value, name];
+                          }}
+                          labelFormatter={(_, payload) => payload?.[0]?.payload?.name ? `Nº ${payload[0].payload.name}` : ""}
+                        />
+                        <Scatter data={cycleScatterData} fill="hsl(var(--primary))">
+                          {cycleScatterData.map((entry, i) => (
+                            <Cell
+                              key={i}
+                              fill={
+                                entry.status === "overdue" ? "hsl(0, 72%, 55%)" :
+                                entry.status === "due" ? "hsl(48, 100%, 52%)" :
+                                "hsl(145, 72%, 42%)"
+                              }
+                            />
+                          ))}
+                        </Scatter>
+                      </ScatterChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
+
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="border-b border-border text-muted-foreground">
                       <th className="text-left p-2">Nº</th>
                       <th className="text-center p-2">Ciclo Médio</th>
-                      <th className="text-center p-2">Atraso Atual</th>
+                      <th className="text-center p-2">Mediana</th>
+                      <th className="text-center p-2">Atraso</th>
+                      <th className="text-center p-2">Status</th>
                       <th className="text-center p-2">Retorno Prev.</th>
                       <th className="text-center p-2">Regularidade</th>
                       <th className="text-center p-2">Confiança</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {report.cycleDetection.slice(0, 20).map(c => (
+                    {report.cycleDetection.slice(0, 25).map(c => (
                       <tr key={c.number} className="border-b border-border/30">
                         <td className="p-2 font-bold text-foreground">{String(c.number).padStart(2, "0")}</td>
                         <td className="p-2 text-center font-mono">{c.avgCycleLength}</td>
+                        <td className="p-2 text-center font-mono text-muted-foreground">{c.medianCycleLength}</td>
                         <td className={`p-2 text-center font-mono ${c.currentDelay > c.avgCycleLength ? "text-yellow-400" : "text-foreground"}`}>
                           {c.currentDelay}
                         </td>
+                        <td className="p-2 text-center">
+                          <Badge variant="outline" className={`text-[10px] ${
+                            c.status === "overdue" ? "text-red-400 border-red-400/30" :
+                            c.status === "due" ? "text-yellow-400 border-yellow-400/30" :
+                            c.status === "early" ? "text-muted-foreground" :
+                            "text-green-400 border-green-400/30"
+                          }`}>
+                            {c.status === "overdue" ? "⚠️ Atrasada" :
+                             c.status === "due" ? "🔔 Esperada" :
+                             c.status === "early" ? "⏳ Cedo" :
+                             "✅ No prazo"}
+                          </Badge>
+                        </td>
                         <td className={`p-2 text-center font-mono font-bold ${c.predictedReturn <= 2 ? "text-primary" : "text-foreground"}`}>
-                          {c.predictedReturn === 0 ? "Agora!" : `~${c.predictedReturn} sorteios`}
+                          {c.predictedReturn === 0 ? "Agora!" : `~${c.predictedReturn}`}
                         </td>
                         <td className="p-2 text-center">
                           <div className="flex items-center justify-center gap-1">
@@ -483,7 +657,7 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
               </div>
             </TabsContent>
 
-            {/* Rare Patterns Tab (v2) */}
+            {/* Rare Patterns Tab */}
             <TabsContent value="rare" className="space-y-3">
               {report.rarePatterns.length > 0 ? (
                 <div className="space-y-3">
@@ -491,8 +665,21 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
                     <div key={i} className="bg-muted/20 rounded-lg p-3 border border-border/30">
                       <div className="flex items-center gap-2 mb-1">
                         <AlertTriangle className={`h-4 w-4 ${r.rarity > 0.99 ? "text-red-400" : r.rarity > 0.95 ? "text-yellow-400" : "text-muted-foreground"}`} />
-                        <span className="text-xs font-semibold text-foreground capitalize">{r.type.replace(/_/g, " ")}</span>
-                        <Badge variant="outline" className="text-[10px] ml-auto">
+                        <span className="text-xs font-semibold text-foreground capitalize">
+                          {r.type === "extreme_parity" ? "Paridade Extrema" :
+                           r.type === "extreme_sum" ? "Soma Extrema" :
+                           r.type === "long_consecutive" ? "Consecutivos Longos" :
+                           r.type === "decade_concentration" ? "Concentração por Dezena" :
+                           r.type === "zero_repeat" ? "Zero Repetição" :
+                           r.type === "prime_concentration" ? "Concentração de Primos" :
+                           r.type === "fibonacci_concentration" ? "Números Fibonacci" :
+                           r.type.replace(/_/g, " ")}
+                        </span>
+                        <Badge variant="outline" className={`text-[10px] ml-auto ${
+                          r.rarity > 0.99 ? "border-red-400/30 text-red-400" :
+                          r.rarity > 0.95 ? "border-yellow-400/30 text-yellow-400" :
+                          ""
+                        }`}>
                           Raridade: {(r.rarity * 100).toFixed(1)}%
                         </Badge>
                       </div>
@@ -522,16 +709,24 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
                 </div>
               )}
               {aiAnalysis && (
-                <div className="prose prose-sm prose-invert max-w-none p-4 rounded-lg bg-muted/20 border border-border">
-                  <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed"
-                    dangerouslySetInnerHTML={{
-                      __html: aiAnalysis
-                        .replace(/\*\*(.*?)\*\*/g, '<strong class="text-primary">$1</strong>')
-                        .replace(/#{3}\s(.*)/g, '<h4 class="text-foreground font-semibold mt-3 mb-1 text-sm">$1</h4>')
-                        .replace(/#{2}\s(.*)/g, '<h3 class="text-foreground font-bold mt-4 mb-2 text-base">$1</h3>')
-                        .replace(/- (.*)/g, '<li class="text-muted-foreground text-xs ml-4">$1</li>')
-                    }}
-                  />
+                <div className="space-y-3">
+                  <div className="flex justify-end">
+                    <Button variant="outline" size="sm" onClick={handleAiAnalysis} disabled={loadingAi} className="text-xs gap-1">
+                      {loadingAi ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+                      Reanalisar
+                    </Button>
+                  </div>
+                  <div className="prose prose-sm prose-invert max-w-none p-4 rounded-lg bg-muted/20 border border-border">
+                    <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed"
+                      dangerouslySetInnerHTML={{
+                        __html: aiAnalysis
+                          .replace(/\*\*(.*?)\*\*/g, '<strong class="text-primary">$1</strong>')
+                          .replace(/#{3}\s(.*)/g, '<h4 class="text-foreground font-semibold mt-3 mb-1 text-sm">$1</h4>')
+                          .replace(/#{2}\s(.*)/g, '<h3 class="text-foreground font-bold mt-4 mb-2 text-base">$1</h3>')
+                          .replace(/- (.*)/g, '<li class="text-muted-foreground text-xs ml-4">$1</li>')
+                      }}
+                    />
+                  </div>
                 </div>
               )}
             </TabsContent>
@@ -542,7 +737,6 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
   );
 }
 
-// Helper component
 function NumberBadgeGrid({ title, icon, numbers, colorClass }: {
   title: string; icon: React.ReactNode; numbers: number[]; colorClass: string;
 }) {
