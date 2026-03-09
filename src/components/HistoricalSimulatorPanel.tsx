@@ -355,44 +355,63 @@ export function HistoricalSimulatorPanel({ config, draws, stats }: Props) {
                 </TabsList>
 
                 <TabsContent value="ranking" className="mt-2">
-                  <div className="max-h-80 overflow-auto rounded border border-border">
+                  <div className="max-h-[420px] overflow-auto rounded-lg border border-border">
                     <Table>
                       <TableHeader>
-                        <TableRow>
+                        <TableRow className="bg-secondary/50">
                           <TableHead className="text-xs w-10">#</TableHead>
                           <TableHead className="text-xs">Jogo</TableHead>
                           <TableHead className="text-xs">Números</TableHead>
                           <TableHead className="text-xs text-center">Melhor</TableHead>
                           <TableHead className="text-xs text-center">Média</TableHead>
                           <TableHead className="text-xs text-center">Prêmios</TableHead>
+                          <TableHead className="text-xs text-center">💰 Valor Est.</TableHead>
                           <TableHead className="text-xs text-center">Score</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {simResults.results.slice(0, 50).map((r, i) => {
                           const totalPrizes = Object.values(r.totalPrizes).reduce((s, v) => s + v, 0);
+                          const prizeTiers = getPrizeTiers(config.id);
+                          // Find highest prize tier achieved
+                          const bestPrizeTier = prizeTiers.find(t => t.hits === r.bestHits);
                           return (
-                            <TableRow key={r.gameId} className={i < 3 ? "bg-primary/5" : ""}>
+                            <TableRow key={r.gameId} className={i < 3 ? "bg-primary/5 hover:bg-primary/10" : "hover:bg-secondary/30"}>
                               <TableCell className="text-xs font-mono">
                                 {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
                               </TableCell>
-                              <TableCell className="text-xs">{r.label}</TableCell>
+                              <TableCell className="text-xs font-medium">{r.label}</TableCell>
                               <TableCell className="text-xs font-mono text-primary">
                                 {r.gameNumbers.map(n => String(n).padStart(2, "0")).join(" ")}
                               </TableCell>
-                              <TableCell className="text-xs text-center font-bold">{r.bestHits}</TableCell>
-                              <TableCell className="text-xs text-center">{r.averageHits}</TableCell>
+                              <TableCell className="text-xs text-center">
+                                <span className={`font-bold ${r.bestHits >= config.pick - 1 ? "text-primary" : r.bestHits >= config.pick - 2 ? "text-chart-4" : "text-foreground"}`}>
+                                  {r.bestHits}
+                                </span>
+                              </TableCell>
+                              <TableCell className="text-xs text-center text-muted-foreground">{r.averageHits}</TableCell>
                               <TableCell className="text-xs text-center">
                                 {totalPrizes > 0 ? (
-                                  <span className="text-primary font-bold">{totalPrizes}x</span>
+                                  <Badge variant="default" className="text-[10px] px-1.5 h-5 bg-primary/20 text-primary border border-primary/30">
+                                    🏆 {totalPrizes}x
+                                  </Badge>
                                 ) : (
-                                  <span className="text-muted-foreground">-</span>
+                                  <span className="text-muted-foreground">—</span>
+                                )}
+                              </TableCell>
+                              <TableCell className="text-xs text-center">
+                                {bestPrizeTier?.estimatedPrize ? (
+                                  <span className="font-semibold text-primary text-[11px]">
+                                    {bestPrizeTier.estimatedPrize}
+                                  </span>
+                                ) : (
+                                  <span className="text-muted-foreground text-[10px]">—</span>
                                 )}
                               </TableCell>
                               <TableCell className="text-xs text-center">
                                 <Badge
                                   variant={r.score >= 70 ? "default" : r.score >= 40 ? "secondary" : "outline"}
-                                  className="text-xs"
+                                  className="text-[10px] h-5"
                                 >
                                   {r.score}
                                 </Badge>
