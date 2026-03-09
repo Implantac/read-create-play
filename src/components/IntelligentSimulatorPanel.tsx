@@ -301,182 +301,159 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
           <Tabs defaultValue="ranking" className="space-y-4">
             <TabsList className="bg-muted/50 flex-wrap h-auto gap-1">
               <TabsTrigger value="ranking"><Trophy className="h-3.5 w-3.5 mr-1.5" />Ranking</TabsTrigger>
-              <TabsTrigger value="details"><BarChart3 className="h-3.5 w-3.5 mr-1.5" />Detalhes</TabsTrigger>
-              <TabsTrigger value="chart"><BarChart3 className="h-3.5 w-3.5 mr-1.5" />Distribuição</TabsTrigger>
-              <TabsTrigger value="timeline"><TrendingUp className="h-3.5 w-3.5 mr-1.5" />Desempenho</TabsTrigger>
+              <TabsTrigger value="chart"><BarChart3 className="h-3.5 w-3.5 mr-1.5" />Gráficos</TabsTrigger>
               <TabsTrigger value="ai"><Brain className="h-3.5 w-3.5 mr-1.5" />Análise IA</TabsTrigger>
             </TabsList>
 
-            {/* Ranking Tab */}
+            {/* Ranking Tab - Clean and Professional */}
             <TabsContent value="ranking" className="space-y-3">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12">#</TableHead>
-                    <TableHead>Jogo</TableHead>
-                    <TableHead className="text-center">Melhor</TableHead>
-                    <TableHead className="text-center">Média</TableHead>
-                    <TableHead className="text-center">Premiações</TableHead>
-                    <TableHead className="text-center">Estabilidade</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {simulation.ranking.map((betIdx, rank) => {
-                    const b = simulation.bets[betIdx];
-                    return (
-                      <TableRow key={b.bet.id} className={rank === 0 ? "bg-primary/5" : ""}>
-                        <TableCell>
-                          <Badge variant={rank === 0 ? "default" : "outline"} className="text-xs">
-                            {rank === 0 ? "🏆" : `${rank + 1}º`}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-wrap gap-0.5">
-                            {b.bet.numbers.slice(0, 8).map(n => (
-                              <span key={n} className="text-[10px] font-mono text-muted-foreground">
-                                {String(n).padStart(2, "0")}{" "}
-                              </span>
-                            ))}
-                            {b.bet.numbers.length > 8 && (
-                              <span className="text-[10px] text-muted-foreground">+{b.bet.numbers.length - 8}</span>
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium text-foreground">
+                  {simulation.totalDraws} concursos analisados • Premiação: ≥{minPrize} acertos
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                {simulation.ranking.map((betIdx, rank) => {
+                  const b = simulation.bets[betIdx];
+                  const medal = rank === 0 ? "🥇" : rank === 1 ? "🥈" : rank === 2 ? "🥉" : null;
+                  const prizeRate = simulation.totalDraws > 0 
+                    ? ((b.prizeCount / simulation.totalDraws) * 100).toFixed(1) 
+                    : "0";
+
+                  return (
+                    <div
+                      key={b.bet.id}
+                      className={`rounded-xl border p-4 transition-all ${
+                        rank < 3
+                          ? "border-primary/30 bg-primary/5"
+                          : "border-border bg-card/50"
+                      }`}
+                    >
+                      {/* Header: Position + Stats */}
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl font-bold min-w-[2rem] text-center">
+                            {medal || <span className="text-muted-foreground text-sm">{rank + 1}º</span>}
+                          </span>
+                          <div>
+                            <span className="text-sm font-semibold text-foreground">Jogo {b.bet.id}</span>
+                            {rank === 0 && (
+                              <Badge className="ml-2 text-[10px] bg-primary/20 text-primary border-0">
+                                Melhor desempenho
+                              </Badge>
                             )}
                           </div>
-                        </TableCell>
-                        <TableCell className="text-center font-bold text-primary">{b.bestHit}</TableCell>
-                        <TableCell className="text-center">{b.avgHits}</TableCell>
-                        <TableCell className="text-center">
-                          <Badge variant="secondary" className="text-xs">
-                            {b.prizeCount}/{simulation.totalDraws}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-center text-muted-foreground text-xs">σ {b.stability}</TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-              <p className="text-xs text-muted-foreground text-center">
-                {simulation.totalDraws} concursos analisados • Premiação: ≥{minPrize} acertos
-              </p>
-            </TabsContent>
+                        </div>
+                      </div>
 
-            {/* Details Tab */}
-            <TabsContent value="details" className="space-y-4">
-              {simulation.bets.map((b, i) => (
-                <div key={b.bet.id} className="border border-border/50 rounded-lg p-4 space-y-2 bg-muted/20">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-semibold text-sm text-foreground">
-                      Jogo {b.bet.id}
-                      <Badge variant="outline" className="ml-2 text-xs">
-                        Ranking #{simulation.ranking.indexOf(i) + 1}
-                      </Badge>
-                    </h4>
-                  </div>
-                  <div className="flex flex-wrap gap-1 mb-2">
-                    {b.bet.numbers.map(n => (
-                      <span key={n} className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-primary/15 text-primary text-xs font-bold">
-                        {String(n).padStart(2, "0")}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                    <div className="bg-muted/50 rounded p-2">
-                      <p className="text-muted-foreground">Concursos</p>
-                      <p className="font-bold text-foreground">{simulation.totalDraws}</p>
-                    </div>
-                    <div className="bg-muted/50 rounded p-2">
-                      <p className="text-muted-foreground">Melhor acerto</p>
-                      <p className="font-bold text-primary">{b.bestHit}</p>
-                    </div>
-                    <div className="bg-muted/50 rounded p-2">
-                      <p className="text-muted-foreground">Média acertos</p>
-                      <p className="font-bold text-foreground">{b.avgHits}</p>
-                    </div>
-                    <div className="bg-muted/50 rounded p-2">
-                      <p className="text-muted-foreground">Premiações</p>
-                      <p className="font-bold text-accent">{b.prizeCount}</p>
-                    </div>
-                  </div>
-                  <div className="text-xs space-y-1">
-                    <p className="text-muted-foreground font-medium">Distribuição de acertos:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {Object.entries(b.hitDistribution)
-                        .sort((a, b) => Number(b[0]) - Number(a[0]))
-                        .map(([hits, count]) => (
-                          <span key={hits} className={`px-2 py-0.5 rounded text-xs font-mono ${
-                            Number(hits) >= minPrize ? "bg-primary/20 text-primary font-bold" : "bg-muted/50 text-muted-foreground"
-                          }`}>
-                            {hits}ac → {count as number}x
+                      {/* Numbers as lottery balls */}
+                      <div className="flex flex-wrap gap-1.5 mb-3">
+                        {b.bet.numbers.map(n => (
+                          <span
+                            key={n}
+                            className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/15 text-primary text-xs font-bold border border-primary/20"
+                          >
+                            {String(n).padStart(2, "0")}
                           </span>
                         ))}
+                      </div>
+
+                      {/* Key metrics in a clean grid */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <div className="bg-muted/40 rounded-lg px-3 py-2 text-center">
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Melhor Acerto</p>
+                          <p className="text-xl font-bold text-primary">{b.bestHit}</p>
+                          <p className="text-[10px] text-muted-foreground">de {config.pick}</p>
+                        </div>
+                        <div className="bg-muted/40 rounded-lg px-3 py-2 text-center">
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Média</p>
+                          <p className="text-xl font-bold text-foreground">{b.avgHits}</p>
+                          <p className="text-[10px] text-muted-foreground">acertos/jogo</p>
+                        </div>
+                        <div className="bg-muted/40 rounded-lg px-3 py-2 text-center">
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Premiações</p>
+                          <p className="text-xl font-bold text-accent">{b.prizeCount}</p>
+                          <p className="text-[10px] text-muted-foreground">{prizeRate}% dos sorteios</p>
+                        </div>
+                        <div className="bg-muted/40 rounded-lg px-3 py-2 text-center">
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Estabilidade</p>
+                          <p className="text-xl font-bold text-foreground">σ {b.stability}</p>
+                          <p className="text-[10px] text-muted-foreground">{b.stability < 1.5 ? "Consistente" : b.stability < 2.5 ? "Moderado" : "Variável"}</p>
+                        </div>
+                      </div>
+
+                      {/* Hit distribution as a compact bar */}
+                      <div className="mt-3 pt-3 border-t border-border/50">
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1.5">Distribuição de Acertos</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {Object.entries(b.hitDistribution)
+                            .sort((a, b) => Number(b[0]) - Number(a[0]))
+                            .map(([hits, count]) => {
+                              const isPrize = Number(hits) >= minPrize;
+                              return (
+                                <div
+                                  key={hits}
+                                  className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs font-mono ${
+                                    isPrize
+                                      ? "bg-primary/20 text-primary font-bold border border-primary/30"
+                                      : "bg-muted/50 text-muted-foreground"
+                                  }`}
+                                >
+                                  <span>{hits} ac</span>
+                                  <span className="text-[10px] opacity-70">×{count as number}</span>
+                                  {isPrize && <Trophy className="h-2.5 w-2.5" />}
+                                </div>
+                              );
+                            })}
+                        </div>
+                      </div>
                     </div>
+                  );
+                })}
+              </div>
+            </TabsContent>
+
+            {/* Charts Tab */}
+            <TabsContent value="chart" className="space-y-6">
+              {chartData.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-foreground">Distribuição de Acertos</h4>
+                  <div className="h-72">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={chartData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis dataKey="acertos" stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 11 }} label={{ value: "Acertos", position: "insideBottom", offset: -5, fill: "hsl(var(--muted-foreground))" }} />
+                        <YAxis stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 11 }} />
+                        <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", color: "hsl(var(--foreground))" }} />
+                        <Legend />
+                        {simulation!.bets.map((b, i) => (
+                          <Bar key={b.bet.id} dataKey={`Jogo ${b.bet.id}`} fill={CHART_COLORS[i % CHART_COLORS.length]} opacity={0.8} radius={[4, 4, 0, 0]} />
+                        ))}
+                      </BarChart>
+                    </ResponsiveContainer>
                   </div>
                 </div>
-              ))}
-            </TabsContent>
-
-            {/* Distribution Chart Tab */}
-            <TabsContent value="chart">
-              {chartData.length > 0 && (
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                      <XAxis dataKey="acertos" stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 11 }} label={{ value: "Acertos", position: "insideBottom", offset: -5, fill: "hsl(var(--muted-foreground))" }} />
-                      <YAxis stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 11 }} />
-                      <Tooltip
-                        contentStyle={{
-                          background: "hsl(var(--card))",
-                          border: "1px solid hsl(var(--border))",
-                          borderRadius: "8px",
-                          color: "hsl(var(--foreground))",
-                        }}
-                      />
-                      {simulation!.bets.map((b, i) => (
-                        <Bar key={b.bet.id} dataKey={`Jogo ${b.bet.id}`} fill={CHART_COLORS[i % CHART_COLORS.length]} opacity={0.8} />
-                      ))}
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
               )}
-            </TabsContent>
 
-            {/* Timeline Chart Tab */}
-            <TabsContent value="timeline">
-              {timelineData.length > 0 ? (
+              {timelineData.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground">Desempenho dos jogos ao longo dos concursos</p>
-                  <div className="h-80">
+                  <h4 className="text-sm font-semibold text-foreground">Desempenho ao Longo do Tempo</h4>
+                  <div className="h-72">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={timelineData}>
                         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                         <XAxis dataKey="concurso" stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 10 }} />
                         <YAxis stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 11 }} label={{ value: "Acertos", angle: -90, position: "insideLeft", fill: "hsl(var(--muted-foreground))" }} />
-                        <Tooltip
-                          contentStyle={{
-                            background: "hsl(var(--card))",
-                            border: "1px solid hsl(var(--border))",
-                            borderRadius: "8px",
-                            color: "hsl(var(--foreground))",
-                          }}
-                        />
+                        <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", color: "hsl(var(--foreground))" }} />
                         <Legend />
                         {simulation!.bets.map((b, i) => (
-                          <Line
-                            key={b.bet.id}
-                            type="monotone"
-                            dataKey={`Jogo ${b.bet.id}`}
-                            stroke={CHART_COLORS[i % CHART_COLORS.length]}
-                            strokeWidth={2}
-                            dot={false}
-                          />
+                          <Line key={b.bet.id} type="monotone" dataKey={`Jogo ${b.bet.id}`} stroke={CHART_COLORS[i % CHART_COLORS.length]} strokeWidth={2} dot={false} />
                         ))}
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
-              ) : (
-                <p className="text-center text-sm text-muted-foreground py-8">Dados de timeline não disponíveis</p>
               )}
             </TabsContent>
 
@@ -492,7 +469,7 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
                     {loadingAi ? (
                       <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Analisando...</>
                     ) : (
-                      <><Brain className="h-4 w-4 mr-2" /> Gerar Análise e Sugestões com IA</>
+                      <><Brain className="h-4 w-4 mr-2" /> Gerar Análise com IA</>
                     )}
                   </Button>
                 </div>
