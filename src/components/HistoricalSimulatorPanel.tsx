@@ -349,7 +349,7 @@ export function HistoricalSimulatorPanel({ config, draws, stats }: Props) {
               <Tabs defaultValue="ranking" className="w-full">
                 <TabsList className="w-full grid grid-cols-4 h-8">
                   <TabsTrigger value="ranking" className="text-xs"><Trophy className="w-3 h-3 mr-1" />Ranking</TabsTrigger>
-                  <TabsTrigger value="prizes" className="text-xs"><BarChart3 className="w-3 h-3 mr-1" />Premiações</TabsTrigger>
+                  <TabsTrigger value="details" className="text-xs"><Eye className="w-3 h-3 mr-1" />Detalhes</TabsTrigger>
                   <TabsTrigger value="distribution" className="text-xs">📊 Distribuição</TabsTrigger>
                   <TabsTrigger value="insights" className="text-xs"><Lightbulb className="w-3 h-3 mr-1" />Insights</TabsTrigger>
                 </TabsList>
@@ -364,65 +364,49 @@ export function HistoricalSimulatorPanel({ config, draws, stats }: Props) {
                           <TableHead className="text-xs">Números</TableHead>
                           <TableHead className="text-xs text-center">Melhor</TableHead>
                           <TableHead className="text-xs text-center">Média</TableHead>
+                          <TableHead className="text-xs text-center">Prêmios</TableHead>
                           <TableHead className="text-xs text-center">Score</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {simResults.results.slice(0, 50).map((r, i) => (
-                          <TableRow key={r.gameId} className={i < 3 ? "bg-primary/5" : ""}>
-                            <TableCell className="text-xs font-mono">
-                              {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
-                            </TableCell>
-                            <TableCell className="text-xs">{r.label}</TableCell>
-                            <TableCell className="text-xs font-mono text-primary">
-                              {r.gameNumbers.map(n => String(n).padStart(2, "0")).join(" ")}
-                            </TableCell>
-                            <TableCell className="text-xs text-center font-bold">{r.bestHits}</TableCell>
-                            <TableCell className="text-xs text-center">{r.averageHits}</TableCell>
-                            <TableCell className="text-xs text-center">
-                              <Badge
-                                variant={r.score >= 70 ? "default" : r.score >= 40 ? "secondary" : "outline"}
-                                className="text-xs"
-                              >
-                                {r.score}
-                              </Badge>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                        {simResults.results.slice(0, 50).map((r, i) => {
+                          const totalPrizes = Object.values(r.totalPrizes).reduce((s, v) => s + v, 0);
+                          return (
+                            <TableRow key={r.gameId} className={i < 3 ? "bg-primary/5" : ""}>
+                              <TableCell className="text-xs font-mono">
+                                {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
+                              </TableCell>
+                              <TableCell className="text-xs">{r.label}</TableCell>
+                              <TableCell className="text-xs font-mono text-primary">
+                                {r.gameNumbers.map(n => String(n).padStart(2, "0")).join(" ")}
+                              </TableCell>
+                              <TableCell className="text-xs text-center font-bold">{r.bestHits}</TableCell>
+                              <TableCell className="text-xs text-center">{r.averageHits}</TableCell>
+                              <TableCell className="text-xs text-center">
+                                {totalPrizes > 0 ? (
+                                  <span className="text-primary font-bold">{totalPrizes}x</span>
+                                ) : (
+                                  <span className="text-muted-foreground">-</span>
+                                )}
+                              </TableCell>
+                              <TableCell className="text-xs text-center">
+                                <Badge
+                                  variant={r.score >= 70 ? "default" : r.score >= 40 ? "secondary" : "outline"}
+                                  className="text-xs"
+                                >
+                                  {r.score}
+                                </Badge>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
                       </TableBody>
                     </Table>
                   </div>
                 </TabsContent>
 
-                <TabsContent value="prizes" className="mt-2">
-                  {prizeChartData.length > 0 ? (
-                    <div className="h-52">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={prizeChartData}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                          <XAxis dataKey="label" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
-                          <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
-                          <Tooltip
-                            contentStyle={{
-                              backgroundColor: "hsl(var(--card))",
-                              border: "1px solid hsl(var(--border))",
-                              borderRadius: "8px",
-                              fontSize: "12px",
-                            }}
-                          />
-                          <Bar dataKey="count" name="Ocorrências" radius={[4, 4, 0, 0]}>
-                            {prizeChartData.map((_, i) => (
-                              <Cell key={i} fill={`hsl(var(--primary) / ${1 - i * 0.15})`} />
-                            ))}
-                          </Bar>
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground text-center py-8">
-                      Nenhuma premiação detectada nesta simulação
-                    </p>
-                  )}
+                <TabsContent value="details" className="mt-2">
+                  <GameDetailsList results={simResults.results} config={config} />
                 </TabsContent>
 
                 <TabsContent value="distribution" className="mt-2">
