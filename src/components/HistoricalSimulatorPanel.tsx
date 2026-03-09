@@ -534,20 +534,35 @@ function GameDetailsList({ results, config }: { results: GameResult[]; config: L
 
             {/* Expanded details */}
             {isExpanded && (
-              <div className="border-t border-border bg-secondary/20 px-3 py-2">
-                {/* Prize summary */}
+              <div className="border-t border-border bg-secondary/20 px-3 py-3">
+                {/* Prize summary cards */}
                 {totalPrizes > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
                     {Object.entries(r.totalPrizes)
                       .filter(([, v]) => v > 0)
+                      .sort(([labelA], [labelB]) => {
+                        const tierA = prizeTiers.find(t => t.label === labelA);
+                        const tierB = prizeTiers.find(t => t.label === labelB);
+                        return (tierB?.hits || 0) - (tierA?.hits || 0);
+                      })
                       .map(([label, count]) => {
                         const tier = prizeTiers.find(t => t.label === label);
+                        const isTopTier = tier && tier.hits >= config.pick - 1;
                         return (
-                          <div key={label} className="bg-primary/10 border border-primary/20 rounded-md px-2.5 py-1.5 text-xs">
-                            <span className="font-semibold text-primary">{count}x</span>
-                            <span className="text-foreground ml-1">{label}</span>
+                          <div
+                            key={label}
+                            className={`rounded-lg p-2.5 border text-center ${
+                              isTopTier
+                                ? "bg-primary/15 border-primary/40"
+                                : "bg-card border-border"
+                            }`}
+                          >
+                            <p className="text-lg font-bold text-primary">{count}x</p>
+                            <p className="text-[10px] font-medium text-foreground">{label}</p>
                             {tier?.estimatedPrize && (
-                              <span className="text-muted-foreground ml-1">≈ {tier.estimatedPrize}</span>
+                              <p className={`text-xs font-bold mt-0.5 ${isTopTier ? "text-primary" : "text-chart-4"}`}>
+                                💰 {tier.estimatedPrize}
+                              </p>
                             )}
                           </div>
                         );
@@ -555,29 +570,50 @@ function GameDetailsList({ results, config }: { results: GameResult[]; config: L
                   </div>
                 )}
 
-                {/* Draw-by-draw results with prizes */}
-                <p className="text-[10px] text-muted-foreground mb-1 font-medium">Concursos com melhor desempenho:</p>
-                <div className="max-h-48 overflow-auto space-y-1">
+                {totalPrizes === 0 && (
+                  <div className="bg-card border border-border rounded-lg p-3 mb-3 text-center">
+                    <p className="text-xs text-muted-foreground">Nenhuma faixa de premiação atingida</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">Melhor resultado: {r.bestHits} acertos</p>
+                  </div>
+                )}
+
+                {/* Draw-by-draw results */}
+                <p className="text-[10px] text-muted-foreground mb-1.5 font-semibold uppercase tracking-wide">
+                  Melhores resultados por concurso
+                </p>
+                <div className="max-h-52 overflow-auto space-y-1">
                   {r.results
                     .filter(cr => cr.hits >= Math.max(2, r.bestHits - 2))
                     .sort((a, b) => b.hits - a.hits)
                     .slice(0, 20)
                     .map(cr => {
                       const prize = getPrizeForHits(cr.hits);
+                      const isPrizeWinner = !!prize;
                       return (
-                        <div key={cr.concurso} className="flex items-center gap-2 text-xs py-1 px-2 rounded bg-card border border-border">
+                        <div
+                          key={cr.concurso}
+                          className={`flex items-center gap-2 text-xs py-1.5 px-2.5 rounded-md border transition-colors ${
+                            isPrizeWinner
+                              ? "bg-primary/5 border-primary/20"
+                              : "bg-card border-border"
+                          }`}
+                        >
                           <span className="font-mono text-muted-foreground w-16 shrink-0">#{cr.concurso}</span>
                           <span className="text-muted-foreground w-20 shrink-0">{cr.date}</span>
-                          <span className={`font-bold w-20 shrink-0 ${prize ? "text-primary" : "text-foreground"}`}>
-                            {cr.hits} acertos
+                          <span className={`font-bold w-8 shrink-0 text-center ${isPrizeWinner ? "text-primary" : "text-foreground"}`}>
+                            {cr.hits}
                           </span>
-                          <span className="font-mono text-primary/80 text-[10px] flex-1">
+                          <span className="font-mono text-primary/70 text-[10px] flex-1 min-w-0 truncate">
                             {cr.matchedNumbers.map(n => String(n).padStart(2, "0")).join(" ")}
                           </span>
-                          {prize && (
-                            <Badge variant="default" className="text-[10px] h-4 px-1.5 shrink-0">
-                              {prize.label} {prize.estimatedPrize ? `≈ ${prize.estimatedPrize}` : ""}
-                            </Badge>
+                          {prize ? (
+                            <div className="shrink-0 text-right">
+                              <Badge className="text-[9px] h-5 px-2 bg-primary/20 text-primary border-primary/30">
+                                💰 {prize.estimatedPrize || prize.label}
+                              </Badge>
+                            </div>
+                          ) : (
+                            <span className="text-[10px] text-muted-foreground shrink-0">sem prêmio</span>
                           )}
                         </div>
                       );
