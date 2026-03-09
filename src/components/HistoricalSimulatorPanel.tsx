@@ -355,74 +355,89 @@ export function HistoricalSimulatorPanel({ config, draws, stats }: Props) {
                 </TabsList>
 
                 <TabsContent value="ranking" className="mt-2">
-                  <div className="max-h-[500px] overflow-auto space-y-1.5 pr-1">
-                    {simResults.results.slice(0, 50).map((r, i) => {
-                      const totalPrizes = Object.values(r.totalPrizes).reduce((s, v) => s + v, 0);
-                      const prizeTiers = getPrizeTiers(config.id);
-                      const bestPrizeTier = prizeTiers.find(t => t.hits === r.bestHits);
-                      const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : null;
-                      const isTop3 = i < 3;
+                  <div className="overflow-auto max-h-[520px] border border-border rounded-lg">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-secondary/50">
+                          <TableHead className="w-12 text-center text-xs">#</TableHead>
+                          <TableHead className="text-xs">Jogo</TableHead>
+                          <TableHead className="text-center text-xs w-24">Acertos</TableHead>
+                          <TableHead className="text-center text-xs w-36">Prêmio Estimado</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {simResults.results.slice(0, 50).map((r, i) => {
+                          const prizeTiers = getPrizeTiers(config.id);
+                          const bestPrizeTier = prizeTiers.find(t => t.hits === r.bestHits);
+                          const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : null;
+                          const isTop3 = i < 3;
 
-                      return (
-                        <div
-                          key={r.gameId}
-                          className={`rounded-lg border p-3 transition-colors ${
-                            isTop3
-                              ? "border-primary/30 bg-primary/5 hover:bg-primary/10"
-                              : "border-border bg-card hover:bg-secondary/30"
-                          }`}
-                        >
-                          {/* Top row: position + numbers */}
-                          <div className="flex items-center gap-2.5">
-                            <span className={`text-sm font-bold font-mono shrink-0 w-8 text-center ${isTop3 ? "text-primary" : "text-muted-foreground"}`}>
-                              {medal || `#${i + 1}`}
-                            </span>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-xs font-semibold text-foreground">{r.label}</span>
-                                <Badge variant={r.score >= 70 ? "default" : r.score >= 40 ? "secondary" : "outline"} className="text-[10px] h-5 px-1.5">
-                                  {r.score}/100
-                                </Badge>
-                              </div>
-                              <div className="flex flex-wrap gap-1 mt-1.5">
-                                {r.gameNumbers.map(n => (
-                                  <span
-                                    key={n}
-                                    className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary/15 text-primary text-[11px] font-bold font-mono border border-primary/20"
-                                  >
-                                    {String(n).padStart(2, "0")}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
+                          // Build prize breakdown: list each tier the game achieved
+                          const prizeBreakdown = prizeTiers
+                            .filter(t => (r.totalPrizes[t.label] || 0) > 0)
+                            .map(t => ({ label: t.label, count: r.totalPrizes[t.label], prize: t.estimatedPrize }));
 
-                          {/* Bottom row: stats */}
-                          <div className="flex items-center gap-3 mt-2.5 ml-10 flex-wrap">
-                            <div className="flex items-center gap-1 text-xs">
-                              <span className="text-muted-foreground">Melhor:</span>
-                              <span className={`font-bold ${r.bestHits >= config.pick - 1 ? "text-primary" : "text-foreground"}`}>
-                                {r.bestHits} acertos
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-1 text-xs">
-                              <span className="text-muted-foreground">Média:</span>
-                              <span className="font-semibold text-foreground">{r.averageHits}</span>
-                            </div>
-                            {totalPrizes > 0 && (
-                              <Badge className="text-[10px] h-5 px-2 bg-primary/20 text-primary border-primary/30">
-                                🏆 {totalPrizes} premiações
-                              </Badge>
-                            )}
-                            {bestPrizeTier?.estimatedPrize && (
-                              <span className="text-xs font-bold text-chart-4">
-                                💰 {bestPrizeTier.estimatedPrize}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
+                          return (
+                            <TableRow
+                              key={r.gameId}
+                              className={isTop3 ? "bg-primary/5 hover:bg-primary/10" : "hover:bg-secondary/30"}
+                            >
+                              {/* Position */}
+                              <TableCell className="text-center font-bold text-sm py-3">
+                                {medal || <span className="text-muted-foreground font-mono">{i + 1}</span>}
+                              </TableCell>
+
+                              {/* Numbers */}
+                              <TableCell className="py-3">
+                                <div className="flex flex-wrap gap-1">
+                                  {r.gameNumbers.map(n => (
+                                    <span
+                                      key={n}
+                                      className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary/15 text-primary text-[11px] font-bold font-mono border border-primary/20"
+                                    >
+                                      {String(n).padStart(2, "0")}
+                                    </span>
+                                  ))}
+                                </div>
+                              </TableCell>
+
+                              {/* Best hits */}
+                              <TableCell className="text-center py-3">
+                                <span className={`text-lg font-extrabold ${r.bestHits >= config.pick - 1 ? "text-primary" : "text-foreground"}`}>
+                                  {r.bestHits}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground block">de {config.pick}</span>
+                              </TableCell>
+
+                              {/* Prize */}
+                              <TableCell className="text-center py-3">
+                                {bestPrizeTier?.estimatedPrize ? (
+                                  <div>
+                                    <span className="text-sm font-bold text-primary">
+                                      {bestPrizeTier.estimatedPrize}
+                                    </span>
+                                    <span className="text-[10px] text-muted-foreground block">
+                                      {bestPrizeTier.label}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <span className="text-xs text-muted-foreground">—</span>
+                                )}
+                                {prizeBreakdown.length > 1 && (
+                                  <div className="mt-1 flex flex-wrap justify-center gap-1">
+                                    {prizeBreakdown.slice(1).map(pb => (
+                                      <Badge key={pb.label} variant="outline" className="text-[9px] h-4 px-1">
+                                        {pb.count}x {pb.label.split("(")[0].trim()}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
                   </div>
                 </TabsContent>
 
