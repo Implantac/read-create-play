@@ -127,7 +127,7 @@ export default function AdminPage() {
         </CardHeader>
         <CardContent>
           <div className="flex gap-2 h-6 rounded-full overflow-hidden bg-muted">
-            {["free", "premium", "professional"].map(plan => {
+            {["free", "premium", "professional", "lifetime"].map(plan => {
               const pct = profiles.length > 0 ? ((planCounts[plan] || 0) / profiles.length) * 100 : 0;
               if (pct === 0) return null;
               return (
