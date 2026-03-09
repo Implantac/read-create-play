@@ -219,6 +219,7 @@ export default function AdminPage() {
                             <SelectItem value="free">Gratuito</SelectItem>
                             <SelectItem value="premium">Premium</SelectItem>
                             <SelectItem value="professional">Profissional</SelectItem>
+                            <SelectItem value="lifetime">Vitalício</SelectItem>
                           </SelectContent>
                         </Select>
                       </TableCell>
