@@ -137,9 +137,9 @@ export function getPrizeTiers(lotteryId: string): { hits: number; label: string;
   switch (lotteryId) {
     case "megasena":
       return [
-        { hits: 6, label: "Sena (6 acertos)", estimatedPrize: "R$ 50.000.000+" },
-        { hits: 5, label: "Quina (5 acertos)", estimatedPrize: "R$ 40.000~80.000" },
-        { hits: 4, label: "Quadra (4 acertos)", estimatedPrize: "R$ 800~1.200" },
+        { hits: 6, label: "Sena (6 acertos)", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 5, label: "Quina (5 acertos)", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 4, label: "Quadra (4 acertos)", estimatedPrize: "Valor variável (rateado)" },
       ];
     case "lotofacil":
       return [
@@ -151,50 +151,50 @@ export function getPrizeTiers(lotteryId: string): { hits: number; label: string;
       ];
     case "quina":
       return [
-        { hits: 5, label: "Quina (5 acertos)", estimatedPrize: "R$ 5.000.000+" },
-        { hits: 4, label: "Quadra (4 acertos)", estimatedPrize: "R$ 5.000~10.000" },
-        { hits: 3, label: "Terno (3 acertos)", estimatedPrize: "R$ 50~150" },
-        { hits: 2, label: "Duque (2 acertos)", estimatedPrize: "R$ 3~6" },
+        { hits: 5, label: "Quina (5 acertos)", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 4, label: "Quadra (4 acertos)", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 3, label: "Terno (3 acertos)", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 2, label: "Duque (2 acertos)", estimatedPrize: "Valor variável (rateado)" },
       ];
     case "lotomania":
       return [
-        { hits: 20, label: "20 acertos", estimatedPrize: "R$ 5.000.000+" },
-        { hits: 19, label: "19 acertos", estimatedPrize: "R$ 50.000~150.000" },
-        { hits: 18, label: "18 acertos", estimatedPrize: "R$ 1.500~5.000" },
-        { hits: 17, label: "17 acertos", estimatedPrize: "R$ 200~500" },
-        { hits: 16, label: "16 acertos", estimatedPrize: "R$ 30~80" },
-        { hits: 15, label: "15 acertos", estimatedPrize: "R$ 6~15" },
-        { hits: 0, label: "0 acertos", estimatedPrize: "R$ 6~15" },
+        { hits: 20, label: "20 acertos", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 19, label: "19 acertos", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 18, label: "18 acertos", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 17, label: "17 acertos", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 16, label: "16 acertos", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 15, label: "15 acertos", estimatedPrize: "R$ 6,00 (fixo)" },
+        { hits: 0, label: "0 acertos", estimatedPrize: "R$ 6,00 (fixo)" },
       ];
     case "duplasena":
       return [
-        { hits: 6, label: "Sena (6 acertos)", estimatedPrize: "R$ 3.000.000+" },
-        { hits: 5, label: "Quina (5 acertos)", estimatedPrize: "R$ 5.000~15.000" },
-        { hits: 4, label: "Quadra (4 acertos)", estimatedPrize: "R$ 80~200" },
-        { hits: 3, label: "Terno (3 acertos)", estimatedPrize: "R$ 3~8" },
+        { hits: 6, label: "Sena (6 acertos)", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 5, label: "Quina (5 acertos)", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 4, label: "Quadra (4 acertos)", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 3, label: "Terno (3 acertos)", estimatedPrize: "Valor variável (rateado)" },
       ];
     case "timemania":
       return [
-        { hits: 7, label: "7 acertos", estimatedPrize: "R$ 5.000.000+" },
-        { hits: 6, label: "6 acertos", estimatedPrize: "R$ 30.000~80.000" },
-        { hits: 5, label: "5 acertos", estimatedPrize: "R$ 500~1.500" },
-        { hits: 4, label: "4 acertos", estimatedPrize: "R$ 8~20" },
-        { hits: 3, label: "3 acertos", estimatedPrize: "R$ 3~5" },
+        { hits: 7, label: "7 acertos", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 6, label: "6 acertos", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 5, label: "5 acertos", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 4, label: "4 acertos", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 3, label: "3 acertos", estimatedPrize: "R$ 3,00 (fixo)" },
       ];
     case "diadesorte":
       return [
-        { hits: 7, label: "7 acertos", estimatedPrize: "R$ 1.000.000+" },
-        { hits: 6, label: "6 acertos", estimatedPrize: "R$ 5.000~15.000" },
-        { hits: 5, label: "5 acertos", estimatedPrize: "R$ 30~80" },
-        { hits: 4, label: "4 acertos", estimatedPrize: "R$ 5~10" },
+        { hits: 7, label: "7 acertos", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 6, label: "6 acertos", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 5, label: "5 acertos", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 4, label: "4 acertos", estimatedPrize: "Valor variável (rateado)" },
       ];
     case "supersete":
       return [
-        { hits: 7, label: "7 acertos", estimatedPrize: "R$ 1.000.000+" },
-        { hits: 6, label: "6 acertos", estimatedPrize: "R$ 30.000~80.000" },
-        { hits: 5, label: "5 acertos", estimatedPrize: "R$ 500~1.500" },
-        { hits: 4, label: "4 acertos", estimatedPrize: "R$ 10~30" },
-        { hits: 3, label: "3 acertos", estimatedPrize: "R$ 3~5" },
+        { hits: 7, label: "7 acertos", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 6, label: "6 acertos", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 5, label: "5 acertos", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 4, label: "4 acertos", estimatedPrize: "Valor variável (rateado)" },
+        { hits: 3, label: "3 acertos", estimatedPrize: "R$ 3,00 (fixo)" },
       ];
     default:
       return [
