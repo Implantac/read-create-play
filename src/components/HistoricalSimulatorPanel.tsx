@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { NumberStats } from "@/engine/statistics";
 import {
