@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.ai-massive-simulation]
 verify_jwt = false
+
+[functions.cleanup-expired-cache]
+verify_jwt = false
