@@ -366,7 +366,7 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
                           : "border-border bg-card/50"
                       }`}
                     >
-                      {/* Header: Position + Stats */}
+                      {/* Header: Position + Stats + Save */}
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <span className="text-xl font-bold min-w-[2rem] text-center">
@@ -381,6 +381,19 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
                             )}
                           </div>
                         </div>
+                        <Button
+                          onClick={() => handleSaveBet(b)}
+                          variant="ghost"
+                          size="sm"
+                          disabled={savedIds.has(b.bet.id)}
+                          className="text-xs h-8"
+                        >
+                          {savedIds.has(b.bet.id) ? (
+                            <><BookmarkCheck className="h-3.5 w-3.5 mr-1 text-primary" /> Salvo</>
+                          ) : (
+                            <><Bookmark className="h-3.5 w-3.5 mr-1" /> Salvar</>
+                          )}
+                        </Button>
                       </div>
 
                       {/* Numbers as lottery balls */}
