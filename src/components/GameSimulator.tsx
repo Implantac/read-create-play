@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { NumberStats, generateSmartBet } from "@/engine/statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { getPrizeTiers } from "@/services/lotteryApi";
@@ -26,6 +26,15 @@ export function GameSimulator({ stats, config, draws }: Props) {
   const [running, setRunning] = useState(false);
   const [rounds, setRounds] = useState(100);
   const [strategy, setStrategy] = useState<"smart" | "random">("smart");
+
+  // Reset state when lottery changes
+  const prevLotteryId = useRef(config.id);
+  useEffect(() => {
+    if (prevLotteryId.current !== config.id) {
+      prevLotteryId.current = config.id;
+      setSimResults(null);
+    }
+  }, [config.id]);
 
   const prizeTiers = getPrizeTiers(config.id);
 

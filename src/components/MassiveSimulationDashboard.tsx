@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -60,6 +60,17 @@ export function MassiveSimulationDashboard({ stats, config, draws }: Props) {
   const [result, setResult] = useState<MassiveSimResult | null>(null);
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
+
+  // Reset state when lottery changes
+  const prevLotteryId = useRef(config.id);
+  useEffect(() => {
+    if (prevLotteryId.current !== config.id) {
+      prevLotteryId.current = config.id;
+      setResult(null);
+      setAiAnalysis(null);
+      setProgress(null);
+    }
+  }, [config.id]);
 
   const handleProgress = useCallback((p: MassiveSimProgress) => {
     setProgress(p);

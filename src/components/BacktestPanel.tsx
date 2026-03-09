@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +32,15 @@ export function BacktestPanel({ stats, config, draws }: Props) {
   const [betsPerDraw, setBetsPerDraw] = useState(3);
   const [running, setRunning] = useState(false);
   const [results, setResults] = useState<BacktestResult[] | null>(null);
+
+  // Reset state when lottery changes
+  const prevLotteryId = useRef(config.id);
+  useEffect(() => {
+    if (prevLotteryId.current !== config.id) {
+      prevLotteryId.current = config.id;
+      setResults(null);
+    }
+  }, [config.id]);
 
   const toggleStrategy = (s: Strategy) => {
     setSelectedStrategies(prev =>

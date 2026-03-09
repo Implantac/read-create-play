@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -51,6 +51,16 @@ export function MassiveSimulatorPanel({ stats, config, draws }: Props) {
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<MassiveSimResult | null>(null);
   const cancelRef = useRef(false);
+
+  // Reset state when lottery changes
+  const prevLotteryId = useRef(config.id);
+  useEffect(() => {
+    if (prevLotteryId.current !== config.id) {
+      prevLotteryId.current = config.id;
+      setResult(null);
+      setProgress(0);
+    }
+  }, [config.id]);
 
   const toggleStrategy = (s: Strategy) => {
     setSelectedStrategies(prev =>
