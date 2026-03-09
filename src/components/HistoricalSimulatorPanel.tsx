@@ -428,7 +428,24 @@ export function HistoricalSimulatorPanel({ config, draws, stats }: Props) {
                   <GameDetailsList results={simResults.results} config={config} />
                 </TabsContent>
 
-                <TabsContent value="distribution" className="mt-2">
+                <TabsContent value="distribution" className="mt-2 space-y-3">
+                  {/* Prize distribution summary */}
+                  {prizeChartData.length > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                      {prizeChartData.map(({ label, count }) => {
+                        const tier = getPrizeTiers(config.id).find(t => t.label === label);
+                        return (
+                          <div key={label} className="bg-card border border-border rounded-lg p-2.5 text-center">
+                            <p className="text-xl font-bold text-primary">{count}</p>
+                            <p className="text-[10px] font-medium text-foreground">{label}</p>
+                            {tier?.estimatedPrize && (
+                              <p className="text-[10px] font-semibold text-chart-4 mt-0.5">💰 {tier.estimatedPrize}</p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                   <div className="h-52">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={hitsChartData}>
