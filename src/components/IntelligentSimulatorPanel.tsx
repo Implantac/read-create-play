@@ -96,6 +96,35 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
     setBets(prev => prev.filter(b => b.id !== id));
   };
 
+  const handleSaveBet = async (b: BetSimulationResult) => {
+    const success = await saveBet({
+      numbers: b.bet.numbers,
+      strategy: `Simulador Inteligente (Avg: ${b.avgHits}, Best: ${b.bestHit})`,
+      score: Math.round(b.avgHits * 3 + b.bestHit * 2 + b.prizeCount * 5 - b.stability),
+      grade: b.bestHit >= config.pick - 1 ? "S" : b.bestHit >= config.pick - 3 ? "A" : "B",
+    });
+    if (success) setSavedIds(prev => new Set(prev).add(b.bet.id));
+  };
+
+  const handleSaveTop = async () => {
+    if (!simulation) return;
+    const top = simulation.ranking.slice(0, Math.min(3, simulation.ranking.length));
+    let count = 0;
+    for (const idx of top) {
+      const b = simulation.bets[idx];
+      if (!savedIds.has(b.bet.id)) {
+        const ok = await saveBet({
+          numbers: b.bet.numbers,
+          strategy: `Top Simulação (Avg: ${b.avgHits}, Best: ${b.bestHit})`,
+          score: Math.round(b.avgHits * 3 + b.bestHit * 2 + b.prizeCount * 5 - b.stability),
+          grade: b.bestHit >= config.pick - 1 ? "S" : b.bestHit >= config.pick - 3 ? "A" : "B",
+        });
+        if (ok) { setSavedIds(prev => new Set(prev).add(b.bet.id)); count++; }
+      }
+    }
+    if (count === 0) toast.info("Os melhores jogos já foram salvos");
+  };
+
   const clearAll = () => {
     setBets([]);
     setSimulation(null);
