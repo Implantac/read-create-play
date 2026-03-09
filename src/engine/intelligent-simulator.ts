@@ -150,13 +150,22 @@ export function parseBetsFromText(text: string, config: LotteryConfig): Simulati
 
 export function generateRandomBets(count: number, config: LotteryConfig): SimulationBet[] {
   const bets: SimulationBet[] = [];
-  for (let i = 0; i < count; i++) {
+  const seen = new Set<string>();
+  let attempts = 0;
+  const maxAttempts = count * 10;
+
+  while (bets.length < count && attempts < maxAttempts) {
+    attempts++;
     const nums: number[] = [];
     while (nums.length < config.pick) {
       const n = Math.floor(Math.random() * config.numbers) + 1;
       if (!nums.includes(n)) nums.push(n);
     }
-    bets.push({ id: bets.length + 1, numbers: nums.sort((a, b) => a - b) });
+    const sorted = nums.sort((a, b) => a - b);
+    const key = sorted.join(",");
+    if (seen.has(key)) continue;
+    seen.add(key);
+    bets.push({ id: bets.length + 1, numbers: sorted });
   }
   return bets;
 }

@@ -46,6 +46,7 @@ export function generateGames(
   mode: "random" | "balanced" | "frequency" | "delayed" | "ai"
 ): GameEntry[] {
   const games: GameEntry[] = [];
+  const seen = new Set<string>();
   const modeLabels: Record<string, string> = {
     random: "Aleatório",
     balanced: "Equilibrado",
@@ -54,7 +55,11 @@ export function generateGames(
     ai: "IA",
   };
 
-  for (let i = 0; i < count; i++) {
+  let attempts = 0;
+  const maxAttempts = count * 10;
+
+  while (games.length < count && attempts < maxAttempts) {
+    attempts++;
     let numbers: number[];
     switch (mode) {
       case "balanced":
@@ -72,10 +77,14 @@ export function generateGames(
       default:
         numbers = generateRandom(config);
     }
+    const sorted = numbers.sort((a, b) => a - b);
+    const key = sorted.join(",");
+    if (seen.has(key)) continue;
+    seen.add(key);
     games.push({
-      id: i + 1,
-      numbers: numbers.sort((a, b) => a - b),
-      label: `${modeLabels[mode]} #${i + 1}`,
+      id: games.length + 1,
+      numbers: sorted,
+      label: `${modeLabels[mode]} #${games.length + 1}`,
     });
   }
   return games;
