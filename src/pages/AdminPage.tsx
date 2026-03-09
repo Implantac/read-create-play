@@ -27,12 +27,14 @@ const PLAN_COLORS: Record<string, string> = {
   free: "bg-muted text-muted-foreground",
   premium: "bg-primary/20 text-primary",
   professional: "bg-accent/20 text-accent",
+  lifetime: "bg-yellow-500/20 text-yellow-400",
 };
 
 const PLAN_LABELS: Record<string, string> = {
   free: "Gratuito",
   premium: "Premium",
   professional: "Profissional",
+  lifetime: "Vitalício",
 };
 
 export default function AdminPage() {
