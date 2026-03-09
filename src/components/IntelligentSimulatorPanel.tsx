@@ -129,6 +129,7 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
     setBets([]);
     setSimulation(null);
     setAiAnalysis("");
+    setSavedIds(new Set());
   };
 
   const handleRunSimulation = () => {
