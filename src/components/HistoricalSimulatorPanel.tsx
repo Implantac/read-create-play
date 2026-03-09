@@ -355,72 +355,74 @@ export function HistoricalSimulatorPanel({ config, draws, stats }: Props) {
                 </TabsList>
 
                 <TabsContent value="ranking" className="mt-2">
-                  <div className="max-h-[420px] overflow-auto rounded-lg border border-border">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="bg-secondary/50">
-                          <TableHead className="text-xs w-10">#</TableHead>
-                          <TableHead className="text-xs">Jogo</TableHead>
-                          <TableHead className="text-xs">Números</TableHead>
-                          <TableHead className="text-xs text-center">Melhor</TableHead>
-                          <TableHead className="text-xs text-center">Média</TableHead>
-                          <TableHead className="text-xs text-center">Prêmios</TableHead>
-                          <TableHead className="text-xs text-center">💰 Valor Est.</TableHead>
-                          <TableHead className="text-xs text-center">Score</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {simResults.results.slice(0, 50).map((r, i) => {
-                          const totalPrizes = Object.values(r.totalPrizes).reduce((s, v) => s + v, 0);
-                          const prizeTiers = getPrizeTiers(config.id);
-                          // Find highest prize tier achieved
-                          const bestPrizeTier = prizeTiers.find(t => t.hits === r.bestHits);
-                          return (
-                            <TableRow key={r.gameId} className={i < 3 ? "bg-primary/5 hover:bg-primary/10" : "hover:bg-secondary/30"}>
-                              <TableCell className="text-xs font-mono">
-                                {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
-                              </TableCell>
-                              <TableCell className="text-xs font-medium">{r.label}</TableCell>
-                              <TableCell className="text-xs font-mono text-primary">
-                                {r.gameNumbers.map(n => String(n).padStart(2, "0")).join(" ")}
-                              </TableCell>
-                              <TableCell className="text-xs text-center">
-                                <span className={`font-bold ${r.bestHits >= config.pick - 1 ? "text-primary" : r.bestHits >= config.pick - 2 ? "text-chart-4" : "text-foreground"}`}>
-                                  {r.bestHits}
-                                </span>
-                              </TableCell>
-                              <TableCell className="text-xs text-center text-muted-foreground">{r.averageHits}</TableCell>
-                              <TableCell className="text-xs text-center">
-                                {totalPrizes > 0 ? (
-                                  <Badge variant="default" className="text-[10px] px-1.5 h-5 bg-primary/20 text-primary border border-primary/30">
-                                    🏆 {totalPrizes}x
-                                  </Badge>
-                                ) : (
-                                  <span className="text-muted-foreground">—</span>
-                                )}
-                              </TableCell>
-                              <TableCell className="text-xs text-center">
-                                {bestPrizeTier?.estimatedPrize ? (
-                                  <span className="font-semibold text-primary text-[11px]">
-                                    {bestPrizeTier.estimatedPrize}
-                                  </span>
-                                ) : (
-                                  <span className="text-muted-foreground text-[10px]">—</span>
-                                )}
-                              </TableCell>
-                              <TableCell className="text-xs text-center">
-                                <Badge
-                                  variant={r.score >= 70 ? "default" : r.score >= 40 ? "secondary" : "outline"}
-                                  className="text-[10px] h-5"
-                                >
-                                  {r.score}
+                  <div className="max-h-[500px] overflow-auto space-y-1.5 pr-1">
+                    {simResults.results.slice(0, 50).map((r, i) => {
+                      const totalPrizes = Object.values(r.totalPrizes).reduce((s, v) => s + v, 0);
+                      const prizeTiers = getPrizeTiers(config.id);
+                      const bestPrizeTier = prizeTiers.find(t => t.hits === r.bestHits);
+                      const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : null;
+                      const isTop3 = i < 3;
+
+                      return (
+                        <div
+                          key={r.gameId}
+                          className={`rounded-lg border p-3 transition-colors ${
+                            isTop3
+                              ? "border-primary/30 bg-primary/5 hover:bg-primary/10"
+                              : "border-border bg-card hover:bg-secondary/30"
+                          }`}
+                        >
+                          {/* Top row: position + numbers */}
+                          <div className="flex items-center gap-2.5">
+                            <span className={`text-sm font-bold font-mono shrink-0 w-8 text-center ${isTop3 ? "text-primary" : "text-muted-foreground"}`}>
+                              {medal || `#${i + 1}`}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-xs font-semibold text-foreground">{r.label}</span>
+                                <Badge variant={r.score >= 70 ? "default" : r.score >= 40 ? "secondary" : "outline"} className="text-[10px] h-5 px-1.5">
+                                  {r.score}/100
                                 </Badge>
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
+                              </div>
+                              <div className="flex flex-wrap gap-1 mt-1.5">
+                                {r.gameNumbers.map(n => (
+                                  <span
+                                    key={n}
+                                    className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary/15 text-primary text-[11px] font-bold font-mono border border-primary/20"
+                                  >
+                                    {String(n).padStart(2, "0")}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Bottom row: stats */}
+                          <div className="flex items-center gap-3 mt-2.5 ml-10 flex-wrap">
+                            <div className="flex items-center gap-1 text-xs">
+                              <span className="text-muted-foreground">Melhor:</span>
+                              <span className={`font-bold ${r.bestHits >= config.pick - 1 ? "text-primary" : "text-foreground"}`}>
+                                {r.bestHits} acertos
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1 text-xs">
+                              <span className="text-muted-foreground">Média:</span>
+                              <span className="font-semibold text-foreground">{r.averageHits}</span>
+                            </div>
+                            {totalPrizes > 0 && (
+                              <Badge className="text-[10px] h-5 px-2 bg-primary/20 text-primary border-primary/30">
+                                🏆 {totalPrizes} premiações
+                              </Badge>
+                            )}
+                            {bestPrizeTier?.estimatedPrize && (
+                              <span className="text-xs font-bold text-chart-4">
+                                💰 {bestPrizeTier.estimatedPrize}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </TabsContent>
 
