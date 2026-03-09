@@ -2,8 +2,9 @@ import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { NumberStats } from "./statistics";
 
 // ═══════════════════════════════════════════════════════════════════
-// DETECTOR DE PADRÕES ESTATÍSTICOS v2.0
+// DETECTOR DE PADRÕES ESTATÍSTICOS v2.1
 // Análise profunda: ciclos, transições, coocorrência, clusterização
+// Melhorias: mediana, primos, fibonacci, gap analysis, scoring
 // ═══════════════════════════════════════════════════════════════════
 
 export interface PatternReport {
@@ -13,7 +14,6 @@ export interface PatternReport {
   frequencyTrends: FrequencyTrend[];
   spatialDistribution: SpatialDistribution;
   hotStreaks: HotStreak[];
-  // v2 additions
   transitionAnalysis: TransitionAnalysis;
   cooccurrenceMatrix: CooccurrencePair[];
   cycleDetection: CyclePattern[];
@@ -51,6 +51,7 @@ export interface FrequencyTrend {
   totalFreq: number;
   trendDirection: "up" | "down" | "stable";
   momentum: number;
+  score: number; // 0-100 composite score
 }
 
 export interface SpatialDistribution {
@@ -65,48 +66,51 @@ export interface HotStreak {
   endDraw: number;
 }
 
-// ─── v2 Types ────────────────────────────────────────────────────
-
 export interface TransitionAnalysis {
   avgRepeatBetweenDraws: number;
   repeatDistribution: { repeats: number; count: number; percentage: number }[];
   mostRepeatedPairs: { from: number; to: number; count: number }[];
+  transitionMatrix: { numberA: number; numberB: number; count: number; direction: "follows" }[];
 }
 
 export interface CooccurrencePair {
   numA: number;
   numB: number;
   count: number;
-  lift: number; // lift > 1 = appear together more than expected
+  lift: number;
 }
 
 export interface CyclePattern {
   number: number;
   avgCycleLength: number;
+  medianCycleLength: number;
   currentDelay: number;
-  predictedReturn: number; // estimated draws until next appearance
-  confidence: number; // 0-1
-  cycleRegularity: number; // 0-1, lower stdDev = more regular
+  predictedReturn: number;
+  confidence: number;
+  cycleRegularity: number;
+  status: "overdue" | "due" | "early" | "on-time";
 }
 
 export interface RarePattern {
   type: string;
   description: string;
   occurrences: number;
-  lastSeen: number; // concurso number
-  rarity: number; // 0-1, higher = more rare
+  lastSeen: number;
+  rarity: number;
 }
 
 export interface NumberCluster {
   id: number;
   numbers: number[];
   avgCooccurrence: number;
-  strength: number; // 0-1
+  strength: number;
 }
 
 export interface PatternSummary {
   mostCommonParity: string;
+  parityDeviation: number;
   avgSum: number;
+  medianSum: number;
   sumStdDev: number;
   avgConsecutives: number;
   trendingUp: number[];
@@ -116,6 +120,8 @@ export interface PatternSummary {
   avgRepeatsBetweenDraws: number;
   strongestCluster: number[];
   topCooccurrences: string[];
+  overallScore: number; // 0-100 data quality/confidence
+  primeRatio: number;
 }
 
 // ─── Main Detection Function ────────────────────────────────────
@@ -127,44 +133,20 @@ export function detectPatterns(
   drawCount: number = 200
 ): PatternReport {
   const selected = draws.slice(0, Math.min(drawCount, draws.length)).filter(d => d && Array.isArray(d.numbers));
-  if (selected.length === 0) {
-    return emptyReport();
-  }
+  if (selected.length === 0) return emptyReport();
 
-  // 1. Parity patterns
   const parityPatterns = analyzeParityPatterns(selected);
-
-  // 2. Sum patterns
-  const { sumPatterns, avgSum, sumStdDev } = analyzeSumPatterns(selected);
-
-  // 3. Consecutive patterns
+  const { sumPatterns, avgSum, sumStdDev, medianSum } = analyzeSumPatterns(selected);
   const consecutivePatterns = analyzeConsecutivePatterns(selected);
-
-  // 4. Frequency trends
   const frequencyTrends = analyzeFrequencyTrends(selected, stats, config);
-
-  // 5. Spatial distribution
   const spatialDistribution = analyzeSpatialDistribution(selected, config);
-
-  // 6. Hot streaks
   const hotStreaks = analyzeHotStreaks(selected, stats);
-
-  // 7. Transition analysis (v2)
-  const transitionAnalysis = analyzeTransitions(selected);
-
-  // 8. Co-occurrence matrix (v2)
+  const transitionAnalysis = analyzeTransitions(selected, config);
   const cooccurrenceMatrix = analyzeCooccurrence(selected, config);
-
-  // 9. Cycle detection (v2)
   const cycleDetection = analyzeCycles(selected, stats, config);
-
-  // 10. Rare patterns (v2)
   const rarePatterns = detectRarePatterns(selected, config);
-
-  // 11. Number clusters (v2)
   const numberClusters = clusterNumbers(cooccurrenceMatrix, config);
 
-  // Summary
   const trendingUp = frequencyTrends.filter(f => f.trendDirection === "up").slice(0, 10).map(f => f.number);
   const trendingDown = frequencyTrends.filter(f => f.trendDirection === "down").slice(0, 10).map(f => f.number);
   const mostConsistent = [...stats]
@@ -178,6 +160,25 @@ export function detectPatterns(
     .slice(0, 10)
     .map(s => s.number);
 
+  // Parity deviation from uniform
+  const idealParityEvens = config.pick / 2;
+  const parityDeviation = parityPatterns.length > 0
+    ? Math.round(Math.abs(parityPatterns[0].evens - idealParityEvens) / idealParityEvens * 100)
+    : 0;
+
+  // Prime ratio
+  const primes = new Set([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]);
+  const primeNumbers = selected.flatMap(d => d.numbers.filter(n => primes.has(n)));
+  const primeRatio = Math.round(primeNumbers.length / (selected.length * config.pick) * 100);
+
+  // Overall score based on data quality
+  const overallScore = Math.min(100, Math.round(
+    (selected.length >= 100 ? 30 : selected.length / 100 * 30) +
+    (cycleDetection.filter(c => c.confidence > 0.3).length > 5 ? 25 : cycleDetection.filter(c => c.confidence > 0.3).length * 5) +
+    (numberClusters.length > 0 ? 20 : 0) +
+    (spatialDistribution.balance > 60 ? 25 : spatialDistribution.balance / 60 * 25)
+  ));
+
   return {
     parityPatterns,
     sumPatterns,
@@ -187,12 +188,14 @@ export function detectPatterns(
     hotStreaks: hotStreaks.slice(0, 15),
     transitionAnalysis,
     cooccurrenceMatrix: cooccurrenceMatrix.slice(0, 30),
-    cycleDetection: cycleDetection.slice(0, 20),
+    cycleDetection: cycleDetection.slice(0, 25),
     rarePatterns,
     numberClusters,
     summary: {
       mostCommonParity: parityPatterns[0] ? `${parityPatterns[0].evens}P/${parityPatterns[0].odds}I` : "",
+      parityDeviation,
       avgSum: Math.round(avgSum),
+      medianSum,
       sumStdDev: Math.round(sumStdDev),
       avgConsecutives: Math.round(
         consecutivePatterns.reduce((s, c) => s + c.consecutiveCount * c.occurrences, 0) / selected.length * 10
@@ -206,6 +209,8 @@ export function detectPatterns(
       topCooccurrences: cooccurrenceMatrix.slice(0, 5).map(c =>
         `${String(c.numA).padStart(2, "0")}+${String(c.numB).padStart(2, "0")}`
       ),
+      overallScore,
+      primeRatio,
     },
   };
 }
@@ -233,6 +238,10 @@ function analyzeSumPatterns(draws: DrawResult[]) {
   const avgSum = sums.reduce((s, v) => s + v, 0) / sums.length;
   const sumVariance = sums.reduce((s, v) => s + (v - avgSum) ** 2, 0) / sums.length;
   const sumStdDev = Math.sqrt(sumVariance);
+  const sortedSums = [...sums].sort((a, b) => a - b);
+  const medianSum = sortedSums.length % 2 === 0
+    ? Math.round((sortedSums[sortedSums.length / 2 - 1] + sortedSums[sortedSums.length / 2]) / 2)
+    : sortedSums[Math.floor(sortedSums.length / 2)];
   const sumMin = Math.min(...sums);
   const sumMax = Math.max(...sums);
   const rangeSize = Math.ceil((sumMax - sumMin) / 5);
@@ -246,7 +255,7 @@ function analyzeSumPatterns(draws: DrawResult[]) {
       percentage: Math.round(count / sums.length * 10000) / 100,
     });
   }
-  return { sumPatterns, avgSum, sumStdDev };
+  return { sumPatterns, avgSum, sumStdDev, medianSum };
 }
 
 function analyzeConsecutivePatterns(draws: DrawResult[]): ConsecutivePattern[] {
@@ -278,12 +287,20 @@ function analyzeFrequencyTrends(draws: DrawResult[], stats: NumberStats[], confi
     const expectedPer10 = (config.pick / config.numbers) * 10;
     const ratio10 = last10 / expectedPer10;
     const ratio30 = (last30 / 3) / expectedPer10;
+    const ratio100 = draws.length >= 100 ? (last100 / 10) / expectedPer10 : ratio30;
     const direction: "up" | "down" | "stable" =
       ratio10 > ratio30 * 1.2 ? "up" : ratio10 < ratio30 * 0.8 ? "down" : "stable";
+    const momentum = Math.round((ratio10 - ratio30) * 100) / 100;
+
+    // Composite score: momentum + consistency + recency
+    const momentumScore = Math.min(50, Math.max(0, (momentum + 1) * 25));
+    const consistencyScore = s.avgGap > 0 ? Math.max(0, 30 - (s.stdDev / s.avgGap) * 30) : 0;
+    const recencyScore = last10 > 0 ? 20 : 0;
+    const score = Math.round(momentumScore + consistencyScore + recencyScore);
+
     return {
       number: s.number, last10Freq: last10, last30Freq: last30, last100Freq: last100,
-      totalFreq: s.frequency, trendDirection: direction,
-      momentum: Math.round((ratio10 - ratio30) * 100) / 100,
+      totalFreq: s.frequency, trendDirection: direction, momentum, score,
     };
   }).sort((a, b) => b.momentum - a.momentum);
 }
@@ -324,9 +341,10 @@ function analyzeHotStreaks(draws: DrawResult[], stats: NumberStats[]): HotStreak
 
 // ─── v2: Transition Analysis ────────────────────────────────────
 
-function analyzeTransitions(draws: DrawResult[]): TransitionAnalysis {
+function analyzeTransitions(draws: DrawResult[], config: LotteryConfig): TransitionAnalysis {
   const repeatCounts: number[] = [];
   const pairCounts = new Map<string, number>();
+  const followCounts = new Map<string, number>();
 
   for (let i = 0; i < draws.length - 1; i++) {
     const current = new Set(draws[i].numbers);
@@ -335,18 +353,26 @@ function analyzeTransitions(draws: DrawResult[]): TransitionAnalysis {
     for (const n of next) {
       if (current.has(n)) {
         repeats++;
-        // Track which numbers repeat
         pairCounts.set(`${n}`, (pairCounts.get(`${n}`) || 0) + 1);
       }
     }
     repeatCounts.push(repeats);
+
+    // Track which numbers follow which (non-repeat transitions)
+    const newInNext = next.filter(n => !current.has(n));
+    const goneFromCurrent = draws[i].numbers.filter(n => !new Set(next).has(n));
+    for (const gone of goneFromCurrent.slice(0, 3)) {
+      for (const arrived of newInNext.slice(0, 3)) {
+        const key = `${gone}->${arrived}`;
+        followCounts.set(key, (followCounts.get(key) || 0) + 1);
+      }
+    }
   }
 
   const avgRepeat = repeatCounts.length > 0
     ? Math.round(repeatCounts.reduce((s, v) => s + v, 0) / repeatCounts.length * 100) / 100
     : 0;
 
-  // Distribution of repeat counts
   const distMap = new Map<number, number>();
   repeatCounts.forEach(r => distMap.set(r, (distMap.get(r) || 0) + 1));
   const repeatDistribution = [...distMap.entries()]
@@ -356,13 +382,20 @@ function analyzeTransitions(draws: DrawResult[]): TransitionAnalysis {
       percentage: Math.round(count / repeatCounts.length * 10000) / 100,
     }));
 
-  // Most repeated numbers between consecutive draws
   const mostRepeatedPairs = [...pairCounts.entries()]
     .sort((a, b) => b[1] - a[1])
     .slice(0, 10)
     .map(([n, count]) => ({ from: Number(n), to: Number(n), count }));
 
-  return { avgRepeatBetweenDraws: avgRepeat, repeatDistribution, mostRepeatedPairs };
+  const transitionMatrix = [...followCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 15)
+    .map(([key, count]) => {
+      const [a, b] = key.split("->").map(Number);
+      return { numberA: a, numberB: b, count, direction: "follows" as const };
+    });
+
+  return { avgRepeatBetweenDraws: avgRepeat, repeatDistribution, mostRepeatedPairs, transitionMatrix };
 }
 
 // ─── v2: Co-occurrence Analysis ─────────────────────────────────
@@ -406,7 +439,6 @@ function analyzeCycles(draws: DrawResult[], stats: NumberStats[], config: Lotter
   const cycles: CyclePattern[] = [];
 
   for (const s of stats) {
-    // Find all positions where this number appeared
     const positions: number[] = [];
     for (let i = 0; i < draws.length; i++) {
       if (draws[i].numbers.includes(s.number)) positions.push(i);
@@ -414,28 +446,39 @@ function analyzeCycles(draws: DrawResult[], stats: NumberStats[], config: Lotter
 
     if (positions.length < 3) continue;
 
-    // Calculate gaps between appearances
     const gaps: number[] = [];
     for (let i = 1; i < positions.length; i++) {
       gaps.push(positions[i] - positions[i - 1]);
     }
 
     const avgGap = gaps.reduce((s, v) => s + v, 0) / gaps.length;
+    const sortedGaps = [...gaps].sort((a, b) => a - b);
+    const medianGap = sortedGaps.length % 2 === 0
+      ? (sortedGaps[sortedGaps.length / 2 - 1] + sortedGaps[sortedGaps.length / 2]) / 2
+      : sortedGaps[Math.floor(sortedGaps.length / 2)];
     const gapVariance = gaps.reduce((s, v) => s + (v - avgGap) ** 2, 0) / gaps.length;
     const gapStdDev = Math.sqrt(gapVariance);
     const regularity = avgGap > 0 ? Math.max(0, 1 - gapStdDev / avgGap) : 0;
 
-    const currentDelay = positions[0]; // draws since last appearance (0 = appeared in most recent)
+    const currentDelay = positions[0];
     const predictedReturn = Math.max(0, Math.round(avgGap - currentDelay));
     const confidence = Math.min(1, regularity * (positions.length / draws.length) * 10);
+
+    // Determine status
+    let status: CyclePattern["status"] = "on-time";
+    if (currentDelay > avgGap * 1.5) status = "overdue";
+    else if (currentDelay > avgGap * 0.9) status = "due";
+    else if (currentDelay < avgGap * 0.5) status = "early";
 
     cycles.push({
       number: s.number,
       avgCycleLength: Math.round(avgGap * 10) / 10,
+      medianCycleLength: Math.round(medianGap * 10) / 10,
       currentDelay,
       predictedReturn,
       confidence: Math.round(confidence * 100) / 100,
       cycleRegularity: Math.round(regularity * 100) / 100,
+      status,
     });
   }
 
@@ -501,7 +544,7 @@ function detectRarePatterns(draws: DrawResult[], config: LotteryConfig): RarePat
     });
   }
 
-  // 4. Numbers from same decade (all in range of 10)
+  // 4. Decade concentration
   let sameDecadeCount = 0, lastSameDecade = 0;
   for (const d of draws) {
     const decades = d.numbers.map(n => Math.floor((n - 1) / 10));
@@ -540,6 +583,46 @@ function detectRarePatterns(draws: DrawResult[], config: LotteryConfig): RarePat
     });
   }
 
+  // 6. Prime concentration
+  const primes = new Set([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]);
+  let highPrimeCount = 0, lastHighPrime = 0;
+  for (const d of draws) {
+    const primeCount = d.numbers.filter(n => primes.has(n)).length;
+    if (primeCount >= Math.ceil(config.pick * 0.7)) {
+      highPrimeCount++;
+      lastHighPrime = d.concurso;
+    }
+  }
+  if (highPrimeCount > 0) {
+    patterns.push({
+      type: "prime_concentration",
+      description: `70%+ dos números são primos: ${highPrimeCount}x`,
+      occurrences: highPrimeCount,
+      lastSeen: lastHighPrime,
+      rarity: 1 - highPrimeCount / draws.length,
+    });
+  }
+
+  // 7. Fibonacci presence
+  const fibs = new Set([1, 2, 3, 5, 8, 13, 21, 34, 55, 89]);
+  let highFibCount = 0, lastHighFib = 0;
+  for (const d of draws) {
+    const fibCount = d.numbers.filter(n => fibs.has(n)).length;
+    if (fibCount >= Math.ceil(config.pick * 0.5)) {
+      highFibCount++;
+      lastHighFib = d.concurso;
+    }
+  }
+  if (highFibCount > 0) {
+    patterns.push({
+      type: "fibonacci_concentration",
+      description: `50%+ dos números são Fibonacci: ${highFibCount}x`,
+      occurrences: highFibCount,
+      lastSeen: lastHighFib,
+      rarity: 1 - highFibCount / draws.length,
+    });
+  }
+
   return patterns.sort((a, b) => b.rarity - a.rarity);
 }
 
@@ -548,7 +631,6 @@ function detectRarePatterns(draws: DrawResult[], config: LotteryConfig): RarePat
 function clusterNumbers(cooccurrences: CooccurrencePair[], config: LotteryConfig): NumberCluster[] {
   if (cooccurrences.length === 0) return [];
 
-  // Simple greedy clustering based on co-occurrence
   const adjacency = new Map<number, Map<number, number>>();
   for (const co of cooccurrences) {
     if (!adjacency.has(co.numA)) adjacency.set(co.numA, new Map());
@@ -571,7 +653,6 @@ function clusterNumbers(cooccurrences: CooccurrencePair[], config: LotteryConfig
     const cluster = [seed];
     used.add(seed);
 
-    // Expand cluster greedily
     const neighbors = adjacency.get(seed);
     if (neighbors) {
       const sorted = [...neighbors.entries()].sort((a, b) => b[1] - a[1]);
@@ -610,12 +691,13 @@ function emptyReport(): PatternReport {
   return {
     parityPatterns: [], sumPatterns: [], consecutivePatterns: [],
     frequencyTrends: [], spatialDistribution: { sectors: [], balance: 0 },
-    hotStreaks: [], transitionAnalysis: { avgRepeatBetweenDraws: 0, repeatDistribution: [], mostRepeatedPairs: [] },
+    hotStreaks: [], transitionAnalysis: { avgRepeatBetweenDraws: 0, repeatDistribution: [], mostRepeatedPairs: [], transitionMatrix: [] },
     cooccurrenceMatrix: [], cycleDetection: [], rarePatterns: [], numberClusters: [],
     summary: {
-      mostCommonParity: "", avgSum: 0, sumStdDev: 0, avgConsecutives: 0,
+      mostCommonParity: "", parityDeviation: 0, avgSum: 0, medianSum: 0, sumStdDev: 0, avgConsecutives: 0,
       trendingUp: [], trendingDown: [], mostConsistent: [], overdueNumbers: [],
       avgRepeatsBetweenDraws: 0, strongestCluster: [], topCooccurrences: [],
+      overallScore: 0, primeRatio: 0,
     },
   };
 }
