@@ -53,6 +53,9 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
   const [running, setRunning] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState("");
   const [loadingAi, setLoadingAi] = useState(false);
+  const [savedIds, setSavedIds] = useState<Set<number>>(new Set());
+
+  const { saveBet } = useSavedBets(config.id);
 
   // Reset all state when lottery changes
   const prevLotteryId = useRef(config.id);
