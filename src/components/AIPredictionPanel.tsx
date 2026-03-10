@@ -182,17 +182,18 @@ export function AIPredictionPanel({ config, stats, onSaveBet }: Props) {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.08 }}
-                className="flex items-center gap-2 p-3 rounded-lg bg-secondary/30 border border-primary/10 hover:border-primary/30 transition-colors group"
+                className="flex flex-col gap-1.5 p-3 rounded-lg bg-secondary/30 border border-primary/10 hover:border-primary/30 transition-colors group"
               >
-                <span className="text-xs text-primary font-mono w-6 font-semibold">#{i + 1}</span>
-                {quality?.scores?.[i] !== undefined && (
-                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
-                    quality.scores[i] >= 90 ? "bg-yellow-500/20 text-yellow-400" :
-                    quality.scores[i] >= 80 ? "bg-green-500/20 text-green-400" :
-                    quality.scores[i] >= 70 ? "bg-blue-500/20 text-blue-400" :
-                    "bg-muted text-muted-foreground"
-                  }`}>{quality.scores[i]}</span>
-                )}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-primary font-mono w-6 font-semibold">#{i + 1}</span>
+                  {quality?.scores?.[i] !== undefined && (
+                    <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
+                      quality.scores[i] >= 90 ? "bg-yellow-500/20 text-yellow-400" :
+                      quality.scores[i] >= 80 ? "bg-green-500/20 text-green-400" :
+                      quality.scores[i] >= 70 ? "bg-blue-500/20 text-blue-400" :
+                      "bg-muted text-muted-foreground"
+                    }`}>{quality.scores[i]}pts</span>
+                  )}
                 <div className="flex flex-wrap gap-1.5 flex-1">
                   {bet.map(n => {
                     const stat = stats.find(s => s.number === n);
