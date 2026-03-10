@@ -292,16 +292,18 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
       return;
     }
 
+    const maxHits = getMaxPossibleHits(lotteryId, pick);
     const perfs: BetPerformance[] = allBets.map(bet => {
       let totalPrizeValue = 0;
       const betResults = selectedDraws.map(draw => {
-        const matched = bet.numbers.filter(n => draw.numbers.includes(n));
-        const prizeInfo = getEstimatedPrize(lotteryId, matched.length);
+        const { hits, matched } = matchBetAgainstDraw(bet.numbers, draw.numbers, lotteryId);
+        // Check for prizes including Lotomania 0-hit special case
+        const prizeInfo = getEstimatedPrize(lotteryId, hits);
         if (prizeInfo) totalPrizeValue += prizeInfo.value;
         return {
           concurso: draw.concurso,
           date: draw.date,
-          hits: matched.length,
+          hits,
           matched,
           prize: prizeInfo?.label || "",
           prizeValue: prizeInfo?.value || 0,
@@ -313,9 +315,10 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
       const bestHit = Math.max(...betResults.map(r => r.hits));
       const prizeHits = betResults.filter(r => r.prizeValue > 0).length;
 
+      // Use maxHits (not pick) as denominator for fair scoring across all lotteries
       const score = Math.round(
-        (avgHits / pick) * 40 +
-        (bestHit / pick) * 30 +
+        (avgHits / maxHits) * 40 +
+        (bestHit / maxHits) * 30 +
         (prizeHits / selectedDraws.length) * 30
       );
 
