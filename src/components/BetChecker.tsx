@@ -638,7 +638,47 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
               </div>
             )}
 
-            {/* Controls row */}
+            {/* Matching rule indicator */}
+            <div className="flex items-center gap-2 text-[10px] rounded-lg px-3 py-2 border border-border/20 bg-muted/30">
+              {lotteryId === "supersete" ? (
+                <>
+                  <div className="w-5 h-5 rounded-md bg-primary/15 border border-primary/30 flex items-center justify-center">
+                    <span className="text-[8px] font-bold text-primary">P</span>
+                  </div>
+                  <span className="text-muted-foreground">
+                    <span className="text-foreground font-semibold">Comparação posicional</span> — cada coluna é comparada individualmente (posição 1 vs posição 1, etc.)
+                  </span>
+                </>
+              ) : lotteryId === "lotomania" ? (
+                <>
+                  <div className="w-5 h-5 rounded-md bg-accent/15 border border-accent/30 flex items-center justify-center">
+                    <span className="text-[8px] font-bold text-accent">20</span>
+                  </div>
+                  <span className="text-muted-foreground">
+                    <span className="text-foreground font-semibold">Interseção (máx. 20)</span> — você aposta 50, mas apenas 20 são sorteados. Acertos = números em comum.
+                  </span>
+                </>
+              ) : lotteryId === "timemania" ? (
+                <>
+                  <div className="w-5 h-5 rounded-md bg-accent/15 border border-accent/30 flex items-center justify-center">
+                    <span className="text-[8px] font-bold text-accent">7</span>
+                  </div>
+                  <span className="text-muted-foreground">
+                    <span className="text-foreground font-semibold">Interseção (máx. 7)</span> — você aposta 10, mas apenas 7 são sorteados. Acertos = números em comum.
+                  </span>
+                </>
+              ) : (
+                <>
+                  <div className="w-5 h-5 rounded-md bg-primary/15 border border-primary/30 flex items-center justify-center">
+                    <span className="text-[8px] font-bold text-primary">∩</span>
+                  </div>
+                  <span className="text-muted-foreground">
+                    <span className="text-foreground font-semibold">Interseção padrão</span> — acertos = números da sua aposta presentes no sorteio.
+                  </span>
+                </>
+              )}
+            </div>
+
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div className="flex items-center gap-2">
                 {[1, 10, 50, 100].map(n => (
