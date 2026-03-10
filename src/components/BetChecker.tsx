@@ -126,7 +126,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
     }
 
     const perfs: BetPerformance[] = allBets.map(bet => {
-      const betResults = last10Draws.map(draw => {
+      const betResults = selectedDraws.map(draw => {
         const matched = bet.numbers.filter(n => draw.numbers.includes(n));
         return {
           concurso: draw.concurso,
