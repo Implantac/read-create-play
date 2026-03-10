@@ -41,10 +41,11 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
   const [showPerformance, setShowPerformance] = useState(false);
   const [aiImprovements, setAiImprovements] = useState<AIImprovement[]>([]);
   const [loadingAI, setLoadingAI] = useState(false);
+  const [drawRange, setDrawRange] = useState<number>(10);
   const [activeTab, setActiveTab] = useState<"check" | "performance" | "improve">("check");
 
   const { savedBets } = useSavedBets(lotteryId);
-  const last10Draws = useMemo(() => draws.slice(0, 10), [draws]);
+  const selectedDraws = useMemo(() => draws.slice(0, drawRange), [draws, drawRange]);
   const prizeTiers = getPrizeTiers(lotteryId);
   const minPrizeHits = prizeTiers.length > 0 ? prizeTiers[prizeTiers.length - 1].hits : 3;
 
