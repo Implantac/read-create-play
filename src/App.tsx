@@ -52,6 +52,7 @@ function App() {
               <Route path="/estatisticas" element={<EstatisticasPage />} />
               <Route path="/historico" element={<HistoricoPage />} />
               <Route path="/planos" element={<PlanosPage />} />
+              <Route path="/perfil" element={<PerfilPage />} />
               <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
             </Route>
             <Route path="*" element={<NotFound />} />
