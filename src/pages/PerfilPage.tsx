@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, Loader2, Save, User } from "lucide-react";
+import { Camera, Loader2, Save, User, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function PerfilPage() {
@@ -18,6 +18,10 @@ export default function PerfilPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || "");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [changingPassword, setChangingPassword] = useState(false);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -146,6 +150,64 @@ export default function PerfilPage() {
           <Button onClick={handleSave} disabled={saving} className="w-full gap-2">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Salvar Alterações
+          </Button>
+        </CardContent>
+      </Card>
+      <Card className="glass-card">
+        <CardHeader>
+          <CardTitle className="text-lg">Alterar Senha</CardTitle>
+          <CardDescription>Digite sua nova senha abaixo</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="new-password">Nova senha</Label>
+            <Input
+              id="new-password"
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Mínimo 6 caracteres"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirm-password">Confirmar nova senha</Label>
+            <Input
+              id="confirm-password"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Repita a nova senha"
+            />
+          </div>
+          <Button
+            onClick={async () => {
+              if (newPassword.length < 6) {
+                toast({ title: "A senha deve ter pelo menos 6 caracteres", variant: "destructive" });
+                return;
+              }
+              if (newPassword !== confirmPassword) {
+                toast({ title: "As senhas não coincidem", variant: "destructive" });
+                return;
+              }
+              setChangingPassword(true);
+              try {
+                const { error } = await supabase.auth.updateUser({ password: newPassword });
+                if (error) throw error;
+                toast({ title: "Senha alterada com sucesso!" });
+                setNewPassword("");
+                setConfirmPassword("");
+              } catch (err: any) {
+                toast({ title: "Erro ao alterar senha", description: err.message, variant: "destructive" });
+              } finally {
+                setChangingPassword(false);
+              }
+            }}
+            disabled={changingPassword || !newPassword}
+            variant="outline"
+            className="w-full gap-2"
+          >
+            {changingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
+            Alterar Senha
           </Button>
         </CardContent>
       </Card>
