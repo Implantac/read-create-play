@@ -20,11 +20,13 @@ export function AIPredictionPanel({ config, stats, onSaveBet }: Props) {
   const [copied, setCopied] = useState<number | null>(null);
   const [saved, setSaved] = useState<Set<number>>(new Set());
   const [count, setCount] = useState(3);
+  const [quality, setQuality] = useState<{ avgScore: number; scores: number[]; grade: string } | null>(null);
 
   const generate = async () => {
     setLoading(true);
     setBets([]);
     setAnalysis("");
+    setQuality(null);
     try {
       const { data, error } = await supabase.functions.invoke("ai-lottery-predict", {
         body: { lottery_id: config.id, count },
@@ -35,8 +37,9 @@ export function AIPredictionPanel({ config, stats, onSaveBet }: Props) {
 
       setBets(data.bets || []);
       setAnalysis(data.analysis || "");
+      setQuality(data.quality || null);
       setSaved(new Set());
-      toast.success(`${data.count} apostas geradas pela IA!`);
+      toast.success(`${data.count} apostas geradas pela IA! ${data.quality ? `Qualidade: ${data.quality.grade}` : ""}`);
     } catch (e: any) {
       console.error("AI prediction error:", e);
       const msg = e?.message || "Erro ao gerar predições";
