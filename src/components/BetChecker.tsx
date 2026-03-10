@@ -34,6 +34,42 @@ interface BetPerformance {
   score: number;
 }
 
+/**
+ * Max possible hits per lottery (differs from pick when draw count != pick count)
+ * - Super Sete: 7 columns, positional match → max 7
+ * - Lotomania: pick 50 but draw 20 → max 20
+ * - Timemania: pick 10 but draw 7 → max 7
+ * - Others: max = pick (draw count == pick count)
+ */
+function getMaxPossibleHits(lotteryId: string, pick: number): number {
+  switch (lotteryId) {
+    case "lotomania": return 20; // Draw picks 20 from 100
+    case "timemania": return 7; // Draw picks 7 from 80
+    default: return pick;
+  }
+}
+
+/**
+ * Match bet against a draw. Super Sete uses positional matching (column by column).
+ * All others use set intersection.
+ */
+function matchBetAgainstDraw(bet: number[], draw: number[], lotteryId: string): { hits: number; matched: number[] } {
+  if (lotteryId === "supersete") {
+    // Positional match: compare bet[i] === draw[i] for each column
+    const matched: number[] = [];
+    const len = Math.min(bet.length, draw.length);
+    for (let i = 0; i < len; i++) {
+      if (bet[i] === draw[i]) {
+        matched.push(bet[i]);
+      }
+    }
+    return { hits: matched.length, matched };
+  }
+  // Standard set intersection
+  const matched = bet.filter(n => draw.includes(n));
+  return { hits: matched.length, matched };
+}
+
 function getEstimatedPrize(lotteryId: string, hits: number): { value: number; label: string } | null {
   const prizes: Record<string, Record<number, { value: number; label: string }>> = {
     megasena: {
@@ -221,7 +257,18 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
       toast.error("Adicione pelo menos 1 número");
       return;
     }
-    const matches = checkBetAgainstDraws(selectedNumbers, draws);
+    // Use lottery-specific matching (positional for Super Sete, set for others)
+    const matches = draws.map(draw => {
+      const { hits, matched } = matchBetAgainstDraw(selectedNumbers, draw.numbers, lotteryId);
+      return {
+        concurso: draw.concurso,
+        date: draw.date,
+        drawnNumbers: draw.numbers,
+        matchedNumbers: matched,
+        matchCount: hits,
+      };
+    }).filter(r => r.matchCount > 0)
+      .sort((a, b) => b.matchCount - a.matchCount);
     setResults(matches);
     toast.success(`${matches.length} concursos com acertos encontrados`);
   };
@@ -256,16 +303,18 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
       return;
     }
 
+    const maxHits = getMaxPossibleHits(lotteryId, pick);
     const perfs: BetPerformance[] = allBets.map(bet => {
       let totalPrizeValue = 0;
       const betResults = selectedDraws.map(draw => {
-        const matched = bet.numbers.filter(n => draw.numbers.includes(n));
-        const prizeInfo = getEstimatedPrize(lotteryId, matched.length);
+        const { hits, matched } = matchBetAgainstDraw(bet.numbers, draw.numbers, lotteryId);
+        // Check for prizes including Lotomania 0-hit special case
+        const prizeInfo = getEstimatedPrize(lotteryId, hits);
         if (prizeInfo) totalPrizeValue += prizeInfo.value;
         return {
           concurso: draw.concurso,
           date: draw.date,
-          hits: matched.length,
+          hits,
           matched,
           prize: prizeInfo?.label || "",
           prizeValue: prizeInfo?.value || 0,
@@ -277,9 +326,10 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
       const bestHit = Math.max(...betResults.map(r => r.hits));
       const prizeHits = betResults.filter(r => r.prizeValue > 0).length;
 
+      // Use maxHits (not pick) as denominator for fair scoring across all lotteries
       const score = Math.round(
-        (avgHits / pick) * 40 +
-        (bestHit / pick) * 30 +
+        (avgHits / maxHits) * 40 +
+        (bestHit / maxHits) * 30 +
         (prizeHits / selectedDraws.length) * 30
       );
 
