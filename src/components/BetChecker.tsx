@@ -34,6 +34,42 @@ interface BetPerformance {
   score: number;
 }
 
+/**
+ * Max possible hits per lottery (differs from pick when draw count != pick count)
+ * - Super Sete: 7 columns, positional match → max 7
+ * - Lotomania: pick 50 but draw 20 → max 20
+ * - Timemania: pick 10 but draw 7 → max 7
+ * - Others: max = pick (draw count == pick count)
+ */
+function getMaxPossibleHits(lotteryId: string, pick: number): number {
+  switch (lotteryId) {
+    case "lotomania": return 20; // Draw picks 20 from 100
+    case "timemania": return 7; // Draw picks 7 from 80
+    default: return pick;
+  }
+}
+
+/**
+ * Match bet against a draw. Super Sete uses positional matching (column by column).
+ * All others use set intersection.
+ */
+function matchBetAgainstDraw(bet: number[], draw: number[], lotteryId: string): { hits: number; matched: number[] } {
+  if (lotteryId === "supersete") {
+    // Positional match: compare bet[i] === draw[i] for each column
+    const matched: number[] = [];
+    const len = Math.min(bet.length, draw.length);
+    for (let i = 0; i < len; i++) {
+      if (bet[i] === draw[i]) {
+        matched.push(bet[i]);
+      }
+    }
+    return { hits: matched.length, matched };
+  }
+  // Standard set intersection
+  const matched = bet.filter(n => draw.includes(n));
+  return { hits: matched.length, matched };
+}
+
 function getEstimatedPrize(lotteryId: string, hits: number): { value: number; label: string } | null {
   const prizes: Record<string, Record<number, { value: number; label: string }>> = {
     megasena: {
