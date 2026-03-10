@@ -257,7 +257,18 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
       toast.error("Adicione pelo menos 1 número");
       return;
     }
-    const matches = checkBetAgainstDraws(selectedNumbers, draws);
+    // Use lottery-specific matching (positional for Super Sete, set for others)
+    const matches = draws.map(draw => {
+      const { hits, matched } = matchBetAgainstDraw(selectedNumbers, draw.numbers, lotteryId);
+      return {
+        concurso: draw.concurso,
+        date: draw.date,
+        drawnNumbers: draw.numbers,
+        matchedNumbers: matched,
+        matchCount: hits,
+      };
+    }).filter(r => r.matchCount > 0)
+      .sort((a, b) => b.matchCount - a.matchCount);
     setResults(matches);
     toast.success(`${matches.length} concursos com acertos encontrados`);
   };
