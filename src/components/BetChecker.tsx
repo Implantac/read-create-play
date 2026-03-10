@@ -638,46 +638,30 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
               </div>
             )}
 
-            {/* Matching rule indicator */}
-            <div className="flex items-center gap-2 text-[10px] rounded-lg px-3 py-2 border border-border/20 bg-muted/30">
-              {lotteryId === "supersete" ? (
-                <>
-                  <div className="w-5 h-5 rounded-md bg-primary/15 border border-primary/30 flex items-center justify-center">
-                    <span className="text-[8px] font-bold text-primary">P</span>
+            {/* Matching rule indicator per lottery */}
+            {(() => {
+              const rules: Record<string, { badge: string; badgeColor: string; title: string; desc: string }> = {
+                megasena: { badge: "6", badgeColor: "primary", title: "Mega Sena — Interseção (6 de 60)", desc: "Aposta 6 números de 1 a 60. Sorteio: 6 dezenas. Faixas: Sena (6), Quina (5), Quadra (4)." },
+                lotofacil: { badge: "15", badgeColor: "primary", title: "Lotofácil — Interseção (15 de 25)", desc: "Aposta 15 números de 1 a 25. Sorteio: 15 dezenas. Faixas: 15 a 11 acertos." },
+                quina: { badge: "5", badgeColor: "primary", title: "Quina — Interseção (5 de 80)", desc: "Aposta 5 números de 1 a 80. Sorteio: 5 dezenas. Faixas: Quina (5), Quadra (4), Terno (3), Duque (2)." },
+                lotomania: { badge: "20", badgeColor: "accent", title: "Lotomania — Interseção (máx. 20 acertos)", desc: "Aposta 50 números de 0 a 99. Sorteio: 20 dezenas. Faixas: 20 a 15 acertos + prêmio especial com 0 acertos." },
+                duplasena: { badge: "2x", badgeColor: "primary", title: "Dupla Sena — Interseção (6 de 50)", desc: "Aposta 6 números de 1 a 50. Dois sorteios por concurso. Faixas: Sena (6), Quina (5), Quadra (4), Terno (3)." },
+                timemania: { badge: "7", badgeColor: "accent", title: "Timemania — Interseção (máx. 7 acertos)", desc: "Aposta 10 números de 1 a 80. Sorteio: 7 dezenas. Faixas: 7 a 3 acertos." },
+                diadesorte: { badge: "7", badgeColor: "primary", title: "Dia de Sorte — Interseção (7 de 31)", desc: "Aposta 7 números de 1 a 31. Sorteio: 7 dezenas + mês da sorte. Faixas: 7 a 4 acertos." },
+                supersete: { badge: "P", badgeColor: "primary", title: "Super Sete — Comparação posicional", desc: "Aposta 1 dígito (0-9) por coluna, 7 colunas. Acertos = posições iguais (coluna a coluna). Faixas: 7 a 3 acertos." },
+              };
+              const rule = rules[lotteryId] || rules.megasena;
+              return (
+                <div className="flex items-center gap-2 text-[10px] rounded-lg px-3 py-2 border border-border/20 bg-muted/30">
+                  <div className={`w-5 h-5 shrink-0 rounded-md bg-${rule.badgeColor}/15 border border-${rule.badgeColor}/30 flex items-center justify-center`}>
+                    <span className={`text-[8px] font-bold text-${rule.badgeColor}`}>{rule.badge}</span>
                   </div>
                   <span className="text-muted-foreground">
-                    <span className="text-foreground font-semibold">Comparação posicional</span> — cada coluna é comparada individualmente (posição 1 vs posição 1, etc.)
+                    <span className="text-foreground font-semibold">{rule.title}</span> — {rule.desc}
                   </span>
-                </>
-              ) : lotteryId === "lotomania" ? (
-                <>
-                  <div className="w-5 h-5 rounded-md bg-accent/15 border border-accent/30 flex items-center justify-center">
-                    <span className="text-[8px] font-bold text-accent">20</span>
-                  </div>
-                  <span className="text-muted-foreground">
-                    <span className="text-foreground font-semibold">Interseção (máx. 20)</span> — você aposta 50, mas apenas 20 são sorteados. Acertos = números em comum.
-                  </span>
-                </>
-              ) : lotteryId === "timemania" ? (
-                <>
-                  <div className="w-5 h-5 rounded-md bg-accent/15 border border-accent/30 flex items-center justify-center">
-                    <span className="text-[8px] font-bold text-accent">7</span>
-                  </div>
-                  <span className="text-muted-foreground">
-                    <span className="text-foreground font-semibold">Interseção (máx. 7)</span> — você aposta 10, mas apenas 7 são sorteados. Acertos = números em comum.
-                  </span>
-                </>
-              ) : (
-                <>
-                  <div className="w-5 h-5 rounded-md bg-primary/15 border border-primary/30 flex items-center justify-center">
-                    <span className="text-[8px] font-bold text-primary">∩</span>
-                  </div>
-                  <span className="text-muted-foreground">
-                    <span className="text-foreground font-semibold">Interseção padrão</span> — acertos = números da sua aposta presentes no sorteio.
-                  </span>
-                </>
-              )}
-            </div>
+                </div>
+              );
+            })()}
 
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div className="flex items-center gap-2">
