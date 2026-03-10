@@ -20,7 +20,7 @@ export function AIPredictionPanel({ config, stats, onSaveBet }: Props) {
   const [copied, setCopied] = useState<number | null>(null);
   const [saved, setSaved] = useState<Set<number>>(new Set());
   const [count, setCount] = useState(3);
-  const [quality, setQuality] = useState<{ avgScore: number; scores: number[]; grade: string } | null>(null);
+  const [quality, setQuality] = useState<{ avgScore: number; scores: number[]; details?: string[][]; grade: string } | null>(null);
 
   const generate = async () => {
     setLoading(true);
