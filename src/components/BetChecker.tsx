@@ -687,7 +687,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
                 {[1, 10, 50, 100].map(n => (
                   <button
                     key={n}
-                    onClick={() => { setDrawRange(n); setPerformances([]); }}
+                    onClick={() => { setDrawRange(n); }}
                     className={`text-[11px] px-3 py-1.5 rounded-lg border transition-all font-medium ${
                       drawRange === n
                         ? "border-primary bg-primary/15 text-primary shadow-sm shadow-primary/10"
