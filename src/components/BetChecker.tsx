@@ -193,13 +193,17 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
     }
 
     const perfs: BetPerformance[] = allBets.map(bet => {
+      let totalPrizeValue = 0;
       const betResults = selectedDraws.map(draw => {
         const matched = bet.numbers.filter(n => draw.numbers.includes(n));
+        const prizeInfo = getEstimatedPrize(lotteryId, matched.length);
+        if (prizeInfo) totalPrizeValue += prizeInfo.value;
         return {
           concurso: draw.concurso,
           date: draw.date,
           hits: matched.length,
           matched,
+          prize: prizeInfo?.label || "",
         };
       });
 
@@ -208,7 +212,6 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
       const bestHit = Math.max(...betResults.map(r => r.hits));
       const prizeHits = betResults.filter(r => r.hits >= minPrizeHits).length;
 
-      // Score: weighted combination
       const score = Math.round(
         (avgHits / pick) * 40 +
         (bestHit / pick) * 30 +
@@ -222,6 +225,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
         avgHits: Math.round(avgHits * 100) / 100,
         bestHit,
         prizeHits,
+        totalPrize: formatCurrency(totalPrizeValue),
         score: Math.min(score, 100),
       };
     });
