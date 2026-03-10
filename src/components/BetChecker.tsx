@@ -161,6 +161,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
 
   const { savedBets, saveBet } = useSavedBets(lotteryId);
   const selectedDraws = useMemo(() => draws.slice(0, drawRange), [draws, drawRange]);
+  const lastDraw = useMemo(() => draws.length > 0 ? draws[0] : null, [draws]);
 
   // Reset all state when lottery changes
   useEffect(() => {
@@ -564,6 +565,26 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
         {/* ========== TAB: PERFORMANCE ========== */}
         {activeTab === "performance" && (
           <div className="space-y-4">
+            {/* Last draw info - prove real data */}
+            {lastDraw && (
+              <div className="rounded-lg bg-accent/5 border border-accent/15 p-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Target className="w-3.5 h-3.5 text-accent" />
+                  <span className="text-[11px] font-semibold text-foreground">
+                    Último sorteio: <span className="font-mono text-accent">#{lastDraw.concurso}</span>
+                    {lastDraw.date && <span className="text-muted-foreground ml-1">({lastDraw.date})</span>}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {lastDraw.numbers.map(n => (
+                    <span key={n} className="text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-mono font-bold bg-accent/15 text-accent border border-accent/30">
+                      {String(n).padStart(2, "0")}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Controls row */}
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div className="flex items-center gap-2">
@@ -595,7 +616,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
                   <span className="font-mono text-foreground">#{selectedDraws[selectedDraws.length - 1]?.concurso}</span>
                   {" a "}
                   <span className="font-mono text-foreground">#{selectedDraws[0]?.concurso}</span>
-                  {" "}({selectedDraws.length} sorteios)
+                  {" "}({selectedDraws.length} sorteios reais do banco de dados)
                 </span>
               </div>
             )}
@@ -688,15 +709,16 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
                             className="overflow-hidden"
                           >
                             <div className="px-3.5 pb-3.5 space-y-3 border-t border-border/20 pt-3">
-                              {/* Numbers - highlight matched in red */}
+                              {/* Numbers with last draw match highlighting */}
                               <div className="flex items-center gap-2">
                                 <div className="flex flex-wrap gap-1">
                                   {perf.numbers.map(n => {
-                                    const allMatched = new Set(perf.results.flatMap(r => r.matched));
-                                    const isHit = allMatched.has(n);
+                                    // Highlight if matched in the LAST draw only (most relevant)
+                                    const lastDrawResult = perf.results[0];
+                                    const isHitLastDraw = lastDrawResult?.matched.includes(n) || false;
                                     return (
                                       <span key={n} className={`text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-mono font-bold ${
-                                        isHit
+                                        isHitLastDraw
                                           ? "bg-gradient-to-br from-destructive to-destructive/80 text-destructive-foreground shadow-sm shadow-destructive/30"
                                           : "lottery-ball"
                                       }`}>
@@ -714,27 +736,47 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
                                 </button>
                               </div>
 
+                              {/* Show drawn numbers from last draw for comparison */}
+                              {perf.results[0] && (
+                                <div className="space-y-1">
+                                  <span className="text-[10px] text-muted-foreground">
+                                    Números sorteados no #{perf.results[0].concurso}:
+                                  </span>
+                                  <div className="flex flex-wrap gap-1">
+                                    {selectedDraws[0]?.numbers.map(n => {
+                                      const isInBet = perf.numbers.includes(n);
+                                      return (
+                                        <span key={n} className={`text-[9px] w-5 h-5 rounded-full flex items-center justify-center font-mono ${
+                                          isInBet
+                                            ? "bg-destructive/15 text-destructive border border-destructive/30 font-bold"
+                                            : "bg-muted/30 text-muted-foreground border border-border/20"
+                                        }`}>
+                                          {String(n).padStart(2, "0")}
+                                        </span>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              )}
+
                               {/* Hit distribution bar */}
                               <div className="space-y-1.5">
                                 <span className="text-[10px] text-muted-foreground">Distribuição de acertos</span>
                                 <div className="flex gap-0.5 h-5 rounded-md overflow-hidden bg-muted/30">
-                                  {perf.results.map((r, ri) => {
-                                    const pct = (r.hits / pick) * 100;
-                                    return (
-                                      <div
-                                        key={ri}
-                                        className={`transition-all ${
-                                          r.prize
-                                            ? "bg-green-500/60"
-                                            : r.hits > 0
-                                            ? "bg-primary/30"
-                                            : "bg-muted/20"
-                                        }`}
-                                        style={{ width: `${100 / perf.results.length}%` }}
-                                        title={`#${r.concurso}: ${r.hits} acertos${r.prize ? ` → ${r.prize}` : ""}`}
-                                      />
-                                    );
-                                  })}
+                                  {perf.results.map((r, ri) => (
+                                    <div
+                                      key={ri}
+                                      className={`transition-all ${
+                                        r.prize
+                                          ? "bg-primary/60"
+                                          : r.hits > 0
+                                          ? "bg-primary/30"
+                                          : "bg-muted/20"
+                                      }`}
+                                      style={{ width: `${100 / perf.results.length}%` }}
+                                      title={`#${r.concurso}: ${r.hits} acertos${r.prize ? ` → ${r.prize}` : ""}`}
+                                    />
+                                  ))}
                                 </div>
                               </div>
 
@@ -745,13 +787,13 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
                                     <DollarSign className="w-3 h-3" /> Prêmios conquistados
                                   </span>
                                   {perf.results.filter(r => r.prize).map(r => (
-                                    <div key={`p-${r.concurso}`} className="flex items-center justify-between text-[10px] px-2.5 py-1.5 rounded-lg bg-green-500/5 border border-green-500/10">
+                                    <div key={`p-${r.concurso}`} className="flex items-center justify-between text-[10px] px-2.5 py-1.5 rounded-lg bg-primary/5 border border-primary/10">
                                       <div className="flex items-center gap-2">
-                                        <CheckCircle2 className="w-3 h-3 text-green-400" />
+                                        <CheckCircle2 className="w-3 h-3 text-primary" />
                                         <span className="text-muted-foreground font-mono">#{r.concurso}</span>
                                         <span className="text-foreground">{r.hits} acertos</span>
                                       </div>
-                                      <span className="font-semibold text-green-400">{r.prize}</span>
+                                      <span className="font-semibold text-primary">{r.prize}</span>
                                     </div>
                                   ))}
                                 </div>
@@ -764,7 +806,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
                                     key={r.concurso}
                                     className={`text-[8px] px-1.5 py-0.5 rounded font-mono ${
                                       r.prize
-                                        ? "bg-green-500/15 text-green-400 border border-green-500/20"
+                                        ? "bg-primary/15 text-primary border border-primary/20"
                                         : "bg-muted/40 text-muted-foreground border border-border/20"
                                     }`}
                                   >
