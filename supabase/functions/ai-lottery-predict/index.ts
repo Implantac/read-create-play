@@ -332,7 +332,114 @@ serve(async (req) => {
       throw new Error("Dados insuficientes. Sincronize os sorteios primeiro.");
     }
 
-    // Check cache
+    // === IMPROVE MODE: AI suggests improvements for existing bets ===
+    if (mode === "improve" && bets_to_improve && Array.isArray(bets_to_improve)) {
+      const last10 = draws.slice(0, 10);
+      const minNum = profile.name === "Super Sete" ? 0 : 1;
+      const allNums = Array.from({ length: profile.numbers - minNum + 1 }, (_, i) => i + minNum);
+      const freq: Record<number, number> = {};
+      const freq10: Record<number, number> = {};
+      for (const n of allNums) { freq[n] = 0; freq10[n] = 0; }
+      draws.forEach((d: any, i: number) => {
+        (d.numbers || []).forEach((n: number) => {
+          freq[n] = (freq[n] || 0) + 1;
+          if (i < 10) freq10[n] = (freq10[n] || 0) + 1;
+        });
+      });
+
+      const hotNums = [...allNums].sort((a, b) => (freq10[b] || 0) - (freq10[a] || 0)).slice(0, 20);
+      const coldNums = [...allNums].sort((a, b) => (freq10[a] || 0) - (freq10[b] || 0)).slice(0, 10);
+
+      const betsInfo = bets_to_improve.map((b: any, i: number) => {
+        const nums = b.numbers || [];
+        const hotCount = nums.filter((n: number) => hotNums.includes(n)).length;
+        const coldCount = nums.filter((n: number) => coldNums.includes(n)).length;
+        const sum = nums.reduce((a: number, b: number) => a + b, 0);
+        const evens = nums.filter((n: number) => n % 2 === 0).length;
+        return `Aposta ${i+1} "${b.label}": [${nums.join(",")}] | Média acertos: ${b.avg_hits || "N/A"} | Melhor: ${b.best_hit || "N/A"} | Premiações: ${b.prize_hits || 0} | Soma: ${sum} | Pares: ${evens} | Quentes: ${hotCount} | Frios: ${coldCount}`;
+      }).join("\n");
+
+      const improvePrompt = `Você é um Analista Estatístico Sênior de loterias brasileiras.
+Loteria: "${profile.name}" (${profile.pick} números de ${minNum} a ${profile.numbers}).
+
+ÚLTIMOS 10 SORTEIOS:
+${last10.map((d: any) => `C${d.concurso}: [${(d.numbers || []).join(", ")}]`).join("\n")}
+
+NÚMEROS QUENTES (últimos 10 sorteios): [${hotNums.join(", ")}]
+NÚMEROS FRIOS: [${coldNums.join(", ")}]
+
+APOSTAS DO USUÁRIO COM PERFORMANCE:
+${betsInfo}
+
+FAIXAS IDEAIS para ${profile.name}:
+- Soma: ${profile.sumRange[0]}-${profile.sumRange[1]}
+- Pares: ${profile.parityRange[0]}-${profile.parityRange[1]}
+- Máx consecutivos: ${profile.maxConsecutive}
+${profile.primesRange ? `- Primos: ${profile.primesRange[0]}-${profile.primesRange[1]}` : ""}
+${profile.repeatRange ? `- Repetição do anterior: ${profile.repeatRange[0]}-${profile.repeatRange[1]}` : ""}
+
+TAREFA: Para cada aposta do usuário, sugira uma versão MELHORADA que:
+1. Substitua números frios por quentes mantendo equilíbrio
+2. Ajuste soma para faixa ideal
+3. Melhore cobertura de faixas
+4. Mantenha pelo menos 60% dos números originais (familiaridade)
+
+Responda APENAS com JSON:
+{"improvements": [{"original": [nums], "suggested": [nums], "reason": "explicação técnica das mudanças", "expectedGain": "+X% estimado"}]}`;
+
+      const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: [
+            { role: "system", content: improvePrompt },
+            { role: "user", content: `Melhore as ${bets_to_improve.length} apostas acima para maximizar chances de premiação em ${profile.name}.` },
+          ],
+          temperature: 0.4,
+        }),
+      });
+
+      if (!aiResponse.ok) {
+        const errText = await aiResponse.text();
+        console.error("AI improve error:", aiResponse.status, errText);
+        throw new Error("Erro ao solicitar melhorias da IA");
+      }
+
+      const aiData = await aiResponse.json();
+      const content = aiData.choices?.[0]?.message?.content || "";
+
+      let parsed: any;
+      try {
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) throw new Error("No JSON");
+        parsed = JSON.parse(jsonMatch[0]);
+      } catch {
+        console.error("Failed to parse improve response:", content);
+        throw new Error("Erro ao processar sugestões da IA");
+      }
+
+      // Validate improvements
+      const improvements = (parsed.improvements || []).map((imp: any) => {
+        let suggested = validateAndRepairBet(imp.suggested, profile, freq, last10[0]?.numbers);
+        if (!suggested) suggested = imp.suggested;
+        return {
+          original: imp.original,
+          suggested: suggested,
+          reason: imp.reason || "Otimização baseada em padrões estatísticos",
+          expectedGain: imp.expectedGain || "+10-20%",
+        };
+      });
+
+      return new Response(JSON.stringify({ success: true, improvements }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Check cache (only for normal generate mode)
     const cacheInput = { lottery_id, count, lastConcurso: draws[0]?.concurso, v: 3 };
     const cached = await getCachedAnalysis(supabase, lottery_id, "ai-lottery-predict", cacheInput, 4);
     if (cached) {
