@@ -20,7 +20,7 @@ export function AIPredictionPanel({ config, stats, onSaveBet }: Props) {
   const [copied, setCopied] = useState<number | null>(null);
   const [saved, setSaved] = useState<Set<number>>(new Set());
   const [count, setCount] = useState(3);
-  const [quality, setQuality] = useState<{ avgScore: number; scores: number[]; grade: string } | null>(null);
+  const [quality, setQuality] = useState<{ avgScore: number; scores: number[]; details?: string[][]; grade: string } | null>(null);
 
   const generate = async () => {
     setLoading(true);
@@ -182,58 +182,69 @@ export function AIPredictionPanel({ config, stats, onSaveBet }: Props) {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.08 }}
-                className="flex items-center gap-2 p-3 rounded-lg bg-secondary/30 border border-primary/10 hover:border-primary/30 transition-colors group"
+                className="flex flex-col gap-1.5 p-3 rounded-lg bg-secondary/30 border border-primary/10 hover:border-primary/30 transition-colors group"
               >
-                <span className="text-xs text-primary font-mono w-6 font-semibold">#{i + 1}</span>
-                {quality?.scores?.[i] !== undefined && (
-                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
-                    quality.scores[i] >= 90 ? "bg-yellow-500/20 text-yellow-400" :
-                    quality.scores[i] >= 80 ? "bg-green-500/20 text-green-400" :
-                    quality.scores[i] >= 70 ? "bg-blue-500/20 text-blue-400" :
-                    "bg-muted text-muted-foreground"
-                  }`}>{quality.scores[i]}</span>
-                )}
-                <div className="flex flex-wrap gap-1.5 flex-1">
-                  {bet.map(n => {
-                    const stat = stats.find(s => s.number === n);
-                    const ballClass =
-                      stat?.status === "hot"
-                        ? "lottery-ball-hot"
-                        : stat?.status === "cold"
-                        ? "lottery-ball-cold"
-                        : "";
-                    return (
-                      <span key={n} className={`lottery-ball text-xs w-8 h-8 ${ballClass}`}>
-                        {String(n).padStart(2, "0")}
-                      </span>
-                    );
-                  })}
-                </div>
-                <div className="flex items-center gap-1">
-                  {onSaveBet && (
-                    <button
-                      onClick={() => handleSave(bet, i)}
-                      className={`transition-colors p-1 rounded-md ${
-                        saved.has(i)
-                          ? "text-yellow-400"
-                          : "text-muted-foreground hover:text-yellow-400 hover:bg-yellow-400/5 opacity-0 group-hover:opacity-100"
-                      }`}
-                      disabled={saved.has(i)}
-                    >
-                      <Star className={`w-4 h-4 ${saved.has(i) ? "fill-yellow-400" : ""}`} />
-                    </button>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-primary font-mono w-6 font-semibold">#{i + 1}</span>
+                  {quality?.scores?.[i] !== undefined && (
+                    <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
+                      quality.scores[i] >= 90 ? "bg-yellow-500/20 text-yellow-400" :
+                      quality.scores[i] >= 80 ? "bg-green-500/20 text-green-400" :
+                      quality.scores[i] >= 70 ? "bg-blue-500/20 text-blue-400" :
+                      "bg-muted text-muted-foreground"
+                    }`}>{quality.scores[i]}pts</span>
                   )}
-                  <button
-                    onClick={() => copyBet(bet, i)}
-                    className="text-muted-foreground hover:text-primary transition-colors p-1 rounded-md hover:bg-primary/5"
-                  >
-                    {copied === i ? (
-                      <Check className="w-4 h-4 text-primary" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
+                  <div className="flex flex-wrap gap-1.5 flex-1">
+                    {bet.map(n => {
+                      const stat = stats.find(s => s.number === n);
+                      const ballClass =
+                        stat?.status === "hot"
+                          ? "lottery-ball-hot"
+                          : stat?.status === "cold"
+                          ? "lottery-ball-cold"
+                          : "";
+                      return (
+                        <span key={n} className={`lottery-ball text-xs w-8 h-8 ${ballClass}`}>
+                          {String(n).padStart(2, "0")}
+                        </span>
+                      );
+                    })}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {onSaveBet && (
+                      <button
+                        onClick={() => handleSave(bet, i)}
+                        className={`transition-colors p-1 rounded-md ${
+                          saved.has(i)
+                            ? "text-yellow-400"
+                            : "text-muted-foreground hover:text-yellow-400 hover:bg-yellow-400/5 opacity-0 group-hover:opacity-100"
+                        }`}
+                        disabled={saved.has(i)}
+                      >
+                        <Star className={`w-4 h-4 ${saved.has(i) ? "fill-yellow-400" : ""}`} />
+                      </button>
                     )}
-                  </button>
+                    <button
+                      onClick={() => copyBet(bet, i)}
+                      className="text-muted-foreground hover:text-primary transition-colors p-1 rounded-md hover:bg-primary/5"
+                    >
+                      {copied === i ? (
+                        <Check className="w-4 h-4 text-primary" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
+                {quality?.details?.[i] && quality.details[i].length > 0 && (
+                  <div className="flex flex-wrap gap-1 ml-8">
+                    {quality.details[i].map((detail: string, j: number) => (
+                      <span key={j} className={`text-[9px] px-1.5 py-0.5 rounded-full ${
+                        detail.startsWith("⚠") ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"
+                      }`}>{detail}</span>
+                    ))}
+                  </div>
+                )}
               </motion.div>
             ))}
           </div>

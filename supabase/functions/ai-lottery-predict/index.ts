@@ -8,161 +8,296 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const PRIMES_25 = new Set([2, 3, 5, 7, 11, 13, 17, 19, 23]);
+
 // Lottery-specific validation profiles
 const LOTTERY_PROFILES: Record<string, {
   numbers: number; pick: number; name: string;
-  sumRange: [number, number]; // acceptable sum range
+  sumRange: [number, number];
   parityRange: [number, number]; // min/max even numbers
-  maxConsecutive: number; // max consecutive numbers allowed
-  minRanges: number; // minimum distinct ranges covered
-  rangeSize: number; // how to divide the number space into ranges
-  specialRules?: string; // extra prompt instructions
+  oddRange: [number, number]; // min/max odd numbers
+  maxConsecutive: number;
+  minRanges: number;
+  rangeSize: number;
+  primesRange?: [number, number]; // min/max primes in bet
+  repeatRange?: [number, number]; // min/max numbers repeated from previous draw
+  specialRules?: string;
 }> = {
   megasena: {
     numbers: 60, pick: 6, name: "Mega Sena",
-    sumRange: [120, 260], parityRange: [2, 4], maxConsecutive: 2, minRanges: 3, rangeSize: 10,
+    sumRange: [120, 260], parityRange: [2, 4], oddRange: [2, 4], maxConsecutive: 2, minRanges: 3, rangeSize: 10,
     specialRules: "Evite concentrar mais de 3 números na mesma dezena. Ideal: 3 pares e 3 ímpares."
   },
   lotofacil: {
     numbers: 25, pick: 15, name: "Lotofácil",
-    sumRange: [170, 230], parityRange: [6, 9], maxConsecutive: 5, minRanges: 5, rangeSize: 5,
-    specialRules: "Distribua 3 números por cada faixa de 5 (1-5, 6-10, 11-15, 16-20, 21-25). Ideal: 7-8 pares e 7-8 ímpares. Pelo menos 4 sequências de consecutivos."
+    sumRange: [180, 220], parityRange: [7, 8], oddRange: [7, 8], maxConsecutive: 5, minRanges: 5, rangeSize: 5,
+    primesRange: [5, 6],
+    repeatRange: [8, 10],
+    specialRules: `REGRAS ESPECÍFICAS DA LOTOFÁCIL (OBRIGATÓRIO):
+- Equilíbrio Par/Ímpar: PRIORIZE 8 ímpares e 7 pares (31% dos sorteios) OU 7 ímpares e 8 pares.
+- Repetição: Repita entre 8 e 10 dezenas do concurso anterior.
+- Números Primos: Inclua 5 a 6 primos (02, 03, 05, 07, 11, 13, 17, 19, 23).
+- Soma Térmica: A soma DEVE estar entre 180 e 220.
+- Dezenas de Ouro: Inclua pelo menos 3 das dezenas 10, 11, 20, 25 (>60% histórico).
+- Distribua 3 números por cada faixa de 5 (1-5, 6-10, 11-15, 16-20, 21-25).
+- Use o Fechamento Matemático: selecione 18 dezenas-base e gere combinações de 15 a partir delas.`
   },
   quina: {
     numbers: 80, pick: 5, name: "Quina",
-    sumRange: [100, 280], parityRange: [2, 3], maxConsecutive: 2, minRanges: 3, rangeSize: 16,
+    sumRange: [100, 280], parityRange: [2, 3], oddRange: [2, 3], maxConsecutive: 2, minRanges: 3, rangeSize: 16,
     specialRules: "Distribua entre faixas de 20 (1-20, 21-40, 41-60, 61-80). Evite mais de 2 na mesma faixa."
   },
   lotomania: {
     numbers: 100, pick: 50, name: "Lotomania",
-    sumRange: [2300, 2800], parityRange: [23, 27], maxConsecutive: 8, minRanges: 10, rangeSize: 10,
-    specialRules: "Distribua ~5 números por dezena (0-9, 10-19, ..., 90-99). Equilíbrio par/ímpar: 24-26 pares. Inclua terminações de 0-9 em quantidade equilibrada."
+    sumRange: [2300, 2800], parityRange: [23, 27], oddRange: [23, 27], maxConsecutive: 8, minRanges: 10, rangeSize: 10,
+    specialRules: "Distribua ~5 números por dezena (0-9, 10-19, ..., 90-99). Equilíbrio par/ímpar: 24-26 pares."
   },
   duplasena: {
     numbers: 50, pick: 6, name: "Dupla Sena",
-    sumRange: [100, 210], parityRange: [2, 4], maxConsecutive: 2, minRanges: 3, rangeSize: 10,
+    sumRange: [100, 210], parityRange: [2, 4], oddRange: [2, 4], maxConsecutive: 2, minRanges: 3, rangeSize: 10,
     specialRules: "Distribua entre as faixas 1-10, 11-20, 21-30, 31-40, 41-50. Máximo 2 por faixa."
   },
   timemania: {
     numbers: 80, pick: 10, name: "Timemania",
-    sumRange: [250, 520], parityRange: [4, 6], maxConsecutive: 3, minRanges: 4, rangeSize: 16,
+    sumRange: [250, 520], parityRange: [4, 6], oddRange: [4, 6], maxConsecutive: 3, minRanges: 4, rangeSize: 16,
     specialRules: "Distribua entre 5 faixas de 16. Equilíbrio 5 pares / 5 ímpares é ideal."
   },
   diadesorte: {
     numbers: 31, pick: 7, name: "Dia de Sorte",
-    sumRange: [80, 150], parityRange: [3, 4], maxConsecutive: 2, minRanges: 3, rangeSize: 8,
+    sumRange: [80, 150], parityRange: [3, 4], oddRange: [3, 4], maxConsecutive: 2, minRanges: 3, rangeSize: 8,
     specialRules: "Cubra pelo menos 3 das 4 faixas (1-8, 9-16, 17-24, 25-31). Soma ideal entre 100-130."
   },
   supersete: {
     numbers: 10, pick: 7, name: "Super Sete",
-    sumRange: [20, 50], parityRange: [3, 4], maxConsecutive: 3, minRanges: 2, rangeSize: 5,
-    specialRules: "ATENÇÃO: Super Sete é especial - cada coluna tem valores de 0-9. Gere 7 dígitos de 0-9 (podem repetir entre colunas). Distribuição equilibrada entre baixos (0-4) e altos (5-9)."
+    sumRange: [20, 50], parityRange: [3, 4], oddRange: [3, 4], maxConsecutive: 3, minRanges: 2, rangeSize: 5,
+    specialRules: "Super Sete: cada coluna tem valores de 0-9. Gere 7 dígitos de 0-9. Equilíbrio baixos (0-4) e altos (5-9)."
   },
 };
 
-// Validate and repair a bet according to lottery-specific rules
-function validateAndRepairBet(bet: number[], profile: typeof LOTTERY_PROFILES[string], allFreq: Record<number, number>): number[] | null {
+// Validate and repair a bet
+function validateAndRepairBet(
+  bet: number[], 
+  profile: typeof LOTTERY_PROFILES[string], 
+  allFreq: Record<number, number>,
+  lastDrawNums?: number[]
+): number[] | null {
   if (!Array.isArray(bet)) return null;
 
-  // Filter valid numbers and remove duplicates
-  let nums = [...new Set(bet.filter(n => n >= (profile.name === "Super Sete" ? 0 : 1) && n <= profile.numbers))];
+  const minN = profile.name === "Super Sete" ? 0 : 1;
+  let nums = [...new Set(bet.filter(n => n >= minN && n <= profile.numbers))];
 
-  // Fix length
-  if (nums.length > profile.pick) {
-    nums = nums.slice(0, profile.pick);
-  }
+  if (nums.length > profile.pick) nums = nums.slice(0, profile.pick);
 
-  // Add missing numbers from top frequency pool
+  // Fill missing from frequency pool
   if (nums.length < profile.pick) {
-    const pool = Array.from({ length: profile.numbers }, (_, i) => i + (profile.name === "Super Sete" ? 0 : 1))
+    const pool = Array.from({ length: profile.numbers - minN + 1 }, (_, i) => i + minN)
       .filter(n => !nums.includes(n))
       .sort((a, b) => (allFreq[b] || 0) - (allFreq[a] || 0));
-    
     while (nums.length < profile.pick && pool.length > 0) {
       nums.push(pool.shift()!);
     }
   }
 
   if (nums.length !== profile.pick) return null;
-
   nums.sort((a, b) => a - b);
 
-  // Validate sum
-  const sum = nums.reduce((a, b) => a + b, 0);
-  if (sum < profile.sumRange[0] || sum > profile.sumRange[1]) {
-    // Try to repair: swap extremes
-    for (let attempt = 0; attempt < 5; attempt++) {
-      if (sum < profile.sumRange[0]) {
-        // Replace lowest non-critical number with a higher one
-        const idx = 0;
-        const candidates = Array.from({ length: profile.numbers }, (_, i) => i + 1)
-          .filter(n => !nums.includes(n) && n > nums[nums.length - 1] * 0.8)
-          .sort((a, b) => (allFreq[b] || 0) - (allFreq[a] || 0));
-        if (candidates.length > 0) {
-          nums[idx] = candidates[0];
-          nums.sort((a, b) => a - b);
-        }
-      } else {
-        const idx = nums.length - 1;
-        const candidates = Array.from({ length: profile.numbers }, (_, i) => i + 1)
-          .filter(n => !nums.includes(n) && n < nums[0] * 1.5)
-          .sort((a, b) => (allFreq[b] || 0) - (allFreq[a] || 0));
-        if (candidates.length > 0) {
-          nums[idx] = candidates[0];
-          nums.sort((a, b) => a - b);
-        }
-      }
-      const newSum = nums.reduce((a, b) => a + b, 0);
-      if (newSum >= profile.sumRange[0] && newSum <= profile.sumRange[1]) break;
+  // Lotofácil-specific: ensure repetition from previous draw
+  if (profile.repeatRange && lastDrawNums && lastDrawNums.length > 0) {
+    const lastSet = new Set(lastDrawNums);
+    let repeated = nums.filter(n => lastSet.has(n)).length;
+    const [minRep, maxRep] = profile.repeatRange;
+
+    // Try to fix if too few repeats
+    for (let attempt = 0; attempt < 10 && repeated < minRep; attempt++) {
+      const nonRepeated = nums.filter(n => !lastSet.has(n));
+      const availableRepeats = lastDrawNums.filter(n => !nums.includes(n));
+      if (nonRepeated.length === 0 || availableRepeats.length === 0) break;
+      // Replace a non-repeated number with a repeat from previous
+      const replaceIdx = nums.indexOf(nonRepeated[nonRepeated.length - 1]);
+      const bestRepeat = availableRepeats.sort((a, b) => (allFreq[b] || 0) - (allFreq[a] || 0))[0];
+      nums[replaceIdx] = bestRepeat;
+      nums.sort((a, b) => a - b);
+      repeated = nums.filter(n => lastSet.has(n)).length;
+    }
+
+    // Fix if too many repeats
+    for (let attempt = 0; attempt < 10 && repeated > maxRep; attempt++) {
+      const repeatedNums = nums.filter(n => lastSet.has(n));
+      const available = Array.from({ length: profile.numbers }, (_, i) => i + 1)
+        .filter(n => !nums.includes(n) && !lastSet.has(n))
+        .sort((a, b) => (allFreq[b] || 0) - (allFreq[a] || 0));
+      if (repeatedNums.length === 0 || available.length === 0) break;
+      const replaceIdx = nums.indexOf(repeatedNums[repeatedNums.length - 1]);
+      nums[replaceIdx] = available[0];
+      nums.sort((a, b) => a - b);
+      repeated = nums.filter(n => lastSet.has(n)).length;
     }
   }
 
-  // Ensure uniqueness after repairs
-  if (new Set(nums).size !== profile.pick) return null;
+  // Fix sum if out of range
+  const sum = nums.reduce((a, b) => a + b, 0);
+  if (sum < profile.sumRange[0] || sum > profile.sumRange[1]) {
+    for (let attempt = 0; attempt < 8; attempt++) {
+      const curSum = nums.reduce((a, b) => a + b, 0);
+      if (curSum >= profile.sumRange[0] && curSum <= profile.sumRange[1]) break;
+      if (curSum < profile.sumRange[0]) {
+        // Replace smallest with a bigger number not in set
+        const candidates = Array.from({ length: profile.numbers }, (_, i) => i + 1)
+          .filter(n => !nums.includes(n) && n > nums[Math.floor(nums.length * 0.7)])
+          .sort((a, b) => (allFreq[b] || 0) - (allFreq[a] || 0));
+        if (candidates.length > 0) {
+          nums[0] = candidates[0];
+          nums.sort((a, b) => a - b);
+        }
+      } else {
+        const candidates = Array.from({ length: profile.numbers }, (_, i) => i + 1)
+          .filter(n => !nums.includes(n) && n < nums[Math.floor(nums.length * 0.3)])
+          .sort((a, b) => (allFreq[b] || 0) - (allFreq[a] || 0));
+        if (candidates.length > 0) {
+          nums[nums.length - 1] = candidates[0];
+          nums.sort((a, b) => a - b);
+        }
+      }
+    }
+  }
 
+  if (new Set(nums).size !== profile.pick) return null;
   return nums;
 }
 
-// Score a bet for quality reporting
-function scoreBet(bet: number[], profile: typeof LOTTERY_PROFILES[string], avgSum: number, sumStdDev: number): {
-  score: number; details: string[];
-} {
+// Score a bet with lottery-specific criteria
+function scoreBet(
+  bet: number[], 
+  profile: typeof LOTTERY_PROFILES[string], 
+  avgSum: number, 
+  sumStdDev: number,
+  lastDrawNums?: number[]
+): { score: number; details: string[] } {
   const details: string[] = [];
   let score = 100;
 
+  // Sum check
   const sum = bet.reduce((a, b) => a + b, 0);
-  const sumDev = Math.abs(sum - avgSum) / Math.max(sumStdDev, 1);
-  if (sumDev > 2) { score -= 20; details.push(`Soma ${sum} distante da média`); }
-  else if (sumDev <= 1) { score += 5; details.push(`Soma ${sum} ideal`); }
-
-  const evens = bet.filter(n => n % 2 === 0).length;
-  if (evens >= profile.parityRange[0] && evens <= profile.parityRange[1]) {
-    score += 5; details.push(`Paridade ${evens}P/${bet.length - evens}I equilibrada`);
+  if (sum >= profile.sumRange[0] && sum <= profile.sumRange[1]) {
+    const sumDev = Math.abs(sum - avgSum) / Math.max(sumStdDev, 1);
+    if (sumDev <= 0.5) { score += 8; details.push(`Soma ${sum} ótima`); }
+    else if (sumDev <= 1) { score += 5; details.push(`Soma ${sum} boa`); }
+    else { details.push(`Soma ${sum} aceitável`); }
   } else {
-    score -= 10; details.push(`Paridade ${evens}P/${bet.length - evens}I desequilibrada`);
+    score -= 25; details.push(`⚠ Soma ${sum} fora do range ${profile.sumRange[0]}-${profile.sumRange[1]}`);
   }
 
-  // Count consecutive
-  let consec = 0;
+  // Parity
+  const evens = bet.filter(n => n % 2 === 0).length;
+  const odds = bet.length - evens;
+  if (evens >= profile.parityRange[0] && evens <= profile.parityRange[1]) {
+    score += 8; details.push(`Paridade ${evens}P/${odds}I ✓`);
+  } else {
+    score -= 15; details.push(`⚠ Paridade ${evens}P/${odds}I desequilibrada`);
+  }
+
+  // Consecutive
+  let maxConsecRun = 0, curRun = 0;
   const sorted = [...bet].sort((a, b) => a - b);
   for (let i = 1; i < sorted.length; i++) {
-    if (sorted[i] === sorted[i - 1] + 1) consec++;
+    if (sorted[i] === sorted[i - 1] + 1) { curRun++; maxConsecRun = Math.max(maxConsecRun, curRun); }
+    else curRun = 0;
   }
-  if (consec <= profile.maxConsecutive) {
+  if (maxConsecRun <= profile.maxConsecutive) {
     score += 3;
   } else {
-    score -= 10; details.push(`${consec} consecutivos (máx ${profile.maxConsecutive})`);
+    score -= 10; details.push(`⚠ ${maxConsecRun + 1} consecutivos`);
   }
 
   // Range coverage
   const ranges = new Set(sorted.map(n => Math.floor((n - 1) / profile.rangeSize)));
   if (ranges.size >= profile.minRanges) {
-    score += 5; details.push(`${ranges.size} faixas cobertas`);
+    score += 5; details.push(`${ranges.size} faixas ✓`);
   } else {
-    score -= 15; details.push(`Apenas ${ranges.size} faixas (mín ${profile.minRanges})`);
+    score -= 15; details.push(`⚠ ${ranges.size}/${profile.minRanges} faixas`);
+  }
+
+  // Lotofácil-specific scoring
+  if (profile.primesRange) {
+    const primeCount = bet.filter(n => PRIMES_25.has(n)).length;
+    if (primeCount >= profile.primesRange[0] && primeCount <= profile.primesRange[1]) {
+      score += 8; details.push(`${primeCount} primos ✓`);
+    } else {
+      score -= 10; details.push(`⚠ ${primeCount} primos (ideal ${profile.primesRange[0]}-${profile.primesRange[1]})`);
+    }
+  }
+
+  if (profile.repeatRange && lastDrawNums && lastDrawNums.length > 0) {
+    const lastSet = new Set(lastDrawNums);
+    const repeated = bet.filter(n => lastSet.has(n)).length;
+    if (repeated >= profile.repeatRange[0] && repeated <= profile.repeatRange[1]) {
+      score += 10; details.push(`${repeated} repetições do anterior ✓`);
+    } else {
+      score -= 12; details.push(`⚠ ${repeated} repetições (ideal ${profile.repeatRange[0]}-${profile.repeatRange[1]})`);
+    }
+  }
+
+  // "Dezenas de Ouro" for Lotofácil
+  if (profile.name === "Lotofácil") {
+    const goldenNums = [10, 11, 20, 25];
+    const goldenCount = bet.filter(n => goldenNums.includes(n)).length;
+    if (goldenCount >= 3) {
+      score += 5; details.push(`${goldenCount}/4 dezenas de ouro ✓`);
+    } else if (goldenCount >= 2) {
+      details.push(`${goldenCount}/4 dezenas de ouro`);
+    } else {
+      score -= 5; details.push(`⚠ Apenas ${goldenCount}/4 dezenas de ouro`);
+    }
   }
 
   return { score: Math.max(0, Math.min(100, score)), details };
+}
+
+// Compute Lotofácil cycle (all 25 numbers drawn at least once)
+function computeLotofacilCycle(draws: any[]): { cycleLength: number; missingInCycle: number[]; cycleDraws: number } {
+  const seen = new Set<number>();
+  let cycleDraws = 0;
+  for (const d of draws) {
+    cycleDraws++;
+    for (const n of (d.numbers || [])) seen.add(n);
+    if (seen.size >= 25) break;
+  }
+  const missing = Array.from({ length: 25 }, (_, i) => i + 1).filter(n => !seen.has(n));
+  return { cycleLength: cycleDraws, missingInCycle: missing, cycleDraws };
+}
+
+// Generate wheeling combinations (18 base numbers → combinations of 15)
+function generateWheeling(baseNums: number[], pick: number, maxCombos: number): number[][] {
+  const combos: number[][] = [];
+  if (baseNums.length <= pick) return [baseNums.sort((a, b) => a - b)];
+  
+  // Generate systematic combinations by removing groups of (base-pick) numbers
+  const removeCount = baseNums.length - pick;
+  const sorted = [...baseNums].sort((a, b) => a - b);
+  
+  // Use systematic rotation to cover all base numbers
+  for (let i = 0; i < sorted.length && combos.length < maxCombos; i++) {
+    const combo: number[] = [];
+    for (let j = 0; j < sorted.length; j++) {
+      // Skip removeCount numbers starting from position i
+      const skipStart = i;
+      const skipPositions = new Set<number>();
+      for (let k = 0; k < removeCount; k++) {
+        skipPositions.add((skipStart + k) % sorted.length);
+      }
+      if (!skipPositions.has(j)) {
+        combo.push(sorted[j]);
+      }
+    }
+    if (combo.length === pick) {
+      const key = combo.join(",");
+      if (!combos.some(c => c.join(",") === key)) {
+        combos.push(combo);
+      }
+    }
+  }
+  
+  return combos;
 }
 
 serve(async (req) => {
@@ -197,7 +332,7 @@ serve(async (req) => {
     }
 
     // Check cache
-    const cacheInput = { lottery_id, count, lastConcurso: draws[0]?.concurso };
+    const cacheInput = { lottery_id, count, lastConcurso: draws[0]?.concurso, v: 3 };
     const cached = await getCachedAnalysis(supabase, lottery_id, "ai-lottery-predict", cacheInput, 4);
     if (cached) {
       return new Response(JSON.stringify({ ...cached, fromCache: true }), {
@@ -265,7 +400,7 @@ serve(async (req) => {
       }
     }
 
-    const lastDrawNums = draws[0]?.numbers || [];
+    const lastDrawNums: number[] = draws[0]?.numbers || [];
     const transitionScores: Record<number, number> = {};
     for (const n of lastDrawNums) {
       if (transitions[n]) {
@@ -293,6 +428,16 @@ serve(async (req) => {
     const sumStdDev = Math.round(Math.sqrt(last20Stats.reduce((a, s) => a + Math.pow(s.sum - avgSum, 2), 0) / last20Stats.length));
     const avgEvens = Math.round(last20Stats.reduce((a, s) => a + s.evens, 0) / last20Stats.length);
 
+    // Repetition analysis from previous draws
+    const repeatStats: number[] = [];
+    for (let i = 0; i < Math.min(draws.length - 1, 30); i++) {
+      const curr = new Set(draws[i].numbers || []);
+      const prev = draws[i + 1].numbers || [];
+      const repeated = prev.filter((n: number) => curr.has(n)).length;
+      repeatStats.push(repeated);
+    }
+    const avgRepeat = repeatStats.length > 0 ? (repeatStats.reduce((a, b) => a + b, 0) / repeatStats.length).toFixed(1) : "N/A";
+
     // Cooccurrence
     const cooccurrence: Record<string, number> = {};
     draws.slice(0, 100).forEach((d: any) => {
@@ -311,7 +456,7 @@ serve(async (req) => {
 
     // Ranked lists
     const hotNums = [...allNums].sort((a, b) => (freq30[b] || 0) - (freq30[a] || 0)).slice(0, 20);
-    const overdueNums = [...allNums].filter(n => lastSeen[n] > 10 && predictedReturn[n] <= 2)
+    const overdueNums = [...allNums].filter(n => lastSeen[n] > 5 && predictedReturn[n] <= 3)
       .sort((a, b) => predictedReturn[a] - predictedReturn[b]).slice(0, 15);
     const risingNums = [...allNums].filter(n => freq10[n] > (freq30[n] || 1) / 3)
       .sort((a, b) => (freq10[b] / Math.max(freq30[b], 1)) - (freq10[a] / Math.max(freq30[a], 1)))
@@ -319,9 +464,67 @@ serve(async (req) => {
 
     const last10 = draws.slice(0, 10).map((d: any) => d.numbers.join(","));
 
-    // Build lottery-specific system prompt
-    const systemPrompt = `Você é um matemático estatístico de elite especializado em loterias brasileiras.
-Você está analisando a loteria "${profile.name}" (${profile.pick} números de ${minNum} a ${profile.numbers}).
+    // === LOTOFÁCIL-SPECIFIC ANALYSIS ===
+    let lotofacilExtra = "";
+    if (lottery_id === "lotofacil") {
+      const cycle = computeLotofacilCycle(draws);
+      
+      // Primes analysis
+      const last10Primes = draws.slice(0, 10).map((d: any) => {
+        const primes = (d.numbers || []).filter((n: number) => PRIMES_25.has(n));
+        return primes.length;
+      });
+      const avgPrimes = (last10Primes.reduce((a: number, b: number) => a + b, 0) / last10Primes.length).toFixed(1);
+
+      // "Dezenas de Ouro" (historically >60%)
+      const goldenNums = [10, 11, 20, 25];
+      const goldenFreqPct = goldenNums.map(n => ({
+        num: n,
+        pct: ((freq[n] || 0) / Math.max(draws.length, 1) * 100).toFixed(1)
+      }));
+
+      // Repetition from last draw
+      const lastDraw = draws[0]?.numbers || [];
+
+      // Build fechamento base: top 18 numbers by composite score
+      const compositeScore = allNums.map(n => ({
+        num: n,
+        score: (freq30[n] || 0) * 2 + (freq10[n] || 0) * 3 + 
+               (lastDraw.includes(n) ? 10 : 0) + // bonus if in last draw
+               (predictedReturn[n] <= 2 ? 5 : 0) + // overdue bonus
+               (PRIMES_25.has(n) ? 2 : 0) + // prime bonus
+               ([10, 11, 20, 25].includes(n) ? 3 : 0) // golden bonus
+      })).sort((a, b) => b.score - a.score);
+      
+      const base18 = compositeScore.slice(0, 18).map(c => c.num).sort((a, b) => a - b);
+      const wheelingCombos = generateWheeling(base18, 15, 6);
+
+      lotofacilExtra = `
+═══ ANÁLISE ESPECÍFICA LOTOFÁCIL ═══
+Ciclo atual: ${cycle.missingInCycle.length === 0 ? `COMPLETO em ${cycle.cycleDraws} concursos` : `Faltam ${cycle.missingInCycle.length} dezenas: [${cycle.missingInCycle.join(", ")}]`}
+Repetição média do anterior (30 concursos): ${avgRepeat} dezenas
+Último concurso C${draws[0]?.concurso}: [${lastDraw.join(", ")}]
+Primos médios (últimos 10): ${avgPrimes}
+Dezenas de Ouro (freq%): ${goldenFreqPct.map(g => `${g.num}(${g.pct}%)`).join(", ")}
+
+═══ FECHAMENTO MATEMÁTICO (18 base → jogos de 15) ═══
+Base 18 selecionada: [${base18.join(", ")}]
+Exemplos de fechamento (use como referência, ADAPTE conforme sua análise):
+${wheelingCombos.slice(0, 3).map((c, i) => `Combo ${i + 1}: [${c.join(", ")}]`).join("\n")}
+
+REGRAS OBRIGATÓRIAS para cada jogo Lotofácil:
+✓ 8 ímpares + 7 pares OU 7 ímpares + 8 pares
+✓ Repetir 8-10 dezenas do C${draws[0]?.concurso}
+✓ Incluir 5-6 primos (02,03,05,07,11,13,17,19,23)
+✓ Soma entre 180-220
+✓ Pelo menos 3 das dezenas de ouro (10,11,20,25)
+✓ 3 números por faixa de 5 (1-5, 6-10, 11-15, 16-20, 21-25)
+${cycle.missingInCycle.length > 0 ? `✓ Considere incluir dezenas faltantes do ciclo: [${cycle.missingInCycle.join(", ")}]` : ""}`;
+    }
+
+    // Build system prompt
+    const systemPrompt = `Você é um Analista Estatístico Sênior especializado em loterias brasileiras, com foco na Lei das Probabilidades e padrões históricos consolidados da Caixa Econômica Federal.
+Loteria: "${profile.name}" (${profile.pick} números de ${minNum} a ${profile.numbers}).
 
 REGRAS ABSOLUTAS INVIOLÁVEIS:
 - Cada aposta DEVE ter EXATAMENTE ${profile.pick} números
@@ -331,34 +534,32 @@ REGRAS ABSOLUTAS INVIOLÁVEIS:
 - Gere exatamente ${Math.min(count, 10)} apostas DIFERENTES entre si
 - NUNCA repita uma combinação idêntica a um sorteio passado
 
-CRITÉRIOS DE QUALIDADE OBRIGATÓRIOS PARA ${profile.name.toUpperCase()}:
-- Soma da aposta: entre ${profile.sumRange[0]} e ${profile.sumRange[1]} (média histórica: ${avgSum} ± ${sumStdDev})
-- Pares: entre ${profile.parityRange[0]} e ${profile.parityRange[1]} números pares (média: ${avgEvens})
-- Máximo de ${profile.maxConsecutive} números consecutivos
-- Mínimo de ${profile.minRanges} faixas cobertas (faixas de ${profile.rangeSize})
-${profile.specialRules ? `- REGRA ESPECIAL: ${profile.specialRules}` : ""}
+CRITÉRIOS DE QUALIDADE PARA ${profile.name.toUpperCase()}:
+- Soma: entre ${profile.sumRange[0]} e ${profile.sumRange[1]} (média: ${avgSum} ± ${sumStdDev})
+- Pares: entre ${profile.parityRange[0]} e ${profile.parityRange[1]} (média: ${avgEvens})
+- Máximo ${profile.maxConsecutive} consecutivos
+- Mínimo ${profile.minRanges} faixas de ${profile.rangeSize} cobertas
+${profile.primesRange ? `- Primos: entre ${profile.primesRange[0]} e ${profile.primesRange[1]}` : ""}
+${profile.repeatRange ? `- Repetição do anterior: entre ${profile.repeatRange[0]} e ${profile.repeatRange[1]} dezenas` : ""}
+${profile.specialRules ? `\n${profile.specialRules}` : ""}
 
-METODOLOGIA DE COMPOSIÇÃO:
-1. NÚCLEO (40%): Números com momentum 🔥FORTE + alta frequência recente
-2. TRANSIÇÕES (25%): Números com alta probabilidade de transição via Markov
-3. OVERDUE (20%): Números cujo retorno previsto é iminente (gap ≥ avgGap)
-4. COBERTURA (15%): Números para equilibrar faixas, paridade e soma
+METODOLOGIA:
+1. NÚCLEO (35%): Números com momentum FORTE + alta frequência recente
+2. REPETIÇÃO (25%): Dezenas do concurso anterior que devem se repetir
+3. TRANSIÇÕES (20%): Alta probabilidade via Markov
+4. OVERDUE (10%): Retorno previsto iminente
+5. COBERTURA (10%): Equilíbrio de faixas, paridade e soma
 
-APÓS COMPOR, VALIDE CADA APOSTA:
-✓ Soma está entre ${profile.sumRange[0]}-${profile.sumRange[1]}?
-✓ Pares entre ${profile.parityRange[0]}-${profile.parityRange[1]}?
-✓ Consecutivos ≤ ${profile.maxConsecutive}?
-✓ Faixas cobertas ≥ ${profile.minRanges}?
-Se algum critério falhar, AJUSTE a aposta antes de incluí-la.
+APÓS COMPOR, VALIDE e AJUSTE cada aposta antes de incluí-la.
 
 Responda APENAS com JSON válido:
-{"bets": [[n1,n2,...], ...], "analysis": "explicação técnica detalhada"}`;
+{"bets": [[n1,n2,...], ...], "analysis": "explicação técnica detalhada incluindo: cenário quente/frio, critérios aplicados por aposta, tabela de probabilidade da estratégia"}`;
 
     const userPrompt = `═══ ÚLTIMOS 10 RESULTADOS ═══
 ${last10.map((r: string, i: number) => `C${draws[i].concurso}: [${r}]`).join("\n")}
 
 ═══ ESTATÍSTICAS (últimos 20) ═══
-Soma média: ${avgSum} (σ${sumStdDev}) | Pares médio: ${avgEvens} | Consecutivos: ${(last20Stats.reduce((a, s) => a + s.consec, 0) / 20).toFixed(1)}
+Soma média: ${avgSum} (σ${sumStdDev}) | Pares: ${avgEvens} | Consecutivos: ${(last20Stats.reduce((a, s) => a + s.consec, 0) / 20).toFixed(1)} | Repetição: ${avgRepeat}
 
 ═══ TOP 20 QUENTES (freq30) ═══
 ${hotNums.map(n => `${n}(f30:${freq30[n]} f10:${freq10[n]} gap:${lastSeen[n]} ${momentum[n]})`).join(", ")}
@@ -377,8 +578,10 @@ ${topPairs.join(", ")}
 
 ═══ FREQ GERAL TOP 30 ═══
 ${[...allNums].sort((a, b) => (freq[b] || 0) - (freq[a] || 0)).slice(0, 30).map(n => `${n}:${freq[n]}`).join(", ")}
+${lotofacilExtra}
 
-Gere ${Math.min(count, 10)} apostas para ${profile.name} seguindo TODOS os critérios de qualidade.`;
+Gere ${Math.min(count, 10)} apostas otimizadas para ${profile.name} seguindo TODOS os critérios.
+Para cada aposta, garanta que TODOS os filtros de qualidade passem antes de incluí-la.`;
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -392,7 +595,7 @@ Gere ${Math.min(count, 10)} apostas para ${profile.name} seguindo TODOS os crit�
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        temperature: 0.5,
+        temperature: 0.45,
       }),
     });
 
@@ -431,16 +634,15 @@ Gere ${Math.min(count, 10)} apostas para ${profile.name} seguindo TODOS os crit�
     const seenCombos = new Set<string>();
 
     for (const rawBet of (parsed.bets || [])) {
-      const repaired = validateAndRepairBet(rawBet, profile, freq);
+      const repaired = validateAndRepairBet(rawBet, profile, freq, lastDrawNums);
       if (!repaired) continue;
 
       const key = repaired.join(",");
       if (seenCombos.has(key)) continue;
       seenCombos.add(key);
 
-      const scoreResult = scoreBet(repaired, profile, avgSum, sumStdDev);
-      // Only include bets with score >= 50
-      if (scoreResult.score >= 50) {
+      const scoreResult = scoreBet(repaired, profile, avgSum, sumStdDev, lastDrawNums);
+      if (scoreResult.score >= 45) {
         validBets.push(repaired);
         betScores.push(scoreResult);
       }
@@ -461,6 +663,7 @@ Gere ${Math.min(count, 10)} apostas para ${profile.name} seguindo TODOS os crit�
       quality: {
         avgScore,
         scores: betScores.map(s => s.score),
+        details: betScores.map(s => s.details),
         grade: avgScore >= 90 ? "S" : avgScore >= 80 ? "A" : avgScore >= 70 ? "B" : avgScore >= 60 ? "C" : "D",
       },
     };
