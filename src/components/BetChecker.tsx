@@ -374,7 +374,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
 
   const tabs = [
     { key: "check" as const, label: "Conferir", icon: Search, desc: "Manual" },
-    { key: "performance" as const, label: "Performance", icon: BarChart3, desc: `${drawRange} jogos` },
+    { key: "performance" as const, label: "Performance", icon: BarChart3, desc: drawRange === 1 ? "Último" : `${drawRange} jogos` },
     { key: "improve" as const, label: "IA Melhorias", icon: Brain, desc: "Otimizar" },
   ];
 
