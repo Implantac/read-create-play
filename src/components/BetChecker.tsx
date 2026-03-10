@@ -372,7 +372,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
   const tierSummary = results
     ? prizeTiers.map(tier => ({
         ...tier,
-        count: results.filter(r => r.matchCount >= tier.hits).length,
+        count: results.filter(r => r.matchCount === tier.hits).length,
       }))
     : [];
 
