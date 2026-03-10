@@ -406,7 +406,17 @@ Responda APENAS com JSON:
       if (!aiResponse.ok) {
         const errText = await aiResponse.text();
         console.error("AI improve error:", aiResponse.status, errText);
-        throw new Error("Erro ao solicitar melhorias da IA");
+        // Fallback: return statistical bets without AI improvement
+        console.log("Falling back to statistical-only bets due to AI error");
+        const fallbackBets = bets_to_improve.map((b: any) => b.numbers || b);
+        const qualityResult = evaluateQuality(fallbackBets, profile, frequency);
+        return new Response(JSON.stringify({
+          success: true,
+          bets: fallbackBets,
+          count: fallbackBets.length,
+          analysis: "Apostas geradas com base estatística (IA temporariamente indisponível - créditos insuficientes).",
+          quality: qualityResult,
+        }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
 
       const aiData = await aiResponse.json();
