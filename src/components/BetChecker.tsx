@@ -19,11 +19,78 @@ interface Props {
 interface BetPerformance {
   numbers: number[];
   label: string;
-  results: { concurso: number; date: string; hits: number; matched: number[] }[];
+  results: { concurso: number; date: string; hits: number; matched: number[]; prize: string }[];
   avgHits: number;
   bestHit: number;
   prizeHits: number;
+  totalPrize: string;
   score: number;
+}
+
+// Estimated prize values per lottery/hits
+function getEstimatedPrize(lotteryId: string, hits: number): { value: number; label: string } | null {
+  const prizes: Record<string, Record<number, { value: number; label: string }>> = {
+    megasena: {
+      6: { value: 50000000, label: "Sena (~R$50M)" },
+      5: { value: 40000, label: "Quina (~R$40k)" },
+      4: { value: 800, label: "Quadra (~R$800)" },
+    },
+    lotofacil: {
+      15: { value: 1500000, label: "15 pts (~R$1.5M)" },
+      14: { value: 2000, label: "14 pts (~R$2k)" },
+      13: { value: 35, label: "13 pts (R$35)" },
+      12: { value: 14, label: "12 pts (R$14)" },
+      11: { value: 7, label: "11 pts (R$7)" },
+    },
+    quina: {
+      5: { value: 5000000, label: "Quina (~R$5M)" },
+      4: { value: 6000, label: "Quadra (~R$6k)" },
+      3: { value: 150, label: "Terno (~R$150)" },
+      2: { value: 5, label: "Duque (~R$5)" },
+    },
+    lotomania: {
+      20: { value: 3000000, label: "20 pts (~R$3M)" },
+      19: { value: 50000, label: "19 pts (~R$50k)" },
+      18: { value: 2000, label: "18 pts (~R$2k)" },
+      17: { value: 200, label: "17 pts (~R$200)" },
+      16: { value: 30, label: "16 pts (~R$30)" },
+      15: { value: 6, label: "15 pts (R$6)" },
+      0: { value: 6, label: "0 pts (R$6)" },
+    },
+    duplasena: {
+      6: { value: 3000000, label: "Sena (~R$3M)" },
+      5: { value: 5000, label: "Quina (~R$5k)" },
+      4: { value: 100, label: "Quadra (~R$100)" },
+      3: { value: 3, label: "Terno (~R$3)" },
+    },
+    timemania: {
+      7: { value: 8000000, label: "7 pts (~R$8M)" },
+      6: { value: 50000, label: "6 pts (~R$50k)" },
+      5: { value: 1000, label: "5 pts (~R$1k)" },
+      4: { value: 10, label: "4 pts (~R$10)" },
+      3: { value: 3, label: "3 pts (R$3)" },
+    },
+    diadesorte: {
+      7: { value: 1000000, label: "7 pts (~R$1M)" },
+      6: { value: 5000, label: "6 pts (~R$5k)" },
+      5: { value: 100, label: "5 pts (~R$100)" },
+      4: { value: 5, label: "4 pts (~R$5)" },
+    },
+    supersete: {
+      7: { value: 1000000, label: "7 pts (~R$1M)" },
+      6: { value: 50000, label: "6 pts (~R$50k)" },
+      5: { value: 1000, label: "5 pts (~R$1k)" },
+      4: { value: 10, label: "4 pts (~R$10)" },
+      3: { value: 3, label: "3 pts (R$3)" },
+    },
+  };
+  return prizes[lotteryId]?.[hits] || null;
+}
+
+function formatCurrency(value: number): string {
+  if (value >= 1000000) return `R$${(value / 1000000).toFixed(1)}M`;
+  if (value >= 1000) return `R$${(value / 1000).toFixed(0)}k`;
+  return `R$${value.toFixed(0)}`;
 }
 
 interface AIImprovement {
@@ -126,13 +193,17 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
     }
 
     const perfs: BetPerformance[] = allBets.map(bet => {
+      let totalPrizeValue = 0;
       const betResults = selectedDraws.map(draw => {
         const matched = bet.numbers.filter(n => draw.numbers.includes(n));
+        const prizeInfo = getEstimatedPrize(lotteryId, matched.length);
+        if (prizeInfo) totalPrizeValue += prizeInfo.value;
         return {
           concurso: draw.concurso,
           date: draw.date,
           hits: matched.length,
           matched,
+          prize: prizeInfo?.label || "",
         };
       });
 
@@ -141,7 +212,6 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
       const bestHit = Math.max(...betResults.map(r => r.hits));
       const prizeHits = betResults.filter(r => r.hits >= minPrizeHits).length;
 
-      // Score: weighted combination
       const score = Math.round(
         (avgHits / pick) * 40 +
         (bestHit / pick) * 30 +
@@ -155,6 +225,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
         avgHits: Math.round(avgHits * 100) / 100,
         bestHit,
         prizeHits,
+        totalPrize: formatCurrency(totalPrizeValue),
         score: Math.min(score, 100),
       };
     });
@@ -463,7 +534,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
                   </div>
 
                   {/* Stats row */}
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-4 gap-2">
                     <div className="text-center p-1.5 rounded bg-muted/30">
                       <p className="text-[9px] text-muted-foreground">Média acertos</p>
                       <p className="text-sm font-bold font-mono text-foreground">{perf.avgHits}</p>
@@ -476,26 +547,39 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
                       <p className="text-[9px] text-muted-foreground">Premiações</p>
                       <p className="text-sm font-bold font-mono text-green-400">{perf.prizeHits}x</p>
                     </div>
+                    <div className="text-center p-1.5 rounded bg-primary/10 border border-primary/20">
+                      <p className="text-[9px] text-muted-foreground">Total estimado</p>
+                      <p className="text-sm font-bold font-mono text-primary">{perf.totalPrize}</p>
+                    </div>
                   </div>
 
                   {/* Per-draw breakdown */}
                   <div className="flex gap-1 flex-wrap">
-                    {perf.results.map(r => (
+                    {perf.results.filter(r => r.hits > 0).map(r => (
                       <span
                         key={r.concurso}
                         className={`text-[9px] px-1.5 py-0.5 rounded font-mono ${
-                          r.hits >= minPrizeHits
+                          r.prize
                             ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                            : r.hits > 0
-                            ? "bg-secondary/50 text-muted-foreground border border-border/30"
-                            : "bg-muted/20 text-muted-foreground/50"
+                            : "bg-secondary/50 text-muted-foreground border border-border/30"
                         }`}
-                        title={`Concurso #${r.concurso}: ${r.hits} acertos`}
+                        title={`Concurso #${r.concurso}: ${r.hits} acertos${r.prize ? ` → ${r.prize}` : ""}`}
                       >
-                        #{r.concurso}: {r.hits}
+                        #{r.concurso}: {r.hits}{r.prize ? ` 💰` : ""}
                       </span>
                     ))}
                   </div>
+                  {/* Prize detail list */}
+                  {perf.results.some(r => r.prize) && (
+                    <div className="space-y-1">
+                      {perf.results.filter(r => r.prize).map(r => (
+                        <div key={`prize-${r.concurso}`} className="flex items-center justify-between text-[10px] px-2 py-1 rounded bg-green-500/5 border border-green-500/10">
+                          <span className="text-muted-foreground font-mono">#{r.concurso} — {r.hits} acertos</span>
+                          <span className="font-semibold text-green-400">{r.prize}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               ))}
             </div>
