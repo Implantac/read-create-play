@@ -161,6 +161,16 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
 
   const { savedBets, saveBet } = useSavedBets(lotteryId);
   const selectedDraws = useMemo(() => draws.slice(0, drawRange), [draws, drawRange]);
+
+  // Reset all state when lottery changes
+  useEffect(() => {
+    setSelectedNumbers([]);
+    setResults(null);
+    setPerformances([]);
+    setAiImprovements([]);
+    setInputValue("");
+    setExpandedPerf(null);
+  }, [lotteryId]);
   const prizeTiers = getPrizeTiers(lotteryId);
   const minPrizeHits = prizeTiers.length > 0 ? prizeTiers[prizeTiers.length - 1].hits : 3;
 
