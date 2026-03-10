@@ -194,6 +194,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
   const [drawRange, setDrawRange] = useState<number>(10);
   const [activeTab, setActiveTab] = useState<"check" | "performance" | "improve">("check");
   const [expandedPerf, setExpandedPerf] = useState<number | null>(null);
+  const [hasRunPerformance, setHasRunPerformance] = useState(false);
 
   const { savedBets, saveBet } = useSavedBets(lotteryId);
   const selectedDraws = useMemo(() => draws.slice(0, drawRange), [draws, drawRange]);
@@ -207,7 +208,18 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
     setAiImprovements([]);
     setInputValue("");
     setExpandedPerf(null);
+    setHasRunPerformance(false);
   }, [lotteryId]);
+
+  // Auto-recalculate when drawRange changes if performance was already run
+  useEffect(() => {
+    if (hasRunPerformance && selectedDraws.length > 0) {
+      // Defer to next tick so selectedDraws memo is fresh
+      const timer = setTimeout(() => runPerformanceCheck(), 50);
+      return () => clearTimeout(timer);
+    }
+  }, [drawRange, selectedDraws]);
+
   const prizeTiers = getPrizeTiers(lotteryId);
   // Get minimum hits that award a prize, ignoring 0-hit special cases (lotomania)
   const minPrizeHits = prizeTiers.length > 0
@@ -287,28 +299,38 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
   const runPerformanceCheck = () => {
     const allBets: { numbers: number[]; label: string }[] = [];
 
+    // Always include current selection if user has any numbers selected
+    if (selectedNumbers.length > 0) {
+      allBets.push({ numbers: [...selectedNumbers], label: `Seleção atual (${selectedNumbers.length} nº)` });
+    }
+
+    // Add saved bets
     savedBets.forEach((bet, i) => {
       allBets.push({
-        numbers: bet.numbers,
+        numbers: [...bet.numbers],
         label: bet.label || bet.strategy || `Aposta salva #${i + 1}`,
       });
     });
 
-    if (selectedNumbers.length === pick) {
-      allBets.push({ numbers: selectedNumbers, label: "Seleção atual" });
-    }
-
     if (allBets.length === 0) {
-      toast.error("Nenhuma aposta para conferir. Salve apostas ou selecione números.");
+      toast.error("Nenhuma aposta para conferir. Selecione números ou salve apostas.");
       return;
     }
+
+    // Ensure we have draws to check against
+    if (selectedDraws.length === 0) {
+      toast.error("Nenhum sorteio disponível. Sincronize os dados primeiro.");
+      return;
+    }
+
+    console.log(`[Performance] Analisando ${allBets.length} apostas contra ${selectedDraws.length} sorteios (range: ${drawRange})`);
+    allBets.forEach((b, i) => console.log(`  Aposta ${i}: [${b.numbers.join(",")}] - ${b.label}`));
 
     const maxHits = getMaxPossibleHits(lotteryId, pick);
     const perfs: BetPerformance[] = allBets.map(bet => {
       let totalPrizeValue = 0;
       const betResults = selectedDraws.map(draw => {
         const { hits, matched } = matchBetAgainstDraw(bet.numbers, draw.numbers, lotteryId);
-        // Check for prizes including Lotomania 0-hit special case
         const prizeInfo = getEstimatedPrize(lotteryId, hits);
         if (prizeInfo) totalPrizeValue += prizeInfo.value;
         return {
@@ -321,17 +343,23 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
         };
       });
 
+      const drawCount = selectedDraws.length;
       const totalHits = betResults.reduce((s, r) => s + r.hits, 0);
-      const avgHits = totalHits / selectedDraws.length;
-      const bestHit = Math.max(...betResults.map(r => r.hits));
+      const avgHits = drawCount > 0 ? totalHits / drawCount : 0;
+      const bestHit = betResults.length > 0 ? Math.max(...betResults.map(r => r.hits)) : 0;
       const prizeHits = betResults.filter(r => r.prizeValue > 0).length;
 
-      // Use maxHits (not pick) as denominator for fair scoring across all lotteries
-      const score = Math.round(
-        (avgHits / maxHits) * 40 +
-        (bestHit / maxHits) * 30 +
-        (prizeHits / selectedDraws.length) * 30
-      );
+      // Use bet-specific max for partial selections vs full bets
+      const effectiveMax = Math.min(bet.numbers.length, maxHits);
+      const score = effectiveMax > 0 && drawCount > 0
+        ? Math.round(
+            (avgHits / effectiveMax) * 40 +
+            (bestHit / effectiveMax) * 30 +
+            (prizeHits / drawCount) * 30
+          )
+        : 0;
+
+      console.log(`  [Score] ${bet.label}: avg=${avgHits.toFixed(2)}, best=${bestHit}, prizes=${prizeHits}, total=R$${totalPrizeValue}, score=${score}`);
 
       return {
         numbers: bet.numbers,
@@ -349,7 +377,8 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
     perfs.sort((a, b) => b.score - a.score);
     setPerformances(perfs);
     setActiveTab("performance");
-    toast.success(`${perfs.length} apostas conferidas ${drawRange === 1 ? "no último sorteio" : `nos últimos ${drawRange} sorteios`}`);
+    setHasRunPerformance(true);
+    toast.success(`${perfs.length} apostas conferidas contra ${selectedDraws.length} sorteios reais`);
   };
 
   const requestAIImprovements = async () => {
@@ -668,7 +697,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
                 {[1, 10, 50, 100].map(n => (
                   <button
                     key={n}
-                    onClick={() => { setDrawRange(n); setPerformances([]); }}
+                    onClick={() => { setDrawRange(n); }}
                     className={`text-[11px] px-3 py-1.5 rounded-lg border transition-all font-medium ${
                       drawRange === n
                         ? "border-primary bg-primary/15 text-primary shadow-sm shadow-primary/10"
