@@ -194,47 +194,57 @@ export function AIPredictionPanel({ config, stats, onSaveBet }: Props) {
                       "bg-muted text-muted-foreground"
                     }`}>{quality.scores[i]}pts</span>
                   )}
-                <div className="flex flex-wrap gap-1.5 flex-1">
-                  {bet.map(n => {
-                    const stat = stats.find(s => s.number === n);
-                    const ballClass =
-                      stat?.status === "hot"
-                        ? "lottery-ball-hot"
-                        : stat?.status === "cold"
-                        ? "lottery-ball-cold"
-                        : "";
-                    return (
-                      <span key={n} className={`lottery-ball text-xs w-8 h-8 ${ballClass}`}>
-                        {String(n).padStart(2, "0")}
-                      </span>
-                    );
-                  })}
-                </div>
-                <div className="flex items-center gap-1">
-                  {onSaveBet && (
-                    <button
-                      onClick={() => handleSave(bet, i)}
-                      className={`transition-colors p-1 rounded-md ${
-                        saved.has(i)
-                          ? "text-yellow-400"
-                          : "text-muted-foreground hover:text-yellow-400 hover:bg-yellow-400/5 opacity-0 group-hover:opacity-100"
-                      }`}
-                      disabled={saved.has(i)}
-                    >
-                      <Star className={`w-4 h-4 ${saved.has(i) ? "fill-yellow-400" : ""}`} />
-                    </button>
-                  )}
-                  <button
-                    onClick={() => copyBet(bet, i)}
-                    className="text-muted-foreground hover:text-primary transition-colors p-1 rounded-md hover:bg-primary/5"
-                  >
-                    {copied === i ? (
-                      <Check className="w-4 h-4 text-primary" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
+                  <div className="flex flex-wrap gap-1.5 flex-1">
+                    {bet.map(n => {
+                      const stat = stats.find(s => s.number === n);
+                      const ballClass =
+                        stat?.status === "hot"
+                          ? "lottery-ball-hot"
+                          : stat?.status === "cold"
+                          ? "lottery-ball-cold"
+                          : "";
+                      return (
+                        <span key={n} className={`lottery-ball text-xs w-8 h-8 ${ballClass}`}>
+                          {String(n).padStart(2, "0")}
+                        </span>
+                      );
+                    })}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {onSaveBet && (
+                      <button
+                        onClick={() => handleSave(bet, i)}
+                        className={`transition-colors p-1 rounded-md ${
+                          saved.has(i)
+                            ? "text-yellow-400"
+                            : "text-muted-foreground hover:text-yellow-400 hover:bg-yellow-400/5 opacity-0 group-hover:opacity-100"
+                        }`}
+                        disabled={saved.has(i)}
+                      >
+                        <Star className={`w-4 h-4 ${saved.has(i) ? "fill-yellow-400" : ""}`} />
+                      </button>
                     )}
-                  </button>
+                    <button
+                      onClick={() => copyBet(bet, i)}
+                      className="text-muted-foreground hover:text-primary transition-colors p-1 rounded-md hover:bg-primary/5"
+                    >
+                      {copied === i ? (
+                        <Check className="w-4 h-4 text-primary" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
+                {quality?.details?.[i] && quality.details[i].length > 0 && (
+                  <div className="flex flex-wrap gap-1 ml-8">
+                    {quality.details[i].map((detail: string, j: number) => (
+                      <span key={j} className={`text-[9px] px-1.5 py-0.5 rounded-full ${
+                        detail.startsWith("⚠") ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"
+                      }`}>{detail}</span>
+                    ))}
+                  </div>
+                )}
               </motion.div>
             ))}
           </div>
