@@ -295,7 +295,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
     perfs.sort((a, b) => b.score - a.score);
     setPerformances(perfs);
     setActiveTab("performance");
-    toast.success(`${perfs.length} apostas conferidas nos últimos ${drawRange} sorteios`);
+    toast.success(`${perfs.length} apostas conferidas ${drawRange === 1 ? "no último sorteio" : `nos últimos ${drawRange} sorteios`}`);
   };
 
   const requestAIImprovements = async () => {
