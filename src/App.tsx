@@ -21,6 +21,7 @@ import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import IAAutonomaPage from "@/pages/IAAutonomaPage";
 import EstatisticasPage from "@/pages/EstatisticasPage";
+import PerfilPage from "@/pages/PerfilPage";
 import LandingPage from "./pages/LandingPage";
 import NotFound from "./pages/NotFound";
 
@@ -51,6 +52,7 @@ function App() {
               <Route path="/estatisticas" element={<EstatisticasPage />} />
               <Route path="/historico" element={<HistoricoPage />} />
               <Route path="/planos" element={<PlanosPage />} />
+              <Route path="/perfil" element={<PerfilPage />} />
               <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
             </Route>
             <Route path="*" element={<NotFound />} />

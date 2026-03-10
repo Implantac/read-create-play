@@ -1,6 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { LotterySelector } from "@/components/LotterySelector";
 import { Button } from "@/components/ui/button";
 import { Database, Loader2, LogOut, User, RefreshCw } from "lucide-react";
@@ -22,6 +22,7 @@ import {
 export function AppLayout() {
   const { selectedLottery, setSelectedLottery, loading, count, syncing, syncDraws } = useLotteryContext();
   const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <SidebarProvider>
@@ -95,6 +96,10 @@ export function AppLayout() {
                       <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
                     </div>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate('/perfil')} className="gap-2 cursor-pointer">
+                      <User className="w-4 h-4" />
+                      Meu Perfil
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={signOut} className="gap-2 cursor-pointer text-destructive focus:text-destructive">
                       <LogOut className="w-4 h-4" />
                       Sair
