@@ -678,14 +678,22 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
                             className="overflow-hidden"
                           >
                             <div className="px-3.5 pb-3.5 space-y-3 border-t border-border/20 pt-3">
-                              {/* Numbers */}
+                              {/* Numbers - highlight matched in red */}
                               <div className="flex items-center gap-2">
                                 <div className="flex flex-wrap gap-1">
-                                  {perf.numbers.map(n => (
-                                    <span key={n} className="lottery-ball text-[10px] w-6 h-6">
-                                      {String(n).padStart(2, "0")}
-                                    </span>
-                                  ))}
+                                  {perf.numbers.map(n => {
+                                    const allMatched = new Set(perf.results.flatMap(r => r.matched));
+                                    const isHit = allMatched.has(n);
+                                    return (
+                                      <span key={n} className={`text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-mono font-bold ${
+                                        isHit
+                                          ? "bg-gradient-to-br from-destructive to-destructive/80 text-destructive-foreground shadow-sm shadow-destructive/30"
+                                          : "lottery-ball"
+                                      }`}>
+                                        {String(n).padStart(2, "0")}
+                                      </span>
+                                    );
+                                  })}
                                 </div>
                                 <button
                                   onClick={(e) => { e.stopPropagation(); copyNumbers(perf.numbers); }}
