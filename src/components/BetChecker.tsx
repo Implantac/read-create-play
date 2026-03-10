@@ -565,6 +565,26 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
         {/* ========== TAB: PERFORMANCE ========== */}
         {activeTab === "performance" && (
           <div className="space-y-4">
+            {/* Last draw info - prove real data */}
+            {lastDraw && (
+              <div className="rounded-lg bg-accent/5 border border-accent/15 p-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Target className="w-3.5 h-3.5 text-accent" />
+                  <span className="text-[11px] font-semibold text-foreground">
+                    Último sorteio: <span className="font-mono text-accent">#{lastDraw.concurso}</span>
+                    {lastDraw.date && <span className="text-muted-foreground ml-1">({lastDraw.date})</span>}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {lastDraw.numbers.map(n => (
+                    <span key={n} className="text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-mono font-bold bg-accent/15 text-accent border border-accent/30">
+                      {String(n).padStart(2, "0")}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Controls row */}
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div className="flex items-center gap-2">
@@ -596,7 +616,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
                   <span className="font-mono text-foreground">#{selectedDraws[selectedDraws.length - 1]?.concurso}</span>
                   {" a "}
                   <span className="font-mono text-foreground">#{selectedDraws[0]?.concurso}</span>
-                  {" "}({selectedDraws.length} sorteios)
+                  {" "}({selectedDraws.length} sorteios reais do banco de dados)
                 </span>
               </div>
             )}
