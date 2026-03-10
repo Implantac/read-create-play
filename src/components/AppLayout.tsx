@@ -96,11 +96,9 @@ export function AppLayout() {
                       <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
                     </div>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild className="gap-2 cursor-pointer">
-                      <a href="/perfil">
-                        <User className="w-4 h-4" />
-                        Meu Perfil
-                      </a>
+                    <DropdownMenuItem onClick={() => navigate('/perfil')} className="gap-2 cursor-pointer">
+                      <User className="w-4 h-4" />
+                      Meu Perfil
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={signOut} className="gap-2 cursor-pointer text-destructive focus:text-destructive">
                       <LogOut className="w-4 h-4" />
