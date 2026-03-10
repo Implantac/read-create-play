@@ -22,6 +22,7 @@ import {
 export function AppLayout() {
   const { selectedLottery, setSelectedLottery, loading, count, syncing, syncDraws } = useLotteryContext();
   const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <SidebarProvider>
