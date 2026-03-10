@@ -534,7 +534,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
                   </div>
 
                   {/* Stats row */}
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-4 gap-2">
                     <div className="text-center p-1.5 rounded bg-muted/30">
                       <p className="text-[9px] text-muted-foreground">Média acertos</p>
                       <p className="text-sm font-bold font-mono text-foreground">{perf.avgHits}</p>
@@ -546,6 +546,10 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
                     <div className="text-center p-1.5 rounded bg-muted/30">
                       <p className="text-[9px] text-muted-foreground">Premiações</p>
                       <p className="text-sm font-bold font-mono text-green-400">{perf.prizeHits}x</p>
+                    </div>
+                    <div className="text-center p-1.5 rounded bg-primary/10 border border-primary/20">
+                      <p className="text-[9px] text-muted-foreground">Total estimado</p>
+                      <p className="text-sm font-bold font-mono text-primary">{perf.totalPrize}</p>
                     </div>
                   </div>
 
