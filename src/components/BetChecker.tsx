@@ -163,7 +163,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
     setPerformances(perfs);
     setShowPerformance(true);
     setActiveTab("performance");
-    toast.success(`${perfs.length} apostas conferidas nos últimos 10 sorteios`);
+    toast.success(`${perfs.length} apostas conferidas nos últimos ${drawRange} sorteios`);
   };
 
   // AI improvement suggestions
