@@ -557,7 +557,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
             {/* Controls row */}
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div className="flex items-center gap-2">
-                {[10, 50, 100].map(n => (
+                {[1, 10, 50, 100].map(n => (
                   <button
                     key={n}
                     onClick={() => { setDrawRange(n); setPerformances([]); }}
@@ -567,7 +567,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
                         : "border-border/50 text-muted-foreground hover:text-foreground hover:border-border"
                     }`}
                   >
-                    {n} jogos
+                    {n === 1 ? "Último" : `${n} jogos`}
                   </button>
                 ))}
               </div>
