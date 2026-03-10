@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { DrawResult } from "@/data/lotteries";
 import { checkBetAgainstDraws, MatchResult, getPrizeTiers } from "@/services/lotteryApi";
 import { motion, AnimatePresence } from "framer-motion";
@@ -161,6 +161,16 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
 
   const { savedBets, saveBet } = useSavedBets(lotteryId);
   const selectedDraws = useMemo(() => draws.slice(0, drawRange), [draws, drawRange]);
+
+  // Reset all state when lottery changes
+  useEffect(() => {
+    setSelectedNumbers([]);
+    setResults(null);
+    setPerformances([]);
+    setAiImprovements([]);
+    setInputValue("");
+    setExpandedPerf(null);
+  }, [lotteryId]);
   const prizeTiers = getPrizeTiers(lotteryId);
   const minPrizeHits = prizeTiers.length > 0 ? prizeTiers[prizeTiers.length - 1].hits : 3;
 
@@ -285,7 +295,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
     perfs.sort((a, b) => b.score - a.score);
     setPerformances(perfs);
     setActiveTab("performance");
-    toast.success(`${perfs.length} apostas conferidas nos últimos ${drawRange} sorteios`);
+    toast.success(`${perfs.length} apostas conferidas ${drawRange === 1 ? "no último sorteio" : `nos últimos ${drawRange} sorteios`}`);
   };
 
   const requestAIImprovements = async () => {
