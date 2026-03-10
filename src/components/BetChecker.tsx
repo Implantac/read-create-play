@@ -173,7 +173,10 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
     setExpandedPerf(null);
   }, [lotteryId]);
   const prizeTiers = getPrizeTiers(lotteryId);
-  const minPrizeHits = prizeTiers.length > 0 ? prizeTiers[prizeTiers.length - 1].hits : 3;
+  // Get minimum hits that award a prize, ignoring 0-hit special cases (lotomania)
+  const minPrizeHits = prizeTiers.length > 0
+    ? Math.max(1, Math.min(...prizeTiers.map(t => t.hits).filter(h => h > 0)))
+    : 3;
 
   const handleInput = (val: string) => {
     setInputValue(val);
