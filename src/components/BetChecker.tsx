@@ -555,22 +555,31 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
 
                   {/* Per-draw breakdown */}
                   <div className="flex gap-1 flex-wrap">
-                    {perf.results.map(r => (
+                    {perf.results.filter(r => r.hits > 0).map(r => (
                       <span
                         key={r.concurso}
                         className={`text-[9px] px-1.5 py-0.5 rounded font-mono ${
-                          r.hits >= minPrizeHits
+                          r.prize
                             ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                            : r.hits > 0
-                            ? "bg-secondary/50 text-muted-foreground border border-border/30"
-                            : "bg-muted/20 text-muted-foreground/50"
+                            : "bg-secondary/50 text-muted-foreground border border-border/30"
                         }`}
-                        title={`Concurso #${r.concurso}: ${r.hits} acertos`}
+                        title={`Concurso #${r.concurso}: ${r.hits} acertos${r.prize ? ` → ${r.prize}` : ""}`}
                       >
-                        #{r.concurso}: {r.hits}
+                        #{r.concurso}: {r.hits}{r.prize ? ` 💰` : ""}
                       </span>
                     ))}
                   </div>
+                  {/* Prize detail list */}
+                  {perf.results.some(r => r.prize) && (
+                    <div className="space-y-1">
+                      {perf.results.filter(r => r.prize).map(r => (
+                        <div key={`prize-${r.concurso}`} className="flex items-center justify-between text-[10px] px-2 py-1 rounded bg-green-500/5 border border-green-500/10">
+                          <span className="text-muted-foreground font-mono">#{r.concurso} — {r.hits} acertos</span>
+                          <span className="font-semibold text-green-400">{r.prize}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               ))}
             </div>
