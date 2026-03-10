@@ -309,7 +309,8 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    const { lottery_id, count = 3 } = await req.json();
+    const reqBody = await req.json();
+    const { lottery_id, count = 3, mode, bets_to_improve, last_draws } = reqBody;
     if (!lottery_id) throw new Error("lottery_id required");
 
     const profile = LOTTERY_PROFILES[lottery_id];
