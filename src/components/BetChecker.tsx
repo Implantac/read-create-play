@@ -189,7 +189,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
     setActiveTab("improve");
 
     try {
-      const last10Data = last10Draws.map(d => ({
+      const last10Data = selectedDraws.slice(0, 10).map(d => ({
         concurso: d.concurso,
         numbers: d.numbers,
         date: d.date,
