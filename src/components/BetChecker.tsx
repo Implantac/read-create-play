@@ -210,6 +210,16 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
     setExpandedPerf(null);
     setHasRunPerformance(false);
   }, [lotteryId]);
+
+  // Auto-recalculate when drawRange changes if performance was already run
+  useEffect(() => {
+    if (hasRunPerformance && selectedDraws.length > 0) {
+      // Defer to next tick so selectedDraws memo is fresh
+      const timer = setTimeout(() => runPerformanceCheck(), 50);
+      return () => clearTimeout(timer);
+    }
+  }, [drawRange, selectedDraws]);
+
   const prizeTiers = getPrizeTiers(lotteryId);
   // Get minimum hits that award a prize, ignoring 0-hit special cases (lotomania)
   const minPrizeHits = prizeTiers.length > 0
