@@ -137,7 +137,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
       });
 
       const totalHits = betResults.reduce((s, r) => s + r.hits, 0);
-      const avgHits = totalHits / last10Draws.length;
+      const avgHits = totalHits / selectedDraws.length;
       const bestHit = Math.max(...betResults.map(r => r.hits));
       const prizeHits = betResults.filter(r => r.hits >= minPrizeHits).length;
 
