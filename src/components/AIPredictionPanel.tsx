@@ -20,11 +20,13 @@ export function AIPredictionPanel({ config, stats, onSaveBet }: Props) {
   const [copied, setCopied] = useState<number | null>(null);
   const [saved, setSaved] = useState<Set<number>>(new Set());
   const [count, setCount] = useState(3);
+  const [quality, setQuality] = useState<{ avgScore: number; scores: number[]; grade: string } | null>(null);
 
   const generate = async () => {
     setLoading(true);
     setBets([]);
     setAnalysis("");
+    setQuality(null);
     try {
       const { data, error } = await supabase.functions.invoke("ai-lottery-predict", {
         body: { lottery_id: config.id, count },
@@ -35,8 +37,9 @@ export function AIPredictionPanel({ config, stats, onSaveBet }: Props) {
 
       setBets(data.bets || []);
       setAnalysis(data.analysis || "");
+      setQuality(data.quality || null);
       setSaved(new Set());
-      toast.success(`${data.count} apostas geradas pela IA!`);
+      toast.success(`${data.count} apostas geradas pela IA! ${data.quality ? `Qualidade: ${data.quality.grade}` : ""}`);
     } catch (e: any) {
       console.error("AI prediction error:", e);
       const msg = e?.message || "Erro ao gerar predições";
@@ -87,6 +90,18 @@ export function AIPredictionPanel({ config, stats, onSaveBet }: Props) {
               </p>
             </div>
           </div>
+          {quality && (
+            <div className="flex items-center gap-2">
+              <span className={`text-xs font-bold px-2 py-1 rounded-md ${
+                quality.grade === "S" ? "bg-yellow-500/20 text-yellow-400" :
+                quality.grade === "A" ? "bg-green-500/20 text-green-400" :
+                quality.grade === "B" ? "bg-blue-500/20 text-blue-400" :
+                "bg-muted text-muted-foreground"
+              }`}>
+                {quality.grade} ({quality.avgScore}pts)
+              </span>
+            </div>
+          )}
           {bets.length > 0 && (
             <Button size="sm" variant="outline" onClick={copyAll} className="text-xs border-border/50">
               <Copy className="w-3 h-3 mr-1" /> Copiar todas
@@ -170,6 +185,14 @@ export function AIPredictionPanel({ config, stats, onSaveBet }: Props) {
                 className="flex items-center gap-2 p-3 rounded-lg bg-secondary/30 border border-primary/10 hover:border-primary/30 transition-colors group"
               >
                 <span className="text-xs text-primary font-mono w-6 font-semibold">#{i + 1}</span>
+                {quality?.scores?.[i] !== undefined && (
+                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
+                    quality.scores[i] >= 90 ? "bg-yellow-500/20 text-yellow-400" :
+                    quality.scores[i] >= 80 ? "bg-green-500/20 text-green-400" :
+                    quality.scores[i] >= 70 ? "bg-blue-500/20 text-blue-400" :
+                    "bg-muted text-muted-foreground"
+                  }`}>{quality.scores[i]}</span>
+                )}
                 <div className="flex flex-wrap gap-1.5 flex-1">
                   {bet.map(n => {
                     const stat = stats.find(s => s.number === n);
