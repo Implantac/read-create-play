@@ -161,6 +161,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
 
   const { savedBets, saveBet } = useSavedBets(lotteryId);
   const selectedDraws = useMemo(() => draws.slice(0, drawRange), [draws, drawRange]);
+  const lastDraw = useMemo(() => draws.length > 0 ? draws[0] : null, [draws]);
 
   // Reset all state when lottery changes
   useEffect(() => {
