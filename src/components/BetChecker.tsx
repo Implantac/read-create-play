@@ -374,7 +374,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
 
   const tabs = [
     { key: "check" as const, label: "Conferir", icon: Search, desc: "Manual" },
-    { key: "performance" as const, label: "Performance", icon: BarChart3, desc: `${drawRange} jogos` },
+    { key: "performance" as const, label: "Performance", icon: BarChart3, desc: drawRange === 1 ? "Último" : `${drawRange} jogos` },
     { key: "improve" as const, label: "IA Melhorias", icon: Brain, desc: "Otimizar" },
   ];
 
@@ -557,7 +557,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
             {/* Controls row */}
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div className="flex items-center gap-2">
-                {[10, 50, 100].map(n => (
+                {[1, 10, 50, 100].map(n => (
                   <button
                     key={n}
                     onClick={() => { setDrawRange(n); setPerformances([]); }}
@@ -567,7 +567,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
                         : "border-border/50 text-muted-foreground hover:text-foreground hover:border-border"
                     }`}
                   >
-                    {n} jogos
+                    {n === 1 ? "Último" : `${n} jogos`}
                   </button>
                 ))}
               </div>
@@ -678,14 +678,22 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
                             className="overflow-hidden"
                           >
                             <div className="px-3.5 pb-3.5 space-y-3 border-t border-border/20 pt-3">
-                              {/* Numbers */}
+                              {/* Numbers - highlight matched in red */}
                               <div className="flex items-center gap-2">
                                 <div className="flex flex-wrap gap-1">
-                                  {perf.numbers.map(n => (
-                                    <span key={n} className="lottery-ball text-[10px] w-6 h-6">
-                                      {String(n).padStart(2, "0")}
-                                    </span>
-                                  ))}
+                                  {perf.numbers.map(n => {
+                                    const allMatched = new Set(perf.results.flatMap(r => r.matched));
+                                    const isHit = allMatched.has(n);
+                                    return (
+                                      <span key={n} className={`text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-mono font-bold ${
+                                        isHit
+                                          ? "bg-gradient-to-br from-destructive to-destructive/80 text-destructive-foreground shadow-sm shadow-destructive/30"
+                                          : "lottery-ball"
+                                      }`}>
+                                        {String(n).padStart(2, "0")}
+                                      </span>
+                                    );
+                                  })}
                                 </div>
                                 <button
                                   onClick={(e) => { e.stopPropagation(); copyNumbers(perf.numbers); }}
