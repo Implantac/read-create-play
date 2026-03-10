@@ -41,10 +41,11 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
   const [showPerformance, setShowPerformance] = useState(false);
   const [aiImprovements, setAiImprovements] = useState<AIImprovement[]>([]);
   const [loadingAI, setLoadingAI] = useState(false);
+  const [drawRange, setDrawRange] = useState<number>(10);
   const [activeTab, setActiveTab] = useState<"check" | "performance" | "improve">("check");
 
   const { savedBets } = useSavedBets(lotteryId);
-  const last10Draws = useMemo(() => draws.slice(0, 10), [draws]);
+  const selectedDraws = useMemo(() => draws.slice(0, drawRange), [draws, drawRange]);
   const prizeTiers = getPrizeTiers(lotteryId);
   const minPrizeHits = prizeTiers.length > 0 ? prizeTiers[prizeTiers.length - 1].hits : 3;
 
@@ -125,7 +126,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
     }
 
     const perfs: BetPerformance[] = allBets.map(bet => {
-      const betResults = last10Draws.map(draw => {
+      const betResults = selectedDraws.map(draw => {
         const matched = bet.numbers.filter(n => draw.numbers.includes(n));
         return {
           concurso: draw.concurso,
@@ -136,7 +137,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
       });
 
       const totalHits = betResults.reduce((s, r) => s + r.hits, 0);
-      const avgHits = totalHits / last10Draws.length;
+      const avgHits = totalHits / selectedDraws.length;
       const bestHit = Math.max(...betResults.map(r => r.hits));
       const prizeHits = betResults.filter(r => r.hits >= minPrizeHits).length;
 
@@ -144,7 +145,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
       const score = Math.round(
         (avgHits / pick) * 40 +
         (bestHit / pick) * 30 +
-        (prizeHits / 10) * 30
+        (prizeHits / selectedDraws.length) * 30
       );
 
       return {
@@ -162,7 +163,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
     setPerformances(perfs);
     setShowPerformance(true);
     setActiveTab("performance");
-    toast.success(`${perfs.length} apostas conferidas nos últimos 10 sorteios`);
+    toast.success(`${perfs.length} apostas conferidas nos últimos ${drawRange} sorteios`);
   };
 
   // AI improvement suggestions
@@ -188,7 +189,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
     setActiveTab("improve");
 
     try {
-      const last10Data = last10Draws.map(d => ({
+      const last10Data = selectedDraws.slice(0, 10).map(d => ({
         concurso: d.concurso,
         numbers: d.numbers,
         date: d.date,
@@ -376,23 +377,45 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
       {/* Tab: Performance */}
       {activeTab === "performance" && (
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <p className="text-xs text-muted-foreground">
-              Confere todas as apostas salvas nos últimos <strong className="text-foreground">10 sorteios</strong>
+              Confere apostas salvas nos últimos <strong className="text-foreground">{drawRange} sorteios</strong>
             </p>
-            <Button size="sm" onClick={runPerformanceCheck} className="text-xs gap-1.5">
-              <TrendingUp className="w-3 h-3" /> Analisar Performance
-            </Button>
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1">
+                {[10, 50, 100].map(n => (
+                  <button
+                    key={n}
+                    onClick={() => { setDrawRange(n); setPerformances([]); }}
+                    className={`text-[10px] px-2.5 py-1 rounded-md border transition-all ${
+                      drawRange === n
+                        ? "border-primary text-primary bg-primary/10 font-semibold"
+                        : "border-border text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {n} jogos
+                  </button>
+                ))}
+              </div>
+              <Button size="sm" onClick={runPerformanceCheck} className="text-xs gap-1.5">
+                <TrendingUp className="w-3 h-3" /> Analisar
+              </Button>
+            </div>
           </div>
 
-          {last10Draws.length > 0 && (
+          {selectedDraws.length > 0 && selectedDraws.length <= 20 && (
             <div className="flex gap-1 flex-wrap">
-              {last10Draws.map(d => (
+              {selectedDraws.map(d => (
                 <span key={d.concurso} className="text-[9px] px-1.5 py-0.5 rounded bg-secondary/50 border border-border/30 text-muted-foreground font-mono">
                   #{d.concurso}
                 </span>
               ))}
             </div>
+          )}
+          {selectedDraws.length > 20 && (
+            <p className="text-[10px] text-muted-foreground">
+              Concursos #{selectedDraws[selectedDraws.length - 1]?.concurso} a #{selectedDraws[0]?.concurso} ({selectedDraws.length} sorteios)
+            </p>
           )}
 
           {performances.length > 0 && (
