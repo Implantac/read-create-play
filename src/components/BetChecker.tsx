@@ -194,6 +194,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
   const [drawRange, setDrawRange] = useState<number>(10);
   const [activeTab, setActiveTab] = useState<"check" | "performance" | "improve">("check");
   const [expandedPerf, setExpandedPerf] = useState<number | null>(null);
+  const [hasRunPerformance, setHasRunPerformance] = useState(false);
 
   const { savedBets, saveBet } = useSavedBets(lotteryId);
   const selectedDraws = useMemo(() => draws.slice(0, drawRange), [draws, drawRange]);
