@@ -145,7 +145,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
       const score = Math.round(
         (avgHits / pick) * 40 +
         (bestHit / pick) * 30 +
-        (prizeHits / 10) * 30
+        (prizeHits / selectedDraws.length) * 30
       );
 
       return {
