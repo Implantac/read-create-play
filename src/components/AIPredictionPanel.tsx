@@ -90,6 +90,18 @@ export function AIPredictionPanel({ config, stats, onSaveBet }: Props) {
               </p>
             </div>
           </div>
+          {quality && (
+            <div className="flex items-center gap-2">
+              <span className={`text-xs font-bold px-2 py-1 rounded-md ${
+                quality.grade === "S" ? "bg-yellow-500/20 text-yellow-400" :
+                quality.grade === "A" ? "bg-green-500/20 text-green-400" :
+                quality.grade === "B" ? "bg-blue-500/20 text-blue-400" :
+                "bg-muted text-muted-foreground"
+              }`}>
+                {quality.grade} ({quality.avgScore}pts)
+              </span>
+            </div>
+          )}
           {bets.length > 0 && (
             <Button size="sm" variant="outline" onClick={copyAll} className="text-xs border-border/50">
               <Copy className="w-3 h-3 mr-1" /> Copiar todas
