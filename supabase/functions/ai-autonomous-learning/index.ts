@@ -16,7 +16,7 @@ serve(async (req) => {
 
     const supabase = await getSupabaseAdmin();
     const lotteryId = lotteryName?.toLowerCase().replace(/\s+/g, "").replace(/á/g, "a") || "unknown";
-    const cacheInput = { lotteryName, confidenceScore: report.confidenceScore, rankingsCount: report.rankings?.length };
+    const cacheInput = { lotteryName, confidenceScore: report.confidenceScore, rankingsCount: report.rankings?.length, version: "v3-10games" };
     const cached = await getCachedAnalysis(supabase, lotteryId, "ai-autonomous-learning", cacheInput, 6);
     if (cached) {
       return new Response(JSON.stringify({ ...cached, fromCache: true }), {
@@ -196,7 +196,7 @@ REGRAS OBRIGATÓRIAS para todos os jogos:
 Responda em português. Seja extremamente técnico, use dados concretos e justificativas numéricas em cada recomendação.`;
 
     // Try multiple models with failover
-    const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
+    const models = ["google/gemini-3-flash-preview", "google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
     let aiAnalysis = "";
     let aiSuccess = false;
 
