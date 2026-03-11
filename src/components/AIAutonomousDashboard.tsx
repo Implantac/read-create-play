@@ -907,7 +907,16 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                   </div>
                   {/* Extract and highlight games */}
                   {(() => {
-                    const gameMatches = aiAnalysis.match(/\*\*Jogo \d+.*?\*\*[\s\S]*?(?=\*\*Jogo \d+|## \d+|$)/g);
+                    // Multiple regex patterns to catch different AI output formats
+                    let gameMatches = aiAnalysis.match(/\*\*Jogo \d+[\s\S]*?(?=\*\*Jogo \d+|## \d+|##\s|$)/gi);
+                    if (!gameMatches || gameMatches.length < 3) {
+                      // Try alternate format: "Jogo X —" without bold
+                      gameMatches = aiAnalysis.match(/Jogo \d+\s*[—–-][\s\S]*?(?=Jogo \d+\s*[—–-]|## \d+|##\s|$)/gi);
+                    }
+                    if (!gameMatches || gameMatches.length < 3) {
+                      // Try numbered list format "1." or "1)"
+                      gameMatches = aiAnalysis.match(/\d+[.)]\s*(?:Jogo|Aposta)[\s\S]*?(?=\d+[.)]\s*(?:Jogo|Aposta)|## |$)/gi);
+                    }
                     if (!gameMatches || gameMatches.length < 3) return null;
                     return (
                       <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 mt-6">
