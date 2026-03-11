@@ -9,6 +9,9 @@ import {
   generateClosure,
   selectBaseNumbersForClosure,
 } from "@/engine/professional-generator";
+import { GenerationFilters, DEFAULT_FILTERS, betMatchesFilters } from "@/engine/generation-filters";
+import { GeneratorFiltersPanel } from "@/components/GeneratorFiltersPanel";
+import { HistoricalValidationBadge } from "@/components/HistoricalValidationBadge";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Trophy, Sparkles, Target, Layers, Copy, Check, ChevronDown, ChevronUp,
@@ -48,7 +51,7 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
   const [copied, setCopied] = useState<number | null>(null);
   const [expandedBet, setExpandedBet] = useState<number | null>(null);
   const [betsPerStrategy, setBetsPerStrategy] = useState(2);
-
+  const [filters, setFilters] = useState<GenerationFilters>({ ...DEFAULT_FILTERS });
   // Closures
   const [closureResult, setClosureResult] = useState<number[][] | null>(null);
   const [closureGenerating, setClosureGenerating] = useState(false);
@@ -61,9 +64,17 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
 
   const handleGenerate = () => {
     setGenerating(true);
-    // Use setTimeout to avoid blocking UI
     setTimeout(() => {
-      const result = generateProfessionalBets(stats, config, draws, betsPerStrategy);
+      let result = generateProfessionalBets(stats, config, draws, betsPerStrategy);
+      // Apply post-generation filters
+      const hasFilters = filters.fixedNumbers.length > 0 || filters.excludedNumbers.length > 0 ||
+        filters.sumMin !== null || filters.sumMax !== null ||
+        filters.minEven !== null || filters.maxEven !== null ||
+        filters.maxConsecutive !== null || filters.mustIncludeHot > 0 || filters.mustIncludeCold > 0;
+      if (hasFilters) {
+        result = result.filter(b => betMatchesFilters(b.numbers, filters, stats));
+        result.forEach((b, i) => { b.rank = i + 1; });
+      }
       setBets(result);
       setGenerating(false);
       toast.success(`${result.length} apostas profissionais geradas!`);
@@ -164,6 +175,9 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
 
         {/* ═══ GERADOR PROFISSIONAL ═══ */}
         <TabsContent value="generator" className="space-y-4">
+          {/* Filters */}
+          <GeneratorFiltersPanel config={config} draws={draws} stats={stats} filters={filters} onFiltersChange={setFilters} />
+
           <div className="flex items-center gap-3 flex-wrap">
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">Jogos/estratégia:</span>
@@ -280,6 +294,11 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
                       </button>
 
                       {isExpanded ? <ChevronUp className="w-3 h-3 text-muted-foreground" /> : <ChevronDown className="w-3 h-3 text-muted-foreground" />}
+                    </div>
+
+                    {/* Historical Validation */}
+                    <div className="px-3 pb-1">
+                      <HistoricalValidationBadge bet={bet.numbers} draws={draws} config={config} />
                     </div>
 
                     {/* Expanded details */}

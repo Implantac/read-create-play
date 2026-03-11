@@ -147,20 +147,43 @@ const CLOSURE_PRESETS: ClosurePreset[] = [
   { lotteryId: "megasena", name: "Mega 12→4se6", baseNumbers: 12, pick: 6, guarantee: 4, ifHit: 6 },
   { lotteryId: "megasena", name: "Mega 15→4se6", baseNumbers: 15, pick: 6, guarantee: 4, ifHit: 6 },
   { lotteryId: "megasena", name: "Mega 10→5se6", baseNumbers: 10, pick: 6, guarantee: 5, ifHit: 6 },
+  { lotteryId: "megasena", name: "Mega 18→4se6", baseNumbers: 18, pick: 6, guarantee: 4, ifHit: 6 },
 
   // Lotofácil (pick 15 of 25)
   { lotteryId: "lotofacil", name: "LF 18→13se15", baseNumbers: 18, pick: 15, guarantee: 13, ifHit: 15 },
   { lotteryId: "lotofacil", name: "LF 20→12se15", baseNumbers: 20, pick: 15, guarantee: 12, ifHit: 15 },
   { lotteryId: "lotofacil", name: "LF 22→11se15", baseNumbers: 22, pick: 15, guarantee: 11, ifHit: 15 },
+  { lotteryId: "lotofacil", name: "LF 20→13se15", baseNumbers: 20, pick: 15, guarantee: 13, ifHit: 15 },
 
   // Quina (pick 5 of 80)
   { lotteryId: "quina", name: "Quina 8→3se5", baseNumbers: 8, pick: 5, guarantee: 3, ifHit: 5 },
   { lotteryId: "quina", name: "Quina 10→3se5", baseNumbers: 10, pick: 5, guarantee: 3, ifHit: 5 },
   { lotteryId: "quina", name: "Quina 12→4se5", baseNumbers: 12, pick: 5, guarantee: 4, ifHit: 5 },
+  { lotteryId: "quina", name: "Quina 15→3se5", baseNumbers: 15, pick: 5, guarantee: 3, ifHit: 5 },
 
   // Lotomania (pick 50 of 100)
   { lotteryId: "lotomania", name: "LM 55→15se20", baseNumbers: 55, pick: 50, guarantee: 15, ifHit: 20 },
   { lotteryId: "lotomania", name: "LM 60→15se20", baseNumbers: 60, pick: 50, guarantee: 15, ifHit: 20 },
+  { lotteryId: "lotomania", name: "LM 65→15se20", baseNumbers: 65, pick: 50, guarantee: 15, ifHit: 20 },
+
+  // Dupla Sena (pick 6 of 50)
+  { lotteryId: "duplasena", name: "DS 8→4se6", baseNumbers: 8, pick: 6, guarantee: 4, ifHit: 6 },
+  { lotteryId: "duplasena", name: "DS 10→4se6", baseNumbers: 10, pick: 6, guarantee: 4, ifHit: 6 },
+  { lotteryId: "duplasena", name: "DS 12→4se6", baseNumbers: 12, pick: 6, guarantee: 4, ifHit: 6 },
+
+  // Timemania (pick 10 of 80)
+  { lotteryId: "timemania", name: "TM 12→8se10", baseNumbers: 12, pick: 10, guarantee: 8, ifHit: 10 },
+  { lotteryId: "timemania", name: "TM 15→7se10", baseNumbers: 15, pick: 10, guarantee: 7, ifHit: 10 },
+  { lotteryId: "timemania", name: "TM 18→7se10", baseNumbers: 18, pick: 10, guarantee: 7, ifHit: 10 },
+
+  // Dia de Sorte (pick 7 of 31)
+  { lotteryId: "diadesorte", name: "DdS 10→5se7", baseNumbers: 10, pick: 7, guarantee: 5, ifHit: 7 },
+  { lotteryId: "diadesorte", name: "DdS 12→5se7", baseNumbers: 12, pick: 7, guarantee: 5, ifHit: 7 },
+  { lotteryId: "diadesorte", name: "DdS 15→5se7", baseNumbers: 15, pick: 7, guarantee: 5, ifHit: 7 },
+
+  // Super Sete (pick 7 of 10)
+  { lotteryId: "supersete", name: "S7 8→5se7", baseNumbers: 8, pick: 7, guarantee: 5, ifHit: 7 },
+  { lotteryId: "supersete", name: "S7 9→5se7", baseNumbers: 9, pick: 7, guarantee: 5, ifHit: 7 },
 ];
 
 export function getClosurePresetsForLottery(lotteryId: string): ClosurePreset[] {

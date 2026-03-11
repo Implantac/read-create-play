@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { NumberStats } from "@/engine/statistics";
-import { LotteryConfig } from "@/data/lotteries";
+import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { STRATEGIES, Strategy, generateByStrategy } from "@/engine/strategies";
+import { GenerationFilters, DEFAULT_FILTERS, generateWithFilters, betMatchesFilters } from "@/engine/generation-filters";
+import { GeneratorFiltersPanel } from "@/components/GeneratorFiltersPanel";
+import { HistoricalValidationBadge } from "@/components/HistoricalValidationBadge";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, RefreshCw, Copy, Check, Brain, Flame, Snowflake, Shuffle, Hash, Sigma, Ratio, Grid3X3, Clock, BarChart3, TrendingUp, Repeat, Layers, Star } from "lucide-react";
+import { Sparkles, RefreshCw, Copy, Check, Brain, Flame, Snowflake, Shuffle, Hash, Sigma, Ratio, Grid3X3, Clock, BarChart3, TrendingUp, Repeat, Layers, Star, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useLotteryContext } from "@/contexts/LotteryContext";
 
 interface Props {
   stats: NumberStats[];
@@ -33,27 +37,57 @@ const ICON_MAP: Record<Strategy, typeof Sparkles> = {
 const CATEGORY_LABELS = { basic: "Básicas", math: "Matemáticas", ai: "Inteligência Artificial" };
 
 export function EnhancedBetGenerator({ stats, config, onSaveBet }: Props) {
+  const { draws } = useLotteryContext();
   const [strategy, setStrategy] = useState<Strategy>("smart");
   const [bets, setBets] = useState<number[][]>([]);
   const [copied, setCopied] = useState<number | null>(null);
   const [saved, setSaved] = useState<Set<number>>(new Set());
+  const [filters, setFilters] = useState<GenerationFilters>({ ...DEFAULT_FILTERS });
+  const [filterFailures, setFilterFailures] = useState(0);
+
+  const hasActiveFilters = filters.fixedNumbers.length > 0 || filters.excludedNumbers.length > 0 ||
+    filters.sumMin !== null || filters.sumMax !== null ||
+    filters.minEven !== null || filters.maxEven !== null ||
+    filters.maxConsecutive !== null || filters.mustIncludeHot > 0 || filters.mustIncludeCold > 0;
 
   const generate = (count: number) => {
     const newBets: number[][] = [];
     const seen = new Set<string>();
-    const maxAttempts = count * 20;
+    const maxAttempts = count * 50;
     let attempts = 0;
+    let failures = 0;
+
     while (newBets.length < count && attempts < maxAttempts) {
       attempts++;
-      const bet = generateByStrategy(strategy, stats, config);
-      const key = bet.join(",");
+
+      let bet: number[] | null;
+      if (hasActiveFilters) {
+        bet = generateWithFilters(
+          () => generateByStrategy(strategy, stats, config),
+          filters,
+          stats,
+          config,
+          50
+        );
+        if (!bet) { failures++; continue; }
+      } else {
+        bet = generateByStrategy(strategy, stats, config);
+      }
+
+      const key = [...bet].sort((a, b) => a - b).join(",");
       if (!seen.has(key)) {
         seen.add(key);
         newBets.push(bet);
       }
     }
+
     setBets(newBets);
     setSaved(new Set());
+    setFilterFailures(failures);
+
+    if (newBets.length < count && hasActiveFilters) {
+      toast.warning(`Filtros restritivos: ${newBets.length}/${count} jogos gerados. Relaxe os filtros para mais resultados.`);
+    }
   };
 
   const copyBet = (bet: number[], index: number) => {
@@ -101,6 +135,17 @@ export function EnhancedBetGenerator({ stats, config, onSaveBet }: Props) {
         )}
       </div>
 
+      {/* Filters Panel */}
+      <div className="mb-4">
+        <GeneratorFiltersPanel
+          config={config}
+          draws={draws}
+          stats={stats}
+          filters={filters}
+          onFiltersChange={setFilters}
+        />
+      </div>
+
       {/* Strategy selector grouped */}
       <div className="space-y-2 mb-4">
         {grouped.map(group => (
@@ -145,59 +190,78 @@ export function EnhancedBetGenerator({ stats, config, onSaveBet }: Props) {
         ))}
       </div>
 
+      {/* Filter warnings */}
+      {filterFailures > 0 && (
+        <div className="flex items-center gap-2 p-2 mb-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-xs text-yellow-400">
+          <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
+          <span>{filterFailures} tentativas descartadas pelos filtros. Considere relaxar os critérios.</span>
+        </div>
+      )}
+
       {/* Bets list */}
       <AnimatePresence mode="wait">
-        <div className="space-y-2 max-h-80 overflow-y-auto">
+        <div className="space-y-2 max-h-[400px] overflow-y-auto">
           {bets.map((bet, i) => (
             <motion.div
               key={`${i}-${bet.join(",")}`}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="flex items-center gap-2 p-3 rounded-lg bg-secondary/30 border border-border/30 hover:border-border/60 transition-colors group"
+              className="rounded-lg bg-secondary/30 border border-border/30 hover:border-border/60 transition-colors group"
             >
-              <span className="text-xs text-muted-foreground font-mono w-6">#{i + 1}</span>
-              <div className="flex flex-wrap gap-1.5 flex-1">
-                {bet.map(n => {
-                  const stat = stats.find(s => s.number === n);
-                  const ballClass =
-                    stat?.status === "hot"
-                      ? "lottery-ball-hot"
-                      : stat?.status === "cold"
-                      ? "lottery-ball-cold"
-                      : "";
-                  return (
-                    <span key={n} className={`lottery-ball text-xs w-8 h-8 ${ballClass}`}>
-                      {String(n).padStart(2, "0")}
-                    </span>
-                  );
-                })}
-              </div>
-              <div className="flex items-center gap-1">
-                {onSaveBet && (
-                  <button
-                    onClick={() => handleSave(bet, i)}
-                    className={`transition-colors p-1 rounded-md ${
-                      saved.has(i) 
-                        ? "text-yellow-400" 
-                        : "text-muted-foreground hover:text-yellow-400 hover:bg-yellow-400/5 opacity-0 group-hover:opacity-100"
-                    }`}
-                    disabled={saved.has(i)}
-                  >
-                    <Star className={`w-4 h-4 ${saved.has(i) ? "fill-yellow-400" : ""}`} />
-                  </button>
-                )}
-                <button
-                  onClick={() => copyBet(bet, i)}
-                  className="text-muted-foreground hover:text-primary transition-colors p-1 rounded-md hover:bg-primary/5"
-                >
-                  {copied === i ? (
-                    <Check className="w-4 h-4 text-primary" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
+              <div className="flex items-center gap-2 p-3">
+                <span className="text-xs text-muted-foreground font-mono w-6">#{i + 1}</span>
+                <div className="flex flex-wrap gap-1.5 flex-1">
+                  {bet.map(n => {
+                    const stat = stats.find(s => s.number === n);
+                    const isFixed = filters.fixedNumbers.includes(n);
+                    const ballClass =
+                      isFixed
+                        ? "ring-2 ring-primary"
+                        : stat?.status === "hot"
+                        ? "lottery-ball-hot"
+                        : stat?.status === "cold"
+                        ? "lottery-ball-cold"
+                        : "";
+                    return (
+                      <span key={n} className={`lottery-ball text-xs w-8 h-8 ${ballClass}`}>
+                        {String(n).padStart(2, "0")}
+                      </span>
+                    );
+                  })}
+                </div>
+                <div className="flex items-center gap-1">
+                  {onSaveBet && (
+                    <button
+                      onClick={() => handleSave(bet, i)}
+                      className={`transition-colors p-1 rounded-md ${
+                        saved.has(i) 
+                          ? "text-yellow-400" 
+                          : "text-muted-foreground hover:text-yellow-400 hover:bg-yellow-400/5 opacity-0 group-hover:opacity-100"
+                      }`}
+                      disabled={saved.has(i)}
+                    >
+                      <Star className={`w-4 h-4 ${saved.has(i) ? "fill-yellow-400" : ""}`} />
+                    </button>
                   )}
-                </button>
+                  <button
+                    onClick={() => copyBet(bet, i)}
+                    className="text-muted-foreground hover:text-primary transition-colors p-1 rounded-md hover:bg-primary/5"
+                  >
+                    {copied === i ? (
+                      <Check className="w-4 h-4 text-primary" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
               </div>
+              {/* Historical Validation */}
+              {draws.length > 0 && (
+                <div className="px-3 pb-2">
+                  <HistoricalValidationBadge bet={bet} draws={draws} config={config} />
+                </div>
+              )}
             </motion.div>
           ))}
         </div>
