@@ -178,36 +178,68 @@ Forneça uma análise COMPLETA com as seções abaixo. Seja TÉCNICO, use NÚMER
 
 Responda em português. Seja extremamente técnico, use dados concretos e justificativas numéricas em cada recomendação.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
-        messages: [
-          { role: "system", content: "Você é um cientista de dados de elite com PhD em estatística aplicada, teoria da informação e modelagem probabilística. Sua análise combina entropia de Shannon, testes chi-quadrado, cadeias de Markov, análise de coocorrência e detecção de change-points para fundamentar recomendações rigorosas e acionáveis." },
-          { role: "user", content: prompt },
-        ],
-        temperature: 0.3,
-      }),
-    });
+    // Try multiple models with failover
+    const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
+    let aiAnalysis = "";
+    let aiSuccess = false;
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Tente novamente em alguns segundos." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    for (const model of models) {
+      try {
+        const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model,
+            messages: [
+              { role: "system", content: "Você é um cientista de dados de elite com PhD em estatística aplicada, teoria da informação e modelagem probabilística. Sua análise combina entropia de Shannon, testes chi-quadrado, cadeias de Markov, análise de coocorrência e detecção de change-points para fundamentar recomendações rigorosas e acionáveis." },
+              { role: "user", content: prompt },
+            ],
+            temperature: 0.3,
+          }),
         });
+
+        if (response.ok) {
+          const data = await response.json();
+          aiAnalysis = data.choices?.[0]?.message?.content || "";
+          if (aiAnalysis) { aiSuccess = true; break; }
+        } else {
+          const errText = await response.text();
+          console.error(`Model ${model} failed (${response.status}):`, errText);
+          if (response.status === 429) {
+            // Rate limited, wait briefly and try next model
+            await new Promise(r => setTimeout(r, 1000));
+          }
+          // For 402/5xx, try next model
+        }
+      } catch (e) {
+        console.error(`Model ${model} exception:`, e);
       }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Créditos insuficientes. Adicione créditos ao workspace." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-      throw new Error(`AI gateway error: ${response.status}`);
+    }
+
+    // Fallback: generate statistical analysis without AI
+    if (!aiSuccess) {
+      console.log("All AI models failed, generating statistical fallback");
+      const topNums = topRankings.slice(0, 10).map((r: any) => `Nº${String(r.number).padStart(2, '0')} (Score: ${r.compositeScore})`).join(", ");
+      const overdueNums = gaps.filter((g: any) => g.isOverdue).slice(0, 5).map((g: any) => `Nº${String(g.number).padStart(2, '0')} (atraso: ${g.currentGap})`).join(", ");
+      const topPairs = cooccurrences.slice(0, 5).map((c: any) => `${c.pair?.join("-")} (lift: ${c.lift?.toFixed?.(2) || "N/A"})`).join(", ");
+      
+      aiAnalysis = `## Análise Estatística (modo offline)\n\n` +
+        `> ⚠️ IA temporariamente indisponível. Análise gerada com base nos dados estatísticos computados localmente.\n\n` +
+        `## 1. Ranking de Dezenas\n**Top 10:** ${topNums}\n\n` +
+        `**Tier S (score ≥80):** ${tierS.length > 0 ? tierS.join(", ") : "Nenhuma"}\n` +
+        `**Tier A (60-79):** ${tierA.length > 0 ? tierA.join(", ") : "Nenhuma"}\n\n` +
+        `## 2. Dezenas Atrasadas\n${overdueNums || "Nenhuma dezena significativamente atrasada"}\n\n` +
+        `## 3. Coocorrências Fortes\n${topPairs || "Dados insuficientes"}\n\n` +
+        `## 4. Entropia\nNormalizada: ${entropy.normalizedEntropy?.toFixed?.(4) || "N/A"} | ` +
+        `Classificação: ${entropy.classification || "N/A"}\n\n` +
+        `## 5. Teste Chi-Quadrado\nχ²: ${chiSquare.chiSquare?.toFixed?.(2) || "N/A"} | ` +
+        `p-valor: ${chiSquare.pValue?.toFixed?.(4) || "N/A"} | ` +
+        `${chiSquare.isUniform ? "Distribuição uniforme" : "Viés detectado"}\n\n` +
+        `## 6. Confiança\nScore geral: ${report.confidenceScore || "N/A"}/100\n\n` +
+        `*Para análise completa com IA, tente novamente mais tarde.*`;
     }
 
     const data = await response.json();
