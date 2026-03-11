@@ -894,25 +894,80 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                 Análise da IA Autônoma
               </CardTitle>
               <CardDescription>
-                Análise profunda com Entropia, χ², Markov, Trios, Coocorrência e Gaps
+                Análise profunda com Entropia, χ², Markov, Trios, Coocorrência, Gaps + 10 Jogos Otimizados
               </CardDescription>
             </CardHeader>
             <CardContent>
               {aiAnalysis ? (
-                <div className="prose prose-sm dark:prose-invert max-w-none">
-                  <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
-                    {aiAnalysis}
+                <div className="space-y-4">
+                  <div className="prose prose-sm dark:prose-invert max-w-none">
+                    <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                      {aiAnalysis}
+                    </div>
                   </div>
+                  {/* Extract and highlight games */}
+                  {(() => {
+                    const gameMatches = aiAnalysis.match(/\*\*Jogo \d+.*?\*\*[\s\S]*?(?=\*\*Jogo \d+|## \d+|$)/g);
+                    if (!gameMatches || gameMatches.length < 3) return null;
+                    return (
+                      <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 mt-6">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-base flex items-center gap-2">
+                            <Target className="h-5 w-5 text-primary" />
+                            🎯 10 Jogos Otimizados — Resumo Visual
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid md:grid-cols-2 gap-3">
+                            {gameMatches.slice(0, 10).map((game, idx) => {
+                              const numbersMatch = game.match(/Dezenas?:\s*([\d,\s]+)/i);
+                              const confMatch = game.match(/Confiança:\s*(\d+)/i);
+                              const stratMatch = game.match(/Jogo \d+\s*[—–-]\s*([^(]+)/);
+                              const numbers = numbersMatch
+                                ? numbersMatch[1].split(/[,\s]+/).filter(Boolean).map(n => parseInt(n.trim()))
+                                : [];
+                              const confidence = confMatch ? parseInt(confMatch[1]) : 0;
+                              const strategy = stratMatch ? stratMatch[1].trim() : "";
+                              const borderColor = idx < 3 ? "border-green-500/30" : idx < 6 ? "border-primary/30" : idx < 8 ? "border-orange-500/30" : "border-purple-500/30";
+                              const badgeVariant = idx < 3 ? "default" : idx < 6 ? "secondary" : "outline";
+                              return (
+                                <Card key={idx} className={`${borderColor} border`}>
+                                  <CardContent className="pt-3 pb-3 px-4">
+                                    <div className="flex items-center justify-between mb-2">
+                                      <span className="font-semibold text-sm">Jogo {idx + 1}</span>
+                                      <div className="flex items-center gap-2">
+                                        {strategy && <Badge variant={badgeVariant} className="text-[10px]">{strategy}</Badge>}
+                                        {confidence > 0 && (
+                                          <Badge variant="outline" className="text-[10px] font-mono">{confidence}/100</Badge>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {numbers.filter(n => !isNaN(n) && n > 0).map(n => (
+                                        <span key={n} className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/15 text-primary font-bold text-xs border border-primary/30">
+                                          {String(n).padStart(2, "0")}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              );
+                            })}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })()}
                 </div>
               ) : (
                 <div className="text-center py-8">
                   <Brain className="mx-auto h-12 w-12 text-muted-foreground/30 mb-4" />
                   <p className="text-muted-foreground mb-4">
-                    Clique abaixo para a IA analisar todos os dados — Entropia, χ², Markov, Trios, Gaps e Estratégias.
+                    Clique abaixo para a IA analisar todos os dados e gerar 10 jogos otimizados para o prêmio principal.
                   </p>
                   <Button onClick={runAIAnalysis} disabled={aiLoading} className="gap-2">
                     {aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                    Executar Análise IA Profunda
+                    Executar Análise IA + 10 Jogos
                   </Button>
                 </div>
               )}
