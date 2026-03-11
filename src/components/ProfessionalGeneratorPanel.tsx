@@ -296,6 +296,11 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
                       {isExpanded ? <ChevronUp className="w-3 h-3 text-muted-foreground" /> : <ChevronDown className="w-3 h-3 text-muted-foreground" />}
                     </div>
 
+                    {/* Historical Validation */}
+                    <div className="px-3 pb-1">
+                      <HistoricalValidationBadge bet={bet.numbers} draws={draws} config={config} />
+                    </div>
+
                     {/* Expanded details */}
                     <AnimatePresence>
                       {isExpanded && (
