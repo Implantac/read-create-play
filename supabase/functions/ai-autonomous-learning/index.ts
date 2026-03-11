@@ -242,9 +242,6 @@ Responda em português. Seja extremamente técnico, use dados concretos e justif
         `*Para análise completa com IA, tente novamente mais tarde.*`;
     }
 
-    const data = await response.json();
-    const aiAnalysis = data.choices?.[0]?.message?.content || "Análise não disponível.";
-
     const responseData = { analysis: aiAnalysis };
     await setCachedAnalysis(supabase, lotteryId, "ai-autonomous-learning", cacheInput, responseData, 6);
 
