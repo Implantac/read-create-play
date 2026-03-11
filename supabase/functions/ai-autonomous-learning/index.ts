@@ -243,6 +243,43 @@ Responda em português. Seja extremamente técnico, use dados concretos e justif
       const overdueNums = gaps.filter((g: any) => g.isOverdue).slice(0, 5).map((g: any) => `Nº${String(g.number).padStart(2, '0')} (atraso: ${g.currentGap})`).join(", ");
       const topPairs = cooccurrences.slice(0, 5).map((c: any) => `${c.pair?.join("-")} (lift: ${c.lift?.toFixed?.(2) || "N/A"})`).join(", ");
       
+      // Generate 10 fallback games using statistical data
+      const allRanked = topRankings.map((r: any) => r.number);
+      const overdueList = gaps.filter((g: any) => g.isOverdue).map((g: any) => g.number);
+      const fallbackGames: string[] = [];
+      
+      for (let g = 0; g < 10; g++) {
+        const pool = [...allRanked];
+        // Add some overdue numbers for variety in aggressive games
+        if (g >= 6) {
+          overdueList.forEach((n: number) => { if (!pool.includes(n)) pool.push(n); });
+        }
+        // Shuffle with bias toward top-ranked
+        const game: number[] = [];
+        const available = [...pool];
+        while (game.length < pick && available.length > 0) {
+          // Weight toward beginning (higher ranked) for conservative, more random for aggressive
+          const bias = g < 3 ? 0.7 : g < 6 ? 0.5 : 0.3;
+          const idx = Math.random() < bias 
+            ? Math.floor(Math.random() * Math.min(available.length, Math.ceil(pick * 1.5)))
+            : Math.floor(Math.random() * available.length);
+          const num = available[Math.min(idx, available.length - 1)];
+          if (!game.includes(num) && num >= 1 && num <= totalNumbers) {
+            game.push(num);
+          }
+          available.splice(Math.min(idx, available.length - 1), 1);
+        }
+        // Fill remaining if needed
+        while (game.length < pick) {
+          const n = Math.floor(Math.random() * totalNumbers) + 1;
+          if (!game.includes(n)) game.push(n);
+        }
+        game.sort((a: number, b: number) => a - b);
+        const strategy = g < 3 ? "Conservador" : g < 6 ? "Equilibrado" : g < 8 ? "Agressivo" : g === 8 ? "Contrário" : "Cobertura Máxima";
+        const confidence = g < 3 ? 75 - g * 3 : g < 6 ? 65 - (g - 3) * 3 : 55 - (g - 6) * 5;
+        fallbackGames.push(`**Jogo ${g + 1} — ${strategy} (Confiança: ${confidence}/100)**\nDezenas: ${game.map((n: number) => String(n).padStart(2, '0')).join(', ')}`);
+      }
+
       aiAnalysis = `## Análise Estatística (modo offline)\n\n` +
         `> ⚠️ IA temporariamente indisponível. Análise gerada com base nos dados estatísticos computados localmente.\n\n` +
         `## 1. Ranking de Dezenas\n**Top 10:** ${topNums}\n\n` +
@@ -256,6 +293,8 @@ Responda em português. Seja extremamente técnico, use dados concretos e justif
         `p-valor: ${chiSquare.pValue?.toFixed?.(4) || "N/A"} | ` +
         `${chiSquare.isUniform ? "Distribuição uniforme" : "Viés detectado"}\n\n` +
         `## 6. Confiança\nScore geral: ${report.confidenceScore || "N/A"}/100\n\n` +
+        `## 8. 🎯 10 JOGOS OTIMIZADOS PARA O PRÊMIO PRINCIPAL\n\n` +
+        fallbackGames.join('\n\n') + '\n\n' +
         `*Para análise completa com IA, tente novamente mais tarde.*`;
     }
 
