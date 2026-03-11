@@ -51,7 +51,7 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
   const [copied, setCopied] = useState<number | null>(null);
   const [expandedBet, setExpandedBet] = useState<number | null>(null);
   const [betsPerStrategy, setBetsPerStrategy] = useState(2);
-
+  const [filters, setFilters] = useState<GenerationFilters>({ ...DEFAULT_FILTERS });
   // Closures
   const [closureResult, setClosureResult] = useState<number[][] | null>(null);
   const [closureGenerating, setClosureGenerating] = useState(false);
