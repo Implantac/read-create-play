@@ -929,9 +929,9 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                         <CardContent>
                           <div className="grid md:grid-cols-2 gap-3">
                             {gameMatches.slice(0, 10).map((game, idx) => {
-                              const numbersMatch = game.match(/Dezenas?:\s*([\d,\s]+)/i);
-                              const confMatch = game.match(/Confiança:\s*(\d+)/i);
-                              const stratMatch = game.match(/Jogo \d+\s*[—–-]\s*([^(]+)/);
+                              const numbersMatch = game.match(/Dezenas?:\s*([\d,\s]+)/i) || game.match(/:\s*((?:\d{2}[,\s]+){2,}\d{2})/);
+                              const confMatch = game.match(/Confiança:\s*(\d+)/i) || game.match(/(\d+)\s*\/\s*100/);
+                              const stratMatch = game.match(/Jogo \d+\s*[—–-]\s*([^(\n]+)/) || game.match(/(?:Estratégia|Tipo):\s*([^\n(]+)/i);
                               const numbers = numbersMatch
                                 ? numbersMatch[1].split(/[,\s]+/).filter(Boolean).map(n => parseInt(n.trim()))
                                 : [];
