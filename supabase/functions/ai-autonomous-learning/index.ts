@@ -166,10 +166,27 @@ Forneça uma análise COMPLETA com as seções abaixo. Seja TÉCNICO, use NÚMER
 - Ajustes baseados em entropia e chi-quadrado
 - Configuração ideal de paridade, soma e distribuição
 
-## 8. JOGOS SUGERIDOS
-- 3 apostas de ${pick} dezenas cada, com justificativa técnica detalhada
-- Score de confiança 0-100 para cada
-- Uma conservadora (baseada em frequência), uma equilibrada (multi-critério), uma agressiva (Markov + gaps + trios)
+## 8. 🎯 10 JOGOS OTIMIZADOS PARA O PRÊMIO PRINCIPAL
+Gere EXATAMENTE 10 apostas de ${pick} dezenas cada, otimizadas para maximizar a chance de acerto do prêmio principal.
+
+Para CADA jogo, forneça no formato:
+**Jogo X — [Estratégia] (Confiança: XX/100)**
+Dezenas: XX, XX, XX, ... (ordenadas)
+Justificativa: [breve explicação técnica de 1-2 linhas]
+
+Distribuição das 10 apostas:
+- Jogos 1-3: CONSERVADORES (baseados em frequência alta + dezenas Tier S/A + paridade ideal)
+- Jogos 4-6: EQUILIBRADOS (multi-critério: frequência + Markov + coocorrência + entropia)
+- Jogos 7-8: AGRESSIVOS (Markov + gaps overdue + trios recorrentes + momentum positivo)
+- Jogo 9: CONTRÁRIO (dezenas em aceleração recente + change-points favoráveis)
+- Jogo 10: MÁXIMA COBERTURA (maximizar cobertura de pares/trios fortes + distribuição espacial ótima)
+
+REGRAS OBRIGATÓRIAS para todos os jogos:
+- Respeitar faixa de soma histórica (média ± 1.5σ)
+- Respeitar equilíbrio de paridade do perfil estatístico
+- Máximo de consecutivos conforme padrão histórico
+- Cada jogo deve ter pelo menos 2-3 dezenas DIFERENTES dos outros jogos
+- Incluir pelo menos 1 dezena de cada zona/faixa nos jogos equilibrados
 
 ## 9. ALERTAS, ANOMALIAS E RED FLAGS
 - Anomalias de entropia detectadas
