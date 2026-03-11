@@ -409,13 +409,21 @@ Responda APENAS com JSON:
         // Fallback: return statistical bets without AI improvement
         console.log("Falling back to statistical-only bets due to AI error");
         const fallbackBets = bets_to_improve.map((b: any) => b.numbers || b);
-        const qualityResult = evaluateQuality(fallbackBets, profile, frequency);
+        // Compute basic quality scores using scoreBet
+        const avgSum = draws.slice(0, 100).reduce((s: number, d: any) => s + (d.numbers || []).reduce((a: number, b: number) => a + b, 0), 0) / Math.min(draws.length, 100);
+        const sumStdDev = Math.sqrt(draws.slice(0, 100).reduce((s: number, d: any) => {
+          const dSum = (d.numbers || []).reduce((a: number, b: number) => a + b, 0);
+          return s + (dSum - avgSum) ** 2;
+        }, 0) / Math.min(draws.length, 100));
+        const scores = fallbackBets.map((b: number[]) => scoreBet(b, profile, avgSum, sumStdDev, last10[0]?.numbers));
+        const avgScore = Math.round(scores.reduce((s: number, q: any) => s + q.score, 0) / scores.length);
+        const grade = avgScore >= 90 ? "S" : avgScore >= 80 ? "A" : avgScore >= 70 ? "B" : "C";
         return new Response(JSON.stringify({
           success: true,
           bets: fallbackBets,
           count: fallbackBets.length,
-          analysis: "Apostas geradas com base estatística (IA temporariamente indisponível - créditos insuficientes).",
-          quality: qualityResult,
+          analysis: "Apostas mantidas com base estatística (IA temporariamente indisponível).",
+          quality: { avgScore, scores: scores.map((s: any) => s.score), details: scores.map((s: any) => s.details), grade },
         }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
 
