@@ -175,6 +175,9 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
 
         {/* ═══ GERADOR PROFISSIONAL ═══ */}
         <TabsContent value="generator" className="space-y-4">
+          {/* Filters */}
+          <GeneratorFiltersPanel config={config} draws={draws} stats={stats} filters={filters} onFiltersChange={setFilters} />
+
           <div className="flex items-center gap-3 flex-wrap">
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">Jogos/estratégia:</span>
