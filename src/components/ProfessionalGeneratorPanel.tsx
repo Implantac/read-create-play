@@ -64,9 +64,17 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
 
   const handleGenerate = () => {
     setGenerating(true);
-    // Use setTimeout to avoid blocking UI
     setTimeout(() => {
-      const result = generateProfessionalBets(stats, config, draws, betsPerStrategy);
+      let result = generateProfessionalBets(stats, config, draws, betsPerStrategy);
+      // Apply post-generation filters
+      const hasFilters = filters.fixedNumbers.length > 0 || filters.excludedNumbers.length > 0 ||
+        filters.sumMin !== null || filters.sumMax !== null ||
+        filters.minEven !== null || filters.maxEven !== null ||
+        filters.maxConsecutive !== null || filters.mustIncludeHot > 0 || filters.mustIncludeCold > 0;
+      if (hasFilters) {
+        result = result.filter(b => betMatchesFilters(b.numbers, filters, stats));
+        result.forEach((b, i) => { b.rank = i + 1; });
+      }
       setBets(result);
       setGenerating(false);
       toast.success(`${result.length} apostas profissionais geradas!`);
