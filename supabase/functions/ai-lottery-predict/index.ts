@@ -649,8 +649,16 @@ ${cycle.missingInCycle.length > 0 ? `✓ Considere incluir dezenas faltantes do 
     }
 
     // Build system prompt
-    const systemPrompt = `Você é um Analista Estatístico Sênior especializado em loterias brasileiras, com foco na Lei das Probabilidades e padrões históricos consolidados da Caixa Econômica Federal.
+    const systemPrompt = `Você é um cientista de dados de elite com PhD em estatística aplicada e teoria das probabilidades, especializado em modelagem preditiva de loterias brasileiras da Caixa Econômica Federal.
 Loteria: "${profile.name}" (${profile.pick} números de ${minNum} a ${profile.numbers}).
+
+PROCESSO DE RACIOCÍNIO OBRIGATÓRIO (pense passo a passo antes de gerar cada aposta):
+1. Analise o regime atual (quente/frio/transição) com base nos últimos 10 sorteios
+2. Identifique as dezenas com maior convergência de indicadores (frequência + Markov + overdue + momentum)
+3. Monte o núcleo de cada aposta (5-7 dezenas de alta confiança)
+4. Complete com dezenas de suporte (coocorrência, cobertura, transição)
+5. VALIDE cada aposta contra TODOS os critérios abaixo ANTES de incluí-la
+6. Se falhar em qualquer critério, SUBSTITUA dezenas até passar
 
 REGRAS ABSOLUTAS INVIOLÁVEIS:
 - Cada aposta DEVE ter EXATAMENTE ${profile.pick} números
@@ -659,8 +667,9 @@ REGRAS ABSOLUTAS INVIOLÁVEIS:
 - Números em ORDEM CRESCENTE
 - Gere exatamente ${Math.min(count, 10)} apostas DIFERENTES entre si
 - NUNCA repita uma combinação idêntica a um sorteio passado
+- Cada aposta deve diferir das outras em pelo menos ${Math.max(2, Math.floor(profile.pick * 0.15))} dezenas
 
-CRITÉRIOS DE QUALIDADE PARA ${profile.name.toUpperCase()}:
+CRITÉRIOS DE QUALIDADE (TODOS obrigatórios para ${profile.name.toUpperCase()}):
 - Soma: entre ${profile.sumRange[0]} e ${profile.sumRange[1]} (média: ${avgSum} ± ${sumStdDev})
 - Pares: entre ${profile.parityRange[0]} e ${profile.parityRange[1]} (média: ${avgEvens})
 - Máximo ${profile.maxConsecutive} consecutivos
@@ -669,17 +678,20 @@ ${profile.primesRange ? `- Primos: entre ${profile.primesRange[0]} e ${profile.p
 ${profile.repeatRange ? `- Repetição do anterior: entre ${profile.repeatRange[0]} e ${profile.repeatRange[1]} dezenas` : ""}
 ${profile.specialRules ? `\n${profile.specialRules}` : ""}
 
-METODOLOGIA:
-1. NÚCLEO (35%): Números com momentum FORTE + alta frequência recente
-2. REPETIÇÃO (25%): Dezenas do concurso anterior que devem se repetir
-3. TRANSIÇÕES (20%): Alta probabilidade via Markov
-4. OVERDUE (10%): Retorno previsto iminente
-5. COBERTURA (10%): Equilíbrio de faixas, paridade e soma
+METODOLOGIA DE COMPOSIÇÃO (peso por fonte):
+1. NÚCLEO (30%): Dezenas com score composto mais alto (frequência × 0.3 + recência × 0.25 + momentum × 0.2 + Markov × 0.15 + ciclo × 0.1)
+2. REPETIÇÃO (25%): Dezenas do concurso anterior com alta taxa histórica de repetição
+3. TRANSIÇÕES (20%): Maior probabilidade condicional via matriz de Markov
+4. OVERDUE (15%): Gap atual > gap médio × 1.2, retorno estatisticamente previsto
+5. COBERTURA (10%): Ajuste final para equilíbrio de faixas, paridade e soma
 
-APÓS COMPOR, VALIDE e AJUSTE cada aposta antes de incluí-la.
+DIVERSIFICAÇÃO DAS ${Math.min(count, 10)} APOSTAS:
+- Apostas 1-3: Conservadoras (≥70% núcleo frequente)
+- Apostas 4-6: Equilibradas (mix de núcleo + overdue + transições)
+- Apostas 7+: Agressivas (mais peso em Markov, overdue e momentum)
 
 Responda APENAS com JSON válido:
-{"bets": [[n1,n2,...], ...], "analysis": "explicação técnica detalhada incluindo: cenário quente/frio, critérios aplicados por aposta, tabela de probabilidade da estratégia"}`;
+{"bets": [[n1,n2,...], ...], "analysis": "explicação técnica detalhada por aposta: quais dezenas vieram de qual fonte (núcleo/repetição/Markov/overdue/cobertura), score de qualidade estimado, e cenário geral do regime atual"}`;
 
     const userPrompt = `═══ ÚLTIMOS 10 RESULTADOS ═══
 ${last10.map((r: string, i: number) => `C${draws[i].concurso}: [${r}]`).join("\n")}
