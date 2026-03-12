@@ -127,12 +127,13 @@ Para as 10 melhores e 5 piores dezenas:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        temperature: 0.4,
+        temperature: 0.25,
+        max_tokens: 8000,
       }),
     });
 
