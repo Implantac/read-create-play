@@ -1,16 +1,25 @@
+import { lazy, Suspense } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
-import { MLPanel } from "@/components/MLPanel";
-import { AdvancedAnalyticsPanel } from "@/components/AdvancedAnalyticsPanel";
-import { ConditionalProbabilityPanel } from "@/components/ConditionalProbabilityPanel";
-import { HPEnginePanel } from "@/components/HPEnginePanel";
-import { OptimizationPanel } from "@/components/OptimizationPanel";
-import { PatternDetectorPanel } from "@/components/PatternDetectorPanel";
-import { StrategyComparatorPanel } from "@/components/StrategyComparatorPanel";
 import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
-import { Brain } from "lucide-react";
+import { Brain, Loader2 } from "lucide-react";
+
+const StrategyComparatorPanel = lazy(() => import("@/components/StrategyComparatorPanel").then(m => ({ default: m.StrategyComparatorPanel })));
+const PatternDetectorPanel = lazy(() => import("@/components/PatternDetectorPanel").then(m => ({ default: m.PatternDetectorPanel })));
+const OptimizationPanel = lazy(() => import("@/components/OptimizationPanel").then(m => ({ default: m.OptimizationPanel })));
+const MLPanel = lazy(() => import("@/components/MLPanel").then(m => ({ default: m.MLPanel })));
+const AdvancedAnalyticsPanel = lazy(() => import("@/components/AdvancedAnalyticsPanel").then(m => ({ default: m.AdvancedAnalyticsPanel })));
+const ConditionalProbabilityPanel = lazy(() => import("@/components/ConditionalProbabilityPanel").then(m => ({ default: m.ConditionalProbabilityPanel })));
+const HPEnginePanel = lazy(() => import("@/components/HPEnginePanel").then(m => ({ default: m.HPEnginePanel })));
+
+const LazyFallback = () => (
+  <div className="flex items-center justify-center py-8 text-muted-foreground">
+    <Loader2 className="h-5 w-5 animate-spin mr-2" />
+    <span className="text-sm">Carregando módulo...</span>
+  </div>
+);
 
 const EstrategiasPage = () => {
   const { config, draws, stats } = useLotteryContext();
@@ -29,24 +38,36 @@ const EstrategiasPage = () => {
         <EmptyState description="Importe os sorteios primeiro no Dashboard para usar as estratégias." />
       ) : (
         <>
-          {/* Comparativo de Estratégias com Radar */}
-          <StrategyComparatorPanel stats={stats} config={config} draws={draws} />
+          <Suspense fallback={<LazyFallback />}>
+            <StrategyComparatorPanel stats={stats} config={config} draws={draws} />
+          </Suspense>
 
-          {/* Detector de Padrões com IA */}
-          <PatternDetectorPanel config={config} draws={draws} stats={stats} />
+          <Suspense fallback={<LazyFallback />}>
+            <PatternDetectorPanel config={config} draws={draws} stats={stats} />
+          </Suspense>
 
           <PlanGate feature="otimizacao" fallbackMessage="Otimização com Algoritmo Genético + SA">
-            <OptimizationPanel stats={stats} config={config} draws={draws} />
+            <Suspense fallback={<LazyFallback />}>
+              <OptimizationPanel stats={stats} config={config} draws={draws} />
+            </Suspense>
           </PlanGate>
           <PlanGate feature="estrategias_ml" fallbackMessage="Machine Learning Preditivo">
-            <MLPanel stats={stats} config={config} draws={draws} />
+            <Suspense fallback={<LazyFallback />}>
+              <MLPanel stats={stats} config={config} draws={draws} />
+            </Suspense>
           </PlanGate>
           <PlanGate feature="estrategias_analytics" fallbackMessage="Analytics Avançado">
-            <AdvancedAnalyticsPanel stats={stats} draws={draws} config={config} />
+            <Suspense fallback={<LazyFallback />}>
+              <AdvancedAnalyticsPanel stats={stats} draws={draws} config={config} />
+            </Suspense>
           </PlanGate>
-          <ConditionalProbabilityPanel draws={draws} config={config} />
+          <Suspense fallback={<LazyFallback />}>
+            <ConditionalProbabilityPanel draws={draws} config={config} />
+          </Suspense>
           <PlanGate feature="estrategias_hp" fallbackMessage="Motor HP Matemático">
-            <HPEnginePanel stats={stats} config={config} draws={draws} />
+            <Suspense fallback={<LazyFallback />}>
+              <HPEnginePanel stats={stats} config={config} draws={draws} />
+            </Suspense>
           </PlanGate>
         </>
       )}
