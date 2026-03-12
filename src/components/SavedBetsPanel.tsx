@@ -3,6 +3,7 @@ import { useLotteryContext } from "@/contexts/LotteryContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bookmark, Trash2, Copy, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ShareBetButton } from "@/components/ShareBetButton";
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -100,6 +101,7 @@ export function SavedBetsPanel() {
               </div>
 
               <div className="flex items-center gap-1 shrink-0">
+                <ShareBetButton numbers={bet.numbers} config={config} strategy={bet.strategy} grade={bet.grade} compact />
                 <button
                   onClick={() => copyBet(bet.numbers, bet.id)}
                   className="text-muted-foreground hover:text-primary transition-colors p-1 rounded-md hover:bg-primary/5"
