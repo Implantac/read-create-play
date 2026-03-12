@@ -104,6 +104,7 @@ export function SavedBetsPanel() {
               </div>
 
               <div className="flex items-center gap-1 shrink-0">
+                <ShareBetButton numbers={bet.numbers} config={config} strategy={bet.strategy} grade={bet.grade} compact />
                 <button
                   onClick={() => copyBet(bet.numbers, bet.id)}
                   className="text-muted-foreground hover:text-primary transition-colors p-1 rounded-md hover:bg-primary/5"
