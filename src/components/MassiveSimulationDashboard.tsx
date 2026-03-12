@@ -88,21 +88,53 @@ export function MassiveSimulationDashboard({ stats, config, draws }: Props) {
     setAiAnalysis(null);
     setProgress(null);
 
-    try {
-      const res = await runMassiveSimAsync({
-        config, draws, stats, totalGames, mode,
+    // Terminate previous worker if still alive
+    workerRef.current?.terminate();
+
+    const worker = new MassiveSimWorker();
+    workerRef.current = worker;
+
+    worker.onmessage = (e: MessageEvent) => {
+      const { type, data } = e.data;
+      if (type === "progress") {
+        setProgress(data as MassiveSimProgress);
+      } else if (type === "result") {
+        setResult(data as MassiveSimResult);
+        setRunning(false);
+        toast.success(`${data.totalGenerated.toLocaleString()} jogos simulados em ${(data.elapsedMs / 1000).toFixed(1)}s`);
+        worker.terminate();
+        workerRef.current = null;
+      }
+    };
+
+    worker.onerror = (err) => {
+      console.error("Worker error:", err);
+      toast.error("Erro na simulação (worker)");
+      setRunning(false);
+      worker.terminate();
+      workerRef.current = null;
+    };
+
+    // Prepare serializable stats
+    const serializableStats = stats.map(s => ({
+      percentage: s.percentage, recentFreq: s.recentFreq, cycleScore: s.cycleScore,
+      trend: s.trend, momentum: s.momentum, lastSeen: s.lastSeen,
+    }));
+
+    worker.postMessage({
+      type: "run_massive_sim",
+      job: {
+        config, draws, stats: serializableStats, totalGames, mode,
         batchSize: Math.min(10_000, totalGames),
         topN: 50,
-      }, handleProgress);
-
-      setResult(res);
-      toast.success(`${res.totalGenerated.toLocaleString()} jogos simulados em ${(res.elapsedMs / 1000).toFixed(1)}s`);
-    } catch (e) {
-      toast.error("Erro na simulação: " + (e instanceof Error ? e.message : "Erro"));
-    } finally {
-      setRunning(false);
-    }
+      },
+    });
   };
+
+  // Cleanup worker on unmount
+  useEffect(() => {
+    return () => { workerRef.current?.terminate(); };
+  }, []);
 
   const requestAIAnalysis = async () => {
     if (!result) return;
