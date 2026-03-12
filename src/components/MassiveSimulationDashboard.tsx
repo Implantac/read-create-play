@@ -61,6 +61,7 @@ export function MassiveSimulationDashboard({ stats, config, draws }: Props) {
   const [result, setResult] = useState<MassiveSimResult | null>(null);
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const workerRef = useRef<Worker | null>(null);
 
   // Reset state when lottery changes
   const prevLotteryId = useRef(config.id);
