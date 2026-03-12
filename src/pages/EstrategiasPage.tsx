@@ -5,6 +5,7 @@ import { ConditionalProbabilityPanel } from "@/components/ConditionalProbability
 import { HPEnginePanel } from "@/components/HPEnginePanel";
 import { OptimizationPanel } from "@/components/OptimizationPanel";
 import { PatternDetectorPanel } from "@/components/PatternDetectorPanel";
+import { StrategyComparatorPanel } from "@/components/StrategyComparatorPanel";
 import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
@@ -28,6 +29,9 @@ const EstrategiasPage = () => {
         <EmptyState description="Importe os sorteios primeiro no Dashboard para usar as estratégias." />
       ) : (
         <>
+          {/* Comparativo de Estratégias com Radar */}
+          <StrategyComparatorPanel stats={stats} config={config} draws={draws} />
+
           {/* Detector de Padrões com IA */}
           <PatternDetectorPanel config={config} draws={draws} stats={stats} />
 
