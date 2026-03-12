@@ -931,7 +931,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                             if (confM) confidence = parseInt(confM[1]);
                             const dezM = bl.match(/Dezenas?:\s*([\d,\s]+)/i);
                             if (dezM) {
-                              numbers = dezM[1].split(/[,\s]+/).map(n => parseInt(n.trim())).filter(n => !isNaN(n) && n > 0 && n <= 80);
+                              numbers = dezM[1].split(/[,\s]+/).map(n => parseInt(n.trim())).filter(n => !isNaN(n) && n > 0 && n <= 100);
                             }
                           }
                           if (numbers.length >= 5) games.push({ numbers, confidence, strategy });
@@ -957,13 +957,13 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                         for (let j = i; j < Math.min(i + 6, lines.length); j++) {
                           const dezMatch = lines[j].match(/Dezenas?:\s*([\d,\s]+)/i);
                           if (dezMatch) {
-                            numbers = dezMatch[1].split(/[,\s]+/).map(n => parseInt(n.trim())).filter(n => !isNaN(n) && n > 0 && n <= 80);
+                            numbers = dezMatch[1].split(/[,\s]+/).map(n => parseInt(n.trim())).filter(n => !isNaN(n) && n > 0 && n <= 100);
                             break;
                           }
                           if (j > i) {
-                            const numsInLine = lines[j].match(/\b(\d{1,2})\b/g);
+                            const numsInLine = lines[j].match(/\b(\d{1,3})\b/g);
                             if (numsInLine && numsInLine.length >= 5) {
-                              numbers = numsInLine.map(n => parseInt(n)).filter(n => n > 0 && n <= 80);
+                              numbers = numsInLine.map(n => parseInt(n)).filter(n => n > 0 && n <= 100);
                               if (numbers.length >= 5) break;
                               numbers = [];
                             }
