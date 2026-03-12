@@ -106,7 +106,7 @@ export function MassiveSimulatorPanel({ stats, config, draws }: Props) {
         stats: stats.map(s => ({
           number: s.number, frequency: s.frequency, percentage: s.percentage,
           lastSeen: s.lastSeen, trend: s.trend, status: s.status,
-          recentFreq: s.recentFreq, stdDevIntervals: s.stdDevIntervals,
+          recentFreq: s.recentFreq, stdDevIntervals: s.stdDev,
           momentum: s.momentum, cycleScore: s.cycleScore,
         })),
         config,
