@@ -47,6 +47,9 @@ const GeradorPage = () => {
             <SavedBetsPanel />
           </div>
 
+          {/* Robustness Radar for saved bets */}
+          <RobustnessRadarPanel stats={stats} config={config} draws={draws} lotteryId={selectedLottery} />
+
           <AIPredictionPanel config={config} stats={stats} onSaveBet={handleSaveBet} />
 
           {/* Gerador Inteligente */}

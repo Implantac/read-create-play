@@ -29,6 +29,9 @@ const EstrategiasPage = () => {
         <EmptyState description="Importe os sorteios primeiro no Dashboard para usar as estratégias." />
       ) : (
         <>
+          {/* Comparativo de Estratégias com Radar */}
+          <StrategyComparatorPanel stats={stats} config={config} draws={draws} />
+
           {/* Detector de Padrões com IA */}
           <PatternDetectorPanel config={config} draws={draws} stats={stats} />
 
