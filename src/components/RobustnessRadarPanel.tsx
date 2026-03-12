@@ -6,9 +6,10 @@ import { NumberStats } from "@/engine/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { computeRobustness, RobustnessResult } from "@/engine/robustness-score";
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from "recharts";
-import { Shield, RefreshCw, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Shield, RefreshCw, AlertTriangle, CheckCircle2, FileDown } from "lucide-react";
 import { CHART_TOOLTIP_STYLE } from "@/lib/chart-theme";
 import { useSavedBets } from "@/hooks/useSavedBets";
+import { exportToPdf } from "@/engine/pdf-export";
 
 interface Props {
   stats: NumberStats[];
