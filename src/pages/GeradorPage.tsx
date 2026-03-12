@@ -9,6 +9,7 @@ import { NumberPickerGrid } from "@/components/NumberPickerGrid";
 import { SavedBetsPanel } from "@/components/SavedBetsPanel";
 import { EvolutiveGeneratorPanel } from "@/components/EvolutiveGeneratorPanel";
 import { IntelligentGeneratorPanel } from "@/components/IntelligentGeneratorPanel";
+import { RobustnessRadarPanel } from "@/components/RobustnessRadarPanel";
 import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
