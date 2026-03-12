@@ -62,6 +62,23 @@ export function StrategyComparatorPanel({ stats, config, draws }: Props) {
 
   const winner = results ? results.reduce((best, r) => r.avgScore > best.avgScore ? r : best, results[0]) : null;
 
+  const handleExportPdf = () => {
+    if (!results || !winner) return;
+    const bets = winner.sampleBets.map(b => ({
+      numbers: b.bet,
+      strategy: winner.label,
+      score: winner.avgScore,
+      grade: b.grade,
+    }));
+    exportToPdf({
+      title: "Comparativo de Estratégias",
+      subtitle: `Melhor: ${winner.label} — Score ${winner.avgScore} | ${results.length} estratégias comparadas`,
+      config,
+      bets,
+      type: "apostas",
+    });
+  };
+
   return (
     <Card className="border-border/60 bg-card/80 backdrop-blur">
       <CardHeader>
