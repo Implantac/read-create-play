@@ -18,7 +18,7 @@ interface Props {
 }
 
 export function RobustnessRadarPanel({ stats, config, draws, lotteryId }: Props) {
-  const { bets } = useSavedBets(lotteryId);
+  const { savedBets: bets } = useSavedBets(lotteryId);
   const [results, setResults] = useState<RobustnessResult[]>([]);
   const [selectedIdx, setSelectedIdx] = useState(0);
 
