@@ -242,7 +242,10 @@ Responda em português. Seja extremamente técnico, use dados concretos e justif
       console.log("All AI models failed, generating statistical fallback");
       const topNums = topRankings.slice(0, 10).map((r: any) => `Nº${String(r.number).padStart(2, '0')} (Score: ${r.compositeScore})`).join(", ");
       const overdueNums = gaps.filter((g: any) => g.isOverdue).slice(0, 5).map((g: any) => `Nº${String(g.number).padStart(2, '0')} (atraso: ${g.currentGap})`).join(", ");
-      const topPairs = cooccurrences.slice(0, 5).map((c: any) => `${c.pair?.join("-")} (lift: ${c.lift?.toFixed?.(2) || "N/A"})`).join(", ");
+      const topPairsText = cooccurrences.slice(0, 5).map((c: any) => {
+        const pair = c.pair ? c.pair.join("-") : (c.a && c.b ? `${c.a}-${c.b}` : "N/A");
+        return `${pair} (lift: ${c.lift?.toFixed?.(2) || "N/A"})`;
+      }).join(", ");
       
       // Generate 10 fallback games using statistical data
       const allRanked = topRankings.map((r: any) => r.number);
@@ -251,26 +254,23 @@ Responda em português. Seja extremamente técnico, use dados concretos e justif
       
       for (let g = 0; g < 10; g++) {
         const pool = [...allRanked];
-        // Add some overdue numbers for variety in aggressive games
         if (g >= 6) {
           overdueList.forEach((n: number) => { if (!pool.includes(n)) pool.push(n); });
         }
-        // Shuffle with bias toward top-ranked
         const game: number[] = [];
         const available = [...pool];
         while (game.length < pick && available.length > 0) {
-          // Weight toward beginning (higher ranked) for conservative, more random for aggressive
           const bias = g < 3 ? 0.7 : g < 6 ? 0.5 : 0.3;
           const idx = Math.random() < bias 
             ? Math.floor(Math.random() * Math.min(available.length, Math.ceil(pick * 1.5)))
             : Math.floor(Math.random() * available.length);
-          const num = available[Math.min(idx, available.length - 1)];
+          const safeIdx = Math.min(idx, available.length - 1);
+          const num = available[safeIdx];
           if (!game.includes(num) && num >= 1 && num <= totalNumbers) {
             game.push(num);
           }
-          available.splice(Math.min(idx, available.length - 1), 1);
+          available.splice(safeIdx, 1);
         }
-        // Fill remaining if needed
         while (game.length < pick) {
           const n = Math.floor(Math.random() * totalNumbers) + 1;
           if (!game.includes(n)) game.push(n);
@@ -278,7 +278,8 @@ Responda em português. Seja extremamente técnico, use dados concretos e justif
         game.sort((a: number, b: number) => a - b);
         const strategy = g < 3 ? "Conservador" : g < 6 ? "Equilibrado" : g < 8 ? "Agressivo" : g === 8 ? "Contrário" : "Cobertura Máxima";
         const confidence = g < 3 ? 75 - g * 3 : g < 6 ? 65 - (g - 3) * 3 : 55 - (g - 6) * 5;
-        fallbackGames.push(`**Jogo ${g + 1} — ${strategy} (Confiança: ${confidence}/100)**\nDezenas: ${game.map((n: number) => String(n).padStart(2, '0')).join(', ')}`);
+        const nums = game.map((n: number) => String(n).padStart(2, '0')).join(', ');
+        fallbackGames.push(`GAME_START\nJogo ${g + 1} - ${strategy} (Confiança: ${confidence}/100)\nDezenas: ${nums}\nGAME_END`);
       }
 
       aiAnalysis = `## Análise Estatística (modo offline)\n\n` +
@@ -287,7 +288,7 @@ Responda em português. Seja extremamente técnico, use dados concretos e justif
         `**Tier S (score ≥80):** ${tierS.length > 0 ? tierS.join(", ") : "Nenhuma"}\n` +
         `**Tier A (60-79):** ${tierA.length > 0 ? tierA.join(", ") : "Nenhuma"}\n\n` +
         `## 2. Dezenas Atrasadas\n${overdueNums || "Nenhuma dezena significativamente atrasada"}\n\n` +
-        `## 3. Coocorrências Fortes\n${topPairs || "Dados insuficientes"}\n\n` +
+        `## 3. Coocorrências Fortes\n${topPairsText || "Dados insuficientes"}\n\n` +
         `## 4. Entropia\nNormalizada: ${entropy.normalizedEntropy?.toFixed?.(4) || "N/A"} | ` +
         `Classificação: ${entropy.classification || "N/A"}\n\n` +
         `## 5. Teste Chi-Quadrado\nχ²: ${chiSquare.chiSquare?.toFixed?.(2) || "N/A"} | ` +
