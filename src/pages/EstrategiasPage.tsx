@@ -35,7 +35,7 @@ const EstrategiasPage = () => {
             <OptimizationPanel stats={stats} config={config} draws={draws} />
           </PlanGate>
           <PlanGate feature="estrategias_ml" fallbackMessage="Machine Learning Preditivo">
-            <MLPanel stats={stats} config={config} />
+            <MLPanel stats={stats} config={config} draws={draws} />
           </PlanGate>
           <PlanGate feature="estrategias_analytics" fallbackMessage="Analytics Avançado">
             <AdvancedAnalyticsPanel stats={stats} draws={draws} config={config} />
