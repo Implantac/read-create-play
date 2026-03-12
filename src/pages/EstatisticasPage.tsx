@@ -46,14 +46,19 @@ const EstatisticasPage = () => {
   const stats = useMemo(() => computeFrequencyStats(filteredDraws, config.numbers), [filteredDraws, config.numbers]);
   const sumData = useMemo(() => computeSumDistribution(filteredDraws), [filteredDraws]);
 
-  const hotNumbers = stats.filter(s => s.status === "hot").length;
-  const coldNumbers = stats.filter(s => s.status === "cold").length;
-  const avgDelay = stats.length > 0 ? Math.round(stats.reduce((a, s) => a + s.lastSeen, 0) / stats.length) : 0;
-  const avgFreq = stats.length > 0 ? Math.round(stats.reduce((a, s) => a + s.frequency, 0) / stats.length) : 0;
-  const maxDelay = stats.length > 0 ? Math.max(...stats.map(s => s.lastSeen)) : 0;
-  const mostFrequent = stats.length > 0 ? stats.reduce((a, s) => s.frequency > a.frequency ? s : a, stats[0]) : null;
-  const leastFrequent = stats.length > 0 ? stats.reduce((a, s) => s.frequency < a.frequency ? s : a, stats[0]) : null;
-  const avgSum = sumData.length > 0 ? Math.round(sumData.reduce((a, s) => a + s.sum, 0) / sumData.length) : 0;
+  const derivedStats = useMemo(() => {
+    const hotNumbers = stats.filter(s => s.status === "hot").length;
+    const coldNumbers = stats.filter(s => s.status === "cold").length;
+    const avgDelay = stats.length > 0 ? Math.round(stats.reduce((a, s) => a + s.lastSeen, 0) / stats.length) : 0;
+    const avgFreq = stats.length > 0 ? Math.round(stats.reduce((a, s) => a + s.frequency, 0) / stats.length) : 0;
+    const maxDelay = stats.length > 0 ? Math.max(...stats.map(s => s.lastSeen)) : 0;
+    const mostFrequent = stats.length > 0 ? stats.reduce((a, s) => s.frequency > a.frequency ? s : a, stats[0]) : null;
+    const leastFrequent = stats.length > 0 ? stats.reduce((a, s) => s.frequency < a.frequency ? s : a, stats[0]) : null;
+    const avgSum = sumData.length > 0 ? Math.round(sumData.reduce((a, s) => a + s.sum, 0) / sumData.length) : 0;
+    return { hotNumbers, coldNumbers, avgDelay, avgFreq, maxDelay, mostFrequent, leastFrequent, avgSum };
+  }, [stats, sumData]);
+
+  const { hotNumbers, coldNumbers, avgDelay, avgFreq, maxDelay, mostFrequent, leastFrequent, avgSum } = derivedStats;
 
   if (draws.length === 0) {
     return (
