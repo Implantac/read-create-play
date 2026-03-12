@@ -3,6 +3,10 @@ import { useLotteryContext } from "@/contexts/LotteryContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bookmark, Trash2, Copy, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ShareBetButton } from "@/components/ShareBetButton";
+import { toast } from "sonner";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
 
