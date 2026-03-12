@@ -74,9 +74,6 @@ export function MassiveSimulationDashboard({ stats, config, draws }: Props) {
     }
   }, [config.id]);
 
-  const handleProgress = useCallback((p: MassiveSimProgress) => {
-    setProgress(p);
-  }, []);
 
   const runSimulation = async () => {
     if (draws.length === 0) {
