@@ -5,6 +5,7 @@ import { ConditionalProbabilityPanel } from "@/components/ConditionalProbability
 import { HPEnginePanel } from "@/components/HPEnginePanel";
 import { OptimizationPanel } from "@/components/OptimizationPanel";
 import { PatternDetectorPanel } from "@/components/PatternDetectorPanel";
+import { StrategyComparatorPanel } from "@/components/StrategyComparatorPanel";
 import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
