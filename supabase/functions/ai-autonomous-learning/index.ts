@@ -16,7 +16,7 @@ serve(async (req) => {
 
     const supabase = await getSupabaseAdmin();
     const lotteryId = lotteryName?.toLowerCase().replace(/\s+/g, "").replace(/á/g, "a") || "unknown";
-    const cacheInput = { lotteryName, confidenceScore: report.confidenceScore, rankingsCount: report.rankings?.length, version: "v4-10games" };
+    const cacheInput = { lotteryName, confidenceScore: report.confidenceScore, rankingsCount: report.rankings?.length, version: "v5-robust-games" };
     const cached = await getCachedAnalysis(supabase, lotteryId, "ai-autonomous-learning", cacheInput, 6);
     if (cached) {
       return new Response(JSON.stringify({ ...cached, fromCache: true }), {
