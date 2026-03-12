@@ -196,7 +196,7 @@ REGRAS OBRIGATÓRIAS para todos os jogos:
 Responda em português. Seja extremamente técnico, use dados concretos e justificativas numéricas em cada recomendação.`;
 
     // Try multiple models with failover
-    const models = ["google/gemini-3-flash-preview", "google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
+    const models = ["google/gemini-2.5-pro", "google/gemini-3-flash-preview", "google/gemini-2.5-flash"];
     let aiAnalysis = "";
     let aiSuccess = false;
 
