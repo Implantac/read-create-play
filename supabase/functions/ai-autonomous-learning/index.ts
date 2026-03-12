@@ -214,8 +214,8 @@ Responda em português. Seja extremamente técnico, use dados concretos e justif
               { role: "system", content: "Você é um cientista de dados de elite com PhD em estatística aplicada, teoria da informação e modelagem probabilística. Sua análise combina entropia de Shannon, testes chi-quadrado, cadeias de Markov, análise de coocorrência e detecção de change-points para fundamentar recomendações rigorosas e acionáveis." },
               { role: "user", content: prompt },
             ],
-            temperature: 0.3,
-            max_tokens: 8000,
+            temperature: 0.2,
+            max_tokens: 10000,
           }),
         });
 
