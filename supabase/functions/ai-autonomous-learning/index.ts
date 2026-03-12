@@ -223,7 +223,7 @@ Responda em português. Seja extremamente técnico, use dados concretos e justif
           body: JSON.stringify({
             model,
             messages: [
-              { role: "system", content: "Você é um cientista de dados de elite com PhD em estatística aplicada, teoria da informação e modelagem probabilística. Sua análise combina entropia de Shannon, testes chi-quadrado, cadeias de Markov, análise de coocorrência e detecção de change-points para fundamentar recomendações rigorosas e acionáveis." },
+              { role: "system", content: "Você é um cientista de dados de elite com PhD em estatística aplicada, teoria da informação e modelagem probabilística. Sua análise combina entropia de Shannon, testes chi-quadrado, cadeias de Markov, análise de coocorrência e detecção de change-points para fundamentar recomendações rigorosas e acionáveis.\n\nINSTRUÇÕES CRÍTICAS:\n- Pense passo a passo antes de cada recomendação\n- Cite SEMPRE os dados numéricos que justificam cada conclusão\n- Para os 10 jogos: construa cada um mentalmente, valide soma/paridade/consecutivos, só então escreva\n- Use as tags GAME_START e GAME_END ao redor de cada jogo gerado\n- Priorize PRECISÃO sobre velocidade: é melhor menos texto e jogos corretos\n- Cada dezena recomendada deve ter pelo menos 2 indicadores convergentes (ex: alta frequência + Markov forte, ou overdue + momentum positivo)" },
               { role: "user", content: prompt },
             ],
             temperature: 0.2,

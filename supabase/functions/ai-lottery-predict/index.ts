@@ -733,7 +733,7 @@ Para cada aposta, garanta que TODOS os filtros de qualidade passem antes de incl
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        temperature: 0.45,
+        temperature: 0.25,
       }),
     });
 

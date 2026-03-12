@@ -159,7 +159,8 @@ Como o jogador deve usar esses resultados na prática?`;
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        temperature: 0.35,
+        temperature: 0.25,
+        max_tokens: 8000,
       }),
     });
 

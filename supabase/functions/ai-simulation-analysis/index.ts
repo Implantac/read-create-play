@@ -152,7 +152,8 @@ Para cada jogo, identifique:
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        temperature: 0.4,
+        temperature: 0.25,
+        max_tokens: 8000,
       }),
     });
 
