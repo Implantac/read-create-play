@@ -167,26 +167,38 @@ Forneça uma análise COMPLETA com as seções abaixo. Seja TÉCNICO, use NÚMER
 - Configuração ideal de paridade, soma e distribuição
 
 ## 8. 🎯 10 JOGOS OTIMIZADOS PARA O PRÊMIO PRINCIPAL
-Gere EXATAMENTE 10 apostas de ${pick} dezenas cada, otimizadas para maximizar a chance de acerto do prêmio principal.
+
+PROCESSO DE CONSTRUÇÃO (execute mentalmente para CADA jogo antes de escrevê-lo):
+1. Selecione o pool de dezenas candidatas de acordo com o perfil do jogo
+2. Monte a combinação respeitando TODOS os filtros de qualidade
+3. Calcule soma, paridade, consecutivos e cobertura de faixas
+4. Se QUALQUER critério falhar, substitua dezenas até passar
+5. Verifique que difere dos outros jogos em pelo menos 2-3 dezenas
+6. Só então inclua o jogo na resposta
+
+Gere EXATAMENTE 10 apostas de ${pick} dezenas cada.
 
 Para CADA jogo, forneça no formato:
+GAME_START
 **Jogo X — [Estratégia] (Confiança: XX/100)**
-Dezenas: XX, XX, XX, ... (ordenadas)
-Justificativa: [breve explicação técnica de 1-2 linhas]
+Dezenas: XX, XX, XX, ... (ordenadas, com vírgula)
+Justificativa: [explicação técnica de 2-3 linhas citando QUAIS dezenas vieram de qual fonte: Tier S/A, Markov, Gap, Coocorrência, etc.]
+GAME_END
 
 Distribuição das 10 apostas:
-- Jogos 1-3: CONSERVADORES (baseados em frequência alta + dezenas Tier S/A + paridade ideal)
-- Jogos 4-6: EQUILIBRADOS (multi-critério: frequência + Markov + coocorrência + entropia)
-- Jogos 7-8: AGRESSIVOS (Markov + gaps overdue + trios recorrentes + momentum positivo)
-- Jogo 9: CONTRÁRIO (dezenas em aceleração recente + change-points favoráveis)
-- Jogo 10: MÁXIMA COBERTURA (maximizar cobertura de pares/trios fortes + distribuição espacial ótima)
+- Jogos 1-3: CONSERVADORES — ≥70% dezenas Tier S/A, paridade ideal, soma no centro da faixa histórica
+- Jogos 4-6: EQUILIBRADOS — mix de Tier S/A (40%) + Markov (25%) + Coocorrência (20%) + Gaps (15%)
+- Jogos 7-8: AGRESSIVOS — Markov (35%) + gaps overdue (30%) + trios recorrentes (20%) + momentum positivo (15%)
+- Jogo 9: CONTRÁRIO — dezenas em aceleração recente + change-points favoráveis + baixo uso nos outros jogos
+- Jogo 10: MÁXIMA COBERTURA — maximizar cobertura de pares/trios fortes + distribuição espacial ótima + dezenas ausentes dos jogos 1-9
 
-REGRAS OBRIGATÓRIAS para todos os jogos:
-- Respeitar faixa de soma histórica (média ± 1.5σ)
-- Respeitar equilíbrio de paridade do perfil estatístico
-- Máximo de consecutivos conforme padrão histórico
-- Cada jogo deve ter pelo menos 2-3 dezenas DIFERENTES dos outros jogos
-- Incluir pelo menos 1 dezena de cada zona/faixa nos jogos equilibrados
+FILTROS DE QUALIDADE OBRIGATÓRIOS (validar para CADA jogo):
+✓ Soma dentro da faixa histórica (média ± 1.5σ)
+✓ Paridade conforme perfil estatístico (informar X pares / Y ímpares)
+✓ Máximo de consecutivos conforme padrão histórico
+✓ Cobertura mínima de faixas/zonas
+✓ Cada jogo difere dos outros em ≥${Math.max(2, Math.floor(pick * 0.15))} dezenas
+✓ Nenhum jogo repete combinação de sorteio passado
 
 ## 9. ALERTAS, ANOMALIAS E RED FLAGS
 - Anomalias de entropia detectadas
