@@ -6,11 +6,8 @@ import { Progress } from "@/components/ui/progress";
 import { NumberStats } from "@/engine/statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { STRATEGIES, Strategy } from "@/engine/strategies";
-import {
-  MassiveSimResult,
-  MassiveSimConfig,
-  runMassiveSimulation,
-} from "@/engine/massive-simulator";
+import type { MassiveSimResult } from "@/engine/massive-simulator";
+import MonteCarloWorker from "@/workers/monte-carlo.worker?worker";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Rocket, Play, Trophy, TrendingUp, BarChart3,
