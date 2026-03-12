@@ -325,7 +325,7 @@ serve(async (req) => {
       .select("concurso, numbers, draw_date")
       .eq("lottery_id", lottery_id)
       .order("concurso", { ascending: false })
-      .limit(200);
+      .limit(300);
 
     if (drawsError) throw drawsError;
     if (!draws || draws.length < 10) {
