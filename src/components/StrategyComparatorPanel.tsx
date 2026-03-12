@@ -8,8 +8,9 @@ import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { Strategy, STRATEGIES } from "@/engine/strategies";
 import { compareStrategies, StrategyComparison } from "@/engine/robustness-score";
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip, Legend } from "recharts";
-import { GitCompareArrows, Trophy, BarChart3, Loader2 } from "lucide-react";
+import { GitCompareArrows, Trophy, BarChart3, Loader2, FileDown } from "lucide-react";
 import { CHART_TOOLTIP_STYLE } from "@/lib/chart-theme";
+import { exportToPdf } from "@/engine/pdf-export";
 
 interface Props {
   stats: NumberStats[];
