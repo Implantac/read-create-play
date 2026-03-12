@@ -1,15 +1,24 @@
+import { lazy, Suspense } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
-import { GameSimulator } from "@/components/GameSimulator";
-import { MassiveSimulatorPanel } from "@/components/MassiveSimulatorPanel";
-import { MassiveSimulationDashboard } from "@/components/MassiveSimulationDashboard";
-import { BacktestPanel } from "@/components/BacktestPanel";
-import { IntelligentSimulatorPanel } from "@/components/IntelligentSimulatorPanel";
-import { HistoricalSimulatorPanel } from "@/components/HistoricalSimulatorPanel";
 import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
-import { FlaskConical } from "lucide-react";
+import { FlaskConical, Loader2 } from "lucide-react";
+
+const HistoricalSimulatorPanel = lazy(() => import("@/components/HistoricalSimulatorPanel").then(m => ({ default: m.HistoricalSimulatorPanel })));
+const MassiveSimulationDashboard = lazy(() => import("@/components/MassiveSimulationDashboard").then(m => ({ default: m.MassiveSimulationDashboard })));
+const IntelligentSimulatorPanel = lazy(() => import("@/components/IntelligentSimulatorPanel").then(m => ({ default: m.IntelligentSimulatorPanel })));
+const MassiveSimulatorPanel = lazy(() => import("@/components/MassiveSimulatorPanel").then(m => ({ default: m.MassiveSimulatorPanel })));
+const GameSimulator = lazy(() => import("@/components/GameSimulator").then(m => ({ default: m.GameSimulator })));
+const BacktestPanel = lazy(() => import("@/components/BacktestPanel").then(m => ({ default: m.BacktestPanel })));
+
+const LazyFallback = () => (
+  <div className="flex items-center justify-center py-8 text-muted-foreground">
+    <Loader2 className="h-5 w-5 animate-spin mr-2" />
+    <span className="text-sm">Carregando módulo...</span>
+  </div>
+);
 
 const SimulacoesPage = () => {
   const { config, draws, stats } = useLotteryContext();
@@ -27,22 +36,31 @@ const SimulacoesPage = () => {
         <EmptyState description="Importe os sorteios primeiro no Dashboard para rodar simulações." />
       ) : (
         <>
-          {/* Simulador Histórico de Jogos - NOVO */}
-          <HistoricalSimulatorPanel config={config} draws={draws} stats={stats} />
+          <Suspense fallback={<LazyFallback />}>
+            <HistoricalSimulatorPanel config={config} draws={draws} stats={stats} />
+          </Suspense>
 
-          {/* Motor de Simulação Massiva v2 */}
-          <MassiveSimulationDashboard stats={stats} config={config} draws={draws} />
+          <Suspense fallback={<LazyFallback />}>
+            <MassiveSimulationDashboard stats={stats} config={config} draws={draws} />
+          </Suspense>
 
-          {/* Simulador Inteligente com IA */}
-          <IntelligentSimulatorPanel config={config} draws={draws} stats={stats} />
+          <Suspense fallback={<LazyFallback />}>
+            <IntelligentSimulatorPanel config={config} draws={draws} stats={stats} />
+          </Suspense>
 
           <PlanGate feature="simulacoes" fallbackMessage="Simulador Massivo Monte Carlo">
-            <MassiveSimulatorPanel stats={stats} config={config} draws={draws} />
+            <Suspense fallback={<LazyFallback />}>
+              <MassiveSimulatorPanel stats={stats} config={config} draws={draws} />
+            </Suspense>
           </PlanGate>
           <PlanGate feature="simulacoes" fallbackMessage="Simulações de Jogos">
             <div className="grid lg:grid-cols-2 gap-6">
-              <GameSimulator stats={stats} config={config} draws={draws} />
-              <BacktestPanel stats={stats} config={config} draws={draws} />
+              <Suspense fallback={<LazyFallback />}>
+                <GameSimulator stats={stats} config={config} draws={draws} />
+              </Suspense>
+              <Suspense fallback={<LazyFallback />}>
+                <BacktestPanel stats={stats} config={config} draws={draws} />
+              </Suspense>
             </div>
           </PlanGate>
         </>

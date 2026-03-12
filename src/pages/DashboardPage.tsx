@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { StatsCard } from "@/components/StatsCard";
 import { FrequencyChart } from "@/components/FrequencyChart";
@@ -36,9 +36,9 @@ const quickLinks = [
 const DashboardPage = () => {
   const { config, draws, loading, syncing, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery } = useLotteryContext();
 
-  const hotNumbers = stats.filter(s => s.status === "hot").length;
-  const coldNumbers = stats.filter(s => s.status === "cold").length;
-  const avgDelay = stats.length > 0 ? Math.round(stats.reduce((a, s) => a + s.lastSeen, 0) / stats.length) : 0;
+  const hotNumbers = useMemo(() => stats.filter(s => s.status === "hot").length, [stats]);
+  const coldNumbers = useMemo(() => stats.filter(s => s.status === "cold").length, [stats]);
+  const avgDelay = useMemo(() => stats.length > 0 ? Math.round(stats.reduce((a, s) => a + s.lastSeen, 0) / stats.length) : 0, [stats]);
 
   const handleNewDraw = useCallback((draw: any) => addDraw(draw), [addDraw]);
 

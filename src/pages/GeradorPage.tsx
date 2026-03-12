@@ -1,21 +1,30 @@
+import { lazy, Suspense } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
-import { EnhancedBetGenerator } from "@/components/EnhancedBetGenerator";
-import { AIPredictionPanel } from "@/components/AIPredictionPanel";
-import { ProfessionalGeneratorPanel } from "@/components/ProfessionalGeneratorPanel";
-import { MonteCarloPanel } from "@/components/MonteCarloPanel";
-import { BetOptimizerPanel } from "@/components/BetOptimizerPanel";
-import { BetChecker } from "@/components/BetChecker";
 import { NumberPickerGrid } from "@/components/NumberPickerGrid";
 import { SavedBetsPanel } from "@/components/SavedBetsPanel";
-import { EvolutiveGeneratorPanel } from "@/components/EvolutiveGeneratorPanel";
-import { IntelligentGeneratorPanel } from "@/components/IntelligentGeneratorPanel";
-import { RobustnessRadarPanel } from "@/components/RobustnessRadarPanel";
 import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { useSavedBets } from "@/hooks/useSavedBets";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
+
+const RobustnessRadarPanel = lazy(() => import("@/components/RobustnessRadarPanel").then(m => ({ default: m.RobustnessRadarPanel })));
+const AIPredictionPanel = lazy(() => import("@/components/AIPredictionPanel").then(m => ({ default: m.AIPredictionPanel })));
+const IntelligentGeneratorPanel = lazy(() => import("@/components/IntelligentGeneratorPanel").then(m => ({ default: m.IntelligentGeneratorPanel })));
+const EvolutiveGeneratorPanel = lazy(() => import("@/components/EvolutiveGeneratorPanel").then(m => ({ default: m.EvolutiveGeneratorPanel })));
+const ProfessionalGeneratorPanel = lazy(() => import("@/components/ProfessionalGeneratorPanel").then(m => ({ default: m.ProfessionalGeneratorPanel })));
+const EnhancedBetGenerator = lazy(() => import("@/components/EnhancedBetGenerator").then(m => ({ default: m.EnhancedBetGenerator })));
+const MonteCarloPanel = lazy(() => import("@/components/MonteCarloPanel").then(m => ({ default: m.MonteCarloPanel })));
+const BetOptimizerPanel = lazy(() => import("@/components/BetOptimizerPanel").then(m => ({ default: m.BetOptimizerPanel })));
+const BetChecker = lazy(() => import("@/components/BetChecker").then(m => ({ default: m.BetChecker })));
+
+const LazyFallback = () => (
+  <div className="flex items-center justify-center py-8 text-muted-foreground">
+    <Loader2 className="h-5 w-5 animate-spin mr-2" />
+    <span className="text-sm">Carregando módulo...</span>
+  </div>
+);
 
 const GeradorPage = () => {
   const { config, draws, stats, selectedLottery } = useLotteryContext();
@@ -47,29 +56,44 @@ const GeradorPage = () => {
             <SavedBetsPanel />
           </div>
 
-          {/* Robustness Radar for saved bets */}
-          <RobustnessRadarPanel stats={stats} config={config} draws={draws} lotteryId={selectedLottery} />
+          <Suspense fallback={<LazyFallback />}>
+            <RobustnessRadarPanel stats={stats} config={config} draws={draws} lotteryId={selectedLottery} />
+          </Suspense>
 
-          <AIPredictionPanel config={config} stats={stats} onSaveBet={handleSaveBet} />
+          <Suspense fallback={<LazyFallback />}>
+            <AIPredictionPanel config={config} stats={stats} onSaveBet={handleSaveBet} />
+          </Suspense>
 
-          {/* Gerador Inteligente */}
-          <IntelligentGeneratorPanel stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
+          <Suspense fallback={<LazyFallback />}>
+            <IntelligentGeneratorPanel stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
+          </Suspense>
 
-          {/* Gerador Evolutivo */}
-          <EvolutiveGeneratorPanel stats={stats} config={config} draws={draws} lotteryId={selectedLottery} />
+          <Suspense fallback={<LazyFallback />}>
+            <EvolutiveGeneratorPanel stats={stats} config={config} draws={draws} lotteryId={selectedLottery} />
+          </Suspense>
 
           <PlanGate feature="gerador_profissional" fallbackMessage="Gerador Profissional com filtros avançados">
-            <ProfessionalGeneratorPanel stats={stats} config={config} draws={draws} />
+            <Suspense fallback={<LazyFallback />}>
+              <ProfessionalGeneratorPanel stats={stats} config={config} draws={draws} />
+            </Suspense>
           </PlanGate>
 
           <div className="grid lg:grid-cols-2 gap-6">
-            <EnhancedBetGenerator stats={stats} config={config} onSaveBet={handleSaveBet} />
-            <MonteCarloPanel stats={stats} config={config} />
+            <Suspense fallback={<LazyFallback />}>
+              <EnhancedBetGenerator stats={stats} config={config} onSaveBet={handleSaveBet} />
+            </Suspense>
+            <Suspense fallback={<LazyFallback />}>
+              <MonteCarloPanel stats={stats} config={config} />
+            </Suspense>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-6">
-            <BetOptimizerPanel stats={stats} config={config} draws={draws} />
-            <BetChecker draws={draws} lotteryId={selectedLottery} maxNumbers={config.numbers} pick={config.pick} />
+            <Suspense fallback={<LazyFallback />}>
+              <BetOptimizerPanel stats={stats} config={config} draws={draws} />
+            </Suspense>
+            <Suspense fallback={<LazyFallback />}>
+              <BetChecker draws={draws} lotteryId={selectedLottery} maxNumbers={config.numbers} pick={config.pick} />
+            </Suspense>
           </div>
         </>
       )}

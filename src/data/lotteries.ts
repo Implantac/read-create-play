@@ -18,34 +18,8 @@ export const LOTTERIES: LotteryConfig[] = [
   { id: "supersete", name: "Super Sete", numbers: 10, pick: 7, color: "neon-amber", icon: "7️⃣" },
 ];
 
-// Generate mock historical results
-function generateMockResults(config: LotteryConfig, count: number): number[][] {
-  const results: number[][] = [];
-  for (let i = 0; i < count; i++) {
-    const draw: number[] = [];
-    while (draw.length < config.pick) {
-      const n = Math.floor(Math.random() * config.numbers) + 1;
-      if (!draw.includes(n)) draw.push(n);
-    }
-    results.push(draw.sort((a, b) => a - b));
-  }
-  return results;
-}
-
 export interface DrawResult {
   concurso: number;
   date: string;
   numbers: number[];
-}
-
-export function getMockDraws(lotteryId: string): DrawResult[] {
-  const config = LOTTERIES.find(l => l.id === lotteryId)!;
-  const count = 200;
-  const results = generateMockResults(config, count);
-  const now = new Date();
-  return results.map((numbers, i) => ({
-    concurso: 3000 - i,
-    date: new Date(now.getTime() - i * 3 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-    numbers,
-  }));
 }
