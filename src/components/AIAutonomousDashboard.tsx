@@ -911,35 +911,62 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                       const games: { numbers: number[]; confidence: number; strategy: string }[] = [];
                       const lines = text.split("\n");
                       
+                      // Method 1: GAME_START/GAME_END blocks (fallback format)
+                      let inGameBlock = false;
+                      let blockLines: string[] = [];
+                      for (const line of lines) {
+                        if (line.trim() === "GAME_START") {
+                          inGameBlock = true;
+                          blockLines = [];
+                          continue;
+                        }
+                        if (line.trim() === "GAME_END") {
+                          inGameBlock = false;
+                          // Parse block
+                          let strategy = "", confidence = 0, numbers: number[] = [];
+                          for (const bl of blockLines) {
+                            const jogoMatch = bl.match(/Jogo\s+\d+\s*[-—–:]\s*(.+?)(?:\(|$)/i);
+                            if (jogoMatch) strategy = jogoMatch[1].replace(/\*+/g, "").trim();
+                            const confM = bl.match(/Confiança:\s*(\d+)/i) || bl.match(/(\d+)\s*\/\s*100/);
+                            if (confM) confidence = parseInt(confM[1]);
+                            const dezM = bl.match(/Dezenas?:\s*([\d,\s]+)/i);
+                            if (dezM) {
+                              numbers = dezM[1].split(/[,\s]+/).map(n => parseInt(n.trim())).filter(n => !isNaN(n) && n > 0 && n <= 80);
+                            }
+                          }
+                          if (numbers.length >= 5) games.push({ numbers, confidence, strategy });
+                          continue;
+                        }
+                        if (inGameBlock) blockLines.push(line);
+                      }
+                      
+                      if (games.length >= 3) return games;
+                      
+                      // Method 2: AI format - detect "Jogo X" headers
                       for (let i = 0; i < lines.length; i++) {
                         const line = lines[i];
-                        // Detect game header lines: "**Jogo X", "Jogo X —", "X.", "X)"
                         const isGameHeader = /(?:\*\*\s*)?Jogo\s+\d+/i.test(line) || /^\d+[.)]\s*(?:\*\*)?(?:Jogo|Aposta)/i.test(line);
                         if (!isGameHeader) continue;
                         
-                        // Extract strategy from header
                         const stratMatch = line.match(/(?:Jogo\s+\d+\s*[—–\-:]\s*\*?\*?)([^(*\n]+)/i);
                         const strategy = stratMatch ? stratMatch[1].replace(/\*+/g, "").trim() : "";
-                        
-                        // Extract confidence
                         const confMatch = line.match(/Confiança:\s*(\d+)/i) || line.match(/(\d+)\s*\/\s*100/);
                         const confidence = confMatch ? parseInt(confMatch[1]) : 0;
                         
-                        // Search next few lines for numbers (Dezenas: XX, XX, ...)
                         let numbers: number[] = [];
-                        for (let j = i; j < Math.min(i + 5, lines.length); j++) {
-                          // Look for "Dezenas:" or a line with many 2-digit numbers
+                        for (let j = i; j < Math.min(i + 6, lines.length); j++) {
                           const dezMatch = lines[j].match(/Dezenas?:\s*([\d,\s]+)/i);
                           if (dezMatch) {
                             numbers = dezMatch[1].split(/[,\s]+/).map(n => parseInt(n.trim())).filter(n => !isNaN(n) && n > 0 && n <= 80);
                             break;
                           }
-                          // Fallback: line with 5+ two-digit numbers separated by commas
-                          const numsInLine = lines[j].match(/\b(\d{1,2})\b/g);
-                          if (numsInLine && numsInLine.length >= 5 && j > i) {
-                            numbers = numsInLine.map(n => parseInt(n)).filter(n => n > 0 && n <= 80);
-                            if (numbers.length >= 5) break;
-                            numbers = [];
+                          if (j > i) {
+                            const numsInLine = lines[j].match(/\b(\d{1,2})\b/g);
+                            if (numsInLine && numsInLine.length >= 5) {
+                              numbers = numsInLine.map(n => parseInt(n)).filter(n => n > 0 && n <= 80);
+                              if (numbers.length >= 5) break;
+                              numbers = [];
+                            }
                           }
                         }
                         
@@ -951,7 +978,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                     };
                     
                     const games = extractGames(aiAnalysis);
-                    if (games.length < 3) return null;
+                    if (games.length < 1) return null;
                     
                     return (
                       <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 mt-6">
