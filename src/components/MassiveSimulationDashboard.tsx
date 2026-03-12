@@ -6,10 +6,11 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { NumberStats } from "@/engine/statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import {
+import type {
   MassiveSimResult, MassiveSimProgress, GenerationMode,
-  runMassiveSimAsync, SimulatedGame,
+  SimulatedGame,
 } from "@/engine/massive-simulation-engine";
+import MassiveSimWorker from "@/workers/massive-sim.worker?worker";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import {
