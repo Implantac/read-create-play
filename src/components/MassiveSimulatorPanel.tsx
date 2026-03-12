@@ -47,7 +47,7 @@ export function MassiveSimulatorPanel({ stats, config, draws }: Props) {
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<MassiveSimResult | null>(null);
-  const cancelRef = useRef(false);
+  const workerRef = useRef<Worker | null>(null);
 
   // Reset state when lottery changes
   const prevLotteryId = useRef(config.id);
@@ -58,6 +58,11 @@ export function MassiveSimulatorPanel({ stats, config, draws }: Props) {
       setProgress(0);
     }
   }, [config.id]);
+
+  // Cleanup worker on unmount
+  useEffect(() => {
+    return () => { workerRef.current?.terminate(); };
+  }, []);
 
   const toggleStrategy = (s: Strategy) => {
     setSelectedStrategies(prev =>
@@ -70,51 +75,50 @@ export function MassiveSimulatorPanel({ stats, config, draws }: Props) {
     setRunning(true);
     setProgress(0);
     setResult(null);
-    cancelRef.current = false;
 
-    // Run in chunks via setTimeout to avoid blocking UI
-    const chunkSize = Math.min(iterations, 50_000);
-    const totalChunks = Math.ceil(iterations / chunkSize);
-    let currentChunk = 0;
+    workerRef.current?.terminate();
 
-    const runNextChunk = () => {
-      if (cancelRef.current) {
+    const worker = new MonteCarloWorker();
+    workerRef.current = worker;
+
+    worker.onmessage = (e: MessageEvent) => {
+      const { type, data } = e.data;
+      if (type === "progress") {
+        setProgress(Math.round((data.completed / data.total) * 100));
+      } else if (type === "result") {
+        setResult(data as MassiveSimResult);
+        setProgress(100);
         setRunning(false);
-        return;
-      }
-
-      // For simplicity, run the full sim at once (chunking is simulated for progress)
-      if (currentChunk === 0) {
-        setTimeout(() => {
-          const simConfig: MassiveSimConfig = {
-            iterations,
-            strategies: selectedStrategies,
-            config,
-            compareWithRandom: true,
-          };
-          const res = runMassiveSimulation(stats, config, draws, simConfig);
-          setResult(res);
-          setProgress(100);
-          setRunning(false);
-        }, 50);
-      }
-
-      currentChunk++;
-      if (currentChunk <= totalChunks) {
-        setProgress(Math.min(95, (currentChunk / totalChunks) * 100));
+        worker.terminate();
+        workerRef.current = null;
       }
     };
 
-    // Simulate progress steps
-    let step = 0;
-    const progressInterval = setInterval(() => {
-      step++;
-      setProgress(Math.min(90, step * (90 / (iterations > 100000 ? 20 : 10))));
-      if (step >= (iterations > 100000 ? 20 : 10)) {
-        clearInterval(progressInterval);
-        runNextChunk();
-      }
-    }, 100);
+    worker.onerror = () => {
+      setRunning(false);
+      worker.terminate();
+      workerRef.current = null;
+    };
+
+    worker.postMessage({
+      type: "run_monte_carlo",
+      job: {
+        stats: stats.map(s => ({
+          number: s.number, frequency: s.frequency, percentage: s.percentage,
+          lastSeen: s.lastSeen, trend: s.trend, status: s.status,
+          recentFreq: s.recentFreq, stdDevIntervals: s.stdDevIntervals,
+          momentum: s.momentum, cycleScore: s.cycleScore,
+        })),
+        config,
+        draws,
+        simConfig: {
+          iterations,
+          strategies: selectedStrategies,
+          config,
+          compareWithRandom: true,
+        },
+      },
+    });
   };
 
   // Build chart data for hit distribution comparison
