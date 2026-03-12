@@ -78,6 +78,9 @@ export function AppLayout() {
                   <TooltipContent>{syncing ? "Sincronizando..." : "Sincronizar sorteios"}</TooltipContent>
                 </Tooltip>
 
+                {/* Theme toggle */}
+                <ThemeToggle />
+
                 <div className="w-px h-6 bg-border/50" />
 
                 {/* User menu */}
