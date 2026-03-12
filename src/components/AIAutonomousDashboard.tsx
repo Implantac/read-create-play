@@ -907,53 +907,80 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                   </div>
                   {/* Extract and highlight games */}
                   {(() => {
-                    // Multiple regex patterns to catch different AI output formats
-                    let gameMatches = aiAnalysis.match(/\*\*Jogo \d+[\s\S]*?(?=\*\*Jogo \d+|## \d+|##\s|$)/gi);
-                    if (!gameMatches || gameMatches.length < 3) {
-                      // Try alternate format: "Jogo X —" without bold
-                      gameMatches = aiAnalysis.match(/Jogo \d+\s*[—–-][\s\S]*?(?=Jogo \d+\s*[—–-]|## \d+|##\s|$)/gi);
-                    }
-                    if (!gameMatches || gameMatches.length < 3) {
-                      // Try numbered list format "1." or "1)"
-                      gameMatches = aiAnalysis.match(/\d+[.)]\s*(?:Jogo|Aposta)[\s\S]*?(?=\d+[.)]\s*(?:Jogo|Aposta)|## |$)/gi);
-                    }
-                    if (!gameMatches || gameMatches.length < 3) return null;
+                    const extractGames = (text: string) => {
+                      const games: { numbers: number[]; confidence: number; strategy: string }[] = [];
+                      const lines = text.split("\n");
+                      
+                      for (let i = 0; i < lines.length; i++) {
+                        const line = lines[i];
+                        // Detect game header lines: "**Jogo X", "Jogo X —", "X.", "X)"
+                        const isGameHeader = /(?:\*\*\s*)?Jogo\s+\d+/i.test(line) || /^\d+[.)]\s*(?:\*\*)?(?:Jogo|Aposta)/i.test(line);
+                        if (!isGameHeader) continue;
+                        
+                        // Extract strategy from header
+                        const stratMatch = line.match(/(?:Jogo\s+\d+\s*[—–\-:]\s*\*?\*?)([^(*\n]+)/i);
+                        const strategy = stratMatch ? stratMatch[1].replace(/\*+/g, "").trim() : "";
+                        
+                        // Extract confidence
+                        const confMatch = line.match(/Confiança:\s*(\d+)/i) || line.match(/(\d+)\s*\/\s*100/);
+                        const confidence = confMatch ? parseInt(confMatch[1]) : 0;
+                        
+                        // Search next few lines for numbers (Dezenas: XX, XX, ...)
+                        let numbers: number[] = [];
+                        for (let j = i; j < Math.min(i + 5, lines.length); j++) {
+                          // Look for "Dezenas:" or a line with many 2-digit numbers
+                          const dezMatch = lines[j].match(/Dezenas?:\s*([\d,\s]+)/i);
+                          if (dezMatch) {
+                            numbers = dezMatch[1].split(/[,\s]+/).map(n => parseInt(n.trim())).filter(n => !isNaN(n) && n > 0 && n <= 80);
+                            break;
+                          }
+                          // Fallback: line with 5+ two-digit numbers separated by commas
+                          const numsInLine = lines[j].match(/\b(\d{1,2})\b/g);
+                          if (numsInLine && numsInLine.length >= 5 && j > i) {
+                            numbers = numsInLine.map(n => parseInt(n)).filter(n => n > 0 && n <= 80);
+                            if (numbers.length >= 5) break;
+                            numbers = [];
+                          }
+                        }
+                        
+                        if (numbers.length >= 5) {
+                          games.push({ numbers, confidence, strategy });
+                        }
+                      }
+                      return games;
+                    };
+                    
+                    const games = extractGames(aiAnalysis);
+                    if (games.length < 3) return null;
+                    
                     return (
                       <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 mt-6">
                         <CardHeader className="pb-3">
                           <CardTitle className="text-base flex items-center gap-2">
                             <Target className="h-5 w-5 text-primary" />
-                            🎯 10 Jogos Otimizados — Resumo Visual
+                            🎯 {games.length} Jogos Otimizados — Resumo Visual
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
                           <div className="grid md:grid-cols-2 gap-3">
-                            {gameMatches.slice(0, 10).map((game, idx) => {
-                              const numbersMatch = game.match(/Dezenas?:\s*([\d,\s]+)/i) || game.match(/:\s*((?:\d{2}[,\s]+){2,}\d{2})/);
-                              const confMatch = game.match(/Confiança:\s*(\d+)/i) || game.match(/(\d+)\s*\/\s*100/);
-                              const stratMatch = game.match(/Jogo \d+\s*[—–-]\s*([^(\n]+)/) || game.match(/(?:Estratégia|Tipo):\s*([^\n(]+)/i);
-                              const numbers = numbersMatch
-                                ? numbersMatch[1].split(/[,\s]+/).filter(Boolean).map(n => parseInt(n.trim()))
-                                : [];
-                              const confidence = confMatch ? parseInt(confMatch[1]) : 0;
-                              const strategy = stratMatch ? stratMatch[1].trim() : "";
+                            {games.slice(0, 10).map((game, idx) => {
                               const borderColor = idx < 3 ? "border-green-500/30" : idx < 6 ? "border-primary/30" : idx < 8 ? "border-orange-500/30" : "border-purple-500/30";
-                              const badgeVariant = idx < 3 ? "default" : idx < 6 ? "secondary" : "outline";
+                              const badgeVariant: "default" | "secondary" | "outline" = idx < 3 ? "default" : idx < 6 ? "secondary" : "outline";
                               return (
                                 <Card key={idx} className={`${borderColor} border`}>
                                   <CardContent className="pt-3 pb-3 px-4">
                                     <div className="flex items-center justify-between mb-2">
                                       <span className="font-semibold text-sm">Jogo {idx + 1}</span>
                                       <div className="flex items-center gap-2">
-                                        {strategy && <Badge variant={badgeVariant} className="text-[10px]">{strategy}</Badge>}
-                                        {confidence > 0 && (
-                                          <Badge variant="outline" className="text-[10px] font-mono">{confidence}/100</Badge>
+                                        {game.strategy && <Badge variant={badgeVariant} className="text-[10px]">{game.strategy}</Badge>}
+                                        {game.confidence > 0 && (
+                                          <Badge variant="outline" className="text-[10px] font-mono">{game.confidence}/100</Badge>
                                         )}
                                       </div>
                                     </div>
                                     <div className="flex flex-wrap gap-1.5">
-                                      {numbers.filter(n => !isNaN(n) && n > 0).map(n => (
-                                        <span key={n} className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/15 text-primary font-bold text-xs border border-primary/30">
+                                      {game.numbers.map((n, ni) => (
+                                        <span key={ni} className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/15 text-primary font-bold text-xs border border-primary/30">
                                           {String(n).padStart(2, "0")}
                                         </span>
                                       ))}

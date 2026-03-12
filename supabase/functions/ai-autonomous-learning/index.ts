@@ -215,6 +215,7 @@ Responda em português. Seja extremamente técnico, use dados concretos e justif
               { role: "user", content: prompt },
             ],
             temperature: 0.3,
+            max_tokens: 8000,
           }),
         });
 
