@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Database, Loader2, LogOut, User, RefreshCw } from "lucide-react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { DrawNotificationChecker } from "@/components/DrawNotificationChecker";
 import {
   DropdownMenu,
   DropdownMenuContent,
