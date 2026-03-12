@@ -116,7 +116,8 @@ export function AppLayout() {
           </header>
 
           {/* Content */}
-          <main className="flex-1 container mx-auto px-4 py-6 md:px-6 lg:px-8">
+          <main className="flex-1 container mx-auto px-4 py-6 md:px-6 lg:px-8 space-y-6">
+            <DrawNotificationChecker />
             <Outlet />
           </main>
 

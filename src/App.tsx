@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LotteryProvider } from "@/contexts/LotteryContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -22,6 +23,7 @@ import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import IAAutonomaPage from "@/pages/IAAutonomaPage";
 import EstatisticasPage from "@/pages/EstatisticasPage";
 import PerfilPage from "@/pages/PerfilPage";
+import ROIDashboardPage from "@/pages/ROIDashboardPage";
 import LandingPage from "./pages/LandingPage";
 import NotFound from "./pages/NotFound";
 
@@ -30,6 +32,7 @@ const queryClient = new QueryClient();
 function App() {
   return (
   <QueryClientProvider client={queryClient}>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -51,6 +54,7 @@ function App() {
               <Route path="/ia-autonoma" element={<IAAutonomaPage />} />
               <Route path="/estatisticas" element={<EstatisticasPage />} />
               <Route path="/historico" element={<HistoricoPage />} />
+              <Route path="/roi" element={<ROIDashboardPage />} />
               <Route path="/planos" element={<PlanosPage />} />
               <Route path="/perfil" element={<PerfilPage />} />
               <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
@@ -60,6 +64,7 @@ function App() {
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
   );
 }
