@@ -6,9 +6,6 @@ import { Button } from "@/components/ui/button";
 import { ShareBetButton } from "@/components/ShareBetButton";
 import { toast } from "sonner";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { useState } from "react";
 
 export function SavedBetsPanel() {
   const { selectedLottery, config, stats } = useLotteryContext();
