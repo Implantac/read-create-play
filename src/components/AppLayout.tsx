@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Database, Loader2, LogOut, User, RefreshCw } from "lucide-react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { DrawNotificationChecker } from "@/components/DrawNotificationChecker";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -76,6 +78,9 @@ export function AppLayout() {
                   <TooltipContent>{syncing ? "Sincronizando..." : "Sincronizar sorteios"}</TooltipContent>
                 </Tooltip>
 
+                {/* Theme toggle */}
+                <ThemeToggle />
+
                 <div className="w-px h-6 bg-border/50" />
 
                 {/* User menu */}
@@ -111,7 +116,8 @@ export function AppLayout() {
           </header>
 
           {/* Content */}
-          <main className="flex-1 container mx-auto px-4 py-6 md:px-6 lg:px-8">
+          <main className="flex-1 container mx-auto px-4 py-6 md:px-6 lg:px-8 space-y-6">
+            <DrawNotificationChecker />
             <Outlet />
           </main>
 

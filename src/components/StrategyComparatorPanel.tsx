@@ -8,8 +8,9 @@ import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { Strategy, STRATEGIES } from "@/engine/strategies";
 import { compareStrategies, StrategyComparison } from "@/engine/robustness-score";
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip, Legend } from "recharts";
-import { GitCompareArrows, Trophy, BarChart3, Loader2 } from "lucide-react";
+import { GitCompareArrows, Trophy, BarChart3, Loader2, FileDown } from "lucide-react";
 import { CHART_TOOLTIP_STYLE } from "@/lib/chart-theme";
+import { exportToPdf } from "@/engine/pdf-export";
 
 interface Props {
   stats: NumberStats[];
@@ -61,6 +62,23 @@ export function StrategyComparatorPanel({ stats, config, draws }: Props) {
 
   const winner = results ? results.reduce((best, r) => r.avgScore > best.avgScore ? r : best, results[0]) : null;
 
+  const handleExportPdf = () => {
+    if (!results || !winner) return;
+    const bets = winner.sampleBets.map(b => ({
+      numbers: b.bet,
+      strategy: winner.label,
+      score: winner.avgScore,
+      grade: b.grade,
+    }));
+    exportToPdf({
+      title: "Comparativo de Estratégias",
+      subtitle: `Melhor: ${winner.label} — Score ${winner.avgScore} | ${results.length} estratégias comparadas`,
+      config,
+      bets,
+      type: "apostas",
+    });
+  };
+
   return (
     <Card className="border-border/60 bg-card/80 backdrop-blur">
       <CardHeader>
@@ -95,10 +113,17 @@ export function StrategyComparatorPanel({ stats, config, draws }: Props) {
           ))}
         </div>
 
-        <Button onClick={run} disabled={loading || selected.length < 2} className="w-full">
-          {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <BarChart3 className="h-4 w-4 mr-2" />}
-          Comparar {selected.length} Estratégias
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={run} disabled={loading || selected.length < 2} className="flex-1">
+            {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <BarChart3 className="h-4 w-4 mr-2" />}
+            Comparar {selected.length} Estratégias
+          </Button>
+          {results && (
+            <Button onClick={handleExportPdf} variant="outline" size="icon" title="Exportar PDF">
+              <FileDown className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
 
         {results && (
           <div className="space-y-6">
