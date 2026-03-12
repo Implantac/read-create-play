@@ -30,6 +30,7 @@ const mainItems = [
   { title: "Estratégias IA", url: "/estrategias", icon: Brain },
   { title: "Simulações", url: "/simulacoes", icon: FlaskConical },
   { title: "Estatísticas", url: "/estatisticas", icon: PieChart },
+  { title: "ROI", url: "/roi", icon: TrendingUp },
   { title: "Histórico", url: "/historico", icon: History },
 ];
 

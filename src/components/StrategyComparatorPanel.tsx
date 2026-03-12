@@ -113,10 +113,17 @@ export function StrategyComparatorPanel({ stats, config, draws }: Props) {
           ))}
         </div>
 
-        <Button onClick={run} disabled={loading || selected.length < 2} className="w-full">
-          {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <BarChart3 className="h-4 w-4 mr-2" />}
-          Comparar {selected.length} Estratégias
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={run} disabled={loading || selected.length < 2} className="flex-1">
+            {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <BarChart3 className="h-4 w-4 mr-2" />}
+            Comparar {selected.length} Estratégias
+          </Button>
+          {results && (
+            <Button onClick={handleExportPdf} variant="outline" size="icon" title="Exportar PDF">
+              <FileDown className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
 
         {results && (
           <div className="space-y-6">

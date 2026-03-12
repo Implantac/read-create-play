@@ -48,10 +48,36 @@ export function RobustnessRadarPanel({ stats, config, draws, lotteryId }: Props)
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Button onClick={analyze} disabled={!bets.length} variant="secondary" className="w-full">
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Analisar {bets.length} Aposta(s) Salva(s)
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={analyze} disabled={!bets.length} variant="secondary" className="flex-1">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Analisar {bets.length} Aposta(s) Salva(s)
+          </Button>
+          {results.length > 0 && (
+            <Button
+              variant="outline"
+              size="icon"
+              title="Exportar PDF"
+              onClick={() => {
+                const exportBets = results.map((r) => ({
+                  numbers: r.bet,
+                  strategy: r.strategy,
+                  score: r.overallScore,
+                  grade: r.grade,
+                }));
+                exportToPdf({
+                  title: "Score de Robustez",
+                  subtitle: `${results.length} apostas analisadas`,
+                  config,
+                  bets: exportBets,
+                  type: "apostas",
+                });
+              }}
+            >
+              <FileDown className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
 
         {results.length > 0 && current && (
           <div className="space-y-4">
