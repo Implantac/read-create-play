@@ -931,7 +931,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                             if (confM) confidence = parseInt(confM[1]);
                             const dezM = bl.match(/Dezenas?:\s*([\d,\s]+)/i);
                             if (dezM) {
-                              numbers = dezM[1].split(/[,\s]+/).map(n => parseInt(n.trim())).filter(n => !isNaN(n) && n > 0 && n <= 80);
+                              numbers = dezM[1].split(/[,\s]+/).map(n => parseInt(n.trim())).filter(n => !isNaN(n) && n > 0 && n <= 100);
                             }
                           }
                           if (numbers.length >= 5) games.push({ numbers, confidence, strategy });
