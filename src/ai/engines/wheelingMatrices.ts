@@ -283,6 +283,94 @@ function generateLotomania60_50(): number[][] {
 }
 
 // ═══════════════════════════════════════════
+// DIA DE SORTE: 12 base → jogos de 7 → garantia 5 pts
+// C(12,7) = 792 possíveis sorteios
+// ═══════════════════════════════════════════
+function generateDiaDeSorte12_5(): number[][] {
+  const allDraws: number[][] = [];
+  for (let a = 0; a < 12; a++)
+    for (let b = a + 1; b < 12; b++)
+      for (let c = b + 1; c < 12; c++)
+        for (let d = c + 1; d < 12; d++)
+          for (let e = d + 1; e < 12; e++)
+            for (let f = e + 1; f < 12; f++)
+              for (let g = f + 1; g < 12; g++)
+                allDraws.push([a, b, c, d, e, f, g]);
+
+  const uncovered = new Set(allDraws.map((_, i) => i));
+  const selected: number[][] = [];
+
+  while (uncovered.size > 0 && selected.length < 40) {
+    let bestGame = -1;
+    let bestCount = 0;
+    for (let g = 0; g < allDraws.length; g++) {
+      const gameSet = new Set(allDraws[g]);
+      let covers = 0;
+      for (const dIdx of uncovered) {
+        const hits = allDraws[dIdx].filter(n => gameSet.has(n)).length;
+        if (hits >= 5) covers++;
+      }
+      if (covers > bestCount) { bestCount = covers; bestGame = g; }
+    }
+    if (bestGame === -1 || bestCount === 0) break;
+    selected.push(allDraws[bestGame]);
+    const selSet = new Set(allDraws[bestGame]);
+    for (const dIdx of [...uncovered]) {
+      const hits = allDraws[dIdx].filter(n => selSet.has(n)).length;
+      if (hits >= 5) uncovered.delete(dIdx);
+    }
+  }
+  return selected;
+}
+
+// ═══════════════════════════════════════════
+// SUPER SETE: 7 colunas × 10 dígitos (0-9)
+// Cada jogo = 7 dígitos. Base = conjunto de dígitos preferidos por coluna
+// Estratégia: 14 dígitos-base (2 por coluna) → jogos cobrindo combinações
+// ═══════════════════════════════════════════
+function generateSuperSete14_5(): number[][] {
+  // Each column picks 1 of 2 digits → 2^7 = 128 combinations
+  // We use index-based: indices 0-13 map to 7 columns × 2 options each
+  // Game = pick one option per column = 7 indices
+  const games: number[][] = [];
+  // Generate all 128 combinations
+  for (let mask = 0; mask < 128; mask++) {
+    const game: number[] = [];
+    for (let col = 0; col < 7; col++) {
+      const bit = (mask >> col) & 1;
+      game.push(col * 2 + bit); // index into 14 base numbers
+    }
+    games.push(game);
+  }
+
+  // Greedy select ~30 games that maximize coverage of 5+ hits
+  const uncovered = new Set(games.map((_, i) => i));
+  const selected: number[][] = [];
+
+  while (uncovered.size > 0 && selected.length < 32) {
+    let bestGame = -1;
+    let bestCount = 0;
+    for (let g = 0; g < games.length; g++) {
+      const gameSet = new Set(games[g]);
+      let covers = 0;
+      for (const dIdx of uncovered) {
+        const hits = games[dIdx].filter(n => gameSet.has(n)).length;
+        if (hits >= 5) covers++;
+      }
+      if (covers > bestCount) { bestCount = covers; bestGame = g; }
+    }
+    if (bestGame === -1 || bestCount === 0) break;
+    selected.push(games[bestGame]);
+    const selSet = new Set(games[bestGame]);
+    for (const dIdx of [...uncovered]) {
+      const hits = games[dIdx].filter(n => selSet.has(n)).length;
+      if (hits >= 5) uncovered.delete(dIdx);
+    }
+  }
+  return selected;
+}
+
+// ═══════════════════════════════════════════
 // Pre-computed matrices
 // ═══════════════════════════════════════════
 
@@ -340,6 +428,24 @@ export const WHEELING_MATRICES = {
     pick: 50,
     guarantee: 40,
     games: generateLotomania60_50(),
+  },
+  diadesorte_12_5: {
+    name: "Dia de Sorte 12→5pts",
+    description: "12 dezenas-base → jogos de 7 com garantia de 5 acertos se os 7 sorteados estiverem na base",
+    lottery: "diadesorte",
+    baseSize: 12,
+    pick: 7,
+    guarantee: 5,
+    games: generateDiaDeSorte12_5(),
+  },
+  supersete_14_5: {
+    name: "Super Sete 14→5pts (32 jogos)",
+    description: "14 dígitos-base (2 por coluna) → jogos de 7 com garantia de 5 acertos na combinação",
+    lottery: "supersete",
+    baseSize: 14,
+    pick: 7,
+    guarantee: 5,
+    games: generateSuperSete14_5(),
   },
 };
 
