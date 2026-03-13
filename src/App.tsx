@@ -26,6 +26,7 @@ import EstatisticasPage from "@/pages/EstatisticasPage";
 import PerfilPage from "@/pages/PerfilPage";
 import ROIDashboardPage from "@/pages/ROIDashboardPage";
 import HistoricoApostasPage from "@/pages/HistoricoApostasPage";
+import FechamentosPage from "@/pages/FechamentosPage";
 import LandingPage from "./pages/LandingPage";
 import NotFound from "./pages/NotFound";
 
