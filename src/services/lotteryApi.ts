@@ -1,4 +1,5 @@
 import { DrawResult, LOTTERIES, LotteryConfig } from "@/data/lotteries";
+import { DrawPrizeData, PrizeTierInfo } from "@/hooks/useLotteryDraws";
 
 const API_PRIMARY = "https://loteriascaixa-api.herokuapp.com/api";
 const API_FALLBACK = "https://api.guidi.dev.br/loteria";
@@ -22,18 +23,45 @@ interface CaixaApiResult {
   dezenas?: string[];
   listaDezenas?: string[];
   listaDezenasSegundoSorteio?: string[];
+  premiacoes?: { descricao: string; faixa: number; ganhadores: number; valorPremio: number }[];
+  acumulou?: boolean;
+  valorAcumuladoProximoConcurso?: number;
+  valorEstimadoProximoConcurso?: number;
+  valorArrecadado?: number;
 }
 
-function parseApiResult(raw: CaixaApiResult): DrawResult {
+export interface LatestDrawResult extends DrawResult {
+  prizeTiers?: DrawPrizeData | null;
+}
+
+function parseApiResult(raw: CaixaApiResult): LatestDrawResult {
   const dezenas = raw.dezenas || raw.listaDezenas || [];
+  
+  let prizeTiers: DrawPrizeData | null = null;
+  if (raw.premiacoes && raw.premiacoes.length > 0) {
+    prizeTiers = {
+      premiacoes: raw.premiacoes.map(p => ({
+        descricao: p.descricao,
+        faixa: p.faixa,
+        ganhadores: p.ganhadores,
+        valorPremio: p.valorPremio,
+      })),
+      acumulou: raw.acumulou ?? false,
+      valorAcumulado: raw.valorAcumuladoProximoConcurso ?? 0,
+      valorEstimado: raw.valorEstimadoProximoConcurso ?? 0,
+      valorArrecadado: raw.valorArrecadado ?? 0,
+    };
+  }
+
   return {
     concurso: raw.concurso,
     date: raw.data || "",
     numbers: dezenas.map(d => parseInt(d, 10)).filter(n => !isNaN(n)),
+    prizeTiers,
   };
 }
 
-export async function fetchLatestDraw(lotteryId: string): Promise<DrawResult | null> {
+export async function fetchLatestDraw(lotteryId: string): Promise<LatestDrawResult | null> {
   const apiName = API_NAMES[lotteryId];
   if (!apiName) return null;
 
