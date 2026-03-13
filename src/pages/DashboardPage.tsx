@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { StatsCard } from "@/components/StatsCard";
 import { FrequencyChart } from "@/components/FrequencyChart";
@@ -13,9 +13,11 @@ import { AutoUpdater } from "@/components/AutoUpdater";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
-import { motion } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 
 const container = {
   hidden: { opacity: 0 },
