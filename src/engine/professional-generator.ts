@@ -30,7 +30,7 @@ export interface ClosureConfig {
 // Scoring Estatístico
 // ═══════════════════════════════════════════════════════
 
-function computeStatisticalScore(bet: number[], stats: NumberStats[]): number {
+function computeStatisticalScore(bet: number[], stats: NumberStats[], config: LotteryConfig, draws: DrawResult[]): number {
   const betStats = bet.map(n => stats.find(s => s.number === n)).filter(Boolean) as NumberStats[];
   if (betStats.length === 0) return 0;
 
@@ -40,14 +40,69 @@ function computeStatisticalScore(bet: number[], stats: NumberStats[]): number {
   const avgMomentum = betStats.reduce((s, st) => s + Math.max(0, st.momentum), 0) / betStats.length;
   const hotRatio = betStats.filter(s => s.status === "hot").length / betStats.length;
 
-  return Math.min(100, Math.round(
-    avgFreqScore * 0.8 +
-    avgTrend * 8 +
-    avgCycle * 12 +
-    avgMomentum * 0.5 +
-    hotRatio * 20 +
-    30 // base
-  ));
+  // Parity score (how close to ideal)
+  const evenCount = bet.filter(n => n % 2 === 0).length;
+  const idealEven = Math.round(config.pick / 2);
+  const parityDeviation = Math.abs(evenCount - idealEven);
+  const parityScore = Math.max(0, 10 - parityDeviation * 3);
+
+  // Sum score (proximity to historical average)
+  const sum = bet.reduce((a, b) => a + b, 0);
+  const sums = draws.slice(0, 100).map(d => d.numbers.reduce((a, b) => a + b, 0));
+  const avgSum = sums.length > 0 ? sums.reduce((a, b) => a + b, 0) / sums.length : sum;
+  const sumStdDev = sums.length > 0 ? Math.sqrt(sums.reduce((s, v) => s + (v - avgSum) ** 2, 0) / sums.length) : 30;
+  const sumDeviation = Math.abs(sum - avgSum) / Math.max(sumStdDev, 1);
+  const sumScore = sumDeviation <= 0.5 ? 10 : sumDeviation <= 1 ? 7 : sumDeviation <= 1.5 ? 4 : 0;
+
+  // Frame/Center score (for Lotofácil-like)
+  let frameScore = 0;
+  if (config.numbers === 25 && config.pick === 15) {
+    const fc = analyzeFrameCenter(bet);
+    if (fc.frame >= 9 && fc.frame <= 11) frameScore = 8;
+    else if (fc.frame >= 8 && fc.frame <= 12) frameScore = 4;
+  }
+
+  // Row coverage (no empty rows)
+  let rowScore = 0;
+  if (config.numbers === 25) {
+    const rows = analyzeRowDistribution(bet);
+    const emptyRows = rows.filter(r => r === 0).length;
+    rowScore = emptyRows === 0 ? 5 : -5;
+  }
+
+  // Sequence run penalty
+  const sorted = [...bet].sort((a, b) => a - b);
+  let maxRun = 1, curRun = 1;
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i] === sorted[i - 1] + 1) { curRun++; maxRun = Math.max(maxRun, curRun); }
+    else curRun = 1;
+  }
+  const seqPenalty = maxRun > 4 ? -8 : maxRun > 3 ? -3 : 0;
+
+  // Repetition from last draw
+  let repeatScore = 0;
+  if (draws.length > 0) {
+    const lastDraw = draws[0].numbers;
+    const repeated = bet.filter(n => lastDraw.includes(n)).length;
+    const idealRepeat = Math.round(config.pick * (config.pick / config.numbers));
+    const repeatDev = Math.abs(repeated - idealRepeat);
+    repeatScore = repeatDev <= 1 ? 5 : repeatDev <= 2 ? 2 : -3;
+  }
+
+  return Math.min(100, Math.max(0, Math.round(
+    avgFreqScore * 0.6 +
+    avgTrend * 6 +
+    avgCycle * 10 +
+    avgMomentum * 0.4 +
+    hotRatio * 15 +
+    parityScore +
+    sumScore +
+    frameScore +
+    rowScore +
+    seqPenalty +
+    repeatScore +
+    20 // base
+  )));
 }
 
 function estimateProbability(bet: number[], stats: NumberStats[], config: LotteryConfig): number {
