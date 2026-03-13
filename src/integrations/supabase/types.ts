@@ -52,6 +52,7 @@ export type Database = {
           id: string
           lottery_id: string
           numbers: number[]
+          prize_tiers: Json | null
         }
         Insert: {
           concurso: number
@@ -60,6 +61,7 @@ export type Database = {
           id?: string
           lottery_id: string
           numbers: number[]
+          prize_tiers?: Json | null
         }
         Update: {
           concurso?: number
@@ -68,6 +70,7 @@ export type Database = {
           id?: string
           lottery_id?: string
           numbers?: number[]
+          prize_tiers?: Json | null
         }
         Relationships: []
       }
