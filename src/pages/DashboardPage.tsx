@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { StatsCard } from "@/components/StatsCard";
 import { FrequencyChart } from "@/components/FrequencyChart";
@@ -13,9 +13,11 @@ import { AutoUpdater } from "@/components/AutoUpdater";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
-import { motion } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 
 const container = {
   hidden: { opacity: 0 },
@@ -35,6 +37,8 @@ const quickLinks = [
 
 const DashboardPage = () => {
   const { config, draws, drawsWithPrizes, loading, syncing, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery } = useLotteryContext();
+  const [luckyGame, setLuckyGame] = useState<{ numbers: number[]; score: number; strategy: string } | null>(null);
+  const [generatingLucky, setGeneratingLucky] = useState(false);
 
   const hotNumbers = useMemo(() => stats.filter(s => s.status === "hot").length, [stats]);
   const coldNumbers = useMemo(() => stats.filter(s => s.status === "cold").length, [stats]);
@@ -42,6 +46,23 @@ const DashboardPage = () => {
 
   const handleNewDraw = useCallback((draw: any) => addDraw(draw), [addDraw]);
 
+  const generateLuckyGame = useCallback(() => {
+    if (stats.length === 0 || draws.length === 0) return;
+    setGeneratingLucky(true);
+    setTimeout(() => {
+      const strategies = ["frequency", "balance", "coverage", "dispersion"];
+      const randomStrategy = strategies[Math.floor(Math.random() * strategies.length)];
+      const result = runIntelligentPipeline(stats, draws, selectedLottery, randomStrategy, 1);
+      if (result.games.length > 0) {
+        setLuckyGame({
+          numbers: result.games[0],
+          score: result.scores[0] || 0,
+          strategy: result.strategy.name,
+        });
+      }
+      setGeneratingLucky(false);
+    }, 800);
+  }, [stats, draws, selectedLottery]);
   return (
     <div className="space-y-6">
       <PageHeader
@@ -72,7 +93,63 @@ const DashboardPage = () => {
         <>
           <AutoUpdater lotteryId={selectedLottery} onNewDraw={handleNewDraw} latestConcurso={draws[0]?.concurso || 0} />
 
-          {/* Quick access cards */}
+          {/* 🍀 GERAR JOGO DA SORTE */}
+          <motion.div variants={item} className="relative">
+            <div className="glass-card rounded-xl border border-primary/20 p-5 flex flex-col sm:flex-row items-center gap-4">
+              <div className="flex-1 text-center sm:text-left">
+                <h3 className="text-lg font-bold text-foreground flex items-center gap-2 justify-center sm:justify-start">
+                  <Clover className="w-5 h-5 text-primary" />
+                  Jogo da Sorte
+                </h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  IA gera 1 jogo otimizado com estratégia aleatória para {config.name}
+                </p>
+              </div>
+              <Button
+                onClick={generateLuckyGame}
+                disabled={generatingLucky || stats.length === 0}
+                className="bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all"
+                size="lg"
+              >
+                {generatingLucky ? (
+                  <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Gerando...</>
+                ) : (
+                  <><Sparkles className="w-4 h-4 mr-2" /> GERAR JOGO DA SORTE</>
+                )}
+              </Button>
+            </div>
+
+            <AnimatePresence>
+              {luckyGame && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="mt-3 glass-card rounded-xl border border-accent/30 p-4"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <span className="text-xs text-muted-foreground">Estratégia: </span>
+                      <span className="text-xs font-semibold text-primary">{luckyGame.strategy}</span>
+                      <span className="ml-3 text-xs text-muted-foreground">Score: </span>
+                      <span className="text-xs font-bold text-accent">{luckyGame.score.toFixed(1)}/100</span>
+                    </div>
+                    <button onClick={() => setLuckyGame(null)} className="text-muted-foreground hover:text-foreground">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {luckyGame.numbers.map(n => (
+                      <span key={n} className="w-9 h-9 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-sm font-bold text-primary">
+                        {String(n).padStart(2, "0")}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+
           <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {quickLinks.map(link => (
               <motion.div key={link.url} variants={item}>

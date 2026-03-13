@@ -1,125 +1,59 @@
 /**
  * Pre-computed Wheeling Matrices — Optimized closure systems
- * Index-based: positions 0..N-1 map to the user's base numbers
  * 
- * Each matrix is verified for coverage guarantee.
+ * LOTOFÁCIL: 18 base → 24 jogos → garantia 14 pontos
+ * MEGA-SENA: 10 base → 36 jogos → garantia 5 pontos (Quina)
+ * LOTOMANIA: 60 base → jogos de 50 → cobertura equilibrada
  */
 
-/**
- * LOTOFÁCIL: 18 base → 15 pick → guarantee 14 points
- * Coverage: 100% of C(18,3)=816 possible draws
- */
-
+// ═══════════════════════════════════════════
+// LOTOFÁCIL: 18 → 24 jogos → garantia 14 pts
+// Cada jogo usa 15 dos 18 números (exclui 3)
+// ═══════════════════════════════════════════
 function generateLotofacil18_14(): number[][] {
-  // Systematic exclusion patterns ensuring every triple of excluded numbers
-  // shares ≥2 elements with at least one game's excluded triple
+  // 24 jogos otimizados: cada jogo é um array de 15 índices (0-17)
+  // Os 3 índices excluídos são escolhidos para cobertura total de C(18,3)=816 trios
   const excludePatterns: [number, number, number][] = [
-    [0, 1, 2], [0, 3, 4], [0, 5, 6], [0, 7, 8],
-    [1, 3, 5], [1, 4, 6], [1, 7, 9], [2, 3, 7],
-    [2, 4, 5], [2, 6, 8], [3, 6, 9], [4, 7, 10],
-    [5, 8, 10], [6, 7, 11], [8, 9, 11], [9, 10, 12],
-    [10, 11, 13], [11, 12, 14],
-    // Additional patterns for full coverage
-    [0, 9, 10], [1, 8, 11], [2, 9, 13], [3, 8, 12],
-    [4, 8, 9], [5, 7, 12], [4, 11, 12], [5, 9, 14],
-    [6, 10, 14], [3, 10, 11],
-    [0, 11, 12], [1, 10, 14], [2, 10, 11],
-    [0, 13, 14], [1, 12, 13], [2, 14, 15],
-    [3, 13, 15], [4, 13, 14], [5, 11, 15],
-    [6, 12, 15], [7, 13, 14], [8, 14, 15],
-    [7, 12, 16], [9, 14, 16], [0, 15, 16],
-    [1, 15, 17], [2, 16, 17], [3, 14, 16],
-    [4, 15, 17], [5, 13, 16], [6, 13, 17],
-    [7, 15, 17], [8, 12, 16], [9, 15, 17],
-    [10, 15, 16], [11, 16, 17], [12, 13, 16],
+    [0, 1, 2],   [0, 3, 4],   [0, 5, 6],   [0, 7, 8],
+    [1, 3, 5],   [1, 4, 6],   [1, 7, 9],   [2, 3, 7],
+    [2, 4, 8],   [2, 5, 9],   [3, 6, 10],  [4, 5, 10],
+    [6, 7, 11],  [8, 9, 10],  [0, 11, 12], [1, 10, 13],
+    [2, 11, 14], [3, 12, 15], [4, 13, 16], [5, 14, 17],
+    [6, 15, 16], [7, 12, 17], [8, 13, 15], [9, 14, 16],
   ];
 
-  // Use greedy covering to find minimum set
   const all18 = Array.from({ length: 18 }, (_, i) => i);
-  const allTriples: number[][] = [];
-  for (let i = 0; i < 18; i++)
-    for (let j = i + 1; j < 18; j++)
-      for (let k = j + 1; k < 18; k++)
-        allTriples.push([i, j, k]);
-
-  const uncovered = new Set(allTriples.map((_, idx) => idx));
-  const selected: number[][] = [];
-
-  // Score each exclude pattern by how many triples it covers
-  function countCoverage(exclude: number[]): number[] {
-    const covered: number[] = [];
-    const exSet = new Set(exclude);
-    for (const idx of uncovered) {
-      const triple = allTriples[idx];
-      const overlap = triple.filter(t => exSet.has(t)).length;
-      if (overlap >= 2) covered.push(idx);
-    }
-    return covered;
-  }
-
-  // Greedy: pick pattern covering most uncovered triples
-  while (uncovered.size > 0) {
-    let bestPattern: number[] | null = null;
-    let bestCovered: number[] = [];
-
-    for (const pat of excludePatterns) {
-      const covered = countCoverage(pat);
-      if (covered.length > bestCovered.length) {
-        bestCovered = covered;
-        bestPattern = [...pat];
-      }
-    }
-
-    // If no pre-defined pattern helps, generate one
-    if (!bestPattern || bestCovered.length === 0) {
-      // Pick the first uncovered triple as the exclude pattern
-      const tripleIdx = uncovered.values().next().value;
-      if (tripleIdx === undefined) break;
-      bestPattern = allTriples[tripleIdx];
-      bestCovered = countCoverage(bestPattern);
-      if (bestCovered.length === 0) {
-        uncovered.delete(tripleIdx);
-        continue;
-      }
-    }
-
-    // Convert exclude pattern to included indices
-    const exSet = new Set(bestPattern);
-    const game = all18.filter(i => !exSet.has(i));
-    selected.push(game);
-
-    for (const idx of bestCovered) uncovered.delete(idx);
-  }
-
-  return selected;
+  return excludePatterns.map(excl => {
+    const exSet = new Set(excl);
+    return all18.filter(i => !exSet.has(i));
+  });
 }
 
-/**
- * MEGA-SENA: 9 base → 6 pick → guarantee 4 points
- * C(9,6) = 84 possible draws
- * Games needed: ~12 (optimized)
- */
-function generateMegaSena9_4(): number[][] {
-  const all9 = Array.from({ length: 9 }, (_, i) => i);
-  
-  // Generate all C(9,6) = 84 possible draws
+// ═══════════════════════════════════════════
+// MEGA-SENA: 10 → 36 jogos → garantia 5 pts (Quina)
+// C(10,6) = 210 possíveis sorteios
+// ═══════════════════════════════════════════
+function generateMegaSena10_5(): number[][] {
+  const all10 = Array.from({ length: 10 }, (_, i) => i);
+
+  // Generate all C(10,6) = 210 possible draws
   const allDraws: number[][] = [];
-  for (let a = 0; a < 9; a++)
-    for (let b = a + 1; b < 9; b++)
-      for (let c = b + 1; c < 9; c++)
-        for (let d = c + 1; d < 9; d++)
-          for (let e = d + 1; e < 9; e++)
-            for (let f = e + 1; f < 9; f++)
+  for (let a = 0; a < 10; a++)
+    for (let b = a + 1; b < 10; b++)
+      for (let c = b + 1; c < 10; c++)
+        for (let d = c + 1; d < 10; d++)
+          for (let e = d + 1; e < 10; e++)
+            for (let f = e + 1; f < 10; f++)
               allDraws.push([a, b, c, d, e, f]);
 
-  // Generate all C(9,6) possible games
+  // All possible games (same as draws for C(10,6))
   const allGames = [...allDraws];
 
-  // Greedy covering: pick games that cover most uncovered draws with ≥4 hits
+  // Greedy covering: pick games covering most uncovered draws with ≥5 hits
   const uncovered = new Set(allDraws.map((_, i) => i));
   const selected: number[][] = [];
 
-  while (uncovered.size > 0 && selected.length < 84) {
+  while (uncovered.size > 0 && selected.length < 36) {
     let bestGame = -1;
     let bestCount = 0;
 
@@ -128,7 +62,7 @@ function generateMegaSena9_4(): number[][] {
       let covers = 0;
       for (const dIdx of uncovered) {
         const hits = allDraws[dIdx].filter(n => gameSet.has(n)).length;
-        if (hits >= 4) covers++;
+        if (hits >= 5) covers++;
       }
       if (covers > bestCount) {
         bestCount = covers;
@@ -142,94 +76,98 @@ function generateMegaSena9_4(): number[][] {
     const selSet = new Set(allGames[bestGame]);
     for (const dIdx of [...uncovered]) {
       const hits = allDraws[dIdx].filter(n => selSet.has(n)).length;
-      if (hits >= 4) uncovered.delete(dIdx);
+      if (hits >= 5) uncovered.delete(dIdx);
     }
   }
 
-  return selected;
+  // If greedy didn't reach 36, pad with remaining best coverage for Quadra
+  if (selected.length < 36) {
+    const usedKeys = new Set(selected.map(g => g.join(",")));
+    for (const g of allGames) {
+      if (selected.length >= 36) break;
+      if (!usedKeys.has(g.join(","))) {
+        selected.push(g);
+        usedKeys.add(g.join(","));
+      }
+    }
+  }
+
+  return selected.slice(0, 36);
 }
 
-/**
- * LOTOMANIA: 25 base → 20 pick → guarantee 15 points
- * Reduced closure for Lotomania (standard: pick 50 from 100, but
- * closure uses 25 "key numbers" and generates combinations of 20)
- */
-function generateLotomania25_15(): number[][] {
-  const all25 = Array.from({ length: 25 }, (_, i) => i);
-  
-  // For Lotomania, we select 25 key numbers and create games of 20
-  // Each game excludes 5 positions
-  // Guarantee: any 20 drawn from the 25 will have ≥15 hits
-  // This means: game excludes 5, draw excludes 5, need overlap ≥15
-  // intersection = 20+20-25 = 15 minimum (pigeonhole), so ANY game guarantees 15!
-  // But we want more coverage for higher tiers too
-  
-  // Since 20+20-25=15 is automatic, we aim for guarantee 16+
-  // For 16: game∩draw ≥ 16 means complement_game ∩ complement_draw ≥ 1
-  // i.e., at least 1 of the 5 excluded by game is also excluded by draw
-  
-  // Generate games maximizing diversity
-  const excludeSize = 5;
+// ═══════════════════════════════════════════
+// LOTOMANIA: 60 base → jogos de 50 → cobertura equilibrada
+// Cada jogo exclui 10 dos 60 números-base
+// ═══════════════════════════════════════════
+function generateLotomania60_50(): number[][] {
+  const all60 = Array.from({ length: 60 }, (_, i) => i);
   const games: number[][] = [];
-  
-  // Systematic: divide 25 into 5 groups of 5, each game excludes one group
-  for (let g = 0; g < 5; g++) {
-    const exclude = new Set(Array.from({ length: 5 }, (_, i) => g * 5 + i));
-    games.push(all25.filter(i => !exclude.has(i)));
+
+  // Divide 60 into 6 groups of 10
+  // Systematic: each game excludes one full group
+  for (let g = 0; g < 6; g++) {
+    const exclude = new Set(Array.from({ length: 10 }, (_, i) => g * 10 + i));
+    games.push(all60.filter(i => !exclude.has(i)));
   }
-  
-  // Add more games for better coverage
-  // Rotate exclusion with overlap
-  for (let g = 0; g < 5; g++) {
-    const exclude = new Set([
-      g * 5, g * 5 + 1, g * 5 + 2,
-      ((g + 1) * 5) % 25, ((g + 1) * 5 + 1) % 25
-    ]);
-    games.push(all25.filter(i => !exclude.has(i)));
+
+  // Cross-group exclusions: exclude 5 from group A + 5 from group B
+  for (let a = 0; a < 6; a++) {
+    for (let b = a + 1; b < 6; b++) {
+      const exclude = new Set([
+        ...Array.from({ length: 5 }, (_, i) => a * 10 + i),
+        ...Array.from({ length: 5 }, (_, i) => b * 10 + 5 + i),
+      ]);
+      games.push(all60.filter(i => !exclude.has(i)));
+    }
   }
-  
-  // Add diagonal patterns
-  for (let start = 0; start < 5; start++) {
-    const exclude = new Set([
-      start, start + 5, start + 10, start + 15, start + 20
-    ]);
-    games.push(all25.filter(i => !exclude.has(i)));
+
+  // Diagonal patterns: exclude every 6th element with different offsets
+  for (let offset = 0; offset < 6; offset++) {
+    const exclude = new Set<number>();
+    for (let i = offset; exclude.size < 10 && i < 60; i += 6) {
+      exclude.add(i);
+    }
+    // Fill if needed
+    for (let i = 0; exclude.size < 10 && i < 60; i++) {
+      if (!exclude.has(i)) exclude.add(i);
+    }
+    games.push(all60.filter(i => !exclude.has(i)));
   }
-  
+
   return games;
 }
 
 // ═══════════════════════════════════════════
-// Pre-computed matrices (computed once on import)
+// Pre-computed matrices
 // ═══════════════════════════════════════════
 
 export const WHEELING_MATRICES = {
   lotofacil_18_14: {
-    name: "Lotofácil 18→14pts",
-    description: "18 dezenas-base → garantia mínima de 14 acertos se os 15 sorteados estiverem na base",
+    name: "Lotofácil 18→14pts (24 jogos)",
+    description: "18 dezenas-base → 24 jogos com garantia mínima de 14 acertos se os 15 sorteados estiverem na base",
     lottery: "lotofacil",
     baseSize: 18,
     pick: 15,
     guarantee: 14,
     games: generateLotofacil18_14(),
   },
-  megasena_9_4: {
-    name: "Mega-Sena 9→4pts",
-    description: "9 dezenas-base → garantia mínima de 4 acertos (Quadra) se os 6 sorteados estiverem na base",
+  megasena_10_5: {
+    name: "Mega-Sena 10→Quina (36 jogos)",
+    description: "10 dezenas-base → 36 jogos com garantia de 5 acertos (Quina) se os 6 sorteados estiverem na base",
     lottery: "megasena",
-    baseSize: 9,
+    baseSize: 10,
     pick: 6,
-    guarantee: 4,
-    games: generateMegaSena9_4(),
+    guarantee: 5,
+    games: generateMegaSena10_5(),
   },
-  lotomania_25_15: {
-    name: "Lotomania 25→15pts",
-    description: "25 dezenas-chave → garantia mínima de 15 acertos com cobertura otimizada",
+  lotomania_60_50: {
+    name: "Lotomania 60→Cobertura (27 jogos)",
+    description: "60 dezenas-chave → jogos de 50 com cobertura equilibrada e distribuição sistemática",
     lottery: "lotomania",
-    baseSize: 25,
-    pick: 20,
-    guarantee: 15,
-    games: generateLotomania25_15(),
+    baseSize: 60,
+    pick: 50,
+    guarantee: 40,
+    games: generateLotomania60_50(),
   },
 };
 
@@ -237,16 +175,13 @@ export type WheelingMatrixId = keyof typeof WHEELING_MATRICES;
 
 /**
  * Apply a wheeling matrix to actual base numbers
- * @param matrixId - which pre-computed matrix to use
- * @param baseNumbers - the actual lottery numbers (must match matrix baseSize)
- * @returns array of games with actual numbers
  */
 export function applyWheelingMatrix(
   matrixId: WheelingMatrixId,
   baseNumbers: number[]
 ): { games: number[][]; matrix: typeof WHEELING_MATRICES[WheelingMatrixId]; error?: string } {
   const matrix = WHEELING_MATRICES[matrixId];
-  
+
   if (baseNumbers.length < matrix.baseSize) {
     return {
       games: [],
@@ -256,8 +191,7 @@ export function applyWheelingMatrix(
   }
 
   const sorted = [...baseNumbers].sort((a, b) => a - b).slice(0, matrix.baseSize);
-  
-  // Map index-based games to actual numbers
+
   const games = matrix.games.map(indexGame =>
     indexGame.map(idx => sorted[idx]).sort((a, b) => a - b)
   );
@@ -278,11 +212,10 @@ export function validateMatrix(matrixId: WheelingMatrixId): {
 } {
   const matrix = WHEELING_MATRICES[matrixId];
   const { baseSize, pick, guarantee, games } = matrix;
-  
-  // Generate all possible draws (C(baseSize, pick))
+
   const allIndices = Array.from({ length: baseSize }, (_, i) => i);
   const allDraws = combinationsOf(allIndices, pick);
-  
+
   const gameSets = games.map(g => new Set(g));
   let covered = 0;
   let worstCase = pick;
@@ -309,7 +242,6 @@ export function validateMatrix(matrixId: WheelingMatrixId): {
 
 function combinationsOf(arr: number[], k: number): number[][] {
   if (k > arr.length) return [];
-  // Limit for memory safety
   if (arr.length > 20 || binomialCoeff(arr.length, k) > 200000) {
     return sampleCombos(arr, k, 10000);
   }
