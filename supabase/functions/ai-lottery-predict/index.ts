@@ -248,6 +248,43 @@ function scoreBet(
     } else {
       score -= 5; details.push(`⚠ Apenas ${goldenCount}/4 dezenas de ouro`);
     }
+
+    // Frame/Center (Moldura/Centro) scoring
+    const FRAME = new Set([1,2,3,4,5,6,10,11,15,16,20,21,22,23,24,25]);
+    const frameCount = bet.filter(n => FRAME.has(n)).length;
+    const centerCount = bet.length - frameCount;
+    if (frameCount >= 9 && frameCount <= 11) {
+      score += 5; details.push(`Moldura ${frameCount}/${centerCount} ✓`);
+    } else if (frameCount >= 8 && frameCount <= 12) {
+      score += 2; details.push(`Moldura ${frameCount}/${centerCount} aceitável`);
+    } else {
+      score -= 8; details.push(`⚠ Moldura ${frameCount}/${centerCount} desequilibrada`);
+    }
+
+    // Row distribution (5x5 grid - no empty rows)
+    const rowCounts = [0,0,0,0,0];
+    for (const n of bet) { rowCounts[Math.floor((n - 1) / 5)]++; }
+    const emptyRows = rowCounts.filter(r => r === 0).length;
+    if (emptyRows === 0) {
+      score += 3; details.push(`Todas 5 linhas cobertas ✓`);
+    } else {
+      score -= 10; details.push(`⚠ ${emptyRows} linha(s) vazia(s)`);
+    }
+
+    // Maximum sequence run (avoid 1-2-3-4-5 type runs)
+    let maxRun = 1, curRunSeq = 1;
+    const sortedBet = [...bet].sort((a, b) => a - b);
+    for (let i = 1; i < sortedBet.length; i++) {
+      if (sortedBet[i] === sortedBet[i-1] + 1) { curRunSeq++; maxRun = Math.max(maxRun, curRunSeq); }
+      else curRunSeq = 1;
+    }
+    if (maxRun <= 3) {
+      score += 2;
+    } else if (maxRun <= 4) {
+      details.push(`Sequência de ${maxRun} consecutivos`);
+    } else {
+      score -= 5; details.push(`⚠ Sequência longa de ${maxRun} consecutivos`);
+    }
   }
 
   return { score: Math.max(0, Math.min(100, score)), details };
@@ -648,17 +685,100 @@ REGRAS OBRIGATÓRIAS para cada jogo Lotofácil:
 ${cycle.missingInCycle.length > 0 ? `✓ Considere incluir dezenas faltantes do ciclo: [${cycle.missingInCycle.join(", ")}]` : ""}`;
     }
 
+    // Frame/center analysis for Lotofácil
+    let frameCenterInfo = "";
+    if (lottery_id === "lotofacil") {
+      const FRAME_NUMS = new Set([1,2,3,4,5,6,10,11,15,16,20,21,22,23,24,25]);
+      const frameCounts = draws.slice(0, 50).map((d: any) => (d.numbers || []).filter((n: number) => FRAME_NUMS.has(n)).length);
+      const avgFrame = (frameCounts.reduce((a: number, b: number) => a + b, 0) / frameCounts.length).toFixed(1);
+      
+      // Row distribution analysis (5x5 grid)
+      const rowDists = draws.slice(0, 50).map((d: any) => {
+        const rows = [0,0,0,0,0];
+        for (const n of (d.numbers || [])) { rows[Math.floor((n - 1) / 5)]++; }
+        return rows;
+      });
+      const avgRows = [0,0,0,0,0];
+      for (const rd of rowDists) { for (let i = 0; i < 5; i++) avgRows[i] += rd[i]; }
+      for (let i = 0; i < 5; i++) avgRows[i] = Math.round(avgRows[i] / rowDists.length * 10) / 10;
+      
+      frameCenterInfo = `
+═══ MOLDURA vs CENTRO (Grade 5×5) ═══
+Moldura (16 posições: bordas): média ${avgFrame} dezenas na moldura
+Centro (9 posições: 7,8,9,12,13,14,17,18,19): média ${(15 - parseFloat(avgFrame)).toFixed(1)} dezenas no centro
+Distribuição ideal: 9-10 moldura / 5-6 centro
+Distribuição por linhas (média últimos 50): L1=${avgRows[0]} L2=${avgRows[1]} L3=${avgRows[2]} L4=${avgRows[3]} L5=${avgRows[4]}
+REGRA: Nenhuma linha pode ter 0 números. Distribuição típica: 2-3-4-3-3 ou 3-3-3-3-3.`;
+    }
+
     // Build system prompt
     const systemPrompt = `Você é um cientista de dados de elite com PhD em estatística aplicada e teoria das probabilidades, especializado em modelagem preditiva de loterias brasileiras da Caixa Econômica Federal.
 Loteria: "${profile.name}" (${profile.pick} números de ${minNum} a ${profile.numbers}).
 
-PROCESSO DE RACIOCÍNIO OBRIGATÓRIO (pense passo a passo antes de gerar cada aposta):
-1. Analise o regime atual (quente/frio/transição) com base nos últimos 10 sorteios
-2. Identifique as dezenas com maior convergência de indicadores (frequência + Markov + overdue + momentum)
-3. Monte o núcleo de cada aposta (5-7 dezenas de alta confiança)
-4. Complete com dezenas de suporte (coocorrência, cobertura, transição)
-5. VALIDE cada aposta contra TODOS os critérios abaixo ANTES de incluí-la
-6. Se falhar em qualquer critério, SUBSTITUA dezenas até passar
+═══ METODOLOGIA PROFISSIONAL (10 PILARES) ═══
+
+1️⃣ FECHAMENTOS MATEMÁTICOS (Wheeling Systems)
+- Selecione 18-22 dezenas-base com maior score composto
+- Monte jogos que cubram essas dezenas com garantia matemática
+- Se 15 estiverem nos 18-20 selecionados → garante 14+ pontos
+- Tipos: simples, garantido, otimizado, econômico
+
+2️⃣ FILTROS ESTATÍSTICOS (aplicar a CADA jogo):
+- Paridade: ${profile.parityRange[0]}-${profile.parityRange[1]} pares (média: ${avgEvens})
+- Soma: ${profile.sumRange[0]}-${profile.sumRange[1]} (média: ${avgSum} ± ${sumStdDev})
+- Linhas/Colunas: todas as faixas cobertas, nenhuma com 0 números
+- Sequências: máximo ${profile.maxConsecutive} consecutivos, máximo 3-4 em sequência contínua
+${profile.primesRange ? `- Primos: entre ${profile.primesRange[0]} e ${profile.primesRange[1]}` : ""}
+${profile.repeatRange ? `- Repetição do anterior: entre ${profile.repeatRange[0]} e ${profile.repeatRange[1]} dezenas` : ""}
+
+3️⃣ ANÁLISE DE FREQUÊNCIA
+- Misturar quentes (alta frequência recente) com frios (atrasados)
+- Núcleo: 60-70% dezenas frequentes + 30-40% atrasadas/médias
+- Evitar extremos: nem só quentes nem só frios
+
+4️⃣ CICLOS DE LOTERIA
+- Ciclo = quando todos os ${profile.numbers} números aparecem pelo menos 1x
+- Apostar em números que AINDA NÃO saíram no ciclo atual
+- Números overdue com gap > média × 1.2 são candidatos fortes
+
+5️⃣ MOLDURA e CENTRO (para grades)
+- Distribuição moldura/centro deve seguir padrão histórico
+- Nenhuma zona vazia
+${lottery_id === "lotofacil" ? "- Lotofácil: 9-10 moldura / 5-6 centro é ideal" : ""}
+
+6️⃣ REDUÇÃO INTELIGENTE (Algoritmos de Otimização)
+- Aplicar lógica de algoritmo genético: manter dezenas de alta qualidade
+- Simulated Annealing: aceitar pequenas variações para escapar de mínimos locais
+- Greedy Optimization: maximizar cobertura combinatória
+
+7️⃣ DESDOBRAMENTO INTELIGENTE
+- Cada jogo deve ser parte de um sistema de cobertura maior
+- Os ${Math.min(count, 10)} jogos juntos devem cobrir o máximo de pares/trios frequentes
+- Maximizar diversidade ENTRE jogos mantendo qualidade individual
+
+8️⃣ ANÁLISE DE PADRÕES DO CONCURSO
+- Repetição média do anterior: ${avgRepeat} dezenas
+- Consecutivos, saltos numéricos, padrões de distribuição espacial
+- Detectar mudanças de regime (change-points)
+
+9️⃣ SIMULAÇÃO ESTATÍSTICA
+- Cada jogo deve ser testável contra histórico recente
+- Priorizar combinações que teriam premiado nos últimos 50 sorteios
+- Validar cobertura de dezenas em janelas de 10-20 concursos
+
+🔟 INTELIGÊNCIA ARTIFICIAL / MACHINE LEARNING
+- Usar transições de Markov para prever sequências prováveis
+- Aplicar coocorrência (pares/trios frequentes) como base
+- Momentum e aceleração como indicadores de timing
+
+═══ PIPELINE DE GERAÇÃO (executar para CADA jogo) ═══
+Passo 1: Escolher base de 18-22 dezenas (score composto)
+Passo 2: Aplicar filtros estatísticos (paridade, soma, linhas, sequências)
+Passo 3: Selecionar ${profile.pick} dezenas da base respeitando todos os filtros
+Passo 4: Aplicar redução inteligente (substituições para otimizar score)
+Passo 5: Validar contra fechamento matemático (cobertura garantida)
+Passo 6: Simular contra últimos 20 sorteios (verificar acertos médios)
+Passo 7: Selecionar os jogos mais eficientes
 
 REGRAS ABSOLUTAS INVIOLÁVEIS:
 - Cada aposta DEVE ter EXATAMENTE ${profile.pick} números
@@ -668,30 +788,15 @@ REGRAS ABSOLUTAS INVIOLÁVEIS:
 - Gere exatamente ${Math.min(count, 10)} apostas DIFERENTES entre si
 - NUNCA repita uma combinação idêntica a um sorteio passado
 - Cada aposta deve diferir das outras em pelo menos ${Math.max(2, Math.floor(profile.pick * 0.15))} dezenas
-
-CRITÉRIOS DE QUALIDADE (TODOS obrigatórios para ${profile.name.toUpperCase()}):
-- Soma: entre ${profile.sumRange[0]} e ${profile.sumRange[1]} (média: ${avgSum} ± ${sumStdDev})
-- Pares: entre ${profile.parityRange[0]} e ${profile.parityRange[1]} (média: ${avgEvens})
-- Máximo ${profile.maxConsecutive} consecutivos
-- Mínimo ${profile.minRanges} faixas de ${profile.rangeSize} cobertas
-${profile.primesRange ? `- Primos: entre ${profile.primesRange[0]} e ${profile.primesRange[1]}` : ""}
-${profile.repeatRange ? `- Repetição do anterior: entre ${profile.repeatRange[0]} e ${profile.repeatRange[1]} dezenas` : ""}
 ${profile.specialRules ? `\n${profile.specialRules}` : ""}
 
-METODOLOGIA DE COMPOSIÇÃO (peso por fonte):
-1. NÚCLEO (30%): Dezenas com score composto mais alto (frequência × 0.3 + recência × 0.25 + momentum × 0.2 + Markov × 0.15 + ciclo × 0.1)
-2. REPETIÇÃO (25%): Dezenas do concurso anterior com alta taxa histórica de repetição
-3. TRANSIÇÕES (20%): Maior probabilidade condicional via matriz de Markov
-4. OVERDUE (15%): Gap atual > gap médio × 1.2, retorno estatisticamente previsto
-5. COBERTURA (10%): Ajuste final para equilíbrio de faixas, paridade e soma
-
 DIVERSIFICAÇÃO DAS ${Math.min(count, 10)} APOSTAS:
-- Apostas 1-3: Conservadoras (≥70% núcleo frequente)
-- Apostas 4-6: Equilibradas (mix de núcleo + overdue + transições)
-- Apostas 7+: Agressivas (mais peso em Markov, overdue e momentum)
+- Apostas 1-3: CONSERVADORAS (≥70% núcleo frequente, paridade ideal, soma central)
+- Apostas 4-6: EQUILIBRADAS (mix núcleo 40% + Markov 25% + Coocorrência 20% + Gaps 15%)
+- Apostas 7+: AGRESSIVAS (Markov 35% + gaps overdue 30% + trios 20% + momentum 15%)
 
 Responda APENAS com JSON válido:
-{"bets": [[n1,n2,...], ...], "analysis": "explicação técnica detalhada por aposta: quais dezenas vieram de qual fonte (núcleo/repetição/Markov/overdue/cobertura), score de qualidade estimado, e cenário geral do regime atual"}`;
+{"bets": [[n1,n2,...], ...], "analysis": "explicação técnica por aposta: pipeline aplicado, fonte de cada dezena (núcleo/Markov/overdue/coocorrência/fechamento), score estimado, validação contra filtros"}`;
 
     const userPrompt = `═══ ÚLTIMOS 10 RESULTADOS ═══
 ${last10.map((r: string, i: number) => `C${draws[i].concurso}: [${r}]`).join("\n")}
@@ -717,9 +822,10 @@ ${topPairs.join(", ")}
 ═══ FREQ GERAL TOP 30 ═══
 ${[...allNums].sort((a, b) => (freq[b] || 0) - (freq[a] || 0)).slice(0, 30).map(n => `${n}:${freq[n]}`).join(", ")}
 ${lotofacilExtra}
+${frameCenterInfo}
 
-Gere ${Math.min(count, 10)} apostas otimizadas para ${profile.name} seguindo TODOS os critérios.
-Para cada aposta, garanta que TODOS os filtros de qualidade passem antes de incluí-la.`;
+Gere ${Math.min(count, 10)} apostas otimizadas para ${profile.name} seguindo o PIPELINE COMPLETO de 7 passos.
+Para cada aposta, aplique TODOS os 10 pilares profissionais e garanta que TODOS os filtros passem.`;
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

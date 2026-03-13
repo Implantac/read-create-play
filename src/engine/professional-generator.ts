@@ -2,6 +2,7 @@ import { NumberStats, generateSmartBet } from "./statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { evaluateBetQuality, BetQualityReport } from "./bet-quality";
 import { generateByStrategy, Strategy } from "./strategies";
+import { analyzeFrameCenter, computeIdealFrameCenter, analyzeRowDistribution } from "./generation-filters";
 
 // ═══════════════════════════════════════════════════════
 // GERADOR PROFISSIONAL DE APOSTAS
@@ -29,7 +30,7 @@ export interface ClosureConfig {
 // Scoring Estatístico
 // ═══════════════════════════════════════════════════════
 
-function computeStatisticalScore(bet: number[], stats: NumberStats[]): number {
+function computeStatisticalScore(bet: number[], stats: NumberStats[], config: LotteryConfig, draws: DrawResult[]): number {
   const betStats = bet.map(n => stats.find(s => s.number === n)).filter(Boolean) as NumberStats[];
   if (betStats.length === 0) return 0;
 
@@ -39,25 +40,77 @@ function computeStatisticalScore(bet: number[], stats: NumberStats[]): number {
   const avgMomentum = betStats.reduce((s, st) => s + Math.max(0, st.momentum), 0) / betStats.length;
   const hotRatio = betStats.filter(s => s.status === "hot").length / betStats.length;
 
-  return Math.min(100, Math.round(
-    avgFreqScore * 0.8 +
-    avgTrend * 8 +
-    avgCycle * 12 +
-    avgMomentum * 0.5 +
-    hotRatio * 20 +
-    30 // base
-  ));
+  // Parity score (how close to ideal)
+  const evenCount = bet.filter(n => n % 2 === 0).length;
+  const idealEven = Math.round(config.pick / 2);
+  const parityDeviation = Math.abs(evenCount - idealEven);
+  const parityScore = Math.max(0, 10 - parityDeviation * 3);
+
+  // Sum score (proximity to historical average)
+  const sum = bet.reduce((a, b) => a + b, 0);
+  const sums = draws.slice(0, 100).map(d => d.numbers.reduce((a, b) => a + b, 0));
+  const avgSum = sums.length > 0 ? sums.reduce((a, b) => a + b, 0) / sums.length : sum;
+  const sumStdDev = sums.length > 0 ? Math.sqrt(sums.reduce((s, v) => s + (v - avgSum) ** 2, 0) / sums.length) : 30;
+  const sumDeviation = Math.abs(sum - avgSum) / Math.max(sumStdDev, 1);
+  const sumScore = sumDeviation <= 0.5 ? 10 : sumDeviation <= 1 ? 7 : sumDeviation <= 1.5 ? 4 : 0;
+
+  // Frame/Center score (for Lotofácil-like)
+  let frameScore = 0;
+  if (config.numbers === 25 && config.pick === 15) {
+    const fc = analyzeFrameCenter(bet);
+    if (fc.frame >= 9 && fc.frame <= 11) frameScore = 8;
+    else if (fc.frame >= 8 && fc.frame <= 12) frameScore = 4;
+  }
+
+  // Row coverage (no empty rows)
+  let rowScore = 0;
+  if (config.numbers === 25) {
+    const rows = analyzeRowDistribution(bet);
+    const emptyRows = rows.filter(r => r === 0).length;
+    rowScore = emptyRows === 0 ? 5 : -5;
+  }
+
+  // Sequence run penalty
+  const sorted = [...bet].sort((a, b) => a - b);
+  let maxRun = 1, curRun = 1;
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i] === sorted[i - 1] + 1) { curRun++; maxRun = Math.max(maxRun, curRun); }
+    else curRun = 1;
+  }
+  const seqPenalty = maxRun > 4 ? -8 : maxRun > 3 ? -3 : 0;
+
+  // Repetition from last draw
+  let repeatScore = 0;
+  if (draws.length > 0) {
+    const lastDraw = draws[0].numbers;
+    const repeated = bet.filter(n => lastDraw.includes(n)).length;
+    const idealRepeat = Math.round(config.pick * (config.pick / config.numbers));
+    const repeatDev = Math.abs(repeated - idealRepeat);
+    repeatScore = repeatDev <= 1 ? 5 : repeatDev <= 2 ? 2 : -3;
+  }
+
+  return Math.min(100, Math.max(0, Math.round(
+    avgFreqScore * 0.6 +
+    avgTrend * 6 +
+    avgCycle * 10 +
+    avgMomentum * 0.4 +
+    hotRatio * 15 +
+    parityScore +
+    sumScore +
+    frameScore +
+    rowScore +
+    seqPenalty +
+    repeatScore +
+    20 // base
+  )));
 }
 
 function estimateProbability(bet: number[], stats: NumberStats[], config: LotteryConfig): number {
-  // Probabilidade combinatória base
   const totalCombinations = binomial(config.numbers, config.pick);
   const baseProbability = 1 / totalCombinations;
-
-  // Ajuste baseado em score estatístico (fator de multiplicação, não altera a probabilidade real)
-  const score = computeStatisticalScore(bet, stats);
-  const adjustmentFactor = 1 + (score - 50) / 100; // score 100 = 1.5x, score 0 = 0.5x
-
+  const betStats = bet.map(n => stats.find(s => s.number === n)).filter(Boolean) as NumberStats[];
+  const avgFreq = betStats.length > 0 ? betStats.reduce((s, st) => s + st.percentage, 0) / betStats.length : 50;
+  const adjustmentFactor = 1 + (avgFreq - 50) / 100;
   return baseProbability * adjustmentFactor;
 }
 
@@ -95,12 +148,62 @@ export function generateProfessionalBets(
   betsPerStrategy: number = 2
 ): ProfessionalBet[] {
   const allBets: ProfessionalBet[] = [];
+  const seenCombos = new Set<string>();
+  const lastDraw = draws.length > 0 ? draws[0].numbers : [];
 
   for (const strat of PRO_STRATEGIES) {
     for (let i = 0; i < betsPerStrategy; i++) {
-      const numbers = generateByStrategy(strat.id, stats, config);
+      let numbers: number[] | null = null;
+      
+      // Step 1-3: Generate base bet via strategy
+      for (let attempt = 0; attempt < 10; attempt++) {
+        const candidate = generateByStrategy(strat.id, stats, config);
+        const key = [...candidate].sort((a, b) => a - b).join(",");
+        
+        // Step 4: Validate against filters
+        const sum = candidate.reduce((a, b) => a + b, 0);
+        const evenCount = candidate.filter(n => n % 2 === 0).length;
+        const idealEven = Math.round(config.pick / 2);
+        
+        // Check parity balance
+        if (Math.abs(evenCount - idealEven) > 2) continue;
+        
+        // Check uniqueness
+        if (seenCombos.has(key)) continue;
+        
+        // For Lotofácil: check frame/center and row distribution
+        if (config.numbers === 25 && config.pick === 15) {
+          const fc = analyzeFrameCenter(candidate);
+          if (fc.frame < 8 || fc.frame > 12) continue;
+          const rows = analyzeRowDistribution(candidate);
+          if (rows.some(r => r === 0)) continue;
+        }
+
+        // Check max sequence run
+        const sorted = [...candidate].sort((a, b) => a - b);
+        let maxRun = 1, curRun = 1;
+        for (let j = 1; j < sorted.length; j++) {
+          if (sorted[j] === sorted[j - 1] + 1) { curRun++; maxRun = Math.max(maxRun, curRun); }
+          else curRun = 1;
+        }
+        if (maxRun > 4) continue;
+
+        numbers = candidate;
+        seenCombos.add(key);
+        break;
+      }
+
+      if (!numbers) {
+        // Fallback: accept any unique bet
+        numbers = generateByStrategy(strat.id, stats, config);
+        const key = [...numbers].sort((a, b) => a - b).join(",");
+        if (seenCombos.has(key)) continue;
+        seenCombos.add(key);
+      }
+
+      // Step 5-6: Evaluate quality and score
       const quality = evaluateBetQuality(numbers, stats, config, draws);
-      const statisticalScore = computeStatisticalScore(numbers, stats);
+      const statisticalScore = computeStatisticalScore(numbers, stats, config, draws);
       const probabilityEstimate = estimateProbability(numbers, stats, config);
 
       allBets.push({
@@ -115,10 +218,10 @@ export function generateProfessionalBets(
     }
   }
 
-  // Rank by combined score
+  // Step 7: Rank by combined score (quality + statistical + diversity bonus)
   allBets.sort((a, b) => {
-    const scoreA = a.quality.overall * 0.6 + a.statisticalScore * 0.4;
-    const scoreB = b.quality.overall * 0.6 + b.statisticalScore * 0.4;
+    const scoreA = a.quality.overall * 0.5 + a.statisticalScore * 0.5;
+    const scoreB = b.quality.overall * 0.5 + b.statisticalScore * 0.5;
     return scoreB - scoreA;
   });
 
