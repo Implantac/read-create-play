@@ -8,9 +8,19 @@ import { getLotteryRules } from "../knowledge/lotteriesKnowledge";
 import { WHEELING_MATRICES, applyWheelingMatrix, type WheelingMatrixId } from "./wheelingMatrices";
 import type { WheelingRequest, WheelingResult, CoverageValidation } from "../core/aiTypes";
 
+/** Find a pre-computed matrix matching the request */
+function findMatchingMatrix(lotteryId: string, baseSize: number, guarantee: number): WheelingMatrixId | null {
+  for (const [id, matrix] of Object.entries(WHEELING_MATRICES)) {
+    if (matrix.lottery === lotteryId && matrix.baseSize === baseSize && matrix.guarantee <= guarantee) {
+      return id as WheelingMatrixId;
+    }
+  }
+  return null;
+}
+
 /**
  * Generate wheeling system — creates minimum games to cover base numbers
- * with mathematical guarantee
+ * with mathematical guarantee. Uses pre-computed matrices when available.
  */
 export function generateWheeling(request: WheelingRequest): WheelingResult {
   const rules = getLotteryRules(request.lotteryId);
