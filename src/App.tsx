@@ -24,6 +24,7 @@ import IAAutonomaPage from "@/pages/IAAutonomaPage";
 import EstatisticasPage from "@/pages/EstatisticasPage";
 import PerfilPage from "@/pages/PerfilPage";
 import ROIDashboardPage from "@/pages/ROIDashboardPage";
+import HistoricoApostasPage from "@/pages/HistoricoApostasPage";
 import LandingPage from "./pages/LandingPage";
 import NotFound from "./pages/NotFound";
 
@@ -55,6 +56,7 @@ function App() {
               <Route path="/estatisticas" element={<EstatisticasPage />} />
               <Route path="/historico" element={<HistoricoPage />} />
               <Route path="/roi" element={<ROIDashboardPage />} />
+              <Route path="/minhas-apostas" element={<HistoricoApostasPage />} />
               <Route path="/planos" element={<PlanosPage />} />
               <Route path="/perfil" element={<PerfilPage />} />
               <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />

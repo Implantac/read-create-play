@@ -1,6 +1,6 @@
 import {
   BarChart3, Sparkles, FlaskConical, History, Zap,
-  Brain, ShieldCheck, Crown, PieChart, TrendingUp,
+  Brain, ShieldCheck, Crown, PieChart, TrendingUp, ClipboardCheck,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -31,6 +31,7 @@ const mainItems = [
   { title: "Simulações", url: "/simulacoes", icon: FlaskConical },
   { title: "Estatísticas", url: "/estatisticas", icon: PieChart },
   { title: "ROI", url: "/roi", icon: TrendingUp },
+  { title: "Minhas Apostas", url: "/minhas-apostas", icon: ClipboardCheck },
   { title: "Histórico", url: "/historico", icon: History },
 ];
 
