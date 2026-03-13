@@ -18,6 +18,7 @@ import {
   CheckCircle2, AlertTriangle, Target, Hash, Layers, Sparkles,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { MatrixComparisonPanel } from "@/components/MatrixComparisonPanel";
 
 // Bet prices per lottery (approximate, single game)
 const BET_PRICES: Record<string, number> = {
@@ -239,6 +240,9 @@ export default function FechamentosPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Comparison panel */}
+      <MatrixComparisonPanel lotteryId={config.id} betPrice={betPrice} />
 
       {/* Number picker */}
       <AnimatePresence>
