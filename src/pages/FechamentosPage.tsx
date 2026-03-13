@@ -241,6 +241,9 @@ export default function FechamentosPage() {
         </CardContent>
       </Card>
 
+      {/* Comparison panel */}
+      <MatrixComparisonPanel lotteryId={config.id} betPrice={betPrice} />
+
       {/* Number picker */}
       <AnimatePresence>
         {selectedMatrix && currentMatrix && (
