@@ -54,6 +54,7 @@ function App() {
               <Route path="/estrategias" element={<EstrategiasPage />} />
               <Route path="/simulacoes" element={<SimulacoesPage />} />
               <Route path="/ia-autonoma" element={<IAAutonomaPage />} />
+              <Route path="/ai-analyst" element={<AIAnalystPage />} />
               <Route path="/estatisticas" element={<EstatisticasPage />} />
               <Route path="/historico" element={<HistoricoPage />} />
               <Route path="/roi" element={<ROIDashboardPage />} />
