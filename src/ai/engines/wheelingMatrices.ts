@@ -105,7 +105,7 @@ function generateQuina12_4(): number[][] {
   for (let a = 0; a < 12; a++)
     for (let b = a + 1; b < 12; b++)
       for (let c = b + 1; c < 12; c++)
-        for (let d = c + 1; c < 12 && d < 12; d++)
+        for (let d = c + 1; d < 12; d++)
           for (let e = d + 1; e < 12; e++)
             allDraws.push([a, b, c, d, e]);
 
