@@ -119,15 +119,48 @@ serve(async (req) => {
         const latestData: CaixaResult = await latestRes.json();
         latestConcurso = latestData.concurso;
 
-        // Also update the latest draw with prize info if missing
+        // Update the latest draw with prize info
         const latestPrizeTiers = extractPrizeTiers(latestData);
-        if (latestPrizeTiers) {
+        const latestNumbers = extractNumbers(latestData);
+        if (latestPrizeTiers && latestNumbers.length > 0) {
+          // Upsert latest draw to ensure it exists with prize data
           await supabase
             .from("lottery_draws")
-            .update({ prize_tiers: latestPrizeTiers })
-            .eq("lottery_id", lottery.id)
-            .eq("concurso", latestData.concurso)
-            .is("prize_tiers", null);
+            .upsert({
+              lottery_id: lottery.id,
+              concurso: latestData.concurso,
+              draw_date: latestData.data || null,
+              numbers: latestNumbers,
+              prize_tiers: latestPrizeTiers,
+            }, { onConflict: "lottery_id,concurso" });
+        }
+
+        // Also backfill prize_tiers for recent draws that are missing them
+        const { data: missingPrizes } = await supabase
+          .from("lottery_draws")
+          .select("concurso")
+          .eq("lottery_id", lottery.id)
+          .is("prize_tiers", null)
+          .order("concurso", { ascending: false })
+          .limit(20);
+
+        if (missingPrizes && missingPrizes.length > 0) {
+          for (const row of missingPrizes) {
+            try {
+              const res = await fetchWithRetry(`${API_BASE}/${lottery.apiName}/${row.concurso}`);
+              if (!res) continue;
+              const data: CaixaResult = await res.json();
+              const pt = extractPrizeTiers(data);
+              if (pt) {
+                await supabase
+                  .from("lottery_draws")
+                  .update({ prize_tiers: pt })
+                  .eq("lottery_id", lottery.id)
+                  .eq("concurso", row.concurso);
+              }
+              await new Promise(r => setTimeout(r, 150));
+            } catch { /* skip */ }
+          }
         }
 
         const { data: existing } = await supabase
