@@ -12,8 +12,9 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Crosshair, Play, Trophy, TrendingUp, Zap, Target, BarChart3,
-  CheckCircle2, XCircle, Minus,
+  CheckCircle2, XCircle, Minus, FileDown,
 } from "lucide-react";
+import { exportToPdf } from "@/engine/pdf-export";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadarChart,
   PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend,
@@ -256,15 +257,50 @@ export function StrategySimulatorPanel({ stats, config, draws }: Props) {
           </div>
         </div>
 
-        {/* Run button */}
-        <Button onClick={runSimulation} disabled={running || draws.length === 0} className="w-full gap-2">
-          {running ? <Zap className="w-4 h-4 animate-pulse" /> : <Play className="w-4 h-4" />}
-          {running
-            ? "Simulando..."
-            : compareMode
-            ? `Comparar 6 estratégias × ${gameCount} jogos`
-            : `Simular ${gameCount} jogos com ${STRATEGIES.find((s) => s.id === selectedStrategy)?.name}`}
-        </Button>
+        {/* Run & Export buttons */}
+        <div className="flex gap-2">
+          <Button onClick={runSimulation} disabled={running || draws.length === 0} className="flex-1 gap-2">
+            {running ? <Zap className="w-4 h-4 animate-pulse" /> : <Play className="w-4 h-4" />}
+            {running
+              ? "Simulando..."
+              : compareMode
+              ? `Comparar 6 estratégias × ${gameCount} jogos`
+              : `Simular ${gameCount} jogos com ${STRATEGIES.find((s) => s.id === selectedStrategy)?.name}`}
+          </Button>
+          {(result || compareResults.length > 0) && (
+            <Button
+              variant="outline"
+              size="icon"
+              title="Exportar PDF"
+              onClick={() => {
+                const source = compareMode ? compareResults : result ? [result] : [];
+                if (source.length === 0) return;
+                const bets = source.flatMap((r) =>
+                  r.games.map((g, i) => ({
+                    numbers: g,
+                    strategy: r.strategyName,
+                    score: Math.round(r.scores[i] || 0),
+                    grade: r.scores[i] >= 80 ? "S" : r.scores[i] >= 60 ? "A" : r.scores[i] >= 40 ? "B" : "C",
+                  }))
+                );
+                const best = source[0];
+                exportToPdf({
+                  title: compareMode
+                    ? "Comparativo de Estratégias"
+                    : `Simulação — ${best.strategyName}`,
+                  subtitle: compareMode
+                    ? `${source.length} estratégias · Melhor: ${best.strategyName} (Média ${best.performance.avgHits.toFixed(2)} acertos, Win ${best.performance.winRate}%)`
+                    : `${best.games.length} jogos · Média ${best.performance.avgHits.toFixed(2)} acertos · Win Rate ${best.performance.winRate}% · Consistência ${Math.round(best.performance.consistency * 100)}%`,
+                  config,
+                  bets,
+                  type: "apostas",
+                });
+              }}
+            >
+              <FileDown className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
 
         <AnimatePresence mode="wait">
           {/* Individual result */}
