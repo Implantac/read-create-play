@@ -20,6 +20,13 @@ const LOTTERIES = [
   { id: "supersete", apiName: "supersete" },
 ];
 
+interface PrizeTier {
+  descricao: string;
+  faixa: number;
+  ganhadores: number;
+  valorPremio: number;
+}
+
 interface CaixaResult {
   concurso: number;
   data?: string;
@@ -27,6 +34,11 @@ interface CaixaResult {
   listaDezenas?: string[];
   dezenasSorteioMunicipioMae?: string[];
   colunas?: string[][];
+  premiacoes?: PrizeTier[];
+  acumulou?: boolean;
+  valorAcumuladoProximoConcurso?: number;
+  valorEstimadoProximoConcurso?: number;
+  valorArrecadado?: number;
 }
 
 async function fetchWithRetry(url: string, retries = 3): Promise<Response | null> {
@@ -34,7 +46,7 @@ async function fetchWithRetry(url: string, retries = 3): Promise<Response | null
     try {
       const res = await fetch(url);
       if (res.ok) return res;
-      if (res.status === 404) return null; // concurso doesn't exist
+      if (res.status === 404) return null;
     } catch {
       // retry
     }
@@ -46,12 +58,29 @@ async function fetchWithRetry(url: string, retries = 3): Promise<Response | null
 }
 
 function extractNumbers(raw: CaixaResult): number[] {
-  // Super Sete has columns format
   if (raw.colunas && Array.isArray(raw.colunas)) {
     return raw.colunas.flat().map((d: string) => parseInt(d, 10)).filter((n: number) => !isNaN(n));
   }
   const dezenas = raw.dezenas || raw.listaDezenas || [];
   return dezenas.map((d: string) => parseInt(d, 10)).filter((n: number) => !isNaN(n));
+}
+
+function extractPrizeTiers(raw: CaixaResult): object | null {
+  if (!raw.premiacoes || !Array.isArray(raw.premiacoes) || raw.premiacoes.length === 0) {
+    return null;
+  }
+  return {
+    premiacoes: raw.premiacoes.map(p => ({
+      descricao: p.descricao,
+      faixa: p.faixa,
+      ganhadores: p.ganhadores,
+      valorPremio: p.valorPremio,
+    })),
+    acumulou: raw.acumulou ?? false,
+    valorAcumulado: raw.valorAcumuladoProximoConcurso ?? 0,
+    valorEstimado: raw.valorEstimadoProximoConcurso ?? 0,
+    valorArrecadado: raw.valorArrecadado ?? 0,
+  };
 }
 
 serve(async (req) => {
@@ -81,7 +110,6 @@ serve(async (req) => {
       let latestConcurso = 0;
 
       try {
-        // Get latest concurso from API
         const latestRes = await fetchWithRetry(`${API_BASE}/${lottery.apiName}/latest`);
         if (!latestRes) {
           console.error(`Failed to fetch latest for ${lottery.id}`);
@@ -91,7 +119,17 @@ serve(async (req) => {
         const latestData: CaixaResult = await latestRes.json();
         latestConcurso = latestData.concurso;
 
-        // Get what we already have
+        // Also update the latest draw with prize info if missing
+        const latestPrizeTiers = extractPrizeTiers(latestData);
+        if (latestPrizeTiers) {
+          await supabase
+            .from("lottery_draws")
+            .update({ prize_tiers: latestPrizeTiers })
+            .eq("lottery_id", lottery.id)
+            .eq("concurso", latestData.concurso)
+            .is("prize_tiers", null);
+        }
+
         const { data: existing } = await supabase
           .from("lottery_draws")
           .select("concurso")
@@ -111,7 +149,6 @@ serve(async (req) => {
 
         console.log(`${lottery.id}: fetching ${startFrom} to ${endAt}`);
 
-        // Fetch in batches of 10
         const batchSize = 10;
         for (let batch = startFrom; batch <= endAt; batch += batchSize) {
           const promises: Promise<CaixaResult | null>[] = [];
@@ -129,11 +166,13 @@ serve(async (req) => {
             .filter((r): r is CaixaResult => r !== null && !!r.concurso)
             .map((r) => {
               const numbers = extractNumbers(r);
+              const prizeTiers = extractPrizeTiers(r);
               return {
                 lottery_id: lottery.id,
                 concurso: r.concurso,
                 draw_date: r.data || null,
                 numbers,
+                prize_tiers: prizeTiers,
               };
             })
             .filter((r) => r.numbers.length > 0);
@@ -151,7 +190,6 @@ serve(async (req) => {
             }
           }
 
-          // Delay between batches to avoid rate limiting
           await new Promise((r) => setTimeout(r, 200));
         }
       } catch (e) {
