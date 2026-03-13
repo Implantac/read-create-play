@@ -2,6 +2,7 @@ import { NumberStats, generateSmartBet } from "./statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { evaluateBetQuality, BetQualityReport } from "./bet-quality";
 import { generateByStrategy, Strategy } from "./strategies";
+import { analyzeFrameCenter, computeIdealFrameCenter, analyzeRowDistribution } from "./generation-filters";
 
 // ═══════════════════════════════════════════════════════
 // GERADOR PROFISSIONAL DE APOSTAS
