@@ -96,6 +96,151 @@ function generateMegaSena10_5(): number[][] {
 }
 
 // ═══════════════════════════════════════════
+// QUINA: 12 base → jogos de 5 → garantia 4 pts (Quadra)
+// C(12,5) = 792 possíveis sorteios
+// ═══════════════════════════════════════════
+function generateQuina12_4(): number[][] {
+  const all12 = Array.from({ length: 12 }, (_, i) => i);
+  const allDraws: number[][] = [];
+  for (let a = 0; a < 12; a++)
+    for (let b = a + 1; b < 12; b++)
+      for (let c = b + 1; c < 12; c++)
+        for (let d = c + 1; c < 12 && d < 12; d++)
+          for (let e = d + 1; e < 12; e++)
+            allDraws.push([a, b, c, d, e]);
+
+  // Greedy covering for guarantee 4
+  const uncovered = new Set(allDraws.map((_, i) => i));
+  const selected: number[][] = [];
+
+  while (uncovered.size > 0 && selected.length < 50) {
+    let bestGame = -1;
+    let bestCount = 0;
+    for (let g = 0; g < allDraws.length; g++) {
+      const gameSet = new Set(allDraws[g]);
+      let covers = 0;
+      for (const dIdx of uncovered) {
+        const hits = allDraws[dIdx].filter(n => gameSet.has(n)).length;
+        if (hits >= 4) covers++;
+      }
+      if (covers > bestCount) { bestCount = covers; bestGame = g; }
+    }
+    if (bestGame === -1 || bestCount === 0) break;
+    selected.push(allDraws[bestGame]);
+    const selSet = new Set(allDraws[bestGame]);
+    for (const dIdx of [...uncovered]) {
+      const hits = allDraws[dIdx].filter(n => selSet.has(n)).length;
+      if (hits >= 4) uncovered.delete(dIdx);
+    }
+  }
+  return selected;
+}
+
+// ═══════════════════════════════════════════
+// DUPLA SENA: 10 base → jogos de 6 → garantia 4 pts (Quadra)
+// C(10,6) = 210 possíveis sorteios
+// ═══════════════════════════════════════════
+function generateDuplaSena10_4(): number[][] {
+  const all10 = Array.from({ length: 10 }, (_, i) => i);
+  const allDraws: number[][] = [];
+  for (let a = 0; a < 10; a++)
+    for (let b = a + 1; b < 10; b++)
+      for (let c = b + 1; c < 10; c++)
+        for (let d = c + 1; d < 10; d++)
+          for (let e = d + 1; e < 10; e++)
+            for (let f = e + 1; f < 10; f++)
+              allDraws.push([a, b, c, d, e, f]);
+
+  const uncovered = new Set(allDraws.map((_, i) => i));
+  const selected: number[][] = [];
+
+  while (uncovered.size > 0 && selected.length < 25) {
+    let bestGame = -1;
+    let bestCount = 0;
+    for (let g = 0; g < allDraws.length; g++) {
+      const gameSet = new Set(allDraws[g]);
+      let covers = 0;
+      for (const dIdx of uncovered) {
+        const hits = allDraws[dIdx].filter(n => gameSet.has(n)).length;
+        if (hits >= 4) covers++;
+      }
+      if (covers > bestCount) { bestCount = covers; bestGame = g; }
+    }
+    if (bestGame === -1 || bestCount === 0) break;
+    selected.push(allDraws[bestGame]);
+    const selSet = new Set(allDraws[bestGame]);
+    for (const dIdx of [...uncovered]) {
+      const hits = allDraws[dIdx].filter(n => selSet.has(n)).length;
+      if (hits >= 4) uncovered.delete(dIdx);
+    }
+  }
+  return selected;
+}
+
+// ═══════════════════════════════════════════
+// TIMEMANIA: 15 base → jogos de 10 → garantia 7 pts
+// ═══════════════════════════════════════════
+function generateTimemania15_7(): number[][] {
+  const baseSize = 15;
+  const pick = 10;
+  const guarantee = 7;
+
+  // Each game picks 10 of 15, i.e. excludes 5
+  // Generate exclude patterns systematically: C(15,5) = 3003, but we only need ~40 games
+  const all15 = Array.from({ length: baseSize }, (_, i) => i);
+
+  // Generate all C(15,10) = 3003 possible games
+  const allGames: number[][] = [];
+  const allDraws: number[][] = [];
+
+  // For efficiency, generate games by choosing which 5 to exclude
+  function combos(arr: number[], k: number): number[][] {
+    const res: number[][] = [];
+    function bt(start: number, cur: number[]) {
+      if (cur.length === k) { res.push([...cur]); return; }
+      for (let i = start; i < arr.length; i++) { cur.push(arr[i]); bt(i + 1, cur); cur.pop(); }
+    }
+    bt(0, []);
+    return res;
+  }
+
+  const excludePatterns = combos(all15, 5);
+  for (const excl of excludePatterns) {
+    const exSet = new Set(excl);
+    allGames.push(all15.filter(i => !exSet.has(i)));
+  }
+
+  // All possible draws: C(15,10) same as games
+  const allDrawsRef = [...allGames];
+
+  // Greedy covering
+  const uncovered = new Set(allDrawsRef.map((_, i) => i));
+  const selected: number[][] = [];
+
+  while (uncovered.size > 0 && selected.length < 45) {
+    let bestGame = -1;
+    let bestCount = 0;
+    for (let g = 0; g < allGames.length; g++) {
+      const gameSet = new Set(allGames[g]);
+      let covers = 0;
+      for (const dIdx of uncovered) {
+        const hits = allDrawsRef[dIdx].filter(n => gameSet.has(n)).length;
+        if (hits >= guarantee) covers++;
+      }
+      if (covers > bestCount) { bestCount = covers; bestGame = g; }
+    }
+    if (bestGame === -1 || bestCount === 0) break;
+    selected.push(allGames[bestGame]);
+    const selSet = new Set(allGames[bestGame]);
+    for (const dIdx of [...uncovered]) {
+      const hits = allDrawsRef[dIdx].filter(n => selSet.has(n)).length;
+      if (hits >= guarantee) uncovered.delete(dIdx);
+    }
+  }
+  return selected;
+}
+
+// ═══════════════════════════════════════════
 // LOTOMANIA: 60 base → jogos de 50 → cobertura equilibrada
 // Cada jogo exclui 10 dos 60 números-base
 // ═══════════════════════════════════════════
