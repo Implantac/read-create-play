@@ -58,6 +58,28 @@ export default function FechamentosPage() {
     return v;
   };
 
+  // Auto-select best numbers based on frequency + delay score
+  const autoSelectNumbers = () => {
+    if (!currentMatrix || !stats || stats.length === 0) return;
+    const scored = stats
+      .filter((s) => s.number >= 1 && s.number <= config.numbers)
+      .map((s) => ({
+        number: s.number,
+        // Composite score: high frequency + high delay ("due") + positive trend + cycle score
+        score:
+          s.frequency * 0.3 +
+          s.lastSeen * 0.25 +
+          s.cycleScore * 0.25 +
+          s.trend * 0.1 +
+          s.recentFreq * 0.1,
+      }))
+      .sort((a, b) => b.score - a.score);
+
+    const selected = scored.slice(0, currentMatrix.baseSize).map((s) => s.number).sort((a, b) => a - b);
+    setBaseNumbers(selected);
+    setGeneratedGames(null);
+  };
+
   // Toggle number selection for base
   const toggleNumber = (n: number) => {
     setBaseNumbers((prev) =>
