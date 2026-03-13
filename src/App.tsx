@@ -21,6 +21,7 @@ import SignupPage from "@/pages/SignupPage";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import IAAutonomaPage from "@/pages/IAAutonomaPage";
+import AIAnalystPage from "@/pages/AIAnalystPage";
 import EstatisticasPage from "@/pages/EstatisticasPage";
 import PerfilPage from "@/pages/PerfilPage";
 import ROIDashboardPage from "@/pages/ROIDashboardPage";
