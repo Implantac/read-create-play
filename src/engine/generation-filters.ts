@@ -15,6 +15,12 @@ export interface GenerationFilters {
   maxConsecutive: number | null; // máximo de sequências consecutivas
   mustIncludeHot: number;       // mínimo de dezenas quentes
   mustIncludeCold: number;      // mínimo de dezenas frias
+  minFrameNumbers: number | null;  // mínimo de números na moldura (Lotofácil)
+  maxFrameNumbers: number | null;  // máximo de números na moldura
+  minRowsCovered: number | null;   // mínimo de linhas cobertas
+  maxSequenceRun: number | null;   // máximo de sequência contínua (ex: 1-2-3-4)
+  minRepeatFromLast: number | null; // mínimo de repetições do concurso anterior
+  maxRepeatFromLast: number | null; // máximo de repetições do concurso anterior
 }
 
 export const DEFAULT_FILTERS: GenerationFilters = {
@@ -27,6 +33,12 @@ export const DEFAULT_FILTERS: GenerationFilters = {
   maxConsecutive: null,
   mustIncludeHot: 0,
   mustIncludeCold: 0,
+  minFrameNumbers: null,
+  maxFrameNumbers: null,
+  minRowsCovered: null,
+  maxSequenceRun: null,
+  minRepeatFromLast: null,
+  maxRepeatFromLast: null,
 };
 
 /**
