@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { Brain, Loader2 } from "lucide-react";
 
+const StrategySimulatorPanel = lazy(() => import("@/components/StrategySimulatorPanel").then(m => ({ default: m.StrategySimulatorPanel })));
 const StrategyComparatorPanel = lazy(() => import("@/components/StrategyComparatorPanel").then(m => ({ default: m.StrategyComparatorPanel })));
 const PatternDetectorPanel = lazy(() => import("@/components/PatternDetectorPanel").then(m => ({ default: m.PatternDetectorPanel })));
 const OptimizationPanel = lazy(() => import("@/components/OptimizationPanel").then(m => ({ default: m.OptimizationPanel })));
