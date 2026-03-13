@@ -12,7 +12,8 @@ function formatCurrency(value: number): string {
 }
 
 export function RecentDraws({ draws }: Props) {
-  const [expandedDraw, setExpandedDraw] = useState<number | null>(null);
+  const firstWithPrizes = draws.find(d => d.prizeTiers?.premiacoes?.length);
+  const [expandedDraw, setExpandedDraw] = useState<number | null>(firstWithPrizes?.concurso ?? null);
 
   return (
     <div className="rounded-xl glass-card p-5 space-y-4">
