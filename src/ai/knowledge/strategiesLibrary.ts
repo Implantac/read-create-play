@@ -212,7 +212,7 @@ export function strategyAntiPattern(
     // Penalize popular numbers (anti-popular)
     const popularityPenalty = s.frequency / draws.length;
     // Favor numbers with irregular patterns
-    const irregularity = s.stdDevInterval || 1;
+    const irregularity = (s as any).stdDevInterval || 1;
     
     const score = irregularity * 2 - seqPenalty * 3 - popularityPenalty * 1.5;
     weights.set(s.number, Math.max(0.1, score));
