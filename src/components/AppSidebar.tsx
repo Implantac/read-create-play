@@ -30,6 +30,7 @@ const mainItems = [
   { title: "AI Analyst", url: "/ai-analyst", icon: Bot },
   { title: "Estratégias IA", url: "/estrategias", icon: Brain },
   { title: "Simulações", url: "/simulacoes", icon: FlaskConical },
+  { title: "Fechamentos", url: "/fechamentos", icon: Grid3X3 },
   { title: "Estatísticas", url: "/estatisticas", icon: PieChart },
   { title: "ROI", url: "/roi", icon: TrendingUp },
   { title: "Minhas Apostas", url: "/minhas-apostas", icon: ClipboardCheck },
