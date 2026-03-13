@@ -248,6 +248,43 @@ function scoreBet(
     } else {
       score -= 5; details.push(`⚠ Apenas ${goldenCount}/4 dezenas de ouro`);
     }
+
+    // Frame/Center (Moldura/Centro) scoring
+    const FRAME = new Set([1,2,3,4,5,6,10,11,15,16,20,21,22,23,24,25]);
+    const frameCount = bet.filter(n => FRAME.has(n)).length;
+    const centerCount = bet.length - frameCount;
+    if (frameCount >= 9 && frameCount <= 11) {
+      score += 5; details.push(`Moldura ${frameCount}/${centerCount} ✓`);
+    } else if (frameCount >= 8 && frameCount <= 12) {
+      score += 2; details.push(`Moldura ${frameCount}/${centerCount} aceitável`);
+    } else {
+      score -= 8; details.push(`⚠ Moldura ${frameCount}/${centerCount} desequilibrada`);
+    }
+
+    // Row distribution (5x5 grid - no empty rows)
+    const rowCounts = [0,0,0,0,0];
+    for (const n of bet) { rowCounts[Math.floor((n - 1) / 5)]++; }
+    const emptyRows = rowCounts.filter(r => r === 0).length;
+    if (emptyRows === 0) {
+      score += 3; details.push(`Todas 5 linhas cobertas ✓`);
+    } else {
+      score -= 10; details.push(`⚠ ${emptyRows} linha(s) vazia(s)`);
+    }
+
+    // Maximum sequence run (avoid 1-2-3-4-5 type runs)
+    let maxRun = 1, curRunSeq = 1;
+    const sortedBet = [...bet].sort((a, b) => a - b);
+    for (let i = 1; i < sortedBet.length; i++) {
+      if (sortedBet[i] === sortedBet[i-1] + 1) { curRunSeq++; maxRun = Math.max(maxRun, curRunSeq); }
+      else curRunSeq = 1;
+    }
+    if (maxRun <= 3) {
+      score += 2;
+    } else if (maxRun <= 4) {
+      details.push(`Sequência de ${maxRun} consecutivos`);
+    } else {
+      score -= 5; details.push(`⚠ Sequência longa de ${maxRun} consecutivos`);
+    }
   }
 
   return { score: Math.max(0, Math.min(100, score)), details };
