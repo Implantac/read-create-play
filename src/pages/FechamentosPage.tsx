@@ -15,7 +15,7 @@ import {
 import { exportToPdf } from "@/engine/pdf-export";
 import {
   Grid3X3, Shield, Trophy, Coins, FileDown, ChevronRight,
-  CheckCircle2, AlertTriangle, Target, Hash, Layers,
+  CheckCircle2, AlertTriangle, Target, Hash, Layers, Sparkles,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -56,6 +56,28 @@ export default function FechamentosPage() {
     const v = validateMatrix(id);
     setValidationCache((prev) => ({ ...prev, [id]: v }));
     return v;
+  };
+
+  // Auto-select best numbers based on frequency + delay score
+  const autoSelectNumbers = () => {
+    if (!currentMatrix || !stats || stats.length === 0) return;
+    const scored = stats
+      .filter((s) => s.number >= 1 && s.number <= config.numbers)
+      .map((s) => ({
+        number: s.number,
+        // Composite score: high frequency + high delay ("due") + positive trend + cycle score
+        score:
+          s.frequency * 0.3 +
+          s.lastSeen * 0.25 +
+          s.cycleScore * 0.25 +
+          s.trend * 0.1 +
+          s.recentFreq * 0.1,
+      }))
+      .sort((a, b) => b.score - a.score);
+
+    const selected = scored.slice(0, currentMatrix.baseSize).map((s) => s.number).sort((a, b) => a - b);
+    setBaseNumbers(selected);
+    setGeneratedGames(null);
   };
 
   // Toggle number selection for base
@@ -281,6 +303,15 @@ export default function FechamentosPage() {
                   >
                     <Grid3X3 className="w-4 h-4" />
                     Gerar {currentMatrix.games.length} Jogos
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={autoSelectNumbers}
+                    className="gap-1.5"
+                    title="Selecionar automaticamente as melhores dezenas com base em frequência, atraso e tendência"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    Auto-Seleção
                   </Button>
                   {baseNumbers.length > 0 && (
                     <Button
