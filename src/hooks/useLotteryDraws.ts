@@ -3,11 +3,31 @@ import { DrawResult } from "@/data/lotteries";
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 
+export interface PrizeTierInfo {
+  descricao: string;
+  faixa: number;
+  ganhadores: number;
+  valorPremio: number;
+}
+
+export interface DrawPrizeData {
+  premiacoes: PrizeTierInfo[];
+  acumulou: boolean;
+  valorAcumulado: number;
+  valorEstimado: number;
+  valorArrecadado: number;
+}
+
+export interface DrawResultWithPrizes extends DrawResult {
+  prizeTiers?: DrawPrizeData | null;
+}
+
 /**
  * Hook to load lottery draws from Supabase database
  */
 export function useLotteryDraws(lotteryId: string) {
   const [draws, setDraws] = useState<DrawResult[]>([]);
+  const [drawsWithPrizes, setDrawsWithPrizes] = useState<DrawResultWithPrizes[]>([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [count, setCount] = useState(0);
@@ -15,7 +35,6 @@ export function useLotteryDraws(lotteryId: string) {
   const fetchDraws = useCallback(async () => {
     setLoading(true);
     try {
-      // Fetch all draws - paginate to avoid 1000-row default limit
       let allData: any[] = [];
       let from = 0;
       const pageSize = 1000;
@@ -24,7 +43,7 @@ export function useLotteryDraws(lotteryId: string) {
       while (true) {
         const { data, error: pageError, count } = await supabase
           .from("lottery_draws")
-          .select("concurso, draw_date, numbers", { count: "exact" })
+          .select("concurso, draw_date, numbers, prize_tiers", { count: "exact" })
           .eq("lottery_id", lotteryId)
           .order("concurso", { ascending: false })
           .range(from, from + pageSize - 1);
@@ -43,11 +62,18 @@ export function useLotteryDraws(lotteryId: string) {
         numbers: row.numbers || [],
       }));
 
+      const mappedWithPrizes: DrawResultWithPrizes[] = allData.map((row: any) => ({
+        concurso: row.concurso,
+        date: row.draw_date || "",
+        numbers: row.numbers || [],
+        prizeTiers: row.prize_tiers as DrawPrizeData | null,
+      }));
+
       setDraws(mapped);
+      setDrawsWithPrizes(mappedWithPrizes);
       setCount(totalCount || mapped.length);
     } catch (e) {
       console.error("Error fetching draws:", e);
-      // Don't show error toast on initial load - data might not be synced yet
     } finally {
       setLoading(false);
     }
@@ -74,7 +100,6 @@ export function useLotteryDraws(lotteryId: string) {
         }
       }
 
-      // Reload draws after sync
       await fetchDraws();
     } catch (e) {
       console.error("Sync error:", e);
@@ -131,6 +156,7 @@ export function useLotteryDraws(lotteryId: string) {
 
   return {
     draws,
+    drawsWithPrizes,
     loading,
     syncing,
     count,
