@@ -12,8 +12,9 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Crosshair, Play, Trophy, TrendingUp, Zap, Target, BarChart3,
-  CheckCircle2, XCircle, Minus,
+  CheckCircle2, XCircle, Minus, FileDown,
 } from "lucide-react";
+import { exportToPdf } from "@/engine/pdf-export";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadarChart,
   PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend,
