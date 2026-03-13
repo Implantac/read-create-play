@@ -62,6 +62,10 @@ const GeradorPage = () => {
           </Suspense>
 
           <Suspense fallback={<LazyFallback />}>
+            <ExtremeGeneratorPanel stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
+          </Suspense>
+
+          <Suspense fallback={<LazyFallback />}>
             <AIPredictionPanel config={config} stats={stats} onSaveBet={handleSaveBet} />
           </Suspense>
 
