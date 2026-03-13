@@ -785,9 +785,10 @@ ${topPairs.join(", ")}
 ═══ FREQ GERAL TOP 30 ═══
 ${[...allNums].sort((a, b) => (freq[b] || 0) - (freq[a] || 0)).slice(0, 30).map(n => `${n}:${freq[n]}`).join(", ")}
 ${lotofacilExtra}
+${frameCenterInfo}
 
-Gere ${Math.min(count, 10)} apostas otimizadas para ${profile.name} seguindo TODOS os critérios.
-Para cada aposta, garanta que TODOS os filtros de qualidade passem antes de incluí-la.`;
+Gere ${Math.min(count, 10)} apostas otimizadas para ${profile.name} seguindo o PIPELINE COMPLETO de 7 passos.
+Para cada aposta, aplique TODOS os 10 pilares profissionais e garanta que TODOS os filtros passem.`;
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

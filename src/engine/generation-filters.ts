@@ -129,7 +129,142 @@ export function betMatchesFilters(bet: number[], filters: GenerationFilters, sta
     if (coldCount < filters.mustIncludeCold) return false;
   }
 
+  // Moldura/Centro (Lotofácil grid: 5x5, moldura = border numbers)
+  if (filters.minFrameNumbers !== null || filters.maxFrameNumbers !== null) {
+    const frameCount = bet.filter(n => isFrameNumber(n)).length;
+    if (filters.minFrameNumbers !== null && frameCount < filters.minFrameNumbers) return false;
+    if (filters.maxFrameNumbers !== null && frameCount > filters.maxFrameNumbers) return false;
+  }
+
+  // Cobertura de linhas (grade 5x5 para Lotofácil, adaptável)
+  if (filters.minRowsCovered !== null) {
+    const rows = new Set(bet.map(n => Math.ceil(n / 5)));
+    if (rows.size < filters.minRowsCovered) return false;
+  }
+
+  // Sequência máxima contínua (ex: 1-2-3-4 = run de 4)
+  if (filters.maxSequenceRun !== null) {
+    const sorted = [...bet].sort((a, b) => a - b);
+    let maxRun = 1, curRun = 1;
+    for (let i = 1; i < sorted.length; i++) {
+      if (sorted[i] === sorted[i - 1] + 1) { curRun++; maxRun = Math.max(maxRun, curRun); }
+      else curRun = 1;
+    }
+    if (maxRun > filters.maxSequenceRun) return false;
+  }
+
+  // Repetição do concurso anterior (requer lastDraw no contexto - validado externamente)
+  // Nota: minRepeatFromLast e maxRepeatFromLast são validados via betMatchesFiltersWithLastDraw
+
   return true;
+}
+
+/**
+ * Verifica filtros incluindo comparação com sorteio anterior
+ */
+export function betMatchesFiltersWithLastDraw(
+  bet: number[],
+  filters: GenerationFilters,
+  stats: NumberStats[],
+  lastDraw: number[]
+): boolean {
+  if (!betMatchesFilters(bet, filters, stats)) return false;
+
+  if (lastDraw.length > 0) {
+    const repeated = bet.filter(n => lastDraw.includes(n)).length;
+    if (filters.minRepeatFromLast !== null && repeated < filters.minRepeatFromLast) return false;
+    if (filters.maxRepeatFromLast !== null && repeated > filters.maxRepeatFromLast) return false;
+  }
+
+  return true;
+}
+
+// ═══════════════════════════════════════════════════════
+// MOLDURA / CENTRO (Lotofácil 5×5 grid)
+// ═══════════════════════════════════════════════════════
+
+// Lotofácil grid 5×5:
+//  1  2  3  4  5
+//  6  7  8  9 10
+// 11 12 13 14 15
+// 16 17 18 19 20
+// 21 22 23 24 25
+//
+// Moldura (border): 1,2,3,4,5,6,10,11,15,16,20,21,22,23,24,25 = 16 números
+// Centro (inner):   7,8,9,12,13,14,17,18,19 = 9 números
+
+const FRAME_NUMBERS = new Set([1,2,3,4,5,6,10,11,15,16,20,21,22,23,24,25]);
+const CENTER_NUMBERS = new Set([7,8,9,12,13,14,17,18,19]);
+
+export function isFrameNumber(n: number): boolean {
+  return FRAME_NUMBERS.has(n);
+}
+
+export function isCenterNumber(n: number): boolean {
+  return CENTER_NUMBERS.has(n);
+}
+
+/**
+ * Analisa distribuição moldura/centro de uma aposta
+ */
+export function analyzeFrameCenter(bet: number[]): { frame: number; center: number; ratio: string } {
+  const frame = bet.filter(n => FRAME_NUMBERS.has(n)).length;
+  const center = bet.filter(n => CENTER_NUMBERS.has(n)).length;
+  return { frame, center, ratio: `${frame}/${center}` };
+}
+
+/**
+ * Retorna distribuição ideal de moldura/centro baseada no histórico
+ */
+export function computeIdealFrameCenter(draws: DrawResult[]): { minFrame: number; maxFrame: number; avgFrame: number; avgCenter: number } {
+  if (draws.length === 0) return { minFrame: 9, maxFrame: 11, avgFrame: 10, avgCenter: 5 };
+  
+  const frameCounts = draws.map(d => d.numbers.filter(n => FRAME_NUMBERS.has(n)).length);
+  const avg = frameCounts.reduce((a, b) => a + b, 0) / frameCounts.length;
+  const stdDev = Math.sqrt(frameCounts.reduce((s, v) => s + (v - avg) ** 2, 0) / frameCounts.length);
+  
+  return {
+    minFrame: Math.max(0, Math.round(avg - stdDev)),
+    maxFrame: Math.min(16, Math.round(avg + stdDev)),
+    avgFrame: Math.round(avg * 10) / 10,
+    avgCenter: Math.round((15 - avg) * 10) / 10,
+  };
+}
+
+/**
+ * Analisa distribuição por linhas na grade 5×5
+ */
+export function analyzeRowDistribution(bet: number[], gridCols: number = 5): number[] {
+  const rows = Math.ceil(25 / gridCols);
+  const dist = new Array(rows).fill(0);
+  for (const n of bet) {
+    const row = Math.floor((n - 1) / gridCols);
+    if (row < rows) dist[row]++;
+  }
+  return dist;
+}
+
+/**
+ * Computa distribuição ideal por linhas baseada no histórico
+ */
+export function computeIdealRowDistribution(draws: DrawResult[], gridCols: number = 5): { avg: number[]; min: number } {
+  const rows = Math.ceil(25 / gridCols);
+  if (draws.length === 0) return { avg: new Array(rows).fill(3), min: 2 };
+  
+  const allDists = draws.map(d => analyzeRowDistribution(d.numbers, gridCols));
+  const avg = new Array(rows).fill(0);
+  for (const dist of allDists) {
+    for (let i = 0; i < rows; i++) avg[i] += dist[i];
+  }
+  for (let i = 0; i < rows; i++) avg[i] = Math.round((avg[i] / draws.length) * 10) / 10;
+  
+  // Minimum per row (rarely 0)
+  const minPerRow = allDists.reduce((min, dist) => {
+    const rowMin = Math.min(...dist);
+    return Math.min(min, rowMin);
+  }, 999);
+  
+  return { avg, min: Math.max(1, Math.round(minPerRow)) };
 }
 
 /**
