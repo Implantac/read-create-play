@@ -239,7 +239,7 @@ export const WHEELING_MATRICES = {
     guarantee: 15,
     games: generateLotomania25_15(),
   },
-} as const;
+};
 
 export type WheelingMatrixId = keyof typeof WHEELING_MATRICES;
 
