@@ -35,6 +35,23 @@ export function generateWheeling(request: WheelingRequest): WheelingResult {
     };
   }
 
+  // Check for pre-computed optimized matrix
+  const matrixId = findMatchingMatrix(request.lotteryId, base.length, guarantee);
+  if (matrixId) {
+    const { games: matrixGames } = applyWheelingMatrix(matrixId, base);
+    if (matrixGames.length > 0) {
+      const matrix = WHEELING_MATRICES[matrixId];
+      const validation = validateCoverage(matrixGames, base, pick, guarantee);
+      const estimatedCost = matrixGames.length * rules.ticketPrice;
+      return {
+        games: matrixGames, baseNumbers: base, totalGames: matrixGames.length,
+        guarantee, estimatedCost, coverageValidation: validation,
+        explanation: `🎯 Matriz otimizada "${matrix.name}" aplicada: ${matrixGames.length} jogos com garantia de ${guarantee}+ acertos. ` +
+          `Cobertura: ${validation.coveragePercent.toFixed(1)}%. Custo: R$ ${estimatedCost.toFixed(2)}.`,
+      };
+    }
+  }
+
   // Generate all pick-sized combinations from base, then use greedy set cover
   const allCombinations = generateCombinations(base, pick);
   
