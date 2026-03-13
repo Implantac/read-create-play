@@ -1,10 +1,11 @@
 /**
  * Native AI — Wheeling Engine
  * Mathematical wheeling/closure systems with coverage guarantees
- * Priority: Lotofácil 18-number closure with 14-point guarantee
+ * Uses pre-computed matrices when available for optimal results
  */
 
 import { getLotteryRules } from "../knowledge/lotteriesKnowledge";
+import { WHEELING_MATRICES, applyWheelingMatrix, type WheelingMatrixId } from "./wheelingMatrices";
 import type { WheelingRequest, WheelingResult, CoverageValidation } from "../core/aiTypes";
 
 /**
