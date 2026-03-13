@@ -21,6 +21,7 @@ import SignupPage from "@/pages/SignupPage";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import IAAutonomaPage from "@/pages/IAAutonomaPage";
+import AIAnalystPage from "@/pages/AIAnalystPage";
 import EstatisticasPage from "@/pages/EstatisticasPage";
 import PerfilPage from "@/pages/PerfilPage";
 import ROIDashboardPage from "@/pages/ROIDashboardPage";
@@ -53,6 +54,7 @@ function App() {
               <Route path="/estrategias" element={<EstrategiasPage />} />
               <Route path="/simulacoes" element={<SimulacoesPage />} />
               <Route path="/ia-autonoma" element={<IAAutonomaPage />} />
+              <Route path="/ai-analyst" element={<AIAnalystPage />} />
               <Route path="/estatisticas" element={<EstatisticasPage />} />
               <Route path="/historico" element={<HistoricoPage />} />
               <Route path="/roi" element={<ROIDashboardPage />} />

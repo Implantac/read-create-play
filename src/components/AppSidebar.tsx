@@ -27,6 +27,7 @@ const mainItems = [
   { title: "Dashboard", url: "/", icon: BarChart3 },
   { title: "Gerador", url: "/gerador", icon: Sparkles },
   { title: "IA Autônoma", url: "/ia-autonoma", icon: Zap },
+  { title: "AI Analyst", url: "/ai-analyst", icon: Brain },
   { title: "Estratégias IA", url: "/estrategias", icon: Brain },
   { title: "Simulações", url: "/simulacoes", icon: FlaskConical },
   { title: "Estatísticas", url: "/estatisticas", icon: PieChart },
