@@ -7,16 +7,8 @@
 
 /**
  * LOTOFÁCIL: 18 base → 15 pick → guarantee 14 points
- * Each game excludes 3 positions from the 18.
- * Any 15 drawn from the 18 will have ≥14 hits with at least one game.
- * 
  * Coverage: 100% of C(18,3)=816 possible draws
- * Games: 18 (optimized minimum)
  */
-export const LOTOFACIL_18_14: number[][] = [
-  // Each row = indices to EXCLUDE from the 18 base numbers
-  // We store the 15 INCLUDED indices for each game
-].length === 0 ? generateLotofacil18_14() : [];
 
 function generateLotofacil18_14(): number[][] {
   // Systematic exclusion patterns ensuring every triple of excluded numbers
