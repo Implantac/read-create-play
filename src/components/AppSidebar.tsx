@@ -31,6 +31,7 @@ const mainItems = [
   { title: "Simulações", url: "/simulacoes", icon: FlaskConical },
   { title: "Estatísticas", url: "/estatisticas", icon: PieChart },
   { title: "ROI", url: "/roi", icon: TrendingUp },
+  { title: "Minhas Apostas", url: "/minhas-apostas", icon: ClipboardCheck },
   { title: "Histórico", url: "/historico", icon: History },
 ];
 
