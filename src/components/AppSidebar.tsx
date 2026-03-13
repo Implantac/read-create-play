@@ -1,6 +1,6 @@
 import {
   BarChart3, Sparkles, FlaskConical, History, Zap,
-  Brain, ShieldCheck, Crown, PieChart, TrendingUp, ClipboardCheck,
+  Brain, ShieldCheck, Crown, PieChart, TrendingUp, ClipboardCheck, Bot,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
