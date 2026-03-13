@@ -106,14 +106,11 @@ function computeStatisticalScore(bet: number[], stats: NumberStats[], config: Lo
 }
 
 function estimateProbability(bet: number[], stats: NumberStats[], config: LotteryConfig): number {
-  // Probabilidade combinatória base
   const totalCombinations = binomial(config.numbers, config.pick);
   const baseProbability = 1 / totalCombinations;
-
-  // Ajuste baseado em score estatístico (fator de multiplicação, não altera a probabilidade real)
-  const score = computeStatisticalScore(bet, stats);
-  const adjustmentFactor = 1 + (score - 50) / 100; // score 100 = 1.5x, score 0 = 0.5x
-
+  const betStats = bet.map(n => stats.find(s => s.number === n)).filter(Boolean) as NumberStats[];
+  const avgFreq = betStats.length > 0 ? betStats.reduce((s, st) => s + st.percentage, 0) / betStats.length : 50;
+  const adjustmentFactor = 1 + (avgFreq - 50) / 100;
   return baseProbability * adjustmentFactor;
 }
 
