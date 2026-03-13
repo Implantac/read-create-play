@@ -37,6 +37,8 @@ const quickLinks = [
 
 const DashboardPage = () => {
   const { config, draws, drawsWithPrizes, loading, syncing, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery } = useLotteryContext();
+  const [luckyGame, setLuckyGame] = useState<{ numbers: number[]; score: number; strategy: string } | null>(null);
+  const [generatingLucky, setGeneratingLucky] = useState(false);
 
   const hotNumbers = useMemo(() => stats.filter(s => s.status === "hot").length, [stats]);
   const coldNumbers = useMemo(() => stats.filter(s => s.status === "cold").length, [stats]);
@@ -44,6 +46,23 @@ const DashboardPage = () => {
 
   const handleNewDraw = useCallback((draw: any) => addDraw(draw), [addDraw]);
 
+  const generateLuckyGame = useCallback(() => {
+    if (stats.length === 0 || draws.length === 0) return;
+    setGeneratingLucky(true);
+    setTimeout(() => {
+      const strategies = ["frequency", "balance", "coverage", "dispersion"];
+      const randomStrategy = strategies[Math.floor(Math.random() * strategies.length)];
+      const result = runIntelligentPipeline(stats, draws, selectedLottery, randomStrategy, 1);
+      if (result.games.length > 0) {
+        setLuckyGame({
+          numbers: result.games[0],
+          score: result.scores[0] || 0,
+          strategy: result.strategy.name,
+        });
+      }
+      setGeneratingLucky(false);
+    }, 800);
+  }, [stats, draws, selectedLottery]);
   return (
     <div className="space-y-6">
       <PageHeader
