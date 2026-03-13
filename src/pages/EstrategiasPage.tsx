@@ -40,6 +40,10 @@ const EstrategiasPage = () => {
       ) : (
         <>
           <Suspense fallback={<LazyFallback />}>
+            <StrategySimulatorPanel stats={stats} config={config} draws={draws} />
+          </Suspense>
+
+          <Suspense fallback={<LazyFallback />}>
             <StrategyComparatorPanel stats={stats} config={config} draws={draws} />
           </Suspense>
 
