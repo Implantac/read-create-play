@@ -151,12 +151,62 @@ export function generateProfessionalBets(
   betsPerStrategy: number = 2
 ): ProfessionalBet[] {
   const allBets: ProfessionalBet[] = [];
+  const seenCombos = new Set<string>();
+  const lastDraw = draws.length > 0 ? draws[0].numbers : [];
 
   for (const strat of PRO_STRATEGIES) {
     for (let i = 0; i < betsPerStrategy; i++) {
-      const numbers = generateByStrategy(strat.id, stats, config);
+      let numbers: number[] | null = null;
+      
+      // Step 1-3: Generate base bet via strategy
+      for (let attempt = 0; attempt < 10; attempt++) {
+        const candidate = generateByStrategy(strat.id, stats, config);
+        const key = [...candidate].sort((a, b) => a - b).join(",");
+        
+        // Step 4: Validate against filters
+        const sum = candidate.reduce((a, b) => a + b, 0);
+        const evenCount = candidate.filter(n => n % 2 === 0).length;
+        const idealEven = Math.round(config.pick / 2);
+        
+        // Check parity balance
+        if (Math.abs(evenCount - idealEven) > 2) continue;
+        
+        // Check uniqueness
+        if (seenCombos.has(key)) continue;
+        
+        // For Lotofácil: check frame/center and row distribution
+        if (config.numbers === 25 && config.pick === 15) {
+          const fc = analyzeFrameCenter(candidate);
+          if (fc.frame < 8 || fc.frame > 12) continue;
+          const rows = analyzeRowDistribution(candidate);
+          if (rows.some(r => r === 0)) continue;
+        }
+
+        // Check max sequence run
+        const sorted = [...candidate].sort((a, b) => a - b);
+        let maxRun = 1, curRun = 1;
+        for (let j = 1; j < sorted.length; j++) {
+          if (sorted[j] === sorted[j - 1] + 1) { curRun++; maxRun = Math.max(maxRun, curRun); }
+          else curRun = 1;
+        }
+        if (maxRun > 4) continue;
+
+        numbers = candidate;
+        seenCombos.add(key);
+        break;
+      }
+
+      if (!numbers) {
+        // Fallback: accept any unique bet
+        numbers = generateByStrategy(strat.id, stats, config);
+        const key = [...numbers].sort((a, b) => a - b).join(",");
+        if (seenCombos.has(key)) continue;
+        seenCombos.add(key);
+      }
+
+      // Step 5-6: Evaluate quality and score
       const quality = evaluateBetQuality(numbers, stats, config, draws);
-      const statisticalScore = computeStatisticalScore(numbers, stats);
+      const statisticalScore = computeStatisticalScore(numbers, stats, config, draws);
       const probabilityEstimate = estimateProbability(numbers, stats, config);
 
       allBets.push({
@@ -171,10 +221,10 @@ export function generateProfessionalBets(
     }
   }
 
-  // Rank by combined score
+  // Step 7: Rank by combined score (quality + statistical + diversity bonus)
   allBets.sort((a, b) => {
-    const scoreA = a.quality.overall * 0.6 + a.statisticalScore * 0.4;
-    const scoreB = b.quality.overall * 0.6 + b.statisticalScore * 0.4;
+    const scoreA = a.quality.overall * 0.5 + a.statisticalScore * 0.5;
+    const scoreB = b.quality.overall * 0.5 + b.statisticalScore * 0.5;
     return scoreB - scoreA;
   });
 
