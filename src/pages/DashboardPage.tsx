@@ -122,7 +122,7 @@ const DashboardPage = () => {
 
           <div className="grid lg:grid-cols-2 gap-6">
             <SumChart data={sumData} />
-            <RecentDraws draws={draws} />
+            <RecentDraws draws={drawsWithPrizes} />
           </div>
         </>
       )}
