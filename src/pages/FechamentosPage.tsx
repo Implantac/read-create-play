@@ -304,6 +304,15 @@ export default function FechamentosPage() {
                     <Grid3X3 className="w-4 h-4" />
                     Gerar {currentMatrix.games.length} Jogos
                   </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={autoSelectNumbers}
+                    className="gap-1.5"
+                    title="Selecionar automaticamente as melhores dezenas com base em frequência, atraso e tendência"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    Auto-Seleção
+                  </Button>
                   {baseNumbers.length > 0 && (
                     <Button
                       variant="outline"
