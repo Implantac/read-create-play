@@ -26,6 +26,7 @@ import EstatisticasPage from "@/pages/EstatisticasPage";
 import PerfilPage from "@/pages/PerfilPage";
 import ROIDashboardPage from "@/pages/ROIDashboardPage";
 import HistoricoApostasPage from "@/pages/HistoricoApostasPage";
+import FechamentosPage from "@/pages/FechamentosPage";
 import LandingPage from "./pages/LandingPage";
 import NotFound from "./pages/NotFound";
 
@@ -56,6 +57,7 @@ function App() {
               <Route path="/ia-autonoma" element={<IAAutonomaPage />} />
               <Route path="/ai-analyst" element={<AIAnalystPage />} />
               <Route path="/estatisticas" element={<EstatisticasPage />} />
+              <Route path="/fechamentos" element={<FechamentosPage />} />
               <Route path="/historico" element={<HistoricoPage />} />
               <Route path="/roi" element={<ROIDashboardPage />} />
               <Route path="/minhas-apostas" element={<HistoricoApostasPage />} />

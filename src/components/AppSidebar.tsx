@@ -1,5 +1,5 @@
 import {
-  BarChart3, Sparkles, FlaskConical, History, Zap,
+  BarChart3, Sparkles, FlaskConical, History, Zap, Grid3X3,
   Brain, ShieldCheck, Crown, PieChart, TrendingUp, ClipboardCheck, Bot,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
@@ -30,6 +30,7 @@ const mainItems = [
   { title: "AI Analyst", url: "/ai-analyst", icon: Bot },
   { title: "Estratégias IA", url: "/estrategias", icon: Brain },
   { title: "Simulações", url: "/simulacoes", icon: FlaskConical },
+  { title: "Fechamentos", url: "/fechamentos", icon: Grid3X3 },
   { title: "Estatísticas", url: "/estatisticas", icon: PieChart },
   { title: "ROI", url: "/roi", icon: TrendingUp },
   { title: "Minhas Apostas", url: "/minhas-apostas", icon: ClipboardCheck },
