@@ -118,7 +118,7 @@ export default function FechamentosPage() {
                 Nenhuma matriz otimizada para <strong className="text-foreground">{config.name}</strong> ainda.
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Matrizes disponíveis para: Lotofácil, Mega-Sena, Lotomania
+                Matrizes disponíveis para: Lotofácil, Mega-Sena, Quina, Dupla Sena, Timemania, Lotomania
               </p>
             </div>
           ) : (
