@@ -18,6 +18,7 @@ const EnhancedBetGenerator = lazy(() => import("@/components/EnhancedBetGenerato
 const MonteCarloPanel = lazy(() => import("@/components/MonteCarloPanel").then(m => ({ default: m.MonteCarloPanel })));
 const BetOptimizerPanel = lazy(() => import("@/components/BetOptimizerPanel").then(m => ({ default: m.BetOptimizerPanel })));
 const BetChecker = lazy(() => import("@/components/BetChecker").then(m => ({ default: m.BetChecker })));
+const ExtremeGeneratorPanel = lazy(() => import("@/components/ExtremeGeneratorPanel").then(m => ({ default: m.ExtremeGeneratorPanel })));
 
 const LazyFallback = () => (
   <div className="flex items-center justify-center py-8 text-muted-foreground">
@@ -58,6 +59,10 @@ const GeradorPage = () => {
 
           <Suspense fallback={<LazyFallback />}>
             <RobustnessRadarPanel stats={stats} config={config} draws={draws} lotteryId={selectedLottery} />
+          </Suspense>
+
+          <Suspense fallback={<LazyFallback />}>
+            <ExtremeGeneratorPanel stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
           </Suspense>
 
           <Suspense fallback={<LazyFallback />}>
