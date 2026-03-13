@@ -1,15 +1,26 @@
 /**
  * Native AI — Wheeling Engine
  * Mathematical wheeling/closure systems with coverage guarantees
- * Priority: Lotofácil 18-number closure with 14-point guarantee
+ * Uses pre-computed matrices when available for optimal results
  */
 
 import { getLotteryRules } from "../knowledge/lotteriesKnowledge";
+import { WHEELING_MATRICES, applyWheelingMatrix, type WheelingMatrixId } from "./wheelingMatrices";
 import type { WheelingRequest, WheelingResult, CoverageValidation } from "../core/aiTypes";
+
+/** Find a pre-computed matrix matching the request */
+function findMatchingMatrix(lotteryId: string, baseSize: number, guarantee: number): WheelingMatrixId | null {
+  for (const [id, matrix] of Object.entries(WHEELING_MATRICES)) {
+    if (matrix.lottery === lotteryId && matrix.baseSize === baseSize && matrix.guarantee <= guarantee) {
+      return id as WheelingMatrixId;
+    }
+  }
+  return null;
+}
 
 /**
  * Generate wheeling system — creates minimum games to cover base numbers
- * with mathematical guarantee
+ * with mathematical guarantee. Uses pre-computed matrices when available.
  */
 export function generateWheeling(request: WheelingRequest): WheelingResult {
   const rules = getLotteryRules(request.lotteryId);
@@ -32,6 +43,23 @@ export function generateWheeling(request: WheelingRequest): WheelingResult {
       coverageValidation: { valid: true, coveragePercent: 100, worstCase: pick, testedCombinations: 1 },
       explanation: `Apenas 1 jogo possível com ${pick} números.`,
     };
+  }
+
+  // Check for pre-computed optimized matrix
+  const matrixId = findMatchingMatrix(request.lotteryId, base.length, guarantee);
+  if (matrixId) {
+    const { games: matrixGames } = applyWheelingMatrix(matrixId, base);
+    if (matrixGames.length > 0) {
+      const matrix = WHEELING_MATRICES[matrixId];
+      const validation = validateCoverage(matrixGames, base, pick, guarantee);
+      const estimatedCost = matrixGames.length * rules.ticketPrice;
+      return {
+        games: matrixGames, baseNumbers: base, totalGames: matrixGames.length,
+        guarantee, estimatedCost, coverageValidation: validation,
+        explanation: `🎯 Matriz otimizada "${matrix.name}" aplicada: ${matrixGames.length} jogos com garantia de ${guarantee}+ acertos. ` +
+          `Cobertura: ${validation.coveragePercent.toFixed(1)}%. Custo: R$ ${estimatedCost.toFixed(2)}.`,
+      };
+    }
   }
 
   // Generate all pick-sized combinations from base, then use greedy set cover
