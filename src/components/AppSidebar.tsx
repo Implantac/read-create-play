@@ -1,5 +1,5 @@
 import {
-  BarChart3, Sparkles, FlaskConical, History, Zap,
+  BarChart3, Sparkles, FlaskConical, History, Zap, Grid3X3,
   Brain, ShieldCheck, Crown, PieChart, TrendingUp, ClipboardCheck, Bot,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
