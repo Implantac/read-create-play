@@ -45,6 +45,26 @@ export default function FechamentosPage() {
   const [baseNumbers, setBaseNumbers] = useState<number[]>([]);
   const [generatedGames, setGeneratedGames] = useState<number[][] | null>(null);
   const [validationCache, setValidationCache] = useState<Record<string, ReturnType<typeof validateMatrix>>>({});
+  const [saving, setSaving] = useState(false);
+  const { saveBet } = useSavedBets(config.id);
+
+  const handleSaveAllGames = async () => {
+    if (!generatedGames || !currentMatrix) return;
+    setSaving(true);
+    let saved = 0;
+    for (const game of generatedGames) {
+      const ok = await saveBet({
+        numbers: game,
+        strategy: `Fechamento: ${currentMatrix.name}`,
+        label: `Fechamento ${currentMatrix.name}`,
+      });
+      if (ok) saved++;
+    }
+    setSaving(false);
+    if (saved > 0) {
+      toast.success(`${saved} jogos salvos nas apostas favoritas!`);
+    }
+  };
 
   // Filter matrices relevant to current lottery
   const availableMatrices = MATRIX_LIST.filter((m) => m.lottery === config.id);
