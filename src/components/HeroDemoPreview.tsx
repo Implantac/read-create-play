@@ -247,7 +247,7 @@ function EstatisticasScreen() {
           </div>
         </div>
         {/* Distribution + delay */}
-        <div className="col-span-2 space-y-2">
+        <div className="sm:col-span-2 space-y-2">
           <div className="rounded-lg border border-border/20 bg-card/20 p-2.5">
             <span className="text-[8px] text-muted-foreground uppercase font-mono flex items-center gap-1 mb-1.5">
               <LineChart className="w-2.5 h-2.5 text-neon-cyan" /> Distribuição
