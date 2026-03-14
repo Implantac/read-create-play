@@ -396,6 +396,58 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Testimonials */}
+      <section className="py-20 md:py-28">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-14"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
+              O que nossos{" "}
+              <span className="gradient-brand-text">jogadores</span> dizem
+            </h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Milhares de usuários já transformaram sua forma de jogar nas loterias.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {[
+              { name: "Carlos M.", initials: "CM", role: "Jogador da Mega-Sena", text: "Com o Titan Loterias, comecei a entender padrões que nunca havia percebido. A análise de frequência e atraso me ajudou a montar jogos muito mais estratégicos." },
+              { name: "Ana Paula S.", initials: "AS", role: "Jogadora da Lotofácil", text: "O gerador profissional é sensacional! Já acertei 13 pontos duas vezes desde que comecei a usar. A IA realmente faz diferença nas escolhas." },
+              { name: "Roberto F.", initials: "RF", role: "Apostador profissional", text: "Uso o plano Pro há 6 meses e o backtesting mudou completamente minha estratégia. Consigo testar minhas ideias antes de investir dinheiro real." },
+              { name: "Mariana L.", initials: "ML", role: "Jogadora da Quina", text: "A simulação massiva me mostrou que algumas combinações são muito mais prováveis do que eu imaginava. Ferramenta indispensável!" },
+              { name: "Fernando G.", initials: "FG", role: "Jogador assíduo", text: "Já testei várias plataformas, mas nenhuma chega perto do Titan. Os dados são sempre atualizados e a interface é muito intuitiva." },
+              { name: "Juliana R.", initials: "JR", role: "Jogadora casual", text: "Mesmo no plano grátis, já consegui informações valiosas. O dashboard é lindo e fácil de entender. Super recomendo!" },
+            ].map((t, i) => (
+              <motion.div
+                key={t.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="glass-card rounded-xl border border-border/30 p-6 space-y-4 hover:border-primary/20 transition-colors"
+              >
+                <Quote className="w-6 h-6 text-primary/40" />
+                <p className="text-sm text-muted-foreground leading-relaxed">{t.text}</p>
+                <div className="flex items-center gap-3 pt-2 border-t border-border/20">
+                  <Avatar className="w-9 h-9">
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">{t.initials}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <div className="text-sm font-semibold text-foreground">{t.name}</div>
+                    <div className="text-[11px] text-muted-foreground">{t.role}</div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section className="py-20 md:py-28 bg-card/20">
         <div className="container mx-auto px-4">
