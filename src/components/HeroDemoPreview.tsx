@@ -116,15 +116,15 @@ function DashboardScreen() {
       {/* Recent draws mini */}
       <div className="rounded-lg border border-border/20 bg-card/20 p-2.5">
         <span className="text-[8px] text-muted-foreground uppercase font-mono">Últimos Resultados</span>
-        <div className="flex gap-3 mt-1.5">
+        <div className="flex gap-2 sm:gap-3 mt-1.5 overflow-x-auto scrollbar-hide">
           {[
             { c: "3248", nums: [7, 13, 22, 34, 41, 58] },
             { c: "3247", nums: [3, 18, 25, 37, 44, 52] },
           ].map((draw) => (
-            <div key={draw.c} className="flex items-center gap-1.5">
+            <div key={draw.c} className="flex items-center gap-1 sm:gap-1.5 shrink-0">
               <span className="text-[7px] font-mono text-muted-foreground/60">#{draw.c}</span>
               {draw.nums.map((n) => (
-                <div key={n} className="w-4.5 h-4.5 rounded-full bg-primary/20 flex items-center justify-center text-[6px] font-mono text-primary font-bold">
+                <div key={n} className="w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-primary/20 flex items-center justify-center text-[5px] sm:text-[6px] font-mono text-primary font-bold">
                   {n.toString().padStart(2, "0")}
                 </div>
               ))}
