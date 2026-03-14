@@ -393,7 +393,7 @@ export default function LandingPage() {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {plans.map((plan, i) => (
               <motion.div
                 key={plan.name}
@@ -404,9 +404,18 @@ export default function LandingPage() {
                 className={`rounded-xl p-6 border transition-all duration-300 hover:translate-y-[-2px] ${
                   plan.highlight
                     ? "glass-card border-primary/30 glow-green relative"
+                    : (plan as any).isLifetime
+                    ? "glass-card border-neon-amber/30 relative shadow-lg shadow-neon-amber/5"
                     : "glass-card border-border/30"
                 }`}
               >
+                {(plan as any).isLifetime && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <span className="px-3 py-1 rounded-full bg-neon-amber text-background text-[10px] font-mono font-bold uppercase tracking-wider whitespace-nowrap">
+                      Pagamento Único
+                    </span>
+                  </div>
+                )}
                 {plan.highlight && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <span className="px-3 py-1 rounded-full gradient-brand text-primary-foreground text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1">
