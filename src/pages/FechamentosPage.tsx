@@ -373,10 +373,22 @@ export default function FechamentosPage() {
                     <Trophy className="w-5 h-5 text-accent" />
                     {generatedGames.length} Jogos Gerados
                   </CardTitle>
-                  <Button variant="outline" size="sm" onClick={handleExportPdf} className="gap-1.5">
-                    <FileDown className="w-3.5 h-3.5" />
-                    Exportar PDF
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={handleExportPdf} className="gap-1.5">
+                      <FileDown className="w-3.5 h-3.5" />
+                      Exportar PDF
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleSaveAllGames}
+                      disabled={saving}
+                      className="gap-1.5"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      {saving ? "Salvando..." : "Salvar Jogos"}
+                    </Button>
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mt-1">
                   <span>
