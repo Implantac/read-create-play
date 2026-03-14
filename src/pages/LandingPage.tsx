@@ -3,7 +3,7 @@ import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { HeroDemoPreview } from "@/components/HeroDemoPreview";
+
 import { LotteryLogosCarousel } from "@/components/LotteryLogosCarousel";
 import { ScreensShowcase } from "@/components/ScreensShowcase";
 import {
@@ -267,17 +267,12 @@ export default function LandingPage() {
               ))}
             </motion.div>
 
-            {/* Animated dashboard preview */}
-            <HeroDemoPreview />
           </motion.div>
         </motion.div>
       </section>
 
       {/* Lotteries carousel */}
       <LotteryLogosCarousel />
-
-      {/* Screens showcase carousel */}
-      <ScreensShowcase />
 
       {/* Stats bar */}
       <section className="border-y border-border/30 bg-card/30 backdrop-blur-lg">
@@ -338,6 +333,9 @@ export default function LandingPage() {
           </div>
         </motion.div>
       </section>
+
+      {/* Screens showcase carousel */}
+      <ScreensShowcase />
 
       {/* How it works */}
       <section className="py-20 md:py-28 bg-card/20">
