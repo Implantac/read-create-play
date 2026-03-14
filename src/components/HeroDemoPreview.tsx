@@ -532,6 +532,7 @@ export function HeroDemoPreview() {
                   {activeScreen === 2 && <EstatisticasScreen />}
                   {activeScreen === 3 && <SimuladorScreen />}
                   {activeScreen === 4 && <IAScreen />}
+                  {activeScreen === 5 && <FechamentosScreen />}
                 </motion.div>
               </AnimatePresence>
             </div>
