@@ -73,7 +73,7 @@ function DashboardScreen() {
       </div>
       {/* Charts */}
       <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
-        <div className="col-span-3 rounded-lg border border-border/20 bg-card/20 p-2.5">
+        <div className="sm:col-span-3 rounded-lg border border-border/20 bg-card/20 p-2.5">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-[8px] text-muted-foreground uppercase font-mono">Frequência dos Números</span>
             <div className="flex gap-1">
