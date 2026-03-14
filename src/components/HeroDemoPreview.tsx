@@ -110,18 +110,20 @@ export function HeroDemoPreview() {
               Aposta Gerada
             </div>
             <div className="grid grid-cols-3 gap-2">
-              {numbers.map((n, i) => (
-                <motion.div
-                  key={n}
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 1.6 + i * 0.1, type: "spring", stiffness: 300 }}
-                  className="w-9 h-9 rounded-full gradient-brand flex items-center justify-center text-primary-foreground text-xs font-bold font-mono mx-auto shadow-md shadow-primary/20"
-                >
-                  {n.toString().padStart(2, "0")}
-                </motion.div>
-              ))}
-            </div>
+              <AnimatePresence mode="popLayout">
+                {numbers.map((n, i) => (
+                  <motion.div
+                    key={n}
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0 }}
+                    transition={{ delay: i * 0.06, type: "spring", stiffness: 300 }}
+                    className="w-9 h-9 rounded-full gradient-brand flex items-center justify-center text-primary-foreground text-xs font-bold font-mono mx-auto shadow-md shadow-primary/20"
+                  >
+                    {n.toString().padStart(2, "0")}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
