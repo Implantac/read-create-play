@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, Crown, Zap, Sparkles, ArrowRight, Save } from "lucide-react";
+import { Check, Crown, Zap, Sparkles, ArrowRight, Save, Infinity } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/PageHeader";
@@ -61,6 +61,26 @@ const plans = [
     cta: "Assinar Profissional",
     highlight: false,
   },
+  {
+    id: "lifetime",
+    name: "Vitalício",
+    price: "R$ 497",
+    period: " único",
+    icon: Infinity,
+    description: "Acesso permanente a tudo",
+    savedBetsLimit: "Jogos salvos ilimitados",
+    features: [
+      "Tudo do plano Profissional",
+      "Acesso vitalício garantido",
+      "Todas as atualizações futuras",
+      "Prioridade máxima no suporte",
+      "Sem mensalidades nunca mais",
+      "Acesso antecipado a novidades",
+    ],
+    cta: "Comprar Vitalício",
+    highlight: false,
+    isLifetime: true,
+  },
 ];
 
 export default function PlanosPage() {
@@ -75,7 +95,7 @@ export default function PlanosPage() {
         icon={Crown}
       />
 
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
         {plans.map((plan, i) => {
           const isCurrent = currentPlan === plan.id;
           return (
@@ -89,6 +109,8 @@ export default function PlanosPage() {
                 className={`relative flex flex-col h-full transition-all duration-300 hover:translate-y-[-2px] ${
                   plan.highlight
                     ? "border-primary/40 glow-green glass-card"
+                    : (plan as any).isLifetime
+                    ? "border-neon-amber/40 glass-card shadow-lg shadow-neon-amber/10"
                     : "border-border/30 glass-card"
                 }`}
               >
@@ -97,11 +119,16 @@ export default function PlanosPage() {
                     Mais popular
                   </Badge>
                 )}
+                {(plan as any).isLifetime && (
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-neon-amber text-background border-0 shadow-lg shadow-neon-amber/20">
+                    Pagamento único
+                  </Badge>
+                )}
                 <CardHeader className="text-center pb-4">
                   <div className={`mx-auto w-12 h-12 rounded-xl flex items-center justify-center mb-3 ${
-                    plan.highlight ? "gradient-brand shadow-lg shadow-primary/20" : "bg-muted/50 border border-border/30"
+                    plan.highlight ? "gradient-brand shadow-lg shadow-primary/20" : (plan as any).isLifetime ? "bg-neon-amber/20 border border-neon-amber/30 shadow-lg shadow-neon-amber/10" : "bg-muted/50 border border-border/30"
                   }`}>
-                    <plan.icon className={`w-6 h-6 ${plan.highlight ? "text-primary-foreground" : "text-primary"}`} />
+                    <plan.icon className={`w-6 h-6 ${plan.highlight ? "text-primary-foreground" : (plan as any).isLifetime ? "text-neon-amber" : "text-primary"}`} />
                   </div>
                   <CardTitle className="text-lg">{plan.name}</CardTitle>
                   <CardDescription className="text-xs">{plan.description}</CardDescription>
@@ -135,6 +162,8 @@ export default function PlanosPage() {
                     className={`w-full gap-2 ${
                       plan.highlight && !isCurrent
                         ? "gradient-brand text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-primary/30"
+                        : (plan as any).isLifetime && !isCurrent
+                        ? "bg-neon-amber text-background hover:bg-neon-amber/90 shadow-lg shadow-neon-amber/20"
                         : ""
                     }`}
                     variant={isCurrent ? "secondary" : plan.highlight ? "default" : "outline"}
