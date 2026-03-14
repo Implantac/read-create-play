@@ -516,7 +516,7 @@ export function HeroDemoPreview() {
             </div>
 
             {/* Screen content */}
-            <div className="p-3 min-h-[200px]">
+            <div className="p-2 sm:p-3 min-h-[180px] sm:min-h-[200px]">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeScreen}
