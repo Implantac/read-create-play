@@ -109,12 +109,19 @@ export default function PlanosPage() {
                 className={`relative flex flex-col h-full transition-all duration-300 hover:translate-y-[-2px] ${
                   plan.highlight
                     ? "border-primary/40 glow-green glass-card"
+                    : (plan as any).isLifetime
+                    ? "border-neon-amber/40 glass-card shadow-lg shadow-neon-amber/10"
                     : "border-border/30 glass-card"
                 }`}
               >
                 {plan.highlight && (
                   <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 gradient-brand text-primary-foreground border-0 shadow-lg shadow-primary/20">
                     Mais popular
+                  </Badge>
+                )}
+                {(plan as any).isLifetime && (
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-neon-amber text-background border-0 shadow-lg shadow-neon-amber/20">
+                    Pagamento único
                   </Badge>
                 )}
                 <CardHeader className="text-center pb-4">
