@@ -44,7 +44,7 @@ export function HeroDemoPreview() {
       className="mt-12 mx-auto max-w-4xl"
       style={{ perspective: "1200px" }}
     >
-      <div className="rounded-2xl border border-border/30 glass-card overflow-hidden shadow-2xl shadow-primary/5">
+      <div className="rounded-2xl border border-border/30 glass-card overflow-hidden shadow-2xl shadow-primary/5 animate-pulse-glow ring-1 ring-primary/10" style={{ boxShadow: '0 0 30px hsl(var(--primary) / 0.12), 0 0 80px hsl(var(--primary) / 0.06), 0 20px 60px hsl(var(--primary) / 0.08)' }}>
         {/* Title bar */}
         <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border/20 bg-card/50">
           <div className="flex gap-1.5">
