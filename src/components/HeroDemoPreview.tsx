@@ -400,7 +400,7 @@ export function HeroDemoPreview() {
       initial={{ opacity: 0, y: 40, rotateX: 8 }}
       animate={{ opacity: 1, y: 0, rotateX: 0 }}
       transition={{ delay: 0.8, duration: 0.8, ease: "easeOut" }}
-      className="mt-12 mx-auto max-w-5xl"
+      className="mt-6 sm:mt-12 mx-auto max-w-5xl px-2 sm:px-0"
       style={{ perspective: "1200px" }}
     >
       <div
