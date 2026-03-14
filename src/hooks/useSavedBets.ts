@@ -17,6 +17,8 @@ export interface SavedBet {
 export function useSavedBets(lotteryId: string) {
   const [savedBets, setSavedBets] = useState<SavedBet[]>([]);
   const [loading, setLoading] = useState(true);
+  const { currentPlan } = usePlanAccess();
+  const limit = PLAN_LIMITS[currentPlan].savedBetsPerLottery;
 
   const fetchBets = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
