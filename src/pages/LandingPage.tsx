@@ -190,14 +190,25 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative pt-32 pb-20 md:pt-44 md:pb-32 gradient-mesh">
-        {/* Grid pattern */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
+      <section ref={heroRef} className="relative pt-32 pb-20 md:pt-44 md:pb-32 gradient-mesh overflow-hidden">
+        {/* Grid pattern with parallax */}
+        <motion.div className="absolute inset-0 opacity-[0.03]" style={{
+          y: gridY,
           backgroundImage: "linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)",
           backgroundSize: "60px 60px",
         }} />
 
-        <div className="container mx-auto px-4 relative">
+        {/* Floating orbs with parallax */}
+        <motion.div
+          className="absolute top-20 left-[10%] w-72 h-72 rounded-full bg-primary/5 blur-[100px]"
+          style={{ y: useTransform(heroProgress, [0, 1], [0, 200]) }}
+        />
+        <motion.div
+          className="absolute bottom-10 right-[15%] w-96 h-96 rounded-full bg-neon-purple/5 blur-[120px]"
+          style={{ y: useTransform(heroProgress, [0, 1], [0, -100]) }}
+        />
+
+        <motion.div className="container mx-auto px-4 relative" style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}>
           <motion.div
             initial="hidden"
             animate="visible"
@@ -240,7 +251,7 @@ export default function LandingPage() {
               ))}
             </motion.div>
           </motion.div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Stats bar */}
@@ -250,10 +261,10 @@ export default function LandingPage() {
             {stats.map((s, i) => (
               <motion.div
                 key={s.label}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.1, type: "spring", stiffness: 200 }}
                 className="text-center"
               >
                 <div className="text-2xl md:text-3xl font-bold font-mono gradient-brand-text">{s.value}</div>
