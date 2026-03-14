@@ -36,6 +36,13 @@ const FEATURE_MIN_PLAN: Record<Feature, PlanType> = {
   otimizacao: "professional",
 };
 
+export const PLAN_LIMITS = {
+  free: { savedBetsPerLottery: 3 },
+  premium: { savedBetsPerLottery: Infinity },
+  professional: { savedBetsPerLottery: Infinity },
+  lifetime: { savedBetsPerLottery: Infinity },
+} as const;
+
 export function usePlanAccess() {
   const { profile } = useAuth();
   const currentPlan: PlanType = profile?.plan ?? "free";
@@ -46,5 +53,7 @@ export function usePlanAccess() {
 
   const getMinPlan = (feature: Feature): PlanType => FEATURE_MIN_PLAN[feature];
 
-  return { currentPlan, hasAccess, getMinPlan };
+  const getLimits = () => PLAN_LIMITS[currentPlan];
+
+  return { currentPlan, hasAccess, getMinPlan, getLimits };
 }
