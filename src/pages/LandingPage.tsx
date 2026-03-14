@@ -267,17 +267,12 @@ export default function LandingPage() {
               ))}
             </motion.div>
 
-            {/* Animated dashboard preview */}
-            <HeroDemoPreview />
           </motion.div>
         </motion.div>
       </section>
 
       {/* Lotteries carousel */}
       <LotteryLogosCarousel />
-
-      {/* Screens showcase carousel */}
-      <ScreensShowcase />
 
       {/* Stats bar */}
       <section className="border-y border-border/30 bg-card/30 backdrop-blur-lg">
