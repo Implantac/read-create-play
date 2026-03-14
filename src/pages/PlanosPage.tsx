@@ -61,6 +61,26 @@ const plans = [
     cta: "Assinar Profissional",
     highlight: false,
   },
+  {
+    id: "lifetime",
+    name: "Vitalício",
+    price: "R$ 497",
+    period: " único",
+    icon: Infinity,
+    description: "Acesso permanente a tudo",
+    savedBetsLimit: "Jogos salvos ilimitados",
+    features: [
+      "Tudo do plano Profissional",
+      "Acesso vitalício garantido",
+      "Todas as atualizações futuras",
+      "Prioridade máxima no suporte",
+      "Sem mensalidades nunca mais",
+      "Acesso antecipado a novidades",
+    ],
+    cta: "Comprar Vitalício",
+    highlight: false,
+    isLifetime: true,
+  },
 ];
 
 export default function PlanosPage() {
@@ -75,7 +95,7 @@ export default function PlanosPage() {
         icon={Crown}
       />
 
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
         {plans.map((plan, i) => {
           const isCurrent = currentPlan === plan.id;
           return (
