@@ -14,6 +14,7 @@ const screens = [
   { id: "estatisticas", label: "Estatísticas", icon: BarChart3, color: "text-accent" },
   { id: "simulador", label: "Simulações", icon: Dices, color: "text-neon-purple" },
   { id: "ia", label: "IA Autônoma", icon: Brain, color: "text-primary" },
+  { id: "fechamentos", label: "Fechamentos", icon: Grid3X3, color: "text-neon-cyan" },
 ];
 
 const sidebarItems = [
