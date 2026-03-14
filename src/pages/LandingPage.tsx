@@ -536,14 +536,9 @@ export default function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 md:py-28 gradient-mesh">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="max-w-2xl mx-auto text-center space-y-6 rounded-2xl glass-card p-10 md:p-14 border border-primary/10 glow-green"
-          >
+      <section ref={ctaRef} className="py-20 md:py-28 gradient-mesh overflow-hidden">
+        <motion.div className="container mx-auto px-4" style={{ scale: ctaScale, opacity: ctaOpacity }}>
+          <div className="max-w-2xl mx-auto text-center space-y-6 rounded-2xl glass-card p-10 md:p-14 border border-primary/10 glow-green">
             <div className="w-14 h-14 rounded-2xl gradient-brand flex items-center justify-center mx-auto shadow-lg shadow-primary/20">
               <Zap className="w-7 h-7 text-primary-foreground" />
             </div>
@@ -559,8 +554,8 @@ export default function LandingPage() {
                 Criar Conta Grátis <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </section>
 
       {/* Footer */}
