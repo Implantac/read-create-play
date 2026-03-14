@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, Crown, Zap, Sparkles, ArrowRight } from "lucide-react";
+import { Check, Crown, Zap, Sparkles, ArrowRight, Save } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/PageHeader";
@@ -14,6 +14,7 @@ const plans = [
     period: "/mês",
     icon: Zap,
     description: "Motor estatístico básico",
+    savedBetsLimit: "3 jogos salvos por loteria",
     features: [
       "Dashboard com estatísticas",
       "Gerador básico de números",
@@ -30,6 +31,7 @@ const plans = [
     period: "/mês",
     icon: Sparkles,
     description: "Ferramentas avançadas de geração",
+    savedBetsLimit: "Jogos salvos ilimitados",
     features: [
       "Tudo do plano Gratuito",
       "Gerador Profissional com filtros",
@@ -47,6 +49,7 @@ const plans = [
     period: "/mês",
     icon: Crown,
     description: "IA + Otimização completa",
+    savedBetsLimit: "Jogos salvos ilimitados",
     features: [
       "Tudo do plano Premium",
       "Machine Learning preditivo",
@@ -108,6 +111,14 @@ export default function PlanosPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1">
+                  <div className={`flex items-center gap-2 mb-4 px-3 py-2 rounded-lg text-xs font-medium ${
+                    plan.id === "free"
+                      ? "bg-destructive/10 text-destructive border border-destructive/20"
+                      : "bg-primary/10 text-primary border border-primary/20"
+                  }`}>
+                    <Save className="w-3.5 h-3.5 shrink-0" />
+                    {plan.savedBetsLimit}
+                  </div>
                   <ul className="space-y-3">
                     {plan.features.map((f) => (
                       <li key={f} className="flex items-start gap-2.5 text-sm text-foreground">
