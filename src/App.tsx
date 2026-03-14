@@ -62,7 +62,6 @@ function App() {
               <Route path="/historico" element={<HistoricoPage />} />
               <Route path="/roi" element={<ROIDashboardPage />} />
               <Route path="/minhas-apostas" element={<HistoricoApostasPage />} />
-              <Route path="/planos" element={<PlanosPage />} />
               <Route path="/perfil" element={<PerfilPage />} />
               <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
             </Route>
