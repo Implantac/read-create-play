@@ -537,22 +537,22 @@ export function HeroDemoPreview() {
         </div>
 
         {/* Bottom status bar */}
-        <div className="px-3 py-1.5 border-t border-border/10 bg-card/30 flex items-center justify-between relative z-10">
-          <div className="flex items-center gap-2">
-            <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} className="w-3 h-3">
+        <div className="px-2 sm:px-3 py-1.5 border-t border-border/10 bg-card/30 flex items-center justify-between relative z-10">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+            <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} className="w-3 h-3 shrink-0">
               <Cpu className="w-3 h-3 text-primary" />
             </motion.div>
             <AnimatePresence mode="wait">
-              <motion.span key={statusMsg} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 8 }} className="text-[8px] font-mono text-muted-foreground">
+              <motion.span key={statusMsg} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 8 }} className="text-[7px] sm:text-[8px] font-mono text-muted-foreground truncate">
                 {statusMsg}{".".repeat(dots)}
               </motion.span>
             </AnimatePresence>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Progress dots */}
-            <div className="flex gap-1">
+            <div className="flex gap-0.5 sm:gap-1">
               {screens.map((_, idx) => (
-                <div key={idx} className="w-5 h-[2px] rounded-full bg-border/30 overflow-hidden">
+                <div key={idx} className="w-3 sm:w-5 h-[2px] rounded-full bg-border/30 overflow-hidden">
                   {idx === activeScreen && (
                     <motion.div
                       key={`prog-${activeScreen}`}
@@ -565,8 +565,8 @@ export function HeroDemoPreview() {
                 </div>
               ))}
             </div>
-            <span className="text-[7px] font-mono text-muted-foreground/40">GPU: 24%</span>
-            <span className="text-[7px] font-mono text-muted-foreground/40">RAM: 1.2GB</span>
+            <span className="text-[7px] font-mono text-muted-foreground/40 hidden sm:inline">GPU: 24%</span>
+            <span className="text-[7px] font-mono text-muted-foreground/40 hidden sm:inline">RAM: 1.2GB</span>
             <span className="text-[7px] font-mono text-primary/70">● Online</span>
           </div>
         </div>
