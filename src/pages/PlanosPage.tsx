@@ -14,6 +14,7 @@ const plans = [
     period: "/mês",
     icon: Zap,
     description: "Motor estatístico básico",
+    savedBetsLimit: "3 jogos salvos por loteria",
     features: [
       "Dashboard com estatísticas",
       "Gerador básico de números",
@@ -30,6 +31,7 @@ const plans = [
     period: "/mês",
     icon: Sparkles,
     description: "Ferramentas avançadas de geração",
+    savedBetsLimit: "Jogos salvos ilimitados",
     features: [
       "Tudo do plano Gratuito",
       "Gerador Profissional com filtros",
@@ -47,6 +49,7 @@ const plans = [
     period: "/mês",
     icon: Crown,
     description: "IA + Otimização completa",
+    savedBetsLimit: "Jogos salvos ilimitados",
     features: [
       "Tudo do plano Premium",
       "Machine Learning preditivo",
