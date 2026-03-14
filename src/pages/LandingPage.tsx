@@ -394,6 +394,56 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="py-20 md:py-28 bg-card/20">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-14"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
+              Perguntas{" "}
+              <span className="gradient-brand-text">frequentes</span>
+            </h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Tire suas dúvidas sobre a plataforma.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-2xl mx-auto"
+          >
+            <Accordion type="single" collapsible className="space-y-3">
+              {[
+                { q: "O Titan Loterias garante que vou ganhar?", a: "Não. Loterias são jogos de azar e nenhuma ferramenta pode garantir prêmios. O Titan oferece análises estatísticas e algoritmos para ajudar você a tomar decisões mais informadas." },
+                { q: "Quais loterias são suportadas?", a: "Atualmente suportamos Mega-Sena, Lotofácil, Quina, Lotomania, Dupla Sena, Timemania, Dia de Sorte e Super Sete. Todas com dados sincronizados da Caixa." },
+                { q: "Como funciona a inteligência artificial?", a: "Nossos modelos de Machine Learning analisam padrões históricos como frequência, atraso, paridade e distribuição para gerar apostas estatisticamente otimizadas." },
+                { q: "Posso cancelar meu plano a qualquer momento?", a: "Sim! Você pode cancelar ou mudar de plano quando quiser, sem multas ou taxas adicionais." },
+                { q: "Os dados dos sorteios são confiáveis?", a: "Sim. Todos os resultados são sincronizados automaticamente a partir das fontes oficiais da Caixa Econômica Federal." },
+                { q: "Preciso instalar algum aplicativo?", a: "Não. O Titan Loterias funciona 100% no navegador, em qualquer dispositivo — computador, tablet ou celular." },
+              ].map((item, i) => (
+                <AccordionItem key={i} value={`faq-${i}`} className="glass-card border border-border/30 rounded-xl px-5 data-[state=open]:border-primary/20">
+                  <AccordionTrigger className="text-sm font-medium text-foreground hover:no-underline gap-3">
+                    <span className="flex items-center gap-2.5 text-left">
+                      <HelpCircle className="w-4 h-4 text-primary shrink-0" />
+                      {item.q}
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed pl-7">
+                    {item.a}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </motion.div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-20 md:py-28 gradient-mesh">
         <div className="container mx-auto px-4">
