@@ -18,7 +18,9 @@ import {
   CheckCircle,
   Users,
   Database,
+  Quote,
 } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
