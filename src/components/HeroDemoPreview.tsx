@@ -493,7 +493,7 @@ export function HeroDemoPreview() {
                 </AnimatePresence>
               </div>
               {/* Tabs */}
-              <div className="flex items-center gap-0.5">
+              <div className="flex items-center gap-0.5 overflow-x-auto scrollbar-hide">
                 {screens.map((screen, idx) => {
                   const Icon = screen.icon;
                   const isActive = idx === activeScreen;
@@ -501,14 +501,14 @@ export function HeroDemoPreview() {
                     <button
                       key={screen.id}
                       onClick={() => handleTabClick(idx)}
-                      className={`flex items-center gap-1 px-2 py-1 text-[7px] font-mono uppercase tracking-wider rounded transition-colors ${
+                      className={`flex items-center gap-1 px-1.5 sm:px-2 py-1 text-[6px] sm:text-[7px] font-mono uppercase tracking-wider rounded transition-colors shrink-0 ${
                         isActive
                           ? `${screen.color} bg-card/60 border border-border/20`
                           : "text-muted-foreground/30 hover:text-muted-foreground/60"
                       }`}
                     >
-                      <Icon className="w-2.5 h-2.5" />
-                      <span className="hidden lg:inline">{screen.label}</span>
+                      <Icon className="w-2 h-2 sm:w-2.5 sm:h-2.5" />
+                      <span className="hidden sm:inline">{screen.label}</span>
                     </button>
                   );
                 })}
