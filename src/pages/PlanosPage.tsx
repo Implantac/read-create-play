@@ -111,6 +111,14 @@ export default function PlanosPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="flex-1">
+                  <div className={`flex items-center gap-2 mb-4 px-3 py-2 rounded-lg text-xs font-medium ${
+                    plan.id === "free"
+                      ? "bg-destructive/10 text-destructive border border-destructive/20"
+                      : "bg-primary/10 text-primary border border-primary/20"
+                  }`}>
+                    <Save className="w-3.5 h-3.5 shrink-0" />
+                    {plan.savedBetsLimit}
+                  </div>
                   <ul className="space-y-3">
                     {plan.features.map((f) => (
                       <li key={f} className="flex items-start gap-2.5 text-sm text-foreground">
