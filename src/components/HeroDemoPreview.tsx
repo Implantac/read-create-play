@@ -1,10 +1,41 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { BarChart3, Brain, TrendingUp, Zap } from "lucide-react";
+import { useState, useEffect } from "react";
 
-const bars = [65, 42, 78, 35, 90, 55, 70, 48, 82, 60, 45, 73, 38, 85, 52];
-const numbers = [7, 13, 22, 34, 41, 58];
+const barSets = [
+  [65, 42, 78, 35, 90, 55, 70, 48, 82, 60, 45, 73, 38, 85, 52],
+  [50, 70, 60, 80, 45, 75, 55, 90, 40, 68, 58, 82, 47, 63, 72],
+  [82, 55, 43, 70, 62, 88, 38, 65, 75, 50, 90, 42, 68, 48, 60],
+];
+
+const numberSets = [
+  [7, 13, 22, 34, 41, 58],
+  [3, 18, 25, 37, 44, 52],
+  [9, 15, 28, 33, 46, 55],
+  [5, 11, 20, 36, 42, 59],
+];
+
+const statValues = [
+  { sorteios: "3.248", padroes: "147", winRate: "68%", score: "A+" },
+  { sorteios: "3.249", padroes: "152", winRate: "71%", score: "A+" },
+  { sorteios: "3.250", padroes: "149", winRate: "69%", score: "A" },
+  { sorteios: "3.251", padroes: "155", winRate: "72%", score: "A+" },
+];
 
 export function HeroDemoPreview() {
+  const [cycle, setCycle] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCycle(c => c + 1);
+    }, 3500);
+    return () => clearInterval(interval);
+  }, []);
+
+  const bars = barSets[cycle % barSets.length];
+  const numbers = numberSets[cycle % numberSets.length];
+  const stats = statValues[cycle % statValues.length];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 40, rotateX: 8 }}
