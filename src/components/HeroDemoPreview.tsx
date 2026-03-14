@@ -3,7 +3,7 @@ import {
   BarChart3, Brain, TrendingUp, Zap, Activity, Sparkles,
   Target, Dices, PieChart, Cpu, LineChart, Settings,
   Home, Layers, History, Award, ChevronRight, Bell,
-  Search, User,
+  Search, User, Grid3X3, Shield, CheckCircle2,
 } from "lucide-react";
 import { useState, useEffect, useCallback, useRef } from "react";
 
