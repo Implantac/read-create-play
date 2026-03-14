@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, Crown, Zap, Sparkles, ArrowRight } from "lucide-react";
+import { Check, Crown, Zap, Sparkles, ArrowRight, Save } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/PageHeader";
