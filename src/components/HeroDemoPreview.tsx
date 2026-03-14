@@ -219,9 +219,9 @@ function GeradorScreen() {
 function EstatisticasScreen() {
   return (
     <div className="space-y-2.5">
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
         {/* Heatmap */}
-        <div className="col-span-3 rounded-lg border border-border/20 bg-card/20 p-2.5">
+        <div className="sm:col-span-3 rounded-lg border border-border/20 bg-card/20 p-2.5">
           <span className="text-[8px] text-muted-foreground uppercase font-mono flex items-center gap-1 mb-1.5">
             <PieChart className="w-2.5 h-2.5 text-accent" /> Mapa de Calor
           </span>
