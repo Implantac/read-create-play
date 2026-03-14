@@ -1,10 +1,41 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { BarChart3, Brain, TrendingUp, Zap } from "lucide-react";
+import { useState, useEffect } from "react";
 
-const bars = [65, 42, 78, 35, 90, 55, 70, 48, 82, 60, 45, 73, 38, 85, 52];
-const numbers = [7, 13, 22, 34, 41, 58];
+const barSets = [
+  [65, 42, 78, 35, 90, 55, 70, 48, 82, 60, 45, 73, 38, 85, 52],
+  [50, 70, 60, 80, 45, 75, 55, 90, 40, 68, 58, 82, 47, 63, 72],
+  [82, 55, 43, 70, 62, 88, 38, 65, 75, 50, 90, 42, 68, 48, 60],
+];
+
+const numberSets = [
+  [7, 13, 22, 34, 41, 58],
+  [3, 18, 25, 37, 44, 52],
+  [9, 15, 28, 33, 46, 55],
+  [5, 11, 20, 36, 42, 59],
+];
+
+const statValues = [
+  { sorteios: "3.248", padroes: "147", winRate: "68%", score: "A+" },
+  { sorteios: "3.249", padroes: "152", winRate: "71%", score: "A+" },
+  { sorteios: "3.250", padroes: "149", winRate: "69%", score: "A" },
+  { sorteios: "3.251", padroes: "155", winRate: "72%", score: "A+" },
+];
 
 export function HeroDemoPreview() {
+  const [cycle, setCycle] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCycle(c => c + 1);
+    }, 3500);
+    return () => clearInterval(interval);
+  }, []);
+
+  const bars = barSets[cycle % barSets.length];
+  const numbers = numberSets[cycle % numberSets.length];
+  const stats = statValues[cycle % statValues.length];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 40, rotateX: 8 }}
@@ -29,10 +60,10 @@ export function HeroDemoPreview() {
           {/* Stats row */}
           <div className="col-span-12 grid grid-cols-4 gap-3">
             {[
-              { label: "Sorteios", value: "3.248", icon: BarChart3, color: "text-primary" },
-              { label: "Padrões IA", value: "147", icon: Brain, color: "text-neon-blue" },
-              { label: "Win Rate", value: "68%", icon: TrendingUp, color: "text-primary" },
-              { label: "Score", value: "A+", icon: Zap, color: "text-neon-amber" },
+              { label: "Sorteios", value: stats.sorteios, icon: BarChart3, color: "text-primary" },
+              { label: "Padrões IA", value: stats.padroes, icon: Brain, color: "text-neon-blue" },
+              { label: "Win Rate", value: stats.winRate, icon: TrendingUp, color: "text-primary" },
+              { label: "Score", value: stats.score, icon: Zap, color: "text-neon-amber" },
             ].map((s, i) => (
               <motion.div
                 key={s.label}
@@ -42,7 +73,15 @@ export function HeroDemoPreview() {
                 className="rounded-lg border border-border/20 bg-card/30 p-3 text-center"
               >
                 <s.icon className={`w-4 h-4 mx-auto mb-1 ${s.color}`} />
-                <div className="text-base md:text-lg font-bold font-mono text-foreground">{s.value}</div>
+                <motion.div
+                  key={s.value}
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="text-base md:text-lg font-bold font-mono text-foreground"
+                >
+                  {s.value}
+                </motion.div>
                 <div className="text-[9px] text-muted-foreground uppercase tracking-wider">{s.label}</div>
               </motion.div>
             ))}
@@ -57,9 +96,8 @@ export function HeroDemoPreview() {
               {bars.map((h, i) => (
                 <motion.div
                   key={i}
-                  initial={{ height: 0 }}
                   animate={{ height: `${h}%` }}
-                  transition={{ delay: 1.2 + i * 0.05, duration: 0.5, ease: "easeOut" }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
                   className="flex-1 rounded-t-sm bg-gradient-to-t from-primary/80 to-primary/30"
                 />
               ))}
@@ -72,17 +110,20 @@ export function HeroDemoPreview() {
               Aposta Gerada
             </div>
             <div className="grid grid-cols-3 gap-2">
-              {numbers.map((n, i) => (
-                <motion.div
-                  key={n}
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 1.6 + i * 0.1, type: "spring", stiffness: 300 }}
-                  className="w-9 h-9 rounded-full gradient-brand flex items-center justify-center text-primary-foreground text-xs font-bold font-mono mx-auto shadow-md shadow-primary/20"
-                >
-                  {n.toString().padStart(2, "0")}
-                </motion.div>
-              ))}
+              <AnimatePresence mode="popLayout">
+                {numbers.map((n, i) => (
+                  <motion.div
+                    key={n}
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0 }}
+                    transition={{ delay: i * 0.06, type: "spring", stiffness: 300 }}
+                    className="w-9 h-9 rounded-full gradient-brand flex items-center justify-center text-primary-foreground text-xs font-bold font-mono mx-auto shadow-md shadow-primary/20"
+                  >
+                    {n.toString().padStart(2, "0")}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
             <motion.div
               initial={{ opacity: 0 }}
