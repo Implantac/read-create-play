@@ -48,7 +48,7 @@ function DashboardScreen() {
   return (
     <div className="space-y-2.5">
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
         {[
           { label: "Sorteios", val: "3.248", icon: BarChart3, c: "text-primary", bg: "bg-primary/10", delta: "+12" },
           { label: "Padrões IA", val: "152", icon: Brain, c: "text-neon-blue", bg: "bg-neon-blue/10", delta: "+8" },
@@ -72,8 +72,8 @@ function DashboardScreen() {
         ))}
       </div>
       {/* Charts */}
-      <div className="grid grid-cols-5 gap-2">
-        <div className="col-span-3 rounded-lg border border-border/20 bg-card/20 p-2.5">
+      <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
+        <div className="sm:col-span-3 rounded-lg border border-border/20 bg-card/20 p-2.5">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-[8px] text-muted-foreground uppercase font-mono">Frequência dos Números</span>
             <div className="flex gap-1">
@@ -95,7 +95,7 @@ function DashboardScreen() {
             ))}
           </div>
         </div>
-        <div className="col-span-2 rounded-lg border border-border/20 bg-card/20 p-2.5">
+        <div className="sm:col-span-2 rounded-lg border border-border/20 bg-card/20 p-2.5">
           <div className="flex items-center gap-1 mb-1">
             <Activity className="w-2.5 h-2.5 text-neon-blue" />
             <span className="text-[8px] text-muted-foreground uppercase font-mono">Tendência</span>
@@ -116,15 +116,15 @@ function DashboardScreen() {
       {/* Recent draws mini */}
       <div className="rounded-lg border border-border/20 bg-card/20 p-2.5">
         <span className="text-[8px] text-muted-foreground uppercase font-mono">Últimos Resultados</span>
-        <div className="flex gap-3 mt-1.5">
+        <div className="flex gap-2 sm:gap-3 mt-1.5 overflow-x-auto scrollbar-hide">
           {[
             { c: "3248", nums: [7, 13, 22, 34, 41, 58] },
             { c: "3247", nums: [3, 18, 25, 37, 44, 52] },
           ].map((draw) => (
-            <div key={draw.c} className="flex items-center gap-1.5">
+            <div key={draw.c} className="flex items-center gap-1 sm:gap-1.5 shrink-0">
               <span className="text-[7px] font-mono text-muted-foreground/60">#{draw.c}</span>
               {draw.nums.map((n) => (
-                <div key={n} className="w-4.5 h-4.5 rounded-full bg-primary/20 flex items-center justify-center text-[6px] font-mono text-primary font-bold">
+                <div key={n} className="w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-primary/20 flex items-center justify-center text-[5px] sm:text-[6px] font-mono text-primary font-bold">
                   {n.toString().padStart(2, "0")}
                 </div>
               ))}
@@ -148,7 +148,7 @@ function GeradorScreen() {
           </span>
           <span className="text-[7px] font-mono text-primary bg-primary/10 rounded px-1.5 py-0.5">Algoritmo Genético</span>
         </div>
-        <div className="flex items-center justify-center gap-2.5 py-1">
+        <div className="flex items-center justify-center gap-1.5 sm:gap-2.5 py-1 flex-wrap">
           <AnimatePresence mode="popLayout">
             {nums.map((n, i) => (
               <motion.div
@@ -156,7 +156,7 @@ function GeradorScreen() {
                 initial={{ opacity: 0, scale: 0, rotateY: 180 }}
                 animate={{ opacity: 1, scale: 1, rotateY: 0 }}
                 transition={{ delay: i * 0.1, type: "spring", stiffness: 260, damping: 20 }}
-                className="w-9 h-9 rounded-full gradient-brand flex items-center justify-center text-primary-foreground text-xs font-bold font-mono relative"
+                className="w-7 h-7 sm:w-9 sm:h-9 rounded-full gradient-brand flex items-center justify-center text-primary-foreground text-[10px] sm:text-xs font-bold font-mono relative"
                 style={{ boxShadow: "0 3px 15px hsl(var(--primary) / 0.35)" }}
               >
                 <motion.div
@@ -219,13 +219,13 @@ function GeradorScreen() {
 function EstatisticasScreen() {
   return (
     <div className="space-y-2.5">
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
         {/* Heatmap */}
-        <div className="col-span-3 rounded-lg border border-border/20 bg-card/20 p-2.5">
+        <div className="sm:col-span-3 rounded-lg border border-border/20 bg-card/20 p-2.5">
           <span className="text-[8px] text-muted-foreground uppercase font-mono flex items-center gap-1 mb-1.5">
             <PieChart className="w-2.5 h-2.5 text-accent" /> Mapa de Calor
           </span>
-          <div className="grid grid-cols-10 gap-[1.5px]">
+          <div className="grid grid-cols-6 sm:grid-cols-10 gap-[1.5px]">
             {Array.from({ length: 60 }, (_, i) => {
               const heat = [0.75, 0.3, 0.6, 0.15, 0.9, 0.45, 0.55, 0.2, 0.8, 0.35, 0.65, 0.5, 0.25, 0.85, 0.4, 0.7, 0.1, 0.95, 0.38, 0.62, 0.48, 0.72, 0.28, 0.58, 0.42, 0.88, 0.18, 0.78, 0.32, 0.68, 0.52, 0.22, 0.82, 0.36, 0.66, 0.46, 0.76, 0.12, 0.92, 0.34, 0.64, 0.44, 0.74, 0.24, 0.84, 0.38, 0.56, 0.16, 0.86, 0.3, 0.7, 0.5, 0.2, 0.8, 0.4, 0.6, 0.1, 0.9, 0.35, 0.65][i];
               return (
@@ -247,7 +247,7 @@ function EstatisticasScreen() {
           </div>
         </div>
         {/* Distribution + delay */}
-        <div className="col-span-2 space-y-2">
+        <div className="sm:col-span-2 space-y-2">
           <div className="rounded-lg border border-border/20 bg-card/20 p-2.5">
             <span className="text-[8px] text-muted-foreground uppercase font-mono flex items-center gap-1 mb-1.5">
               <LineChart className="w-2.5 h-2.5 text-neon-cyan" /> Distribuição
@@ -284,7 +284,7 @@ function EstatisticasScreen() {
 function SimuladorScreen() {
   return (
     <div className="space-y-2.5">
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
         {[
           { l: "Jogos", v: "1.000.000", c: "text-foreground", bg: "bg-muted/30" },
           { l: "Sena (6/6)", v: "0", c: "text-neon-red", bg: "bg-neon-red/10" },
@@ -337,7 +337,7 @@ function IAScreen() {
           Recomendação: priorizar faixa 21-40 com paridade equilibrada.
         </div>
       </div>
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
         {[
           { l: "Precisão", v: "78%", c: "text-primary" },
           { l: "Modelos", v: "5", c: "text-neon-blue" },
@@ -400,7 +400,7 @@ export function HeroDemoPreview() {
       initial={{ opacity: 0, y: 40, rotateX: 8 }}
       animate={{ opacity: 1, y: 0, rotateX: 0 }}
       transition={{ delay: 0.8, duration: 0.8, ease: "easeOut" }}
-      className="mt-12 mx-auto max-w-5xl"
+      className="mt-6 sm:mt-12 mx-auto max-w-5xl px-2 sm:px-0"
       style={{ perspective: "1200px" }}
     >
       <div
@@ -493,7 +493,7 @@ export function HeroDemoPreview() {
                 </AnimatePresence>
               </div>
               {/* Tabs */}
-              <div className="flex items-center gap-0.5">
+              <div className="flex items-center gap-0.5 overflow-x-auto scrollbar-hide">
                 {screens.map((screen, idx) => {
                   const Icon = screen.icon;
                   const isActive = idx === activeScreen;
@@ -501,14 +501,14 @@ export function HeroDemoPreview() {
                     <button
                       key={screen.id}
                       onClick={() => handleTabClick(idx)}
-                      className={`flex items-center gap-1 px-2 py-1 text-[7px] font-mono uppercase tracking-wider rounded transition-colors ${
+                      className={`flex items-center gap-1 px-1.5 sm:px-2 py-1 text-[6px] sm:text-[7px] font-mono uppercase tracking-wider rounded transition-colors shrink-0 ${
                         isActive
                           ? `${screen.color} bg-card/60 border border-border/20`
                           : "text-muted-foreground/30 hover:text-muted-foreground/60"
                       }`}
                     >
-                      <Icon className="w-2.5 h-2.5" />
-                      <span className="hidden lg:inline">{screen.label}</span>
+                      <Icon className="w-2 h-2 sm:w-2.5 sm:h-2.5" />
+                      <span className="hidden sm:inline">{screen.label}</span>
                     </button>
                   );
                 })}
@@ -516,7 +516,7 @@ export function HeroDemoPreview() {
             </div>
 
             {/* Screen content */}
-            <div className="p-3 min-h-[200px]">
+            <div className="p-2 sm:p-3 min-h-[180px] sm:min-h-[200px]">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeScreen}
@@ -537,22 +537,22 @@ export function HeroDemoPreview() {
         </div>
 
         {/* Bottom status bar */}
-        <div className="px-3 py-1.5 border-t border-border/10 bg-card/30 flex items-center justify-between relative z-10">
-          <div className="flex items-center gap-2">
-            <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} className="w-3 h-3">
+        <div className="px-2 sm:px-3 py-1.5 border-t border-border/10 bg-card/30 flex items-center justify-between relative z-10">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+            <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} className="w-3 h-3 shrink-0">
               <Cpu className="w-3 h-3 text-primary" />
             </motion.div>
             <AnimatePresence mode="wait">
-              <motion.span key={statusMsg} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 8 }} className="text-[8px] font-mono text-muted-foreground">
+              <motion.span key={statusMsg} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 8 }} className="text-[7px] sm:text-[8px] font-mono text-muted-foreground truncate">
                 {statusMsg}{".".repeat(dots)}
               </motion.span>
             </AnimatePresence>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Progress dots */}
-            <div className="flex gap-1">
+            <div className="flex gap-0.5 sm:gap-1">
               {screens.map((_, idx) => (
-                <div key={idx} className="w-5 h-[2px] rounded-full bg-border/30 overflow-hidden">
+                <div key={idx} className="w-3 sm:w-5 h-[2px] rounded-full bg-border/30 overflow-hidden">
                   {idx === activeScreen && (
                     <motion.div
                       key={`prog-${activeScreen}`}
@@ -565,8 +565,8 @@ export function HeroDemoPreview() {
                 </div>
               ))}
             </div>
-            <span className="text-[7px] font-mono text-muted-foreground/40">GPU: 24%</span>
-            <span className="text-[7px] font-mono text-muted-foreground/40">RAM: 1.2GB</span>
+            <span className="text-[7px] font-mono text-muted-foreground/40 hidden sm:inline">GPU: 24%</span>
+            <span className="text-[7px] font-mono text-muted-foreground/40 hidden sm:inline">RAM: 1.2GB</span>
             <span className="text-[7px] font-mono text-primary/70">● Online</span>
           </div>
         </div>
