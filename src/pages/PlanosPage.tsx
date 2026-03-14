@@ -126,9 +126,9 @@ export default function PlanosPage() {
                 )}
                 <CardHeader className="text-center pb-4">
                   <div className={`mx-auto w-12 h-12 rounded-xl flex items-center justify-center mb-3 ${
-                    plan.highlight ? "gradient-brand shadow-lg shadow-primary/20" : "bg-muted/50 border border-border/30"
+                    plan.highlight ? "gradient-brand shadow-lg shadow-primary/20" : (plan as any).isLifetime ? "bg-neon-amber/20 border border-neon-amber/30 shadow-lg shadow-neon-amber/10" : "bg-muted/50 border border-border/30"
                   }`}>
-                    <plan.icon className={`w-6 h-6 ${plan.highlight ? "text-primary-foreground" : "text-primary"}`} />
+                    <plan.icon className={`w-6 h-6 ${plan.highlight ? "text-primary-foreground" : (plan as any).isLifetime ? "text-neon-amber" : "text-primary"}`} />
                   </div>
                   <CardTitle className="text-lg">{plan.name}</CardTitle>
                   <CardDescription className="text-xs">{plan.description}</CardDescription>
