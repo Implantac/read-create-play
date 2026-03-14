@@ -462,10 +462,11 @@ export default function LandingPage() {
             ].map((t, i) => (
               <motion.div
                 key={t.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: i % 2 === 0 ? -40 : 40, rotateY: i % 2 === 0 ? -5 : 5 }}
+                whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.12, duration: 0.6, type: "spring", stiffness: 100 }}
+                whileHover={{ y: -6, transition: { duration: 0.2 } }}
                 className="glass-card rounded-xl border border-border/30 p-6 space-y-4 hover:border-primary/20 transition-colors"
               >
                 <Quote className="w-6 h-6 text-primary/40" />
