@@ -140,6 +140,11 @@ export default function LandingPage() {
             </span>
           </Link>
           <div className="flex items-center gap-3">
+            <Link to="/planos">
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                Planos
+              </Button>
+            </Link>
             <Link to="/login">
               <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
                 Entrar
@@ -426,6 +431,7 @@ export default function LandingPage() {
               <span className="text-sm font-semibold">Titan Loterias</span>
             </div>
             <div className="flex items-center gap-6 text-xs text-muted-foreground">
+              <Link to="/planos" className="hover:text-foreground transition-colors">Planos</Link>
               <Link to="/login" className="hover:text-foreground transition-colors">Entrar</Link>
               <Link to="/signup" className="hover:text-foreground transition-colors">Criar Conta</Link>
             </div>
