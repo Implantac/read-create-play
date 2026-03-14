@@ -337,7 +337,7 @@ function IAScreen() {
           Recomendação: priorizar faixa 21-40 com paridade equilibrada.
         </div>
       </div>
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
         {[
           { l: "Precisão", v: "78%", c: "text-primary" },
           { l: "Modelos", v: "5", c: "text-neon-blue" },
