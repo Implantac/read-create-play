@@ -131,6 +131,31 @@ const plans = [
 ];
 
 export default function LandingPage() {
+  const heroRef = useRef<HTMLDivElement>(null);
+  const featuresRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress: heroProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const { scrollYProgress: featuresProgress } = useScroll({
+    target: featuresRef,
+    offset: ["start end", "end start"],
+  });
+  const { scrollYProgress: ctaProgress } = useScroll({
+    target: ctaRef,
+    offset: ["start end", "end start"],
+  });
+
+  const heroY = useTransform(heroProgress, [0, 1], [0, 150]);
+  const heroOpacity = useTransform(heroProgress, [0, 0.6], [1, 0]);
+  const heroScale = useTransform(heroProgress, [0, 0.6], [1, 0.92]);
+  const gridY = useTransform(heroProgress, [0, 1], [0, 80]);
+  const featuresRotateX = useTransform(featuresProgress, [0, 0.5], [4, 0]);
+  const ctaScale = useTransform(ctaProgress, [0, 0.5], [0.85, 1]);
+  const ctaOpacity = useTransform(ctaProgress, [0, 0.4], [0, 1]);
+
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Nav */}
