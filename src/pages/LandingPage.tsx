@@ -302,7 +302,8 @@ export default function LandingPage() {
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeUp}
-                className={`rounded-xl bg-gradient-to-b ${colorMap[f.color]} border p-6 hover:translate-y-[-2px] transition-transform duration-300`}
+                whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.2 } }}
+                className={`rounded-xl bg-gradient-to-b ${colorMap[f.color]} border p-6 transition-shadow duration-300 hover:shadow-lg`}
               >
                 <f.icon className="w-8 h-8 mb-4" />
                 <h3 className="text-lg font-semibold text-foreground mb-2">{f.title}</h3>
