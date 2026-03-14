@@ -39,6 +39,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    const authStorageKey = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session);
@@ -51,20 +53,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (error) {
-        console.warn("Session recovery failed, signing out:", error.message);
-        supabase.auth.signOut();
-        setSession(null);
-        setProfile(null);
-      } else {
+    supabase.auth.getSession()
+      .then(({ data: { session }, error }) => {
+        if (error) {
+          const message = error.message.toLowerCase();
+          const isInvalidRefreshToken =
+            message.includes("invalid refresh token") ||
+            message.includes("refresh token not found");
+
+          if (isInvalidRefreshToken) {
+            localStorage.removeItem(authStorageKey);
+          }
+
+          setSession(null);
+          setProfile(null);
+          return;
+        }
+
         setSession(session);
         if (session?.user) {
           fetchProfile(session.user.id);
         }
-      }
-      setLoading(false);
-    });
+      })
+      .catch(() => {
+        localStorage.removeItem(authStorageKey);
+        setSession(null);
+        setProfile(null);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     return () => subscription.unsubscribe();
   }, []);
