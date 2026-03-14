@@ -122,11 +122,24 @@ const plans = [
       "Motor HP exclusivo",
       "Algoritmos genéticos",
       "Otimizador combinatorial",
-      "API dedicada",
-      "Consultoria personalizada",
+      "Suporte prioritário",
     ],
     cta: "Assinar Titan",
     highlight: false,
+  },
+  {
+    name: "Vitalício",
+    price: "R$ 497",
+    period: " único",
+    features: [
+      "Tudo incluso para sempre",
+      "Todas as atualizações futuras",
+      "Prioridade máxima",
+      "Sem mensalidades",
+    ],
+    cta: "Comprar Vitalício",
+    highlight: false,
+    isLifetime: true,
   },
 ];
 
