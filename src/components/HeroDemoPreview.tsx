@@ -48,7 +48,7 @@ function DashboardScreen() {
   return (
     <div className="space-y-2.5">
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
         {[
           { label: "Sorteios", val: "3.248", icon: BarChart3, c: "text-primary", bg: "bg-primary/10", delta: "+12" },
           { label: "Padrões IA", val: "152", icon: Brain, c: "text-neon-blue", bg: "bg-neon-blue/10", delta: "+8" },
