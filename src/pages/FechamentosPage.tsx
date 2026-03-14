@@ -15,10 +15,12 @@ import {
 import { exportToPdf } from "@/engine/pdf-export";
 import {
   Grid3X3, Shield, Trophy, Coins, FileDown, ChevronRight,
-  CheckCircle2, AlertTriangle, Target, Hash, Layers, Sparkles,
+  CheckCircle2, AlertTriangle, Target, Hash, Layers, Sparkles, Save,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MatrixComparisonPanel } from "@/components/MatrixComparisonPanel";
+import { useSavedBets } from "@/hooks/useSavedBets";
+import { toast } from "sonner";
 
 // Bet prices per lottery (approximate, single game)
 const BET_PRICES: Record<string, number> = {
@@ -43,6 +45,26 @@ export default function FechamentosPage() {
   const [baseNumbers, setBaseNumbers] = useState<number[]>([]);
   const [generatedGames, setGeneratedGames] = useState<number[][] | null>(null);
   const [validationCache, setValidationCache] = useState<Record<string, ReturnType<typeof validateMatrix>>>({});
+  const [saving, setSaving] = useState(false);
+  const { saveBet } = useSavedBets(config.id);
+
+  const handleSaveAllGames = async () => {
+    if (!generatedGames || !currentMatrix) return;
+    setSaving(true);
+    let saved = 0;
+    for (const game of generatedGames) {
+      const ok = await saveBet({
+        numbers: game,
+        strategy: `Fechamento: ${currentMatrix.name}`,
+        label: `Fechamento ${currentMatrix.name}`,
+      });
+      if (ok) saved++;
+    }
+    setSaving(false);
+    if (saved > 0) {
+      toast.success(`${saved} jogos salvos nas apostas favoritas!`);
+    }
+  };
 
   // Filter matrices relevant to current lottery
   const availableMatrices = MATRIX_LIST.filter((m) => m.lottery === config.id);
@@ -351,10 +373,22 @@ export default function FechamentosPage() {
                     <Trophy className="w-5 h-5 text-accent" />
                     {generatedGames.length} Jogos Gerados
                   </CardTitle>
-                  <Button variant="outline" size="sm" onClick={handleExportPdf} className="gap-1.5">
-                    <FileDown className="w-3.5 h-3.5" />
-                    Exportar PDF
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={handleExportPdf} className="gap-1.5">
+                      <FileDown className="w-3.5 h-3.5" />
+                      Exportar PDF
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleSaveAllGames}
+                      disabled={saving}
+                      className="gap-1.5"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      {saving ? "Salvando..." : "Salvar Jogos"}
+                    </Button>
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-3 text-xs text-muted-foreground mt-1">
                   <span>
