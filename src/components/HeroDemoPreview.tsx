@@ -156,7 +156,7 @@ function GeradorScreen() {
                 initial={{ opacity: 0, scale: 0, rotateY: 180 }}
                 animate={{ opacity: 1, scale: 1, rotateY: 0 }}
                 transition={{ delay: i * 0.1, type: "spring", stiffness: 260, damping: 20 }}
-                className="w-9 h-9 rounded-full gradient-brand flex items-center justify-center text-primary-foreground text-xs font-bold font-mono relative"
+                className="w-7 h-7 sm:w-9 sm:h-9 rounded-full gradient-brand flex items-center justify-center text-primary-foreground text-[10px] sm:text-xs font-bold font-mono relative"
                 style={{ boxShadow: "0 3px 15px hsl(var(--primary) / 0.35)" }}
               >
                 <motion.div
