@@ -60,10 +60,10 @@ export function HeroDemoPreview() {
           {/* Stats row */}
           <div className="col-span-12 grid grid-cols-4 gap-3">
             {[
-              { label: "Sorteios", value: "3.248", icon: BarChart3, color: "text-primary" },
-              { label: "Padrões IA", value: "147", icon: Brain, color: "text-neon-blue" },
-              { label: "Win Rate", value: "68%", icon: TrendingUp, color: "text-primary" },
-              { label: "Score", value: "A+", icon: Zap, color: "text-neon-amber" },
+              { label: "Sorteios", value: stats.sorteios, icon: BarChart3, color: "text-primary" },
+              { label: "Padrões IA", value: stats.padroes, icon: Brain, color: "text-neon-blue" },
+              { label: "Win Rate", value: stats.winRate, icon: TrendingUp, color: "text-primary" },
+              { label: "Score", value: stats.score, icon: Zap, color: "text-neon-amber" },
             ].map((s, i) => (
               <motion.div
                 key={s.label}
@@ -73,7 +73,15 @@ export function HeroDemoPreview() {
                 className="rounded-lg border border-border/20 bg-card/30 p-3 text-center"
               >
                 <s.icon className={`w-4 h-4 mx-auto mb-1 ${s.color}`} />
-                <div className="text-base md:text-lg font-bold font-mono text-foreground">{s.value}</div>
+                <motion.div
+                  key={s.value}
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="text-base md:text-lg font-bold font-mono text-foreground"
+                >
+                  {s.value}
+                </motion.div>
                 <div className="text-[9px] text-muted-foreground uppercase tracking-wider">{s.label}</div>
               </motion.div>
             ))}
@@ -88,9 +96,8 @@ export function HeroDemoPreview() {
               {bars.map((h, i) => (
                 <motion.div
                   key={i}
-                  initial={{ height: 0 }}
                   animate={{ height: `${h}%` }}
-                  transition={{ delay: 1.2 + i * 0.05, duration: 0.5, ease: "easeOut" }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
                   className="flex-1 rounded-t-sm bg-gradient-to-t from-primary/80 to-primary/30"
                 />
               ))}
