@@ -5,6 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { HeroDemoPreview } from "@/components/HeroDemoPreview";
 import { LotteryLogosCarousel } from "@/components/LotteryLogosCarousel";
+import { ScreensShowcase } from "@/components/ScreensShowcase";
 import {
   Zap,
   BarChart3,
