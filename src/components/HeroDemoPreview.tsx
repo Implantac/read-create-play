@@ -3,7 +3,7 @@ import {
   BarChart3, Brain, TrendingUp, Zap, Activity, Sparkles,
   Target, Dices, PieChart, Cpu, LineChart, Settings,
   Home, Layers, History, Award, ChevronRight, Bell,
-  Search, User,
+  Search, User, Grid3X3, Shield, CheckCircle2,
 } from "lucide-react";
 import { useState, useEffect, useCallback, useRef } from "react";
 
@@ -14,6 +14,7 @@ const screens = [
   { id: "estatisticas", label: "Estatísticas", icon: BarChart3, color: "text-accent" },
   { id: "simulador", label: "Simulações", icon: Dices, color: "text-neon-purple" },
   { id: "ia", label: "IA Autônoma", icon: Brain, color: "text-primary" },
+  { id: "fechamentos", label: "Fechamentos", icon: Grid3X3, color: "text-neon-cyan" },
 ];
 
 const sidebarItems = [
@@ -33,6 +34,7 @@ const statusMessages = [
   "Modelo neural processando dados...",
   "Simulação Monte Carlo em progresso...",
   "Aprendizado autônomo ativo...",
+  "Calculando fechamento matemático...",
 ];
 
 function makePath(pts: number[], width = 260) {
@@ -364,6 +366,89 @@ function IAScreen() {
   );
 }
 
+// ── Screen: Fechamentos ──
+function FechamentosScreen() {
+  const baseNums = [3, 7, 13, 22, 28, 34, 41, 47, 52, 58];
+  const games = [
+    [3, 13, 22, 34, 41, 58],
+    [7, 22, 28, 41, 47, 52],
+    [3, 7, 34, 47, 52, 58],
+    [13, 28, 34, 41, 52, 58],
+    [3, 7, 13, 28, 47, 58],
+    [7, 13, 22, 34, 47, 52],
+  ];
+  return (
+    <div className="space-y-2.5">
+      {/* Base numbers */}
+      <div className="rounded-lg border border-neon-cyan/20 bg-neon-cyan/5 p-2.5">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[8px] text-muted-foreground uppercase font-mono flex items-center gap-1">
+            <Grid3X3 className="w-2.5 h-2.5 text-neon-cyan" /> Mega-Sena — Fechamento 10→Quina
+          </span>
+          <span className="text-[7px] font-mono text-neon-cyan bg-neon-cyan/10 rounded px-1.5 py-0.5">10 dezenas-base</span>
+        </div>
+        <div className="flex items-center justify-center gap-1 sm:gap-1.5 flex-wrap">
+          {baseNums.map((n, i) => (
+            <motion.div
+              key={n}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.06, type: "spring", stiffness: 300, damping: 20 }}
+              className="w-6 h-6 sm:w-7 sm:h-7 rounded-full border-2 border-neon-cyan/40 bg-neon-cyan/10 flex items-center justify-center text-[8px] sm:text-[9px] font-mono text-neon-cyan font-bold"
+            >
+              {n.toString().padStart(2, "0")}
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Generated games matrix */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+        {games.map((game, gi) => (
+          <motion.div
+            key={gi}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: gi * 0.08 }}
+            className="rounded-lg border border-border/20 bg-card/20 p-1.5 flex items-center gap-1.5"
+          >
+            <span className="text-[6px] font-mono text-muted-foreground/50 w-5 shrink-0">J{gi + 1}</span>
+            <div className="flex gap-0.5 flex-1">
+              {game.map((n) => (
+                <div key={n} className="flex-1 h-4 rounded bg-primary/15 flex items-center justify-center text-[6px] font-mono text-primary font-semibold">
+                  {n.toString().padStart(2, "0")}
+                </div>
+              ))}
+            </div>
+            <CheckCircle2 className="w-2.5 h-2.5 text-primary/40 shrink-0" />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+        {[
+          { l: "Jogos", v: "6", c: "text-neon-cyan" },
+          { l: "Garantia", v: "Quina", c: "text-primary" },
+          { l: "Economia", v: "97%", c: "text-accent" },
+          { l: "Cobertura", v: "100%", c: "text-neon-blue" },
+        ].map((s) => (
+          <div key={s.l} className="rounded-lg border border-border/20 bg-card/30 p-1.5 text-center">
+            <div className={`text-[10px] font-bold font-mono ${s.c}`}>{s.v}</div>
+            <div className="text-[5px] text-muted-foreground uppercase">{s.l}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="rounded-lg border border-neon-cyan/20 bg-neon-cyan/5 p-1.5 text-center">
+        <span className="text-[7px] font-mono text-neon-cyan flex items-center justify-center gap-1">
+          <Shield className="w-2.5 h-2.5" /> Cobertura matemática garantida: se 5 dos 10 números saírem, você acerta a Quina
+        </span>
+      </div>
+    </div>
+  );
+}
+
 // ── Main component ──
 export function HeroDemoPreview() {
   const [activeScreen, setActiveScreen] = useState(0);
@@ -530,6 +615,7 @@ export function HeroDemoPreview() {
                   {activeScreen === 2 && <EstatisticasScreen />}
                   {activeScreen === 3 && <SimuladorScreen />}
                   {activeScreen === 4 && <IAScreen />}
+                  {activeScreen === 5 && <FechamentosScreen />}
                 </motion.div>
               </AnimatePresence>
             </div>
