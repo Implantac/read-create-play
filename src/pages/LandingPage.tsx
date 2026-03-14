@@ -140,6 +140,11 @@ export default function LandingPage() {
             </span>
           </Link>
           <div className="flex items-center gap-3">
+            <Link to="/planos">
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                Planos
+              </Button>
+            </Link>
             <Link to="/login">
               <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
                 Entrar
