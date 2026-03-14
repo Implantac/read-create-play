@@ -14,10 +14,12 @@ import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X } from "lucide-react";
+import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
+import { useSavedBets } from "@/hooks/useSavedBets";
+import { usePlanAccess } from "@/hooks/usePlanAccess";
 
 const container = {
   hidden: { opacity: 0 },
@@ -37,6 +39,8 @@ const quickLinks = [
 
 const DashboardPage = () => {
   const { config, draws, drawsWithPrizes, loading, syncing, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery } = useLotteryContext();
+  const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
+  const { currentPlan } = usePlanAccess();
   const [luckyGame, setLuckyGame] = useState<{ numbers: number[]; score: number; strategy: string } | null>(null);
   const [generatingLucky, setGeneratingLucky] = useState(false);
 
@@ -181,6 +185,50 @@ const DashboardPage = () => {
             <motion.div variants={item}><StatsCard title="Números Frios" value={coldNumbers} icon={Snowflake} color="blue" subtitle="Abaixo da média" /></motion.div>
             <motion.div variants={item}><StatsCard title="Atraso Médio" value={`${avgDelay}d`} icon={TrendingUp} color="amber" subtitle="Concursos sem aparecer" /></motion.div>
           </motion.div>
+
+          {/* Saved bets limit card */}
+          {limit !== Infinity && (
+            <motion.div variants={item} className="glass-card rounded-xl border border-border/50 p-5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center">
+                    <Save className="w-5 h-5 text-accent" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-foreground">Apostas Salvas — {config.name}</h3>
+                    <p className="text-xs text-muted-foreground">
+                      Plano {currentPlan === "free" ? "Gratuito" : currentPlan} • Limite de {limit} jogos por loteria
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <span className={`text-2xl font-bold font-mono ${isAtLimit ? "text-destructive" : "text-primary"}`}>
+                      {savedBets.length}/{limit}
+                    </span>
+                    <p className="text-[10px] text-muted-foreground">
+                      {isAtLimit ? "Limite atingido" : `${remaining} restante${remaining !== 1 ? "s" : ""}`}
+                    </p>
+                  </div>
+                  {isAtLimit && (
+                    <Link to="/planos">
+                      <Button size="sm" variant="outline" className="gap-1.5 border-accent/20 text-accent hover:bg-accent/5">
+                        <Crown className="w-3.5 h-3.5" />
+                        Upgrade
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              </div>
+              {/* Progress bar */}
+              <div className="mt-3 h-1.5 rounded-full bg-muted/50 overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${isAtLimit ? "bg-destructive" : "bg-primary"}`}
+                  style={{ width: `${Math.min((savedBets.length / limit) * 100, 100)}%` }}
+                />
+              </div>
+            </motion.div>
+          )}
 
           <motion.div variants={container} initial="hidden" animate="show" className="grid lg:grid-cols-2 gap-6">
             <motion.div variants={item}><FrequencyChart stats={stats} /></motion.div>
