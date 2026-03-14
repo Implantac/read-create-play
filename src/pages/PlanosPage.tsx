@@ -162,6 +162,8 @@ export default function PlanosPage() {
                     className={`w-full gap-2 ${
                       plan.highlight && !isCurrent
                         ? "gradient-brand text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-primary/30"
+                        : (plan as any).isLifetime && !isCurrent
+                        ? "bg-neon-amber text-background hover:bg-neon-amber/90 shadow-lg shadow-neon-amber/20"
                         : ""
                     }`}
                     variant={isCurrent ? "secondary" : plan.highlight ? "default" : "outline"}
