@@ -100,5 +100,8 @@ export function useSavedBets(lotteryId: string) {
     setSavedBets(prev => prev.filter(b => b.id !== id));
   }, []);
 
-  return { savedBets, loading, saveBet, updateBet, deleteBet, refetch: fetchBets };
+  const remaining = Math.max(0, limit - savedBets.length);
+  const isAtLimit = remaining === 0 && limit !== Infinity;
+
+  return { savedBets, loading, saveBet, updateBet, deleteBet, refetch: fetchBets, limit, remaining, isAtLimit };
 }
