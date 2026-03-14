@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
@@ -130,6 +131,31 @@ const plans = [
 ];
 
 export default function LandingPage() {
+  const heroRef = useRef<HTMLDivElement>(null);
+  const featuresRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress: heroProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const { scrollYProgress: featuresProgress } = useScroll({
+    target: featuresRef,
+    offset: ["start end", "end start"],
+  });
+  const { scrollYProgress: ctaProgress } = useScroll({
+    target: ctaRef,
+    offset: ["start end", "end start"],
+  });
+
+  const heroY = useTransform(heroProgress, [0, 1], [0, 150]);
+  const heroOpacity = useTransform(heroProgress, [0, 0.6], [1, 0]);
+  const heroScale = useTransform(heroProgress, [0, 0.6], [1, 0.92]);
+  const gridY = useTransform(heroProgress, [0, 1], [0, 80]);
+  const featuresRotateX = useTransform(featuresProgress, [0, 0.5], [4, 0]);
+  const ctaScale = useTransform(ctaProgress, [0, 0.5], [0.85, 1]);
+  const ctaOpacity = useTransform(ctaProgress, [0, 0.4], [0, 1]);
+
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Nav */}
@@ -164,14 +190,25 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative pt-32 pb-20 md:pt-44 md:pb-32 gradient-mesh">
-        {/* Grid pattern */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
+      <section ref={heroRef} className="relative pt-32 pb-20 md:pt-44 md:pb-32 gradient-mesh overflow-hidden">
+        {/* Grid pattern with parallax */}
+        <motion.div className="absolute inset-0 opacity-[0.03]" style={{
+          y: gridY,
           backgroundImage: "linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)",
           backgroundSize: "60px 60px",
         }} />
 
-        <div className="container mx-auto px-4 relative">
+        {/* Floating orbs with parallax */}
+        <motion.div
+          className="absolute top-20 left-[10%] w-72 h-72 rounded-full bg-primary/5 blur-[100px]"
+          style={{ y: useTransform(heroProgress, [0, 1], [0, 200]) }}
+        />
+        <motion.div
+          className="absolute bottom-10 right-[15%] w-96 h-96 rounded-full bg-neon-purple/5 blur-[120px]"
+          style={{ y: useTransform(heroProgress, [0, 1], [0, -100]) }}
+        />
+
+        <motion.div className="container mx-auto px-4 relative" style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}>
           <motion.div
             initial="hidden"
             animate="visible"
@@ -214,7 +251,7 @@ export default function LandingPage() {
               ))}
             </motion.div>
           </motion.div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Stats bar */}
@@ -224,10 +261,10 @@ export default function LandingPage() {
             {stats.map((s, i) => (
               <motion.div
                 key={s.label}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.1, type: "spring", stiffness: 200 }}
                 className="text-center"
               >
                 <div className="text-2xl md:text-3xl font-bold font-mono gradient-brand-text">{s.value}</div>
@@ -239,8 +276,8 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section className="py-20 md:py-28">
-        <div className="container mx-auto px-4">
+      <section ref={featuresRef} className="py-20 md:py-28" style={{ perspective: "1200px" }}>
+        <motion.div style={{ rotateX: featuresRotateX }} className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -265,7 +302,8 @@ export default function LandingPage() {
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeUp}
-                className={`rounded-xl bg-gradient-to-b ${colorMap[f.color]} border p-6 hover:translate-y-[-2px] transition-transform duration-300`}
+                whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.2 } }}
+                className={`rounded-xl bg-gradient-to-b ${colorMap[f.color]} border p-6 transition-shadow duration-300 hover:shadow-lg`}
               >
                 <f.icon className="w-8 h-8 mb-4" />
                 <h3 className="text-lg font-semibold text-foreground mb-2">{f.title}</h3>
@@ -273,7 +311,7 @@ export default function LandingPage() {
               </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* How it works */}
@@ -425,10 +463,11 @@ export default function LandingPage() {
             ].map((t, i) => (
               <motion.div
                 key={t.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: i % 2 === 0 ? -40 : 40, rotateY: i % 2 === 0 ? -5 : 5 }}
+                whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.12, duration: 0.6, type: "spring", stiffness: 100 }}
+                whileHover={{ y: -6, transition: { duration: 0.2 } }}
                 className="glass-card rounded-xl border border-border/30 p-6 space-y-4 hover:border-primary/20 transition-colors"
               >
                 <Quote className="w-6 h-6 text-primary/40" />
@@ -499,14 +538,9 @@ export default function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 md:py-28 gradient-mesh">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="max-w-2xl mx-auto text-center space-y-6 rounded-2xl glass-card p-10 md:p-14 border border-primary/10 glow-green"
-          >
+      <section ref={ctaRef} className="py-20 md:py-28 gradient-mesh overflow-hidden">
+        <motion.div className="container mx-auto px-4" style={{ scale: ctaScale, opacity: ctaOpacity }}>
+          <div className="max-w-2xl mx-auto text-center space-y-6 rounded-2xl glass-card p-10 md:p-14 border border-primary/10 glow-green">
             <div className="w-14 h-14 rounded-2xl gradient-brand flex items-center justify-center mx-auto shadow-lg shadow-primary/20">
               <Zap className="w-7 h-7 text-primary-foreground" />
             </div>
@@ -522,8 +556,8 @@ export default function LandingPage() {
                 Criar Conta Grátis <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </section>
 
       {/* Footer */}
