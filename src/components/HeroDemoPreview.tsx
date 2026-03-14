@@ -284,7 +284,7 @@ function EstatisticasScreen() {
 function SimuladorScreen() {
   return (
     <div className="space-y-2.5">
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
         {[
           { l: "Jogos", v: "1.000.000", c: "text-foreground", bg: "bg-muted/30" },
           { l: "Sena (6/6)", v: "0", c: "text-neon-red", bg: "bg-neon-red/10" },
