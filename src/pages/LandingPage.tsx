@@ -443,9 +443,11 @@ export default function LandingPage() {
                     className={`w-full ${
                       plan.highlight
                         ? "gradient-brand text-primary-foreground shadow-lg shadow-primary/20"
+                        : (plan as any).isLifetime
+                        ? "bg-neon-amber text-background hover:bg-neon-amber/90 shadow-lg shadow-neon-amber/20"
                         : ""
                     }`}
-                    variant={plan.highlight ? "default" : "outline"}
+                    variant={plan.highlight ? "default" : (plan as any).isLifetime ? "default" : "outline"}
                   >
                     {plan.cta}
                   </Button>
