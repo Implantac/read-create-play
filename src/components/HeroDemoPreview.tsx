@@ -34,6 +34,7 @@ const statusMessages = [
   "Modelo neural processando dados...",
   "Simulação Monte Carlo em progresso...",
   "Aprendizado autônomo ativo...",
+  "Calculando fechamento matemático...",
 ];
 
 function makePath(pts: number[], width = 260) {
