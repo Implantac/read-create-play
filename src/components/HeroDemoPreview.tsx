@@ -148,7 +148,7 @@ function GeradorScreen() {
           </span>
           <span className="text-[7px] font-mono text-primary bg-primary/10 rounded px-1.5 py-0.5">Algoritmo Genético</span>
         </div>
-        <div className="flex items-center justify-center gap-2.5 py-1">
+        <div className="flex items-center justify-center gap-1.5 sm:gap-2.5 py-1 flex-wrap">
           <AnimatePresence mode="popLayout">
             {nums.map((n, i) => (
               <motion.div
