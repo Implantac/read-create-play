@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
         setSession(session);
         if (session?.user) {
           setTimeout(() => fetchProfile(session.user.id), 0);
@@ -51,10 +51,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session?.user) {
-        fetchProfile(session.user.id);
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.warn("Session recovery failed, signing out:", error.message);
+        supabase.auth.signOut();
+        setSession(null);
+        setProfile(null);
+      } else {
+        setSession(session);
+        if (session?.user) {
+          fetchProfile(session.user.id);
+        }
       }
       setLoading(false);
     });
