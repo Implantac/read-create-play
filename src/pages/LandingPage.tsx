@@ -264,6 +264,9 @@ export default function LandingPage() {
                 </span>
               ))}
             </motion.div>
+
+            {/* Animated dashboard preview */}
+            <HeroDemoPreview />
           </motion.div>
         </motion.div>
       </section>
