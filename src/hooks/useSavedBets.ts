@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { usePlanAccess, PLAN_LIMITS } from "@/hooks/usePlanAccess";
 
 export interface SavedBet {
   id: string;
@@ -16,6 +17,8 @@ export interface SavedBet {
 export function useSavedBets(lotteryId: string) {
   const [savedBets, setSavedBets] = useState<SavedBet[]>([]);
   const [loading, setLoading] = useState(true);
+  const { currentPlan } = usePlanAccess();
+  const limit = PLAN_LIMITS[currentPlan].savedBetsPerLottery;
 
   const fetchBets = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -48,6 +51,11 @@ export function useSavedBets(lotteryId: string) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       toast.error("Faça login para salvar apostas");
+      return false;
+    }
+
+    if (savedBets.length >= limit) {
+      toast.error(`Limite de ${limit} jogos salvos por loteria no plano gratuito. Faça upgrade para salvar mais!`);
       return false;
     }
 
@@ -92,5 +100,8 @@ export function useSavedBets(lotteryId: string) {
     setSavedBets(prev => prev.filter(b => b.id !== id));
   }, []);
 
-  return { savedBets, loading, saveBet, updateBet, deleteBet, refetch: fetchBets };
+  const remaining = Math.max(0, limit - savedBets.length);
+  const isAtLimit = remaining === 0 && limit !== Infinity;
+
+  return { savedBets, loading, saveBet, updateBet, deleteBet, refetch: fetchBets, limit, remaining, isAtLimit };
 }
