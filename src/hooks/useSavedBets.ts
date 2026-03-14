@@ -54,6 +54,11 @@ export function useSavedBets(lotteryId: string) {
       return false;
     }
 
+    if (savedBets.length >= limit) {
+      toast.error(`Limite de ${limit} jogos salvos por loteria no plano gratuito. Faça upgrade para salvar mais!`);
+      return false;
+    }
+
     const { error } = await supabase.from("saved_bets").insert({
       user_id: user.id,
       lottery_id: lotteryId,
