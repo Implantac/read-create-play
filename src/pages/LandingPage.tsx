@@ -5,6 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { HeroDemoPreview } from "@/components/HeroDemoPreview";
 import { LotteryLogosCarousel } from "@/components/LotteryLogosCarousel";
+import { ScreensShowcase } from "@/components/ScreensShowcase";
 import {
   Zap,
   BarChart3,
@@ -274,6 +275,9 @@ export default function LandingPage() {
 
       {/* Lotteries carousel */}
       <LotteryLogosCarousel />
+
+      {/* Screens showcase carousel */}
+      <ScreensShowcase />
 
       {/* Stats bar */}
       <section className="border-y border-border/30 bg-card/30 backdrop-blur-lg">
