@@ -272,6 +272,9 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
+      {/* Lotteries carousel */}
+      <LotteryLogosCarousel />
+
       {/* Stats bar */}
       <section className="border-y border-border/30 bg-card/30 backdrop-blur-lg">
         <div className="container mx-auto px-4 py-8">
