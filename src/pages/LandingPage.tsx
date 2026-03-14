@@ -13,6 +13,7 @@ import {
   ChevronRight,
   ArrowRight,
   Dices,
+  HelpCircle,
   Star,
   CheckCircle,
   Users,
