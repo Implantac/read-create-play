@@ -39,6 +39,8 @@ const quickLinks = [
 
 const DashboardPage = () => {
   const { config, draws, drawsWithPrizes, loading, syncing, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery } = useLotteryContext();
+  const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
+  const { currentPlan } = usePlanAccess();
   const [luckyGame, setLuckyGame] = useState<{ numbers: number[]; score: number; strategy: string } | null>(null);
   const [generatingLucky, setGeneratingLucky] = useState(false);
 
