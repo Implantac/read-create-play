@@ -124,6 +124,7 @@ export function HeroDemoPreview() {
                   </motion.div>
                 ))}
               </AnimatePresence>
+            </div>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
