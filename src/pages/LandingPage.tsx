@@ -310,7 +310,7 @@ export default function LandingPage() {
               </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* How it works */}
