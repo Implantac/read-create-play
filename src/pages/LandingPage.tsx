@@ -334,6 +334,9 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
+      {/* Screens showcase carousel */}
+      <ScreensShowcase />
+
       {/* How it works */}
       <section className="py-20 md:py-28 bg-card/20">
         <div className="container mx-auto px-4">
