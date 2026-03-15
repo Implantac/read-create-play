@@ -286,17 +286,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((s, i) => (
-              <motion.div
-                key={s.label}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, type: "spring", stiffness: 200 }}
-                className="text-center"
-              >
-                <div className="text-2xl md:text-3xl font-bold font-mono gradient-brand-text">{s.value}</div>
-                <div className="text-xs text-muted-foreground mt-1 uppercase tracking-wider">{s.label}</div>
-              </motion.div>
+              <AnimatedCounter key={s.label} value={s.value} label={s.label} index={i} />
             ))}
           </div>
         </div>
