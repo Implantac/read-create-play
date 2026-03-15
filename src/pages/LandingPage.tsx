@@ -505,6 +505,7 @@ export default function LandingPage() {
                 </ul>
                 <Link to="/signup">
                   <Button
+                    onClick={(e) => burstConfetti(e)}
                     className={`w-full ${
                       plan.highlight
                         ? "gradient-brand text-primary-foreground shadow-lg shadow-primary/20"
