@@ -594,7 +594,7 @@ export default function LandingPage() {
               ))}
             </Accordion>
           </motion.div>
-        </div>
+        </motion.div>
       </section>
 
       {/* CTA */}
