@@ -10,6 +10,7 @@ import { AnimatedCounter } from "@/components/AnimatedCounter";
 import { FloatingCTA } from "@/components/FloatingCTA";
 import { SocialProofBar } from "@/components/SocialProofBar";
 import { FloatingLotteryBalls } from "@/components/FloatingLotteryBalls";
+import { burstConfetti } from "@/lib/confetti";
 import {
   Zap,
   BarChart3,
