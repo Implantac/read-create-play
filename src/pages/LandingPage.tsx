@@ -153,6 +153,7 @@ const plans = [
 export default function LandingPage() {
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
+  const faqRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress: heroProgress } = useScroll({
@@ -173,6 +174,14 @@ export default function LandingPage() {
   const heroScale = useTransform(heroProgress, [0, 0.6], [1, 0.92]);
   const gridY = useTransform(heroProgress, [0, 1], [0, 80]);
   const featuresRotateX = useTransform(featuresProgress, [0, 0.5], [4, 0]);
+  const { scrollYProgress: faqProgress } = useScroll({
+    target: faqRef,
+    offset: ["start end", "end start"],
+  });
+  const faqY = useTransform(faqProgress, [0, 1], [60, -30]);
+  const faqRotateX = useTransform(faqProgress, [0, 0.4, 0.6], [6, 0, -2]);
+  const faqScale = useTransform(faqProgress, [0, 0.4], [0.92, 1]);
+
   const ctaScale = useTransform(ctaProgress, [0, 0.5], [0.85, 1]);
   const ctaOpacity = useTransform(ctaProgress, [0, 0.4], [0, 1]);
 
@@ -536,8 +545,11 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 md:py-28 bg-card/20">
-        <div className="container mx-auto px-4">
+      <section ref={faqRef} className="py-20 md:py-28 bg-card/20" style={{ perspective: 1200 }}>
+        <motion.div
+          className="container mx-auto px-4"
+          style={{ y: faqY, rotateX: faqRotateX, scale: faqScale }}
+        >
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -582,7 +594,7 @@ export default function LandingPage() {
               ))}
             </Accordion>
           </motion.div>
-        </div>
+        </motion.div>
       </section>
 
       {/* CTA */}
