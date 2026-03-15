@@ -545,8 +545,11 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 md:py-28 bg-card/20">
-        <div className="container mx-auto px-4">
+      <section ref={faqRef} className="py-20 md:py-28 bg-card/20" style={{ perspective: 1200 }}>
+        <motion.div
+          className="container mx-auto px-4"
+          style={{ y: faqY, rotateX: faqRotateX, scale: faqScale }}
+        >
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
