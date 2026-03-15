@@ -254,9 +254,16 @@ export default function LandingPage() {
 
             <motion.div custom={3} variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <Link to="/signup">
-                <Button size="lg" className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-8 h-12">
-                  Começar Grátis <ChevronRight className="w-4 h-4" />
-                </Button>
+                <motion.div
+                  whileHover={{ scale: 1.06, boxShadow: "0 0 30px hsl(var(--primary) / 0.5)" }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                  className="rounded-md"
+                >
+                  <Button size="lg" className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-8 h-12 w-full">
+                    Começar Grátis <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </motion.div>
               </Link>
               <Link to="/login">
                 <Button size="lg" variant="outline" className="gap-2 text-base px-8 h-12 border-border/50 hover:border-primary/30 hover:text-primary">
@@ -593,9 +600,16 @@ export default function LandingPage() {
               Junte-se a milhares de jogadores que já usam o Titan Loterias para tomar decisões baseadas em dados.
             </p>
             <Link to="/signup">
-              <Button size="lg" className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-10 h-12">
-                Criar Conta Grátis <ArrowRight className="w-4 h-4" />
-              </Button>
+              <motion.div
+                whileHover={{ scale: 1.06, boxShadow: "0 0 30px hsl(var(--primary) / 0.5)" }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                className="rounded-md inline-block"
+              >
+                <Button size="lg" className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-10 h-12">
+                  Criar Conta Grátis <ArrowRight className="w-4 h-4" />
+                </Button>
+              </motion.div>
             </Link>
           </div>
         </motion.div>
