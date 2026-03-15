@@ -462,6 +462,7 @@ export default function LandingPage() {
                     : "glass-card border-border/30"
                 }`}
               >
+                <div data-glow className="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 z-0" />
                 {(plan as any).isLifetime && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <span className="px-3 py-1 rounded-full bg-neon-amber text-background text-[10px] font-mono font-bold uppercase tracking-wider whitespace-nowrap">
