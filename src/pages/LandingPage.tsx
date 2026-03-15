@@ -212,6 +212,8 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section ref={heroRef} className="relative pt-32 pb-20 md:pt-44 md:pb-32 gradient-mesh overflow-hidden">
+        {/* Floating lottery balls */}
+        <FloatingLotteryBalls />
         {/* Grid pattern with parallax */}
         <motion.div className="absolute inset-0 opacity-[0.03]" style={{
           y: gridY,
