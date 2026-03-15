@@ -454,15 +454,25 @@ export default function LandingPage() {
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
                 style={{ transition: "transform 0.15s ease-out", transformStyle: "preserve-3d" }}
-                className={`rounded-xl p-6 border ${
+                className={`rounded-xl p-6 border relative overflow-hidden group/card ${
                   plan.highlight
-                    ? "glass-card border-primary/30 glow-green relative"
+                    ? "glass-card border-primary/30 glow-green"
                     : (plan as any).isLifetime
-                    ? "glass-card border-neon-amber/30 relative shadow-lg shadow-neon-amber/5"
+                    ? "glass-card border-neon-amber/30 shadow-lg shadow-neon-amber/5"
                     : "glass-card border-border/30"
                 }`}
               >
-                <div data-glow className="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 z-0" />
+                {/* Animated border glow */}
+                <div className="pointer-events-none absolute -inset-[1px] rounded-xl opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 z-0"
+                  style={{
+                    background: 'conic-gradient(from var(--border-angle, 0deg), hsl(var(--primary) / 0.6), hsl(var(--neon-blue) / 0.6), hsl(var(--neon-purple) / 0.4), hsl(var(--primary) / 0.6))',
+                    animation: 'border-rotate 3s linear infinite',
+                  }}
+                />
+                {/* Inner background to mask the border glow center */}
+                <div className="pointer-events-none absolute inset-[1px] rounded-[11px] bg-card z-[1] opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
+                <div data-glow className="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 z-[2]" />
+                <div className="relative z-[3]">
                 {(plan as any).isLifetime && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <span className="px-3 py-1 rounded-full bg-neon-amber text-background text-[10px] font-mono font-bold uppercase tracking-wider whitespace-nowrap">
@@ -506,6 +516,7 @@ export default function LandingPage() {
                     {plan.cta}
                   </Button>
                 </Link>
+                </div>
               </motion.div>
               );
             })}
