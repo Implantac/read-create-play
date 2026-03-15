@@ -42,7 +42,7 @@ export function FloatingLotteryBalls() {
       {balls.map((ball, i) => (
         <motion.div
           key={i}
-          className={`absolute rounded-full bg-gradient-to-br border backdrop-blur-[2px] flex items-center justify-center font-mono font-bold text-foreground/20 select-none ${ball.color}`}
+          className={`absolute rounded-full bg-gradient-to-br border backdrop-blur-[1px] flex items-center justify-center font-mono font-bold text-foreground/10 select-none ${ball.color}`}
           style={{
             width: ball.size,
             height: ball.size,
