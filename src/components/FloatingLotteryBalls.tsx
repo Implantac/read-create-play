@@ -12,12 +12,12 @@ interface Ball {
 }
 
 const BALL_COLORS = [
-  "from-primary/30 to-primary/10 border-primary/20",
-  "from-neon-blue/30 to-neon-blue/10 border-neon-blue/20",
-  "from-accent/30 to-accent/10 border-accent/20",
-  "from-neon-purple/30 to-neon-purple/10 border-neon-purple/20",
-  "from-neon-cyan/30 to-neon-cyan/10 border-neon-cyan/20",
-  "from-neon-red/25 to-neon-red/8 border-neon-red/15",
+  "from-primary/15 to-primary/5 border-primary/10",
+  "from-neon-blue/15 to-neon-blue/5 border-neon-blue/10",
+  "from-accent/15 to-accent/5 border-accent/10",
+  "from-neon-purple/15 to-neon-purple/5 border-neon-purple/10",
+  "from-neon-cyan/15 to-neon-cyan/5 border-neon-cyan/10",
+  "from-neon-red/12 to-neon-red/4 border-neon-red/8",
 ];
 
 export function FloatingLotteryBalls() {
