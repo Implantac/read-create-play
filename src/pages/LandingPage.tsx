@@ -430,9 +430,19 @@ export default function LandingPage() {
                 const rotateX = ((y - centerY) / centerY) * -10;
                 const rotateY = ((x - centerX) / centerX) * 10;
                 e.currentTarget.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03,1.03,1.03)`;
+                // Update glow overlay position
+                const glowEl = e.currentTarget.querySelector('[data-glow]') as HTMLElement;
+                if (glowEl) {
+                  glowEl.style.opacity = '1';
+                  glowEl.style.background = `radial-gradient(250px circle at ${x}px ${y}px, hsl(var(--primary) / 0.15), transparent 70%)`;
+                }
               };
               const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
                 e.currentTarget.style.transform = `perspective(600px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)`;
+                const glowEl = e.currentTarget.querySelector('[data-glow]') as HTMLElement;
+                if (glowEl) {
+                  glowEl.style.opacity = '0';
+                }
               };
               return (
               <motion.div
@@ -452,6 +462,7 @@ export default function LandingPage() {
                     : "glass-card border-border/30"
                 }`}
               >
+                <div data-glow className="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 z-0" />
                 {(plan as any).isLifetime && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <span className="px-3 py-1 rounded-full bg-neon-amber text-background text-[10px] font-mono font-bold uppercase tracking-wider whitespace-nowrap">
