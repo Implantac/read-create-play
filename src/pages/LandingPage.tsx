@@ -420,14 +420,31 @@ export default function LandingPage() {
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-            {plans.map((plan, i) => (
+            {plans.map((plan, i) => {
+              const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -10;
+                const rotateY = ((x - centerX) / centerX) * 10;
+                e.currentTarget.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03,1.03,1.03)`;
+              };
+              const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+                e.currentTarget.style.transform = `perspective(600px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)`;
+              };
+              return (
               <motion.div
                 key={plan.name}
                 initial={{ opacity: 0, x: i % 2 === 0 ? -60 : 60, rotateY: i % 2 === 0 ? 12 : -12, scale: 0.9 }}
                 whileInView={{ opacity: 1, x: 0, rotateY: 0, scale: 1 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ delay: i * 0.15, duration: 0.6, type: "spring", stiffness: 80, damping: 15 }}
-                className={`rounded-xl p-6 border transition-all duration-300 hover:translate-y-[-2px] ${
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+                style={{ transition: "transform 0.15s ease-out", transformStyle: "preserve-3d" }}
+                className={`rounded-xl p-6 border ${
                   plan.highlight
                     ? "glass-card border-primary/30 glow-green relative"
                     : (plan as any).isLifetime
@@ -479,7 +496,8 @@ export default function LandingPage() {
                   </Button>
                 </Link>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
