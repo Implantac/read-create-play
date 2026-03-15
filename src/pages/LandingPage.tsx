@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 
 import { LotteryLogosCarousel } from "@/components/LotteryLogosCarousel";
 import { ScreensShowcase } from "@/components/ScreensShowcase";
+import { AnimatedCounter } from "@/components/AnimatedCounter";
+import { FloatingCTA } from "@/components/FloatingCTA";
+import { SocialProofBar } from "@/components/SocialProofBar";
 import {
   Zap,
   BarChart3,
