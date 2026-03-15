@@ -9,6 +9,7 @@ import { ScreensShowcase } from "@/components/ScreensShowcase";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
 import { FloatingCTA } from "@/components/FloatingCTA";
 import { SocialProofBar } from "@/components/SocialProofBar";
+import { FloatingLotteryBalls } from "@/components/FloatingLotteryBalls";
 import {
   Zap,
   BarChart3,
@@ -211,6 +212,8 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section ref={heroRef} className="relative pt-32 pb-20 md:pt-44 md:pb-32 gradient-mesh overflow-hidden">
+        {/* Floating lottery balls */}
+        <FloatingLotteryBalls />
         {/* Grid pattern with parallax */}
         <motion.div className="absolute inset-0 opacity-[0.03]" style={{
           y: gridY,
