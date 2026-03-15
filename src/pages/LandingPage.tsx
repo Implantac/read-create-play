@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 
 import { LotteryLogosCarousel } from "@/components/LotteryLogosCarousel";
 import { ScreensShowcase } from "@/components/ScreensShowcase";
+import { AnimatedCounter } from "@/components/AnimatedCounter";
+import { FloatingCTA } from "@/components/FloatingCTA";
+import { SocialProofBar } from "@/components/SocialProofBar";
 import {
   Zap,
   BarChart3,
@@ -174,6 +177,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+      <FloatingCTA />
       {/* Nav */}
       <nav className="fixed top-0 inset-x-0 z-50 glass-panel border-b border-border/30">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -274,22 +278,15 @@ export default function LandingPage() {
       {/* Lotteries carousel */}
       <LotteryLogosCarousel />
 
+      {/* Social proof badges */}
+      <SocialProofBar />
+
       {/* Stats bar */}
       <section className="border-y border-border/30 bg-card/30 backdrop-blur-lg">
         <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((s, i) => (
-              <motion.div
-                key={s.label}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, type: "spring", stiffness: 200 }}
-                className="text-center"
-              >
-                <div className="text-2xl md:text-3xl font-bold font-mono gradient-brand-text">{s.value}</div>
-                <div className="text-xs text-muted-foreground mt-1 uppercase tracking-wider">{s.label}</div>
-              </motion.div>
+              <AnimatedCounter key={s.label} value={s.value} label={s.label} index={i} />
             ))}
           </div>
         </div>
