@@ -486,7 +486,7 @@ export default function LandingPage() {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto" style={{ perspective: "1000px" }}>
             {[
               { name: "Carlos M.", initials: "CM", role: "Jogador da Mega-Sena", text: "Com o Titan Loterias, comecei a entender padrões que nunca havia percebido. A análise de frequência e atraso me ajudou a montar jogos muito mais estratégicos." },
               { name: "Ana Paula S.", initials: "AS", role: "Jogadora da Lotofácil", text: "O gerador profissional é sensacional! Já acertei 13 pontos duas vezes desde que comecei a usar. A IA realmente faz diferença nas escolhas." },
@@ -497,12 +497,19 @@ export default function LandingPage() {
             ].map((t, i) => (
               <motion.div
                 key={t.name}
-                initial={{ opacity: 0, x: i % 2 === 0 ? -40 : 40, rotateY: i % 2 === 0 ? -5 : 5 }}
-                whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.12, duration: 0.6, type: "spring", stiffness: 100 }}
-                whileHover={{ y: -6, transition: { duration: 0.2 } }}
+                initial={{ opacity: 0, rotateY: 90, scale: 0.8 }}
+                whileInView={{ opacity: 1, rotateY: 0, scale: 1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{
+                  delay: i * 0.15,
+                  duration: 0.7,
+                  type: "spring",
+                  stiffness: 80,
+                  damping: 14,
+                }}
+                whileHover={{ y: -8, rotateY: -5, scale: 1.03, transition: { duration: 0.25 } }}
                 className="glass-card rounded-xl border border-border/30 p-6 space-y-4 hover:border-primary/20 transition-colors"
+                style={{ transformStyle: "preserve-3d", backfaceVisibility: "hidden" }}
               >
                 <Quote className="w-6 h-6 text-primary/40" />
                 <p className="text-sm text-muted-foreground leading-relaxed">{t.text}</p>
