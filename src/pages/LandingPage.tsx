@@ -9,6 +9,7 @@ import { ScreensShowcase } from "@/components/ScreensShowcase";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
 import { FloatingCTA } from "@/components/FloatingCTA";
 import { SocialProofBar } from "@/components/SocialProofBar";
+import { FloatingLotteryBalls } from "@/components/FloatingLotteryBalls";
 import {
   Zap,
   BarChart3,
