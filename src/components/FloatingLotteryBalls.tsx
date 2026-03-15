@@ -23,7 +23,7 @@ const BALL_COLORS = [
 export function FloatingLotteryBalls() {
   const balls = useMemo<Ball[]>(() => {
     const items: Ball[] = [];
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 8; i++) {
       items.push({
         number: Math.floor(Math.random() * 60) + 1,
         x: Math.random() * 100,
