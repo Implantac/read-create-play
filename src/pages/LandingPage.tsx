@@ -660,7 +660,7 @@ export default function LandingPage() {
                 transition={{ type: "spring", stiffness: 300, damping: 15 }}
                 className="rounded-md inline-block"
               >
-                <Button size="lg" className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-10 h-12">
+                <Button size="lg" onClick={(e) => burstConfetti(e)} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-10 h-12">
                   Criar Conta Grátis <ArrowRight className="w-4 h-4" />
                 </Button>
               </motion.div>
