@@ -10,6 +10,7 @@ import { AnimatedCounter } from "@/components/AnimatedCounter";
 import { FloatingCTA } from "@/components/FloatingCTA";
 import { SocialProofBar } from "@/components/SocialProofBar";
 import { FloatingLotteryBalls } from "@/components/FloatingLotteryBalls";
+import { burstConfetti } from "@/lib/confetti";
 import {
   Zap,
   BarChart3,
@@ -504,6 +505,7 @@ export default function LandingPage() {
                 </ul>
                 <Link to="/signup">
                   <Button
+                    onClick={(e) => burstConfetti(e)}
                     className={`w-full ${
                       plan.highlight
                         ? "gradient-brand text-primary-foreground shadow-lg shadow-primary/20"
