@@ -423,10 +423,10 @@ export default function LandingPage() {
             {plans.map((plan, i) => (
               <motion.div
                 key={plan.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                initial={{ opacity: 0, x: i % 2 === 0 ? -60 : 60, rotateY: i % 2 === 0 ? 12 : -12, scale: 0.9 }}
+                whileInView={{ opacity: 1, x: 0, rotateY: 0, scale: 1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ delay: i * 0.15, duration: 0.6, type: "spring", stiffness: 80, damping: 15 }}
                 className={`rounded-xl p-6 border transition-all duration-300 hover:translate-y-[-2px] ${
                   plan.highlight
                     ? "glass-card border-primary/30 glow-green relative"
