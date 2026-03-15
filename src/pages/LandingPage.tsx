@@ -177,6 +177,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+      <FloatingCTA />
       {/* Nav */}
       <nav className="fixed top-0 inset-x-0 z-50 glass-panel border-b border-border/30">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
