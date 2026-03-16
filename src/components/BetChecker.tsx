@@ -405,46 +405,25 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
     setActiveTab("improve");
 
     try {
-      const last10Data = selectedDraws.slice(0, 10).map(d => ({
-        concurso: d.concurso,
-        numbers: d.numbers,
-        date: d.date,
-      }));
-
-      const { data, error } = await supabase.functions.invoke("ai-lottery-predict", {
-        body: {
-          lottery_id: lotteryId,
-          count: betsToImprove.length,
-          mode: "improve",
-          bets_to_improve: betsToImprove.map(b => ({
-            numbers: b.numbers,
-            label: b.label,
-            avg_hits: b.avgHits,
-            best_hit: b.bestHit,
-            prize_hits: b.prizeHits,
-          })),
-          last_draws: last10Data,
-        },
-      });
-
-      if (error) throw error;
-
-      if (data?.improvements) {
-        setAiImprovements(data.improvements);
-        toast.success("IA gerou sugestões de melhoria!");
-      } else if (data?.bets) {
-        const improvements: AIImprovement[] = betsToImprove.map((original, i) => ({
-          original: original.numbers,
-          suggested: data.bets[i] || data.bets[0],
-          reason: data.analysis || "Otimização baseada em padrões estatísticos recentes",
-          expectedGain: "+15-25% de chance de acerto",
-        }));
-        setAiImprovements(improvements);
-        toast.success("IA gerou apostas otimizadas!");
-      }
+      const stats = computeFrequencyStats(draws, maxNumbers);
+      const config = { id: lotteryId, name: lotteryId, numbers: maxNumbers, pick, color: "" };
+      const improvements = generateNativeImprovements(
+        betsToImprove.map(b => ({
+          numbers: b.numbers,
+          label: b.label,
+          avgHits: b.avgHits,
+          bestHit: b.bestHit,
+          prizeHits: b.prizeHits,
+        })),
+        stats,
+        config,
+        draws
+      );
+      setAiImprovements(improvements);
+      toast.success("Motor nativo gerou sugestões de melhoria!");
     } catch (e: any) {
-      console.error("AI improvement error:", e);
-      toast.error("Erro ao solicitar melhorias da IA");
+      console.error("Native improvement error:", e);
+      toast.error("Erro ao gerar melhorias");
     } finally {
       setLoadingAI(false);
     }
