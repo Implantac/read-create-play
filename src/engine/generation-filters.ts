@@ -247,11 +247,11 @@ export function analyzeRowDistribution(bet: number[], gridCols: number = 5, tota
 /**
  * Computa distribuição ideal por linhas baseada no histórico
  */
-export function computeIdealRowDistribution(draws: DrawResult[], gridCols: number = 5): { avg: number[]; min: number } {
-  const rows = Math.ceil(25 / gridCols);
+export function computeIdealRowDistribution(draws: DrawResult[], gridCols: number = 5, totalNumbers: number = 25): { avg: number[]; min: number } {
+  const rows = Math.ceil(totalNumbers / gridCols);
   if (draws.length === 0) return { avg: new Array(rows).fill(3), min: 2 };
   
-  const allDists = draws.map(d => analyzeRowDistribution(d.numbers, gridCols));
+  const allDists = draws.map(d => analyzeRowDistribution(d.numbers, gridCols, totalNumbers));
   const avg = new Array(rows).fill(0);
   for (const dist of allDists) {
     for (let i = 0; i < rows; i++) avg[i] += dist[i];
