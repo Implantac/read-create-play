@@ -117,7 +117,7 @@ export function RobustnessRadarPanel({ stats, config, draws, lotteryId }: Props)
               {results.map((r, i) => (
                 <button
                   key={i}
-                  onClick={() => { setSelectedIdx(i); setShowImproved(false); }}
+                  onClick={() => setSelectedIdx(i)}
                   className={`shrink-0 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
                     i === selectedIdx
                       ? "bg-primary/20 text-primary border border-primary/30"
