@@ -1,6 +1,6 @@
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
-import { Link } from "react-router-dom";
+import { useRef, useCallback } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 
@@ -152,10 +152,17 @@ const plans = [
 ];
 
 export default function LandingPage() {
+  const navigate = useNavigate();
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
   const faqRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
+
+  const handleCtaClick = useCallback((e: React.MouseEvent, to: string) => {
+    e.preventDefault();
+    burstConfetti(e);
+    setTimeout(() => navigate(to), 500);
+  }, [navigate]);
 
   const { scrollYProgress: heroProgress } = useScroll({
     target: heroRef,
@@ -263,18 +270,16 @@ export default function LandingPage() {
             </motion.p>
 
             <motion.div custom={3} variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-              <Link to="/signup">
-                <motion.div
+              <motion.div
                   whileHover={{ scale: 1.06, boxShadow: "0 0 30px hsl(var(--primary) / 0.5)" }}
                   whileTap={{ scale: 0.97 }}
                   transition={{ type: "spring", stiffness: 300, damping: 15 }}
                   className="rounded-md"
                 >
-                  <Button size="lg" onClick={(e) => burstConfetti(e)} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-8 h-12 w-full">
+                  <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-8 h-12 w-full">
                     Começar Grátis <ChevronRight className="w-4 h-4" />
                   </Button>
                 </motion.div>
-              </Link>
               <Link to="/login">
                 <Button size="lg" variant="outline" className="gap-2 text-base px-8 h-12 border-border/50 hover:border-primary/30 hover:text-primary">
                   Já tenho conta
@@ -503,9 +508,8 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link to="/signup">
                   <Button
-                    onClick={(e) => burstConfetti(e)}
+                    onClick={(e) => handleCtaClick(e, "/signup")}
                     className={`w-full ${
                       plan.highlight
                         ? "gradient-brand text-primary-foreground shadow-lg shadow-primary/20"
@@ -517,7 +521,6 @@ export default function LandingPage() {
                   >
                     {plan.cta}
                   </Button>
-                </Link>
                 </div>
               </motion.div>
               );
@@ -653,18 +656,16 @@ export default function LandingPage() {
             <p className="text-muted-foreground">
               Junte-se a milhares de jogadores que já usam o Titan Loterias para tomar decisões baseadas em dados.
             </p>
-            <Link to="/signup">
               <motion.div
                 whileHover={{ scale: 1.06, boxShadow: "0 0 30px hsl(var(--primary) / 0.5)" }}
                 whileTap={{ scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 300, damping: 15 }}
                 className="rounded-md inline-block"
               >
-                <Button size="lg" onClick={(e) => burstConfetti(e)} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-10 h-12">
+                <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-10 h-12">
                   Criar Conta Grátis <ArrowRight className="w-4 h-4" />
                 </Button>
               </motion.div>
-            </Link>
           </div>
         </motion.div>
       </section>
