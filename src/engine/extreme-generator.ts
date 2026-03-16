@@ -241,13 +241,13 @@ function applyStatFilters(candidates: number[][], ecfg: ExtremeConfig, config: L
   const gridCols = config.id === "lotofacil" ? 5 : Math.ceil(Math.sqrt(config.numbers));
 
   return candidates.filter(bet => {
-    // Row distribution
+    // Row distribution (only apply for Lotofácil or when explicitly configured)
     if (ecfg.minPerRow > 0 || ecfg.maxPerRow < config.pick) {
-      const rows = analyzeRowDistribution(bet, gridCols);
+      const rows = analyzeRowDistribution(bet, gridCols, config.numbers);
       if (rows.some(r => r < ecfg.minPerRow) || rows.some(r => r > ecfg.maxPerRow)) return false;
     }
 
-    // Column distribution
+    // Column distribution (only apply for Lotofácil or when explicitly configured)
     if (ecfg.minPerCol > 0 || ecfg.maxPerCol < config.pick) {
       const colDist = new Array(gridCols).fill(0);
       for (const n of bet) {
