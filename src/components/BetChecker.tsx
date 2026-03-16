@@ -11,7 +11,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { generateNativeImprovements } from "@/engine/native-analysis";
+import { computeStats } from "@/engine/statistics";
+import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useSavedBets, SavedBet } from "@/hooks/useSavedBets";
 import { Progress } from "@/components/ui/progress";
 
