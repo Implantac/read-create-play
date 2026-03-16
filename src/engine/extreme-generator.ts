@@ -220,17 +220,15 @@ function generateFrequencyMix(
 // ═══════════════════════════════════════════════════════
 
 function applyMathFilters(candidates: number[][], ecfg: ExtremeConfig): number[][] {
-  return candidates.filter(bet => {
-    // Parity
+  const filtered = candidates.filter(bet => {
     const evens = bet.filter(n => n % 2 === 0).length;
     if (evens < ecfg.parityRange[0] || evens > ecfg.parityRange[1]) return false;
-
-    // Sum
     const sum = bet.reduce((a, b) => a + b, 0);
     if (sum < ecfg.sumRange[0] || sum > ecfg.sumRange[1]) return false;
-
     return true;
   });
+  // Fallback: if too strict, return all candidates
+  return filtered.length > 0 ? filtered : candidates;
 }
 
 // ═══════════════════════════════════════════════════════
