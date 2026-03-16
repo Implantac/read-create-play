@@ -11,7 +11,7 @@ import type {
   SimulatedGame,
 } from "@/engine/massive-simulation-engine";
 import MassiveSimWorker from "@/workers/massive-sim.worker?worker";
-import { supabase } from "@/integrations/supabase/client";
+
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Rocket, Play, Trophy, TrendingUp, BarChart3,
