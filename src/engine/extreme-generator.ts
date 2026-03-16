@@ -236,7 +236,7 @@ function applyMathFilters(candidates: number[][], ecfg: ExtremeConfig): { result
 // Step 5: Statistical filters (rows, cols, sequences)
 // ═══════════════════════════════════════════════════════
 
-function applyStatFilters(candidates: number[][], ecfg: ExtremeConfig, config: LotteryConfig): number[][] {
+function applyStatFilters(candidates: number[][], ecfg: ExtremeConfig, config: LotteryConfig): { result: number[][]; fallback: boolean } {
   const gridCols = config.id === "lotofacil" ? 5 : Math.ceil(Math.sqrt(config.numbers));
 
   const filtered = candidates.filter(bet => {
@@ -265,7 +265,8 @@ function applyStatFilters(candidates: number[][], ecfg: ExtremeConfig, config: L
     return true;
   });
 
-  return filtered.length > 0 ? filtered : candidates;
+  const fallback = filtered.length === 0;
+  return { result: fallback ? candidates : filtered, fallback };
 }
 
 // ═══════════════════════════════════════════════════════
