@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { burstConfetti } from "@/lib/confetti";
 
 export function FloatingCTA() {
   const [visible, setVisible] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const onScroll = () => {
@@ -14,6 +16,12 @@ export function FloatingCTA() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    burstConfetti(e);
+    setTimeout(() => navigate("/signup"), 500);
+  }, [navigate]);
 
   return (
     <AnimatePresence>
@@ -25,14 +33,13 @@ export function FloatingCTA() {
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
           className="fixed bottom-6 right-6 z-50"
         >
-          <Link to="/signup">
-            <Button
-              size="lg"
-              className="gradient-brand text-primary-foreground shadow-2xl shadow-primary/30 gap-2 px-6 h-12 text-sm font-semibold"
-            >
-              Começar Grátis <ArrowRight className="w-4 h-4" />
-            </Button>
-          </Link>
+          <Button
+            size="lg"
+            onClick={handleClick}
+            className="gradient-brand text-primary-foreground shadow-2xl shadow-primary/30 gap-2 px-6 h-12 text-sm font-semibold"
+          >
+            Começar Grátis <ArrowRight className="w-4 h-4" />
+          </Button>
         </motion.div>
       )}
     </AnimatePresence>
