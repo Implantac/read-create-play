@@ -451,7 +451,7 @@ export function runExtremePipeline(
     const sum = bet.reduce((a, b) => a + b, 0);
     const fc = config.id === "lotofacil" ? analyzeFrameCenter(bet) : { frame: 0, center: 0, ratio: "N/A" };
     const gridCols = config.id === "lotofacil" ? 5 : Math.ceil(Math.sqrt(config.numbers));
-    const rows = analyzeRowDistribution(bet, gridCols);
+    const rows = analyzeRowDistribution(bet, gridCols, config.numbers);
     const repeated = lastDraw.length > 0 ? bet.filter(n => lastDraw.includes(n)).length : 0;
     const hotNumbers = bet.filter(n => classified.hot.includes(n)).length;
     const coldNumbers = bet.filter(n => classified.cold.includes(n)).length;
