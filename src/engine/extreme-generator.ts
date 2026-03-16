@@ -58,6 +58,7 @@ export interface PipelineStep {
   inputCount: number;
   outputCount: number;
   filtered: number;
+  fallback?: boolean;
 }
 
 // ═══════════════════════════════════════════════════════
