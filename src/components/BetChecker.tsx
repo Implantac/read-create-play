@@ -406,7 +406,7 @@ export function BetChecker({ draws, lotteryId, maxNumbers, pick }: Props) {
 
     try {
       const stats = computeFrequencyStats(draws, maxNumbers);
-      const config = { id: lotteryId, name: lotteryId, numbers: maxNumbers, pick, color: "" };
+      const config = { id: lotteryId, name: lotteryId, numbers: maxNumbers, pick, color: "", icon: "" };
       const improvements = generateNativeImprovements(
         betsToImprove.map(b => ({
           numbers: b.numbers,
