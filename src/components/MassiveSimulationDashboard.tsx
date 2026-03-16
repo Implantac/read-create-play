@@ -137,22 +137,19 @@ export function MassiveSimulationDashboard({ stats, config, draws }: Props) {
     if (!result) return;
     setAiLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("ai-massive-simulation", {
-        body: {
-          topGames: result.topGames.slice(0, 15),
-          patternInsights: result.patternInsights,
-          distributionSummary: result.distributionSummary,
-          lotteryName: config.name,
-          lotteryPick: config.pick,
-          lotteryNumbers: config.numbers,
-          totalGenerated: result.totalGenerated,
-          totalEvaluated: result.totalEvaluated,
-        },
-      });
-      if (error) throw error;
-      setAiAnalysis(data.analysis || "Análise não disponível.");
+      await new Promise(r => setTimeout(r, 200));
+      const { generateMassiveSimAnalysis } = await import("@/engine/native-analysis");
+      const analysis = generateMassiveSimAnalysis(
+        result.topGames.slice(0, 15),
+        result.patternInsights,
+        result.distributionSummary,
+        config,
+        result.totalGenerated,
+        result.totalEvaluated
+      );
+      setAiAnalysis(analysis);
     } catch (e) {
-      toast.error("Erro na análise IA");
+      toast.error("Erro na análise");
     } finally {
       setAiLoading(false);
     }

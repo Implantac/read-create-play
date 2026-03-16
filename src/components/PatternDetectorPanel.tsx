@@ -73,25 +73,11 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
     if (!report) return;
     setLoadingAi(true);
     try {
-      const { data, error } = await supabase.functions.invoke("ai-pattern-analysis", {
-        body: {
-          patternReport: {
-            ...report,
-            cooccurrenceMatrix: report.cooccurrenceMatrix.slice(0, 15),
-            cycleDetection: report.cycleDetection.slice(0, 10),
-          },
-          lotteryName: config.name,
-          lotteryPick: config.pick,
-          lotteryNumbers: config.numbers,
-          drawCount: parseInt(drawCount),
-        },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      setAiAnalysis(data.analysis || "Análise indisponível.");
-      if (data?.fromCache) toast.info("Análise carregada do cache (atualizada periodicamente)");
+      await new Promise(r => setTimeout(r, 200));
+      const analysis = generatePatternAnalysis(report, config, parseInt(drawCount));
+      setAiAnalysis(analysis);
     } catch (e: any) {
-      toast.error(e.message || "Erro na análise de IA");
+      toast.error(e.message || "Erro na análise");
     } finally {
       setLoadingAi(false);
     }
