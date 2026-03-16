@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { NumberStats } from "@/engine/statistics";
 import { detectPatterns, PatternReport } from "@/engine/pattern-detector";
-import { supabase } from "@/integrations/supabase/client";
+import { generatePatternAnalysis } from "@/engine/native-analysis";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
