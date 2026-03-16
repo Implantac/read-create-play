@@ -411,16 +411,16 @@ export function runExtremePipeline(
   pipeline.push({ name: "Geração Massiva", inputCount: ecfg.totalCandidates, outputCount: raw.length, filtered: ecfg.totalCandidates - raw.length });
 
   // Step 4: Math filters
-  const afterMath = applyMathFilters(raw, ecfg);
-  pipeline.push({ name: "Filtros Matemáticos", inputCount: raw.length, outputCount: afterMath.length, filtered: raw.length - afterMath.length });
+  const mathResult = applyMathFilters(raw, ecfg);
+  pipeline.push({ name: "Filtros Matemáticos", inputCount: raw.length, outputCount: mathResult.result.length, filtered: raw.length - mathResult.result.length, fallback: mathResult.fallback });
 
   // Step 5: Statistical filters
-  const afterStat = applyStatFilters(afterMath, ecfg, config);
-  pipeline.push({ name: "Filtros Estatísticos", inputCount: afterMath.length, outputCount: afterStat.length, filtered: afterMath.length - afterStat.length });
+  const statResult = applyStatFilters(mathResult.result, ecfg, config);
+  pipeline.push({ name: "Filtros Estatísticos", inputCount: mathResult.result.length, outputCount: statResult.result.length, filtered: mathResult.result.length - statResult.result.length, fallback: statResult.fallback });
 
   // Step 6: Pattern filters
-  const afterPattern = applyPatternFilters(afterStat, ecfg, config, lastDraw, classified);
-  pipeline.push({ name: "Filtros de Padrões", inputCount: afterStat.length, outputCount: afterPattern.length, filtered: afterStat.length - afterPattern.length });
+  const patternResult = applyPatternFilters(statResult.result, ecfg, config, lastDraw, classified);
+  pipeline.push({ name: "Filtros de Padrões", inputCount: statResult.result.length, outputCount: patternResult.result.length, filtered: statResult.result.length - patternResult.result.length, fallback: patternResult.fallback });
 
   // Step 7: Score all remaining
   const scored = afterPattern.map(bet => ({
