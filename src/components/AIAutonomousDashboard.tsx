@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { NumberStats } from "@/engine/statistics";
 import { runAutonomousAnalysis, AutonomousAIReport } from "@/engine/autonomous-ai";
-import { supabase } from "@/integrations/supabase/client";
+import { generateAutonomousAnalysis } from "@/engine/native-analysis";
 import { useToast } from "@/hooks/use-toast";
 import {
   Brain, TrendingUp, TrendingDown, Zap, Target, RefreshCw, Sparkles,
