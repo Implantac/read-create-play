@@ -491,8 +491,25 @@ export function runExtremePipeline(
     };
   });
 
+  // Step 9: Backtest quality filter — discard weak bets
+  const beforeBtFilter = bets.length;
+  const filtered = bets.filter(b => b.backtest.winRate > 0 || b.backtest.consistency >= 30);
+  const validBets = filtered.length > 0 ? filtered : bets; // fallback if all filtered
+  const btFallback = filtered.length === 0 && bets.length > 0;
+
+  // Re-rank after filtering
+  validBets.forEach((b, i) => { b.rank = i + 1; });
+
+  pipeline.push({
+    name: "Filtro Backtest",
+    inputCount: beforeBtFilter,
+    outputCount: validBets.length,
+    filtered: beforeBtFilter - validBets.length,
+    fallback: btFallback,
+  });
+
   return {
-    bets,
+    bets: validBets,
     pipeline,
     elapsedMs: Math.round(performance.now() - start),
   };
