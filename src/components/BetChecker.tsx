@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { generateNativeImprovements } from "@/engine/native-analysis";
-import { computeStats } from "@/engine/statistics";
+import { computeFrequencyStats } from "@/engine/statistics";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useSavedBets, SavedBet } from "@/hooks/useSavedBets";
 import { Progress } from "@/components/ui/progress";
