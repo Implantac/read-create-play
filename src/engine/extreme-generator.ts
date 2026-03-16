@@ -238,14 +238,12 @@ function applyMathFilters(candidates: number[][], ecfg: ExtremeConfig): number[]
 function applyStatFilters(candidates: number[][], ecfg: ExtremeConfig, config: LotteryConfig): number[][] {
   const gridCols = config.id === "lotofacil" ? 5 : Math.ceil(Math.sqrt(config.numbers));
 
-  return candidates.filter(bet => {
-    // Row distribution (only apply for Lotofácil or when explicitly configured)
+  const filtered = candidates.filter(bet => {
     if (ecfg.minPerRow > 0 || ecfg.maxPerRow < config.pick) {
       const rows = analyzeRowDistribution(bet, gridCols, config.numbers);
       if (rows.some(r => r < ecfg.minPerRow) || rows.some(r => r > ecfg.maxPerRow)) return false;
     }
 
-    // Column distribution (only apply for Lotofácil or when explicitly configured)
     if (ecfg.minPerCol > 0 || ecfg.maxPerCol < config.pick) {
       const colDist = new Array(gridCols).fill(0);
       for (const n of bet) {
@@ -255,7 +253,6 @@ function applyStatFilters(candidates: number[][], ecfg: ExtremeConfig, config: L
       if (colDist.some(c => c < ecfg.minPerCol) || colDist.some(c => c > ecfg.maxPerCol)) return false;
     }
 
-    // Max sequence run
     const sorted = [...bet].sort((a, b) => a - b);
     let maxRun = 1, curRun = 1;
     for (let i = 1; i < sorted.length; i++) {
@@ -266,6 +263,8 @@ function applyStatFilters(candidates: number[][], ecfg: ExtremeConfig, config: L
 
     return true;
   });
+
+  return filtered.length > 0 ? filtered : candidates;
 }
 
 // ═══════════════════════════════════════════════════════
