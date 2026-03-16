@@ -53,7 +53,13 @@ export function RobustnessRadarPanel({ stats, config, draws, lotteryId }: Props)
 
   const handleSaveImproved = () => {
     if (!currentImproved) return;
-    saveBet(currentImproved.improved, `Otimizado (${currentImproved.improvedGrade})`, currentImproved.improvedScore, currentImproved.improvedGrade);
+    saveBet({
+      numbers: currentImproved.improved,
+      label: `Otimizado (${currentImproved.improvedGrade})`,
+      score: currentImproved.improvedScore,
+      grade: currentImproved.improvedGrade,
+      strategy: "Robustez AI",
+    });
     toast.success("Jogo melhorado salvo nas apostas!");
   };
 
