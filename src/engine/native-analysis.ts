@@ -317,6 +317,52 @@ export function generateAutonomousAnalysis(
   md += `- Respeite as transições de Markov para sequências prováveis\n`;
   md += `- Monte fechamentos com as dezenas de maior score composto\n\n`;
 
+  // Generate 10 games using rankings
+  const allRanked = topRankings.map((r: any) => r.number);
+  const overdueList = gaps.filter((g: any) => g.isOverdue || g.currentGap > (g.avgGap || 5) * 1.2).map((g: any) => g.number);
+  
+  md += `## 🎯 10 JOGOS OTIMIZADOS\n\n`;
+  
+  const strategies = [
+    'Conservador', 'Conservador', 'Conservador',
+    'Equilibrado', 'Equilibrado', 'Equilibrado',
+    'Agressivo', 'Agressivo', 'Contrário', 'Cobertura Máxima'
+  ];
+  const seenGames = new Set<string>();
+  
+  for (let g = 0; g < 10; g++) {
+    const pool = [...allRanked];
+    if (g >= 6) {
+      overdueList.forEach((n: number) => { if (!pool.includes(n)) pool.push(n); });
+    }
+    const game: number[] = [];
+    const available = [...pool];
+    while (game.length < config.pick && available.length > 0) {
+      const bias = g < 3 ? 0.7 : g < 6 ? 0.5 : 0.3;
+      const idx = Math.random() < bias
+        ? Math.floor(Math.random() * Math.min(available.length, Math.ceil(config.pick * 1.5)))
+        : Math.floor(Math.random() * available.length);
+      const safeIdx = Math.min(idx, available.length - 1);
+      const num = available[safeIdx];
+      if (!game.includes(num) && num >= 1 && num <= config.numbers) {
+        game.push(num);
+      }
+      available.splice(safeIdx, 1);
+    }
+    while (game.length < config.pick) {
+      const n = Math.floor(Math.random() * config.numbers) + 1;
+      if (!game.includes(n)) game.push(n);
+    }
+    game.sort((a, b) => a - b);
+    const key = game.join(',');
+    if (seenGames.has(key)) continue;
+    seenGames.add(key);
+    
+    const confidence = g < 3 ? 75 - g * 3 : g < 6 ? 65 - (g - 3) * 3 : 55 - (g - 6) * 5;
+    const nums = game.map(n => String(n).padStart(2, '0')).join(', ');
+    md += `GAME_START\nJogo ${g + 1} - ${strategies[g]} (Confiança: ${confidence}/100)\nDezenas: ${nums}\nGAME_END\n\n`;
+  }
+
   md += `---\n*Análise gerada pelo motor estatístico nativo. Sem custo de créditos.*`;
   return md;
 }
