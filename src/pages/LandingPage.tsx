@@ -508,9 +508,8 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link to="/signup">
                   <Button
-                    onClick={(e) => burstConfetti(e)}
+                    onClick={(e) => handleCtaClick(e, "/signup")}
                     className={`w-full ${
                       plan.highlight
                         ? "gradient-brand text-primary-foreground shadow-lg shadow-primary/20"
