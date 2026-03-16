@@ -14,7 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Rocket, Loader2, Copy, Check, ChevronDown, ChevronUp,
   Award, Download, Sliders, Flame, Snowflake, Minus,
-  Filter, BarChart3, Zap, Target
+  Filter, BarChart3, Zap, Target, AlertTriangle, ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -330,11 +330,24 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
           <div className="flex items-center gap-1 flex-wrap text-[10px]">
             {result.pipeline.map((step, i) => (
               <div key={i} className="flex items-center gap-1">
-                <div className="px-2 py-1 rounded bg-secondary/50 border border-border">
-                  <div className="font-bold text-foreground">{step.name}</div>
+                <div className={`px-2 py-1 rounded border ${
+                  step.fallback 
+                    ? "bg-yellow-500/10 border-yellow-500/30" 
+                    : "bg-secondary/50 border-border"
+                }`}>
+                  <div className="font-bold text-foreground flex items-center gap-1">
+                    {step.fallback && <AlertTriangle className="w-3 h-3 text-yellow-500" />}
+                    {!step.fallback && step.filtered > 0 && <ShieldCheck className="w-3 h-3 text-primary" />}
+                    {step.name}
+                  </div>
                   <div className="text-muted-foreground">
                     {step.inputCount.toLocaleString()} → {step.outputCount.toLocaleString()}
-                    <span className="text-destructive ml-1">(-{step.filtered.toLocaleString()})</span>
+                    {step.filtered > 0 && !step.fallback && (
+                      <span className="text-destructive ml-1">(-{step.filtered.toLocaleString()})</span>
+                    )}
+                    {step.fallback && (
+                      <span className="text-yellow-500 ml-1 font-semibold">fallback</span>
+                    )}
                   </div>
                 </div>
                 {i < result.pipeline.length - 1 && (
@@ -346,6 +359,15 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
               ⏱ {result.elapsedMs}ms
             </div>
           </div>
+          {result.pipeline.some(s => s.fallback) && (
+            <div className="mt-2 flex items-start gap-2 p-2 rounded-lg bg-yellow-500/5 border border-yellow-500/20 text-[10px] text-yellow-600 dark:text-yellow-400">
+              <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+              <span>
+                Alguns filtros foram relaxados automaticamente (fallback) para garantir resultados. 
+                Ajuste os parâmetros em "Configurar" para refinar.
+              </span>
+            </div>
+          )}
         </div>
       )}
 

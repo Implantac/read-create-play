@@ -58,6 +58,7 @@ export interface PipelineStep {
   inputCount: number;
   outputCount: number;
   filtered: number;
+  fallback?: boolean;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -219,7 +220,7 @@ function generateFrequencyMix(
 // Step 4: Mathematical filters
 // ═══════════════════════════════════════════════════════
 
-function applyMathFilters(candidates: number[][], ecfg: ExtremeConfig): number[][] {
+function applyMathFilters(candidates: number[][], ecfg: ExtremeConfig): { result: number[][]; fallback: boolean } {
   const filtered = candidates.filter(bet => {
     const evens = bet.filter(n => n % 2 === 0).length;
     if (evens < ecfg.parityRange[0] || evens > ecfg.parityRange[1]) return false;
@@ -227,15 +228,15 @@ function applyMathFilters(candidates: number[][], ecfg: ExtremeConfig): number[]
     if (sum < ecfg.sumRange[0] || sum > ecfg.sumRange[1]) return false;
     return true;
   });
-  // Fallback: if too strict, return all candidates
-  return filtered.length > 0 ? filtered : candidates;
+  const fallback = filtered.length === 0;
+  return { result: fallback ? candidates : filtered, fallback };
 }
 
 // ═══════════════════════════════════════════════════════
 // Step 5: Statistical filters (rows, cols, sequences)
 // ═══════════════════════════════════════════════════════
 
-function applyStatFilters(candidates: number[][], ecfg: ExtremeConfig, config: LotteryConfig): number[][] {
+function applyStatFilters(candidates: number[][], ecfg: ExtremeConfig, config: LotteryConfig): { result: number[][]; fallback: boolean } {
   const gridCols = config.id === "lotofacil" ? 5 : Math.ceil(Math.sqrt(config.numbers));
 
   const filtered = candidates.filter(bet => {
@@ -264,7 +265,8 @@ function applyStatFilters(candidates: number[][], ecfg: ExtremeConfig, config: L
     return true;
   });
 
-  return filtered.length > 0 ? filtered : candidates;
+  const fallback = filtered.length === 0;
+  return { result: fallback ? candidates : filtered, fallback };
 }
 
 // ═══════════════════════════════════════════════════════
@@ -277,22 +279,18 @@ function applyPatternFilters(
   config: LotteryConfig,
   lastDraw: number[],
   classified: ClassifiedNumbers
-): number[][] {
+): { result: number[][]; fallback: boolean } {
   const filtered = candidates.filter(bet => {
-    // Frame/Center (Lotofácil only)
     if (config.id === "lotofacil") {
       const fc = analyzeFrameCenter(bet);
       if (fc.frame < ecfg.frameRange[0] || fc.frame > ecfg.frameRange[1]) return false;
     }
 
-    // Repeat from last draw
     if (lastDraw.length > 0) {
       const repeated = bet.filter(n => lastDraw.includes(n)).length;
       if (repeated < ecfg.repeatRange[0] || repeated > ecfg.repeatRange[1]) return false;
     }
 
-    // Frequency mix: ensure reasonable hot/cold distribution
-    // Use wider tolerance for lotteries with many picks
     const tolerance = config.pick >= 15 ? 5 : config.pick >= 10 ? 4 : 3;
     const hotCount = bet.filter(n => classified.hot.includes(n)).length;
     const coldCount = bet.filter(n => classified.cold.includes(n)).length;
@@ -302,12 +300,8 @@ function applyPatternFilters(
     return true;
   });
 
-  // Fallback: if filters are too strict, return best available candidates
-  if (filtered.length === 0 && candidates.length > 0) {
-    return candidates;
-  }
-
-  return filtered;
+  const fallback = filtered.length === 0 && candidates.length > 0;
+  return { result: fallback ? candidates : filtered, fallback };
 }
 
 // ═══════════════════════════════════════════════════════
@@ -417,19 +411,19 @@ export function runExtremePipeline(
   pipeline.push({ name: "Geração Massiva", inputCount: ecfg.totalCandidates, outputCount: raw.length, filtered: ecfg.totalCandidates - raw.length });
 
   // Step 4: Math filters
-  const afterMath = applyMathFilters(raw, ecfg);
-  pipeline.push({ name: "Filtros Matemáticos", inputCount: raw.length, outputCount: afterMath.length, filtered: raw.length - afterMath.length });
+  const mathResult = applyMathFilters(raw, ecfg);
+  pipeline.push({ name: "Filtros Matemáticos", inputCount: raw.length, outputCount: mathResult.result.length, filtered: raw.length - mathResult.result.length, fallback: mathResult.fallback });
 
   // Step 5: Statistical filters
-  const afterStat = applyStatFilters(afterMath, ecfg, config);
-  pipeline.push({ name: "Filtros Estatísticos", inputCount: afterMath.length, outputCount: afterStat.length, filtered: afterMath.length - afterStat.length });
+  const statResult = applyStatFilters(mathResult.result, ecfg, config);
+  pipeline.push({ name: "Filtros Estatísticos", inputCount: mathResult.result.length, outputCount: statResult.result.length, filtered: mathResult.result.length - statResult.result.length, fallback: statResult.fallback });
 
   // Step 6: Pattern filters
-  const afterPattern = applyPatternFilters(afterStat, ecfg, config, lastDraw, classified);
-  pipeline.push({ name: "Filtros de Padrões", inputCount: afterStat.length, outputCount: afterPattern.length, filtered: afterStat.length - afterPattern.length });
+  const patternResult = applyPatternFilters(statResult.result, ecfg, config, lastDraw, classified);
+  pipeline.push({ name: "Filtros de Padrões", inputCount: statResult.result.length, outputCount: patternResult.result.length, filtered: statResult.result.length - patternResult.result.length, fallback: patternResult.fallback });
 
   // Step 7: Score all remaining
-  const scored = afterPattern.map(bet => ({
+  const scored = patternResult.result.map(bet => ({
     bet,
     score: scoreBet(bet, stats, config, draws, classified, ecfg),
   }));
@@ -439,7 +433,7 @@ export function runExtremePipeline(
 
   // Step 8: Take top N and build final result
   const topBets = scored.slice(0, ecfg.topN);
-  pipeline.push({ name: "Ranking & Seleção", inputCount: afterPattern.length, outputCount: topBets.length, filtered: afterPattern.length - topBets.length });
+  pipeline.push({ name: "Ranking & Seleção", inputCount: patternResult.result.length, outputCount: topBets.length, filtered: patternResult.result.length - topBets.length });
 
   const bets: ExtremeBet[] = topBets.map((item, i) => {
     const bet = item.bet;
