@@ -220,7 +220,7 @@ function generateFrequencyMix(
 // Step 4: Mathematical filters
 // ═══════════════════════════════════════════════════════
 
-function applyMathFilters(candidates: number[][], ecfg: ExtremeConfig): number[][] {
+function applyMathFilters(candidates: number[][], ecfg: ExtremeConfig): { result: number[][]; fallback: boolean } {
   const filtered = candidates.filter(bet => {
     const evens = bet.filter(n => n % 2 === 0).length;
     if (evens < ecfg.parityRange[0] || evens > ecfg.parityRange[1]) return false;
@@ -228,8 +228,8 @@ function applyMathFilters(candidates: number[][], ecfg: ExtremeConfig): number[]
     if (sum < ecfg.sumRange[0] || sum > ecfg.sumRange[1]) return false;
     return true;
   });
-  // Fallback: if too strict, return all candidates
-  return filtered.length > 0 ? filtered : candidates;
+  const fallback = filtered.length === 0;
+  return { result: fallback ? candidates : filtered, fallback };
 }
 
 // ═══════════════════════════════════════════════════════
