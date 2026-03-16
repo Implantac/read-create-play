@@ -32,18 +32,31 @@ export function AIPredictionPanel({ config, stats, onSaveBet }: Props) {
         body: { lottery_id: config.id, count },
       });
 
-      if (error) throw error;
+      // Handle structured error responses (402, 429, etc.)
+      if (error) {
+        // supabase.functions.invoke returns the body as data even on error status
+        if (data?.error) throw new Error(data.error);
+        throw error;
+      }
+      if (data?.error) throw new Error(data.error);
       if (!data?.success) throw new Error(data?.error || "Erro na predição");
 
       setBets(data.bets || []);
       setAnalysis(data.analysis || "");
       setQuality(data.quality || null);
       setSaved(new Set());
-      toast.success(`${data.count} apostas geradas pela IA! ${data.quality ? `Qualidade: ${data.quality.grade}` : ""}`);
+      const fromCache = data.fromCache ? " (cache)" : "";
+      toast.success(`${data.count} apostas geradas pela IA!${fromCache} ${data.quality ? `Qualidade: ${data.quality.grade}` : ""}`);
     } catch (e: any) {
       console.error("AI prediction error:", e);
       const msg = e?.message || "Erro ao gerar predições";
-      toast.error(msg);
+      if (msg.includes("Créditos") || msg.includes("esgotados") || msg.includes("402")) {
+        toast.error("Créditos de IA esgotados. Adicione créditos em Settings → Workspace → Usage.", { duration: 8000 });
+      } else if (msg.includes("429") || msg.includes("Limite")) {
+        toast.error("Limite de requisições excedido. Aguarde alguns instantes.", { duration: 5000 });
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setLoading(false);
     }
