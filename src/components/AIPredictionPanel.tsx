@@ -54,7 +54,7 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
   };
 
   const handleSave = (bet: number[], index: number) => {
-    onSaveBet?.(bet, "IA Avançada (Gemini)");
+    onSaveBet?.(bet, "IA Nativa v2.0");
     setSaved(prev => new Set([...prev, index]));
   };
 
@@ -77,13 +77,13 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
             </div>
             <div>
               <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-                IA Avançada
+                IA Nativa v2.0
                 <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
-                  Gemini AI
+                  Motor Estatístico
                 </span>
               </h3>
               <p className="text-[10px] text-muted-foreground mt-0.5">
-                Análise profunda dos últimos 100 sorteios com inteligência artificial
+                Frequência + Markov + Ciclos + Co-ocorrência + Entropia — sem custo de créditos
               </p>
             </div>
           </div>
