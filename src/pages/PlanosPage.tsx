@@ -146,6 +146,7 @@ export default function PlanosPage() {
                 />
                 <div className="pointer-events-none absolute inset-[1px] rounded-[calc(var(--radius)-1px)] bg-card z-[1] opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
                 <div data-glow className="pointer-events-none absolute inset-0 rounded-lg opacity-0 transition-opacity duration-300 z-[2]" />
+                <div className="relative z-[3] flex flex-col h-full">
                 {plan.highlight && (
                   <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 gradient-brand text-primary-foreground border-0 shadow-lg shadow-primary/20">
                     Mais popular
@@ -205,6 +206,7 @@ export default function PlanosPage() {
                     {!isCurrent && <ArrowRight className="w-4 h-4" />}
                   </Button>
                 </CardFooter>
+                </div>
               </Card>
             </motion.div>
           );
