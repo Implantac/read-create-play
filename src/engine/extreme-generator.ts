@@ -66,19 +66,22 @@ export interface PipelineStep {
 
 export function getDefaultExtremeConfig(config: LotteryConfig, draws: DrawResult[]): ExtremeConfig {
   const isLF = config.id === "lotofacil";
+  const isSuperSete = config.id === "supersete";
+  const isLotomania = config.id === "lotomania";
   const idealEven = Math.round(config.pick / 2);
 
-  // Compute sum range from history
-  let sumMin = 0, sumMax = 999;
+  // Compute sum range from history (wider for edge lotteries)
+  let sumMin = 0, sumMax = 99999;
   if (draws.length > 0) {
     const sums = draws.slice(0, 200).map(d => d.numbers.reduce((a, b) => a + b, 0));
     const avg = sums.reduce((a, b) => a + b, 0) / sums.length;
     const std = Math.sqrt(sums.reduce((s, v) => s + (v - avg) ** 2, 0) / sums.length);
-    sumMin = Math.round(avg - std * 1.5);
-    sumMax = Math.round(avg + std * 1.5);
+    const spread = isSuperSete || isLotomania ? 2.5 : 1.5;
+    sumMin = Math.max(0, Math.round(avg - std * spread));
+    sumMax = Math.round(avg + std * spread);
   }
 
-  // Compute repeat range from history
+  // Compute repeat range from history (wider tolerance)
   let repMin = 0, repMax = config.pick;
   if (draws.length > 1) {
     const reps = [];
@@ -88,20 +91,31 @@ export function getDefaultExtremeConfig(config: LotteryConfig, draws: DrawResult
     }
     const avg = reps.reduce((a, b) => a + b, 0) / reps.length;
     const std = Math.sqrt(reps.reduce((s, v) => s + (v - avg) ** 2, 0) / reps.length);
-    repMin = Math.max(0, Math.round(avg - std * 1.5));
-    repMax = Math.min(config.pick, Math.round(avg + std * 1.5));
+    const spread = isSuperSete || isLotomania ? 2.5 : 1.5;
+    repMin = Math.max(0, Math.round(avg - std * spread));
+    repMax = Math.min(config.pick, Math.round(avg + std * spread));
   }
 
+  // Parity range — wider for extreme lotteries
+  const parityMargin = isSuperSete ? 3 : isLotomania ? 5 : 2;
+
+  // Candidate count — fewer for lotteries with limited combinations
+  const maxPossible = isSuperSete ? 120 : isLotomania ? 50000 : isLF ? 50000 : 30000;
+  const totalCandidates = Math.min(maxPossible, isLF ? 50000 : 30000);
+
+  // Max sequence — relaxed for Super Sete (pick 7 from 10, sequences are inevitable)
+  const maxSeq = isSuperSete ? 6 : isLotomania ? 6 : isLF ? 4 : 4;
+
   return {
-    totalCandidates: isLF ? 50000 : 30000,
+    totalCandidates,
     topN: 50,
-    parityRange: [Math.max(0, idealEven - 2), Math.min(config.pick, idealEven + 2)],
+    parityRange: [Math.max(0, idealEven - parityMargin), Math.min(config.pick, idealEven + parityMargin)],
     sumRange: [sumMin, sumMax],
     minPerRow: isLF ? 2 : 0,
     maxPerRow: isLF ? 4 : config.pick,
     minPerCol: isLF ? 1 : 0,
     maxPerCol: isLF ? 4 : config.pick,
-    maxSequenceRun: isLF ? 4 : 4,
+    maxSequenceRun: maxSeq,
     frameRange: isLF ? [8, 11] : [0, config.pick],
     repeatRange: [repMin, repMax],
     hotCount: isLF ? 6 : Math.round(config.pick * 0.4),
@@ -206,17 +220,15 @@ function generateFrequencyMix(
 // ═══════════════════════════════════════════════════════
 
 function applyMathFilters(candidates: number[][], ecfg: ExtremeConfig): number[][] {
-  return candidates.filter(bet => {
-    // Parity
+  const filtered = candidates.filter(bet => {
     const evens = bet.filter(n => n % 2 === 0).length;
     if (evens < ecfg.parityRange[0] || evens > ecfg.parityRange[1]) return false;
-
-    // Sum
     const sum = bet.reduce((a, b) => a + b, 0);
     if (sum < ecfg.sumRange[0] || sum > ecfg.sumRange[1]) return false;
-
     return true;
   });
+  // Fallback: if too strict, return all candidates
+  return filtered.length > 0 ? filtered : candidates;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -226,14 +238,12 @@ function applyMathFilters(candidates: number[][], ecfg: ExtremeConfig): number[]
 function applyStatFilters(candidates: number[][], ecfg: ExtremeConfig, config: LotteryConfig): number[][] {
   const gridCols = config.id === "lotofacil" ? 5 : Math.ceil(Math.sqrt(config.numbers));
 
-  return candidates.filter(bet => {
-    // Row distribution
+  const filtered = candidates.filter(bet => {
     if (ecfg.minPerRow > 0 || ecfg.maxPerRow < config.pick) {
-      const rows = analyzeRowDistribution(bet, gridCols);
+      const rows = analyzeRowDistribution(bet, gridCols, config.numbers);
       if (rows.some(r => r < ecfg.minPerRow) || rows.some(r => r > ecfg.maxPerRow)) return false;
     }
 
-    // Column distribution
     if (ecfg.minPerCol > 0 || ecfg.maxPerCol < config.pick) {
       const colDist = new Array(gridCols).fill(0);
       for (const n of bet) {
@@ -243,7 +253,6 @@ function applyStatFilters(candidates: number[][], ecfg: ExtremeConfig, config: L
       if (colDist.some(c => c < ecfg.minPerCol) || colDist.some(c => c > ecfg.maxPerCol)) return false;
     }
 
-    // Max sequence run
     const sorted = [...bet].sort((a, b) => a - b);
     let maxRun = 1, curRun = 1;
     for (let i = 1; i < sorted.length; i++) {
@@ -254,6 +263,8 @@ function applyStatFilters(candidates: number[][], ecfg: ExtremeConfig, config: L
 
     return true;
   });
+
+  return filtered.length > 0 ? filtered : candidates;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -267,8 +278,8 @@ function applyPatternFilters(
   lastDraw: number[],
   classified: ClassifiedNumbers
 ): number[][] {
-  return candidates.filter(bet => {
-    // Frame/Center (Lotofácil)
+  const filtered = candidates.filter(bet => {
+    // Frame/Center (Lotofácil only)
     if (config.id === "lotofacil") {
       const fc = analyzeFrameCenter(bet);
       if (fc.frame < ecfg.frameRange[0] || fc.frame > ecfg.frameRange[1]) return false;
@@ -281,14 +292,22 @@ function applyPatternFilters(
     }
 
     // Frequency mix: ensure reasonable hot/cold distribution
+    // Use wider tolerance for lotteries with many picks
+    const tolerance = config.pick >= 15 ? 5 : config.pick >= 10 ? 4 : 3;
     const hotCount = bet.filter(n => classified.hot.includes(n)).length;
     const coldCount = bet.filter(n => classified.cold.includes(n)).length;
-    // Allow ±2 from ideal
-    if (Math.abs(hotCount - ecfg.hotCount) > 3) return false;
-    if (Math.abs(coldCount - ecfg.coldCount) > 3) return false;
+    if (Math.abs(hotCount - ecfg.hotCount) > tolerance) return false;
+    if (Math.abs(coldCount - ecfg.coldCount) > tolerance) return false;
 
     return true;
   });
+
+  // Fallback: if filters are too strict, return best available candidates
+  if (filtered.length === 0 && candidates.length > 0) {
+    return candidates;
+  }
+
+  return filtered;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -429,7 +448,7 @@ export function runExtremePipeline(
     const sum = bet.reduce((a, b) => a + b, 0);
     const fc = config.id === "lotofacil" ? analyzeFrameCenter(bet) : { frame: 0, center: 0, ratio: "N/A" };
     const gridCols = config.id === "lotofacil" ? 5 : Math.ceil(Math.sqrt(config.numbers));
-    const rows = analyzeRowDistribution(bet, gridCols);
+    const rows = analyzeRowDistribution(bet, gridCols, config.numbers);
     const repeated = lastDraw.length > 0 ? bet.filter(n => lastDraw.includes(n)).length : 0;
     const hotNumbers = bet.filter(n => classified.hot.includes(n)).length;
     const coldNumbers = bet.filter(n => classified.cold.includes(n)).length;
