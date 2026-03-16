@@ -66,19 +66,22 @@ export interface PipelineStep {
 
 export function getDefaultExtremeConfig(config: LotteryConfig, draws: DrawResult[]): ExtremeConfig {
   const isLF = config.id === "lotofacil";
+  const isSuperSete = config.id === "supersete";
+  const isLotomania = config.id === "lotomania";
   const idealEven = Math.round(config.pick / 2);
 
-  // Compute sum range from history
-  let sumMin = 0, sumMax = 999;
+  // Compute sum range from history (wider for edge lotteries)
+  let sumMin = 0, sumMax = 99999;
   if (draws.length > 0) {
     const sums = draws.slice(0, 200).map(d => d.numbers.reduce((a, b) => a + b, 0));
     const avg = sums.reduce((a, b) => a + b, 0) / sums.length;
     const std = Math.sqrt(sums.reduce((s, v) => s + (v - avg) ** 2, 0) / sums.length);
-    sumMin = Math.round(avg - std * 1.5);
-    sumMax = Math.round(avg + std * 1.5);
+    const spread = isSuperSete || isLotomania ? 2.5 : 1.5;
+    sumMin = Math.max(0, Math.round(avg - std * spread));
+    sumMax = Math.round(avg + std * spread);
   }
 
-  // Compute repeat range from history
+  // Compute repeat range from history (wider tolerance)
   let repMin = 0, repMax = config.pick;
   if (draws.length > 1) {
     const reps = [];
@@ -88,20 +91,31 @@ export function getDefaultExtremeConfig(config: LotteryConfig, draws: DrawResult
     }
     const avg = reps.reduce((a, b) => a + b, 0) / reps.length;
     const std = Math.sqrt(reps.reduce((s, v) => s + (v - avg) ** 2, 0) / reps.length);
-    repMin = Math.max(0, Math.round(avg - std * 1.5));
-    repMax = Math.min(config.pick, Math.round(avg + std * 1.5));
+    const spread = isSuperSete || isLotomania ? 2.5 : 1.5;
+    repMin = Math.max(0, Math.round(avg - std * spread));
+    repMax = Math.min(config.pick, Math.round(avg + std * spread));
   }
 
+  // Parity range — wider for extreme lotteries
+  const parityMargin = isSuperSete ? 3 : isLotomania ? 5 : 2;
+
+  // Candidate count — fewer for lotteries with limited combinations
+  const maxPossible = isSuperSete ? 120 : isLotomania ? 50000 : isLF ? 50000 : 30000;
+  const totalCandidates = Math.min(maxPossible, isLF ? 50000 : 30000);
+
+  // Max sequence — relaxed for Super Sete (pick 7 from 10, sequences are inevitable)
+  const maxSeq = isSuperSete ? 6 : isLotomania ? 6 : isLF ? 4 : 4;
+
   return {
-    totalCandidates: isLF ? 50000 : 30000,
+    totalCandidates,
     topN: 50,
-    parityRange: [Math.max(0, idealEven - 2), Math.min(config.pick, idealEven + 2)],
+    parityRange: [Math.max(0, idealEven - parityMargin), Math.min(config.pick, idealEven + parityMargin)],
     sumRange: [sumMin, sumMax],
     minPerRow: isLF ? 2 : 0,
     maxPerRow: isLF ? 4 : config.pick,
     minPerCol: isLF ? 1 : 0,
     maxPerCol: isLF ? 4 : config.pick,
-    maxSequenceRun: isLF ? 4 : 4,
+    maxSequenceRun: maxSeq,
     frameRange: isLF ? [8, 11] : [0, config.pick],
     repeatRange: [repMin, repMax],
     hotCount: isLF ? 6 : Math.round(config.pick * 0.4),

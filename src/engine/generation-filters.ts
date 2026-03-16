@@ -234,8 +234,8 @@ export function computeIdealFrameCenter(draws: DrawResult[]): { minFrame: number
 /**
  * Analisa distribuição por linhas na grade 5×5
  */
-export function analyzeRowDistribution(bet: number[], gridCols: number = 5): number[] {
-  const rows = Math.ceil(25 / gridCols);
+export function analyzeRowDistribution(bet: number[], gridCols: number = 5, totalNumbers: number = 25): number[] {
+  const rows = Math.ceil(totalNumbers / gridCols);
   const dist = new Array(rows).fill(0);
   for (const n of bet) {
     const row = Math.floor((n - 1) / gridCols);
