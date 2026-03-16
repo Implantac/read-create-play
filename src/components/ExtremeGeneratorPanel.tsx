@@ -14,7 +14,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Rocket, Loader2, Copy, Check, ChevronDown, ChevronUp,
   Award, Download, Sliders, Flame, Snowflake, Minus,
-  Filter, BarChart3, Zap, Target, AlertTriangle, ShieldCheck
+  Filter, BarChart3, Zap, Target, AlertTriangle, ShieldCheck,
+  History, TrendingUp, Trophy
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
