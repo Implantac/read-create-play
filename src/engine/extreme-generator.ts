@@ -33,6 +33,16 @@ export interface ExtremeConfig {
   coldCount: number;
 }
 
+export interface BetBacktest {
+  avgHits: number;
+  bestHit: number;
+  worstHit: number;
+  hitDistribution: Record<number, number>;
+  winRate: number;       // % of draws with >= minPrize hits
+  consistency: number;   // 0-100
+  testedDraws: number;
+}
+
 export interface ExtremeBet {
   numbers: number[];
   rank: number;
@@ -45,6 +55,7 @@ export interface ExtremeBet {
   repeatFromLast: number;
   hotNumbers: number;
   coldNumbers: number;
+  backtest: BetBacktest;
 }
 
 export interface ExtremeResult {
