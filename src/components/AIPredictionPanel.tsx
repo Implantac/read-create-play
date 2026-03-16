@@ -54,7 +54,7 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
   };
 
   const handleSave = (bet: number[], index: number) => {
-    onSaveBet?.(bet, "IA Avançada (Gemini)");
+    onSaveBet?.(bet, "IA Nativa v2.0");
     setSaved(prev => new Set([...prev, index]));
   };
 
