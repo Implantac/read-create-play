@@ -497,7 +497,14 @@ export function runExtremePipeline(
   const validBets = filtered.length > 0 ? filtered : bets; // fallback if all filtered
   const btFallback = filtered.length === 0 && bets.length > 0;
 
-  // Re-rank after filtering
+  // Sort by combined score: 70% score + 20% winRate + 10% consistency
+  validBets.sort((a, b) => {
+    const combinedA = a.score * 0.7 + a.backtest.winRate * 0.2 + a.backtest.consistency * 0.1;
+    const combinedB = b.score * 0.7 + b.backtest.winRate * 0.2 + b.backtest.consistency * 0.1;
+    return combinedB - combinedA;
+  });
+
+  // Re-rank after sorting
   validBets.forEach((b, i) => { b.rank = i + 1; });
 
   pipeline.push({
