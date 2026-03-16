@@ -458,6 +458,23 @@ export function runExtremePipeline(
     const hotNumbers = bet.filter(n => classified.hot.includes(n)).length;
     const coldNumbers = bet.filter(n => classified.cold.includes(n)).length;
 
+    // Backtesting against last 50 draws
+    const btDraws = draws.slice(0, 50);
+    const hits = btDraws.map(d => bet.filter(n => d.numbers.includes(n)).length);
+    const avgHits = hits.length > 0 ? hits.reduce((a, b) => a + b, 0) / hits.length : 0;
+    const bestHit = hits.length > 0 ? Math.max(...hits) : 0;
+    const worstHit = hits.length > 0 ? Math.min(...hits) : 0;
+    const hitDist: Record<number, number> = {};
+    for (let h = 0; h <= config.pick; h++) hitDist[h] = 0;
+    hits.forEach(h => { hitDist[h] = (hitDist[h] || 0) + 1; });
+    // Min prize: lotofacil=11, megasena=4, quina=2, lotomania=15, etc
+    const minPrize = config.id === "lotofacil" ? 11 : config.id === "megasena" ? 4 : config.id === "quina" ? 2 : config.id === "lotomania" ? 15 : config.id === "diadasorte" ? 3 : config.id === "timemania" ? 3 : config.id === "supersete" ? 3 : Math.ceil(config.pick * 0.6);
+    const winRate = hits.length > 0 ? (hits.filter(h => h >= minPrize).length / hits.length) * 100 : 0;
+    const stdDev = hits.length > 0 ? Math.sqrt(hits.reduce((s, h) => s + (h - avgHits) ** 2, 0) / hits.length) : 0;
+    const consistency = Math.max(0, Math.min(100, 100 - stdDev * 20));
+
+    const backtest: BetBacktest = { avgHits: Math.round(avgHits * 100) / 100, bestHit, worstHit, hitDistribution: hitDist, winRate: Math.round(winRate * 10) / 10, consistency: Math.round(consistency), testedDraws: btDraws.length };
+
     return {
       numbers: bet,
       rank: i + 1,
@@ -470,6 +487,7 @@ export function runExtremePipeline(
       repeatFromLast: repeated,
       hotNumbers,
       coldNumbers,
+      backtest,
     };
   });
 
