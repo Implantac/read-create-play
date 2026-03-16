@@ -98,15 +98,38 @@ export default function PlanosPage() {
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
         {plans.map((plan, i) => {
           const isCurrent = currentPlan === plan.id;
+          const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * -8;
+            const rotateY = ((x - centerX) / centerX) * 8;
+            e.currentTarget.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03,1.03,1.03)`;
+            const glowEl = e.currentTarget.querySelector('[data-glow]') as HTMLElement;
+            if (glowEl) {
+              glowEl.style.opacity = '1';
+              glowEl.style.background = `radial-gradient(250px circle at ${x}px ${y}px, hsl(var(--primary) / 0.15), transparent 70%)`;
+            }
+          };
+          const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+            e.currentTarget.style.transform = `perspective(600px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)`;
+            const glowEl = e.currentTarget.querySelector('[data-glow]') as HTMLElement;
+            if (glowEl) glowEl.style.opacity = '0';
+          };
           return (
             <motion.div
               key={plan.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
+              initial={{ opacity: 0, x: i % 2 === 0 ? -40 : 40, rotateY: i % 2 === 0 ? 8 : -8, scale: 0.9 }}
+              animate={{ opacity: 1, x: 0, rotateY: 0, scale: 1 }}
+              transition={{ delay: i * 0.12, duration: 0.6, type: "spring", stiffness: 80, damping: 15 }}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+              style={{ transition: "transform 0.15s ease-out", transformStyle: "preserve-3d" }}
             >
               <Card
-                className={`relative flex flex-col h-full transition-all duration-300 hover:translate-y-[-2px] ${
+                className={`relative flex flex-col h-full overflow-hidden group/card ${
                   plan.highlight
                     ? "border-primary/40 glow-green glass-card"
                     : (plan as any).isLifetime
@@ -114,6 +137,16 @@ export default function PlanosPage() {
                     : "border-border/30 glass-card"
                 }`}
               >
+                {/* Animated border glow */}
+                <div className="pointer-events-none absolute -inset-[1px] rounded-lg opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 z-0"
+                  style={{
+                    background: 'conic-gradient(from var(--border-angle, 0deg), hsl(var(--primary) / 0.6), hsl(var(--neon-blue) / 0.6), hsl(var(--neon-purple) / 0.4), hsl(var(--primary) / 0.6))',
+                    animation: 'border-rotate 3s linear infinite',
+                  }}
+                />
+                <div className="pointer-events-none absolute inset-[1px] rounded-[calc(var(--radius)-1px)] bg-card z-[1] opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
+                <div data-glow className="pointer-events-none absolute inset-0 rounded-lg opacity-0 transition-opacity duration-300 z-[2]" />
+                <div className="relative z-[3] flex flex-col h-full">
                 {plan.highlight && (
                   <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 gradient-brand text-primary-foreground border-0 shadow-lg shadow-primary/20">
                     Mais popular
@@ -173,6 +206,7 @@ export default function PlanosPage() {
                     {!isCurrent && <ArrowRight className="w-4 h-4" />}
                   </Button>
                 </CardFooter>
+                </div>
               </Card>
             </motion.div>
           );
