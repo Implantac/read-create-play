@@ -307,7 +307,13 @@ export default function LandingPage() {
       <SocialProofBar />
 
       {/* Stats bar */}
-      <section className="border-y border-border/30 bg-card/30 backdrop-blur-lg">
+      <motion.section
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="border-y border-border/30 bg-card/30 backdrop-blur-lg"
+      >
         <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {stats.map((s, i) => (
@@ -315,7 +321,7 @@ export default function LandingPage() {
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Features */}
       <section ref={featuresRef} className="py-20 md:py-28" style={{ perspective: "1200px" }}>
