@@ -433,7 +433,7 @@ export function runExtremePipeline(
 
   // Step 8: Take top N and build final result
   const topBets = scored.slice(0, ecfg.topN);
-  pipeline.push({ name: "Ranking & Seleção", inputCount: afterPattern.length, outputCount: topBets.length, filtered: afterPattern.length - topBets.length });
+  pipeline.push({ name: "Ranking & Seleção", inputCount: patternResult.result.length, outputCount: topBets.length, filtered: patternResult.result.length - topBets.length });
 
   const bets: ExtremeBet[] = topBets.map((item, i) => {
     const bet = item.bet;
