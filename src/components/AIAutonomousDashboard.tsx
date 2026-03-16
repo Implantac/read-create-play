@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { NumberStats } from "@/engine/statistics";
 import { runAutonomousAnalysis, AutonomousAIReport } from "@/engine/autonomous-ai";
-import { supabase } from "@/integrations/supabase/client";
+import { generateAutonomousAnalysis } from "@/engine/native-analysis";
 import { useToast } from "@/hooks/use-toast";
 import {
   Brain, TrendingUp, TrendingDown, Zap, Target, RefreshCw, Sparkles,
@@ -45,12 +45,10 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
     if (!report) return;
     setAiLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("ai-autonomous-learning", {
-        body: { report, lotteryName: config.name, pick: config.pick, totalNumbers: config.numbers },
-      });
-      if (error) throw error;
-      setAiAnalysis(data.analysis);
-      toast({ title: "IA Autônoma", description: "Análise concluída com sucesso!" });
+      await new Promise(r => setTimeout(r, 300));
+      const analysis = generateAutonomousAnalysis(report, config);
+      setAiAnalysis(analysis);
+      toast({ title: "IA Nativa", description: "Análise concluída com sucesso!" });
     } catch (err: any) {
       toast({ title: "Erro", description: err.message, variant: "destructive" });
     } finally {

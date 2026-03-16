@@ -16,7 +16,7 @@ import {
   SimulationBet, SimulationOutput, BetSimulationResult,
   runSimulation, parseBetsFromText, generateRandomBets, getMinPrizeHits,
 } from "@/engine/intelligent-simulator";
-import { supabase } from "@/integrations/supabase/client";
+
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line, Legend,
@@ -162,30 +162,26 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
     if (!simulation) return;
     setLoadingAi(true);
     try {
-      const { data, error } = await supabase.functions.invoke("ai-simulation-analysis", {
-        body: {
-          simulationData: {
-            bets: simulation.bets.map(b => ({
-              bet: b.bet,
-              bestHit: b.bestHit,
-              avgHits: b.avgHits,
-              hitDistribution: b.hitDistribution,
-              prizeCount: b.prizeCount,
-              stability: b.stability,
-            })),
-            totalDraws: simulation.totalDraws,
-            ranking: simulation.ranking,
-          },
-          lotteryName: config.name,
-          lotteryPick: config.pick,
-          lotteryNumbers: config.numbers,
+      await new Promise(r => setTimeout(r, 200));
+      const { generateSimulationAnalysis } = await import("@/engine/native-analysis");
+      const analysis = generateSimulationAnalysis(
+        {
+          bets: simulation.bets.map(b => ({
+            bet: b.bet,
+            bestHit: b.bestHit,
+            avgHits: b.avgHits,
+            hitDistribution: b.hitDistribution,
+            prizeCount: b.prizeCount,
+            stability: b.stability,
+          })),
+          totalDraws: simulation.totalDraws,
+          ranking: simulation.ranking,
         },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      setAiAnalysis(data.analysis || "Análise indisponível.");
+        config
+      );
+      setAiAnalysis(analysis);
     } catch (e: any) {
-      toast.error(e.message || "Erro na análise de IA");
+      toast.error(e.message || "Erro na análise");
     } finally {
       setLoadingAi(false);
     }

@@ -1,19 +1,20 @@
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { LotteryConfig } from "@/data/lotteries";
+import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { NumberStats } from "@/engine/statistics";
 import { motion, AnimatePresence } from "framer-motion";
 import { Brain, Loader2, Copy, Check, Star, Sparkles, RefreshCw, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { generateNativeBets } from "@/engine/native-analysis";
 
 interface Props {
   config: LotteryConfig;
   stats: NumberStats[];
+  draws: DrawResult[];
   onSaveBet?: (numbers: number[], strategy?: string, score?: number, grade?: string) => void;
 }
 
-export function AIPredictionPanel({ config, stats, onSaveBet }: Props) {
+export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
   const [bets, setBets] = useState<number[][]>([]);
   const [analysis, setAnalysis] = useState<string>("");
   const [loading, setLoading] = useState(false);
@@ -28,35 +29,18 @@ export function AIPredictionPanel({ config, stats, onSaveBet }: Props) {
     setAnalysis("");
     setQuality(null);
     try {
-      const { data, error } = await supabase.functions.invoke("ai-lottery-predict", {
-        body: { lottery_id: config.id, count },
-      });
+      // Native generation — no AI credits needed
+      await new Promise(r => setTimeout(r, 300)); // Brief delay for UX
+      const result = generateNativeBets(stats, config, draws, count);
 
-      // Handle structured error responses (402, 429, etc.)
-      if (error) {
-        // supabase.functions.invoke returns the body as data even on error status
-        if (data?.error) throw new Error(data.error);
-        throw error;
-      }
-      if (data?.error) throw new Error(data.error);
-      if (!data?.success) throw new Error(data?.error || "Erro na predição");
-
-      setBets(data.bets || []);
-      setAnalysis(data.analysis || "");
-      setQuality(data.quality || null);
+      setBets(result.bets);
+      setAnalysis(result.analysis);
+      setQuality(result.quality);
       setSaved(new Set());
-      const fromCache = data.fromCache ? " (cache)" : "";
-      toast.success(`${data.count} apostas geradas pela IA!${fromCache} ${data.quality ? `Qualidade: ${data.quality.grade}` : ""}`);
+      toast.success(`${result.bets.length} apostas geradas! Qualidade: ${result.quality.grade}`);
     } catch (e: any) {
-      console.error("AI prediction error:", e);
-      const msg = e?.message || "Erro ao gerar predições";
-      if (msg.includes("Créditos") || msg.includes("esgotados") || msg.includes("402")) {
-        toast.error("Créditos de IA esgotados. Adicione créditos em Settings → Workspace → Usage.", { duration: 8000 });
-      } else if (msg.includes("429") || msg.includes("Limite")) {
-        toast.error("Limite de requisições excedido. Aguarde alguns instantes.", { duration: 5000 });
-      } else {
-        toast.error(msg);
-      }
+      console.error("Native prediction error:", e);
+      toast.error(e?.message || "Erro ao gerar predições");
     } finally {
       setLoading(false);
     }
