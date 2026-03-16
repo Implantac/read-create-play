@@ -152,10 +152,17 @@ const plans = [
 ];
 
 export default function LandingPage() {
+  const navigate = useNavigate();
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
   const faqRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
+
+  const handleCtaClick = useCallback((e: React.MouseEvent, to: string) => {
+    e.preventDefault();
+    burstConfetti(e);
+    setTimeout(() => navigate(to), 500);
+  }, [navigate]);
 
   const { scrollYProgress: heroProgress } = useScroll({
     target: heroRef,
