@@ -423,7 +423,7 @@ export function runExtremePipeline(
   pipeline.push({ name: "Filtros de Padrões", inputCount: statResult.result.length, outputCount: patternResult.result.length, filtered: statResult.result.length - patternResult.result.length, fallback: patternResult.fallback });
 
   // Step 7: Score all remaining
-  const scored = afterPattern.map(bet => ({
+  const scored = patternResult.result.map(bet => ({
     bet,
     score: scoreBet(bet, stats, config, draws, classified, ecfg),
   }));
