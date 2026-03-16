@@ -281,8 +281,8 @@ function applyPatternFilters(
   lastDraw: number[],
   classified: ClassifiedNumbers
 ): number[][] {
-  return candidates.filter(bet => {
-    // Frame/Center (Lotofácil)
+  const filtered = candidates.filter(bet => {
+    // Frame/Center (Lotofácil only)
     if (config.id === "lotofacil") {
       const fc = analyzeFrameCenter(bet);
       if (fc.frame < ecfg.frameRange[0] || fc.frame > ecfg.frameRange[1]) return false;
@@ -295,14 +295,22 @@ function applyPatternFilters(
     }
 
     // Frequency mix: ensure reasonable hot/cold distribution
+    // Use wider tolerance for lotteries with many picks
+    const tolerance = config.pick >= 15 ? 5 : config.pick >= 10 ? 4 : 3;
     const hotCount = bet.filter(n => classified.hot.includes(n)).length;
     const coldCount = bet.filter(n => classified.cold.includes(n)).length;
-    // Allow ±2 from ideal
-    if (Math.abs(hotCount - ecfg.hotCount) > 3) return false;
-    if (Math.abs(coldCount - ecfg.coldCount) > 3) return false;
+    if (Math.abs(hotCount - ecfg.hotCount) > tolerance) return false;
+    if (Math.abs(coldCount - ecfg.coldCount) > tolerance) return false;
 
     return true;
   });
+
+  // Fallback: if filters are too strict, return best available candidates
+  if (filtered.length === 0 && candidates.length > 0) {
+    return candidates;
+  }
+
+  return filtered;
 }
 
 // ═══════════════════════════════════════════════════════
