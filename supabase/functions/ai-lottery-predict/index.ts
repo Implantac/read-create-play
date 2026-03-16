@@ -847,6 +847,52 @@ Para cada aposta, aplique TODOS os 10 pilares profissionais e garanta que TODOS 
     });
 
     if (!aiResponse.ok) {
+      console.error("AI gateway error:", aiResponse.status);
+      // Fallback: generate statistical bets without AI
+      console.log("Falling back to statistical-only generation");
+      const statBets: number[][] = [];
+      const statScores: { score: number; details: string[] }[] = [];
+      const sorted = [...allNums].sort((a, b) => {
+        const scoreA = (freq30[a] || 0) * 2 + (freq10[a] || 0) * 3 + (predictedReturn[a] <= 2 ? 5 : 0);
+        const scoreB = (freq30[b] || 0) * 2 + (freq10[b] || 0) * 3 + (predictedReturn[b] <= 2 ? 5 : 0);
+        return scoreB - scoreA;
+      });
+      const topPool = sorted.slice(0, Math.min(sorted.length, profile.pick * 2));
+      const seenKeys = new Set<string>();
+      for (let attempt = 0; attempt < 500 && statBets.length < Math.min(count, 10); attempt++) {
+        const shuffled = [...topPool].sort(() => Math.random() - 0.5);
+        const candidate = shuffled.slice(0, profile.pick).sort((a, b) => a - b);
+        const key = candidate.join(",");
+        if (seenKeys.has(key)) continue;
+        const repaired = validateAndRepairBet(candidate, profile, freq, lastDrawNums);
+        if (!repaired) continue;
+        const sc = scoreBet(repaired, profile, avgSum, sumStdDev, lastDrawNums);
+        if (sc.score >= 50) {
+          seenKeys.add(repaired.join(","));
+          statBets.push(repaired);
+          statScores.push(sc);
+        }
+      }
+      if (statBets.length > 0) {
+        const statAvg = Math.round(statScores.reduce((a, b) => a + b.score, 0) / statScores.length);
+        const fallbackData = {
+          success: true,
+          bets: statBets,
+          count: statBets.length,
+          analysis: "⚡ Apostas geradas pelo motor estatístico (IA temporariamente indisponível). Baseadas em frequência, tendência e ciclos dos últimos 300 concursos.",
+          quality: {
+            avgScore: statAvg,
+            scores: statScores.map(s => s.score),
+            details: statScores.map(s => s.details),
+            grade: statAvg >= 90 ? "S" : statAvg >= 80 ? "A" : statAvg >= 70 ? "B" : statAvg >= 60 ? "C" : "D",
+          },
+          fallback: true,
+        };
+        return new Response(JSON.stringify(fallbackData), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      // If even fallback fails, return error
       if (aiResponse.status === 429) {
         return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em instantes." }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -857,8 +903,6 @@ Para cada aposta, aplique TODOS os 10 pilares profissionais e garanta que TODOS 
           status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      const errText = await aiResponse.text();
-      console.error("AI error:", aiResponse.status, errText);
       throw new Error("Erro na análise de IA");
     }
 
