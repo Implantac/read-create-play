@@ -38,7 +38,7 @@ export function RobustnessRadarPanel({ stats, config, draws, lotteryId }: Props)
     setResults(res);
     setImprovedBets(improved);
     setSelectedIdx(0);
-    setShowImproved(false);
+    setShowImproved(true);
   };
 
   const current = results[selectedIdx];
