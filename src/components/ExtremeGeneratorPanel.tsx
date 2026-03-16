@@ -14,7 +14,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Rocket, Loader2, Copy, Check, ChevronDown, ChevronUp,
   Award, Download, Sliders, Flame, Snowflake, Minus,
-  Filter, BarChart3, Zap, Target, AlertTriangle, ShieldCheck
+  Filter, BarChart3, Zap, Target, AlertTriangle, ShieldCheck,
+  History, TrendingUp, Trophy
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -488,6 +489,62 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
                               <Flame className="w-3 h-3 inline text-red-400" /> / <Snowflake className="w-3 h-3 inline text-cyan-400" />
                             </div>
                             <div className="text-xs font-bold text-foreground">{bet.hotNumbers}/{bet.coldNumbers}</div>
+                          </div>
+                        </div>
+
+                        {/* Backtesting Results */}
+                        <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+                          <div className="flex items-center gap-1.5 mb-2">
+                            <History className="w-3.5 h-3.5 text-primary" />
+                            <span className="text-[11px] font-bold text-foreground">
+                              Backtesting — Últimos {bet.backtest.testedDraws} concursos
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
+                            <div className="p-1.5 rounded bg-background border border-border">
+                              <div className="text-[9px] text-muted-foreground">Média Acertos</div>
+                              <div className="text-xs font-bold text-foreground">{bet.backtest.avgHits}</div>
+                            </div>
+                            <div className="p-1.5 rounded bg-background border border-border">
+                              <div className="text-[9px] text-muted-foreground flex items-center justify-center gap-0.5"><Trophy className="w-2.5 h-2.5" /> Melhor</div>
+                              <div className="text-xs font-bold text-primary">{bet.backtest.bestHit}</div>
+                            </div>
+                            <div className="p-1.5 rounded bg-background border border-border">
+                              <div className="text-[9px] text-muted-foreground">Pior</div>
+                              <div className="text-xs font-bold text-muted-foreground">{bet.backtest.worstHit}</div>
+                            </div>
+                            <div className="p-1.5 rounded bg-background border border-border">
+                              <div className="text-[9px] text-muted-foreground flex items-center justify-center gap-0.5"><TrendingUp className="w-2.5 h-2.5" /> Win Rate</div>
+                              <div className={`text-xs font-bold ${bet.backtest.winRate > 0 ? "text-primary" : "text-muted-foreground"}`}>{bet.backtest.winRate}%</div>
+                            </div>
+                            <div className="p-1.5 rounded bg-background border border-border">
+                              <div className="text-[9px] text-muted-foreground">Consistência</div>
+                              <div className="flex items-center justify-center gap-1">
+                                <div className="w-8 h-1.5 bg-secondary rounded-full overflow-hidden">
+                                  <div className={`h-full rounded-full ${bet.backtest.consistency >= 70 ? "bg-primary" : bet.backtest.consistency >= 40 ? "bg-yellow-500" : "bg-destructive"}`} style={{ width: `${bet.backtest.consistency}%` }} />
+                                </div>
+                                <span className="text-[10px] font-bold text-foreground">{bet.backtest.consistency}</span>
+                              </div>
+                            </div>
+                          </div>
+                          {/* Hit distribution bar */}
+                          <div className="mt-2">
+                            <div className="text-[9px] text-muted-foreground mb-1">Distribuição de acertos:</div>
+                            <div className="flex gap-px h-6">
+                              {Object.entries(bet.backtest.hitDistribution)
+                                .filter(([, count]) => count > 0)
+                                .map(([hits, count]) => {
+                                  const pct = (count / bet.backtest.testedDraws) * 100;
+                                  return (
+                                    <div key={hits} className="flex flex-col items-center flex-1 min-w-0" title={`${hits} acertos: ${count}x (${pct.toFixed(0)}%)`}>
+                                      <div className="w-full bg-secondary rounded-t relative" style={{ height: `${Math.max(pct * 0.6, 2)}px` }}>
+                                        <div className={`absolute inset-0 rounded-t ${Number(hits) >= bet.backtest.bestHit - 1 ? "bg-primary" : "bg-muted-foreground/40"}`} />
+                                      </div>
+                                      <span className="text-[7px] text-muted-foreground mt-0.5">{hits}</span>
+                                    </div>
+                                  );
+                                })}
+                            </div>
                           </div>
                         </div>
 
