@@ -521,7 +521,6 @@ export default function LandingPage() {
                   >
                     {plan.cta}
                   </Button>
-                </Link>
                 </div>
               </motion.div>
               );
