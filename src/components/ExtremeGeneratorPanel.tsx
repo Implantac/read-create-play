@@ -426,13 +426,20 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
                   <TooltipProvider delayDuration={200}>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <div className="text-right hidden sm:block flex-shrink-0 min-w-[60px] cursor-help">
-                          <div className="text-xs font-bold text-primary">
-                            {Math.round(bet.score * 0.7 + bet.backtest.winRate * 0.2 + bet.backtest.consistency * 0.1)}
-                          </div>
-                          <div className="text-[9px] text-muted-foreground">combinada</div>
-                          <div className="text-[9px] text-muted-foreground/60">{bet.score} + bt</div>
-                        </div>
+                         {(() => {
+                           const combined = Math.round(bet.score * 0.7 + bet.backtest.winRate * 0.2 + bet.backtest.consistency * 0.1);
+                           const colorClass = combined >= 60 ? "text-emerald-500" : combined >= 35 ? "text-yellow-500" : "text-red-500";
+                           const bgClass = combined >= 60 ? "bg-emerald-500/10 border-emerald-500/30" : combined >= 35 ? "bg-yellow-500/10 border-yellow-500/30" : "bg-red-500/10 border-red-500/30";
+                           return (
+                             <div className={`text-right hidden sm:block flex-shrink-0 min-w-[60px] cursor-help rounded-md border px-2 py-1 ${bgClass}`}>
+                               <div className={`text-xs font-bold ${colorClass}`}>
+                                 {combined}
+                               </div>
+                               <div className="text-[9px] text-muted-foreground">combinada</div>
+                               <div className="text-[9px] text-muted-foreground/60">{bet.score} + bt</div>
+                             </div>
+                           );
+                         })()}
                       </TooltipTrigger>
                       <TooltipContent side="left" className="max-w-[220px] text-xs">
                         <p className="font-semibold mb-1">Nota Combinada</p>
