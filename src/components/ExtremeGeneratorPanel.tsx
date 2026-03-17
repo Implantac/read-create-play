@@ -431,7 +431,7 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
                            const colorClass = combined >= 60 ? "text-emerald-500" : combined >= 35 ? "text-yellow-500" : "text-red-500";
                            const bgClass = combined >= 60 ? "bg-emerald-500/10 border-emerald-500/30" : combined >= 35 ? "bg-yellow-500/10 border-yellow-500/30" : "bg-red-500/10 border-red-500/30";
                            return (
-                             <div className={`text-right hidden sm:block flex-shrink-0 min-w-[60px] cursor-help rounded-md border px-2 py-1 ${bgClass}`}>
+                             <div className={`text-right flex-shrink-0 min-w-[50px] sm:min-w-[60px] cursor-help rounded-md border px-1.5 py-0.5 sm:px-2 sm:py-1 ${bgClass}`}>
                                <div className={`text-xs font-bold ${colorClass}`}>
                                  {combined}
                                </div>
