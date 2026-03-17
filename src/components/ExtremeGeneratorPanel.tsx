@@ -423,13 +423,26 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
                   </div>
 
                   {/* Score + Combined */}
-                  <div className="text-right hidden sm:block flex-shrink-0 min-w-[60px]">
-                    <div className="text-xs font-bold text-primary">
-                      {Math.round(bet.score * 0.7 + bet.backtest.winRate * 0.2 + bet.backtest.consistency * 0.1)}
-                    </div>
-                    <div className="text-[9px] text-muted-foreground">combinada</div>
-                    <div className="text-[9px] text-muted-foreground/60">{bet.score} + bt</div>
-                  </div>
+                  <TooltipProvider delayDuration={200}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="text-right hidden sm:block flex-shrink-0 min-w-[60px] cursor-help">
+                          <div className="text-xs font-bold text-primary">
+                            {Math.round(bet.score * 0.7 + bet.backtest.winRate * 0.2 + bet.backtest.consistency * 0.1)}
+                          </div>
+                          <div className="text-[9px] text-muted-foreground">combinada</div>
+                          <div className="text-[9px] text-muted-foreground/60">{bet.score} + bt</div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent side="left" className="max-w-[220px] text-xs">
+                        <p className="font-semibold mb-1">Nota Combinada</p>
+                        <p>Score×0.7 + WinRate×0.2 + Consistência×0.1</p>
+                        <p className="mt-1 text-muted-foreground">
+                          {bet.score}×0.7 + {bet.backtest.winRate}×0.2 + {bet.backtest.consistency}×0.1 = {Math.round(bet.score * 0.7 + bet.backtest.winRate * 0.2 + bet.backtest.consistency * 0.1)}
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
 
                   {/* Actions */}
                   <button
