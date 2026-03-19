@@ -49,6 +49,9 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
   const [copied, setCopied] = useState<number | null>(null);
   const [expandedBet, setExpandedBet] = useState<number | null>(null);
   const [showConfig, setShowConfig] = useState(false);
+  const [selectedForCompare, setSelectedForCompare] = useState<Set<number>>(new Set());
+  const [showComparison, setShowComparison] = useState(false);
+  const [userFilters, setUserFilters] = useState<GenerationFilters>({ ...DEFAULT_FILTERS });
 
   // Reset config when lottery changes
   useMemo(() => {
