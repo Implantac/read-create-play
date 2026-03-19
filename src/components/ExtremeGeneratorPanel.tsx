@@ -351,6 +351,16 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
             <Button size="sm" variant="outline" onClick={handleExport} className="text-xs gap-1">
               <Download className="w-3 h-3" /> PDF
             </Button>
+            {selectedForCompare.size >= 2 && (
+              <Button
+                size="sm"
+                variant="default"
+                onClick={() => setShowComparison(true)}
+                className="text-xs gap-1"
+              >
+                <BarChart3 className="w-3 h-3" /> Comparar {selectedForCompare.size} jogos
+              </Button>
+            )}
           </>
         )}
       </div>
