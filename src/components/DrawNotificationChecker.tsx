@@ -1,11 +1,14 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useSavedBets } from "@/hooks/useSavedBets";
+import { useNotificationPermission } from "@/hooks/useNotificationPermission";
+import { LOTTERIES } from "@/data/lotteries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Bell, BellRing, Trophy, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Bell, BellRing, BellOff, Trophy, X, ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 
 interface MatchResult {
   betId: string;
@@ -23,6 +26,8 @@ export function DrawNotificationChecker() {
   const [dismissed, setDismissed] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [lastCheckedConcurso, setLastCheckedConcurso] = useState<number>(0);
+  const { permission, supported, requestPermission, sendNotification } = useNotificationPermission();
+  const notifiedConcursos = useRef<Set<string>>(new Set());
 
   const checkMatches = useCallback(() => {
     if (!draws.length || !savedBets.length) return;
@@ -51,11 +56,69 @@ export function DrawNotificationChecker() {
     setMatches(results);
     setLastCheckedConcurso(latestDraw.concurso);
     setDismissed(false);
-  }, [draws, savedBets, config.pick, lastCheckedConcurso]);
+
+    // Send browser push notification
+    const notifKey = `${selectedLottery}-${latestDraw.concurso}`;
+    if (results.length > 0 && !notifiedConcursos.current.has(notifKey)) {
+      notifiedConcursos.current.add(notifKey);
+      const best = results[0];
+      const isWinner = best.matchCount >= config.pick;
+      const lotteryName = LOTTERIES.find(l => l.id === selectedLottery)?.name || selectedLottery;
+
+      sendNotification(
+        isWinner
+          ? `🎉 Parabéns! Jogo premiado na ${lotteryName}!`
+          : `🔔 ${lotteryName} — ${results.length} aposta(s) com acertos!`,
+        {
+          body: isWinner
+            ? `Você acertou ${best.matchCount}/${config.pick} no concurso #${latestDraw.concurso}!`
+            : `Melhor resultado: ${best.matchCount}/${config.pick} acertos no concurso #${latestDraw.concurso}`,
+          tag: notifKey,
+        }
+      );
+    }
+  }, [draws, savedBets, config.pick, lastCheckedConcurso, selectedLottery, sendNotification]);
 
   useEffect(() => {
     checkMatches();
   }, [checkMatches]);
+
+  const handleEnableNotifications = async () => {
+    const result = await requestPermission();
+    if (result === "granted") {
+      toast.success("Notificações ativadas! Você será avisado quando houver acertos.");
+    } else if (result === "denied") {
+      toast.error("Notificações bloqueadas. Ative nas configurações do navegador.");
+    }
+  };
+
+  // Notification permission banner
+  if (supported && permission !== "granted" && !dismissed) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <Card className="border border-primary/30 bg-primary/5 backdrop-blur">
+          <CardHeader className="py-3 px-4">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Bell className="h-4 w-4 text-primary" />
+              <span>Ative as notificações para ser avisado quando suas apostas tiverem acertos!</span>
+              <div className="ml-auto flex items-center gap-2">
+                <Button size="sm" variant="default" onClick={handleEnableNotifications} className="h-7 text-xs">
+                  <BellRing className="h-3 w-3 mr-1" />
+                  Ativar
+                </Button>
+                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setDismissed(true)}>
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            </CardTitle>
+          </CardHeader>
+        </Card>
+      </motion.div>
+    );
+  }
 
   if (!matches.length || dismissed) return null;
 
@@ -81,6 +144,12 @@ export function DrawNotificationChecker() {
                 {isWinner ? "🎉 Parabéns! Jogo premiado!" : `Concurso ${bestMatch.concurso} — ${matches.length} aposta(s) com acertos`}
               </span>
               <div className="ml-auto flex items-center gap-1">
+                {supported && permission === "granted" && (
+                  <Badge variant="outline" className="text-[10px] text-primary border-primary/30">
+                    <Bell className="h-2.5 w-2.5 mr-1" />
+                    Push ON
+                  </Badge>
+                )}
                 <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setExpanded(!expanded)}>
                   {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
                 </Button>
