@@ -107,6 +107,27 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
     setEcfg(prev => ({ ...prev, [key]: value }));
   };
 
+  const toggleCompare = (index: number) => {
+    setSelectedForCompare(prev => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  };
+
+  const averages = useMemo(() => {
+    if (!result || result.bets.length === 0) return null;
+    const bets = result.bets;
+    const avgScore = Math.round(bets.reduce((s, b) => s + b.score, 0) / bets.length);
+    const avgWinRate = Math.round(bets.reduce((s, b) => s + b.backtest.winRate, 0) / bets.length);
+    const avgConsistency = Math.round(bets.reduce((s, b) => s + b.backtest.consistency, 0) / bets.length);
+    const avgCombined = Math.round(bets.reduce((s, b) => s + b.score * 0.7 + b.backtest.winRate * 0.2 + b.backtest.consistency * 0.1, 0) / bets.length);
+    const avgHits = (bets.reduce((s, b) => s + b.backtest.avgHits, 0) / bets.length).toFixed(1);
+    const bestGrade = bets[0]?.quality.grade || "-";
+    return { avgScore, avgWinRate, avgConsistency, avgCombined, avgHits, bestGrade, total: bets.length };
+  }, [result]);
+
   const isLF = config.id === "lotofacil";
 
   return (
