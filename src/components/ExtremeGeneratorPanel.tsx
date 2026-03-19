@@ -61,6 +61,8 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
 
   const handleGenerate = () => {
     setGenerating(true);
+    setSelectedForCompare(new Set());
+    setShowComparison(false);
     setTimeout(() => {
       const res = runExtremePipeline(stats, config, draws, ecfg);
       setResult(res);
