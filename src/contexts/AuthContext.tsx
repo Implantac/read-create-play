@@ -10,6 +10,7 @@ interface Profile {
   full_name: string | null;
   avatar_url: string | null;
   plan: PlanType;
+  theme_preference: string;
 }
 
 interface AuthContextType {
