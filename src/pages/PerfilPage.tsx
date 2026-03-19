@@ -16,6 +16,7 @@ import { playTierPreview } from "@/lib/alert-sounds";
 export default function PerfilPage() {
   const { user, profile } = useAuth();
   const { toast } = useToast();
+  const sound = useSoundSettings();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [fullName, setFullName] = useState(profile?.full_name || "");
