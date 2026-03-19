@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { playMatchAlert } from "@/lib/alert-sounds";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { useNotificationPermission } from "@/hooks/useNotificationPermission";
@@ -64,6 +65,9 @@ export function DrawNotificationChecker() {
       const best = results[0];
       const isWinner = best.matchCount >= config.pick;
       const lotteryName = LOTTERIES.find(l => l.id === selectedLottery)?.name || selectedLottery;
+
+      // Play tier-based alert sound (different melody per match level)
+      playMatchAlert(best.matchCount, config.pick);
 
       sendNotification(
         isWinner
