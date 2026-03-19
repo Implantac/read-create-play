@@ -365,6 +365,54 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
         )}
       </div>
 
+      {/* Summary Panel */}
+      {averages && (
+        <div className="mb-4 p-3 rounded-lg bg-secondary/30 border border-border">
+          <div className="flex items-center gap-2 mb-2">
+            <BarChart3 className="w-4 h-4 text-primary" />
+            <span className="text-xs font-bold text-foreground">Resumo — {averages.total} jogos gerados</span>
+          </div>
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center">
+            {[
+              { label: "Nota Combinada", value: averages.avgCombined, color: averages.avgCombined >= 60 ? "text-emerald-500" : averages.avgCombined >= 35 ? "text-yellow-500" : "text-red-500" },
+              { label: "Score Médio", value: averages.avgScore, color: "text-foreground" },
+              { label: "Win Rate Médio", value: `${averages.avgWinRate}%`, color: "text-primary" },
+              { label: "Consistência", value: averages.avgConsistency, color: "text-foreground" },
+              { label: "Média Acertos", value: averages.avgHits, color: "text-foreground" },
+              { label: "Melhor Nota", value: averages.bestGrade, color: "text-yellow-400" },
+            ].map((item, idx) => (
+              <div key={idx} className="p-2 rounded bg-background border border-border">
+                <div className="text-[9px] text-muted-foreground">{item.label}</div>
+                <div className={`text-sm font-bold ${item.color}`}>{item.value}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Comparison Panel */}
+      {showComparison && result && selectedForCompare.size >= 2 && (
+        <div className="mb-4">
+          <ExtremeComparisonPanel
+            bets={result.bets.filter((_, i) => selectedForCompare.has(i))}
+            stats={stats}
+            config={config}
+            onClose={() => setShowComparison(false)}
+          />
+        </div>
+      )}
+
+      {/* User Filters */}
+      <div className="mb-4">
+        <GeneratorFiltersPanel
+          config={config}
+          draws={draws}
+          stats={stats}
+          filters={userFilters}
+          onFiltersChange={setUserFilters}
+        />
+      </div>
+
       {/* Pipeline visualization */}
       {result && (
         <div className="mb-4">
