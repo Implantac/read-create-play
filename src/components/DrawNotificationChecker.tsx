@@ -66,6 +66,9 @@ export function DrawNotificationChecker() {
       const isWinner = best.matchCount >= config.pick;
       const lotteryName = LOTTERIES.find(l => l.id === selectedLottery)?.name || selectedLottery;
 
+      // Play tier-based alert sound (different melody per match level)
+      playMatchAlert(best.matchCount, config.pick);
+
       sendNotification(
         isWinner
           ? `🎉 Parabéns! Jogo premiado na ${lotteryName}!`
