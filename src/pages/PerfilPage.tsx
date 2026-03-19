@@ -18,6 +18,18 @@ export default function PerfilPage() {
   const { user, profile } = useAuth();
   const { toast } = useToast();
   const sound = useSoundSettings();
+  const { theme, setTheme } = useTheme();
+
+  const handleThemeChange = (newTheme: string) => {
+    setTheme(newTheme);
+    if (user) {
+      supabase
+        .from("profiles")
+        .update({ theme_preference: newTheme } as any)
+        .eq("id", user.id)
+        .then();
+    }
+  };
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [fullName, setFullName] = useState(profile?.full_name || "");
