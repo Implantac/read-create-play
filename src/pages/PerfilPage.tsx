@@ -6,8 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, Loader2, Save, User, Lock } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Camera, Loader2, Save, User, Lock, Volume2, VolumeX, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useSoundSettings } from "@/hooks/useSoundSettings";
+import { playTierPreview } from "@/lib/alert-sounds";
 
 export default function PerfilPage() {
   const { user, profile } = useAuth();
