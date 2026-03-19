@@ -171,6 +171,40 @@ export default function PerfilPage() {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Theme Preference */}
+      <Card className="glass-card">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            {theme === "dark" ? <Moon className="w-5 h-5 text-primary" /> : <Sun className="w-5 h-5 text-primary" />}
+            Aparência
+          </CardTitle>
+          <CardDescription>Escolha o tema da interface</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-3">
+            {([
+              { value: "light", label: "Claro", icon: Sun },
+              { value: "dark", label: "Escuro", icon: Moon },
+              { value: "system", label: "Sistema", icon: Monitor },
+            ] as const).map(({ value, label, icon: Icon }) => (
+              <button
+                key={value}
+                onClick={() => handleThemeChange(value)}
+                className={`flex flex-col items-center gap-2 rounded-lg border p-4 transition-all ${
+                  theme === value
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-muted/30 text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                <span className="text-xs font-medium">{label}</span>
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       <Card className="glass-card">
         <CardHeader>
           <CardTitle className="text-lg">Alterar Senha</CardTitle>
