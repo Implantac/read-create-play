@@ -28,7 +28,7 @@ const LazyFallback = () => (
 );
 
 const GeradorPage = () => {
-  const { config, draws, stats, selectedLottery } = useLotteryContext();
+  const { config, draws, drawsWithPrizes, stats, selectedLottery } = useLotteryContext();
   const { saveBet } = useSavedBets(selectedLottery);
 
   const handleSaveBet = (numbers: number[], strategy?: string, score?: number, grade?: string) => {
