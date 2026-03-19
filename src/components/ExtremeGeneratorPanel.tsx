@@ -471,12 +471,24 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: Math.min(i * 0.02, 0.5) }}
-                className="rounded-lg bg-secondary/30 border border-border overflow-hidden"
+                className={`rounded-lg bg-secondary/30 border overflow-hidden ${
+                  selectedForCompare.has(i) ? "border-primary/50 ring-1 ring-primary/20" : "border-border"
+                }`}
               >
                 <div
                   className="flex items-center gap-2 p-3 cursor-pointer hover:bg-secondary/50 transition-colors"
                   onClick={() => setExpandedBet(isExpanded ? null : i)}
                 >
+                  {/* Compare checkbox */}
+                  <input
+                    type="checkbox"
+                    checked={selectedForCompare.has(i)}
+                    onClick={e => e.stopPropagation()}
+                    onChange={() => toggleCompare(i)}
+                    className="w-3.5 h-3.5 rounded border-border accent-primary flex-shrink-0 cursor-pointer"
+                    title="Selecionar para comparação"
+                  />
+
                   {/* Rank */}
                   <div className="w-8 flex-shrink-0">
                     {bet.rank <= 3 ? (
