@@ -11,6 +11,9 @@ import {
 } from "@/engine/extreme-generator";
 import { exportToPdf } from "@/engine/pdf-export";
 import { HistoricalValidationBadge } from "@/components/HistoricalValidationBadge";
+import { ExtremeComparisonPanel } from "@/components/ExtremeComparisonPanel";
+import { GeneratorFiltersPanel } from "@/components/GeneratorFiltersPanel";
+import { GenerationFilters, DEFAULT_FILTERS } from "@/engine/generation-filters";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Rocket, Loader2, Copy, Check, ChevronDown, ChevronUp,
