@@ -13,6 +13,7 @@ import { Camera, Loader2, Save, User, Lock, Volume2, VolumeX, Play, Sun, Moon, M
 import { useToast } from "@/hooks/use-toast";
 import { useSoundSettings } from "@/hooks/useSoundSettings";
 import { playTierPreview } from "@/lib/alert-sounds";
+import UserPreferencesPanel from "@/components/UserPreferencesPanel";
 
 export default function PerfilPage() {
   const { user, profile } = useAuth();
@@ -204,6 +205,8 @@ export default function PerfilPage() {
           </div>
         </CardContent>
       </Card>
+
+      <UserPreferencesPanel />
 
       <Card className="glass-card">
         <CardHeader>

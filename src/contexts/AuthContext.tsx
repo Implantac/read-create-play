@@ -11,6 +11,9 @@ interface Profile {
   avatar_url: string | null;
   plan: PlanType;
   theme_preference: string;
+  language: string;
+  timezone: string;
+  currency_format: string;
 }
 
 interface AuthContextType {
