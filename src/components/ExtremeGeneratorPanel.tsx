@@ -89,11 +89,20 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
 
   const handleExport = () => {
     if (!result) return;
+    const avgCombined = averages ? averages.avgCombined : 0;
     exportToPdf({
       title: `Gerador Extremo - ${config.name}`,
-      subtitle: `Top ${result.bets.length} jogos • Pipeline de 8 etapas • ${result.elapsedMs}ms`,
+      subtitle: `Top ${result.bets.length} jogos • Nota média: ${avgCombined} • Pipeline ${result.elapsedMs}ms`,
       config,
-      bets: result.bets.map(b => ({ numbers: b.numbers, strategy: "Extremo", score: b.score, grade: b.quality.grade })),
+      bets: result.bets.map(b => {
+        const combined = Math.round(b.score * 0.7 + b.backtest.winRate * 0.2 + b.backtest.consistency * 0.1);
+        return {
+          numbers: b.numbers,
+          strategy: `WR:${b.backtest.winRate}% C:${b.backtest.consistency}`,
+          score: combined,
+          grade: b.quality.grade,
+        };
+      }),
       type: "apostas",
     });
   };
