@@ -206,6 +206,8 @@ export default function PerfilPage() {
         </CardContent>
       </Card>
 
+      <UserPreferencesPanel />
+
       <Card className="glass-card">
         <CardHeader>
           <CardTitle className="text-lg">Alterar Senha</CardTitle>
