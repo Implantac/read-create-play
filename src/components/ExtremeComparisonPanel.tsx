@@ -15,19 +15,19 @@ export function ExtremeComparisonPanel({ bets, stats, config, onClose }: Props) 
   const getCombined = (b: ExtremeBet) =>
     Math.round(b.score * 0.7 + b.backtest.winRate * 0.2 + b.backtest.consistency * 0.1);
 
-  const metrics = [
-    { label: "Nota Combinada", get: (b: ExtremeBet) => getCombined(b), best: "max" },
-    { label: "Score", get: (b: ExtremeBet) => b.score, best: "max" },
-    { label: "Win Rate", get: (b: ExtremeBet) => b.backtest.winRate, suffix: "%", best: "max" },
-    { label: "Consistência", get: (b: ExtremeBet) => b.backtest.consistency, best: "max" },
-    { label: "Média Acertos", get: (b: ExtremeBet) => b.backtest.avgHits, best: "max" },
-    { label: "Melhor Acerto", get: (b: ExtremeBet) => b.backtest.bestHit, best: "max" },
-    { label: "Soma", get: (b: ExtremeBet) => b.sum, best: "neutral" },
-    { label: "Paridade", get: (b: ExtremeBet) => b.parityLabel, best: "neutral" },
-    { label: "Quentes", get: (b: ExtremeBet) => b.hotNumbers, best: "neutral" },
-    { label: "Frias", get: (b: ExtremeBet) => b.coldNumbers, best: "neutral" },
-    { label: "Repet. Ant.", get: (b: ExtremeBet) => b.repeatFromLast, best: "neutral" },
-  ] as const;
+  const metrics: { label: string; get: (b: ExtremeBet) => number | string; best: string; suffix?: string }[] = [
+    { label: "Nota Combinada", get: (b) => getCombined(b), best: "max" },
+    { label: "Score", get: (b) => b.score, best: "max" },
+    { label: "Win Rate", get: (b) => b.backtest.winRate, suffix: "%", best: "max" },
+    { label: "Consistência", get: (b) => b.backtest.consistency, best: "max" },
+    { label: "Média Acertos", get: (b) => b.backtest.avgHits, best: "max" },
+    { label: "Melhor Acerto", get: (b) => b.backtest.bestHit, best: "max" },
+    { label: "Soma", get: (b) => b.sum, best: "neutral" },
+    { label: "Paridade", get: (b) => b.parityLabel, best: "neutral" },
+    { label: "Quentes", get: (b) => b.hotNumbers, best: "neutral" },
+    { label: "Frias", get: (b) => b.coldNumbers, best: "neutral" },
+    { label: "Repet. Ant.", get: (b) => b.repeatFromLast, best: "neutral" },
+  ];
 
   return (
     <div className="rounded-xl bg-card border border-primary/30 p-4 space-y-3">
