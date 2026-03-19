@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useTheme } from "next-themes";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { Camera, Loader2, Save, User, Lock, Volume2, VolumeX, Play } from "lucide-react";
+import { Camera, Loader2, Save, User, Lock, Volume2, VolumeX, Play, Sun, Moon, Monitor } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSoundSettings } from "@/hooks/useSoundSettings";
 import { playTierPreview } from "@/lib/alert-sounds";
@@ -17,6 +18,18 @@ export default function PerfilPage() {
   const { user, profile } = useAuth();
   const { toast } = useToast();
   const sound = useSoundSettings();
+  const { theme, setTheme } = useTheme();
+
+  const handleThemeChange = (newTheme: string) => {
+    setTheme(newTheme);
+    if (user) {
+      supabase
+        .from("profiles")
+        .update({ theme_preference: newTheme } as any)
+        .eq("id", user.id)
+        .then();
+    }
+  };
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [fullName, setFullName] = useState(profile?.full_name || "");
@@ -158,6 +171,40 @@ export default function PerfilPage() {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Theme Preference */}
+      <Card className="glass-card">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            {theme === "dark" ? <Moon className="w-5 h-5 text-primary" /> : <Sun className="w-5 h-5 text-primary" />}
+            Aparência
+          </CardTitle>
+          <CardDescription>Escolha o tema da interface</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-3">
+            {([
+              { value: "light", label: "Claro", icon: Sun },
+              { value: "dark", label: "Escuro", icon: Moon },
+              { value: "system", label: "Sistema", icon: Monitor },
+            ] as const).map(({ value, label, icon: Icon }) => (
+              <button
+                key={value}
+                onClick={() => handleThemeChange(value)}
+                className={`flex flex-col items-center gap-2 rounded-lg border p-4 transition-all ${
+                  theme === value
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-muted/30 text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                <span className="text-xs font-medium">{label}</span>
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       <Card className="glass-card">
         <CardHeader>
           <CardTitle className="text-lg">Alterar Senha</CardTitle>
