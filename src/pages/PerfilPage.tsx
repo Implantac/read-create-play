@@ -216,6 +216,67 @@ export default function PerfilPage() {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Sound Settings */}
+      <Card className="glass-card">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            {sound.muted ? <VolumeX className="w-5 h-5 text-muted-foreground" /> : <Volume2 className="w-5 h-5 text-primary" />}
+            Alertas Sonoros
+          </CardTitle>
+          <CardDescription>Controle o volume e silencie os alertas de acertos</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Mute toggle */}
+          <div className="flex items-center justify-between">
+            <div>
+              <Label className="text-sm font-medium">Ativar sons de alerta</Label>
+              <p className="text-xs text-muted-foreground mt-0.5">Sons ao detectar acertos em sorteios</p>
+            </div>
+            <Switch checked={!sound.muted} onCheckedChange={(checked) => sound.setMuted(!checked)} />
+          </div>
+
+          {/* Volume slider */}
+          <div className={`space-y-3 ${sound.muted ? "opacity-40 pointer-events-none" : ""}`}>
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">Volume</Label>
+              <span className="text-xs font-mono text-muted-foreground">{sound.volume}%</span>
+            </div>
+            <Slider
+              value={[sound.volume]}
+              onValueChange={([v]) => sound.setVolume(v)}
+              min={0}
+              max={100}
+              step={5}
+              className="w-full"
+            />
+          </div>
+
+          {/* Preview buttons */}
+          <div className={`space-y-2 ${sound.muted ? "opacity-40 pointer-events-none" : ""}`}>
+            <Label className="text-sm font-medium">Testar sons por faixa</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {([
+                { tier: "low" as const, label: "Poucos acertos", emoji: "🔔" },
+                { tier: "mid" as const, label: "Acertos médios", emoji: "🎵" },
+                { tier: "high" as const, label: "Muitos acertos", emoji: "🎶" },
+                { tier: "jackpot" as const, label: "Jackpot!", emoji: "🏆" },
+              ]).map(({ tier, label, emoji }) => (
+                <Button
+                  key={tier}
+                  variant="outline"
+                  size="sm"
+                  className="justify-start gap-2 text-xs"
+                  onClick={() => playTierPreview(tier)}
+                >
+                  <Play className="w-3 h-3" />
+                  {emoji} {label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
