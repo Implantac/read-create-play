@@ -97,7 +97,7 @@ const GeradorPage = () => {
               <BetOptimizerPanel stats={stats} config={config} draws={draws} />
             </Suspense>
             <Suspense fallback={<LazyFallback />}>
-              <BetChecker draws={draws} lotteryId={selectedLottery} maxNumbers={config.numbers} pick={config.pick} />
+              <BetChecker draws={draws} drawsWithPrizes={drawsWithPrizes} lotteryId={selectedLottery} maxNumbers={config.numbers} pick={config.pick} />
             </Suspense>
           </div>
         </>
