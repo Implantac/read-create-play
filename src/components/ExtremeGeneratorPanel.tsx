@@ -11,6 +11,9 @@ import {
 } from "@/engine/extreme-generator";
 import { exportToPdf } from "@/engine/pdf-export";
 import { HistoricalValidationBadge } from "@/components/HistoricalValidationBadge";
+import { ExtremeComparisonPanel } from "@/components/ExtremeComparisonPanel";
+import { GeneratorFiltersPanel } from "@/components/GeneratorFiltersPanel";
+import { GenerationFilters, DEFAULT_FILTERS } from "@/engine/generation-filters";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Rocket, Loader2, Copy, Check, ChevronDown, ChevronUp,
@@ -46,6 +49,9 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
   const [copied, setCopied] = useState<number | null>(null);
   const [expandedBet, setExpandedBet] = useState<number | null>(null);
   const [showConfig, setShowConfig] = useState(false);
+  const [selectedForCompare, setSelectedForCompare] = useState<Set<number>>(new Set());
+  const [showComparison, setShowComparison] = useState(false);
+  const [userFilters, setUserFilters] = useState<GenerationFilters>({ ...DEFAULT_FILTERS });
 
   // Reset config when lottery changes
   useMemo(() => {
@@ -55,6 +61,8 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
 
   const handleGenerate = () => {
     setGenerating(true);
+    setSelectedForCompare(new Set());
+    setShowComparison(false);
     setTimeout(() => {
       const res = runExtremePipeline(stats, config, draws, ecfg);
       setResult(res);
@@ -81,11 +89,20 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
 
   const handleExport = () => {
     if (!result) return;
+    const avgCombined = averages ? averages.avgCombined : 0;
     exportToPdf({
       title: `Gerador Extremo - ${config.name}`,
-      subtitle: `Top ${result.bets.length} jogos • Pipeline de 8 etapas • ${result.elapsedMs}ms`,
+      subtitle: `Top ${result.bets.length} jogos • Nota média: ${avgCombined} • Pipeline ${result.elapsedMs}ms`,
       config,
-      bets: result.bets.map(b => ({ numbers: b.numbers, strategy: "Extremo", score: b.score, grade: b.quality.grade })),
+      bets: result.bets.map(b => {
+        const combined = Math.round(b.score * 0.7 + b.backtest.winRate * 0.2 + b.backtest.consistency * 0.1);
+        return {
+          numbers: b.numbers,
+          strategy: `WR:${b.backtest.winRate}% C:${b.backtest.consistency}`,
+          score: combined,
+          grade: b.quality.grade,
+        };
+      }),
       type: "apostas",
     });
   };
@@ -98,6 +115,27 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
   const updateConfig = (key: keyof ExtremeConfig, value: any) => {
     setEcfg(prev => ({ ...prev, [key]: value }));
   };
+
+  const toggleCompare = (index: number) => {
+    setSelectedForCompare(prev => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  };
+
+  const averages = useMemo(() => {
+    if (!result || result.bets.length === 0) return null;
+    const bets = result.bets;
+    const avgScore = Math.round(bets.reduce((s, b) => s + b.score, 0) / bets.length);
+    const avgWinRate = Math.round(bets.reduce((s, b) => s + b.backtest.winRate, 0) / bets.length);
+    const avgConsistency = Math.round(bets.reduce((s, b) => s + b.backtest.consistency, 0) / bets.length);
+    const avgCombined = Math.round(bets.reduce((s, b) => s + b.score * 0.7 + b.backtest.winRate * 0.2 + b.backtest.consistency * 0.1, 0) / bets.length);
+    const avgHits = (bets.reduce((s, b) => s + b.backtest.avgHits, 0) / bets.length).toFixed(1);
+    const bestGrade = bets[0]?.quality.grade || "-";
+    return { avgScore, avgWinRate, avgConsistency, avgCombined, avgHits, bestGrade, total: bets.length };
+  }, [result]);
 
   const isLF = config.id === "lotofacil";
 
@@ -322,8 +360,66 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
             <Button size="sm" variant="outline" onClick={handleExport} className="text-xs gap-1">
               <Download className="w-3 h-3" /> PDF
             </Button>
+            {selectedForCompare.size >= 2 && (
+              <Button
+                size="sm"
+                variant="default"
+                onClick={() => setShowComparison(true)}
+                className="text-xs gap-1"
+              >
+                <BarChart3 className="w-3 h-3" /> Comparar {selectedForCompare.size} jogos
+              </Button>
+            )}
           </>
         )}
+      </div>
+
+      {/* Summary Panel */}
+      {averages && (
+        <div className="mb-4 p-3 rounded-lg bg-secondary/30 border border-border">
+          <div className="flex items-center gap-2 mb-2">
+            <BarChart3 className="w-4 h-4 text-primary" />
+            <span className="text-xs font-bold text-foreground">Resumo — {averages.total} jogos gerados</span>
+          </div>
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center">
+            {[
+              { label: "Nota Combinada", value: averages.avgCombined, color: averages.avgCombined >= 60 ? "text-emerald-500" : averages.avgCombined >= 35 ? "text-yellow-500" : "text-red-500" },
+              { label: "Score Médio", value: averages.avgScore, color: "text-foreground" },
+              { label: "Win Rate Médio", value: `${averages.avgWinRate}%`, color: "text-primary" },
+              { label: "Consistência", value: averages.avgConsistency, color: "text-foreground" },
+              { label: "Média Acertos", value: averages.avgHits, color: "text-foreground" },
+              { label: "Melhor Nota", value: averages.bestGrade, color: "text-yellow-400" },
+            ].map((item, idx) => (
+              <div key={idx} className="p-2 rounded bg-background border border-border">
+                <div className="text-[9px] text-muted-foreground">{item.label}</div>
+                <div className={`text-sm font-bold ${item.color}`}>{item.value}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Comparison Panel */}
+      {showComparison && result && selectedForCompare.size >= 2 && (
+        <div className="mb-4">
+          <ExtremeComparisonPanel
+            bets={result.bets.filter((_, i) => selectedForCompare.has(i))}
+            stats={stats}
+            config={config}
+            onClose={() => setShowComparison(false)}
+          />
+        </div>
+      )}
+
+      {/* User Filters */}
+      <div className="mb-4">
+        <GeneratorFiltersPanel
+          config={config}
+          draws={draws}
+          stats={stats}
+          filters={userFilters}
+          onFiltersChange={setUserFilters}
+        />
       </div>
 
       {/* Pipeline visualization */}
@@ -384,12 +480,24 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: Math.min(i * 0.02, 0.5) }}
-                className="rounded-lg bg-secondary/30 border border-border overflow-hidden"
+                className={`rounded-lg bg-secondary/30 border overflow-hidden ${
+                  selectedForCompare.has(i) ? "border-primary/50 ring-1 ring-primary/20" : "border-border"
+                }`}
               >
                 <div
                   className="flex items-center gap-2 p-3 cursor-pointer hover:bg-secondary/50 transition-colors"
                   onClick={() => setExpandedBet(isExpanded ? null : i)}
                 >
+                  {/* Compare checkbox */}
+                  <input
+                    type="checkbox"
+                    checked={selectedForCompare.has(i)}
+                    onClick={e => e.stopPropagation()}
+                    onChange={() => toggleCompare(i)}
+                    className="w-3.5 h-3.5 rounded border-border accent-primary flex-shrink-0 cursor-pointer"
+                    title="Selecionar para comparação"
+                  />
+
                   {/* Rank */}
                   <div className="w-8 flex-shrink-0">
                     {bet.rank <= 3 ? (
