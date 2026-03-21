@@ -579,8 +579,9 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
                 </div>
 
                 {/* Validation badge */}
-                <div className="px-3 pb-1">
+                <div className="px-3 pb-1 space-y-1">
                   <HistoricalValidationBadge bet={bet.numbers} draws={draws} config={config} />
+                  <GameAnalysisBlock numbers={bet.numbers} stats={stats} config={config} draws={draws} />
                 </div>
 
                 {/* Expanded details */}
