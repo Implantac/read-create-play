@@ -3,6 +3,7 @@ import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { NumberStats } from "@/engine/statistics";
 import { motion, AnimatePresence } from "framer-motion";
 import { Brain, Loader2, Copy, Check, Star, Sparkles, RefreshCw, AlertTriangle } from "lucide-react";
+import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { generateNativeBets } from "@/engine/native-analysis";
@@ -242,6 +243,9 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
                     ))}
                   </div>
                 )}
+                <div className="ml-8">
+                  <GameAnalysisBlock numbers={bet} stats={stats} config={config} draws={draws} />
+                </div>
               </motion.div>
             ))}
           </div>
