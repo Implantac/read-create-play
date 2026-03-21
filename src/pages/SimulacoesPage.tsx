@@ -4,6 +4,8 @@ import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
+import { ComplianceDisclaimer } from "@/components/ComplianceDisclaimer";
+import { ComparativeSimulatorPanel } from "@/components/ComparativeSimulatorPanel";
 import { FlaskConical, Loader2 } from "lucide-react";
 
 const HistoricalSimulatorPanel = lazy(() => import("@/components/HistoricalSimulatorPanel").then(m => ({ default: m.HistoricalSimulatorPanel })));
