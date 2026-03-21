@@ -243,6 +243,9 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
                     ))}
                   </div>
                 )}
+                <div className="ml-8">
+                  <GameAnalysisBlock numbers={bet} stats={stats} config={config} draws={draws} />
+                </div>
               </motion.div>
             ))}
           </div>
