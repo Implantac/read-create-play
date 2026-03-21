@@ -44,6 +44,7 @@ const GeradorPage = () => {
         icon={Sparkles}
       />
       <LotteryContextBanner />
+      <ComplianceDisclaimer />
 
       {draws.length === 0 ? (
         <EmptyState description="Importe os sorteios primeiro no Dashboard para usar o gerador." />
