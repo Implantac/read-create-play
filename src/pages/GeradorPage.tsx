@@ -6,6 +6,7 @@ import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
+import { ComplianceDisclaimer } from "@/components/ComplianceDisclaimer";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { Sparkles, Loader2 } from "lucide-react";
 
