@@ -33,11 +33,14 @@ const SimulacoesPage = () => {
         icon={FlaskConical}
       />
       <LotteryContextBanner />
+      <ComplianceDisclaimer />
 
       {draws.length === 0 ? (
         <EmptyState description="Importe os sorteios primeiro no Dashboard para rodar simulações." />
       ) : (
         <>
+          <ComparativeSimulatorPanel stats={stats} config={config} draws={draws} />
+
           <Suspense fallback={<LazyFallback />}>
             <HistoricalSimulatorPanel config={config} draws={draws} stats={stats} />
           </Suspense>
