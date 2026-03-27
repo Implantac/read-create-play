@@ -141,6 +141,30 @@ export default function SignupPage() {
                 </div>
               </div>
               <div className="space-y-2">
+                <Label htmlFor="phone" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Telefone (com DDD)</Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="(11) 99999-0000"
+                    value={phone}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/\D/g, "").slice(0, 11);
+                      const formatted = v.length > 6
+                        ? `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`
+                        : v.length > 2
+                        ? `(${v.slice(0,2)}) ${v.slice(2)}`
+                        : v.length > 0
+                        ? `(${v}`
+                        : "";
+                      setPhone(formatted);
+                    }}
+                    className="pl-10 h-11 bg-muted/30 border-border/50 focus:border-primary/50 focus:ring-primary/20 transition-colors"
+                    required
+                  />
+                </div>
+              <div className="space-y-2">
                 <Label htmlFor="email" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
