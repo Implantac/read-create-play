@@ -33,11 +33,7 @@ export default function SignupPage() {
     setLoading(true);
 
     // Check if phone is already in use
-    const { data: existingPhone } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("phone_number", cleanPhone)
-      .maybeSingle();
+    const { data: phoneExists } = await supabase.rpc("check_phone_exists", { _phone: cleanPhone });
 
     if (existingPhone) {
       setLoading(false);
