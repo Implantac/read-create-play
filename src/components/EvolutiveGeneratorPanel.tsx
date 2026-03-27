@@ -283,6 +283,7 @@ export function EvolutiveGeneratorPanel({ stats, config, draws, lotteryId }: Pro
                       </button>
                     </div>
                   </div>
+                  <GameAnalysisBlock numbers={bet.numbers} stats={stats} config={config} draws={draws} />
                 ))}
               </div>
             </div>
