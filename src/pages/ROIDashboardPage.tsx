@@ -238,6 +238,7 @@ const ROIDashboardPage = () => {
             <PrizeHistoryPanel />
           </TabsContent>
         </Tabs>
+        </PlanGate>
       )}
     </div>
   );
