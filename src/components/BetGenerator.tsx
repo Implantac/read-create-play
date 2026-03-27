@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { NumberStats, generateSmartBet } from "@/engine/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { evaluateBetQuality, BetQualityReport } from "@/engine/bet-quality";
+import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, RefreshCw, Copy, Check, ChevronRight, TrendingUp, Shield, Zap, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -253,6 +254,9 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
                   </p>
                 ))}
               </div>
+
+              {/* AI Analysis Block */}
+              <GameAnalysisBlock numbers={bet.numbers} stats={stats} config={config} draws={draws} />
 
               {/* Actions */}
               <div className="flex items-center gap-2 pt-1">

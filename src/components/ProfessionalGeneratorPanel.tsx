@@ -12,6 +12,7 @@ import {
 import { GenerationFilters, DEFAULT_FILTERS, betMatchesFilters } from "@/engine/generation-filters";
 import { GeneratorFiltersPanel } from "@/components/GeneratorFiltersPanel";
 import { HistoricalValidationBadge } from "@/components/HistoricalValidationBadge";
+import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Trophy, Sparkles, Target, Layers, Copy, Check, ChevronDown, ChevronUp,
@@ -299,6 +300,11 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
                     {/* Historical Validation */}
                     <div className="px-3 pb-1">
                       <HistoricalValidationBadge bet={bet.numbers} draws={draws} config={config} />
+                    </div>
+
+                    {/* AI Analysis */}
+                    <div className="px-3 pb-2">
+                      <GameAnalysisBlock numbers={bet.numbers} stats={stats} config={config} draws={draws} />
                     </div>
 
                     {/* Expanded details */}
