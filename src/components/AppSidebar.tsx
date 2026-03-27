@@ -95,21 +95,40 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {mainItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      end={item.url === "/"}
-                      className="rounded-lg px-3 py-2.5 text-sm transition-all duration-200 hover:bg-sidebar-accent/60 text-sidebar-foreground"
-                      activeClassName="bg-primary/10 text-primary font-semibold glow-green"
-                    >
-                      <item.icon className="mr-3 h-4 w-4 shrink-0" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {mainItems.map((item) => {
+                const locked = item.requiredFeature ? !hasAccess(item.requiredFeature) : false;
+                const minPlan = item.requiredFeature ? getMinPlan(item.requiredFeature) : null;
+
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink
+                        to={item.url}
+                        end={item.url === "/"}
+                        className={`rounded-lg px-3 py-2.5 text-sm transition-all duration-200 hover:bg-sidebar-accent/60 ${locked ? "text-muted-foreground/50" : "text-sidebar-foreground"}`}
+                        activeClassName="bg-primary/10 text-primary font-semibold glow-green"
+                      >
+                        <item.icon className="mr-3 h-4 w-4 shrink-0" />
+                        {!collapsed && (
+                          <>
+                            <span className="flex-1">{item.title}</span>
+                            {locked && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Lock className="h-3 w-3 text-muted-foreground/40 shrink-0 ml-1" />
+                                </TooltipTrigger>
+                                <TooltipContent side="right" className="text-xs">
+                                  Requer plano {PLAN_LABELS[minPlan!] || "Premium"}
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
+                          </>
+                        )}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
