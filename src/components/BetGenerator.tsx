@@ -255,6 +255,9 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
                 ))}
               </div>
 
+              {/* AI Analysis Block */}
+              <GameAnalysisBlock numbers={bet.numbers} stats={stats} config={config} draws={draws} />
+
               {/* Actions */}
               <div className="flex items-center gap-2 pt-1">
                 <Button
