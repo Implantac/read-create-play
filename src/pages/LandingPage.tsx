@@ -8,6 +8,7 @@ import { LotteryLogosCarousel } from "@/components/LotteryLogosCarousel";
 import { ScreensShowcase } from "@/components/ScreensShowcase";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
 import { FloatingCTA } from "@/components/FloatingCTA";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { SocialProofBar } from "@/components/SocialProofBar";
 import { FloatingLotteryBalls } from "@/components/FloatingLotteryBalls";
 import { burstConfetti } from "@/lib/confetti";
@@ -704,6 +705,7 @@ export default function LandingPage() {
           </div>
         </div>
       </motion.footer>
+      <WhatsAppButton />
     </div>
   );
 }
