@@ -705,6 +705,7 @@ export default function LandingPage() {
           </div>
         </div>
       </motion.footer>
+      <WhatsAppButton />
     </div>
   );
 }
