@@ -84,6 +84,7 @@ export type Database = {
           full_name: string | null
           id: string
           language: string
+          phone_number: string | null
           plan: string
           theme_preference: string
           timezone: string
@@ -98,6 +99,7 @@ export type Database = {
           full_name?: string | null
           id: string
           language?: string
+          phone_number?: string | null
           plan?: string
           theme_preference?: string
           timezone?: string
@@ -112,6 +114,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           language?: string
+          phone_number?: string | null
           plan?: string
           theme_preference?: string
           timezone?: string
