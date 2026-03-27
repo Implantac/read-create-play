@@ -12,6 +12,7 @@ import {
 import { GenerationFilters, DEFAULT_FILTERS, betMatchesFilters } from "@/engine/generation-filters";
 import { GeneratorFiltersPanel } from "@/components/GeneratorFiltersPanel";
 import { HistoricalValidationBadge } from "@/components/HistoricalValidationBadge";
+import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Trophy, Sparkles, Target, Layers, Copy, Check, ChevronDown, ChevronUp,
