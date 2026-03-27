@@ -63,7 +63,7 @@ export default function AdminPage() {
     setUpdating(userId);
     const { error } = await supabase
       .from("profiles")
-      .update({ plan: newPlan, updated_at: new Date().toISOString() })
+      .update({ plan: newPlan, updated_at: new Date().toISOString() } as any)
       .eq("id", userId);
     setUpdating(null);
     if (error) {
@@ -71,6 +71,24 @@ export default function AdminPage() {
     } else {
       setProfiles(prev => prev.map(p => p.id === userId ? { ...p, plan: newPlan } : p));
       toast({ title: "Plano atualizado", description: `Plano alterado para ${PLAN_LABELS[newPlan]}.` });
+    }
+  };
+
+  const toggleBlock = async (userId: string, currentBlocked: boolean) => {
+    setUpdating(userId);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ blocked: !currentBlocked, updated_at: new Date().toISOString() } as any)
+      .eq("id", userId);
+    setUpdating(null);
+    if (error) {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } else {
+      setProfiles(prev => prev.map(p => p.id === userId ? { ...p, blocked: !currentBlocked } : p));
+      toast({
+        title: !currentBlocked ? "Usuário bloqueado" : "Usuário desbloqueado",
+        description: !currentBlocked ? "O usuário não poderá mais acessar o sistema." : "O acesso do usuário foi restaurado.",
+      });
     }
   };
 
