@@ -20,16 +20,36 @@ export default function SignupPage() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    const cleanPhone = phone.replace(/\D/g, "");
+    if (cleanPhone.length < 10 || cleanPhone.length > 11) {
+      toast({ title: "Telefone inválido", description: "Informe um número com DDD (10 ou 11 dígitos).", variant: "destructive" });
+      return;
+    }
     if (password.length < 6) {
       toast({ title: "Senha fraca", description: "A senha deve ter no mínimo 6 caracteres.", variant: "destructive" });
       return;
     }
+
     setLoading(true);
+
+    // Check if phone is already in use
+    const { data: existingPhone } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("phone_number", cleanPhone)
+      .maybeSingle();
+
+    if (existingPhone) {
+      setLoading(false);
+      toast({ title: "Telefone já cadastrado", description: "Este número de telefone já está vinculado a outra conta.", variant: "destructive" });
+      return;
+    }
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: { full_name: fullName, phone_number: cleanPhone },
         emailRedirectTo: window.location.origin,
       },
     });
