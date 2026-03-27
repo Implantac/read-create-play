@@ -242,48 +242,50 @@ export function EvolutiveGeneratorPanel({ stats, config, draws, lotteryId }: Pro
               </h4>
               <div className="space-y-2 max-h-96 overflow-y-auto">
                 {result.top10.map((bet, i) => (
-                  <div key={i} className={`flex items-center gap-2 p-3 rounded-lg border transition-colors group ${
+                  <div key={i} className={`p-3 rounded-lg border transition-colors group ${
                     i === 0 ? "bg-primary/5 border-primary/30" : "bg-muted/20 border-border/30 hover:border-border/60"
                   }`}>
-                    <Badge variant={i === 0 ? "default" : "outline"} className="text-xs shrink-0">
-                      {i === 0 ? "🏆" : `${i + 1}º`}
-                    </Badge>
-                    <Badge className={`text-xs shrink-0 border ${gradeColor(bet.quality.grade)}`}>
-                      {bet.quality.grade}
-                    </Badge>
-                    <div className="flex flex-wrap gap-1 flex-1">
-                      {bet.numbers.map(n => {
-                        const stat = stats.find(s => s.number === n);
-                        const cls = stat?.status === "hot" ? "bg-red-500/20 text-red-400" :
-                                    stat?.status === "cold" ? "bg-blue-500/20 text-blue-400" :
-                                    "bg-primary/15 text-primary";
-                        return (
-                          <span key={n} className={`inline-flex items-center justify-center w-7 h-7 rounded-md text-xs font-bold ${cls}`}>
-                            {String(n).padStart(2, "0")}
-                          </span>
-                        );
-                      })}
+                    <div className="flex items-center gap-2">
+                      <Badge variant={i === 0 ? "default" : "outline"} className="text-xs shrink-0">
+                        {i === 0 ? "🏆" : `${i + 1}º`}
+                      </Badge>
+                      <Badge className={`text-xs shrink-0 border ${gradeColor(bet.quality.grade)}`}>
+                        {bet.quality.grade}
+                      </Badge>
+                      <div className="flex flex-wrap gap-1 flex-1">
+                        {bet.numbers.map(n => {
+                          const stat = stats.find(s => s.number === n);
+                          const cls = stat?.status === "hot" ? "bg-red-500/20 text-red-400" :
+                                      stat?.status === "cold" ? "bg-blue-500/20 text-blue-400" :
+                                      "bg-primary/15 text-primary";
+                          return (
+                            <span key={n} className={`inline-flex items-center justify-center w-7 h-7 rounded-md text-xs font-bold ${cls}`}>
+                              {String(n).padStart(2, "0")}
+                            </span>
+                          );
+                        })}
+                      </div>
+                      <span className="text-xs text-muted-foreground font-mono shrink-0">{bet.fitness}pts</span>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={() => handleSave(bet.numbers, i, bet.quality)}
+                          className={`p-1 rounded-md transition-colors ${
+                            saved.has(i) ? "text-yellow-400" : "text-muted-foreground hover:text-yellow-400 hover:bg-yellow-400/5 opacity-0 group-hover:opacity-100"
+                          }`}
+                          disabled={saved.has(i)}
+                        >
+                          <Star className={`w-4 h-4 ${saved.has(i) ? "fill-yellow-400" : ""}`} />
+                        </button>
+                        <button
+                          onClick={() => handleCopy(bet.numbers, i)}
+                          className="p-1 rounded-md text-muted-foreground hover:text-primary transition-colors hover:bg-primary/5"
+                        >
+                          {copied === i ? <Check className="w-4 h-4 text-primary" /> : <Copy className="w-4 h-4" />}
+                        </button>
+                      </div>
                     </div>
-                    <span className="text-xs text-muted-foreground font-mono shrink-0">{bet.fitness}pts</span>
-                    <div className="flex items-center gap-1 shrink-0">
-                      <button
-                        onClick={() => handleSave(bet.numbers, i, bet.quality)}
-                        className={`p-1 rounded-md transition-colors ${
-                          saved.has(i) ? "text-yellow-400" : "text-muted-foreground hover:text-yellow-400 hover:bg-yellow-400/5 opacity-0 group-hover:opacity-100"
-                        }`}
-                        disabled={saved.has(i)}
-                      >
-                        <Star className={`w-4 h-4 ${saved.has(i) ? "fill-yellow-400" : ""}`} />
-                      </button>
-                      <button
-                        onClick={() => handleCopy(bet.numbers, i)}
-                        className="p-1 rounded-md text-muted-foreground hover:text-primary transition-colors hover:bg-primary/5"
-                      >
-                        {copied === i ? <Check className="w-4 h-4 text-primary" /> : <Copy className="w-4 h-4" />}
-                      </button>
-                    </div>
+                    <GameAnalysisBlock numbers={bet.numbers} stats={stats} config={config} draws={draws} />
                   </div>
-                  <GameAnalysisBlock numbers={bet.numbers} stats={stats} config={config} draws={draws} />
                 ))}
               </div>
             </div>
