@@ -16,7 +16,7 @@ import { playTierPreview } from "@/lib/alert-sounds";
 import UserPreferencesPanel from "@/components/UserPreferencesPanel";
 
 export default function PerfilPage() {
-  const { user, profile } = useAuth();
+  const { user, profile, session } = useAuth();
   const { toast } = useToast();
   const sound = useSoundSettings();
   const { theme, setTheme } = useTheme();
