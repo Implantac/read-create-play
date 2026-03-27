@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
+import { BetGenerator } from "@/components/BetGenerator";
 import { NumberPickerGrid } from "@/components/NumberPickerGrid";
 import { SavedBetsPanel } from "@/components/SavedBetsPanel";
 import { PlanGate } from "@/components/PlanGate";
@@ -50,6 +51,9 @@ const GeradorPage = () => {
         <EmptyState description="Importe os sorteios primeiro no Dashboard para usar o gerador." />
       ) : (
         <>
+          {/* Smart Generator - Primary */}
+          <BetGenerator stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
+
           <div className="grid lg:grid-cols-2 gap-6">
             <NumberPickerGrid
               config={config}
