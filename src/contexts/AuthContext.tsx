@@ -42,6 +42,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const syncSubscription = async (accessToken: string) => {
+    try {
+      const { data } = await supabase.functions.invoke("check-subscription", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (data?.plan) {
+        setProfile(prev => prev ? { ...prev, plan: data.plan as PlanType } : prev);
+      }
+    } catch (e) {
+      console.error("Error checking subscription:", e);
+    }
+  };
+
   useEffect(() => {
     const authStorageKey = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`;
 
@@ -77,6 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         if (session?.user) {
           fetchProfile(session.user.id);
+          syncSubscription(session.access_token);
         }
       })
       .catch(() => {

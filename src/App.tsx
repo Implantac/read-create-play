@@ -28,6 +28,7 @@ import ROIDashboardPage from "@/pages/ROIDashboardPage";
 import HistoricoApostasPage from "@/pages/HistoricoApostasPage";
 import FechamentosPage from "@/pages/FechamentosPage";
 import LandingPage from "./pages/LandingPage";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/planos" element={<PlanosPage />} />
+            <Route path="/payment-success" element={<PaymentSuccessPage />} />
             {/* Protected */}
             <Route element={<ProtectedRoute><LotteryProvider><AppLayout /></LotteryProvider></ProtectedRoute>}>
               <Route path="/" element={<DashboardPage />} />
