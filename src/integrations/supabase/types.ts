@@ -84,6 +84,7 @@ export type Database = {
           full_name: string | null
           id: string
           language: string
+          phone_number: string | null
           plan: string
           theme_preference: string
           timezone: string
@@ -98,6 +99,7 @@ export type Database = {
           full_name?: string | null
           id: string
           language?: string
+          phone_number?: string | null
           plan?: string
           theme_preference?: string
           timezone?: string
@@ -112,6 +114,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           language?: string
+          phone_number?: string | null
           plan?: string
           theme_preference?: string
           timezone?: string
@@ -178,6 +181,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_phone_exists: { Args: { _phone: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

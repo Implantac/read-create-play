@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Zap, Loader2, Mail, Lock, User, ArrowRight } from "lucide-react";
+import { Zap, Loader2, Mail, Lock, User, ArrowRight, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 
@@ -13,22 +13,39 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const { toast } = useToast();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    const cleanPhone = phone.replace(/\D/g, "");
+    if (cleanPhone.length < 10 || cleanPhone.length > 11) {
+      toast({ title: "Telefone inválido", description: "Informe um número com DDD (10 ou 11 dígitos).", variant: "destructive" });
+      return;
+    }
     if (password.length < 6) {
       toast({ title: "Senha fraca", description: "A senha deve ter no mínimo 6 caracteres.", variant: "destructive" });
       return;
     }
+
     setLoading(true);
+
+    // Check if phone is already in use
+    const { data: phoneExists } = await supabase.rpc("check_phone_exists", { _phone: cleanPhone });
+
+    if (phoneExists) {
+      setLoading(false);
+      toast({ title: "Telefone já cadastrado", description: "Este número de telefone já está vinculado a outra conta.", variant: "destructive" });
+      return;
+    }
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: { full_name: fullName, phone_number: cleanPhone },
         emailRedirectTo: window.location.origin,
       },
     });
@@ -99,7 +116,7 @@ export default function SignupPage() {
                 Criar <span className="gradient-brand-text">Conta</span>
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Comece grátis com acesso ao motor estatístico
+                7 dias grátis • Comece agora
               </p>
             </div>
           </CardHeader>
@@ -114,6 +131,31 @@ export default function SignupPage() {
                     placeholder="Seu nome"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
+                    className="pl-10 h-11 bg-muted/30 border-border/50 focus:border-primary/50 focus:ring-primary/20 transition-colors"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Telefone (com DDD)</Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="(11) 99999-0000"
+                    value={phone}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/\D/g, "").slice(0, 11);
+                      const formatted = v.length > 6
+                        ? `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`
+                        : v.length > 2
+                        ? `(${v.slice(0,2)}) ${v.slice(2)}`
+                        : v.length > 0
+                        ? `(${v}`
+                        : "";
+                      setPhone(formatted);
+                    }}
                     className="pl-10 h-11 bg-muted/30 border-border/50 focus:border-primary/50 focus:ring-primary/20 transition-colors"
                     required
                   />
