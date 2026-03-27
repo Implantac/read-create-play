@@ -41,6 +41,28 @@ export default function PerfilPage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
+  const [openingPortal, setOpeningPortal] = useState(false);
+
+  const isPaidPlan = profile?.plan && profile.plan !== "free";
+
+  const handleManageSubscription = async () => {
+    setOpeningPortal(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("customer-portal", {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, "_blank");
+      } else {
+        throw new Error("URL do portal não recebida");
+      }
+    } catch (err: any) {
+      toast({ title: "Erro ao abrir portal", description: err.message, variant: "destructive" });
+    } finally {
+      setOpeningPortal(false);
+    }
+  };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
