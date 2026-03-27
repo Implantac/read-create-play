@@ -188,6 +188,18 @@ export default function PerfilPage() {
               {profile?.plan || "free"}
             </div>
           </div>
+          {isPaidPlan && (
+            <Button
+              onClick={handleManageSubscription}
+              disabled={openingPortal}
+              variant="outline"
+              className="w-full gap-2 border-primary/30 hover:border-primary/50 text-primary"
+            >
+              {openingPortal ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
+              Gerenciar Assinatura
+              <ExternalLink className="w-3 h-3 ml-auto opacity-50" />
+            </Button>
+          )}
           <Button onClick={handleSave} disabled={saving} className="w-full gap-2">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Salvar Alterações
