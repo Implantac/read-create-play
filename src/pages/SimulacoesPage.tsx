@@ -38,27 +38,26 @@ const SimulacoesPage = () => {
       {draws.length === 0 ? (
         <EmptyState description="Importe os sorteios primeiro no Dashboard para rodar simulações." />
       ) : (
-        <>
-          <ComparativeSimulatorPanel stats={stats} config={config} draws={draws} />
+        <PlanGate feature="simulacoes" fallbackMessage="Simulações avançadas — disponível nos planos Premium e superiores">
+          <>
+            <ComparativeSimulatorPanel stats={stats} config={config} draws={draws} />
 
-          <Suspense fallback={<LazyFallback />}>
-            <HistoricalSimulatorPanel config={config} draws={draws} stats={stats} />
-          </Suspense>
+            <Suspense fallback={<LazyFallback />}>
+              <HistoricalSimulatorPanel config={config} draws={draws} stats={stats} />
+            </Suspense>
 
-          <Suspense fallback={<LazyFallback />}>
-            <MassiveSimulationDashboard stats={stats} config={config} draws={draws} />
-          </Suspense>
+            <Suspense fallback={<LazyFallback />}>
+              <MassiveSimulationDashboard stats={stats} config={config} draws={draws} />
+            </Suspense>
 
-          <Suspense fallback={<LazyFallback />}>
-            <IntelligentSimulatorPanel config={config} draws={draws} stats={stats} />
-          </Suspense>
+            <Suspense fallback={<LazyFallback />}>
+              <IntelligentSimulatorPanel config={config} draws={draws} stats={stats} />
+            </Suspense>
 
-          <PlanGate feature="simulacoes" fallbackMessage="Simulador Massivo Monte Carlo">
             <Suspense fallback={<LazyFallback />}>
               <MassiveSimulatorPanel stats={stats} config={config} draws={draws} />
             </Suspense>
-          </PlanGate>
-          <PlanGate feature="simulacoes" fallbackMessage="Simulações de Jogos">
+
             <div className="grid lg:grid-cols-2 gap-6">
               <Suspense fallback={<LazyFallback />}>
                 <GameSimulator stats={stats} config={config} draws={draws} />
@@ -67,8 +66,8 @@ const SimulacoesPage = () => {
                 <BacktestPanel stats={stats} config={config} draws={draws} />
               </Suspense>
             </div>
-          </PlanGate>
-        </>
+          </>
+        </PlanGate>
       )}
     </div>
   );

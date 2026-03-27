@@ -39,18 +39,32 @@ const EstrategiasPage = () => {
         <EmptyState description="Importe os sorteios primeiro no Dashboard para usar as estratégias." />
       ) : (
         <>
-          <Suspense fallback={<LazyFallback />}>
-            <StrategySimulatorPanel stats={stats} config={config} draws={draws} />
-          </Suspense>
+          {/* PREMIUM: Basic strategies */}
+          <PlanGate feature="estrategias_basicas" fallbackMessage="Simulador de Estratégias">
+            <Suspense fallback={<LazyFallback />}>
+              <StrategySimulatorPanel stats={stats} config={config} draws={draws} />
+            </Suspense>
+          </PlanGate>
 
-          <Suspense fallback={<LazyFallback />}>
-            <StrategyComparatorPanel stats={stats} config={config} draws={draws} />
-          </Suspense>
+          <PlanGate feature="estrategias_basicas" fallbackMessage="Comparador de Estratégias">
+            <Suspense fallback={<LazyFallback />}>
+              <StrategyComparatorPanel stats={stats} config={config} draws={draws} />
+            </Suspense>
+          </PlanGate>
 
-          <Suspense fallback={<LazyFallback />}>
-            <PatternDetectorPanel config={config} draws={draws} stats={stats} />
-          </Suspense>
+          <PlanGate feature="estrategias_basicas" fallbackMessage="Detector de Padrões">
+            <Suspense fallback={<LazyFallback />}>
+              <PatternDetectorPanel config={config} draws={draws} stats={stats} />
+            </Suspense>
+          </PlanGate>
 
+          <PlanGate feature="estrategias_basicas" fallbackMessage="Probabilidade Condicional">
+            <Suspense fallback={<LazyFallback />}>
+              <ConditionalProbabilityPanel draws={draws} config={config} />
+            </Suspense>
+          </PlanGate>
+
+          {/* PROFESSIONAL: Advanced */}
           <PlanGate feature="otimizacao" fallbackMessage="Otimização com Algoritmo Genético + SA">
             <Suspense fallback={<LazyFallback />}>
               <OptimizationPanel stats={stats} config={config} draws={draws} />
@@ -66,9 +80,6 @@ const EstrategiasPage = () => {
               <AdvancedAnalyticsPanel stats={stats} draws={draws} config={config} />
             </Suspense>
           </PlanGate>
-          <Suspense fallback={<LazyFallback />}>
-            <ConditionalProbabilityPanel draws={draws} config={config} />
-          </Suspense>
           <PlanGate feature="estrategias_hp" fallbackMessage="Motor HP Matemático">
             <Suspense fallback={<LazyFallback />}>
               <HPEnginePanel stats={stats} config={config} draws={draws} />

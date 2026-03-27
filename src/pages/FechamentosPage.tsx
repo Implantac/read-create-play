@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PageHeader } from "@/components/PageHeader";
+import { PlanGate } from "@/components/PlanGate";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -147,6 +148,7 @@ export default function FechamentosPage() {
       />
       <LotteryContextBanner />
 
+      <PlanGate feature="fechamentos" fallbackMessage="Fechamentos Matemáticos — matrizes otimizadas com garantia de acertos">
       {/* Available matrices for current lottery */}
       <Card className="bg-card/80 backdrop-blur border-border">
         <CardHeader className="pb-3">
@@ -435,6 +437,7 @@ export default function FechamentosPage() {
           </motion.div>
         )}
       </AnimatePresence>
+      </PlanGate>
     </div>
   );
 }

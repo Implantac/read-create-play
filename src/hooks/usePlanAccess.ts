@@ -11,25 +11,37 @@ export type Feature =
   | "dashboard"
   | "gerador_basico"
   | "gerador_profissional"
+  | "gerador_avancado"
   | "fechamentos"
   | "conferidor"
+  | "estrategias_basicas"
   | "estrategias_ml"
   | "estrategias_hp"
   | "estrategias_analytics"
   | "otimizacao"
   | "simulacoes"
+  | "simulacoes_avancadas"
   | "historico"
-  | "export_pdf";
+  | "export_pdf"
+  | "ia_autonoma"
+  | "ai_analyst"
+  | "roi_dashboard";
 
 const FEATURE_MIN_PLAN: Record<Feature, PlanType> = {
   dashboard: "free",
   gerador_basico: "free",
   historico: "free",
   conferidor: "free",
+  gerador_avancado: "premium",
   gerador_profissional: "premium",
   fechamentos: "premium",
   simulacoes: "premium",
+  simulacoes_avancadas: "premium",
   export_pdf: "premium",
+  estrategias_basicas: "premium",
+  roi_dashboard: "premium",
+  ia_autonoma: "professional",
+  ai_analyst: "professional",
   estrategias_ml: "professional",
   estrategias_hp: "professional",
   estrategias_analytics: "professional",
