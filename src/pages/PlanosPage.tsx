@@ -280,6 +280,16 @@ export default function PlanosPage() {
             </AccordionItem>
           ))}
         </Accordion>
+
+        <div className="mt-6 text-center text-sm text-muted-foreground">
+          Ainda tem dúvidas?{" "}
+          <a
+            href="mailto:suporte@titanloterias.com"
+            className="text-primary hover:underline font-medium"
+          >
+            Entre em contato com nosso suporte
+          </a>
+        </div>
       </div>
     </div>
   );
