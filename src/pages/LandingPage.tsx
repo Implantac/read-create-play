@@ -199,8 +199,8 @@ export default function LandingPage() {
       {/* Nav */}
       <nav className="fixed top-0 inset-x-0 z-50 glass-panel border-b border-border/30">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 overflow-hidden">
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/40 group-hover:scale-110 transition-all duration-300 overflow-hidden">
               <img src="/logo.png" alt="Titan Loterias" className="w-10 h-10 object-contain" />
             </div>
             <span className="text-lg font-bold tracking-tight">
