@@ -15,6 +15,7 @@ interface Profile {
   timezone: string;
   currency_format: string;
   blocked: boolean;
+  created_at: string;
 }
 
 interface AuthContextType {
@@ -22,6 +23,8 @@ interface AuthContextType {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
+  isTrialExpired: boolean;
+  trialDaysLeft: number;
   signOut: () => Promise<void>;
 }
 
@@ -112,8 +115,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null);
   };
 
+  const TRIAL_DAYS = 7;
+
+  const trialDaysLeft = (() => {
+    if (!profile?.created_at || profile.plan !== "free") return TRIAL_DAYS;
+    const created = new Date(profile.created_at).getTime();
+    const now = Date.now();
+    const elapsed = Math.floor((now - created) / (1000 * 60 * 60 * 24));
+    return Math.max(0, TRIAL_DAYS - elapsed);
+  })();
+
+  const isTrialExpired = profile?.plan === "free" && trialDaysLeft <= 0;
+
   return (
-    <AuthContext.Provider value={{ session, user: session?.user ?? null, profile, loading, signOut }}>
+    <AuthContext.Provider value={{ session, user: session?.user ?? null, profile, loading, isTrialExpired, trialDaysLeft, signOut }}>
       {children}
     </AuthContext.Provider>
   );

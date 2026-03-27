@@ -6,6 +6,7 @@ import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { usePlanAccess, type Feature } from "@/hooks/usePlanAccess";
+import { useAuth } from "@/contexts/AuthContext";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { LOTTERIES } from "@/data/lotteries";
 import {
@@ -51,6 +52,7 @@ export function AppSidebar() {
   const location = useLocation();
   const { isAdmin } = useAdminCheck();
   const { currentPlan, hasAccess, getMinPlan } = usePlanAccess();
+  const { trialDaysLeft } = useAuth();
   const { config } = useLotteryContext();
 
   return (
@@ -159,7 +161,23 @@ export function AppSidebar() {
       </SidebarContent>
 
       {!collapsed && (
-        <SidebarFooter className="p-3 border-t border-sidebar-border">
+        <SidebarFooter className="p-3 border-t border-sidebar-border space-y-2">
+          {currentPlan === "free" && trialDaysLeft > 0 && (
+            <div className="rounded-lg bg-accent/10 border border-accent/20 px-3 py-2 text-center">
+              <p className="text-[11px] font-semibold text-accent">
+                ⏱ {trialDaysLeft} {trialDaysLeft === 1 ? "dia restante" : "dias restantes"}
+              </p>
+              <p className="text-[9px] text-muted-foreground">Período de teste gratuito</p>
+            </div>
+          )}
+          {currentPlan === "free" && trialDaysLeft <= 0 && (
+            <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2 text-center">
+              <p className="text-[11px] font-semibold text-destructive">
+                Teste expirado
+              </p>
+              <p className="text-[9px] text-muted-foreground">Assine para continuar</p>
+            </div>
+          )}
           <Link
             to="/planos"
             className="flex items-center gap-2 rounded-lg bg-primary/5 border border-primary/10 px-3 py-2.5 hover:bg-primary/10 transition-colors group"
