@@ -21,6 +21,7 @@ interface Profile {
   full_name: string | null;
   plan: string;
   created_at: string;
+  blocked: boolean;
 }
 
 const PLAN_COLORS: Record<string, string> = {
