@@ -120,7 +120,7 @@ export default function SignupPage() {
                 Criar <span className="gradient-brand-text">Conta</span>
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Comece grátis com acesso ao motor estatístico
+                7 dias grátis • Comece agora
               </p>
             </div>
           </CardHeader>
