@@ -135,6 +135,7 @@ const AIAnalystPage = () => {
       />
       <LotteryContextBanner />
 
+      <PlanGate feature="ai_analyst" fallbackMessage="AI Analyst — IA nativa com geração, análise e simulação">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-5 w-full">
           <TabsTrigger value="chat" className="gap-1.5"><Send className="h-3.5 w-3.5" />Chat IA</TabsTrigger>
