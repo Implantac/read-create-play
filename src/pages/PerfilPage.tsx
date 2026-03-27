@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth, PlanType } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "next-themes";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -9,14 +9,14 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { Camera, Loader2, Save, User, Lock, Volume2, VolumeX, Play, Sun, Moon, Monitor } from "lucide-react";
+import { Camera, Loader2, Save, User, Lock, Volume2, VolumeX, Play, Sun, Moon, Monitor, CreditCard, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSoundSettings } from "@/hooks/useSoundSettings";
 import { playTierPreview } from "@/lib/alert-sounds";
 import UserPreferencesPanel from "@/components/UserPreferencesPanel";
 
 export default function PerfilPage() {
-  const { user, profile } = useAuth();
+  const { user, profile, session } = useAuth();
   const { toast } = useToast();
   const sound = useSoundSettings();
   const { theme, setTheme } = useTheme();
@@ -41,6 +41,28 @@ export default function PerfilPage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
+  const [openingPortal, setOpeningPortal] = useState(false);
+
+  const isPaidPlan = profile?.plan && profile.plan !== "free";
+
+  const handleManageSubscription = async () => {
+    setOpeningPortal(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("customer-portal", {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, "_blank");
+      } else {
+        throw new Error("URL do portal não recebida");
+      }
+    } catch (err: any) {
+      toast({ title: "Erro ao abrir portal", description: err.message, variant: "destructive" });
+    } finally {
+      setOpeningPortal(false);
+    }
+  };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -166,6 +188,18 @@ export default function PerfilPage() {
               {profile?.plan || "free"}
             </div>
           </div>
+          {isPaidPlan && (
+            <Button
+              onClick={handleManageSubscription}
+              disabled={openingPortal}
+              variant="outline"
+              className="w-full gap-2 border-primary/30 hover:border-primary/50 text-primary"
+            >
+              {openingPortal ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
+              Gerenciar Assinatura
+              <ExternalLink className="w-3 h-3 ml-auto opacity-50" />
+            </Button>
+          )}
           <Button onClick={handleSave} disabled={saving} className="w-full gap-2">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Salvar Alterações
