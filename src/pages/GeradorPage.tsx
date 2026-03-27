@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
+import { BetGenerator } from "@/components/BetGenerator";
 import { NumberPickerGrid } from "@/components/NumberPickerGrid";
 import { SavedBetsPanel } from "@/components/SavedBetsPanel";
 import { PlanGate } from "@/components/PlanGate";
