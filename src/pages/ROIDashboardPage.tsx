@@ -115,6 +115,7 @@ const ROIDashboardPage = () => {
       {!savedBets.length ? (
         <EmptyState description="Salve apostas no Gerador para acompanhar seu ROI e premiações." />
       ) : (
+        <PlanGate feature="roi_dashboard" fallbackMessage="Dashboard de ROI e análise de premiações">
         <Tabs defaultValue="roi" className="space-y-4">
           <TabsList>
             <TabsTrigger value="roi">ROI</TabsTrigger>

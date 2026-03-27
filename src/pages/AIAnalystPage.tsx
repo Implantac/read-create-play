@@ -448,6 +448,7 @@ const AIAnalystPage = () => {
           <AnalysisTab draws={draws} lotteryId={selectedLottery} stats={stats} config={config} />
         </TabsContent>
       </Tabs>
+      </PlanGate>
     </div>
   );
 };
