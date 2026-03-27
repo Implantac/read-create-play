@@ -11,6 +11,7 @@ import { NumberStats } from "@/engine/statistics";
 import { runGeneticAlgorithm, GeneticResult, RiskLevel } from "@/engine/genetic-algorithm";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
 
 interface Props {
   stats: NumberStats[];
