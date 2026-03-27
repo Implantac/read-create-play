@@ -23,6 +23,8 @@ interface AuthContextType {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
+  isTrialExpired: boolean;
+  trialDaysLeft: number;
   signOut: () => Promise<void>;
 }
 
