@@ -6,6 +6,7 @@ import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { usePlanAccess, type Feature } from "@/hooks/usePlanAccess";
+import { useAuth } from "@/contexts/AuthContext";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { LOTTERIES } from "@/data/lotteries";
 import {
