@@ -17,6 +17,7 @@ import { generateNativeImprovements } from "@/engine/native-analysis";
 import { computeFrequencyStats } from "@/engine/statistics";
 import { useSavedBets, SavedBet } from "@/hooks/useSavedBets";
 import { Progress } from "@/components/ui/progress";
+import { BetHitsChart } from "@/components/BetHitsChart";
 
 interface Props {
   draws: DrawResult[];
