@@ -41,8 +41,8 @@ export default function ForgotPasswordPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/login" className="inline-flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl gradient-brand flex items-center justify-center shadow-lg shadow-primary/20">
-              <span className="text-lg font-bold text-primary-foreground">T</span>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 overflow-hidden">
+              <img src="/logo.png" alt="Titan Loterias" className="w-10 h-10 object-contain" />
             </div>
             <span className="text-xl font-bold gradient-brand-text font-display">Titan Loterias</span>
           </Link>

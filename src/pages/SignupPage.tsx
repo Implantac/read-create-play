@@ -90,8 +90,8 @@ export default function SignupPage() {
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
             >
-              <div className="w-16 h-16 rounded-2xl gradient-brand flex items-center justify-center shadow-lg shadow-primary/25 mx-auto">
-                <Zap className="w-8 h-8 text-primary-foreground" />
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25 mx-auto overflow-hidden">
+                <img src="/logo.png" alt="Titan Loterias" className="w-16 h-16 object-contain" />
               </div>
             </motion.div>
             <div>
