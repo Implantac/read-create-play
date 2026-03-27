@@ -24,6 +24,7 @@ import {
   PieChart, Pie, Cell,
 } from "recharts";
 import { toast } from "sonner";
+import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
 
 interface Props {
   stats: NumberStats[];
