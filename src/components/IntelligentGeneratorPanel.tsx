@@ -24,6 +24,7 @@ import {
   PieChart, Pie, Cell,
 } from "recharts";
 import { toast } from "sonner";
+import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
 
 interface Props {
   stats: NumberStats[];
@@ -202,6 +203,7 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
                     <div className="mt-2">
                       <Progress value={bet.score} className="h-1" />
                     </div>
+                    <GameAnalysisBlock numbers={bet.numbers} stats={stats} config={config} draws={draws} />
                   </div>
                 ))}
               </div>
