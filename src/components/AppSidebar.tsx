@@ -1,11 +1,11 @@
 import {
   BarChart3, Sparkles, FlaskConical, History, Zap, Grid3X3,
-  Brain, ShieldCheck, Crown, PieChart, TrendingUp, ClipboardCheck, Bot,
+  Brain, ShieldCheck, Crown, PieChart, TrendingUp, ClipboardCheck, Bot, Lock,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
-import { usePlanAccess } from "@/hooks/usePlanAccess";
+import { usePlanAccess, type Feature } from "@/hooks/usePlanAccess";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { LOTTERIES } from "@/data/lotteries";
 import {
@@ -22,27 +22,35 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Link } from "react-router-dom";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-const mainItems = [
+const mainItems: { title: string; url: string; icon: any; requiredFeature?: Feature }[] = [
   { title: "Dashboard", url: "/", icon: BarChart3 },
   { title: "Gerador", url: "/gerador", icon: Sparkles },
-  { title: "IA Autônoma", url: "/ia-autonoma", icon: Zap },
-  { title: "AI Analyst", url: "/ai-analyst", icon: Bot },
-  { title: "Estratégias IA", url: "/estrategias", icon: Brain },
-  { title: "Simulações", url: "/simulacoes", icon: FlaskConical },
-  { title: "Fechamentos", url: "/fechamentos", icon: Grid3X3 },
+  { title: "IA Autônoma", url: "/ia-autonoma", icon: Zap, requiredFeature: "ia_autonoma" },
+  { title: "AI Analyst", url: "/ai-analyst", icon: Bot, requiredFeature: "ai_analyst" },
+  { title: "Estratégias IA", url: "/estrategias", icon: Brain, requiredFeature: "estrategias_basicas" },
+  { title: "Simulações", url: "/simulacoes", icon: FlaskConical, requiredFeature: "simulacoes" },
+  { title: "Fechamentos", url: "/fechamentos", icon: Grid3X3, requiredFeature: "fechamentos" },
   { title: "Estatísticas", url: "/estatisticas", icon: PieChart },
-  { title: "ROI", url: "/roi", icon: TrendingUp },
+  { title: "ROI", url: "/roi", icon: TrendingUp, requiredFeature: "roi_dashboard" },
   { title: "Minhas Apostas", url: "/minhas-apostas", icon: ClipboardCheck },
   { title: "Histórico", url: "/historico", icon: History },
 ];
+
+const PLAN_LABELS: Record<string, string> = {
+  free: "Gratuito",
+  premium: "Premium",
+  professional: "Profissional",
+  lifetime: "Vitalício",
+};
 
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
   const { isAdmin } = useAdminCheck();
-  const { currentPlan } = usePlanAccess();
+  const { currentPlan, hasAccess, getMinPlan } = usePlanAccess();
   const { config } = useLotteryContext();
 
   return (
@@ -87,21 +95,40 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {mainItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      end={item.url === "/"}
-                      className="rounded-lg px-3 py-2.5 text-sm transition-all duration-200 hover:bg-sidebar-accent/60 text-sidebar-foreground"
-                      activeClassName="bg-primary/10 text-primary font-semibold glow-green"
-                    >
-                      <item.icon className="mr-3 h-4 w-4 shrink-0" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {mainItems.map((item) => {
+                const locked = item.requiredFeature ? !hasAccess(item.requiredFeature) : false;
+                const minPlan = item.requiredFeature ? getMinPlan(item.requiredFeature) : null;
+
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink
+                        to={item.url}
+                        end={item.url === "/"}
+                        className={`rounded-lg px-3 py-2.5 text-sm transition-all duration-200 hover:bg-sidebar-accent/60 ${locked ? "text-muted-foreground/50" : "text-sidebar-foreground"}`}
+                        activeClassName="bg-primary/10 text-primary font-semibold glow-green"
+                      >
+                        <item.icon className="mr-3 h-4 w-4 shrink-0" />
+                        {!collapsed && (
+                          <>
+                            <span className="flex-1">{item.title}</span>
+                            {locked && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Lock className="h-3 w-3 text-muted-foreground/40 shrink-0 ml-1" />
+                                </TooltipTrigger>
+                                <TooltipContent side="right" className="text-xs">
+                                  Requer plano {PLAN_LABELS[minPlan!] || "Premium"}
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
+                          </>
+                        )}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
