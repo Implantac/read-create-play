@@ -827,6 +827,9 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                                 </div>
                               </div>
 
+                              {/* Hits over time chart */}
+                              <BetHitsChart results={perf.results} avgHits={perf.avgHits} pick={pick} />
+
                               {/* Prize details with real values */}
                               {perf.results.some(r => r.prize) && (
                                 <div className="space-y-1">
