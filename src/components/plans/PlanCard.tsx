@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, ArrowRight, Loader2, Save, LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
+import React from "react";
 
 export interface PlanData {
   id: string;
@@ -28,33 +29,65 @@ interface PlanCardProps {
 }
 
 export function PlanCard({ plan, index, isCurrent, isUpgrade, isLoading, onCheckout }: PlanCardProps) {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * -10;
+    const rotateY = ((x - centerX) / centerX) * 10;
+    e.currentTarget.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03,1.03,1.03)`;
+    const glowEl = e.currentTarget.querySelector('[data-glow]') as HTMLElement;
+    if (glowEl) {
+      glowEl.style.opacity = '1';
+      glowEl.style.background = `radial-gradient(250px circle at ${x}px ${y}px, hsl(var(--primary) / 0.15), transparent 70%)`;
+    }
+  };
+
+  const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.currentTarget.style.transform = `perspective(600px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)`;
+    const glowEl = e.currentTarget.querySelector('[data-glow]') as HTMLElement;
+    if (glowEl) {
+      glowEl.style.opacity = '0';
+    }
+  };
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.5, type: "spring", stiffness: 100, damping: 18 }}
-      className="relative"
+      initial={{ opacity: 0, x: index % 2 === 0 ? -60 : 60, rotateY: index % 2 === 0 ? 12 : -12, scale: 0.9 }}
+      animate={{ opacity: 1, x: 0, rotateY: 0, scale: 1 }}
+      transition={{ delay: index * 0.15, duration: 0.6, type: "spring", stiffness: 80, damping: 15 }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ transition: "transform 0.15s ease-out", transformStyle: "preserve-3d" }}
+      className="relative group/card"
     >
-      {/* Glow effect for highlighted card */}
-      {plan.highlight && (
-        <div className="absolute -inset-[1px] rounded-xl bg-gradient-to-b from-primary/40 via-primary/10 to-transparent blur-sm" />
-      )}
-      {plan.isLifetime && (
-        <div className="absolute -inset-[1px] rounded-xl bg-gradient-to-b from-accent/30 via-accent/5 to-transparent blur-sm" />
-      )}
+      {/* Animated border glow on hover */}
+      <div
+        className="pointer-events-none absolute -inset-[1px] rounded-xl opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 z-0"
+        style={{
+          background: 'conic-gradient(from var(--border-angle, 0deg), hsl(var(--primary) / 0.6), hsl(var(--neon-blue) / 0.6), hsl(var(--neon-purple) / 0.4), hsl(var(--primary) / 0.6))',
+          animation: 'border-rotate 3s linear infinite',
+        }}
+      />
+      {/* Inner bg to mask border glow center */}
+      <div className="pointer-events-none absolute inset-[1px] rounded-[11px] bg-card z-[1] opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
+      {/* Radial glow following cursor */}
+      <div data-glow className="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 z-[2]" />
 
       <Card
-        className={`relative flex flex-col h-full overflow-hidden transition-all duration-300 ${
+        className={`relative flex flex-col h-full overflow-hidden z-[3] ${
           plan.highlight
-            ? "border-primary/50 bg-card/90 shadow-lg shadow-primary/10 hover:shadow-xl hover:shadow-primary/15 scale-[1.02]"
+            ? "border-primary/50 bg-card/90 shadow-lg shadow-primary/10 scale-[1.02]"
             : plan.isLifetime
-            ? "border-accent/40 bg-card/90 shadow-lg shadow-accent/10 hover:shadow-xl hover:shadow-accent/15"
+            ? "border-accent/40 bg-card/90 shadow-lg shadow-accent/10"
             : isCurrent
             ? "border-primary/30 bg-card/90 ring-2 ring-primary/20"
-            : "border-border/40 bg-card/80 hover:border-border/60 hover:shadow-md"
+            : "border-border/40 bg-card/80"
         }`}
       >
-        {/* Top badge */}
+        {/* Top accent line */}
         {plan.highlight && !isCurrent && (
           <div className="absolute top-0 left-0 right-0 h-1 gradient-brand" />
         )}
