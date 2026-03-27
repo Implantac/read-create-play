@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { Camera, Loader2, Save, User, Lock, Volume2, VolumeX, Play, Sun, Moon, Monitor } from "lucide-react";
+import { Camera, Loader2, Save, User, Lock, Volume2, VolumeX, Play, Sun, Moon, Monitor, CreditCard, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSoundSettings } from "@/hooks/useSoundSettings";
 import { playTierPreview } from "@/lib/alert-sounds";
