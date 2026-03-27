@@ -28,6 +28,7 @@ import ROIDashboardPage from "@/pages/ROIDashboardPage";
 import HistoricoApostasPage from "@/pages/HistoricoApostasPage";
 import FechamentosPage from "@/pages/FechamentosPage";
 import LandingPage from "./pages/LandingPage";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
