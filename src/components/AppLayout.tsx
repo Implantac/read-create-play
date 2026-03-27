@@ -130,6 +130,7 @@ export function AppLayout() {
             </div>
           </footer>
         </div>
+        <WhatsAppButton />
       </div>
     </SidebarProvider>
   );
