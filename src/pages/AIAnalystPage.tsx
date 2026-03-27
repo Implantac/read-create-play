@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
+import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
+import { PlanGate } from "@/components/PlanGate";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { PageHeader } from "@/components/PageHeader";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
