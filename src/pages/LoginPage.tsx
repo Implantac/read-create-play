@@ -65,8 +65,8 @@ export default function LoginPage() {
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
               className="mx-auto"
             >
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25 mx-auto overflow-hidden">
-                <img src="/logo.png" alt="Titan Loterias" className="w-16 h-16 object-contain" />
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25 mx-auto overflow-hidden">
+                <img src="/logo.png" alt="Titan Loterias" className="w-14 h-14 object-contain" />
               </div>
             </motion.div>
             <div>
