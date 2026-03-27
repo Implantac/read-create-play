@@ -1,11 +1,11 @@
 import {
   BarChart3, Sparkles, FlaskConical, History, Zap, Grid3X3,
-  Brain, ShieldCheck, Crown, PieChart, TrendingUp, ClipboardCheck, Bot,
+  Brain, ShieldCheck, Crown, PieChart, TrendingUp, ClipboardCheck, Bot, Lock,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
-import { usePlanAccess } from "@/hooks/usePlanAccess";
+import { usePlanAccess, type Feature } from "@/hooks/usePlanAccess";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { LOTTERIES } from "@/data/lotteries";
 import {
@@ -22,20 +22,28 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Link } from "react-router-dom";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-const mainItems = [
+const mainItems: { title: string; url: string; icon: any; requiredFeature?: Feature }[] = [
   { title: "Dashboard", url: "/", icon: BarChart3 },
   { title: "Gerador", url: "/gerador", icon: Sparkles },
-  { title: "IA Autônoma", url: "/ia-autonoma", icon: Zap },
-  { title: "AI Analyst", url: "/ai-analyst", icon: Bot },
-  { title: "Estratégias IA", url: "/estrategias", icon: Brain },
-  { title: "Simulações", url: "/simulacoes", icon: FlaskConical },
-  { title: "Fechamentos", url: "/fechamentos", icon: Grid3X3 },
+  { title: "IA Autônoma", url: "/ia-autonoma", icon: Zap, requiredFeature: "ia_autonoma" },
+  { title: "AI Analyst", url: "/ai-analyst", icon: Bot, requiredFeature: "ai_analyst" },
+  { title: "Estratégias IA", url: "/estrategias", icon: Brain, requiredFeature: "estrategias_basicas" },
+  { title: "Simulações", url: "/simulacoes", icon: FlaskConical, requiredFeature: "simulacoes" },
+  { title: "Fechamentos", url: "/fechamentos", icon: Grid3X3, requiredFeature: "fechamentos" },
   { title: "Estatísticas", url: "/estatisticas", icon: PieChart },
-  { title: "ROI", url: "/roi", icon: TrendingUp },
+  { title: "ROI", url: "/roi", icon: TrendingUp, requiredFeature: "roi_dashboard" },
   { title: "Minhas Apostas", url: "/minhas-apostas", icon: ClipboardCheck },
   { title: "Histórico", url: "/historico", icon: History },
 ];
+
+const PLAN_LABELS: Record<string, string> = {
+  free: "Gratuito",
+  premium: "Premium",
+  professional: "Profissional",
+  lifetime: "Vitalício",
+};
 
 export function AppSidebar() {
   const { state } = useSidebar();
