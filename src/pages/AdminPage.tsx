@@ -11,7 +11,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Users, Crown, TrendingUp, Search, Shield, Loader2, RefreshCw,
+  Users, Crown, TrendingUp, Search, Shield, Loader2, RefreshCw, Ban, CheckCircle2,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
