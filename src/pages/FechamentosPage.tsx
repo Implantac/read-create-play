@@ -437,6 +437,7 @@ export default function FechamentosPage() {
           </motion.div>
         )}
       </AnimatePresence>
+      </PlanGate>
     </div>
   );
 }
