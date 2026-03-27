@@ -50,7 +50,7 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const location = useLocation();
   const { isAdmin } = useAdminCheck();
-  const { currentPlan } = usePlanAccess();
+  const { currentPlan, hasAccess, getMinPlan } = usePlanAccess();
   const { config } = useLotteryContext();
 
   return (
