@@ -8,6 +8,7 @@ import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { DrawNotificationChecker } from "@/components/DrawNotificationChecker";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -129,6 +130,7 @@ export function AppLayout() {
             </div>
           </footer>
         </div>
+        <WhatsAppButton />
       </div>
     </SidebarProvider>
   );
