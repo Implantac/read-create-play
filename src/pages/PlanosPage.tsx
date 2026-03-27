@@ -259,6 +259,28 @@ export default function PlanosPage() {
           );
         })}
       </div>
+
+      <div className="mt-12 max-w-3xl mx-auto">
+        <div className="flex items-center gap-2 mb-6">
+          <HelpCircle className="w-5 h-5 text-primary" />
+          <h2 className="text-xl font-bold text-foreground">Perguntas Frequentes</h2>
+        </div>
+        <Accordion type="single" collapsible className="space-y-2">
+          {[
+            { q: "Como funciona o período de teste?", a: "Você pode usar o plano Gratuito sem limite de tempo. Ao assinar um plano pago, você terá acesso imediato a todas as funcionalidades do plano escolhido." },
+            { q: "Posso trocar de plano a qualquer momento?", a: "Sim! Você pode fazer upgrade ou downgrade do seu plano quando quiser. Ao fazer upgrade, a diferença será cobrada proporcionalmente. Ao fazer downgrade, o novo valor será aplicado no próximo ciclo de cobrança." },
+            { q: "Como cancelo minha assinatura?", a: "Você pode cancelar a qualquer momento clicando em \"Gerenciar assinatura\" nesta página. O cancelamento é imediato, mas você mantém o acesso até o final do período já pago." },
+            { q: "O plano Vitalício inclui atualizações futuras?", a: "Sim! O plano Vitalício garante acesso permanente a todas as funcionalidades atuais e futuras da plataforma, sem nenhum custo adicional." },
+            { q: "Quais formas de pagamento são aceitas?", a: "Aceitamos cartões de crédito e débito (Visa, Mastercard, Elo, American Express) e Pix, tudo processado de forma segura pelo Stripe." },
+            { q: "Posso solicitar reembolso?", a: "Sim, oferecemos reembolso integral em até 7 dias após a compra, sem perguntas. Basta entrar em contato com nosso suporte." },
+          ].map((faq, i) => (
+            <AccordionItem key={i} value={`faq-${i}`} className="border border-border/30 rounded-lg px-4 glass-card">
+              <AccordionTrigger className="text-sm font-medium text-foreground hover:no-underline">{faq.q}</AccordionTrigger>
+              <AccordionContent className="text-sm text-muted-foreground">{faq.a}</AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </div>
     </div>
   );
 }
