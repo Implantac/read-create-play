@@ -35,7 +35,7 @@ export default function SignupPage() {
     // Check if phone is already in use
     const { data: phoneExists } = await supabase.rpc("check_phone_exists", { _phone: cleanPhone });
 
-    if (existingPhone) {
+    if (phoneExists) {
       setLoading(false);
       toast({ title: "Telefone já cadastrado", description: "Este número de telefone já está vinculado a outra conta.", variant: "destructive" });
       return;
