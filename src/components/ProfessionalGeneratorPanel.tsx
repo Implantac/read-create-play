@@ -302,6 +302,11 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
                       <HistoricalValidationBadge bet={bet.numbers} draws={draws} config={config} />
                     </div>
 
+                    {/* AI Analysis */}
+                    <div className="px-3 pb-2">
+                      <GameAnalysisBlock numbers={bet.numbers} stats={stats} config={config} draws={draws} />
+                    </div>
+
                     {/* Expanded details */}
                     <AnimatePresence>
                       {isExpanded && (
