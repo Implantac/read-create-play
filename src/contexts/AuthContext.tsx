@@ -14,6 +14,7 @@ interface Profile {
   language: string;
   timezone: string;
   currency_format: string;
+  blocked: boolean;
 }
 
 interface AuthContextType {

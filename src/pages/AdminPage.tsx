@@ -201,12 +201,13 @@ export default function AdminPage() {
                     <TableHead>Email</TableHead>
                     <TableHead>Plano</TableHead>
                     <TableHead>Cadastro</TableHead>
+                    <TableHead>Status</TableHead>
                     <TableHead>Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filtered.map(p => (
-                    <TableRow key={p.id}>
+                    <TableRow key={p.id} className={p.blocked ? "opacity-60" : ""}>
                       <TableCell className="font-medium text-foreground">
                         {p.full_name || "—"}
                       </TableCell>
@@ -222,31 +223,57 @@ export default function AdminPage() {
                         {new Date(p.created_at).toLocaleDateString("pt-BR")}
                       </TableCell>
                       <TableCell>
-                        <Select
-                          value={p.plan}
-                          onValueChange={(v) => updatePlan(p.id, v)}
-                          disabled={updating === p.id}
-                        >
-                          <SelectTrigger className="w-[140px] h-8 text-xs">
-                            {updating === p.id ? (
-                              <Loader2 className="w-3 h-3 animate-spin" />
+                        {p.blocked ? (
+                          <Badge variant="destructive" className="gap-1">
+                            <Ban className="w-3 h-3" /> Bloqueado
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="gap-1 text-green-500 border-green-500/30">
+                            <CheckCircle2 className="w-3 h-3" /> Ativo
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Select
+                            value={p.plan}
+                            onValueChange={(v) => updatePlan(p.id, v)}
+                            disabled={updating === p.id}
+                          >
+                            <SelectTrigger className="w-[140px] h-8 text-xs">
+                              {updating === p.id ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <SelectValue />
+                              )}
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="free">Gratuito</SelectItem>
+                              <SelectItem value="premium">Premium</SelectItem>
+                              <SelectItem value="professional">Profissional</SelectItem>
+                              <SelectItem value="lifetime">Vitalício</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            variant={p.blocked ? "outline" : "destructive"}
+                            size="sm"
+                            className="h-8 text-xs gap-1"
+                            onClick={() => toggleBlock(p.id, p.blocked)}
+                            disabled={updating === p.id}
+                          >
+                            {p.blocked ? (
+                              <><CheckCircle2 className="w-3 h-3" /> Desbloquear</>
                             ) : (
-                              <SelectValue />
+                              <><Ban className="w-3 h-3" /> Bloquear</>
                             )}
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="free">Gratuito</SelectItem>
-                            <SelectItem value="premium">Premium</SelectItem>
-                            <SelectItem value="professional">Profissional</SelectItem>
-                            <SelectItem value="lifetime">Vitalício</SelectItem>
-                          </SelectContent>
-                        </Select>
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
                   {filtered.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                      <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                         Nenhum usuário encontrado.
                       </TableCell>
                     </TableRow>
