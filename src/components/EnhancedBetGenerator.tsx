@@ -5,6 +5,7 @@ import { STRATEGIES, Strategy, generateByStrategy } from "@/engine/strategies";
 import { GenerationFilters, DEFAULT_FILTERS, generateWithFilters, betMatchesFilters } from "@/engine/generation-filters";
 import { GeneratorFiltersPanel } from "@/components/GeneratorFiltersPanel";
 import { HistoricalValidationBadge } from "@/components/HistoricalValidationBadge";
+import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, RefreshCw, Copy, Check, Brain, Flame, Snowflake, Shuffle, Hash, Sigma, Ratio, Grid3X3, Clock, BarChart3, TrendingUp, Repeat, Layers, Star, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
