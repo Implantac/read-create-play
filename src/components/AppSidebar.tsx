@@ -52,6 +52,7 @@ export function AppSidebar() {
   const location = useLocation();
   const { isAdmin } = useAdminCheck();
   const { currentPlan, hasAccess, getMinPlan } = usePlanAccess();
+  const { trialDaysLeft } = useAuth();
   const { config } = useLotteryContext();
 
   return (
