@@ -164,6 +164,7 @@ export default function SignupPage() {
                     required
                   />
                 </div>
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Email</Label>
                 <div className="relative">
