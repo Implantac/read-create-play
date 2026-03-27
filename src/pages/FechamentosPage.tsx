@@ -148,6 +148,7 @@ export default function FechamentosPage() {
       />
       <LotteryContextBanner />
 
+      <PlanGate feature="fechamentos" fallbackMessage="Fechamentos Matemáticos — matrizes otimizadas com garantia de acertos">
       {/* Available matrices for current lottery */}
       <Card className="bg-card/80 backdrop-blur border-border">
         <CardHeader className="pb-3">
