@@ -9,7 +9,9 @@ const corsHeaders = {
 
 const PLAN_PRICES: Record<string, { price_id: string; mode: "subscription" | "payment" }> = {
   premium: { price_id: "price_1TFfc9CzGT9FnNQptfREBkbH", mode: "subscription" },
+  premium_annual: { price_id: "price_1TFl8yCzGT9FnNQpAJCMX3vY", mode: "subscription" },
   professional: { price_id: "price_1TFfckCzGT9FnNQp2uEvf3iM", mode: "subscription" },
+  professional_annual: { price_id: "price_1TFlIkCzGT9FnNQpi4eSk938", mode: "subscription" },
   lifetime: { price_id: "price_1TFflFCzGT9FnNQpKT7INteS", mode: "payment" },
 };
 
