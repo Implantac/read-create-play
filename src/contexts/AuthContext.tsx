@@ -23,6 +23,7 @@ interface AuthContextType {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
+  isAdmin: boolean;
   isTrialExpired: boolean;
   trialDaysLeft: number;
   signOut: () => Promise<void>;
