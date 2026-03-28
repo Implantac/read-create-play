@@ -439,9 +439,34 @@ export default function LandingPage() {
               Planos para cada{" "}
               <span className="gradient-brand-text">jogador</span>
             </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
+            <p className="text-muted-foreground max-w-xl mx-auto mb-6">
               Comece grátis e evolua quando quiser. Sem surpresas.
             </p>
+            <div className="inline-flex items-center gap-3 bg-muted/50 rounded-full p-1 border border-border/50">
+              <button
+                onClick={() => setBillingCycle("monthly")}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+                  billingCycle === "monthly"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Mensal
+              </button>
+              <button
+                onClick={() => setBillingCycle("annual")}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 ${
+                  billingCycle === "annual"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Anual
+                <span className="px-1.5 py-0.5 rounded-full bg-neon-green/20 text-neon-green text-[10px] font-bold">
+                  -20%
+                </span>
+              </button>
+            </div>
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
