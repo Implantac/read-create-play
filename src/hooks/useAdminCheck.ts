@@ -5,11 +5,13 @@ import { useAuth } from "@/contexts/AuthContext";
 export function useAdminCheck() {
   const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) {
       setIsAdmin(false);
+      setIsSuperAdmin(false);
       setLoading(false);
       return;
     }
@@ -19,14 +21,15 @@ export function useAdminCheck() {
         .from("user_roles")
         .select("role")
         .eq("user_id", user.id)
-        .eq("role", "admin")
-        .maybeSingle();
-      setIsAdmin(!!data);
+        .in("role", ["admin", "super_admin"]);
+      const roles = (data || []).map((r: any) => r.role as string);
+      setIsAdmin(roles.includes("admin") || roles.includes("super_admin"));
+      setIsSuperAdmin(roles.includes("super_admin"));
       setLoading(false);
     };
 
     check();
   }, [user]);
 
-  return { isAdmin, loading };
+  return { isAdmin, isSuperAdmin, loading };
 }

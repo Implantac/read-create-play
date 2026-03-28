@@ -56,11 +56,11 @@ export const PLAN_LIMITS = {
 } as const;
 
 export function usePlanAccess() {
-  const { profile, isAdmin } = useAuth();
-  const currentPlan: PlanType = isAdmin ? "lifetime" : (profile?.plan ?? "free");
+  const { profile, isAdmin, isSuperAdmin } = useAuth();
+  const currentPlan: PlanType = (isAdmin || isSuperAdmin) ? "lifetime" : (profile?.plan ?? "free");
 
   const hasAccess = (feature: Feature): boolean => {
-    if (isAdmin) return true;
+    if (isAdmin || isSuperAdmin) return true;
     return PLAN_HIERARCHY[currentPlan] >= PLAN_HIERARCHY[FEATURE_MIN_PLAN[feature]];
   };
 
@@ -68,5 +68,5 @@ export function usePlanAccess() {
 
   const getLimits = () => PLAN_LIMITS[currentPlan];
 
-  return { currentPlan, hasAccess, getMinPlan, getLimits };
+  return { currentPlan, hasAccess, getMinPlan, getLimits, isAdmin, isSuperAdmin };
 }
