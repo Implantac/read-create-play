@@ -540,9 +540,27 @@ export default function LandingPage() {
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold text-foreground">{plan.name}</h3>
                   <div className="mt-2 flex items-baseline gap-1">
-                    <span className="text-3xl font-bold font-mono text-foreground">{plan.price}</span>
-                    <span className="text-sm text-muted-foreground">{plan.period}</span>
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={billingCycle}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2 }}
+                        className="text-3xl font-bold font-mono text-foreground"
+                      >
+                        {billingCycle === "annual" ? (plan as any).annualPrice : plan.price}
+                      </motion.span>
+                    </AnimatePresence>
+                    <span className="text-sm text-muted-foreground">
+                      {billingCycle === "annual" ? (plan as any).annualPeriod : plan.period}
+                    </span>
                   </div>
+                  {billingCycle === "annual" && (plan as any).annualTotal && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Cobrado {(plan as any).annualTotal}
+                    </p>
+                  )}
                 </div>
                 <ul className="space-y-2.5 mb-6">
                   {plan.features.map((f) => (
