@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { session, profile, loading, signOut, isTrialExpired, trialDaysLeft } = useAuth();
+  const { session, profile, loading, signOut, isTrialExpired, isAdmin, trialDaysLeft } = useAuth();
   const location = useLocation();
 
   if (loading) {
