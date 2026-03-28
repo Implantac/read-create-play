@@ -103,7 +103,9 @@ const plans = [
   {
     name: "Grátis",
     price: "R$ 0",
+    annualPrice: "R$ 0",
     period: "/mês",
+    annualPeriod: "/mês",
     features: ["Dashboard básico", "Frequência e atraso", "1 loteria", "Gerador simples"],
     cta: "Começar Grátis",
     highlight: false,
@@ -111,7 +113,10 @@ const plans = [
   {
     name: "Pro",
     price: "R$ 29",
+    annualPrice: "R$ 23",
+    annualTotal: "R$ 287,00/ano",
     period: "/mês",
+    annualPeriod: "/mês",
     features: [
       "Todas as loterias",
       "IA e Machine Learning",
@@ -126,7 +131,10 @@ const plans = [
   {
     name: "Titan",
     price: "R$ 59",
+    annualPrice: "R$ 47",
+    annualTotal: "R$ 575,00/ano",
     period: "/mês",
+    annualPeriod: "/mês",
     features: [
       "Tudo do Pro",
       "Motor HP exclusivo",
@@ -140,7 +148,9 @@ const plans = [
   {
     name: "Vitalício",
     price: "R$ 497",
+    annualPrice: "R$ 497",
     period: " único",
+    annualPeriod: " único",
     features: [
       "Tudo incluso para sempre",
       "Todas as atualizações futuras",
