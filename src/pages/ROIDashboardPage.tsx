@@ -13,20 +13,47 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, L
 import { CHART_TOOLTIP_STYLE } from "@/lib/chart-theme";
 import { ROIFilters, ROIFilterState } from "@/components/ROIFilters";
 import { PrizeHistoryPanel } from "@/components/PrizeHistoryPanel";
+import { DrawResultWithPrizes } from "@/hooks/useLotteryDraws";
 
-const PRIZE_CONFIG: Record<string, { cost: number; prizes: Record<number, number> }> = {
-  megasena:  { cost: 5.00,  prizes: { 4: 1200, 5: 50000, 6: 50000000 } },
-  lotofacil: { cost: 3.00,  prizes: { 11: 6, 12: 12, 13: 30, 14: 2000, 15: 2000000 } },
-  quina:     { cost: 2.50,  prizes: { 2: 3, 3: 100, 4: 8000, 5: 15000000 } },
-  lotomania: { cost: 3.00,  prizes: { 15: 20, 16: 25, 17: 200, 18: 2000, 19: 50000, 20: 5000000 } },
-  duplasena: { cost: 2.50,  prizes: { 3: 4, 4: 100, 5: 5000, 6: 3000000 } },
-  timemania: { cost: 3.50,  prizes: { 3: 3, 4: 20, 5: 1000, 6: 50000, 7: 10000000 } },
-  diadesorte:{ cost: 2.50,  prizes: { 4: 6, 5: 50, 6: 2000, 7: 1000000 } },
-  supersete: { cost: 2.50,  prizes: { 3: 2, 4: 20, 5: 300, 6: 10000, 7: 1000000 } },
+// Custo mínimo da aposta simples por loteria
+const BET_COST: Record<string, number> = {
+  megasena: 5.00, lotofacil: 3.00, quina: 2.50, lotomania: 3.00,
+  duplasena: 2.50, timemania: 3.50, diadesorte: 2.50, supersete: 2.50,
 };
 
+/**
+ * Encontra o próximo sorteio REAL após a data de criação da aposta
+ */
+function findNextDraw(betDate: Date, sortedDraws: DrawResultWithPrizes[]): DrawResultWithPrizes | null {
+  // sortedDraws está em ordem DESC (mais recente primeiro)
+  let closest: DrawResultWithPrizes | null = null;
+  for (const draw of sortedDraws) {
+    const drawDate = draw.date ? new Date(draw.date) : null;
+    if (!drawDate) continue;
+    if (drawDate >= betDate) {
+      closest = draw; // continua procurando um mais próximo
+    } else {
+      break;
+    }
+  }
+  return closest;
+}
+
+/**
+ * Calcula o prêmio REAL usando prize_tiers do banco de dados
+ */
+function getRealPrize(hits: number, draw: DrawResultWithPrizes): number {
+  if (!draw.prizeTiers?.premiacoes) return 0;
+  for (const tier of draw.prizeTiers.premiacoes) {
+    if (tier.faixa === hits || tier.descricao?.toLowerCase().includes(`${hits} acerto`)) {
+      return tier.valorPremio || 0;
+    }
+  }
+  return 0;
+}
+
 const ROIDashboardPage = () => {
-  const { config, draws, selectedLottery } = useLotteryContext();
+  const { config, drawsWithPrizes, selectedLottery } = useLotteryContext();
   const { savedBets } = useSavedBets(selectedLottery);
   const [filters, setFilters] = useState<ROIFilterState>({ period: "all", strategy: "all", minHits: "0" });
 
@@ -50,40 +77,35 @@ const ROIDashboardPage = () => {
   }, [savedBets, filters]);
 
   const analysis = useMemo(() => {
-    if (!filteredBets.length || !draws.length) return null;
+    if (!filteredBets.length || !drawsWithPrizes.length) return null;
 
-    const prizeConfig = PRIZE_CONFIG[selectedLottery] || PRIZE_CONFIG.megasena;
+    const cost = BET_COST[selectedLottery] || 5.00;
     const minHits = parseInt(filters.minHits) || 0;
     let totalInvested = 0;
     let totalReturn = 0;
-    const betResults: { date: string; invested: number; returned: number; hits: number; concurso: number }[] = [];
+    const betResults: { date: string; invested: number; returned: number; hits: number; concurso: number; realPrize: boolean }[] = [];
     const hitDistribution: Record<number, number> = {};
 
     for (const bet of filteredBets) {
       const betDate = new Date(bet.created_at);
-      totalInvested += prizeConfig.cost;
+      totalInvested += cost;
 
-      let bestHits = 0;
-      let bestConcurso = 0;
-      let totalPrize = 0;
+      // Encontra o PRÓXIMO sorteio real após a aposta
+      const nextDraw = findNextDraw(betDate, drawsWithPrizes);
+      if (!nextDraw) continue;
 
-      for (const draw of draws) {
-        const drawDate = draw.date ? new Date(draw.date) : null;
-        if (drawDate && drawDate < betDate) continue;
-        const drawSet = new Set(draw.numbers);
-        const hits = bet.numbers.filter(n => drawSet.has(n)).length;
-        if (hits > bestHits) { bestHits = hits; bestConcurso = draw.concurso; }
-        const prize = prizeConfig.prizes[hits] || 0;
-        if (prize > 0) totalPrize += prize;
-      }
+      const drawSet = new Set(nextDraw.numbers);
+      const hits = bet.numbers.filter(n => drawSet.has(n)).length;
+      const prize = getRealPrize(hits, nextDraw);
+      const hasRealPrize = !!nextDraw.prizeTiers?.premiacoes?.length;
 
-      if (bestHits < minHits) continue;
+      if (hits < minHits) continue;
 
-      hitDistribution[bestHits] = (hitDistribution[bestHits] || 0) + 1;
-      totalReturn += totalPrize;
+      hitDistribution[hits] = (hitDistribution[hits] || 0) + 1;
+      totalReturn += prize;
       betResults.push({
         date: betDate.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
-        invested: prizeConfig.cost, returned: totalPrize, hits: bestHits, concurso: bestConcurso,
+        invested: cost, returned: prize, hits, concurso: nextDraw.concurso, realPrize: hasRealPrize,
       });
     }
 
@@ -105,11 +127,11 @@ const ROIDashboardPage = () => {
       hitChartData, roiTimeline, betResults,
       bestResult: betResults.reduce((best, r) => r.returned > best.returned ? r : best, betResults[0]),
     };
-  }, [filteredBets, draws, selectedLottery, filters.minHits]);
+  }, [filteredBets, drawsWithPrizes, selectedLottery, filters.minHits]);
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Dashboard de ROI" description="Retorno sobre investimento e histórico de premiações reais" icon={TrendingUp} />
+      <PageHeader title="Dashboard de ROI" description="Retorno sobre investimento baseado em dados REAIS de sorteios" icon={TrendingUp} />
       <LotteryContextBanner />
 
       {!savedBets.length ? (
@@ -166,11 +188,11 @@ const ROIDashboardPage = () => {
                     <CardContent>
                       <ResponsiveContainer width="100%" height={250}>
                         <LineChart data={analysis.roiTimeline}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(225, 16%, 15%)" />
-                          <XAxis dataKey="date" tick={{ fontSize: 10, fill: "hsl(215, 12%, 48%)" }} />
-                          <YAxis tick={{ fontSize: 10, fill: "hsl(215, 12%, 48%)" }} tickFormatter={v => `${v}%`} />
+                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                          <XAxis dataKey="date" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                          <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} tickFormatter={v => `${v}%`} />
                           <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={(v: number) => [`${v}%`, "ROI"]} />
-                          <Line type="monotone" dataKey="roi" stroke="hsl(145, 72%, 42%)" strokeWidth={2} dot={{ r: 3, fill: "hsl(145, 72%, 42%)" }} />
+                          <Line type="monotone" dataKey="roi" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3, fill: "hsl(var(--primary))" }} />
                         </LineChart>
                       </ResponsiveContainer>
                     </CardContent>
@@ -180,13 +202,13 @@ const ROIDashboardPage = () => {
                     <CardContent>
                       <ResponsiveContainer width="100%" height={250}>
                         <BarChart data={analysis.hitChartData}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(225, 16%, 15%)" />
-                          <XAxis dataKey="hits" tick={{ fontSize: 10, fill: "hsl(215, 12%, 48%)" }} />
-                          <YAxis tick={{ fontSize: 10, fill: "hsl(215, 12%, 48%)" }} />
+                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                          <XAxis dataKey="hits" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                          <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
                           <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
                           <Bar dataKey="count" name="Apostas" radius={[4, 4, 0, 0]}>
                             {analysis.hitChartData.map((_, i) => (
-                              <Cell key={i} fill={i >= analysis.hitChartData.length - 2 ? "hsl(145, 72%, 42%)" : "hsl(225, 16%, 25%)"} />
+                              <Cell key={i} fill={i >= analysis.hitChartData.length - 2 ? "hsl(var(--primary))" : "hsl(var(--muted))"} />
                             ))}
                           </Bar>
                         </BarChart>
@@ -196,13 +218,14 @@ const ROIDashboardPage = () => {
                 </div>
 
                 <Card className="border-border/60 bg-card/80 backdrop-blur">
-                  <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Calendar className="h-4 w-4 text-muted-foreground" />Histórico</CardTitle></CardHeader>
+                  <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Calendar className="h-4 w-4 text-muted-foreground" />Histórico (dados reais)</CardTitle></CardHeader>
                   <CardContent>
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-border/40 text-muted-foreground">
                             <th className="text-left py-2 px-2">Data</th>
+                            <th className="text-center py-2 px-2">Concurso</th>
                             <th className="text-center py-2 px-2">Acertos</th>
                             <th className="text-right py-2 px-2">Investido</th>
                             <th className="text-right py-2 px-2">Retorno</th>
@@ -213,6 +236,7 @@ const ROIDashboardPage = () => {
                           {analysis.betResults.slice(0, 20).map((r, i) => (
                             <tr key={i} className="border-b border-border/20">
                               <td className="py-2 px-2 text-muted-foreground text-xs">{r.date}</td>
+                              <td className="py-2 px-2 text-center text-xs font-mono text-muted-foreground">#{r.concurso}</td>
                               <td className="py-2 px-2 text-center">
                                 <Badge variant={r.hits >= config.pick - 1 ? "default" : "secondary"} className="text-[10px]">{r.hits}/{config.pick}</Badge>
                               </td>
