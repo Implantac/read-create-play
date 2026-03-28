@@ -141,10 +141,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return Math.max(0, TRIAL_DAYS - elapsed);
   })();
 
-  const isTrialExpired = profile?.plan === "free" && trialDaysLeft <= 0;
+  const isTrialExpired = !isAdmin && profile?.plan === "free" && trialDaysLeft <= 0;
 
   return (
-    <AuthContext.Provider value={{ session, user: session?.user ?? null, profile, loading, isTrialExpired, trialDaysLeft, signOut }}>
+    <AuthContext.Provider value={{ session, user: session?.user ?? null, profile, loading, isAdmin, isTrialExpired, trialDaysLeft, signOut }}>
       {children}
     </AuthContext.Provider>
   );
