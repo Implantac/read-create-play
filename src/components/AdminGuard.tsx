@@ -1,9 +1,9 @@
-import { useAdminCheck } from "@/hooks/useAdminCheck";
+import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 
 export function AdminGuard({ children }: { children: React.ReactNode }) {
-  const { isAdmin, loading } = useAdminCheck();
+  const { isAdmin, isSuperAdmin, loading } = useAuth();
 
   if (loading) {
     return (
@@ -13,7 +13,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!isAdmin) {
+  if (!isAdmin && !isSuperAdmin) {
     return <Navigate to="/" replace />;
   }
 

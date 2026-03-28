@@ -174,10 +174,14 @@ export function AppSidebar() {
       {!collapsed && (
         <SidebarFooter className="p-3 border-t border-sidebar-border space-y-2">
           {isAdmin ? (
-            <div className="rounded-lg bg-amber-500/10 border border-amber-500/25 px-3 py-2.5 text-center">
+            <div className={`rounded-lg px-3 py-2.5 text-center ${
+              isSuperAdmin ? "bg-amber-500/10 border border-amber-500/25" : "bg-red-500/10 border border-red-500/25"
+            }`}>
               <div className="flex items-center justify-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-amber-400" />
-                <p className="text-xs font-bold text-amber-400 uppercase tracking-wider">Modo Admin</p>
+                <ShieldCheck className={`w-4 h-4 ${isSuperAdmin ? "text-amber-400" : "text-red-400"}`} />
+                <p className={`text-xs font-bold uppercase tracking-wider ${isSuperAdmin ? "text-amber-400" : "text-red-400"}`}>
+                  {isSuperAdmin ? "Super Admin" : "Modo Admin"}
+                </p>
               </div>
               <p className="text-[9px] text-muted-foreground mt-0.5">Acesso irrestrito</p>
             </div>
