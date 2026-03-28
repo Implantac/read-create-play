@@ -50,7 +50,7 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
-  const { isAdmin } = useAdminCheck();
+  const { isAdmin, isSuperAdmin } = useAdminCheck();
   const { currentPlan, hasAccess, getMinPlan } = usePlanAccess();
   const { trialDaysLeft } = useAuth();
   const { config } = useLotteryContext();
@@ -69,8 +69,12 @@ export function AppSidebar() {
                   Titan<span className="gradient-brand-text ml-1">Loterias</span>
                 </h1>
                 {isAdmin && (
-                  <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse">
-                    GOD
+                  <span className={`px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded border animate-pulse ${
+                    isSuperAdmin 
+                      ? "bg-amber-500/20 text-amber-400 border-amber-500/30" 
+                      : "bg-red-500/20 text-red-400 border-red-500/30"
+                  }`}>
+                    {isSuperAdmin ? "GOD" : "ADMIN"}
                   </span>
                 )}
               </div>
@@ -170,10 +174,14 @@ export function AppSidebar() {
       {!collapsed && (
         <SidebarFooter className="p-3 border-t border-sidebar-border space-y-2">
           {isAdmin ? (
-            <div className="rounded-lg bg-amber-500/10 border border-amber-500/25 px-3 py-2.5 text-center">
+            <div className={`rounded-lg px-3 py-2.5 text-center ${
+              isSuperAdmin ? "bg-amber-500/10 border border-amber-500/25" : "bg-red-500/10 border border-red-500/25"
+            }`}>
               <div className="flex items-center justify-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-amber-400" />
-                <p className="text-xs font-bold text-amber-400 uppercase tracking-wider">Modo Admin</p>
+                <ShieldCheck className={`w-4 h-4 ${isSuperAdmin ? "text-amber-400" : "text-red-400"}`} />
+                <p className={`text-xs font-bold uppercase tracking-wider ${isSuperAdmin ? "text-amber-400" : "text-red-400"}`}>
+                  {isSuperAdmin ? "Super Admin" : "Modo Admin"}
+                </p>
               </div>
               <p className="text-[9px] text-muted-foreground mt-0.5">Acesso irrestrito</p>
             </div>

@@ -24,6 +24,8 @@ interface AuthContextType {
   profile: Profile | null;
   loading: boolean;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
+  userRole: string;
   isTrialExpired: boolean;
   trialDaysLeft: number;
   signOut: () => Promise<void>;
@@ -36,6 +38,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [userRole, setUserRole] = useState<string>("user");
 
   const fetchProfile = async (userId: string) => {
     const { data } = await supabase
@@ -53,9 +57,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .from("user_roles")
       .select("role")
       .eq("user_id", userId)
-      .eq("role", "admin")
-      .maybeSingle();
-    setIsAdmin(!!data);
+      .in("role", ["admin", "super_admin"]);
+    const roles = (data || []).map((r: any) => r.role as string);
+    setIsAdmin(roles.includes("admin") || roles.includes("super_admin"));
+    setIsSuperAdmin(roles.includes("super_admin"));
+    setUserRole(roles.includes("super_admin") ? "super_admin" : roles.includes("admin") ? "admin" : roles[0] || "user");
   };
 
   const syncSubscription = async (accessToken: string) => {
@@ -85,6 +91,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else {
           setProfile(null);
           setIsAdmin(false);
+          setIsSuperAdmin(false);
+          setUserRole("user");
         }
         setLoading(false);
       }
@@ -144,7 +152,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isTrialExpired = !isAdmin && profile?.plan === "free" && trialDaysLeft <= 0;
 
   return (
-    <AuthContext.Provider value={{ session, user: session?.user ?? null, profile, loading, isAdmin, isTrialExpired, trialDaysLeft, signOut }}>
+    <AuthContext.Provider value={{ session, user: session?.user ?? null, profile, loading, isAdmin, isSuperAdmin, userRole, isTrialExpired, trialDaysLeft, signOut }}>
       {children}
     </AuthContext.Provider>
   );
