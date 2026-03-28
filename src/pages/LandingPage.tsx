@@ -1,5 +1,5 @@
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef, useCallback } from "react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { useState, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
@@ -102,7 +102,9 @@ const plans = [
   {
     name: "Grátis",
     price: "R$ 0",
+    annualPrice: "R$ 0",
     period: "/mês",
+    annualPeriod: "/mês",
     features: ["Dashboard básico", "Frequência e atraso", "1 loteria", "Gerador simples"],
     cta: "Começar Grátis",
     highlight: false,
@@ -110,7 +112,10 @@ const plans = [
   {
     name: "Pro",
     price: "R$ 29",
+    annualPrice: "R$ 23",
+    annualTotal: "R$ 287,00/ano",
     period: "/mês",
+    annualPeriod: "/mês",
     features: [
       "Todas as loterias",
       "IA e Machine Learning",
@@ -125,7 +130,10 @@ const plans = [
   {
     name: "Titan",
     price: "R$ 59",
+    annualPrice: "R$ 47",
+    annualTotal: "R$ 575,00/ano",
     period: "/mês",
+    annualPeriod: "/mês",
     features: [
       "Tudo do Pro",
       "Motor HP exclusivo",
@@ -139,7 +147,9 @@ const plans = [
   {
     name: "Vitalício",
     price: "R$ 497",
+    annualPrice: "R$ 497",
     period: " único",
+    annualPeriod: " único",
     features: [
       "Tudo incluso para sempre",
       "Todas as atualizações futuras",
@@ -154,6 +164,7 @@ const plans = [
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
   const faqRef = useRef<HTMLDivElement>(null);
@@ -427,9 +438,34 @@ export default function LandingPage() {
               Planos para cada{" "}
               <span className="gradient-brand-text">jogador</span>
             </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
+            <p className="text-muted-foreground max-w-xl mx-auto mb-6">
               Comece grátis e evolua quando quiser. Sem surpresas.
             </p>
+            <div className="inline-flex items-center gap-3 bg-muted/50 rounded-full p-1 border border-border/50">
+              <button
+                onClick={() => setBillingCycle("monthly")}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+                  billingCycle === "monthly"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Mensal
+              </button>
+              <button
+                onClick={() => setBillingCycle("annual")}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 ${
+                  billingCycle === "annual"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Anual
+                <span className="px-1.5 py-0.5 rounded-full bg-neon-green/20 text-neon-green text-[10px] font-bold">
+                  -20%
+                </span>
+              </button>
+            </div>
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
@@ -503,9 +539,27 @@ export default function LandingPage() {
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold text-foreground">{plan.name}</h3>
                   <div className="mt-2 flex items-baseline gap-1">
-                    <span className="text-3xl font-bold font-mono text-foreground">{plan.price}</span>
-                    <span className="text-sm text-muted-foreground">{plan.period}</span>
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={billingCycle}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2 }}
+                        className="text-3xl font-bold font-mono text-foreground"
+                      >
+                        {billingCycle === "annual" ? (plan as any).annualPrice : plan.price}
+                      </motion.span>
+                    </AnimatePresence>
+                    <span className="text-sm text-muted-foreground">
+                      {billingCycle === "annual" ? (plan as any).annualPeriod : plan.period}
+                    </span>
                   </div>
+                  {billingCycle === "annual" && (plan as any).annualTotal && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Cobrado {(plan as any).annualTotal}
+                    </p>
+                  )}
                 </div>
                 <ul className="space-y-2.5 mb-6">
                   {plan.features.map((f) => (
