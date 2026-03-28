@@ -17,6 +17,7 @@ export interface PlanData {
   cta: string;
   highlight?: boolean;
   isLifetime?: boolean;
+  annualTotal?: string;
 }
 
 interface PlanCardProps {
