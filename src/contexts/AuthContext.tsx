@@ -79,27 +79,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const authStorageKey = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`;
+    let initialLoad = true;
+
+    const loadUserData = async (userId: string, accessToken?: string) => {
+      await Promise.all([
+        fetchProfile(userId),
+        checkAdmin(userId),
+        ...(accessToken ? [syncSubscription(accessToken)] : []),
+      ]);
+    };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (_event, session) => {
         setSession(session);
         if (session?.user) {
-          setTimeout(() => {
-            fetchProfile(session.user.id);
-            checkAdmin(session.user.id);
-          }, 0);
+          if (!initialLoad) {
+            await loadUserData(session.user.id);
+          }
         } else {
           setProfile(null);
           setIsAdmin(false);
           setIsSuperAdmin(false);
           setUserRole("user");
         }
-        setLoading(false);
+        if (!initialLoad) setLoading(false);
       }
     );
 
     supabase.auth.getSession()
-      .then(({ data: { session }, error }) => {
+      .then(async ({ data: { session }, error }) => {
         if (error) {
           const message = error.message.toLowerCase();
           const isInvalidRefreshToken =
@@ -117,9 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         setSession(session);
         if (session?.user) {
-          fetchProfile(session.user.id);
-          checkAdmin(session.user.id);
-          syncSubscription(session.access_token);
+          await loadUserData(session.user.id, session.access_token);
         }
       })
       .catch(() => {
@@ -128,6 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(null);
       })
       .finally(() => {
+        initialLoad = false;
         setLoading(false);
       });
 
