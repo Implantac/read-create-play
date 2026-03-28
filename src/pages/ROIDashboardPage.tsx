@@ -13,17 +13,46 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, L
 import { CHART_TOOLTIP_STYLE } from "@/lib/chart-theme";
 import { ROIFilters, ROIFilterState } from "@/components/ROIFilters";
 import { PrizeHistoryPanel } from "@/components/PrizeHistoryPanel";
+import { DrawResultWithPrizes } from "@/hooks/useLotteryDraws";
 
-const PRIZE_CONFIG: Record<string, { cost: number; prizes: Record<number, number> }> = {
-  megasena:  { cost: 5.00,  prizes: { 4: 1200, 5: 50000, 6: 50000000 } },
-  lotofacil: { cost: 3.00,  prizes: { 11: 6, 12: 12, 13: 30, 14: 2000, 15: 2000000 } },
-  quina:     { cost: 2.50,  prizes: { 2: 3, 3: 100, 4: 8000, 5: 15000000 } },
-  lotomania: { cost: 3.00,  prizes: { 15: 20, 16: 25, 17: 200, 18: 2000, 19: 50000, 20: 5000000 } },
-  duplasena: { cost: 2.50,  prizes: { 3: 4, 4: 100, 5: 5000, 6: 3000000 } },
-  timemania: { cost: 3.50,  prizes: { 3: 3, 4: 20, 5: 1000, 6: 50000, 7: 10000000 } },
-  diadesorte:{ cost: 2.50,  prizes: { 4: 6, 5: 50, 6: 2000, 7: 1000000 } },
-  supersete: { cost: 2.50,  prizes: { 3: 2, 4: 20, 5: 300, 6: 10000, 7: 1000000 } },
+// Custo mínimo da aposta simples por loteria
+const BET_COST: Record<string, number> = {
+  megasena: 5.00, lotofacil: 3.00, quina: 2.50, lotomania: 3.00,
+  duplasena: 2.50, timemania: 3.50, diadesorte: 2.50, supersete: 2.50,
 };
+
+/**
+ * Encontra o próximo sorteio REAL após a data de criação da aposta
+ */
+function findNextDraw(betDate: Date, sortedDraws: DrawResultWithPrizes[]): DrawResultWithPrizes | null {
+  // sortedDraws está em ordem DESC (mais recente primeiro)
+  // Queremos o primeiro sorteio cuja data >= betDate
+  let closest: DrawResultWithPrizes | null = null;
+  for (const draw of sortedDraws) {
+    const drawDate = draw.date ? new Date(draw.date) : null;
+    if (!drawDate) continue;
+    if (drawDate >= betDate) {
+      closest = draw;
+    } else {
+      break; // como está DESC, todos os próximos serão anteriores
+    }
+  }
+  return closest;
+}
+
+/**
+ * Calcula o prêmio REAL usando prize_tiers do banco de dados
+ */
+function getRealPrize(hits: number, draw: DrawResultWithPrizes): number {
+  if (!draw.prizeTiers?.premiacoes) return 0;
+  for (const tier of draw.prizeTiers.premiacoes) {
+    // A faixa corresponde ao número de acertos
+    if (tier.faixa === hits || tier.descricao?.toLowerCase().includes(`${hits} acerto`)) {
+      return tier.valorPremio || 0;
+    }
+  }
+  return 0;
+}
 
 const ROIDashboardPage = () => {
   const { config, draws, selectedLottery } = useLotteryContext();
