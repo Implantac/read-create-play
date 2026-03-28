@@ -118,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         if (session?.user) {
           fetchProfile(session.user.id);
+          checkAdmin(session.user.id);
           syncSubscription(session.access_token);
         }
       })
