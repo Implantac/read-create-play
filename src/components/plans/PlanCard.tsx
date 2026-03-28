@@ -138,6 +138,11 @@ export function PlanCard({ plan, index, isCurrent, isUpgrade, isLoading, onCheck
               <span className="text-4xl font-extrabold text-foreground font-mono tracking-tight">{plan.price}</span>
               <span className="text-muted-foreground text-sm ml-1">{plan.period}</span>
             </div>
+            {plan.annualTotal && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Cobrado <span className="font-semibold text-foreground">{plan.annualTotal}</span>
+              </p>
+            )}
           </CardHeader>
 
           <CardContent className="flex-1 pt-2">
