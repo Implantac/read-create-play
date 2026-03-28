@@ -64,9 +64,16 @@ export function AppSidebar() {
           </div>
           {!collapsed && (
             <div>
-              <h1 className="text-base font-bold tracking-tight text-sidebar-accent-foreground">
-                Titan<span className="gradient-brand-text ml-1">Loterias</span>
-              </h1>
+              <div className="flex items-center gap-1.5">
+                <h1 className="text-base font-bold tracking-tight text-sidebar-accent-foreground">
+                  Titan<span className="gradient-brand-text ml-1">Loterias</span>
+                </h1>
+                {isAdmin && (
+                  <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse">
+                    GOD
+                  </span>
+                )}
+              </div>
               <p className="text-[10px] text-muted-foreground font-mono tracking-wider uppercase">
                 Motor v4.0
               </p>
@@ -162,36 +169,48 @@ export function AppSidebar() {
 
       {!collapsed && (
         <SidebarFooter className="p-3 border-t border-sidebar-border space-y-2">
-          {currentPlan === "free" && trialDaysLeft > 0 && (
-            <div className="rounded-lg bg-accent/10 border border-accent/20 px-3 py-2 text-center">
-              <p className="text-[11px] font-semibold text-accent">
-                ⏱ {trialDaysLeft} {trialDaysLeft === 1 ? "dia restante" : "dias restantes"}
-              </p>
-              <p className="text-[9px] text-muted-foreground">Período de teste gratuito</p>
+          {isAdmin ? (
+            <div className="rounded-lg bg-amber-500/10 border border-amber-500/25 px-3 py-2.5 text-center">
+              <div className="flex items-center justify-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-amber-400" />
+                <p className="text-xs font-bold text-amber-400 uppercase tracking-wider">Modo Admin</p>
+              </div>
+              <p className="text-[9px] text-muted-foreground mt-0.5">Acesso irrestrito</p>
             </div>
+          ) : (
+            <>
+              {currentPlan === "free" && trialDaysLeft > 0 && (
+                <div className="rounded-lg bg-accent/10 border border-accent/20 px-3 py-2 text-center">
+                  <p className="text-[11px] font-semibold text-accent">
+                    ⏱ {trialDaysLeft} {trialDaysLeft === 1 ? "dia restante" : "dias restantes"}
+                  </p>
+                  <p className="text-[9px] text-muted-foreground">Período de teste gratuito</p>
+                </div>
+              )}
+              {currentPlan === "free" && trialDaysLeft <= 0 && (
+                <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2 text-center">
+                  <p className="text-[11px] font-semibold text-destructive">
+                    Teste expirado
+                  </p>
+                  <p className="text-[9px] text-muted-foreground">Assine para continuar</p>
+                </div>
+              )}
+              <Link
+                to="/planos"
+                className="flex items-center gap-2 rounded-lg bg-primary/5 border border-primary/10 px-3 py-2.5 hover:bg-primary/10 transition-colors group"
+              >
+                <Crown className="w-4 h-4 text-accent shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-sidebar-accent-foreground">
+                    {currentPlan === "free" ? "Upgrade" : currentPlan === "premium" ? "Premium" : "Pro"}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground truncate">
+                    {currentPlan === "free" ? "Desbloquear recursos" : "Plano ativo"}
+                  </p>
+                </div>
+              </Link>
+            </>
           )}
-          {currentPlan === "free" && trialDaysLeft <= 0 && (
-            <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2 text-center">
-              <p className="text-[11px] font-semibold text-destructive">
-                Teste expirado
-              </p>
-              <p className="text-[9px] text-muted-foreground">Assine para continuar</p>
-            </div>
-          )}
-          <Link
-            to="/planos"
-            className="flex items-center gap-2 rounded-lg bg-primary/5 border border-primary/10 px-3 py-2.5 hover:bg-primary/10 transition-colors group"
-          >
-            <Crown className="w-4 h-4 text-accent shrink-0" />
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-sidebar-accent-foreground">
-                {currentPlan === "free" ? "Upgrade" : currentPlan === "premium" ? "Premium" : "Pro"}
-              </p>
-              <p className="text-[10px] text-muted-foreground truncate">
-                {currentPlan === "free" ? "Desbloquear recursos" : "Plano ativo"}
-              </p>
-            </div>
-          </Link>
         </SidebarFooter>
       )}
     </Sidebar>
