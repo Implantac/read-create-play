@@ -165,6 +165,7 @@ const plans = [
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
   const faqRef = useRef<HTMLDivElement>(null);
