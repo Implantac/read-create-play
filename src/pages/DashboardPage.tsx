@@ -17,6 +17,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { usePlanAccess } from "@/hooks/usePlanAccess";
@@ -41,6 +42,7 @@ const DashboardPage = () => {
   const { config, draws, drawsWithPrizes, loading, syncing, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery } = useLotteryContext();
   const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
   const { currentPlan } = usePlanAccess();
+  const { profile, trialDaysLeft, isTrialExpired } = useAuth();
   const [luckyGame, setLuckyGame] = useState<{ numbers: number[]; score: number; strategy: string } | null>(null);
   const [generatingLucky, setGeneratingLucky] = useState(false);
 
@@ -76,6 +78,48 @@ const DashboardPage = () => {
         badge={draws.length > 0 ? `${draws.length} sorteios` : undefined}
       />
       <LotteryContextBanner />
+
+      {/* Trial countdown banner */}
+      {profile?.plan === "free" && !isTrialExpired && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative overflow-hidden rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-accent/10 p-4"
+        >
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/15">
+                <Crown className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  {trialDaysLeft === 1
+                    ? "⏱ Último dia do período de teste!"
+                    : `⏱ ${trialDaysLeft} dias restantes no período de teste`}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Faça upgrade para desbloquear todas as funcionalidades
+                </p>
+              </div>
+            </div>
+            <Link to="/planos">
+              <Button size="sm" className="gradient-brand text-primary-foreground gap-1.5 shadow-lg shadow-primary/20">
+                <Crown className="w-3.5 h-3.5" />
+                Ver Planos
+              </Button>
+            </Link>
+          </div>
+          {/* Progress bar */}
+          <div className="mt-3 h-1.5 rounded-full bg-muted/50 overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${((7 - trialDaysLeft) / 7) * 100}%` }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="h-full rounded-full bg-gradient-to-r from-primary to-accent"
+            />
+          </div>
+        </motion.div>
+      )}
 
       {loading && (
         <div className="flex items-center justify-center py-16 gap-3 text-muted-foreground">
