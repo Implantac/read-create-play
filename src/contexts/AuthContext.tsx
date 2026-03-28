@@ -48,6 +48,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const checkAdmin = async (userId: string) => {
+    const { data } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    setIsAdmin(!!data);
+  };
+
   const syncSubscription = async (accessToken: string) => {
     try {
       const { data } = await supabase.functions.invoke("check-subscription", {
