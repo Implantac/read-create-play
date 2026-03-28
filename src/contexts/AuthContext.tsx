@@ -53,9 +53,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .from("user_roles")
       .select("role")
       .eq("user_id", userId)
-      .eq("role", "admin")
-      .maybeSingle();
-    setIsAdmin(!!data);
+      .in("role", ["admin", "super_admin"]);
+    const roles = (data || []).map((r: any) => r.role as string);
+    setIsAdmin(roles.includes("admin") || roles.includes("super_admin"));
+    setIsSuperAdmin(roles.includes("super_admin"));
+    setUserRole(roles.includes("super_admin") ? "super_admin" : roles.includes("admin") ? "admin" : roles[0] || "user");
   };
 
   const syncSubscription = async (accessToken: string) => {
