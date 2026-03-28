@@ -5,40 +5,46 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Award, TrendingUp } from "lucide-react";
 import { getPrizeTiers } from "@/services/lotteryApi";
+import { DrawResultWithPrizes } from "@/hooks/useLotteryDraws";
+
+function findNextDraw(betDate: Date, sortedDraws: DrawResultWithPrizes[]): DrawResultWithPrizes | null {
+  let closest: DrawResultWithPrizes | null = null;
+  for (const draw of sortedDraws) {
+    const drawDate = draw.date ? new Date(draw.date) : null;
+    if (!drawDate) continue;
+    if (drawDate >= betDate) {
+      closest = draw;
+    } else {
+      break;
+    }
+  }
+  return closest;
+}
 
 export function PrizeHistoryPanel() {
-  const { selectedLottery, config, draws } = useLotteryContext();
+  const { selectedLottery, config, drawsWithPrizes } = useLotteryContext();
   const { savedBets } = useSavedBets(selectedLottery);
   const prizeTiers = getPrizeTiers(selectedLottery);
 
   const results = useMemo(() => {
-    if (!savedBets.length || !draws.length) return [];
+    if (!savedBets.length || !drawsWithPrizes.length) return [];
 
     return savedBets.map((bet) => {
       const betDate = new Date(bet.created_at);
-      let bestMatch = { concurso: 0, hits: 0, date: "", matchedNumbers: [] as number[] };
+      const nextDraw = findNextDraw(betDate, drawsWithPrizes);
 
-      for (const draw of draws) {
-        const drawDate = draw.date ? new Date(draw.date) : null;
-        if (drawDate && drawDate < betDate) continue;
-
-        const drawSet = new Set(draw.numbers);
-        const matched = bet.numbers.filter(n => drawSet.has(n));
-        if (matched.length > bestMatch.hits) {
-          bestMatch = { concurso: draw.concurso, hits: matched.length, date: draw.date, matchedNumbers: matched };
-        }
+      if (!nextDraw) {
+        return { bet, bestMatch: { concurso: 0, hits: 0, date: "", matchedNumbers: [] as number[] }, tier: undefined, isPrizeWinner: false };
       }
 
-      const tier = prizeTiers.find(t => t.hits === bestMatch.hits);
+      const drawSet = new Set(nextDraw.numbers);
+      const matched = bet.numbers.filter(n => drawSet.has(n));
+      const bestMatch = { concurso: nextDraw.concurso, hits: matched.length, date: nextDraw.date, matchedNumbers: matched };
+      const tier = prizeTiers.find(t => t.hits === matched.length);
 
-      return {
-        bet,
-        bestMatch,
-        tier,
-        isPrizeWinner: !!tier,
-      };
+      return { bet, bestMatch, tier, isPrizeWinner: !!tier };
     }).sort((a, b) => b.bestMatch.hits - a.bestMatch.hits);
-  }, [savedBets, draws, prizeTiers]);
+  }, [savedBets, drawsWithPrizes, prizeTiers]);
 
   const winners = results.filter(r => r.isPrizeWinner);
   const bestResult = results[0];
