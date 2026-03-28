@@ -152,7 +152,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isTrialExpired = !isAdmin && profile?.plan === "free" && trialDaysLeft <= 0;
 
   return (
-    <AuthContext.Provider value={{ session, user: session?.user ?? null, profile, loading, isAdmin, isTrialExpired, trialDaysLeft, signOut }}>
+    <AuthContext.Provider value={{ session, user: session?.user ?? null, profile, loading, isAdmin, isSuperAdmin, userRole, isTrialExpired, trialDaysLeft, signOut }}>
       {children}
     </AuthContext.Provider>
   );
