@@ -24,6 +24,8 @@ interface AuthContextType {
   profile: Profile | null;
   loading: boolean;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
+  userRole: string;
   isTrialExpired: boolean;
   trialDaysLeft: number;
   signOut: () => Promise<void>;
