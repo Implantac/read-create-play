@@ -50,6 +50,7 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/planos" element={<PlanosPage />} />
+            <Route path="/suporte" element={<SuportePage />} />
             <Route path="/payment-success" element={<PaymentSuccessPage />} />
             {/* Protected */}
             <Route element={<ProtectedRoute><LotteryProvider><AppLayout /></LotteryProvider></ProtectedRoute>}>
