@@ -23,6 +23,7 @@ interface AuthContextType {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
+  isAdmin: boolean;
   isTrialExpired: boolean;
   trialDaysLeft: number;
   signOut: () => Promise<void>;
@@ -34,6 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const fetchProfile = async (userId: string) => {
     const { data } = await supabase
@@ -44,6 +46,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (data) {
       setProfile(data as Profile);
     }
+  };
+
+  const checkAdmin = async (userId: string) => {
+    const { data } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    setIsAdmin(!!data);
   };
 
   const syncSubscription = async (accessToken: string) => {
@@ -66,9 +78,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       (_event, session) => {
         setSession(session);
         if (session?.user) {
-          setTimeout(() => fetchProfile(session.user.id), 0);
+          setTimeout(() => {
+            fetchProfile(session.user.id);
+            checkAdmin(session.user.id);
+          }, 0);
         } else {
           setProfile(null);
+          setIsAdmin(false);
         }
         setLoading(false);
       }
@@ -125,10 +141,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return Math.max(0, TRIAL_DAYS - elapsed);
   })();
 
-  const isTrialExpired = profile?.plan === "free" && trialDaysLeft <= 0;
+  const isTrialExpired = !isAdmin && profile?.plan === "free" && trialDaysLeft <= 0;
 
   return (
-    <AuthContext.Provider value={{ session, user: session?.user ?? null, profile, loading, isTrialExpired, trialDaysLeft, signOut }}>
+    <AuthContext.Provider value={{ session, user: session?.user ?? null, profile, loading, isAdmin, isTrialExpired, trialDaysLeft, signOut }}>
       {children}
     </AuthContext.Provider>
   );
