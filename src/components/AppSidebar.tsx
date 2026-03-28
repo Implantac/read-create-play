@@ -69,8 +69,12 @@ export function AppSidebar() {
                   Titan<span className="gradient-brand-text ml-1">Loterias</span>
                 </h1>
                 {isAdmin && (
-                  <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse">
-                    GOD
+                  <span className={`px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded border animate-pulse ${
+                    isSuperAdmin 
+                      ? "bg-amber-500/20 text-amber-400 border-amber-500/30" 
+                      : "bg-red-500/20 text-red-400 border-red-500/30"
+                  }`}>
+                    {isSuperAdmin ? "GOD" : "ADMIN"}
                   </span>
                 )}
               </div>
