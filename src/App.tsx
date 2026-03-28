@@ -29,6 +29,7 @@ import HistoricoApostasPage from "@/pages/HistoricoApostasPage";
 import FechamentosPage from "@/pages/FechamentosPage";
 import LandingPage from "./pages/LandingPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import SuportePage from "./pages/SuportePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
