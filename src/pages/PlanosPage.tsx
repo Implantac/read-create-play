@@ -11,12 +11,14 @@ import { PlanFAQ } from "@/components/plans/PlanFAQ";
 import { PlanTrustBar } from "@/components/plans/PlanTrustBar";
 import { PlanComparisonTable } from "@/components/plans/PlanComparisonTable";
 
-const plans: PlanData[] = [
+const basePlans = [
   {
     id: "free",
     name: "Gratuito",
-    price: "R$ 0",
+    monthlyPrice: "R$ 0",
+    annualPrice: "R$ 0",
     period: "/mês",
+    annualPeriod: "/mês",
     icon: Zap,
     description: "Motor estatístico básico",
     savedBetsLimit: "3 jogos salvos por loteria",
@@ -30,9 +32,13 @@ const plans: PlanData[] = [
   },
   {
     id: "premium",
+    annualId: "premium_annual",
     name: "Premium",
-    price: "R$ 29,90",
+    monthlyPrice: "R$ 29,90",
+    annualPrice: "R$ 23,92",
+    annualTotal: "R$ 287,00/ano",
     period: "/mês",
+    annualPeriod: "/mês",
     icon: Sparkles,
     description: "Ferramentas avançadas de geração",
     savedBetsLimit: "Jogos salvos ilimitados",
@@ -48,9 +54,13 @@ const plans: PlanData[] = [
   },
   {
     id: "professional",
+    annualId: "professional_annual",
     name: "Profissional",
-    price: "R$ 59,90",
+    monthlyPrice: "R$ 59,90",
+    annualPrice: "R$ 47,92",
+    annualTotal: "R$ 575,00/ano",
     period: "/mês",
+    annualPeriod: "/mês",
     icon: Crown,
     description: "IA + Otimização completa",
     savedBetsLimit: "Jogos salvos ilimitados",
@@ -67,8 +77,10 @@ const plans: PlanData[] = [
   {
     id: "lifetime",
     name: "Vitalício",
-    price: "R$ 497",
+    monthlyPrice: "R$ 497",
+    annualPrice: "R$ 497",
     period: " único",
+    annualPeriod: " único",
     icon: Infinity,
     description: "Acesso permanente a tudo",
     savedBetsLimit: "Jogos salvos ilimitados",
@@ -89,17 +101,41 @@ export default function PlanosPage() {
   const { profile, session } = useAuth();
   const currentPlan = profile?.plan ?? "free";
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
   const navigate = useNavigate();
+
+  const plans: PlanData[] = basePlans.map((p) => ({
+    id: p.id,
+    name: p.name,
+    price: billingCycle === "annual" ? p.annualPrice : p.monthlyPrice,
+    period: billingCycle === "annual" ? p.annualPeriod : p.period,
+    icon: p.icon,
+    description: p.description,
+    savedBetsLimit: p.savedBetsLimit,
+    features: p.features,
+    cta: p.cta,
+    highlight: p.highlight,
+    isLifetime: p.isLifetime,
+    annualTotal: billingCycle === "annual" ? (p as any).annualTotal : undefined,
+  }));
 
   const handleCheckout = async (planId: string) => {
     if (!session) {
       navigate("/login");
       return;
     }
+
+    // Map to annual variant if annual billing selected
+    let checkoutPlanId = planId;
+    if (billingCycle === "annual" && (planId === "premium" || planId === "professional")) {
+      const base = basePlans.find((p) => p.id === planId);
+      checkoutPlanId = (base as any)?.annualId || planId;
+    }
+
     setLoadingPlan(planId);
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { planId },
+        body: { planId: checkoutPlanId },
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       if (error) throw error;
@@ -134,7 +170,7 @@ export default function PlanosPage() {
         initial={{ opacity: 0, y: -15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center pt-8 pb-10"
+        className="text-center pt-8 pb-6"
       >
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-5">
           <Crown className="w-3.5 h-3.5" />
@@ -147,6 +183,40 @@ export default function PlanosPage() {
         <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto">
           Motor estatístico, IA preditiva e algoritmos avançados para maximizar suas chances
         </p>
+      </motion.div>
+
+      {/* Billing Toggle */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15, duration: 0.4 }}
+        className="flex justify-center mb-8"
+      >
+        <div className="inline-flex items-center gap-1 p-1 rounded-full bg-muted/50 border border-border/30">
+          <button
+            onClick={() => setBillingCycle("monthly")}
+            className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
+              billingCycle === "monthly"
+                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Mensal
+          </button>
+          <button
+            onClick={() => setBillingCycle("annual")}
+            className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 relative ${
+              billingCycle === "annual"
+                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Anual
+            <span className="absolute -top-2.5 -right-3 px-1.5 py-0.5 rounded-full bg-accent text-accent-foreground text-[10px] font-bold leading-none">
+              -20%
+            </span>
+          </button>
+        </div>
       </motion.div>
 
       {/* Manage subscription */}
