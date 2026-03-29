@@ -1,20 +1,60 @@
 import { motion } from "framer-motion";
-import { useRef, useState, useCallback } from "react";
-import { Play, Pause } from "lucide-react";
+import { useRef, useState, useCallback, useEffect } from "react";
+import { Play, Pause, Volume2, VolumeX } from "lucide-react";
+import { createAmbientTrack } from "@/lib/ambient-audio";
 
 export function DemoVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const ambientRef = useRef<ReturnType<typeof createAmbientTrack> | null>(null);
   const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(false);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      ambientRef.current?.stop();
+      audioCtxRef.current?.close();
+    };
+  }, []);
+
+  const ensureAudio = useCallback(() => {
+    if (!audioCtxRef.current) {
+      audioCtxRef.current = new AudioContext();
+      ambientRef.current = createAmbientTrack(audioCtxRef.current);
+    }
+  }, []);
 
   const togglePlay = useCallback(() => {
     if (!videoRef.current) return;
+    ensureAudio();
+
     if (videoRef.current.paused) {
       videoRef.current.play();
+      if (audioCtxRef.current?.state === "suspended") {
+        audioCtxRef.current.resume();
+      }
+      ambientRef.current?.start();
+      if (!muted) ambientRef.current?.setVolume(1);
       setPlaying(true);
     } else {
       videoRef.current.pause();
+      ambientRef.current?.stop();
       setPlaying(false);
     }
+  }, [ensureAudio, muted]);
+
+  const toggleMute = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setMuted((prev) => {
+      const next = !prev;
+      ambientRef.current?.setVolume(next ? 0 : 1);
+      return next;
+    });
+  }, []);
+
+  const handleVideoEnd = useCallback(() => {
+    // Loop — video has loop attr, but restart audio cycle
   }, []);
 
   return (
@@ -44,15 +84,27 @@ export function DemoVideo() {
           onClick={togglePlay}
         >
           {/* Browser chrome */}
-          <div className="flex items-center gap-2 px-4 py-2.5 bg-card/80 border-b border-border/20">
-            <div className="flex gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-neon-red/50" />
-              <div className="w-2.5 h-2.5 rounded-full bg-accent/50" />
-              <div className="w-2.5 h-2.5 rounded-full bg-primary/50" />
+          <div className="flex items-center justify-between px-4 py-2.5 bg-card/80 border-b border-border/20">
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-neon-red/50" />
+                <div className="w-2.5 h-2.5 rounded-full bg-accent/50" />
+                <div className="w-2.5 h-2.5 rounded-full bg-primary/50" />
+              </div>
+              <span className="text-[10px] font-mono text-muted-foreground/50 ml-2">
+                titan-loterias.com
+              </span>
             </div>
-            <span className="text-[10px] font-mono text-muted-foreground/50 ml-2">
-              titan-loterias.com
-            </span>
+            {/* Mute toggle - only show when playing */}
+            {playing && (
+              <button
+                onClick={toggleMute}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors text-muted-foreground hover:text-foreground z-10"
+              >
+                {muted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                <span className="text-[10px] font-mono">{muted ? "Som off" : "Som on"}</span>
+              </button>
+            )}
           </div>
 
           <video
@@ -62,7 +114,7 @@ export function DemoVideo() {
             muted
             playsInline
             loop
-            onEnded={() => setPlaying(false)}
+            onEnded={handleVideoEnd}
           />
 
           {/* Play overlay */}
@@ -77,7 +129,25 @@ export function DemoVideo() {
               </motion.div>
             </div>
           )}
+
+          {/* Pause overlay on hover when playing */}
+          {playing && (
+            <div className="absolute inset-0 top-[36px] flex items-center justify-center bg-background/0 hover:bg-background/20 transition-colors opacity-0 hover:opacity-100">
+              <Pause className="w-12 h-12 text-foreground/70" />
+            </div>
+          )}
         </motion.div>
+
+        {/* Audio hint */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="text-center text-xs text-muted-foreground/50 mt-4 flex items-center justify-center gap-1.5"
+        >
+          <Volume2 className="w-3 h-3" />
+          Clique para assistir com trilha sonora ambiente
+        </motion.p>
       </div>
     </section>
   );
