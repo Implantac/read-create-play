@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 
 import { LotteryLogosCarousel } from "@/components/LotteryLogosCarousel";
 import { ScreensShowcase } from "@/components/ScreensShowcase";
+import { DemoVideo } from "@/components/DemoVideo";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
 import { FloatingCTA } from "@/components/FloatingCTA";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
