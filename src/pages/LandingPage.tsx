@@ -448,6 +448,9 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
+      {/* Demo video */}
+      <DemoVideo />
+
       {/* Screens showcase carousel */}
       <ScreensShowcase />
 
