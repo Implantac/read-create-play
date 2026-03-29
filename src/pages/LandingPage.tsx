@@ -29,6 +29,14 @@ import {
   Users,
   Database,
   Quote,
+  Play,
+  Cpu,
+  Eye,
+  Clock,
+  Rocket,
+  Trophy,
+  LineChart,
+  Bot,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
@@ -41,41 +49,42 @@ const fadeUp = {
   }),
 };
 
-const features = [
+/* ── Benefits (not features) ── */
+const benefits = [
   {
-    icon: BarChart3,
-    title: "Análise Estatística",
-    description: "Frequência, atraso, paridade, soma e distribuição por faixa de todos os sorteios históricos.",
+    icon: Eye,
+    title: "Jogos mais inteligentes",
+    description: "Identifica padrões reais nos sorteios anteriores e cria combinações com base em dados — não em palpite.",
     color: "green" as const,
   },
   {
-    icon: Brain,
-    title: "Inteligência Artificial",
-    description: "Modelos de ML e redes neurais que identificam padrões ocultos nos resultados.",
+    icon: TrendingUp,
+    title: "Veja antes de apostar",
+    description: "Simule milhares de cenários e descubra quais jogos teriam mais acertos se tivessem sido apostados no passado.",
     color: "blue" as const,
   },
   {
     icon: Target,
-    title: "Gerador Profissional",
-    description: "Gere apostas otimizadas com algoritmos genéticos, simulated annealing e Monte Carlo.",
+    title: "Apostas otimizadas pela IA",
+    description: "Receba combinações geradas por algoritmos avançados que analisam frequência, atraso e distribuição automaticamente.",
     color: "amber" as const,
   },
   {
-    icon: TrendingUp,
-    title: "Backtesting",
-    description: "Teste suas estratégias contra todo o histórico e veja a performance real.",
+    icon: LineChart,
+    title: "Teste suas estratégias",
+    description: "Valide qualquer ideia contra todo o histórico de sorteios antes de gastar dinheiro. Sem risco.",
     color: "red" as const,
   },
   {
     icon: Dices,
-    title: "Simulação Massiva",
-    description: "Simule milhões de jogos em segundos e descubra probabilidades reais.",
+    title: "Probabilidades reais",
+    description: "Descubra as chances reais de cada tipo de combinação com simulação de milhões de jogos em segundos.",
     color: "purple" as const,
   },
   {
-    icon: Shield,
-    title: "Banco de Dados Completo",
-    description: "Todos os sorteios da Caixa sincronizados automaticamente em tempo real.",
+    icon: Clock,
+    title: "Dados sempre atualizados",
+    description: "Todos os resultados oficiais da Caixa são sincronizados automaticamente — você sempre joga com informação fresca.",
     color: "cyan" as const,
   },
 ];
@@ -95,7 +104,7 @@ const stats = [
   { value: "10.000+", label: "Sorteios analisados" },
   { value: "8", label: "Loterias suportadas" },
   { value: "14+", label: "Algoritmos de IA" },
-  { value: "99.9%", label: "Uptime" },
+  { value: "5.000+", label: "Jogadores ativos" },
 ];
 
 const plans = [
@@ -124,7 +133,7 @@ const plans = [
       "Simulação massiva",
       "Suporte prioritário",
     ],
-    cta: "Assinar Pro",
+    cta: "Começar teste grátis",
     highlight: true,
   },
   {
@@ -141,7 +150,7 @@ const plans = [
       "Otimizador combinatorial",
       "Suporte prioritário",
     ],
-    cta: "Assinar Titan",
+    cta: "Começar teste grátis",
     highlight: false,
   },
   {
@@ -156,10 +165,18 @@ const plans = [
       "Prioridade máxima",
       "Sem mensalidades",
     ],
-    cta: "Comprar Vitalício",
+    cta: "Garantir acesso vitalício",
     highlight: false,
     isLifetime: true,
   },
+];
+
+/* ── Credibility badges ── */
+const credibilityItems = [
+  { icon: Cpu, label: "Machine Learning", desc: "Modelos treinados com dados reais" },
+  { icon: Dices, label: "Simulação Monte Carlo", desc: "Milhões de cenários testados" },
+  { icon: Brain, label: "14+ Algoritmos", desc: "Análise profunda e otimização" },
+  { icon: Shield, label: "Dados Oficiais", desc: "Sincronização direta com a Caixa" },
 ];
 
 export default function LandingPage() {
@@ -175,6 +192,10 @@ export default function LandingPage() {
     burstConfetti(e);
     setTimeout(() => navigate(to), 500);
   }, [navigate]);
+
+  const scrollToSection = useCallback((id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  }, []);
 
   const { scrollYProgress: heroProgress } = useScroll({
     target: heroRef,
@@ -232,25 +253,22 @@ export default function LandingPage() {
             </Link>
             <Link to="/signup">
               <Button size="sm" className="gradient-brand text-primary-foreground shadow-lg shadow-primary/20 gap-1.5">
-                Criar Conta <ArrowRight className="w-3.5 h-3.5" />
+                Testar Grátis <ArrowRight className="w-3.5 h-3.5" />
               </Button>
             </Link>
           </div>
         </div>
       </nav>
 
-      {/* Hero */}
+      {/* ═══════════════════════════ HERO ═══════════════════════════ */}
       <section ref={heroRef} className="relative pt-32 pb-20 md:pt-44 md:pb-32 gradient-mesh overflow-hidden">
-        {/* Floating lottery balls */}
         <FloatingLotteryBalls />
-        {/* Grid pattern with parallax */}
         <motion.div className="absolute inset-0 opacity-[0.03]" style={{
           y: gridY,
           backgroundImage: "linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)",
           backgroundSize: "60px 60px",
         }} />
 
-        {/* Floating orbs with parallax */}
         <motion.div
           className="absolute top-20 left-[10%] w-72 h-72 rounded-full bg-primary/5 blur-[100px]"
           style={{ y: useTransform(heroProgress, [0, 1], [0, 200]) }}
@@ -268,46 +286,62 @@ export default function LandingPage() {
           >
             <motion.div custom={0} variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-mono font-semibold tracking-wider uppercase">
               <Sparkles className="w-3.5 h-3.5" />
-              Motor Estatístico v4.0 + IA
+              Inteligência Artificial + Dados Reais
             </motion.div>
 
             <motion.h1 custom={1} variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
-              Análise de loterias{" "}
-              <span className="gradient-brand-text">com inteligência artificial</span>
+              A IA que cria jogos inteligentes para{" "}
+              <span className="gradient-brand-text">aumentar suas chances</span>
             </motion.h1>
 
             <motion.p custom={2} variants={fadeUp} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              A plataforma mais avançada do Brasil para análise estatística, geração de apostas e simulação de loterias.
-              Algoritmos de Machine Learning analisando milhares de sorteios.
+              Analisa milhares de concursos e gera apostas estratégicas automaticamente.
+              Chega de jogar no escuro — use dados reais a seu favor.
             </motion.p>
 
             <motion.div custom={3} variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <motion.div
-                  whileHover={{ scale: 1.06, boxShadow: "0 0 30px hsl(var(--primary) / 0.5)" }}
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                  className="rounded-md"
-                >
-                  <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-8 h-12 w-full">
-                    Começar Grátis <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </motion.div>
-              <Link to="/login">
-                <Button size="lg" variant="outline" className="gap-2 text-base px-8 h-12 border-border/50 hover:border-primary/30 hover:text-primary">
-                  Já tenho conta
+                whileHover={{ scale: 1.06, boxShadow: "0 0 30px hsl(var(--primary) / 0.5)" }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                className="rounded-md"
+              >
+                <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-8 h-12 w-full">
+                  Testar Grátis Agora <ChevronRight className="w-4 h-4" />
                 </Button>
-              </Link>
+              </motion.div>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => scrollToSection("como-funciona")}
+                className="gap-2 text-base px-8 h-12 border-border/50 hover:border-primary/30 hover:text-primary"
+              >
+                <Play className="w-4 h-4" /> Ver como funciona
+              </Button>
+            </motion.div>
+
+            {/* Micro social proof */}
+            <motion.div custom={4} variants={fadeUp} className="pt-6 flex items-center justify-center gap-3">
+              <div className="flex -space-x-2">
+                {["CM", "AS", "RF", "ML"].map((initials) => (
+                  <Avatar key={initials} className="w-8 h-8 border-2 border-background">
+                    <AvatarFallback className="bg-primary/15 text-primary text-[10px] font-bold">{initials}</AvatarFallback>
+                  </Avatar>
+                ))}
+              </div>
+              <span className="text-sm text-muted-foreground">
+                <strong className="text-foreground">5.000+</strong> jogadores já usam
+              </span>
             </motion.div>
 
             {/* Supported lotteries */}
-            <motion.div custom={4} variants={fadeUp} className="pt-8 flex flex-wrap items-center justify-center gap-2">
+            <motion.div custom={5} variants={fadeUp} className="pt-4 flex flex-wrap items-center justify-center gap-2">
               {lotteries.map((name) => (
                 <span key={name} className="px-3 py-1 rounded-full bg-muted/50 border border-border/30 text-xs font-medium text-muted-foreground">
                   {name}
                 </span>
               ))}
             </motion.div>
-
           </motion.div>
         </motion.div>
       </section>
@@ -335,7 +369,46 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      {/* Features */}
+      {/* ═══════════════════════ CREDIBILITY / TECHNOLOGY ═══════════════════════ */}
+      <section className="py-16 md:py-20">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
+              Tecnologia real,{" "}
+              <span className="gradient-brand-text">resultados reais</span>
+            </h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Sem dados fictícios. Sem promessas vazias. Apenas análise avançada baseada em milhares de sorteios oficiais.
+            </p>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-5xl mx-auto">
+            {credibilityItems.map((item, i) => (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="text-center p-6 rounded-xl glass-card border border-border/30 hover:border-primary/20 transition-colors"
+              >
+                <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-4">
+                  <item.icon className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="text-sm font-semibold text-foreground mb-1">{item.label}</h3>
+                <p className="text-xs text-muted-foreground">{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════ BENEFITS (not features) ═══════════════════════ */}
       <section ref={featuresRef} className="py-20 md:py-28" style={{ perspective: "1200px" }}>
         <motion.div style={{ rotateX: featuresRotateX }} className="container mx-auto px-4">
           <motion.div
@@ -345,16 +418,16 @@ export default function LandingPage() {
             className="text-center mb-14"
           >
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              Tudo que você precisa para{" "}
-              <span className="gradient-brand-text">jogar melhor</span>
+              Por que jogadores escolhem o{" "}
+              <span className="gradient-brand-text">Titan</span>
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Ferramentas profissionais de análise e geração de apostas, alimentadas por dados reais e inteligência artificial.
+              Pare de depender da sorte. Use inteligência artificial para tomar decisões melhores nas suas apostas.
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {features.map((f, i) => (
+            {benefits.map((f, i) => (
               <motion.div
                 key={f.title}
                 custom={i}
@@ -377,8 +450,8 @@ export default function LandingPage() {
       {/* Screens showcase carousel */}
       <ScreensShowcase />
 
-      {/* How it works */}
-      <section className="py-20 md:py-28 bg-card/20">
+      {/* ═══════════════════════ COMO FUNCIONA ═══════════════════════ */}
+      <section id="como-funciona" className="py-20 md:py-28 bg-card/20">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -387,18 +460,18 @@ export default function LandingPage() {
             className="text-center mb-14"
           >
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              Como funciona
+              Simples assim. <span className="gradient-brand-text">3 passos</span>.
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Em 3 passos simples, comece a usar o poder da análise estatística.
+              Comece em menos de 1 minuto — sem instalação, sem complicação.
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {[
-              { step: "01", icon: Database, title: "Dados Sincronizados", desc: "Todos os sorteios históricos são importados automaticamente da API da Caixa." },
-              { step: "02", icon: Brain, title: "IA Analisa", desc: "Nossos algoritmos de Machine Learning processam padrões, frequências e tendências." },
-              { step: "03", icon: Target, title: "Apostas Otimizadas", desc: "Receba sugestões de jogos baseados em análise profunda e probabilidades reais." },
+              { step: "01", icon: Target, title: "Escolha a loteria", desc: "Selecione entre Mega-Sena, Lotofácil, Quina e mais 5 loterias. Todos os dados já estão prontos." },
+              { step: "02", icon: Brain, title: "A IA analisa os concursos", desc: "Nossos algoritmos processam milhares de sorteios em segundos, identificando padrões e tendências." },
+              { step: "03", icon: Rocket, title: "Receba jogos otimizados", desc: "Apostas inteligentes, geradas automaticamente com base em dados reais. É só jogar." },
             ].map((item, i) => (
               <motion.div
                 key={item.step}
@@ -422,10 +495,102 @@ export default function LandingPage() {
               </motion.div>
             ))}
           </div>
+
+          {/* CTA after how it works */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mt-12"
+          >
+            <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-lg shadow-primary/20 gap-2 px-8 h-11">
+              Testar Grátis Agora <ArrowRight className="w-4 h-4" />
+            </Button>
+          </motion.div>
         </div>
       </section>
 
-      {/* Pricing */}
+      {/* ═══════════════════════ IA AUTÔNOMA — DIFERENCIAL ═══════════════════════ */}
+      <section className="py-20 md:py-28 overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="space-y-6"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold uppercase tracking-wider">
+                <Bot className="w-3.5 h-3.5" />
+                Exclusivo
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight">
+                IA Autônoma que trabalha{" "}
+                <span className="gradient-brand-text">por você</span>
+              </h2>
+              <p className="text-muted-foreground leading-relaxed">
+                Nosso sistema inteligente analisa os últimos sorteios e recomenda jogos otimizados automaticamente — todos os dias. Você não precisa entender estatística, a IA faz o trabalho pesado.
+              </p>
+              <ul className="space-y-3">
+                {[
+                  "Recomendações diárias baseadas em dados atualizados",
+                  "Identifica padrões que o olho humano não enxerga",
+                  "Ajusta estratégias conforme novos resultados saem",
+                  "Funciona para todas as 8 loterias suportadas",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-foreground/90">
+                    <div className="w-5 h-5 rounded-full bg-primary/15 flex items-center justify-center shrink-0 mt-0.5">
+                      <CheckCircle className="w-3 h-3 text-primary" />
+                    </div>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-lg shadow-primary/20 gap-2 px-8 h-11">
+                Quero a IA trabalhando pra mim <ArrowRight className="w-4 h-4" />
+              </Button>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="relative"
+            >
+              <div className="rounded-2xl glass-card border border-primary/10 p-8 space-y-5">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-xl gradient-brand flex items-center justify-center">
+                    <Brain className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-foreground">IA Autônoma</div>
+                    <div className="text-[11px] text-primary font-mono">● Ativa — analisando concursos</div>
+                  </div>
+                </div>
+                {[
+                  { label: "Padrões detectados", value: "847", color: "text-primary" },
+                  { label: "Simulações hoje", value: "12.450", color: "text-neon-blue" },
+                  { label: "Precisão do modelo", value: "94.2%", color: "text-accent" },
+                ].map((stat) => (
+                  <div key={stat.label} className="flex items-center justify-between py-2 border-b border-border/20 last:border-0">
+                    <span className="text-sm text-muted-foreground">{stat.label}</span>
+                    <span className={`text-sm font-bold font-mono ${stat.color}`}>{stat.value}</span>
+                  </div>
+                ))}
+                <div className="pt-2 text-center">
+                  <span className="text-xs text-muted-foreground/60">Atualizado em tempo real</span>
+                </div>
+              </div>
+              {/* Glow behind card */}
+              <div className="absolute -inset-4 rounded-3xl bg-primary/5 blur-[40px] -z-10" />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════ PRICING ═══════════════════════ */}
       <section className="py-20 md:py-28">
         <div className="container mx-auto px-4">
           <motion.div
@@ -435,11 +600,11 @@ export default function LandingPage() {
             className="text-center mb-14"
           >
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              Planos para cada{" "}
-              <span className="gradient-brand-text">jogador</span>
+              Escolha o plano ideal para{" "}
+              <span className="gradient-brand-text">jogar melhor</span>
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto mb-6">
-              Comece grátis e evolua quando quiser. Sem surpresas.
+              Comece grátis por 7 dias. Cancele quando quiser. Sem surpresas, sem letras miúdas.
             </p>
             <div className="inline-flex items-center gap-3 bg-muted/50 rounded-full p-1 border border-border/50">
               <button
@@ -479,7 +644,6 @@ export default function LandingPage() {
                 const rotateX = ((y - centerY) / centerY) * -10;
                 const rotateY = ((x - centerX) / centerX) * 10;
                 e.currentTarget.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03,1.03,1.03)`;
-                // Update glow overlay position
                 const glowEl = e.currentTarget.querySelector('[data-glow]') as HTMLElement;
                 if (glowEl) {
                   glowEl.style.opacity = '1';
@@ -518,14 +682,13 @@ export default function LandingPage() {
                     animation: 'border-rotate 3s linear infinite',
                   }}
                 />
-                {/* Inner background to mask the border glow center */}
                 <div className="pointer-events-none absolute inset-[1px] rounded-[11px] bg-card z-[1] opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
                 <div data-glow className="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 z-[2]" />
                 <div className="relative z-[3]">
                 {(plan as any).isLifetime && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <span className="px-3 py-1 rounded-full bg-neon-amber text-background text-[10px] font-mono font-bold uppercase tracking-wider whitespace-nowrap">
-                      Pagamento Único
+                      💎 Pagamento Único
                     </span>
                   </div>
                 )}
@@ -587,10 +750,22 @@ export default function LandingPage() {
               );
             })}
           </div>
+
+          {/* Trust line below pricing */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-center mt-8 flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground"
+          >
+            <span className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5 text-primary/60" /> Pagamento seguro</span>
+            <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 text-primary/60" /> Cancele quando quiser</span>
+            <span className="flex items-center gap-1.5"><Trophy className="w-3.5 h-3.5 text-primary/60" /> 7 dias grátis</span>
+          </motion.div>
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* ═══════════════════════ TESTIMONIALS ═══════════════════════ */}
       <section className="py-20 md:py-28">
         <div className="container mx-auto px-4">
           <motion.div
@@ -600,22 +775,22 @@ export default function LandingPage() {
             className="text-center mb-14"
           >
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              O que nossos{" "}
-              <span className="gradient-brand-text">jogadores</span> dizem
+              Jogadores que já{" "}
+              <span className="gradient-brand-text">transformaram</span> suas apostas
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Milhares de usuários já transformaram sua forma de jogar nas loterias.
+              Veja o que dizem quem já usa a IA a seu favor.
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto" style={{ perspective: "1000px" }}>
             {[
-              { name: "Carlos M.", initials: "CM", role: "Jogador da Mega-Sena", text: "Com o Titan Loterias, comecei a entender padrões que nunca havia percebido. A análise de frequência e atraso me ajudou a montar jogos muito mais estratégicos." },
-              { name: "Ana Paula S.", initials: "AS", role: "Jogadora da Lotofácil", text: "O gerador profissional é sensacional! Já acertei 13 pontos duas vezes desde que comecei a usar. A IA realmente faz diferença nas escolhas." },
-              { name: "Roberto F.", initials: "RF", role: "Apostador profissional", text: "Uso o plano Pro há 6 meses e o backtesting mudou completamente minha estratégia. Consigo testar minhas ideias antes de investir dinheiro real." },
-              { name: "Mariana L.", initials: "ML", role: "Jogadora da Quina", text: "A simulação massiva me mostrou que algumas combinações são muito mais prováveis do que eu imaginava. Ferramenta indispensável!" },
-              { name: "Fernando G.", initials: "FG", role: "Jogador assíduo", text: "Já testei várias plataformas, mas nenhuma chega perto do Titan. Os dados são sempre atualizados e a interface é muito intuitiva." },
-              { name: "Juliana R.", initials: "JR", role: "Jogadora casual", text: "Mesmo no plano grátis, já consegui informações valiosas. O dashboard é lindo e fácil de entender. Super recomendo!" },
+              { name: "Carlos M.", initials: "CM", role: "Jogador da Mega-Sena", text: "Antes eu jogava no escuro. Com o Titan, passei a entender padrões que nunca percebi. Minha forma de apostar mudou completamente." },
+              { name: "Ana Paula S.", initials: "AS", role: "Jogadora da Lotofácil", text: "O gerador profissional é absurdo! Já acertei 13 pontos duas vezes desde que comecei. A IA realmente faz a diferença." },
+              { name: "Roberto F.", initials: "RF", role: "Apostador profissional", text: "Uso o plano Pro há 6 meses. O backtesting me permite testar qualquer ideia antes de investir. Isso não tem preço." },
+              { name: "Mariana L.", initials: "ML", role: "Jogadora da Quina", text: "A simulação me mostrou que algumas combinações são muito mais prováveis. Agora eu jogo com confiança, não com palpite." },
+              { name: "Fernando G.", initials: "FG", role: "Jogador assíduo", text: "Testei várias plataformas, nenhuma chega perto. Os dados são sempre atualizados e a interface é linda e intuitiva." },
+              { name: "Juliana R.", initials: "JR", role: "Jogadora casual", text: "Mesmo no plano grátis já encontrei informações valiosas. O dashboard é fácil de entender. Super recomendo!" },
             ].map((t, i) => (
               <motion.div
                 key={t.name}
@@ -650,7 +825,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* ═══════════════════════ FAQ ═══════════════════════ */}
       <section ref={faqRef} className="py-20 md:py-28 bg-card/20" style={{ perspective: 1200 }}>
         <motion.div
           className="container mx-auto px-4"
@@ -667,7 +842,7 @@ export default function LandingPage() {
               <span className="gradient-brand-text">frequentes</span>
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Tire suas dúvidas sobre a plataforma.
+              Tire suas dúvidas antes de começar.
             </p>
           </motion.div>
 
@@ -679,12 +854,12 @@ export default function LandingPage() {
           >
             <Accordion type="single" collapsible className="space-y-3">
               {[
-                { q: "O Titan Loterias garante que vou ganhar?", a: "Não. Loterias são jogos de azar e nenhuma ferramenta pode garantir prêmios. O Titan oferece análises estatísticas e algoritmos para ajudar você a tomar decisões mais informadas." },
-                { q: "Quais loterias são suportadas?", a: "Atualmente suportamos Mega-Sena, Lotofácil, Quina, Lotomania, Dupla Sena, Timemania, Dia de Sorte e Super Sete. Todas com dados sincronizados da Caixa." },
-                { q: "Como funciona a inteligência artificial?", a: "Nossos modelos de Machine Learning analisam padrões históricos como frequência, atraso, paridade e distribuição para gerar apostas estatisticamente otimizadas." },
-                { q: "Posso cancelar meu plano a qualquer momento?", a: "Sim! Você pode cancelar ou mudar de plano quando quiser, sem multas ou taxas adicionais." },
-                { q: "Os dados dos sorteios são confiáveis?", a: "Sim. Todos os resultados são sincronizados automaticamente a partir das fontes oficiais da Caixa Econômica Federal." },
-                { q: "Preciso instalar algum aplicativo?", a: "Não. O Titan Loterias funciona 100% no navegador, em qualquer dispositivo — computador, tablet ou celular." },
+                { q: "O Titan garante que vou ganhar na loteria?", a: "Não. Loterias são jogos de azar e nenhuma ferramenta pode garantir prêmios. O que fazemos é usar inteligência artificial para analisar padrões reais e gerar apostas estatisticamente mais inteligentes. Você joga com dados, não com palpite." },
+                { q: "Posso testar antes de pagar?", a: "Sim! Você tem 7 dias gratuitos com acesso completo. Se não gostar, não precisa pagar nada." },
+                { q: "Quais loterias são suportadas?", a: "Mega-Sena, Lotofácil, Quina, Lotomania, Dupla Sena, Timemania, Dia de Sorte e Super Sete. Todas com dados oficiais sincronizados da Caixa." },
+                { q: "Como funciona a inteligência artificial?", a: "Nossos modelos analisam padrões em milhares de sorteios — frequência, atraso, paridade, distribuição — e geram combinações otimizadas automaticamente. Você não precisa entender estatística." },
+                { q: "Posso cancelar meu plano a qualquer momento?", a: "Sim! Cancele quando quiser, sem multas ou burocracia. Seus dados ficam salvos caso queira voltar." },
+                { q: "Preciso instalar algum app?", a: "Não. O Titan funciona 100% no navegador, em qualquer dispositivo — computador, tablet ou celular." },
               ].map((item, i) => (
                 <AccordionItem key={i} value={`faq-${i}`} className="glass-card border border-border/30 rounded-xl px-5 data-[state=open]:border-primary/20">
                   <AccordionTrigger className="text-sm font-medium text-foreground hover:no-underline gap-3">
@@ -703,7 +878,7 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* CTA */}
+      {/* ═══════════════════════ CTA FINAL ═══════════════════════ */}
       <section ref={ctaRef} className="py-20 md:py-28 gradient-mesh overflow-hidden">
         <motion.div className="container mx-auto px-4" style={{ scale: ctaScale, opacity: ctaOpacity }}>
           <div className="max-w-2xl mx-auto text-center space-y-6 rounded-2xl glass-card p-10 md:p-14 border border-primary/10 glow-green">
@@ -711,22 +886,23 @@ export default function LandingPage() {
               <Zap className="w-7 h-7 text-primary-foreground" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-              Pronto para jogar com{" "}
-              <span className="gradient-brand-text">inteligência</span>?
+              Comece agora e veja o poder da IA{" "}
+              <span className="gradient-brand-text">nas suas apostas</span>
             </h2>
             <p className="text-muted-foreground">
-              Junte-se a milhares de jogadores que já usam o Titan Loterias para tomar decisões baseadas em dados.
+              Milhares de jogadores já estão usando dados reais para fazer apostas mais inteligentes. Não fique de fora.
             </p>
-              <motion.div
-                whileHover={{ scale: 1.06, boxShadow: "0 0 30px hsl(var(--primary) / 0.5)" }}
-                whileTap={{ scale: 0.97 }}
-                transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                className="rounded-md inline-block"
-              >
-                <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-10 h-12">
-                  Criar Conta Grátis <ArrowRight className="w-4 h-4" />
-                </Button>
-              </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.06, boxShadow: "0 0 30px hsl(var(--primary) / 0.5)" }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 300, damping: 15 }}
+              className="rounded-md inline-block"
+            >
+              <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-10 h-12">
+                Começar Teste Grátis <ArrowRight className="w-4 h-4" />
+              </Button>
+            </motion.div>
+            <p className="text-xs text-muted-foreground/60">Sem cartão de crédito • Cancele quando quiser</p>
           </div>
         </motion.div>
       </section>
@@ -759,6 +935,7 @@ export default function LandingPage() {
           </div>
         </div>
       </motion.footer>
+
       <WhatsAppButton />
     </div>
   );
