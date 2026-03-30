@@ -1,4 +1,5 @@
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import Autoplay from "embla-carousel-autoplay";
 import { useState, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
