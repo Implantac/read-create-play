@@ -40,6 +40,8 @@ import {
   Bot,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
