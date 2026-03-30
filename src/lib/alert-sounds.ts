@@ -86,6 +86,11 @@ export function playMatchAlert(matchCount: number, pick: number) {
     playTone(ctx, freq, t, dur, baseGain, melody.type);
     t += dur * 0.85;
   }
+
+  // Visual confetti for jackpot-tier matches
+  if (tier === "jackpot") {
+    burstConfettiCenter(80);
+  }
 }
 
 export function playSimpleBeep() {
