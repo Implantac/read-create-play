@@ -2,6 +2,7 @@
 // Different melodies per match tier: low matches → simple beep, high matches → celebratory fanfare
 
 import { getSoundSettings } from "@/hooks/useSoundSettings";
+import { burstConfettiCenter } from "@/lib/confetti";
 
 type Tier = "low" | "mid" | "high" | "jackpot";
 
@@ -84,6 +85,11 @@ export function playMatchAlert(matchCount: number, pick: number) {
   for (const [freq, dur] of melody.notes) {
     playTone(ctx, freq, t, dur, baseGain, melody.type);
     t += dur * 0.85;
+  }
+
+  // Visual confetti for jackpot-tier matches
+  if (tier === "jackpot") {
+    burstConfettiCenter(80);
   }
 }
 
