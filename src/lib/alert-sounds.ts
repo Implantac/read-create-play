@@ -26,22 +26,27 @@ function playTone(ctx: AudioContext, freq: number, start: number, duration: numb
 }
 
 const MELODIES: Record<Tier, { notes: [number, number][]; type: OscillatorType }> = {
+  // Coin-drop style — two quick metallic plinks
   low: {
-    notes: [[523, 0.15], [659, 0.2]],
-    type: "sine",
+    notes: [[1200, 0.08], [900, 0.15]],
+    type: "triangle",
   },
+  // Slot-machine partial win — ascending chime triplet
   mid: {
-    notes: [[523, 0.15], [659, 0.15], [784, 0.25]],
+    notes: [[880, 0.1], [1047, 0.1], [1319, 0.22]],
     type: "triangle",
   },
+  // Big win fanfare — dramatic ascending run with sustain
   high: {
-    notes: [[523, 0.12], [659, 0.12], [784, 0.12], [1047, 0.3]],
+    notes: [[659, 0.1], [784, 0.1], [988, 0.1], [1175, 0.12], [1319, 0.3]],
     type: "triangle",
   },
+  // Jackpot celebration — slot-machine payout cascade + triumphant resolve
   jackpot: {
     notes: [
-      [523, 0.1], [659, 0.1], [784, 0.1],
-      [1047, 0.15], [1047, 0.1], [1175, 0.1], [1319, 0.4],
+      [784, 0.08], [988, 0.08], [1175, 0.08],
+      [1319, 0.1], [1568, 0.1], [1319, 0.08],
+      [1568, 0.1], [1760, 0.15], [2093, 0.4],
     ],
     type: "square",
   },
