@@ -111,7 +111,7 @@ function TestimonialsCards() {
   if (isMobile) {
     return (
       <div className="max-w-5xl mx-auto">
-        <Carousel opts={{ loop: true, align: "center" }} className="w-full">
+        <Carousel opts={{ loop: true, align: "center" }} plugins={[Autoplay({ delay: 4000, stopOnInteraction: false })]} className="w-full">
           <CarouselContent className="-ml-3">
             {testimonials.map((t, i) => (
               <CarouselItem key={t.name} className="pl-3 basis-[85%]">
