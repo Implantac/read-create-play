@@ -2,6 +2,7 @@
 // Different melodies per match tier: low matches → simple beep, high matches → celebratory fanfare
 
 import { getSoundSettings } from "@/hooks/useSoundSettings";
+import { burstConfettiCenter } from "@/lib/confetti";
 
 type Tier = "low" | "mid" | "high" | "jackpot";
 
