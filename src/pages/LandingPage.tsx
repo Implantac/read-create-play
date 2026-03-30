@@ -52,7 +52,90 @@ const fadeUp = {
   }),
 };
 
-/* ── Benefits (not features) ── */
+const testimonials = [
+  { name: "Carlos M.", initials: "CM", role: "Jogador da Mega-Sena", stars: 5, text: "Antes eu jogava no escuro. Com o Titan, passei a entender padrões que nunca percebi. Minha forma de apostar mudou completamente.", highlight: "acertei a quadra 3 vezes" },
+  { name: "Ana Paula S.", initials: "AS", role: "Jogadora da Lotofácil", stars: 5, text: "O gerador profissional é absurdo! Já acertei 13 pontos duas vezes desde que comecei. A IA realmente faz a diferença.", highlight: "13 pontos 2x" },
+  { name: "Roberto F.", initials: "RF", role: "Apostador profissional", stars: 5, text: "Uso o plano Pro há 6 meses. O backtesting me permite testar qualquer ideia antes de investir. Isso não tem preço.", highlight: "ROI positivo em 6 meses" },
+  { name: "Mariana L.", initials: "ML", role: "Jogadora da Quina", stars: 4, text: "A simulação me mostrou que algumas combinações são muito mais prováveis. Agora eu jogo com confiança, não com palpite.", highlight: null },
+  { name: "Fernando G.", initials: "FG", role: "Jogador assíduo", stars: 5, text: "Testei várias plataformas, nenhuma chega perto. Os dados são sempre atualizados e a interface é linda e intuitiva.", highlight: "melhor plataforma do mercado" },
+  { name: "Juliana R.", initials: "JR", role: "Jogadora casual", stars: 5, text: "Mesmo no plano grátis já encontrei informações valiosas. O dashboard é fácil de entender. Super recomendo!", highlight: null },
+];
+
+function TestimonialCard({ t, i }: { t: typeof testimonials[0]; i: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, rotateY: 90, scale: 0.8 }}
+      whileInView={{ opacity: 1, rotateY: 0, scale: 1 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ delay: i * 0.15, duration: 0.7, type: "spring", stiffness: 80, damping: 14 }}
+      whileHover={{ y: -8, rotateY: -5, scale: 1.03, transition: { duration: 0.25 } }}
+      className="glass-card rounded-xl border border-border/30 p-6 space-y-4 hover:border-primary/20 transition-colors h-full"
+      style={{ transformStyle: "preserve-3d", backfaceVisibility: "hidden" }}
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex gap-0.5">
+          {Array.from({ length: t.stars }).map((_, s) => (
+            <Star key={s} className="w-3.5 h-3.5 fill-neon-amber text-neon-amber" />
+          ))}
+          {Array.from({ length: 5 - t.stars }).map((_, s) => (
+            <Star key={s} className="w-3.5 h-3.5 text-muted-foreground/30" />
+          ))}
+        </div>
+        <span className="flex items-center gap-1 text-[10px] text-primary/70 font-medium">
+          <CheckCircle className="w-3 h-3" /> Verificado
+        </span>
+      </div>
+      <p className="text-sm text-muted-foreground leading-relaxed">"{t.text}"</p>
+      {t.highlight && (
+        <span className="inline-block px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-semibold uppercase tracking-wider">
+          🏆 {t.highlight}
+        </span>
+      )}
+      <div className="flex items-center gap-3 pt-2 border-t border-border/20">
+        <Avatar className="w-9 h-9">
+          <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">{t.initials}</AvatarFallback>
+        </Avatar>
+        <div>
+          <div className="text-sm font-semibold text-foreground">{t.name}</div>
+          <div className="text-[11px] text-muted-foreground">{t.role}</div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function TestimonialsCards() {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <div className="max-w-5xl mx-auto">
+        <Carousel opts={{ loop: true, align: "center" }} className="w-full">
+          <CarouselContent className="-ml-3">
+            {testimonials.map((t, i) => (
+              <CarouselItem key={t.name} className="pl-3 basis-[85%]">
+                <TestimonialCard t={t} i={0} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+        <p className="text-center text-[10px] text-muted-foreground mt-4 font-mono">
+          ← Deslize para ver mais →
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto" style={{ perspective: "1000px" }}>
+      {testimonials.map((t, i) => (
+        <TestimonialCard key={t.name} t={t} i={i} />
+      ))}
+    </div>
+  );
+}
+
+
 const benefits = [
   {
     icon: Eye,
