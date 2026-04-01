@@ -739,7 +739,7 @@ function selectDiverseGames(
 
 /** Get all available strategy IDs */
 export function getAllStrategyIds(): string[] {
-  return ["frequency", "delay", "balance", "dispersion", "anti_pattern", "coverage"];
+  return ["frequency", "delay", "balance", "dispersion", "anti_pattern", "coverage", "markov", "momentum", "harmonic", "regression"];
 }
 
 /** Get strategy info by ID */
@@ -751,6 +751,10 @@ export function getStrategyInfo(id: string): { id: string; name: string; descrip
     dispersion: { name: "Dispersão", description: "Evita concentração no volante" },
     anti_pattern: { name: "Anti-Padrões", description: "Evita sequências e padrões óbvios" },
     coverage: { name: "Cobertura Máxima", description: "Maximiza cobertura do volante" },
+    markov: { name: "Cadeia de Markov", description: "Probabilidades de transição entre sorteios" },
+    momentum: { name: "Momentum & Tendência", description: "Números em aceleração de frequência" },
+    harmonic: { name: "Harmônico Matemático", description: "Primos, Fibonacci e padrões matemáticos" },
+    regression: { name: "Regressão à Média", description: "Números sub-representados estatisticamente" },
   };
   return { id, ...(map[id] || map.frequency) };
 }
