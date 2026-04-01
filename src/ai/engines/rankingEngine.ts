@@ -35,41 +35,47 @@ export function scoreGame(
   // Structural score: pattern profile
   const structScore = Math.round(pattern.overallScore * 100);
 
-  // Coverage score: backtesting
-  const recent = draws.slice(0, 30);
-  const gameSet = new Set(sorted);
-  let totalHits = 0;
-  for (const d of recent) {
-    totalHits += d.numbers.filter(n => gameSet.has(n)).length;
-  }
-  const avgHits = recent.length > 0 ? totalHits / recent.length : 0;
+  // Coverage score: backtesting with advanced hit rate analysis
+  const hitRate = computeHistoricalHitRate(sorted, draws, lotteryId);
   const expectedHits = rules.pick * sorted.length / rules.totalNumbers;
-  const coverageScore = Math.min(100, Math.round((avgHits / expectedHits) * 100));
+  const coverageScore = Math.min(100, Math.round((hitRate.avgHits / expectedHits) * 100));
+
+  // Win rate bonus — games that historically hit prize tiers
+  const winRateBonus = Math.round(hitRate.winRate * 50);
 
   // Diversity score: how different from average
   const avgFreq = selectedStats.reduce((s, st) => s + st.frequency, 0) / selectedStats.length;
   const freqVariance = selectedStats.reduce((s, st) => s + (st.frequency - avgFreq) ** 2, 0) / selectedStats.length;
   const diversityScore = Math.min(100, Math.round(Math.sqrt(freqVariance) * riskConfig.diversityWeight * 5));
 
-  // Strategy fit
+  // Special numbers score (primes/fibonacci alignment)
+  const specialScore = computeSpecialNumberScore(sorted).specialScore;
+
+  // Strategy fit with advanced metrics
   const strategyFit = Math.round(
-    (pattern.parityBalance * 20 +
-    pattern.sumProximity * 20 +
-    pattern.sequencePenalty * riskConfig.sequencePenalty * 15 +
+    (pattern.parityBalance * 18 +
+    pattern.sumProximity * 18 +
+    pattern.sequencePenalty * riskConfig.sequencePenalty * 12 +
     pattern.dispersalScore * 15 +
-    (statScore / 100) * 30) 
+    pattern.rowBalance * 7 +
+    pattern.colBalance * 7 +
+    (statScore / 100) * 23) 
   );
 
-  // Probability score (simplified)
+  // Probability score incorporating zone balance and co-occurrence potential
   const probScore = Math.round(
-    (pattern.sumProximity * 30 + pattern.parityBalance * 30 + pattern.dispersalScore * 40)
+    (pattern.sumProximity * 25 + 
+     pattern.parityBalance * 25 + 
+     pattern.dispersalScore * 25 + 
+     pattern.repeatScore * 15 +
+     (specialScore / 100) * 10)
   );
 
   const w = AI_CONFIG.scoringWeights;
   const totalScore = Math.round(
     statScore * w.statistical +
     structScore * w.structural +
-    coverageScore * w.coverage +
+    (coverageScore + winRateBonus) * w.coverage +
     diversityScore * w.diversity +
     strategyFit * w.strategyFit +
     probScore * w.probability
