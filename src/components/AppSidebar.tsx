@@ -3,8 +3,6 @@ import {
   Brain, ShieldCheck, Crown, PieChart, TrendingUp, ClipboardCheck, Bot, Lock,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { useLocation } from "react-router-dom";
-import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { usePlanAccess, type Feature } from "@/hooks/usePlanAccess";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLotteryContext } from "@/contexts/LotteryContext";
@@ -49,10 +47,8 @@ const PLAN_LABELS: Record<string, string> = {
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const location = useLocation();
-  const { isAdmin, isSuperAdmin } = useAdminCheck();
+  const { isAdmin, isSuperAdmin, trialDaysLeft } = useAuth();
   const { currentPlan, hasAccess, getMinPlan } = usePlanAccess();
-  const { trialDaysLeft } = useAuth();
   const { config } = useLotteryContext();
 
   return (
