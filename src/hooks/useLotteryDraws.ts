@@ -50,6 +50,11 @@ export function useLotteryDraws(lotteryId: string) {
 
   const fetchDraws = useCallback(async () => {
     setLoading(true);
+    setDraws([]);
+    setDrawsWithPrizes([]);
+    setCount(0);
+    setLoadedCount(0);
+    let alive = true;
     try {
       // Fast first paint: load only recent 50 draws
       const { data: initialData, error: initialError, count: totalCount } = await supabase
@@ -60,6 +65,7 @@ export function useLotteryDraws(lotteryId: string) {
         .range(0, 49);
 
       if (initialError) throw initialError;
+      if (!alive) return;
 
       const total = totalCount ?? 0;
       setCount(total);
@@ -79,7 +85,7 @@ export function useLotteryDraws(lotteryId: string) {
         let from = 50;
         const pageSize = 1000;
 
-        while (from < total) {
+        while (from < total && alive) {
           const { data, error: pageError } = await supabase
             .from("lottery_draws")
             .select("concurso, draw_date, numbers, prize_tiers")
@@ -90,19 +96,23 @@ export function useLotteryDraws(lotteryId: string) {
           if (pageError) break;
           if (!data || data.length === 0) break;
           allData = allData.concat(data);
-          setLoadedCount(allData.length);
+          if (alive) setLoadedCount(allData.length);
           if (data.length < pageSize) break;
           from += pageSize;
         }
 
-        const { mapped, mappedWithPrizes } = mapRows(allData);
-        setDraws(mapped);
-        setDrawsWithPrizes(mappedWithPrizes);
+        if (alive) {
+          const { mapped, mappedWithPrizes } = mapRows(allData);
+          setDraws(mapped);
+          setDrawsWithPrizes(mappedWithPrizes);
+        }
       }
     } catch (e) {
       console.error("Error fetching draws:", e);
-      setLoading(false);
+    } finally {
+      if (alive) setLoading(false);
     }
+    return () => { alive = false; };
   }, [lotteryId, mapRows]);
 
   const syncDraws = useCallback(async () => {
