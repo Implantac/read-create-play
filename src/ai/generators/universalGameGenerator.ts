@@ -106,23 +106,16 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
 function buildWeightedPool(
   stats: NumberStats[],
   strategyFilters: { hotBias: number; coldBias: number },
-  intentFilters: IntentFilters
+  intentFilters: IntentFilters,
+  advancedWeights?: Map<number, number>
 ): { number: number; weight: number }[] {
   return stats.map(s => {
-    let weight = 1;
+    // Start with advanced weight if available (includes co-occurrence, gap, trend, regime)
+    let weight = advancedWeights?.get(s.number) ?? 1;
 
-    // Frequency weighting
-    if (s.status === "hot") weight += strategyFilters.hotBias * 3;
-    else if (s.status === "cold") weight += strategyFilters.coldBias * 3;
-
-    // Trend boost
-    if (s.trend > 0) weight += s.trend * 0.3;
-
-    // Cycle due boost
-    if (s.cycleScore > 1) weight += (s.cycleScore - 1) * 1.5;
-
-    // Momentum
-    if (s.momentum > 0) weight += s.momentum * 0.002;
+    // Strategy bias overlay
+    if (s.status === "hot") weight += strategyFilters.hotBias * 2;
+    else if (s.status === "cold") weight += strategyFilters.coldBias * 2;
 
     // Intent-specific
     if (intentFilters.prioritizeHot && s.status === "hot") weight *= 1.5;
