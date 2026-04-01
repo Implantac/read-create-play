@@ -154,7 +154,8 @@ export function DrawNotificationChecker() {
         exit={{ opacity: 0, y: -20 }}
         className={isHighTier ? "animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_3]" : ""}
       >
-        <Card className={`border ${isWinner ? "border-yellow-400/60 bg-yellow-500/10 shadow-[0_0_20px_rgba(234,179,8,0.4),0_0_40px_rgba(234,179,8,0.2)] animate-[jackpot-glow_2s_ease-in-out_infinite]" : isHighTier ? "border-amber-400/50 bg-amber-500/5 shadow-[0_0_15px_rgba(245,158,11,0.3)]" : "border-primary/30 bg-primary/5"} backdrop-blur`}>
+        <Card className={`relative border ${isWinner ? "border-yellow-400/60 bg-yellow-500/10 shadow-[0_0_20px_rgba(234,179,8,0.4),0_0_40px_rgba(234,179,8,0.2)] animate-[jackpot-glow_2s_ease-in-out_infinite]" : isHighTier ? "border-amber-400/50 bg-amber-500/5 shadow-[0_0_15px_rgba(245,158,11,0.3)]" : "border-primary/30 bg-primary/5"} backdrop-blur`}>
+          {isWinner && <JackpotParticles />}
           <CardHeader className="py-3 px-4">
             <CardTitle className="flex items-center gap-2 text-sm">
               {isWinner ? (
