@@ -128,13 +128,30 @@ export function DrawNotificationChecker() {
 
   const bestMatch = matches[0];
   const isWinner = bestMatch.matchCount >= config.pick;
+  const tier = getTier(bestMatch.matchCount, config.pick);
+  const isHighTier = tier === "high" || tier === "jackpot";
 
   return (
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
+        animate={
+          isHighTier
+            ? {
+                opacity: 1,
+                y: 0,
+                scale: [1, 1.02, 0.98, 1.01, 1],
+                x: [0, -3, 3, -2, 2, 0],
+              }
+            : { opacity: 1, y: 0 }
+        }
+        transition={
+          isHighTier
+            ? { duration: 0.6, ease: "easeOut", scale: { repeat: 2, duration: 0.5 } }
+            : { duration: 0.3 }
+        }
         exit={{ opacity: 0, y: -20 }}
+        className={isHighTier ? "animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_3]" : ""}
       >
         <Card className={`border ${isWinner ? "border-accent/50 bg-accent/5" : "border-primary/30 bg-primary/5"} backdrop-blur`}>
           <CardHeader className="py-3 px-4">
