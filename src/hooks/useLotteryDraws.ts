@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { DrawResult } from "@/data/lotteries";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { toast } from "sonner";
 
 export interface PrizeTierInfo {
@@ -32,6 +32,7 @@ export function useLotteryDraws(lotteryId: string) {
   const [syncing, setSyncing] = useState(false);
   const [count, setCount] = useState(0);
   const [loadedCount, setLoadedCount] = useState(0);
+  const cancelRef = useRef<{ cancelled: boolean }>({ cancelled: false });
 
   const mapRows = useCallback((allData: any[]) => {
     const mapped: DrawResult[] = allData.map((row: any) => ({
@@ -49,9 +50,13 @@ export function useLotteryDraws(lotteryId: string) {
   }, []);
 
   const fetchDraws = useCallback(async () => {
+    // Cancel any in-flight request
+    cancelRef.current.cancelled = true;
+    const signal = { cancelled: false };
+    cancelRef.current = signal;
+
     setLoading(true);
     try {
-      // Fast first paint: load only recent 50 draws
       const { data: initialData, error: initialError, count: totalCount } = await supabase
         .from("lottery_draws")
         .select("concurso, draw_date, numbers, prize_tiers", { count: "exact" })
@@ -60,6 +65,7 @@ export function useLotteryDraws(lotteryId: string) {
         .range(0, 49);
 
       if (initialError) throw initialError;
+      if (signal.cancelled) return;
 
       const total = totalCount ?? 0;
       setCount(total);
@@ -69,6 +75,10 @@ export function useLotteryDraws(lotteryId: string) {
         setDraws(mapped);
         setDrawsWithPrizes(mappedWithPrizes);
         setLoadedCount(initialData.length);
+      } else {
+        setDraws([]);
+        setDrawsWithPrizes([]);
+        setLoadedCount(0);
       }
 
       setLoading(false);
@@ -80,6 +90,7 @@ export function useLotteryDraws(lotteryId: string) {
         const pageSize = 1000;
 
         while (from < total) {
+          if (signal.cancelled) return;
           const { data, error: pageError } = await supabase
             .from("lottery_draws")
             .select("concurso, draw_date, numbers, prize_tiers")
@@ -90,18 +101,21 @@ export function useLotteryDraws(lotteryId: string) {
           if (pageError) break;
           if (!data || data.length === 0) break;
           allData = allData.concat(data);
-          setLoadedCount(allData.length);
+          if (!signal.cancelled) setLoadedCount(allData.length);
           if (data.length < pageSize) break;
           from += pageSize;
         }
 
-        const { mapped, mappedWithPrizes } = mapRows(allData);
-        setDraws(mapped);
-        setDrawsWithPrizes(mappedWithPrizes);
+        if (!signal.cancelled) {
+          const { mapped, mappedWithPrizes } = mapRows(allData);
+          setDraws(mapped);
+          setDrawsWithPrizes(mappedWithPrizes);
+        }
       }
     } catch (e) {
       console.error("Error fetching draws:", e);
-      setLoading(false);
+    } finally {
+      if (!signal.cancelled) setLoading(false);
     }
   }, [lotteryId, mapRows]);
 
@@ -178,6 +192,9 @@ export function useLotteryDraws(lotteryId: string) {
 
   useEffect(() => {
     fetchDraws();
+    return () => {
+      cancelRef.current.cancelled = true;
+    };
   }, [fetchDraws]);
 
   return {
