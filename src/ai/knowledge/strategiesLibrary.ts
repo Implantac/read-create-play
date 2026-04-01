@@ -581,6 +581,10 @@ function executeStrategy(
     case "dispersion": return strategyDispersion(stats, lotteryId);
     case "anti_pattern": return strategyAntiPattern(stats, draws, lotteryId);
     case "coverage": return strategyCoverage(stats, lotteryId);
+    case "markov": return strategyMarkov(stats, draws, lotteryId);
+    case "momentum": return strategyMomentum(stats, draws);
+    case "harmonic": return strategyHarmonic(stats, lotteryId);
+    case "regression": return strategyRegression(stats, draws, lotteryId);
     default: return strategyFrequency(stats, draws);
   }
 }
