@@ -121,7 +121,7 @@ const DashboardPage = () => {
         </motion.div>
       )}
 
-      {loading && (
+      {loading && draws.length === 0 && (
         <div className="flex items-center justify-center py-16 gap-3 text-muted-foreground">
           <Loader2 className="w-5 h-5 animate-spin text-primary" />
           <span className="text-sm">Carregando resultados...</span>
