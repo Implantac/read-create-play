@@ -31,6 +31,7 @@ export function useLotteryDraws(lotteryId: string) {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [count, setCount] = useState(0);
+  const [loadedCount, setLoadedCount] = useState(0);
 
   const mapRows = useCallback((allData: any[]) => {
     const mapped: DrawResult[] = allData.map((row: any) => ({
