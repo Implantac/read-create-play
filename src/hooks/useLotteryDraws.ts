@@ -186,6 +186,7 @@ export function useLotteryDraws(lotteryId: string) {
     loading,
     syncing,
     count,
+    loadedCount,
     syncDraws,
     syncAllLotteries,
     addDraw,
