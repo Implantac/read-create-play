@@ -87,9 +87,12 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     candidates.push({ game, coOccBonus });
   }
 
+  // Sort candidates by co-occurrence bonus first, then score
+  candidates.sort((a, b) => b.coOccBonus - a.coOccBonus);
+
   // Score and rank all candidates
-  const scored = candidates.map(g =>
-    scoreGame(g, config.lotteryId, config.stats, config.draws, config.riskProfile)
+  const scored = candidates.map(c =>
+    scoreGame(c.game, config.lotteryId, config.stats, config.draws, config.riskProfile)
   );
 
   // Sort by score and take top N, ensuring diversity
