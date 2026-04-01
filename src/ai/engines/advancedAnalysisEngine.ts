@@ -261,7 +261,8 @@ export function computeHistoricalHitRate(
 export function buildAdvancedWeightMap(
   stats: NumberStats[],
   draws: DrawResult[],
-  lotteryId: string
+  lotteryId: string,
+  engineWeights?: Record<string, number>
 ): Map<number, number> {
   const rules = getLotteryRules(lotteryId);
   const trends = multiWindowTrend(draws, rules.totalNumbers);
@@ -269,45 +270,70 @@ export function buildAdvancedWeightMap(
   const coOcc = computeCoOccurrence(draws, rules.totalNumbers, 50);
   const zoneAnalysis = analyzeZoneDistribution(draws, lotteryId);
 
+  // Default engine weights if none provided
+  const ew = {
+    frequency: engineWeights?.frequency ?? 0.25,
+    gap: engineWeights?.gap ?? 0.15,
+    trend: engineWeights?.trend ?? 0.2,
+    coOccurrence: engineWeights?.coOccurrence ?? 0.15,
+    zone: engineWeights?.zone ?? 0.1,
+    cycle: engineWeights?.cycle ?? 0.1,
+    special: engineWeights?.special ?? 0.05,
+    antiPopular: engineWeights?.antiPopular ?? 0,
+  };
+
   const weights = new Map<number, number>();
 
-  // Collect co-occurrence boost numbers (numbers that appear in top pairs)
+  // Collect co-occurrence boost numbers
   const coOccBoost = new Map<number, number>();
   for (const pair of coOcc.topPairs) {
     coOccBoost.set(pair.a, (coOccBoost.get(pair.a) || 0) + pair.lift * 0.1);
     coOccBoost.set(pair.b, (coOccBoost.get(pair.b) || 0) + pair.lift * 0.1);
   }
 
+  // Anti-popularity: penalize most frequent numbers
+  const maxFreq = Math.max(...stats.map(s => s.frequency));
+
   for (const s of stats) {
     let w = 1.0;
 
-    // Base frequency weight
-    if (s.status === "hot") w += 1.5;
-    else if (s.status === "cold") w += 0.5;
+    // Frequency weight (scaled by engine weight)
+    const freqBonus = s.status === "hot" ? 1.5 : s.status === "cold" ? 0.5 : 0.8;
+    w += freqBonus * ew.frequency * 8;
 
     // Trend weight (multi-window)
     const trend = trends.find(t => t.number === s.number);
     if (trend) {
-      if (trend.regime === "ascending") w += 2.0;
-      else if (trend.regime === "descending") w -= 0.5;
-      w += trend.acceleration * 10; // boost accelerating numbers
+      const trendBonus = trend.regime === "ascending" ? 2.0 : trend.regime === "descending" ? -0.5 : 0;
+      w += trendBonus * ew.trend * 5;
+      w += trend.acceleration * ew.trend * 15;
     }
 
     // Gap prediction weight
     const gap = gapPredictions.find(g => g.number === s.number);
     if (gap && gap.overdueFactor > 1.3) {
-      w += Math.min(3, (gap.overdueFactor - 1) * 2);
+      w += Math.min(3, (gap.overdueFactor - 1) * 2) * ew.gap * 5;
     }
 
     // Co-occurrence boost
     const coBoost = coOccBoost.get(s.number) || 0;
-    w += Math.min(1.5, coBoost);
+    w += Math.min(1.5, coBoost) * ew.coOccurrence * 5;
 
     // Cycle score
-    if (s.cycleScore > 1.2) w += (s.cycleScore - 1) * 1.5;
+    if (s.cycleScore > 1.2) w += (s.cycleScore - 1) * ew.cycle * 8;
 
     // Momentum
-    if (s.momentum > 0) w += s.momentum * 0.003;
+    if (s.momentum > 0) w += s.momentum * ew.trend * 0.01;
+
+    // Special numbers (primes/fibonacci)
+    if (PRIMES.has(s.number)) w += ew.special * 3;
+    if (FIBONACCI.has(s.number)) w += ew.special * 2.5;
+
+    // Anti-popular: penalize popular numbers
+    if (ew.antiPopular > 0) {
+      const popRatio = s.frequency / maxFreq;
+      w -= popRatio * ew.antiPopular * 4;
+    }
 
     weights.set(s.number, Math.max(0.05, w));
   }

@@ -27,7 +27,11 @@ export type RiskProfile =
   | "statistical"
   | "exploratory"
   | "max_coverage"
-  | "anti_popular";
+  | "anti_popular"
+  | "markov"
+  | "momentum"
+  | "harmonic"
+  | "regression";
 
 export interface ParsedIntent {
   intent: AIIntent;
