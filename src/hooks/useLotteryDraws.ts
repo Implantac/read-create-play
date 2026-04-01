@@ -68,6 +68,7 @@ export function useLotteryDraws(lotteryId: string) {
         const { mapped, mappedWithPrizes } = mapRows(initialData);
         setDraws(mapped);
         setDrawsWithPrizes(mappedWithPrizes);
+        setLoadedCount(initialData.length);
       }
 
       setLoading(false);
