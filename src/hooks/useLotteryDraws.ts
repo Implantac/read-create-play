@@ -31,6 +31,7 @@ export function useLotteryDraws(lotteryId: string) {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [count, setCount] = useState(0);
+  const [loadedCount, setLoadedCount] = useState(0);
 
   const mapRows = useCallback((allData: any[]) => {
     const mapped: DrawResult[] = allData.map((row: any) => ({
@@ -67,6 +68,7 @@ export function useLotteryDraws(lotteryId: string) {
         const { mapped, mappedWithPrizes } = mapRows(initialData);
         setDraws(mapped);
         setDrawsWithPrizes(mappedWithPrizes);
+        setLoadedCount(initialData.length);
       }
 
       setLoading(false);
@@ -88,6 +90,7 @@ export function useLotteryDraws(lotteryId: string) {
           if (pageError) break;
           if (!data || data.length === 0) break;
           allData = allData.concat(data);
+          setLoadedCount(allData.length);
           if (data.length < pageSize) break;
           from += pageSize;
         }
@@ -183,6 +186,7 @@ export function useLotteryDraws(lotteryId: string) {
     loading,
     syncing,
     count,
+    loadedCount,
     syncDraws,
     syncAllLotteries,
     addDraw,

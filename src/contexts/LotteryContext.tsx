@@ -12,6 +12,7 @@ interface LotteryContextType {
   loading: boolean;
   syncing: boolean;
   count: number;
+  loadedCount: number;
   syncDraws: () => void;
   syncAllLotteries: () => void;
   addDraw: (draw: DrawResult) => void;
@@ -24,14 +25,14 @@ const LotteryContext = createContext<LotteryContextType | null>(null);
 export function LotteryProvider({ children }: { children: ReactNode }) {
   const [selectedLottery, setSelectedLottery] = useState("megasena");
   const config = LOTTERIES.find(l => l.id === selectedLottery)!;
-  const { draws, drawsWithPrizes, loading, syncing, count, syncDraws, syncAllLotteries, addDraw } = useLotteryDraws(selectedLottery);
+  const { draws, drawsWithPrizes, loading, syncing, count, loadedCount, syncDraws, syncAllLotteries, addDraw } = useLotteryDraws(selectedLottery);
   const stats = useMemo(() => computeFrequencyStats(draws, config.numbers), [draws, config.numbers]);
   const sumData = useMemo(() => computeSumDistribution(draws), [draws]);
 
   return (
     <LotteryContext.Provider value={{
       selectedLottery, setSelectedLottery: useCallback((id: string) => setSelectedLottery(id), []),
-      config, draws, drawsWithPrizes, loading, syncing, count, syncDraws, syncAllLotteries, addDraw, stats, sumData,
+      config, draws, drawsWithPrizes, loading, syncing, count, loadedCount, syncDraws, syncAllLotteries, addDraw, stats, sumData,
     }}>
       {children}
     </LotteryContext.Provider>
