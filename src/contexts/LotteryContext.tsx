@@ -12,6 +12,7 @@ interface LotteryContextType {
   loading: boolean;
   syncing: boolean;
   count: number;
+  loadedCount: number;
   syncDraws: () => void;
   syncAllLotteries: () => void;
   addDraw: (draw: DrawResult) => void;
