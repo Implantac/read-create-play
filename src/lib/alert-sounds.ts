@@ -87,9 +87,11 @@ export function playMatchAlert(matchCount: number, pick: number) {
     t += dur * 0.85;
   }
 
-  // Visual confetti for jackpot-tier matches
+  // Visual confetti for high and jackpot-tier matches
   if (tier === "jackpot") {
     burstConfettiCenter(80);
+  } else if (tier === "high") {
+    burstConfettiCenter(30);
   }
 }
 
