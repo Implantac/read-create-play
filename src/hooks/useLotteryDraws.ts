@@ -90,6 +90,7 @@ export function useLotteryDraws(lotteryId: string) {
           if (pageError) break;
           if (!data || data.length === 0) break;
           allData = allData.concat(data);
+          setLoadedCount(allData.length);
           if (data.length < pageSize) break;
           from += pageSize;
         }
