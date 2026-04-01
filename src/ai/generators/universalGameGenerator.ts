@@ -10,6 +10,7 @@ import { getStrategy } from "../knowledge/strategiesKnowledge";
 import { computePatternProfile } from "../engines/patternEngine";
 import type { RiskProfile, IntentFilters, ScoredGame } from "../core/aiTypes";
 import { scoreGame } from "../engines/rankingEngine";
+import { buildAdvancedWeightMap, analyzeZoneDistribution, computeCoOccurrence } from "../engines/advancedAnalysisEngine";
 
 interface GeneratorConfig {
   lotteryId: string;
@@ -26,12 +27,23 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
   const strategy = getStrategy(config.riskProfile);
   const prevDraw = config.draws.length > 0 ? config.draws[0].numbers : undefined;
 
-  // Build weighted pool
-  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters);
+  // Build advanced weighted pool using multi-dimensional analysis
+  const advancedWeights = buildAdvancedWeightMap(config.stats, config.draws, config.lotteryId);
+  const zoneAnalysis = analyzeZoneDistribution(config.draws, config.lotteryId);
+  const coOcc = computeCoOccurrence(config.draws, rules.totalNumbers, 30);
+  const topPairSet = new Map<number, Set<number>>();
+  for (const p of coOcc.topPairs.slice(0, 15)) {
+    if (!topPairSet.has(p.a)) topPairSet.set(p.a, new Set());
+    if (!topPairSet.has(p.b)) topPairSet.set(p.b, new Set());
+    topPairSet.get(p.a)!.add(p.b);
+    topPairSet.get(p.b)!.add(p.a);
+  }
+
+  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters, advancedWeights);
 
   // Generate candidates (10x requested count for filtering)
   const candidateCount = Math.max(config.count * 20, 500);
-  const candidates: number[][] = [];
+  const candidates: { game: number[]; coOccBonus: number }[] = [];
 
   for (let attempt = 0; attempt < candidateCount * 3 && candidates.length < candidateCount; attempt++) {
     const game = weightedSample(pool, rules.pick);
@@ -53,12 +65,34 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     if (config.filters.avoidSequences && pattern.sequencePenalty < 0.5) continue;
     if (pattern.sumProximity < 0.3) continue; // always filter extreme sums
 
-    candidates.push(game);
+    // Advanced zone distribution filter
+    const zoneSize = 10;
+    const zoneCount = Math.ceil(rules.totalNumbers / zoneSize);
+    const gamezones = new Array(zoneCount).fill(0);
+    for (const n of game) gamezones[Math.min(Math.floor((n - 1) / zoneSize), zoneCount - 1)]++;
+    const emptyZones = gamezones.filter(c => c === 0).length;
+    if (emptyZones > Math.ceil(zoneCount * 0.4)) continue; // reject poor zone coverage
+
+    // Co-occurrence bonus: prefer games with proven pairs
+    let coOccBonus = 0;
+    for (let i = 0; i < game.length; i++) {
+      const partners = topPairSet.get(game[i]);
+      if (partners) {
+        for (let j = i + 1; j < game.length; j++) {
+          if (partners.has(game[j])) coOccBonus++;
+        }
+      }
+    }
+
+    candidates.push({ game, coOccBonus });
   }
 
+  // Sort candidates by co-occurrence bonus first, then score
+  candidates.sort((a, b) => b.coOccBonus - a.coOccBonus);
+
   // Score and rank all candidates
-  const scored = candidates.map(g =>
-    scoreGame(g, config.lotteryId, config.stats, config.draws, config.riskProfile)
+  const scored = candidates.map(c =>
+    scoreGame(c.game, config.lotteryId, config.stats, config.draws, config.riskProfile)
   );
 
   // Sort by score and take top N, ensuring diversity
@@ -72,23 +106,16 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
 function buildWeightedPool(
   stats: NumberStats[],
   strategyFilters: { hotBias: number; coldBias: number },
-  intentFilters: IntentFilters
+  intentFilters: IntentFilters,
+  advancedWeights?: Map<number, number>
 ): { number: number; weight: number }[] {
   return stats.map(s => {
-    let weight = 1;
+    // Start with advanced weight if available (includes co-occurrence, gap, trend, regime)
+    let weight = advancedWeights?.get(s.number) ?? 1;
 
-    // Frequency weighting
-    if (s.status === "hot") weight += strategyFilters.hotBias * 3;
-    else if (s.status === "cold") weight += strategyFilters.coldBias * 3;
-
-    // Trend boost
-    if (s.trend > 0) weight += s.trend * 0.3;
-
-    // Cycle due boost
-    if (s.cycleScore > 1) weight += (s.cycleScore - 1) * 1.5;
-
-    // Momentum
-    if (s.momentum > 0) weight += s.momentum * 0.002;
+    // Strategy bias overlay
+    if (s.status === "hot") weight += strategyFilters.hotBias * 2;
+    else if (s.status === "cold") weight += strategyFilters.coldBias * 2;
 
     // Intent-specific
     if (intentFilters.prioritizeHot && s.status === "hot") weight *= 1.5;
