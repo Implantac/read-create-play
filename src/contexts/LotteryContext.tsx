@@ -25,7 +25,7 @@ const LotteryContext = createContext<LotteryContextType | null>(null);
 export function LotteryProvider({ children }: { children: ReactNode }) {
   const [selectedLottery, setSelectedLottery] = useState("megasena");
   const config = LOTTERIES.find(l => l.id === selectedLottery)!;
-  const { draws, drawsWithPrizes, loading, syncing, count, syncDraws, syncAllLotteries, addDraw } = useLotteryDraws(selectedLottery);
+  const { draws, drawsWithPrizes, loading, syncing, count, loadedCount, syncDraws, syncAllLotteries, addDraw } = useLotteryDraws(selectedLottery);
   const stats = useMemo(() => computeFrequencyStats(draws, config.numbers), [draws, config.numbers]);
   const sumData = useMemo(() => computeSumDistribution(draws), [draws]);
 
