@@ -121,8 +121,17 @@ function buildExplanation(
   if (pattern.dispersalScore >= 0.7) lines.push("✅ Boa dispersão numérica");
   else lines.push("⚠️ Números concentrados em uma faixa");
 
+  if (pattern.rowBalance >= 0.7) lines.push("✅ Distribuição equilibrada entre linhas");
+  if (pattern.colBalance >= 0.7) lines.push("✅ Distribuição equilibrada entre colunas");
+
+  if (pattern.repeatScore >= 0.8) lines.push("✅ Repetições do concurso anterior dentro da média");
+  else if (pattern.repeatScore < 0.5) lines.push("⚠️ Repetições fora do padrão histórico");
+
   if (lotteryId === "lotofacil" && pattern.frameCenterBalance >= 0.8)
     lines.push("✅ Equilíbrio moldura/centro adequado");
+
+  if (scores.coverage >= 70) lines.push("✅ Boa performance no backtesting histórico");
+  else lines.push("⚠️ Performance abaixo da média no backtesting");
 
   return lines;
 }
