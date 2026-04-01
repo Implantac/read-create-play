@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Bell, BellRing, BellOff, Trophy, X, ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { JackpotParticles } from "@/components/JackpotParticles";
 
 interface MatchResult {
   betId: string;
