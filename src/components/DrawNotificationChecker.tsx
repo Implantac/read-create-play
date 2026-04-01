@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { playMatchAlert } from "@/lib/alert-sounds";
+import { playMatchAlert, getTier } from "@/lib/alert-sounds";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { useNotificationPermission } from "@/hooks/useNotificationPermission";

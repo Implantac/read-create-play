@@ -6,7 +6,7 @@ import { burstConfettiCenter } from "@/lib/confetti";
 
 type Tier = "low" | "mid" | "high" | "jackpot";
 
-function getTier(matchCount: number, pick: number): Tier {
+export function getTier(matchCount: number, pick: number): Tier {
   const ratio = matchCount / pick;
   if (ratio >= 1) return "jackpot";
   if (ratio >= 0.7) return "high";
