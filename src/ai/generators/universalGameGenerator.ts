@@ -27,8 +27,19 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
   const strategy = getStrategy(config.riskProfile);
   const prevDraw = config.draws.length > 0 ? config.draws[0].numbers : undefined;
 
-  // Build weighted pool
-  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters);
+  // Build advanced weighted pool using multi-dimensional analysis
+  const advancedWeights = buildAdvancedWeightMap(config.stats, config.draws, config.lotteryId);
+  const zoneAnalysis = analyzeZoneDistribution(config.draws, config.lotteryId);
+  const coOcc = computeCoOccurrence(config.draws, rules.totalNumbers, 30);
+  const topPairSet = new Map<number, Set<number>>();
+  for (const p of coOcc.topPairs.slice(0, 15)) {
+    if (!topPairSet.has(p.a)) topPairSet.set(p.a, new Set());
+    if (!topPairSet.has(p.b)) topPairSet.set(p.b, new Set());
+    topPairSet.get(p.a)!.add(p.b);
+    topPairSet.get(p.b)!.add(p.a);
+  }
+
+  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters, advancedWeights);
 
   // Generate candidates (10x requested count for filtering)
   const candidateCount = Math.max(config.count * 20, 500);
