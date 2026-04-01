@@ -65,7 +65,26 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     if (config.filters.avoidSequences && pattern.sequencePenalty < 0.5) continue;
     if (pattern.sumProximity < 0.3) continue; // always filter extreme sums
 
-    candidates.push(game);
+    // Advanced zone distribution filter
+    const zoneSize = 10;
+    const zoneCount = Math.ceil(rules.totalNumbers / zoneSize);
+    const gamezones = new Array(zoneCount).fill(0);
+    for (const n of game) gamezones[Math.min(Math.floor((n - 1) / zoneSize), zoneCount - 1)]++;
+    const emptyZones = gamezones.filter(c => c === 0).length;
+    if (emptyZones > Math.ceil(zoneCount * 0.4)) continue; // reject poor zone coverage
+
+    // Co-occurrence bonus: prefer games with proven pairs
+    let coOccBonus = 0;
+    for (let i = 0; i < game.length; i++) {
+      const partners = topPairSet.get(game[i]);
+      if (partners) {
+        for (let j = i + 1; j < game.length; j++) {
+          if (partners.has(game[j])) coOccBonus++;
+        }
+      }
+    }
+
+    candidates.push({ game, coOccBonus });
   }
 
   // Score and rank all candidates
