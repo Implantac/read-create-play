@@ -43,7 +43,7 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
 
   // Generate candidates (10x requested count for filtering)
   const candidateCount = Math.max(config.count * 20, 500);
-  const candidates: number[][] = [];
+  const candidates: { game: number[]; coOccBonus: number }[] = [];
 
   for (let attempt = 0; attempt < candidateCount * 3 && candidates.length < candidateCount; attempt++) {
     const game = weightedSample(pool, rules.pick);
