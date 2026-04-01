@@ -32,7 +32,7 @@ export function LotteryProvider({ children }: { children: ReactNode }) {
   return (
     <LotteryContext.Provider value={{
       selectedLottery, setSelectedLottery: useCallback((id: string) => setSelectedLottery(id), []),
-      config, draws, drawsWithPrizes, loading, syncing, count, syncDraws, syncAllLotteries, addDraw, stats, sumData,
+      config, draws, drawsWithPrizes, loading, syncing, count, loadedCount, syncDraws, syncAllLotteries, addDraw, stats, sumData,
     }}>
       {children}
     </LotteryContext.Provider>
