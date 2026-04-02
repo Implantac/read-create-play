@@ -219,9 +219,14 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
               transition={{ delay: i * 0.06 }}
               className="p-4 rounded-xl bg-card border border-border/50 hover:border-border transition-colors space-y-3"
             >
-              {/* Card Header: Rank + Score + Grade */}
+              {/* Card Header: Checkbox + Rank + Score + Grade */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
+                  <Checkbox
+                    checked={isBetMarked(bet.numbers)}
+                    onCheckedChange={() => toggleBet({ numbers: bet.numbers, label: `Gerador #${i + 1} (${bet.report.grade})` })}
+                    className="h-4 w-4"
+                  />
                   <span className="text-xs text-muted-foreground font-mono">#{i + 1}</span>
                   <div className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${getGradeBg(bet.report.grade)}`}>
                     {bet.report.grade}
