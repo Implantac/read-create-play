@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useSelectedBets } from "@/contexts/SelectedBetsContext";
 
 interface Props {
   stats: NumberStats[];
