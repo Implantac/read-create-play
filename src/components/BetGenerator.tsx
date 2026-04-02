@@ -102,6 +102,7 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
   const [copied, setCopied] = useState<number | null>(null);
   const [step, setStep] = useState<1 | 2>(1);
   const [generating, setGenerating] = useState(false);
+  const { toggleBet, isBetMarked } = useSelectedBets();
 
   const avgScore = useMemo(() => {
     if (bets.length === 0) return 0;
