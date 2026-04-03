@@ -240,7 +240,31 @@ export function rankGames(
   draws: DrawResult[],
   riskProfile: RiskProfile = "balanced"
 ): ScoredGame[] {
-  return games
-    .map(g => scoreGame(g, lotteryId, stats, draws, riskProfile))
-    .sort((a, b) => b.totalScore - a.totalScore);
+  const rules = getLotteryRules(lotteryId);
+
+  // Score all games
+  const scored = games.map(g => scoreGame(g, lotteryId, stats, draws, riskProfile));
+  scored.sort((a, b) => b.totalScore - a.totalScore);
+
+  // PORTFOLIO OPTIMIZATION: if many games, diversify the selection
+  if (scored.length > 3) {
+    const candidates = scored.map(s => ({ numbers: s.numbers, score: s.totalScore }));
+    const optimized = optimizePortfolio(candidates, scored.length, rules.totalNumbers, rules.pick);
+    const optimizedSet = new Set(optimized.map(o => o.join(",")));
+
+    // Re-order: optimized games first, rest after
+    const primary = scored.filter(s => optimizedSet.has(s.numbers.join(",")));
+    const secondary = scored.filter(s => !optimizedSet.has(s.numbers.join(",")));
+    const result = [...primary, ...secondary];
+
+    // SELF-LEARNING: Record performance for future optimization
+    const avgScore = result.reduce((s, g) => s + g.totalScore, 0) / result.length;
+    const roi = estimateROI(result[0].numbers, draws, lotteryId);
+    const portfolio = evaluatePortfolio(result.map(r => r.numbers), rules.totalNumbers);
+    recordPerformance(lotteryId, riskProfile, avgScore, roi.riskAdjustedScore, portfolio.diversityScore);
+
+    return result;
+  }
+
+  return scored;
 }
