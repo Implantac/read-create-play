@@ -28,7 +28,20 @@ export function scoreGame(
   // ADAPTIVE: Self-calibrate weights from historical patterns
   const adaptiveW = selfCalibrateWeights(draws, lotteryId);
   const context = detectContext(draws, lotteryId);
-  const contextW = applyContextAdjustments(adaptiveW, context, riskProfile);
+  let contextW = applyContextAdjustments(adaptiveW, context, riskProfile);
+
+  // SELF-LEARNING: Apply weight optimizations from performance history
+  const learned = optimizeWeightsFromHistory(lotteryId, riskProfile);
+  if (learned.confidence > 0.3) {
+    for (const [key, mult] of Object.entries(learned.adjustments)) {
+      if (key in contextW) {
+        (contextW as any)[key] *= mult as number;
+      }
+    }
+  }
+
+  // WINNING PATTERNS: Extract and score against real historical patterns
+  const winningPatterns = extractWinningPatterns(draws, lotteryId);
 
   // Statistical score: based on frequency alignment
   const selectedStats = sorted.map(n => stats.find(s => s.number === n)).filter(Boolean) as NumberStats[];
