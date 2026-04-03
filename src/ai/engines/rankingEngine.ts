@@ -8,8 +8,9 @@ import { DrawResult } from "@/data/lotteries";
 import { computePatternProfile } from "./patternEngine";
 import { getLotteryRules } from "../knowledge/lotteriesKnowledge";
 import { AI_CONFIG } from "../core/aiConfig";
-import { computeSpecialNumberScore, computeHistoricalHitRate, computeClusterScore, computeHumanPatternPenalty, lightMonteCarlo } from "./advancedAnalysisEngine";
-import { estimateROI, detectContext, selfCalibrateWeights, applyContextAdjustments, extractWinningPatterns, scoreAgainstWinningPatterns, getAdaptiveSimCount, optimizeWeightsFromHistory } from "./adaptiveEngine";
+import { computeSpecialNumberScore, computeHistoricalHitRate, computeClusterScore, computeHumanPatternPenalty, lightMonteCarlo, computeCoOccurrence } from "./advancedAnalysisEngine";
+import { estimateROI, detectContext, selfCalibrateWeights, applyContextAdjustments, extractWinningPatterns, scoreAgainstWinningPatterns, getAdaptiveSimCount, optimizeWeightsFromHistory, recordPerformance, evaluatePortfolio, optimizePortfolio } from "./adaptiveEngine";
+import { smoothWeights, computeProgressivePenalty, computeCoOccurrenceBonus, computeAntiPairPenalty } from "./stabilityEngine";
 import type { ScoredGame, GameScores, RiskProfile } from "../core/aiTypes";
 
 export function scoreGame(
@@ -29,6 +30,9 @@ export function scoreGame(
   const adaptiveW = selfCalibrateWeights(draws, lotteryId);
   const context = detectContext(draws, lotteryId);
   let contextW = applyContextAdjustments(adaptiveW, context, riskProfile);
+
+  // STABILITY: Smooth weights with EMA to prevent erratic changes
+  contextW = smoothWeights(contextW, lotteryId, riskProfile);
 
   // SELF-LEARNING: Apply weight optimizations from performance history
   const learned = optimizeWeightsFromHistory(lotteryId, riskProfile);
@@ -78,8 +82,14 @@ export function scoreGame(
   // Cluster concentration score
   const clusterScore = computeClusterScore(sorted, rules.totalNumbers);
 
-  // Human pattern penalty (dates, arithmetic, visual lines)
-  const humanPenalty = computeHumanPatternPenalty(sorted);
+  // Human pattern penalty (dates, arithmetic, visual lines) — PROGRESSIVE
+  const progressivePenalty = computeProgressivePenalty(sorted, rules.totalNumbers);
+  const humanPenalty = progressivePenalty.totalPenalty;
+
+  // CO-OCCURRENCE: reward historically co-occurring pairs
+  const coOcc = computeCoOccurrence(draws, rules.totalNumbers, 30);
+  const coOccBonus = computeCoOccurrenceBonus(sorted, coOcc.topPairs);
+  const antiPairPenalty = computeAntiPairPenalty(sorted, coOcc.antiPairs, draws.length);
 
   // ADAPTIVE Monte Carlo — variable depth based on context
   const adaptiveSimCount = getAdaptiveSimCount(context, riskProfile, draws.length);
@@ -129,8 +139,16 @@ export function scoreGame(
     probScore * w.probability
   );
 
-  // Apply all overlays: Monte Carlo + ROI + winning patterns - human penalty
-  const totalScore = Math.max(0, Math.min(100, rawScore + monteCarloBonus * 0.15 + roiBonus * 0.1 + winPatternBonus * 0.1 - humanPenalty * 0.4));
+  // Apply all overlays: Monte Carlo + ROI + winning patterns + co-occurrence - penalties
+  const totalScore = Math.max(0, Math.min(100,
+    rawScore
+    + monteCarloBonus * 0.15
+    + roiBonus * 0.1
+    + winPatternBonus * 0.1
+    + coOccBonus * 0.08
+    - humanPenalty * 0.4
+    - antiPairPenalty * 0.15
+  ));
 
   const grade = totalScore >= 85 ? "S" : totalScore >= 70 ? "A" : totalScore >= 55 ? "B" :
     totalScore >= 40 ? "C" : totalScore >= 25 ? "D" : "F";
@@ -222,7 +240,31 @@ export function rankGames(
   draws: DrawResult[],
   riskProfile: RiskProfile = "balanced"
 ): ScoredGame[] {
-  return games
-    .map(g => scoreGame(g, lotteryId, stats, draws, riskProfile))
-    .sort((a, b) => b.totalScore - a.totalScore);
+  const rules = getLotteryRules(lotteryId);
+
+  // Score all games
+  const scored = games.map(g => scoreGame(g, lotteryId, stats, draws, riskProfile));
+  scored.sort((a, b) => b.totalScore - a.totalScore);
+
+  // PORTFOLIO OPTIMIZATION: if many games, diversify the selection
+  if (scored.length > 3) {
+    const candidates = scored.map(s => ({ numbers: s.numbers, score: s.totalScore }));
+    const optimized = optimizePortfolio(candidates, scored.length, rules.totalNumbers, rules.pick);
+    const optimizedSet = new Set(optimized.map(o => o.join(",")));
+
+    // Re-order: optimized games first, rest after
+    const primary = scored.filter(s => optimizedSet.has(s.numbers.join(",")));
+    const secondary = scored.filter(s => !optimizedSet.has(s.numbers.join(",")));
+    const result = [...primary, ...secondary];
+
+    // SELF-LEARNING: Record performance for future optimization
+    const avgScore = result.reduce((s, g) => s + g.totalScore, 0) / result.length;
+    const roi = estimateROI(result[0].numbers, draws, lotteryId);
+    const portfolio = evaluatePortfolio(result.map(r => r.numbers), rules.totalNumbers);
+    recordPerformance(lotteryId, riskProfile, avgScore, roi.riskAdjustedScore, portfolio.diversityScore);
+
+    return result;
+  }
+
+  return scored;
 }
