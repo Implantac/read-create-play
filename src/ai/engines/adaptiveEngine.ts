@@ -477,3 +477,217 @@ export function applyContextAdjustments(
 
   return adjusted;
 }
+
+// ═══════════════════════════════════════════════════════
+// 7. WINNING PATTERN MEMORY — Learn from real draw results
+// ═══════════════════════════════════════════════════════
+
+export interface WinningPatternProfile {
+  avgParityRatio: number; // avg even/total ratio in winning draws
+  avgSumNormalized: number; // avg sum as % of ideal range
+  avgConsecutivePairs: number;
+  avgDispersal: number; // avg (max-min)/totalNumbers
+  avgRepeatFromPrev: number;
+  zoneProfile: number[]; // avg numbers per zone (5 zones)
+  sampleSize: number;
+}
+
+/** Extract winning patterns from real historical draws */
+export function extractWinningPatterns(
+  draws: DrawResult[],
+  lotteryId: string,
+  window: number = 100
+): WinningPatternProfile {
+  const rules = getLotteryRules(lotteryId);
+  const subset = draws.slice(0, Math.min(window, draws.length));
+  if (subset.length < 5) {
+    return { avgParityRatio: 0.5, avgSumNormalized: 0.5, avgConsecutivePairs: 1, avgDispersal: 0.7, avgRepeatFromPrev: 0, zoneProfile: [], sampleSize: 0 };
+  }
+
+  let totalParityRatio = 0;
+  let totalSumNorm = 0;
+  let totalConsecutive = 0;
+  let totalDispersal = 0;
+  let totalRepeat = 0;
+  const zoneSize = Math.ceil(rules.totalNumbers / 5);
+  const zoneAccum = new Array(5).fill(0);
+
+  for (let i = 0; i < subset.length; i++) {
+    const nums = subset[i].numbers;
+    const sorted = [...nums].sort((a, b) => a - b);
+
+    // Parity
+    const evens = nums.filter(n => n % 2 === 0).length;
+    totalParityRatio += evens / nums.length;
+
+    // Sum normalized to ideal range
+    const sum = nums.reduce((a, b) => a + b, 0);
+    const idealMid = (rules.idealSumRange[0] + rules.idealSumRange[1]) / 2;
+    const sumRange = rules.idealSumRange[1] - rules.idealSumRange[0];
+    totalSumNorm += Math.max(0, 1 - Math.abs(sum - idealMid) / (sumRange * 0.5));
+
+    // Consecutive pairs
+    let consec = 0;
+    for (let j = 1; j < sorted.length; j++) {
+      if (sorted[j] - sorted[j - 1] === 1) consec++;
+    }
+    totalConsecutive += consec;
+
+    // Dispersal
+    totalDispersal += (sorted[sorted.length - 1] - sorted[0]) / rules.totalNumbers;
+
+    // Repeat from previous
+    if (i < subset.length - 1) {
+      const prevSet = new Set(subset[i + 1].numbers);
+      totalRepeat += nums.filter(n => prevSet.has(n)).length;
+    }
+
+    // Zone distribution
+    for (const n of nums) {
+      const z = Math.min(Math.floor((n - 1) / zoneSize), 4);
+      zoneAccum[z]++;
+    }
+  }
+
+  const len = subset.length;
+  return {
+    avgParityRatio: totalParityRatio / len,
+    avgSumNormalized: totalSumNorm / len,
+    avgConsecutivePairs: totalConsecutive / len,
+    avgDispersal: totalDispersal / len,
+    avgRepeatFromPrev: len > 1 ? totalRepeat / (len - 1) : 0,
+    zoneProfile: zoneAccum.map(z => z / len),
+    sampleSize: len,
+  };
+}
+
+/** Score how well a game matches winning patterns */
+export function scoreAgainstWinningPatterns(
+  game: number[],
+  patterns: WinningPatternProfile,
+  lotteryId: string
+): number {
+  if (patterns.sampleSize < 5) return 50; // neutral if insufficient data
+
+  const rules = getLotteryRules(lotteryId);
+  const sorted = [...game].sort((a, b) => a - b);
+
+  // Parity alignment
+  const evens = game.filter(n => n % 2 === 0).length;
+  const parityDev = Math.abs(evens / game.length - patterns.avgParityRatio);
+  const parityScore = Math.max(0, 1 - parityDev * 4);
+
+  // Sum alignment
+  const sum = game.reduce((a, b) => a + b, 0);
+  const idealMid = (rules.idealSumRange[0] + rules.idealSumRange[1]) / 2;
+  const sumRange = rules.idealSumRange[1] - rules.idealSumRange[0];
+  const gameSumNorm = Math.max(0, 1 - Math.abs(sum - idealMid) / (sumRange * 0.5));
+  const sumDev = Math.abs(gameSumNorm - patterns.avgSumNormalized);
+  const sumScore = Math.max(0, 1 - sumDev * 3);
+
+  // Consecutive pairs alignment
+  let consec = 0;
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i] - sorted[i - 1] === 1) consec++;
+  }
+  const consecDev = Math.abs(consec - patterns.avgConsecutivePairs);
+  const consecScore = Math.max(0, 1 - consecDev * 0.3);
+
+  // Dispersal alignment
+  const dispersal = (sorted[sorted.length - 1] - sorted[0]) / rules.totalNumbers;
+  const dispersalDev = Math.abs(dispersal - patterns.avgDispersal);
+  const dispersalScore = Math.max(0, 1 - dispersalDev * 3);
+
+  // Zone alignment
+  let zoneScore = 1;
+  if (patterns.zoneProfile.length === 5) {
+    const zoneSize = Math.ceil(rules.totalNumbers / 5);
+    const gameZones = new Array(5).fill(0);
+    for (const n of game) gameZones[Math.min(Math.floor((n - 1) / zoneSize), 4)]++;
+    let zoneDev = 0;
+    for (let z = 0; z < 5; z++) {
+      zoneDev += Math.abs(gameZones[z] - patterns.zoneProfile[z]);
+    }
+    zoneScore = Math.max(0, 1 - (zoneDev / game.length) * 0.8);
+  }
+
+  // Weighted combination
+  return Math.round(
+    (parityScore * 25 + sumScore * 25 + consecScore * 15 + dispersalScore * 20 + zoneScore * 15)
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// 8. ADAPTIVE MONTE CARLO — Variable depth by context
+// ═══════════════════════════════════════════════════════
+
+/** Determine optimal Monte Carlo simulation count based on context */
+export function getAdaptiveSimCount(
+  context: ContextSnapshot,
+  riskProfile: RiskProfile,
+  drawCount: number
+): number {
+  let base = 50;
+
+  // More simulations when volatility is high (need more confidence)
+  if (context.volatilityIndex > 0.6) base += 25;
+  if (context.volatilityIndex > 0.8) base += 25;
+
+  // More simulations for conservative profiles (need higher confidence)
+  if (riskProfile === "conservative" || riskProfile === "statistical") base += 15;
+
+  // Less simulations for aggressive/exploratory (speed matters more)
+  if (riskProfile === "aggressive" || riskProfile === "exploratory") base -= 10;
+
+  // More sims when regime is unstable
+  if (context.regimeStability < 0.4) base += 20;
+
+  // Cap based on available draw data
+  return Math.min(base, Math.max(20, drawCount));
+}
+
+// ═══════════════════════════════════════════════════════
+// 9. SELF-LEARNING WEIGHT OPTIMIZER
+// ═══════════════════════════════════════════════════════
+
+/** Analyze performance memory to suggest weight adjustments */
+export function optimizeWeightsFromHistory(
+  lotteryId: string,
+  riskProfile: string
+): { adjustments: Partial<AdaptiveWeights>; confidence: number } {
+  const entries = performanceMemory.filter(
+    e => e.lotteryId === lotteryId && e.riskProfile === riskProfile
+  );
+
+  if (entries.length < 3) {
+    return { adjustments: {}, confidence: 0 };
+  }
+
+  // Find the best performing entries
+  const sorted = [...entries].sort((a, b) => b.avgScore - a.avgScore);
+  const topQuartile = sorted.slice(0, Math.max(1, Math.floor(sorted.length / 4)));
+  const bottomQuartile = sorted.slice(-Math.max(1, Math.floor(sorted.length / 4)));
+
+  const avgTopROI = topQuartile.reduce((s, e) => s + e.avgROI, 0) / topQuartile.length;
+  const avgBottomROI = bottomQuartile.reduce((s, e) => s + e.avgROI, 0) / bottomQuartile.length;
+  const avgTopDiversity = topQuartile.reduce((s, e) => s + e.portfolioDiversity, 0) / topQuartile.length;
+  const avgBottomDiversity = bottomQuartile.reduce((s, e) => s + e.portfolioDiversity, 0) / bottomQuartile.length;
+
+  const adjustments: Partial<AdaptiveWeights> = {};
+
+  // If high-scoring batches had better ROI, boost frequency weight
+  if (avgTopROI > avgBottomROI * 1.1) {
+    adjustments.frequencyWeight = 1.1;
+  }
+
+  // If high-scoring batches had better diversity, boost dispersal
+  if (avgTopDiversity > avgBottomDiversity * 1.05) {
+    adjustments.dispersalWeight = 1.1;
+    adjustments.clusterWeight = 1.05;
+  }
+
+  const confidence = Math.min(1, entries.length / 20);
+
+  return { adjustments, confidence };
+}
+

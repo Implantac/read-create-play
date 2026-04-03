@@ -9,7 +9,7 @@ import { computePatternProfile } from "./patternEngine";
 import { getLotteryRules } from "../knowledge/lotteriesKnowledge";
 import { AI_CONFIG } from "../core/aiConfig";
 import { computeSpecialNumberScore, computeHistoricalHitRate, computeClusterScore, computeHumanPatternPenalty, lightMonteCarlo } from "./advancedAnalysisEngine";
-import { estimateROI, detectContext, selfCalibrateWeights, applyContextAdjustments } from "./adaptiveEngine";
+import { estimateROI, detectContext, selfCalibrateWeights, applyContextAdjustments, extractWinningPatterns, scoreAgainstWinningPatterns, getAdaptiveSimCount, optimizeWeightsFromHistory } from "./adaptiveEngine";
 import type { ScoredGame, GameScores, RiskProfile } from "../core/aiTypes";
 
 export function scoreGame(
@@ -28,7 +28,20 @@ export function scoreGame(
   // ADAPTIVE: Self-calibrate weights from historical patterns
   const adaptiveW = selfCalibrateWeights(draws, lotteryId);
   const context = detectContext(draws, lotteryId);
-  const contextW = applyContextAdjustments(adaptiveW, context, riskProfile);
+  let contextW = applyContextAdjustments(adaptiveW, context, riskProfile);
+
+  // SELF-LEARNING: Apply weight optimizations from performance history
+  const learned = optimizeWeightsFromHistory(lotteryId, riskProfile);
+  if (learned.confidence > 0.3) {
+    for (const [key, mult] of Object.entries(learned.adjustments)) {
+      if (key in contextW) {
+        (contextW as any)[key] *= mult as number;
+      }
+    }
+  }
+
+  // WINNING PATTERNS: Extract and score against real historical patterns
+  const winningPatterns = extractWinningPatterns(draws, lotteryId);
 
   // Statistical score: based on frequency alignment
   const selectedStats = sorted.map(n => stats.find(s => s.number === n)).filter(Boolean) as NumberStats[];
@@ -68,8 +81,9 @@ export function scoreGame(
   // Human pattern penalty (dates, arithmetic, visual lines)
   const humanPenalty = computeHumanPatternPenalty(sorted);
 
-  // Monte Carlo simulation
-  const monteCarlo = lightMonteCarlo(sorted, draws, 50);
+  // ADAPTIVE Monte Carlo — variable depth based on context
+  const adaptiveSimCount = getAdaptiveSimCount(context, riskProfile, draws.length);
+  const monteCarlo = lightMonteCarlo(sorted, draws, adaptiveSimCount);
   const monteCarloBonus = Math.round(
     monteCarlo.consistency * 30 + monteCarlo.prizeRate * 20
   );
@@ -77,6 +91,10 @@ export function scoreGame(
   // ADAPTIVE: ROI estimation
   const roi = estimateROI(sorted, draws, lotteryId);
   const roiBonus = Math.round(roi.riskAdjustedScore * 15);
+
+  // WINNING PATTERNS: Score against real historical winning patterns
+  const winPatternScore = scoreAgainstWinningPatterns(sorted, winningPatterns, lotteryId);
+  const winPatternBonus = Math.round((winPatternScore - 50) * 0.2); // centered around 50
 
   // Strategy fit with adaptive cluster/context awareness
   const strategyFit = Math.round(
@@ -111,8 +129,8 @@ export function scoreGame(
     probScore * w.probability
   );
 
-  // Apply bonuses and penalties as overlay (adaptive ROI + Monte Carlo + human penalty)
-  const totalScore = Math.max(0, Math.min(100, rawScore + monteCarloBonus * 0.15 + roiBonus * 0.1 - humanPenalty * 0.4));
+  // Apply all overlays: Monte Carlo + ROI + winning patterns - human penalty
+  const totalScore = Math.max(0, Math.min(100, rawScore + monteCarloBonus * 0.15 + roiBonus * 0.1 + winPatternBonus * 0.1 - humanPenalty * 0.4));
 
   const grade = totalScore >= 85 ? "S" : totalScore >= 70 ? "A" : totalScore >= 55 ? "B" :
     totalScore >= 40 ? "C" : totalScore >= 25 ? "D" : "F";
