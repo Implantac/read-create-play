@@ -35,6 +35,7 @@ const mainItems: { title: string; url: string; icon: any; requiredFeature?: Feat
   { title: "ROI", url: "/roi", icon: TrendingUp, requiredFeature: "roi_dashboard" },
   { title: "Minhas Apostas", url: "/minhas-apostas", icon: ClipboardCheck },
   { title: "Histórico", url: "/historico", icon: History },
+  { title: "Instalar App", url: "/install", icon: Smartphone },
 ];
 
 const PLAN_LABELS: Record<string, string> = {
