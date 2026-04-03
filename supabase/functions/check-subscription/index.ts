@@ -34,8 +34,19 @@ serve(async (req) => {
     if (!authHeader) throw new Error("No authorization header");
 
     const token = authHeader.replace("Bearer ", "");
+    
+    // Use getUser which handles token refresh server-side with service role
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError) throw new Error(`Auth error: ${userError.message}`);
+    if (userError) {
+      // If token is expired, return graceful response instead of 500
+      if (userError.message.includes("expired") || userError.message.includes("invalid")) {
+        return new Response(JSON.stringify({ plan: "free", subscribed: false, expired_token: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+      throw new Error(`Auth error: ${userError.message}`);
+    }
     const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated");
 
