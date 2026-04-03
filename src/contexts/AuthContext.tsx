@@ -41,27 +41,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [userRole, setUserRole] = useState<string>("user");
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = async (userId: string, forceLifetime = false) => {
     const { data } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", userId)
       .single();
     if (data) {
-      setProfile(data as Profile);
+      const p = data as Profile;
+      if (forceLifetime && p.plan !== "lifetime") {
+        p.plan = "lifetime";
+      }
+      setProfile(p);
     }
   };
 
-  const checkAdmin = async (userId: string) => {
+  const checkAdmin = async (userId: string): Promise<boolean> => {
     const { data } = await supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", userId)
       .in("role", ["admin", "super_admin"]);
     const roles = (data || []).map((r: any) => r.role as string);
-    setIsAdmin(roles.includes("admin") || roles.includes("super_admin"));
-    setIsSuperAdmin(roles.includes("super_admin"));
-    setUserRole(roles.includes("super_admin") ? "super_admin" : roles.includes("admin") ? "admin" : roles[0] || "user");
+    const isSA = roles.includes("super_admin");
+    setIsAdmin(roles.includes("admin") || isSA);
+    setIsSuperAdmin(isSA);
+    setUserRole(isSA ? "super_admin" : roles.includes("admin") ? "admin" : roles[0] || "user");
+    return isSA;
   };
 
   const syncSubscription = async (accessToken: string) => {
@@ -95,10 +101,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let initialLoad = true;
 
     const loadUserData = async (userId: string, accessToken?: string) => {
+      const isSA = await checkAdmin(userId);
       await Promise.all([
-        fetchProfile(userId),
-        checkAdmin(userId),
-        ...(accessToken ? [syncSubscription(accessToken)] : []),
+        fetchProfile(userId, isSA),
+        ...(accessToken && !isSA ? [syncSubscription(accessToken)] : []),
       ]);
     };
 
