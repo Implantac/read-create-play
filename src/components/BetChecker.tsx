@@ -8,7 +8,7 @@ import {
   BarChart3, Target, ArrowUpRight, ChevronDown, ChevronUp,
   Award, DollarSign, Sparkles, CheckCircle2, AlertTriangle,
   Copy, Save, Grid3X3, ArrowDown, ArrowUp, Minus, ListChecks,
-  FileDown
+  FileDown, RotateCcw, Hash, Eye, Dice1
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +18,7 @@ import { computeFrequencyStats } from "@/engine/statistics";
 import { useSavedBets, SavedBet } from "@/hooks/useSavedBets";
 import { Progress } from "@/components/ui/progress";
 import { BetHitsChart } from "@/components/BetHitsChart";
+import { Badge } from "@/components/ui/badge";
 
 interface Props {
   draws: DrawResult[];
@@ -101,7 +102,6 @@ function getEstimatedPrize(lotteryId: string, hits: number): { value: number; la
   return prizes[lotteryId]?.[hits] || null;
 }
 
-/** Try to get the real prize value from prize_tiers data */
 function getRealPrizeLabel(prizeTiers: DrawPrizeData | null | undefined, hits: number): string | undefined {
   if (!prizeTiers?.premiacoes) return undefined;
   const tier = prizeTiers.premiacoes.find(p => {
@@ -150,20 +150,6 @@ function ScoreRing({ score, size = 48 }: { score: number; size?: number }) {
   );
 }
 
-function StatCard({ icon: Icon, label, value, accent = false }: {
-  icon: React.ElementType; label: string; value: string | number; accent?: boolean;
-}) {
-  return (
-    <div className={`flex flex-col items-center gap-1 p-2 sm:p-2.5 rounded-lg border transition-colors ${
-      accent ? "bg-primary/10 border-primary/20" : "bg-muted/30 border-border/30"
-    }`}>
-      <Icon className={`w-3.5 h-3.5 ${accent ? "text-primary" : "text-muted-foreground"}`} />
-      <span className={`text-xs sm:text-sm font-bold font-mono ${accent ? "text-primary" : "text-foreground"}`}>{value}</span>
-      <span className="text-[8px] sm:text-[9px] text-muted-foreground leading-tight text-center">{label}</span>
-    </div>
-  );
-}
-
 function TrendBadge({ trend, recentAvg, previousAvg }: { trend: "up" | "down" | "stable"; recentAvg: number; previousAvg: number }) {
   const config = {
     up: { icon: ArrowUp, color: "text-green-400 bg-green-400/10 border-green-400/30", label: "Subindo" },
@@ -180,6 +166,140 @@ function TrendBadge({ trend, recentAvg, previousAvg }: { trend: "up" | "down" | 
   );
 }
 
+/* ─── Quick Check Result Card ─── */
+function QuickCheckResult({
+  bet, draw, lotteryId, onClose
+}: {
+  bet: number[]; draw: DrawResult; lotteryId: string; onClose: () => void;
+}) {
+  const { hits, matched } = matchBetAgainstDraw(bet, draw.numbers, lotteryId);
+  const prize = getEstimatedPrize(lotteryId, hits);
+  const maxHits = getMaxPossibleHits(lotteryId, bet.length);
+  const pct = maxHits > 0 ? Math.round((hits / maxHits) * 100) : 0;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95, y: 10 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      className="rounded-xl border-2 overflow-hidden"
+      style={{
+        borderColor: prize ? "hsl(var(--primary))" : hits > 0 ? "hsl(var(--border))" : "hsl(var(--destructive) / 0.3)"
+      }}
+    >
+      {/* Result header */}
+      <div className={`px-4 py-3 flex items-center justify-between ${
+        prize ? "bg-primary/10" : "bg-muted/30"
+      }`}>
+        <div className="flex items-center gap-3">
+          {prize ? (
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+              <Trophy className="w-5 h-5 text-primary" />
+            </div>
+          ) : hits > 0 ? (
+            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+              <Target className="w-5 h-5 text-muted-foreground" />
+            </div>
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
+              <X className="w-5 h-5 text-destructive" />
+            </div>
+          )}
+          <div>
+            <p className="text-sm font-bold text-foreground">
+              {hits} de {maxHits} acertos
+              {prize && <span className="ml-2 text-primary">🎉</span>}
+            </p>
+            <p className="text-[11px] text-muted-foreground">
+              Concurso #{draw.concurso} — {draw.date}
+            </p>
+          </div>
+        </div>
+        <button onClick={onClose} className="p-1 rounded-md hover:bg-muted/50">
+          <X className="w-4 h-4 text-muted-foreground" />
+        </button>
+      </div>
+
+      <div className="p-4 space-y-4">
+        {/* Progress bar */}
+        <div className="space-y-1">
+          <div className="flex justify-between text-[10px] text-muted-foreground">
+            <span>Aproveitamento</span>
+            <span className="font-mono font-bold text-foreground">{pct}%</span>
+          </div>
+          <div className="h-2 rounded-full bg-muted overflow-hidden">
+            <motion.div
+              className={`h-full rounded-full ${prize ? "bg-primary" : hits > 0 ? "bg-muted-foreground" : "bg-destructive/50"}`}
+              initial={{ width: 0 }}
+              animate={{ width: `${pct}%` }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            />
+          </div>
+        </div>
+
+        {/* Numbers comparison */}
+        <div className="space-y-2">
+          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Seus números</p>
+          <div className="flex flex-wrap gap-1.5">
+            {bet.map(n => {
+              const isMatch = matched.includes(n);
+              return (
+                <motion.span
+                  key={n}
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: 1 }}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-mono font-bold border-2 transition-all ${
+                    isMatch
+                      ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/30 ring-2 ring-primary/20"
+                      : "bg-muted/50 text-muted-foreground border-border/50"
+                  }`}
+                >
+                  {String(n).padStart(2, "0")}
+                </motion.span>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Números sorteados</p>
+          <div className="flex flex-wrap gap-1.5">
+            {draw.numbers.map(n => {
+              const isMatch = matched.includes(n);
+              return (
+                <span
+                  key={n}
+                  className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-mono font-bold border ${
+                    isMatch
+                      ? "bg-primary/15 text-primary border-primary/40 font-black"
+                      : "bg-card text-foreground/60 border-border/30"
+                  }`}
+                >
+                  {String(n).padStart(2, "0")}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Prize info */}
+        {prize && (
+          <motion.div
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/20"
+          >
+            <DollarSign className="w-5 h-5 text-primary" />
+            <div>
+              <p className="text-xs font-bold text-primary">{prize.label}</p>
+              <p className="text-[10px] text-muted-foreground">Estimativa de prêmio</p>
+            </div>
+          </motion.div>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
 export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick }: Props) {
   const [inputValue, setInputValue] = useState("");
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
@@ -188,16 +308,16 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
   const [aiImprovements, setAiImprovements] = useState<AIImprovement[]>([]);
   const [loadingAI, setLoadingAI] = useState(false);
   const [drawRange, setDrawRange] = useState<number>(10);
-  const [activeTab, setActiveTab] = useState<"check" | "performance" | "improve">("check");
+  const [activeTab, setActiveTab] = useState<"quick" | "check" | "performance" | "improve">("quick");
   const [expandedPerf, setExpandedPerf] = useState<number | null>(null);
   const [hasRunPerformance, setHasRunPerformance] = useState(false);
-  const [showGrid, setShowGrid] = useState(false);
+  const [showGrid, setShowGrid] = useState(true);
+  const [quickCheckResult, setQuickCheckResult] = useState<{ bet: number[]; draw: DrawResult } | null>(null);
 
   const { savedBets, saveBet } = useSavedBets(lotteryId);
   const selectedDraws = useMemo(() => draws.slice(0, drawRange), [draws, drawRange]);
   const lastDraw = useMemo(() => draws.length > 0 ? draws[0] : null, [draws]);
 
-  // Prize data map for real values
   const prizeDataMap = useMemo(() => {
     if (!drawsWithPrizes) return new Map<number, DrawPrizeData | null>();
     const map = new Map<number, DrawPrizeData | null>();
@@ -213,7 +333,9 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
     setInputValue("");
     setExpandedPerf(null);
     setHasRunPerformance(false);
-    setShowGrid(false);
+    setShowGrid(true);
+    setQuickCheckResult(null);
+    setActiveTab("quick");
   }, [lotteryId]);
 
   useEffect(() => {
@@ -230,7 +352,7 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
 
   const handleInput = (val: string) => {
     setInputValue(val);
-    const nums = val.split(/[,\s\-]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n) && n >= 1 && n <= maxNumbers);
+    const nums = val.split(/[,\s\-]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n) && n >= (lotteryId === "lotomania" ? 0 : 1) && n <= maxNumbers);
     if (nums.length > 0 && (val.endsWith(" ") || val.endsWith(",") || val.endsWith("-"))) {
       const unique = [...new Set([...selectedNumbers, ...nums])].sort((a, b) => a - b);
       if (unique.length <= pick) {
@@ -242,7 +364,7 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
   };
 
   const addFromInput = () => {
-    const nums = inputValue.split(/[,\s\-]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n) && n >= 1 && n <= maxNumbers);
+    const nums = inputValue.split(/[,\s\-]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n) && n >= (lotteryId === "lotomania" ? 0 : 1) && n <= maxNumbers);
     if (nums.length === 0) return;
     const unique = [...new Set([...selectedNumbers, ...nums])].sort((a, b) => a - b);
     if (unique.length > pick) { toast.error(`Máximo de ${pick} números`); return; }
@@ -254,6 +376,7 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
   const removeNumber = (n: number) => {
     setSelectedNumbers(prev => prev.filter(x => x !== n));
     setResults(null);
+    setQuickCheckResult(null);
   };
 
   const toggleGridNumber = useCallback((n: number) => {
@@ -263,12 +386,21 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
       return [...prev, n].sort((a, b) => a - b);
     });
     setResults(null);
+    setQuickCheckResult(null);
   }, [pick]);
 
   const loadSavedBet = (bet: SavedBet) => {
     setSelectedNumbers([...bet.numbers]);
     setResults(null);
+    setQuickCheckResult(null);
     toast.success(`Aposta "${bet.label || bet.strategy || "salva"}" carregada`);
+  };
+
+  // Quick check against last draw
+  const quickCheck = () => {
+    if (selectedNumbers.length < 1) { toast.error("Selecione pelo menos 1 número"); return; }
+    if (!lastDraw) { toast.error("Nenhum sorteio disponível"); return; }
+    setQuickCheckResult({ bet: [...selectedNumbers], draw: lastDraw });
   };
 
   const check = () => {
@@ -278,11 +410,21 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
       return { concurso: draw.concurso, date: draw.date, drawnNumbers: draw.numbers, matchedNumbers: matched, matchCount: hits };
     }).filter(r => r.matchCount > 0).sort((a, b) => b.matchCount - a.matchCount);
     setResults(matches);
+    setActiveTab("check");
     toast.success(`${matches.length} concursos com acertos encontrados`);
   };
 
-  const clear = () => { setSelectedNumbers([]); setResults(null); setInputValue(""); };
-  const copyNumbers = (nums: number[]) => { navigator.clipboard.writeText(nums.join(", ")); toast.success("Números copiados!"); };
+  const clear = () => {
+    setSelectedNumbers([]);
+    setResults(null);
+    setInputValue("");
+    setQuickCheckResult(null);
+  };
+
+  const copyNumbers = (nums: number[]) => {
+    navigator.clipboard.writeText(nums.join(", "));
+    toast.success("Números copiados!");
+  };
 
   const computeTrend = (betResults: { hits: number }[]): { trend: "up" | "down" | "stable"; recentAvg: number; previousAvg: number } => {
     if (betResults.length < 6) return { trend: "stable", recentAvg: 0, previousAvg: 0 };
@@ -309,7 +451,6 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
         const { hits, matched } = matchBetAgainstDraw(bet.numbers, draw.numbers, lotteryId);
         const prizeInfo = getEstimatedPrize(lotteryId, hits);
         if (prizeInfo) totalPrizeValue += prizeInfo.value;
-        // Try real prize
         const realPrize = getRealPrizeLabel(prizeDataMap.get(draw.concurso), hits);
         return { concurso: draw.concurso, date: draw.date, hits, matched, prize: prizeInfo?.label || "", prizeValue: prizeInfo?.value || 0, realPrize };
       });
@@ -390,13 +531,15 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
   }, [performances]);
 
   const tabs = [
-    { key: "check" as const, label: "Conferir", icon: Search, desc: "Manual" },
-    { key: "performance" as const, label: "Performance", icon: BarChart3, desc: drawRange === 1 ? "Último" : `${drawRange} jogos` },
-    { key: "improve" as const, label: "IA Melhorias", icon: Brain, desc: "Otimizar" },
+    { key: "quick" as const, label: "Conferir", icon: Zap, desc: "Último sorteio" },
+    { key: "check" as const, label: "Histórico", icon: Search, desc: "Todos" },
+    { key: "performance" as const, label: "Performance", icon: BarChart3, desc: `${drawRange} jogos` },
+    { key: "improve" as const, label: "IA", icon: Brain, desc: "Melhorias" },
   ];
 
-  // Number grid columns
-  const gridCols = maxNumbers <= 31 ? 8 : maxNumbers <= 50 ? 10 : 10;
+  const gridCols = maxNumbers <= 10 ? 5 : maxNumbers <= 31 ? 8 : maxNumbers <= 50 ? 10 : 10;
+  const startNum = lotteryId === "lotomania" ? 0 : 1;
+  const totalNums = lotteryId === "lotomania" ? maxNumbers + 1 : maxNumbers;
 
   return (
     <div className="rounded-xl glass-card overflow-hidden">
@@ -404,169 +547,260 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
       <div className="relative p-4 sm:p-5 pb-3 sm:pb-4">
         <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-primary/5 pointer-events-none" />
         <div className="relative flex items-center gap-3">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-accent/20 to-primary/20 border border-accent/20 flex items-center justify-center shadow-lg shadow-accent/5">
-            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent/20 to-primary/20 border border-accent/20 flex items-center justify-center shadow-lg shadow-accent/5">
+            <CheckCircle2 className="w-5 h-5 text-accent" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm sm:text-base font-bold text-foreground tracking-tight">Conferência Inteligente</h3>
+            <h3 className="text-sm sm:text-base font-bold text-foreground tracking-tight">Conferência de Jogos</h3>
             <p className="text-[10px] sm:text-[11px] text-muted-foreground mt-0.5">
-              Confira apostas, analise performance e receba melhorias da IA
+              Selecione seus números e confira instantaneamente
             </p>
           </div>
-          <div className="flex items-center gap-1.5 shrink-0">
-            {savedBets.length > 0 && (
-              <span className="text-[10px] px-2 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary font-medium">
-                {savedBets.length} salvas
-              </span>
-            )}
-          </div>
+          {savedBets.length > 0 && (
+            <Badge variant="outline" className="text-[10px] border-primary/30 text-primary shrink-0">
+              {savedBets.length} salvas
+            </Badge>
+          )}
         </div>
       </div>
 
+      {/* ─── Number Input Area ─── */}
+      <div className="px-4 sm:px-5 space-y-3">
+        {/* Input field */}
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Hash className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+            <Input
+              value={inputValue}
+              onChange={e => handleInput(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && addFromInput()}
+              placeholder={`Digite: 5, 12, 23... (${selectedNumbers.length}/${pick})`}
+              className="bg-muted/50 border-border/50 text-sm pl-9"
+            />
+          </div>
+          <Button
+            size="icon"
+            variant={showGrid ? "default" : "outline"}
+            onClick={() => setShowGrid(!showGrid)}
+            className="shrink-0"
+            title="Grade visual"
+          >
+            <Grid3X3 className="w-4 h-4" />
+          </Button>
+          {selectedNumbers.length > 0 && (
+            <Button size="icon" variant="ghost" onClick={clear} title="Limpar">
+              <RotateCcw className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
+
+        {/* Quick load saved bets */}
+        {savedBets.length > 0 && (
+          <div className="flex gap-1.5 flex-wrap items-center">
+            <span className="text-[10px] text-muted-foreground mr-1">Salvas:</span>
+            {savedBets.slice(0, 8).map((bet, i) => (
+              <button
+                key={bet.id}
+                onClick={() => loadSavedBet(bet)}
+                className="text-[10px] px-2 py-1 rounded-lg border border-border/40 bg-muted/30 hover:bg-primary/10 hover:border-primary/30 text-muted-foreground hover:text-foreground transition-all truncate max-w-[120px]"
+              >
+                {bet.label || bet.strategy || `#${i + 1}`}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Number Grid */}
+        <AnimatePresence>
+          {showGrid && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+            >
+              <div
+                className="grid gap-1 sm:gap-1.5 p-3 rounded-xl bg-muted/20 border border-border/30"
+                style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}
+              >
+                {Array.from({ length: totalNums }, (_, i) => i + startNum).map(n => {
+                  const isSelected = selectedNumbers.includes(n);
+                  const isInLastDraw = lastDraw?.numbers.includes(n);
+                  return (
+                    <motion.button
+                      key={n}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => toggleGridNumber(n)}
+                      className={`relative aspect-square rounded-lg text-[10px] sm:text-xs font-mono font-bold flex items-center justify-center transition-all border ${
+                        isSelected
+                          ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/30 scale-105 z-10"
+                          : "bg-card/60 text-foreground/70 border-border/40 hover:bg-primary/10 hover:border-primary/30"
+                      }`}
+                    >
+                      {String(n).padStart(2, "0")}
+                      {isInLastDraw && !isSelected && (
+                        <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-accent border border-background" />
+                      )}
+                    </motion.button>
+                  );
+                })}
+              </div>
+              {/* Legend */}
+              <div className="flex items-center gap-3 mt-2 px-1 text-[9px] text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-primary" /> Selecionado
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-accent" /> Último sorteio
+                </span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Selected numbers display */}
+        {selectedNumbers.length > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-muted-foreground font-medium">
+                {selectedNumbers.length}/{pick} selecionados
+              </span>
+              <button onClick={() => copyNumbers(selectedNumbers)} className="text-[10px] text-primary hover:underline flex items-center gap-1">
+                <Copy className="w-3 h-3" /> Copiar
+              </button>
+            </div>
+            <Progress value={(selectedNumbers.length / pick) * 100} className="h-1.5" />
+            <div className="flex flex-wrap gap-1.5 min-h-[36px] items-center">
+              <AnimatePresence mode="popLayout">
+                {selectedNumbers.map(n => (
+                  <motion.button
+                    key={n} layout initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
+                    className="lottery-ball text-xs w-8 h-8 relative group cursor-pointer"
+                    onClick={() => removeNumber(n)}
+                  >
+                    {String(n).padStart(2, "0")}
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full text-[8px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <X className="w-2.5 h-2.5" />
+                    </span>
+                  </motion.button>
+                ))}
+              </AnimatePresence>
+            </div>
+          </div>
+        )}
+
+        {/* Action buttons */}
+        <div className="flex gap-2 flex-wrap">
+          <Button
+            onClick={quickCheck}
+            disabled={selectedNumbers.length < 1 || !lastDraw}
+            className="flex-1 gap-2 gradient-brand text-primary-foreground shadow-md"
+          >
+            <Zap className="w-4 h-4" />
+            Conferir Último Sorteio
+          </Button>
+          <Button
+            onClick={check}
+            disabled={selectedNumbers.length < 1}
+            variant="outline"
+            className="gap-2"
+          >
+            <Search className="w-4 h-4" />
+            Todos
+          </Button>
+          {savedBets.length > 0 && (
+            <Button onClick={runCheckAll} variant="outline" className="gap-2">
+              <ListChecks className="w-4 h-4" />
+              Conferir Salvas
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Quick check result */}
+      <AnimatePresence>
+        {quickCheckResult && (
+          <div className="px-4 sm:px-5 pt-3">
+            <QuickCheckResult
+              bet={quickCheckResult.bet}
+              draw={quickCheckResult.draw}
+              lotteryId={lotteryId}
+              onClose={() => setQuickCheckResult(null)}
+            />
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Tab navigation */}
-      <div className="px-4 sm:px-5">
+      <div className="px-4 sm:px-5 pt-4">
         <div className="flex gap-0.5 p-1 rounded-xl bg-muted/50 border border-border/30">
           {tabs.map(tab => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 flex flex-col items-center gap-0.5 py-2 sm:py-2.5 px-1.5 sm:px-2 rounded-lg transition-all duration-200 ${
+              className={`flex-1 flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg transition-all duration-200 ${
                 activeTab === tab.key
                   ? "bg-card text-foreground shadow-md border border-border/50"
                   : "text-muted-foreground hover:text-foreground hover:bg-card/50"
               }`}
             >
-              <tab.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${activeTab === tab.key ? "text-primary" : ""}`} />
-              <span className="text-[10px] sm:text-[11px] font-medium">{tab.label}</span>
-              <span className="text-[7px] sm:text-[8px] opacity-60">{tab.desc}</span>
+              <tab.icon className={`w-3.5 h-3.5 ${activeTab === tab.key ? "text-primary" : ""}`} />
+              <span className="text-[10px] font-medium">{tab.label}</span>
+              <span className="text-[7px] opacity-60">{tab.desc}</span>
             </button>
           ))}
         </div>
       </div>
 
-      <div className="p-4 sm:p-5 pt-3 sm:pt-4">
-        {/* ========== TAB: CHECK ========== */}
-        {activeTab === "check" && (
-          <div className="space-y-3 sm:space-y-4">
-            {/* Input + grid toggle */}
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Input
-                  value={inputValue}
-                  onChange={e => handleInput(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && addFromInput()}
-                  placeholder={`Digite números: 5, 12, 23...`}
-                  className="bg-muted/50 border-border/50 text-sm focus:border-primary/50 pl-9"
-                />
-                <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
-              </div>
-              <Button size="icon" variant="outline" onClick={() => setShowGrid(!showGrid)} className="shrink-0 border-border/50" title="Grade visual">
-                <Grid3X3 className={`w-4 h-4 ${showGrid ? "text-primary" : ""}`} />
-              </Button>
-              <Button size="sm" onClick={check} disabled={selectedNumbers.length < 1} className="gradient-brand text-primary-foreground shadow-md shadow-primary/10 px-3 sm:px-5">
-                Conferir
-              </Button>
-            </div>
-
-            {/* Quick-load saved bets */}
-            {savedBets.length > 0 && (
-              <div className="space-y-1.5">
-                <p className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
-                  <ListChecks className="w-3 h-3" /> Carregar aposta salva:
-                </p>
-                <div className="flex gap-1.5 flex-wrap">
-                  {savedBets.slice(0, 6).map((bet, i) => (
-                    <button
-                      key={bet.id}
-                      onClick={() => loadSavedBet(bet)}
-                      className="text-[10px] px-2.5 py-1.5 rounded-lg border border-border/40 bg-muted/30 hover:bg-primary/10 hover:border-primary/30 text-muted-foreground hover:text-foreground transition-all truncate max-w-[140px]"
-                    >
-                      {bet.label || bet.strategy || `#${i + 1}`}
-                    </button>
+      <div className="p-4 sm:p-5 pt-3">
+        {/* ========== TAB: QUICK (last draw) ========== */}
+        {activeTab === "quick" && (
+          <div className="space-y-3">
+            {lastDraw && (
+              <div className="rounded-xl bg-accent/5 border border-accent/15 p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Target className="w-4 h-4 text-accent" />
+                    <span className="text-xs font-semibold text-foreground">
+                      Último: <span className="font-mono text-accent">#{lastDraw.concurso}</span>
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground">{lastDraw.date}</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {lastDraw.numbers.map(n => (
+                    <span key={n} className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-mono font-bold bg-accent/15 text-accent border border-accent/30">
+                      {String(n).padStart(2, "0")}
+                    </span>
                   ))}
-                  {savedBets.length > 6 && (
-                    <span className="text-[10px] text-muted-foreground self-center">+{savedBets.length - 6}</span>
-                  )}
                 </div>
               </div>
             )}
 
-            {/* Number grid */}
-            <AnimatePresence>
-              {showGrid && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div
-                    className="grid gap-1 sm:gap-1.5 p-3 rounded-xl bg-muted/20 border border-border/30"
-                    style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}
-                  >
-                    {Array.from({ length: maxNumbers }, (_, i) => i + 1).map(n => {
-                      const isSelected = selectedNumbers.includes(n);
-                      return (
-                        <motion.button
-                          key={n}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => toggleGridNumber(n)}
-                          className={`aspect-square rounded-md text-[10px] sm:text-xs font-mono font-bold flex items-center justify-center transition-all border ${
-                            isSelected
-                              ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/30"
-                              : "bg-card/60 text-foreground/70 border-border/40 hover:bg-primary/10 hover:border-primary/30"
-                          }`}
-                        >
-                          {String(n).padStart(2, "0")}
-                        </motion.button>
-                      );
-                    })}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Selected numbers with counter */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] text-muted-foreground">{selectedNumbers.length}/{pick} números</span>
-                {selectedNumbers.length > 0 && (
-                  <button onClick={clear} className="text-[10px] text-destructive hover:text-destructive/80 transition-colors">Limpar tudo</button>
-                )}
+            {selectedNumbers.length === 0 && !quickCheckResult && (
+              <div className="text-center py-8 text-muted-foreground border border-dashed border-border/30 rounded-xl">
+                <Dice1 className="w-8 h-8 mx-auto mb-3 opacity-30" />
+                <p className="text-xs font-medium">Selecione seus números acima</p>
+                <p className="text-[10px] mt-1 opacity-60">Use a grade ou digite para conferir</p>
               </div>
-              <Progress value={(selectedNumbers.length / pick) * 100} className="h-1" />
-              <div className="flex flex-wrap gap-1.5 min-h-[36px] items-center">
-                <AnimatePresence mode="popLayout">
-                  {selectedNumbers.map(n => (
-                    <motion.button
-                      key={n} layout initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
-                      className="lottery-ball text-xs w-8 h-8 relative group cursor-pointer"
-                      onClick={() => removeNumber(n)}
-                    >
-                      {String(n).padStart(2, "0")}
-                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive text-destructive-foreground rounded-full text-[8px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <X className="w-2.5 h-2.5" />
-                      </span>
-                    </motion.button>
-                  ))}
-                </AnimatePresence>
-                {selectedNumbers.length === 0 && (
-                  <span className="text-xs text-muted-foreground/60 py-2 italic">Nenhum número selecionado</span>
-                )}
-              </div>
-            </div>
+            )}
+          </div>
+        )}
 
+        {/* ========== TAB: CHECK (all draws) ========== */}
+        {activeTab === "check" && (
+          <div className="space-y-3">
             {/* Prize tier summary */}
             <AnimatePresence>
               {results && tierSummary.length > 0 && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-3 gap-2">
                   {tierSummary.filter(t => t.count > 0).map(tier => (
                     <motion.div key={tier.label} initial={{ scale: 0.9 }} animate={{ scale: 1 }}
-                      className="rounded-xl bg-gradient-to-br from-accent/10 to-accent/5 border border-accent/20 p-2.5 sm:p-3 text-center"
+                      className="rounded-xl bg-gradient-to-br from-accent/10 to-accent/5 border border-accent/20 p-2.5 text-center"
                     >
-                      <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-accent mx-auto mb-1" />
-                      <p className="text-base sm:text-lg font-bold font-mono text-accent">{tier.count}x</p>
-                      <p className="text-[9px] sm:text-[10px] text-muted-foreground">{tier.label}</p>
+                      <Trophy className="w-4 h-4 text-accent mx-auto mb-1" />
+                      <p className="text-lg font-bold font-mono text-accent">{tier.count}x</p>
+                      <p className="text-[9px] text-muted-foreground">{tier.label}</p>
                     </motion.div>
                   ))}
                 </motion.div>
@@ -576,24 +810,24 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
             {/* Results list */}
             <AnimatePresence>
               {results && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-1.5 max-h-60 overflow-y-auto pr-1">
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-1.5 max-h-[350px] overflow-y-auto pr-1">
                   {results.length === 0 && (
                     <div className="text-center py-6 text-muted-foreground">
                       <AlertTriangle className="w-6 h-6 mx-auto mb-2 opacity-40" />
                       <p className="text-xs">Nenhum acerto nos {draws.length} concursos</p>
                     </div>
                   )}
-                  {results.slice(0, 30).map((r, i) => (
-                    <motion.div key={r.concurso} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.02 }}
-                      className="flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-lg bg-muted/30 border border-border/20 hover:bg-muted/50 transition-colors"
+                  {results.slice(0, 50).map((r, i) => (
+                    <motion.div key={r.concurso} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.015 }}
+                      className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/30 border border-border/20 hover:bg-muted/50 transition-colors"
                     >
-                      <div className="text-xs min-w-[60px] sm:min-w-[80px]">
+                      <div className="text-xs min-w-[70px]">
                         <span className="font-mono font-medium text-foreground">#{r.concurso}</span>
-                        <span className="text-muted-foreground ml-1 text-[9px] sm:text-[10px] hidden sm:inline">{r.date}</span>
+                        <span className="text-muted-foreground ml-1 text-[10px] hidden sm:inline">{r.date}</span>
                       </div>
                       <div className="flex items-center gap-1 shrink-0">
                         <Trophy className="w-3 h-3 text-accent" />
-                        <span className="text-xs font-bold text-accent">{r.matchCount}</span>
+                        <span className="text-sm font-bold text-accent">{r.matchCount}</span>
                       </div>
                       <div className="flex flex-wrap gap-0.5 ml-auto">
                         {r.matchedNumbers.map(n => (
@@ -605,66 +839,29 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {!results && (
+              <div className="text-center py-8 text-muted-foreground border border-dashed border-border/30 rounded-xl">
+                <Search className="w-8 h-8 mx-auto mb-3 opacity-30" />
+                <p className="text-xs font-medium">Confira contra todo o histórico</p>
+                <p className="text-[10px] mt-1 opacity-60">Selecione números e clique "Todos"</p>
+              </div>
+            )}
           </div>
         )}
 
         {/* ========== TAB: PERFORMANCE ========== */}
         {activeTab === "performance" && (
-          <div className="space-y-3 sm:space-y-4">
-            {/* Last draw info */}
-            {lastDraw && (
-              <div className="rounded-lg bg-accent/5 border border-accent/15 p-2.5 sm:p-3 space-y-2">
-                <div className="flex items-center gap-2">
-                  <Target className="w-3.5 h-3.5 text-accent" />
-                  <span className="text-[10px] sm:text-[11px] font-semibold text-foreground">
-                    Último sorteio: <span className="font-mono text-accent">#{lastDraw.concurso}</span>
-                    {lastDraw.date && <span className="text-muted-foreground ml-1">({lastDraw.date})</span>}
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  {lastDraw.numbers.map(n => (
-                    <span key={n} className="text-[9px] sm:text-[10px] w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center font-mono font-bold bg-accent/15 text-accent border border-accent/30">
-                      {String(n).padStart(2, "0")}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Matching rule indicator */}
-            {(() => {
-              const rules: Record<string, { badge: string; title: string; desc: string }> = {
-                megasena: { badge: "6", title: "Mega Sena — Interseção (6 de 60)", desc: "Aposta 6 números de 1 a 60. Faixas: Sena (6), Quina (5), Quadra (4)." },
-                lotofacil: { badge: "15", title: "Lotofácil — Interseção (15 de 25)", desc: "Aposta 15 números de 1 a 25. Faixas: 15 a 11 acertos." },
-                quina: { badge: "5", title: "Quina — Interseção (5 de 80)", desc: "Aposta 5 números de 1 a 80. Faixas: Quina (5) a Duque (2)." },
-                lotomania: { badge: "20", title: "Lotomania — Interseção (máx. 20)", desc: "Aposta 50 de 0 a 99. Sorteio: 20. Faixas: 20 a 15 + prêmio 0." },
-                duplasena: { badge: "2x", title: "Dupla Sena — Interseção (6 de 50)", desc: "Dois sorteios por concurso. Faixas: Sena a Terno." },
-                timemania: { badge: "7", title: "Timemania — Interseção (máx. 7)", desc: "Aposta 10 de 1 a 80. Sorteio: 7. Faixas: 7 a 3." },
-                diadesorte: { badge: "7", title: "Dia de Sorte — Interseção (7 de 31)", desc: "Aposta 7 de 1 a 31. Faixas: 7 a 4." },
-                supersete: { badge: "P", title: "Super Sete — Posicional", desc: "1 dígito por coluna, 7 colunas. Acertos = posições iguais." },
-              };
-              const rule = rules[lotteryId] || rules.megasena;
-              return (
-                <div className="flex items-start gap-2 text-[9px] sm:text-[10px] rounded-lg px-2.5 sm:px-3 py-2 border border-border/20 bg-muted/30">
-                  <div className="w-5 h-5 shrink-0 rounded-md bg-primary/15 border border-primary/30 flex items-center justify-center">
-                    <span className="text-[8px] font-bold text-primary">{rule.badge}</span>
-                  </div>
-                  <span className="text-muted-foreground">
-                    <span className="text-foreground font-semibold">{rule.title}</span> — {rule.desc}
-                  </span>
-                </div>
-              );
-            })()}
-
-            <div className="flex items-center justify-between flex-wrap gap-2 sm:gap-3">
-              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 {[1, 10, 50, 100].map(n => (
                   <button
                     key={n}
                     onClick={() => setDrawRange(n)}
-                    className={`text-[10px] sm:text-[11px] px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border transition-all font-medium ${
+                    className={`text-[10px] px-3 py-1.5 rounded-lg border transition-all font-medium ${
                       drawRange === n
-                        ? "border-primary bg-primary/15 text-primary shadow-sm shadow-primary/10"
+                        ? "border-primary bg-primary/15 text-primary shadow-sm"
                         : "border-border/50 text-muted-foreground hover:text-foreground hover:border-border"
                     }`}
                   >
@@ -672,28 +869,19 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                   </button>
                 ))}
               </div>
-              <div className="flex gap-1.5">
-                {savedBets.length > 0 && (
-                  <Button size="sm" variant="outline" onClick={runCheckAll} className="text-[10px] sm:text-xs gap-1 h-7 sm:h-8 border-border/50">
-                    <ListChecks className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Conferir Todas
-                  </Button>
-                )}
-                <Button size="sm" onClick={runPerformanceCheck} className="text-[10px] sm:text-xs gap-1 shadow-md h-7 sm:h-8">
-                  <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Analisar
-                </Button>
-              </div>
+              <Button size="sm" onClick={runPerformanceCheck} className="text-xs gap-1.5 shadow-md">
+                <TrendingUp className="w-3.5 h-3.5" /> Analisar
+              </Button>
             </div>
 
             {/* Draw range info */}
-            {selectedDraws.length > 0 && (
-              <div className="flex items-center gap-2 text-[9px] sm:text-[10px] text-muted-foreground bg-muted/30 rounded-lg px-2.5 sm:px-3 py-2 border border-border/20">
+            {selectedDraws.length > 0 && performances.length > 0 && (
+              <div className="flex items-center gap-2 text-[10px] text-muted-foreground bg-muted/30 rounded-lg px-3 py-2 border border-border/20">
                 <BarChart3 className="w-3 h-3 shrink-0" />
                 <span>
-                  Concursos{" "}
-                  <span className="font-mono text-foreground">#{selectedDraws[selectedDraws.length - 1]?.concurso}</span>
-                  {" a "}
-                  <span className="font-mono text-foreground">#{selectedDraws[0]?.concurso}</span>
-                  {" "}({selectedDraws.length} sorteios)
+                  Concursos <span className="font-mono text-foreground">#{selectedDraws[selectedDraws.length - 1]?.concurso}</span>
+                  {" a "}<span className="font-mono text-foreground">#{selectedDraws[0]?.concurso}</span>
+                  {" "}({selectedDraws.length})
                 </span>
               </div>
             )}
@@ -702,13 +890,22 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
             <AnimatePresence>
               {globalSummary && (
                 <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
-                    <StatCard icon={Target} label="Score médio" value={globalSummary.avgScore} />
-                    <StatCard icon={Trophy} label="Melhor acerto" value={globalSummary.bestOverall} />
-                    <StatCard icon={Award} label="Premiações" value={`${globalSummary.totalPrizeHits}x`} />
-                    <StatCard icon={DollarSign} label="Total estimado" value={formatCurrency(globalSummary.totalPrize)} accent />
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {[
+                      { icon: Target, label: "Score médio", value: globalSummary.avgScore },
+                      { icon: Trophy, label: "Melhor acerto", value: globalSummary.bestOverall, accent: true },
+                      { icon: Award, label: "Premiações", value: `${globalSummary.totalPrizeHits}x` },
+                      { icon: DollarSign, label: "Total estimado", value: formatCurrency(globalSummary.totalPrize), accent: true },
+                    ].map(s => (
+                      <div key={s.label} className={`flex flex-col items-center gap-1 p-2.5 rounded-lg border transition-colors ${
+                        s.accent ? "bg-primary/10 border-primary/20" : "bg-muted/30 border-border/30"
+                      }`}>
+                        <s.icon className={`w-3.5 h-3.5 ${s.accent ? "text-primary" : "text-muted-foreground"}`} />
+                        <span className={`text-sm font-bold font-mono ${s.accent ? "text-primary" : "text-foreground"}`}>{s.value}</span>
+                        <span className="text-[9px] text-muted-foreground text-center">{s.label}</span>
+                      </div>
+                    ))}
                   </div>
-                  {/* Trend summary */}
                   {(globalSummary.trendsUp > 0 || globalSummary.trendsDown > 0) && (
                     <div className="flex items-center gap-3 mt-2 text-[10px] text-muted-foreground">
                       {globalSummary.trendsUp > 0 && (
@@ -736,42 +933,42 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                     <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
                       className="rounded-xl bg-card/60 border border-border/30 overflow-hidden hover:border-border/60 transition-colors"
                     >
-                      <button className="w-full flex items-center gap-2 sm:gap-3 p-3 sm:p-3.5 text-left" onClick={() => setExpandedPerf(isExpanded ? null : i)}>
+                      <button className="w-full flex items-center gap-2 sm:gap-3 p-3 text-left" onClick={() => setExpandedPerf(isExpanded ? null : i)}>
                         <div className="shrink-0">
-                          {i < 3 ? <span className="text-base sm:text-lg">{["🥇", "🥈", "🥉"][i]}</span>
+                          {i < 3 ? <span className="text-lg">{["🥇", "🥈", "🥉"][i]}</span>
                             : <span className="text-xs font-mono text-muted-foreground w-6 text-center">#{i + 1}</span>}
                         </div>
                         <ScoreRing score={perf.score} size={38} />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <p className="text-[11px] sm:text-xs font-semibold text-foreground truncate">{perf.label}</p>
+                            <p className="text-xs font-semibold text-foreground truncate">{perf.label}</p>
                             {perf.trend && perf.recentAvg !== undefined && perf.previousAvg !== undefined && (
                               <TrendBadge trend={perf.trend} recentAvg={perf.recentAvg} previousAvg={perf.previousAvg} />
                             )}
                           </div>
-                          <div className="flex items-center gap-2 sm:gap-3 mt-1 flex-wrap">
-                            <span className="text-[9px] sm:text-[10px] text-muted-foreground">
+                          <div className="flex items-center gap-3 mt-1 flex-wrap">
+                            <span className="text-[10px] text-muted-foreground">
                               Média: <span className="text-foreground font-mono">{perf.avgHits}</span>
                             </span>
-                            <span className="text-[9px] sm:text-[10px] text-muted-foreground">
+                            <span className="text-[10px] text-muted-foreground">
                               Melhor: <span className="text-accent font-mono">{perf.bestHit}</span>
                             </span>
-                            <span className="text-[9px] sm:text-[10px] text-muted-foreground">
+                            <span className="text-[10px] text-muted-foreground">
                               Prêmios: <span className="text-green-400 font-mono">{perf.prizeHits}x</span>
                             </span>
                           </div>
                         </div>
                         {perf.totalPrizeValue > 0 && (
-                          <span className="text-[10px] sm:text-xs font-bold text-primary font-mono shrink-0">{perf.totalPrize}</span>
+                          <span className="text-xs font-bold text-primary font-mono shrink-0">{perf.totalPrize}</span>
                         )}
-                        {isExpanded ? <ChevronUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted-foreground shrink-0" />
-                          : <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted-foreground shrink-0" />}
+                        {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0" />
+                          : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />}
                       </button>
 
                       <AnimatePresence>
                         {isExpanded && (
-                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
-                            <div className="px-3 sm:px-3.5 pb-3 sm:pb-3.5 space-y-3 border-t border-border/20 pt-3">
+                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                            <div className="px-3 pb-3 space-y-3 border-t border-border/20 pt-3">
                               {/* Numbers with last draw match */}
                               <div className="flex items-center gap-2">
                                 <div className="flex flex-wrap gap-1">
@@ -779,45 +976,24 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                                     const lastDrawResult = perf.results[0];
                                     const isHitLastDraw = lastDrawResult?.matched.includes(n) || false;
                                     return (
-                                      <span key={n} className={`text-[9px] sm:text-[10px] w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center font-mono font-bold ${
+                                      <span key={n} className={`text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-mono font-bold ${
                                         isHitLastDraw
-                                          ? "bg-gradient-to-br from-destructive to-destructive/80 text-destructive-foreground shadow-sm shadow-destructive/30"
+                                          ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-sm shadow-primary/30"
                                           : "lottery-ball"
                                       }`}>{String(n).padStart(2, "0")}</span>
                                     );
                                   })}
                                 </div>
                                 <button onClick={(e) => { e.stopPropagation(); copyNumbers(perf.numbers); }}
-                                  className="ml-auto p-1.5 rounded-md hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors" title="Copiar números">
+                                  className="ml-auto p-1.5 rounded-md hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors" title="Copiar">
                                   <Copy className="w-3.5 h-3.5" />
                                 </button>
                               </div>
 
-                              {/* Drawn numbers from last draw */}
-                              {perf.results[0] && (
-                                <div className="space-y-1">
-                                  <span className="text-[9px] sm:text-[10px] text-muted-foreground">
-                                    Sorteados no #{perf.results[0].concurso}:
-                                  </span>
-                                  <div className="flex flex-wrap gap-1">
-                                    {selectedDraws[0]?.numbers.map(n => {
-                                      const isInBet = perf.numbers.includes(n);
-                                      return (
-                                        <span key={n} className={`text-[8px] sm:text-[9px] w-4.5 h-4.5 sm:w-5 sm:h-5 rounded-full flex items-center justify-center font-mono ${
-                                          isInBet
-                                            ? "bg-destructive/15 text-destructive border border-destructive/30 font-bold"
-                                            : "bg-muted/30 text-muted-foreground border border-border/20"
-                                        }`}>{String(n).padStart(2, "0")}</span>
-                                      );
-                                    })}
-                                  </div>
-                                </div>
-                              )}
-
                               {/* Hit distribution bar */}
                               <div className="space-y-1.5">
-                                <span className="text-[9px] sm:text-[10px] text-muted-foreground">Distribuição de acertos</span>
-                                <div className="flex gap-0.5 h-4 sm:h-5 rounded-md overflow-hidden bg-muted/30">
+                                <span className="text-[10px] text-muted-foreground">Distribuição de acertos</span>
+                                <div className="flex gap-0.5 h-5 rounded-md overflow-hidden bg-muted/30">
                                   {perf.results.map((r, ri) => (
                                     <div key={ri} className={`transition-all ${r.prize ? "bg-primary/60" : r.hits > 0 ? "bg-primary/30" : "bg-muted/20"}`}
                                       style={{ width: `${100 / perf.results.length}%` }}
@@ -827,18 +1003,18 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                                 </div>
                               </div>
 
-                              {/* Hits over time chart */}
+                              {/* Chart */}
                               <BetHitsChart results={perf.results} avgHits={perf.avgHits} pick={pick} />
 
-                              {/* Prize details with real values */}
+                              {/* Prize details */}
                               {perf.results.some(r => r.prize) && (
                                 <div className="space-y-1">
-                                  <span className="text-[9px] sm:text-[10px] text-muted-foreground flex items-center gap-1">
+                                  <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                                     <DollarSign className="w-3 h-3" /> Prêmios conquistados
                                   </span>
                                   {perf.results.filter(r => r.prize).map(r => (
-                                    <div key={`p-${r.concurso}`} className="flex items-center justify-between text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-1.5 rounded-lg bg-primary/5 border border-primary/10">
-                                      <div className="flex items-center gap-1.5 sm:gap-2">
+                                    <div key={`p-${r.concurso}`} className="flex items-center justify-between text-[10px] px-2.5 py-1.5 rounded-lg bg-primary/5 border border-primary/10">
+                                      <div className="flex items-center gap-2">
                                         <CheckCircle2 className="w-3 h-3 text-primary" />
                                         <span className="text-muted-foreground font-mono">#{r.concurso}</span>
                                         <span className="text-foreground">{r.hits} acertos</span>
@@ -854,18 +1030,6 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                                   ))}
                                 </div>
                               )}
-
-                              {/* Per-draw mini chips */}
-                              <div className="flex gap-1 flex-wrap">
-                                {perf.results.filter(r => r.hits > 0).slice(0, 20).map(r => (
-                                  <span key={r.concurso} className={`text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded font-mono ${
-                                    r.prize ? "bg-primary/15 text-primary border border-primary/20" : "bg-muted/40 text-muted-foreground border border-border/20"
-                                  }`}>#{r.concurso}:{r.hits}</span>
-                                ))}
-                                {perf.results.filter(r => r.hits > 0).length > 20 && (
-                                  <span className="text-[7px] sm:text-[8px] text-muted-foreground py-0.5">+{perf.results.filter(r => r.hits > 0).length - 20} mais</span>
-                                )}
-                              </div>
                             </div>
                           </motion.div>
                         )}
@@ -877,10 +1041,10 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
             )}
 
             {performances.length === 0 && (
-              <div className="text-center py-8 sm:py-10 text-muted-foreground border border-dashed border-border/30 rounded-xl">
-                <BarChart3 className="w-7 h-7 sm:w-8 sm:h-8 mx-auto mb-3 opacity-30" />
-                <p className="text-[11px] sm:text-xs font-medium">Analise a performance das suas apostas</p>
-                <p className="text-[9px] sm:text-[10px] mt-1 opacity-60">Selecione o range e clique em "Analisar"</p>
+              <div className="text-center py-8 text-muted-foreground border border-dashed border-border/30 rounded-xl">
+                <BarChart3 className="w-8 h-8 mx-auto mb-3 opacity-30" />
+                <p className="text-xs font-medium">Analise a performance das suas apostas</p>
+                <p className="text-[10px] mt-1 opacity-60">Selecione o range e clique em "Analisar"</p>
               </div>
             )}
           </div>
@@ -888,27 +1052,24 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
 
         {/* ========== TAB: AI IMPROVEMENTS ========== */}
         {activeTab === "improve" && (
-          <div className="space-y-3 sm:space-y-4">
+          <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-[10px] sm:text-[11px] text-muted-foreground leading-relaxed">
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
                 A IA analisa suas apostas e sugere ajustes para <strong className="text-foreground">maximizar acertos</strong>
               </p>
-              <Button size="sm" onClick={requestAIImprovements} disabled={loadingAI} className="text-[10px] sm:text-xs gap-1.5 shrink-0 shadow-md h-7 sm:h-8">
-                {loadingAI ? <><Loader2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-spin" /> Analisando...</>
-                  : <><Brain className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Sugerir Melhorias</>}
+              <Button size="sm" onClick={requestAIImprovements} disabled={loadingAI} className="text-xs gap-1.5 shrink-0 shadow-md">
+                {loadingAI ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Analisando...</>
+                  : <><Brain className="w-3.5 h-3.5" /> Melhorar</>}
               </Button>
             </div>
 
             {loadingAI && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-10 sm:py-12 gap-4">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-12 gap-4">
                 <div className="relative">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-primary/15 border-t-primary animate-spin" />
-                  <div className="absolute inset-0 flex items-center justify-center"><Brain className="w-5 h-5 sm:w-6 sm:h-6 text-primary animate-pulse" /></div>
+                  <div className="w-16 h-16 rounded-full border-2 border-primary/15 border-t-primary animate-spin" />
+                  <div className="absolute inset-0 flex items-center justify-center"><Brain className="w-6 h-6 text-primary animate-pulse" /></div>
                 </div>
-                <div className="text-center">
-                  <p className="text-[11px] sm:text-xs text-foreground font-medium">IA analisando...</p>
-                  <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-1">Processando padrões e gerando melhorias</p>
-                </div>
+                <p className="text-xs text-foreground font-medium">IA analisando padrões...</p>
               </motion.div>
             )}
 
@@ -916,41 +1077,41 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
               <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
                 {aiImprovements.map((imp, i) => (
                   <motion.div key={i} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
-                    className="rounded-xl border border-primary/15 bg-gradient-to-br from-primary/5 to-transparent p-3 sm:p-4 space-y-3"
+                    className="rounded-xl border border-primary/15 bg-gradient-to-br from-primary/5 to-transparent p-4 space-y-3"
                   >
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-primary/15 flex items-center justify-center">
-                        <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
+                      <div className="w-7 h-7 rounded-lg bg-primary/15 flex items-center justify-center">
+                        <Zap className="w-4 h-4 text-primary" />
                       </div>
-                      <span className="text-[11px] sm:text-xs font-bold text-foreground flex-1">Melhoria #{i + 1}</span>
-                      <span className="text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 font-medium border border-green-500/20">
+                      <span className="text-xs font-bold text-foreground flex-1">Melhoria #{i + 1}</span>
+                      <Badge variant="outline" className="text-[9px] border-green-500/30 text-green-500">
                         {imp.expectedGain}
-                      </span>
+                      </Badge>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                      <div className="space-y-1.5 sm:space-y-2">
-                        <p className="text-[9px] sm:text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Original</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Original</p>
                         <div className="flex flex-wrap gap-1">
                           {imp.original.map(n => {
                             const removed = !imp.suggested.includes(n);
                             return (
-                              <span key={n} className={`text-[9px] sm:text-[10px] w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center font-mono border ${
+                              <span key={n} className={`text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-mono border ${
                                 removed ? "bg-destructive/15 text-destructive border-destructive/30 line-through" : "bg-muted/40 text-foreground/70 border-border/30"
                               }`}>{String(n).padStart(2, "0")}</span>
                             );
                           })}
                         </div>
                       </div>
-                      <div className="space-y-1.5 sm:space-y-2">
-                        <p className="text-[9px] sm:text-[10px] text-primary font-medium flex items-center gap-1 uppercase tracking-wider">
+                      <div className="space-y-2">
+                        <p className="text-[10px] text-primary font-medium flex items-center gap-1 uppercase tracking-wider">
                           <ArrowUpRight className="w-3 h-3" /> Sugerida
                         </p>
                         <div className="flex flex-wrap gap-1">
                           {imp.suggested.map(n => {
                             const added = !imp.original.includes(n);
                             return (
-                              <span key={n} className={`lottery-ball text-[9px] sm:text-[10px] w-5 h-5 sm:w-6 sm:h-6 ${
+                              <span key={n} className={`lottery-ball text-[10px] w-6 h-6 ${
                                 added ? "ring-2 ring-green-400/60 ring-offset-1 ring-offset-background" : ""
                               }`}>{String(n).padStart(2, "0")}</span>
                             );
@@ -959,16 +1120,16 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                       </div>
                     </div>
 
-                    <div className="flex gap-2 p-2 sm:p-2.5 rounded-lg bg-muted/20 border border-border/20">
-                      <Target className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary shrink-0 mt-0.5" />
-                      <p className="text-[9px] sm:text-[10px] text-muted-foreground leading-relaxed">{imp.reason}</p>
+                    <div className="flex gap-2 p-2.5 rounded-lg bg-muted/20 border border-border/20">
+                      <Target className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                      <p className="text-[10px] text-muted-foreground leading-relaxed">{imp.reason}</p>
                     </div>
 
                     <div className="flex gap-2">
-                      <Button size="sm" variant="ghost" className="text-[9px] sm:text-[10px] h-7 gap-1 flex-1" onClick={() => copyNumbers(imp.suggested)}>
+                      <Button size="sm" variant="ghost" className="text-[10px] h-7 gap-1 flex-1" onClick={() => copyNumbers(imp.suggested)}>
                         <Copy className="w-3 h-3" /> Copiar
                       </Button>
-                      <Button size="sm" variant="outline" className="text-[9px] sm:text-[10px] h-7 gap-1 flex-1 border-primary/20 text-primary hover:bg-primary/10"
+                      <Button size="sm" variant="outline" className="text-[10px] h-7 gap-1 flex-1 border-primary/20 text-primary hover:bg-primary/10"
                         onClick={() => saveBet({ numbers: imp.suggested, strategy: "IA Otimizada", label: `Melhoria IA #${i + 1}` })}>
                         <Save className="w-3 h-3" /> Salvar
                       </Button>
@@ -979,12 +1140,10 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
             )}
 
             {!loadingAI && aiImprovements.length === 0 && (
-              <div className="text-center py-8 sm:py-10 text-muted-foreground border border-dashed border-primary/15 rounded-xl">
-                <Brain className="w-7 h-7 sm:w-8 sm:h-8 mx-auto mb-3 opacity-30" />
-                <p className="text-[11px] sm:text-xs font-medium">
-                  {performances.length > 0 ? 'Clique em "Sugerir Melhorias" para otimizar' : "Analise a performance primeiro"}
-                </p>
-                <p className="text-[9px] sm:text-[10px] mt-1 opacity-60">A IA manterá ~60% dos seus números originais</p>
+              <div className="text-center py-8 text-muted-foreground border border-dashed border-primary/15 rounded-xl">
+                <Brain className="w-8 h-8 mx-auto mb-3 opacity-30" />
+                <p className="text-xs font-medium">Nenhuma sugestão de melhoria ainda</p>
+                <p className="text-[10px] mt-1 opacity-60">Clique em "Melhorar" para analisar</p>
               </div>
             )}
           </div>
