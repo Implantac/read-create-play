@@ -11,6 +11,7 @@ import { computePatternProfile } from "../engines/patternEngine";
 import type { RiskProfile, IntentFilters, ScoredGame } from "../core/aiTypes";
 import { scoreGame } from "../engines/rankingEngine";
 import { buildAdvancedWeightMap, analyzeZoneDistribution, computeCoOccurrence, computeHumanPatternPenalty } from "../engines/advancedAnalysisEngine";
+import { optimizePortfolio, evaluatePortfolio, recordPerformance, estimateROI } from "../engines/adaptiveEngine";
 
 interface GeneratorConfig {
   lotteryId: string;
