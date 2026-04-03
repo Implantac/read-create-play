@@ -8,7 +8,7 @@ import { DrawResult } from "@/data/lotteries";
 import { computePatternProfile } from "./patternEngine";
 import { getLotteryRules } from "../knowledge/lotteriesKnowledge";
 import { AI_CONFIG } from "../core/aiConfig";
-import { computeSpecialNumberScore, computeHistoricalHitRate } from "./advancedAnalysisEngine";
+import { computeSpecialNumberScore, computeHistoricalHitRate, computeClusterScore, computeHumanPatternPenalty, lightMonteCarlo } from "./advancedAnalysisEngine";
 import type { ScoredGame, GameScores, RiskProfile } from "../core/aiTypes";
 
 export function scoreGame(
@@ -51,28 +51,42 @@ export function scoreGame(
   // Special numbers score (primes/fibonacci alignment)
   const specialScore = computeSpecialNumberScore(sorted).specialScore;
 
-  // Strategy fit with advanced metrics
+  // NEW: Cluster concentration score
+  const clusterScore = computeClusterScore(sorted, rules.totalNumbers);
+
+  // NEW: Human pattern penalty (dates, arithmetic, visual lines)
+  const humanPenalty = computeHumanPatternPenalty(sorted);
+
+  // NEW: Lightweight Monte Carlo simulation
+  const monteCarlo = lightMonteCarlo(sorted, draws, 50);
+  const monteCarloBonus = Math.round(
+    monteCarlo.consistency * 30 + monteCarlo.prizeRate * 20
+  );
+
+  // Strategy fit with advanced metrics + cluster awareness
   const strategyFit = Math.round(
-    (pattern.parityBalance * 18 +
-    pattern.sumProximity * 18 +
-    pattern.sequencePenalty * riskConfig.sequencePenalty * 12 +
-    pattern.dispersalScore * 15 +
+    (pattern.parityBalance * 16 +
+    pattern.sumProximity * 16 +
+    pattern.sequencePenalty * riskConfig.sequencePenalty * 10 +
+    pattern.dispersalScore * 13 +
     pattern.rowBalance * 7 +
     pattern.colBalance * 7 +
-    (statScore / 100) * 23) 
+    (statScore / 100) * 18 +
+    (clusterScore / 100) * 13)
   );
 
   // Probability score incorporating zone balance and co-occurrence potential
   const probScore = Math.round(
-    (pattern.sumProximity * 25 + 
-     pattern.parityBalance * 25 + 
-     pattern.dispersalScore * 25 + 
-     pattern.repeatScore * 15 +
-     (specialScore / 100) * 10)
+    (pattern.sumProximity * 22 + 
+     pattern.parityBalance * 22 + 
+     pattern.dispersalScore * 22 + 
+     pattern.repeatScore * 12 +
+     (specialScore / 100) * 10 +
+     (clusterScore / 100) * 12)
   );
 
   const w = AI_CONFIG.scoringWeights;
-  const totalScore = Math.round(
+  const rawScore = Math.round(
     statScore * w.statistical +
     structScore * w.structural +
     (coverageScore + winRateBonus) * w.coverage +
@@ -81,15 +95,18 @@ export function scoreGame(
     probScore * w.probability
   );
 
+  // Apply bonuses and penalties as overlay (no structural change)
+  const totalScore = Math.max(0, Math.min(100, rawScore + monteCarloBonus * 0.15 - humanPenalty * 0.4));
+
   const grade = totalScore >= 85 ? "S" : totalScore >= 70 ? "A" : totalScore >= 55 ? "B" :
     totalScore >= 40 ? "C" : totalScore >= 25 ? "D" : "F";
 
-  const explanation = buildExplanation(sorted, lotteryId, pattern, { statistical: statScore, structural: structScore, coverage: coverageScore, diversity: diversityScore, strategyFit, probability: probScore }, totalScore, grade);
+  const explanation = buildExplanation(sorted, lotteryId, pattern, { statistical: statScore, structural: structScore, coverage: coverageScore, diversity: diversityScore, strategyFit, probability: probScore }, totalScore, grade, clusterScore, humanPenalty, monteCarlo);
 
   return {
     numbers: sorted,
     scores: { statistical: statScore, structural: structScore, coverage: coverageScore, diversity: diversityScore, strategyFit, probability: probScore },
-    totalScore,
+    totalScore: Math.round(totalScore),
     grade,
     explanation,
   };
@@ -101,7 +118,10 @@ function buildExplanation(
   pattern: ReturnType<typeof computePatternProfile>,
   scores: GameScores,
   total: number,
-  grade: string
+  grade: string,
+  clusterScore?: number,
+  humanPenalty?: number,
+  monteCarlo?: { avgHits: number; consistency: number; prizeRate: number }
 ): string[] {
   const lines: string[] = [];
   lines.push(`Score geral: ${total}/100 (${grade})`);
@@ -132,6 +152,19 @@ function buildExplanation(
 
   if (scores.coverage >= 70) lines.push("✅ Boa performance no backtesting histórico");
   else lines.push("⚠️ Performance abaixo da média no backtesting");
+
+  // NEW: Cluster and human pattern explanations
+  if (clusterScore !== undefined) {
+    if (clusterScore >= 70) lines.push("✅ Boa distribuição entre faixas numéricas");
+    else lines.push("⚠️ Números concentrados em poucas faixas");
+  }
+  if (humanPenalty !== undefined && humanPenalty > 10) {
+    lines.push("⚠️ Padrão comum detectado (datas/sequências aritméticas)");
+  }
+  if (monteCarlo) {
+    if (monteCarlo.consistency >= 0.6) lines.push(`✅ Consistência Monte Carlo: ${Math.round(monteCarlo.consistency * 100)}%`);
+    if (monteCarlo.prizeRate >= 0.3) lines.push(`✅ Taxa de premiação simulada: ${Math.round(monteCarlo.prizeRate * 100)}%`);
+  }
 
   return lines;
 }
