@@ -153,6 +153,19 @@ function buildExplanation(
   if (scores.coverage >= 70) lines.push("✅ Boa performance no backtesting histórico");
   else lines.push("⚠️ Performance abaixo da média no backtesting");
 
+  // NEW: Cluster and human pattern explanations
+  if (clusterScore !== undefined) {
+    if (clusterScore >= 70) lines.push("✅ Boa distribuição entre faixas numéricas");
+    else lines.push("⚠️ Números concentrados em poucas faixas");
+  }
+  if (humanPenalty !== undefined && humanPenalty > 10) {
+    lines.push("⚠️ Padrão comum detectado (datas/sequências aritméticas)");
+  }
+  if (monteCarlo) {
+    if (monteCarlo.consistency >= 0.6) lines.push(`✅ Consistência Monte Carlo: ${Math.round(monteCarlo.consistency * 100)}%`);
+    if (monteCarlo.prizeRate >= 0.3) lines.push(`✅ Taxa de premiação simulada: ${Math.round(monteCarlo.prizeRate * 100)}%`);
+  }
+
   return lines;
 }
 
