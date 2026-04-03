@@ -33,6 +33,7 @@ const FechamentosPage = lazy(() => import("@/pages/FechamentosPage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage"));
 const SuportePage = lazy(() => import("./pages/SuportePage"));
+const InstallPage = lazy(() => import("./pages/InstallPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -65,6 +66,7 @@ function App() {
                   <Route path="/planos" element={<PlanosPage />} />
                   <Route path="/suporte" element={<SuportePage />} />
                   <Route path="/payment-success" element={<PaymentSuccessPage />} />
+                  <Route path="/install" element={<InstallPage />} />
 
                   {/* Protected */}
                   <Route element={<ProtectedRoute><LotteryProvider><AppLayout /></LotteryProvider></ProtectedRoute>}>
