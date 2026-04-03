@@ -137,7 +137,9 @@ function buildExplanation(
   grade: string,
   clusterScore?: number,
   humanPenalty?: number,
-  monteCarlo?: { avgHits: number; consistency: number; prizeRate: number }
+  monteCarlo?: { avgHits: number; consistency: number; prizeRate: number },
+  roi?: { expectedPrizeRate: number; consistencyScore: number; riskAdjustedScore: number; roiTier: string },
+  context?: { recentSumTrend: string; volatilityIndex: number; regimeStability: number }
 ): string[] {
   const lines: string[] = [];
   lines.push(`Score geral: ${total}/100 (${grade})`);
@@ -169,7 +171,6 @@ function buildExplanation(
   if (scores.coverage >= 70) lines.push("✅ Boa performance no backtesting histórico");
   else lines.push("⚠️ Performance abaixo da média no backtesting");
 
-  // NEW: Cluster and human pattern explanations
   if (clusterScore !== undefined) {
     if (clusterScore >= 70) lines.push("✅ Boa distribuição entre faixas numéricas");
     else lines.push("⚠️ Números concentrados em poucas faixas");
@@ -180,6 +181,16 @@ function buildExplanation(
   if (monteCarlo) {
     if (monteCarlo.consistency >= 0.6) lines.push(`✅ Consistência Monte Carlo: ${Math.round(monteCarlo.consistency * 100)}%`);
     if (monteCarlo.prizeRate >= 0.3) lines.push(`✅ Taxa de premiação simulada: ${Math.round(monteCarlo.prizeRate * 100)}%`);
+  }
+
+  // ADAPTIVE: ROI and context explanations
+  if (roi) {
+    const tierLabels: Record<string, string> = { excellent: "Excelente", good: "Bom", average: "Médio", below_average: "Abaixo da média" };
+    lines.push(`📊 ROI estimado: ${tierLabels[roi.roiTier] || roi.roiTier} (consistência ${Math.round(roi.consistencyScore * 100)}%)`);
+  }
+  if (context) {
+    if (context.volatilityIndex > 0.6) lines.push("⚡ Volatilidade alta detectada — pesos adaptativos ajustados");
+    if (context.regimeStability < 0.4) lines.push("🔄 Regime instável — tendências com menor peso");
   }
 
   return lines;
