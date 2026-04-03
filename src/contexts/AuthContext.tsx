@@ -69,6 +69,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data } = await supabase.functions.invoke("check-subscription", {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
+      // If token was expired, try refreshing session and retry
+      if (data?.expired_token) {
+        const { data: refreshData } = await supabase.auth.refreshSession();
+        if (refreshData?.session?.access_token) {
+          const { data: retryData } = await supabase.functions.invoke("check-subscription", {
+            headers: { Authorization: `Bearer ${refreshData.session.access_token}` },
+          });
+          if (retryData?.plan) {
+            setProfile(prev => prev ? { ...prev, plan: retryData.plan as PlanType } : prev);
+          }
+          return;
+        }
+      }
       if (data?.plan) {
         setProfile(prev => prev ? { ...prev, plan: data.plan as PlanType } : prev);
       }
