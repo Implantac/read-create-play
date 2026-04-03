@@ -162,12 +162,16 @@ function weightedSample(pool: { number: number; weight: number }[], pick: number
   return selected.sort((a, b) => a - b);
 }
 
-/** Select diverse set of games — avoid too-similar combinations */
+/** Select diverse set of games — avoid too-similar combinations and global number overuse */
 function selectDiverse(scored: ScoredGame[], count: number, pick: number): ScoredGame[] {
   if (scored.length <= count) return scored;
 
   const selected: ScoredGame[] = [scored[0]];
   const minDiff = Math.max(2, Math.floor(pick * 0.3));
+  const globalFreq = new Map<number, number>();
+  
+  // Track global frequency of selected numbers
+  for (const n of scored[0].numbers) globalFreq.set(n, 1);
 
   for (const game of scored.slice(1)) {
     if (selected.length >= count) break;
@@ -179,14 +183,24 @@ function selectDiverse(scored: ScoredGame[], count: number, pick: number): Score
       return pick - overlap >= minDiff;
     });
 
-    if (isDiverse) selected.push(game);
+    if (!isDiverse) continue;
+
+    // NEW: Penalize games that reuse globally overrepresented numbers
+    const overuseCount = game.numbers.filter(n => (globalFreq.get(n) || 0) >= Math.ceil(count * 0.5)).length;
+    if (overuseCount > pick * 0.4) continue;
+
+    selected.push(game);
+    for (const n of game.numbers) globalFreq.set(n, (globalFreq.get(n) || 0) + 1);
   }
 
   // Fill remaining if diversity was too strict
   if (selected.length < count) {
     for (const game of scored) {
       if (selected.length >= count) break;
-      if (!selected.includes(game)) selected.push(game);
+      if (!selected.includes(game)) {
+        selected.push(game);
+        for (const n of game.numbers) globalFreq.set(n, (globalFreq.get(n) || 0) + 1);
+      }
     }
   }
 
