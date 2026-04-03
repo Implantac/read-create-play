@@ -139,8 +139,16 @@ export function scoreGame(
     probScore * w.probability
   );
 
-  // Apply all overlays: Monte Carlo + ROI + winning patterns - human penalty
-  const totalScore = Math.max(0, Math.min(100, rawScore + monteCarloBonus * 0.15 + roiBonus * 0.1 + winPatternBonus * 0.1 - humanPenalty * 0.4));
+  // Apply all overlays: Monte Carlo + ROI + winning patterns + co-occurrence - penalties
+  const totalScore = Math.max(0, Math.min(100,
+    rawScore
+    + monteCarloBonus * 0.15
+    + roiBonus * 0.1
+    + winPatternBonus * 0.1
+    + coOccBonus * 0.08
+    - humanPenalty * 0.4
+    - antiPairPenalty * 0.15
+  ));
 
   const grade = totalScore >= 85 ? "S" : totalScore >= 70 ? "A" : totalScore >= 55 ? "B" :
     totalScore >= 40 ? "C" : totalScore >= 25 ? "D" : "F";
