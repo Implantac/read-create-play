@@ -41,14 +41,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [userRole, setUserRole] = useState<string>("user");
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = async (userId: string, forceLifetime = false) => {
     const { data } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", userId)
       .single();
     if (data) {
-      setProfile(data as Profile);
+      const p = data as Profile;
+      if (forceLifetime && p.plan !== "lifetime") {
+        p.plan = "lifetime";
+      }
+      setProfile(p);
     }
   };
 
