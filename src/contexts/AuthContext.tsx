@@ -101,10 +101,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let initialLoad = true;
 
     const loadUserData = async (userId: string, accessToken?: string) => {
+      const isSA = await checkAdmin(userId);
       await Promise.all([
-        fetchProfile(userId),
-        checkAdmin(userId),
-        ...(accessToken ? [syncSubscription(accessToken)] : []),
+        fetchProfile(userId, isSA),
+        ...(accessToken && !isSA ? [syncSubscription(accessToken)] : []),
       ]);
     };
 
