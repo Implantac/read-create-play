@@ -257,6 +257,123 @@ export function computeHistoricalHitRate(
   };
 }
 
+/** Cluster concentration analysis — penalizes games grouped in narrow bands */
+export function computeClusterScore(numbers: number[], totalNumbers: number): number {
+  const sorted = [...numbers].sort((a, b) => a - b);
+  const zoneSize = Math.ceil(totalNumbers / 5);
+  const zones = new Array(5).fill(0);
+  for (const n of sorted) zones[Math.min(Math.floor((n - 1) / zoneSize), 4)]++;
+  const emptyZones = zones.filter(c => c === 0).length;
+  const maxInZone = Math.max(...zones);
+  const idealPerZone = sorted.length / 5;
+  const deviation = zones.reduce((s, z) => s + Math.abs(z - idealPerZone), 0) / 5;
+  const balance = Math.max(0, 1 - deviation / idealPerZone);
+  const emptyPenalty = emptyZones * 0.15;
+  const concentrationPenalty = maxInZone > idealPerZone * 2 ? 0.2 : 0;
+  return Math.max(0, Math.min(100, Math.round((balance - emptyPenalty - concentrationPenalty) * 100)));
+}
+
+/** Human pattern detection — penalizes date-like, visual lines, arithmetic sequences */
+export function computeHumanPatternPenalty(numbers: number[]): number {
+  const sorted = [...numbers].sort((a, b) => a - b);
+  let penalty = 0;
+
+  // Date-like: all numbers ≤ 31 and many ≤ 12
+  const under31 = sorted.filter(n => n <= 31).length;
+  const under12 = sorted.filter(n => n <= 12).length;
+  if (under31 === sorted.length) penalty += 15;
+  if (under12 >= sorted.length * 0.6) penalty += 10;
+
+  // Arithmetic sequences (constant difference)
+  if (sorted.length >= 4) {
+    const diff = sorted[1] - sorted[0];
+    let isArith = diff > 0;
+    for (let i = 2; i < sorted.length && isArith; i++) {
+      if (sorted[i] - sorted[i - 1] !== diff) isArith = false;
+    }
+    if (isArith) penalty += 25;
+  }
+
+  // Multiples of 5 or 10 dominance
+  const mult5 = sorted.filter(n => n % 5 === 0).length;
+  if (mult5 >= sorted.length * 0.6) penalty += 10;
+
+  // All same last digit
+  const lastDigits = new Set(sorted.map(n => n % 10));
+  if (lastDigits.size <= 2 && sorted.length >= 5) penalty += 15;
+
+  return Math.min(50, penalty);
+}
+
+/** Lightweight Monte Carlo simulation — fast backtesting proxy */
+export function lightMonteCarlo(
+  game: number[],
+  draws: DrawResult[],
+  simCount: number = 50
+): { avgHits: number; consistency: number; prizeRate: number } {
+  const gameSet = new Set(game);
+  const subset = draws.slice(0, Math.min(simCount, draws.length));
+  if (subset.length === 0) return { avgHits: 0, consistency: 0, prizeRate: 0 };
+
+  const hits: number[] = [];
+  for (const d of subset) {
+    hits.push(d.numbers.filter(n => gameSet.has(n)).length);
+  }
+  const avg = hits.reduce((a, b) => a + b, 0) / hits.length;
+  const variance = hits.reduce((s, h) => s + (h - avg) ** 2, 0) / hits.length;
+  const stdDev = Math.sqrt(variance);
+  // Consistency: lower variance = higher consistency (0-1)
+  const consistency = Math.max(0, 1 - stdDev / (avg || 1));
+  // Prize rate: how many draws would have hit at least some threshold
+  const minPrize = Math.max(2, Math.floor(game.length * 0.4));
+  const prizeRate = hits.filter(h => h >= minPrize).length / hits.length;
+
+  return { avgHits: avg, consistency, prizeRate };
+}
+
+/** Dynamic weight calibration based on recent draw patterns */
+export function calibrateDynamicWeights(
+  draws: DrawResult[],
+  lotteryId: string
+): Record<string, number> {
+  const rules = getLotteryRules(lotteryId);
+  const recent = draws.slice(0, 30);
+  if (recent.length < 10) return { frequency: 0.25, gap: 0.15, trend: 0.2, coOccurrence: 0.15, zone: 0.1, cycle: 0.1, special: 0.05, antiPopular: 0 };
+
+  // Measure how predictive each signal was in recent draws
+  const sums = recent.map(d => d.numbers.reduce((a, b) => a + b, 0));
+  const avgSum = sums.reduce((a, b) => a + b, 0) / sums.length;
+  const sumStability = 1 - Math.min(1, Math.abs(avgSum - (rules.idealSumRange[0] + rules.idealSumRange[1]) / 2) / ((rules.idealSumRange[1] - rules.idealSumRange[0]) / 2));
+
+  // Repeat stability
+  let repeatStd = 0;
+  const repeats: number[] = [];
+  for (let i = 0; i < recent.length - 1; i++) {
+    const prev = new Set(recent[i + 1].numbers);
+    repeats.push(recent[i].numbers.filter(n => prev.has(n)).length);
+  }
+  if (repeats.length > 0) {
+    const avgR = repeats.reduce((a, b) => a + b, 0) / repeats.length;
+    repeatStd = Math.sqrt(repeats.reduce((s, r) => s + (r - avgR) ** 2, 0) / repeats.length);
+  }
+  const repeatStable = Math.max(0, 1 - repeatStd / (rules.pick * 0.3));
+
+  // Boost trend weight when recent draws show momentum patterns
+  const trendWeight = sumStability > 0.7 ? 0.25 : 0.18;
+  const gapWeight = repeatStable < 0.5 ? 0.2 : 0.13;
+
+  return {
+    frequency: 0.22 + sumStability * 0.06,
+    gap: gapWeight,
+    trend: trendWeight,
+    coOccurrence: 0.13 + repeatStable * 0.05,
+    zone: 0.1,
+    cycle: 0.08 + (1 - sumStability) * 0.05,
+    special: 0.04,
+    antiPopular: 0,
+  };
+}
+
 /** Build an advanced weight map incorporating all analyses */
 export function buildAdvancedWeightMap(
   stats: NumberStats[],
@@ -270,16 +387,17 @@ export function buildAdvancedWeightMap(
   const coOcc = computeCoOccurrence(draws, rules.totalNumbers, 50);
   const zoneAnalysis = analyzeZoneDistribution(draws, lotteryId);
 
-  // Default engine weights if none provided
+  // Use dynamic calibration if no explicit weights provided
+  const dynamicWeights = calibrateDynamicWeights(draws, lotteryId);
   const ew = {
-    frequency: engineWeights?.frequency ?? 0.25,
-    gap: engineWeights?.gap ?? 0.15,
-    trend: engineWeights?.trend ?? 0.2,
-    coOccurrence: engineWeights?.coOccurrence ?? 0.15,
-    zone: engineWeights?.zone ?? 0.1,
-    cycle: engineWeights?.cycle ?? 0.1,
-    special: engineWeights?.special ?? 0.05,
-    antiPopular: engineWeights?.antiPopular ?? 0,
+    frequency: engineWeights?.frequency ?? dynamicWeights.frequency,
+    gap: engineWeights?.gap ?? dynamicWeights.gap,
+    trend: engineWeights?.trend ?? dynamicWeights.trend,
+    coOccurrence: engineWeights?.coOccurrence ?? dynamicWeights.coOccurrence,
+    zone: engineWeights?.zone ?? dynamicWeights.zone,
+    cycle: engineWeights?.cycle ?? dynamicWeights.cycle,
+    special: engineWeights?.special ?? dynamicWeights.special,
+    antiPopular: engineWeights?.antiPopular ?? dynamicWeights.antiPopular,
   };
 
   const weights = new Map<number, number>();
