@@ -9,7 +9,7 @@ import { computePatternProfile } from "./patternEngine";
 import { getLotteryRules } from "../knowledge/lotteriesKnowledge";
 import { AI_CONFIG } from "../core/aiConfig";
 import { computeSpecialNumberScore, computeHistoricalHitRate, computeClusterScore, computeHumanPatternPenalty, lightMonteCarlo } from "./advancedAnalysisEngine";
-import { estimateROI, detectContext, selfCalibrateWeights, applyContextAdjustments } from "./adaptiveEngine";
+import { estimateROI, detectContext, selfCalibrateWeights, applyContextAdjustments, extractWinningPatterns, scoreAgainstWinningPatterns, getAdaptiveSimCount, optimizeWeightsFromHistory } from "./adaptiveEngine";
 import type { ScoredGame, GameScores, RiskProfile } from "../core/aiTypes";
 
 export function scoreGame(
