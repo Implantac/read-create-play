@@ -118,7 +118,10 @@ function buildExplanation(
   pattern: ReturnType<typeof computePatternProfile>,
   scores: GameScores,
   total: number,
-  grade: string
+  grade: string,
+  clusterScore?: number,
+  humanPenalty?: number,
+  monteCarlo?: { avgHits: number; consistency: number; prizeRate: number }
 ): string[] {
   const lines: string[] = [];
   lines.push(`Score geral: ${total}/100 (${grade})`);
