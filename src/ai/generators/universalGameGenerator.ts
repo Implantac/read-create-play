@@ -67,6 +67,10 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     if (config.filters.avoidSequences && pattern.sequencePenalty < 0.5) continue;
     if (pattern.sumProximity < 0.3) continue; // always filter extreme sums
 
+    // NEW: Reject human-like patterns (dates, arithmetic sequences)
+    const humanPenalty = computeHumanPatternPenalty(game);
+    if (humanPenalty > 25) continue;
+
     // Advanced zone distribution filter
     const zoneSize = 10;
     const zoneCount = Math.ceil(rules.totalNumbers / zoneSize);
@@ -74,6 +78,10 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     for (const n of game) gamezones[Math.min(Math.floor((n - 1) / zoneSize), zoneCount - 1)]++;
     const emptyZones = gamezones.filter(c => c === 0).length;
     if (emptyZones > Math.ceil(zoneCount * 0.4)) continue; // reject poor zone coverage
+
+    // NEW: Reject high concentration in single zone
+    const maxInZone = Math.max(...gamezones);
+    if (maxInZone > rules.pick * 0.6) continue;
 
     // Co-occurrence bonus: prefer games with proven pairs
     let coOccBonus = 0;
