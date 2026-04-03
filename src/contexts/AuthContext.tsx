@@ -33,6 +33,11 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+const LIFETIME_OWNER_EMAIL = "etcsuporte889@gmail.com";
+
+const isLifetimeOwner = (email?: string | null) =>
+  email?.trim().toLowerCase() === LIFETIME_OWNER_EMAIL;
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -49,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .single();
     if (data) {
       const p = data as Profile;
-      if (forceLifetime && p.plan !== "lifetime") {
+      if ((forceLifetime || isLifetimeOwner(p.email)) && p.plan !== "lifetime") {
         p.plan = "lifetime";
       }
       setProfile(p);
@@ -100,11 +105,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const authStorageKey = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`;
     let initialLoad = true;
 
-    const loadUserData = async (userId: string, accessToken?: string) => {
+    const loadUserData = async (userId: string, accessToken?: string, email?: string | null) => {
+      const shouldForceLifetime = isLifetimeOwner(email);
       const isSA = await checkAdmin(userId);
       await Promise.all([
-        fetchProfile(userId, isSA),
-        ...(accessToken && !isSA ? [syncSubscription(accessToken)] : []),
+        fetchProfile(userId, isSA || shouldForceLifetime),
+        ...(accessToken && !isSA && !shouldForceLifetime ? [syncSubscription(accessToken)] : []),
       ]);
     };
 
@@ -113,7 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         if (session?.user) {
           if (!initialLoad) {
-            await loadUserData(session.user.id);
+            await loadUserData(session.user.id, undefined, session.user.email);
           }
         } else {
           setProfile(null);
@@ -144,7 +150,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         setSession(session);
         if (session?.user) {
-          await loadUserData(session.user.id, session.access_token);
+          await loadUserData(session.user.id, session.access_token, session.user.email);
         }
       })
       .catch(() => {
