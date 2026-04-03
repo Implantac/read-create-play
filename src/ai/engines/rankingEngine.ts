@@ -31,6 +31,9 @@ export function scoreGame(
   const context = detectContext(draws, lotteryId);
   let contextW = applyContextAdjustments(adaptiveW, context, riskProfile);
 
+  // STABILITY: Smooth weights with EMA to prevent erratic changes
+  contextW = smoothWeights(contextW, lotteryId, riskProfile);
+
   // SELF-LEARNING: Apply weight optimizations from performance history
   const learned = optimizeWeightsFromHistory(lotteryId, riskProfile);
   if (learned.confidence > 0.3) {
