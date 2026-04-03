@@ -10,7 +10,7 @@ import { getStrategy, getAllStrategyIds } from "../knowledge/strategiesKnowledge
 import { computePatternProfile } from "../engines/patternEngine";
 import type { RiskProfile, IntentFilters, ScoredGame } from "../core/aiTypes";
 import { scoreGame } from "../engines/rankingEngine";
-import { buildAdvancedWeightMap, analyzeZoneDistribution, computeCoOccurrence } from "../engines/advancedAnalysisEngine";
+import { buildAdvancedWeightMap, analyzeZoneDistribution, computeCoOccurrence, computeHumanPatternPenalty } from "../engines/advancedAnalysisEngine";
 
 interface GeneratorConfig {
   lotteryId: string;
