@@ -985,6 +985,7 @@ export default function LandingPage() {
             </div>
             <div className="flex items-center gap-6 text-xs text-muted-foreground">
               <Link to="/planos" className="hover:text-foreground transition-colors">Planos</Link>
+              <Link to="/install" className="hover:text-foreground transition-colors">Instalar App</Link>
               <Link to="/login" className="hover:text-foreground transition-colors">Entrar</Link>
               <Link to="/signup" className="hover:text-foreground transition-colors">Criar Conta</Link>
             </div>
