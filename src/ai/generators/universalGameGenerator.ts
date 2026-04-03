@@ -11,6 +11,7 @@ import { computePatternProfile } from "../engines/patternEngine";
 import type { RiskProfile, IntentFilters, ScoredGame } from "../core/aiTypes";
 import { scoreGame } from "../engines/rankingEngine";
 import { buildAdvancedWeightMap, analyzeZoneDistribution, computeCoOccurrence, computeHumanPatternPenalty } from "../engines/advancedAnalysisEngine";
+import { optimizePortfolio, evaluatePortfolio, recordPerformance, estimateROI } from "../engines/adaptiveEngine";
 
 interface GeneratorConfig {
   lotteryId: string;
@@ -100,15 +101,32 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
   // Sort candidates by co-occurrence bonus first, then score
   candidates.sort((a, b) => b.coOccBonus - a.coOccBonus);
 
-  // Score and rank all candidates
+  // Score all candidates
   const scored = candidates.map(c =>
     scoreGame(c.game, config.lotteryId, config.stats, config.draws, config.riskProfile)
   );
 
-  // Sort by score and take top N, ensuring diversity
+  // Sort by score
   scored.sort((a, b) => b.totalScore - a.totalScore);
 
-  const selected = selectDiverse(scored, config.count, rules.pick);
+  // ADAPTIVE: Use portfolio optimizer for diverse selection
+  const candidatesForPortfolio = scored.map(s => ({ numbers: s.numbers, score: s.totalScore }));
+  const portfolioNumbers = optimizePortfolio(candidatesForPortfolio, config.count, rules.totalNumbers, rules.pick);
+
+  // Re-score the portfolio-selected games to get full ScoredGame objects
+  const selected = portfolioNumbers.map(nums =>
+    scoreGame(nums, config.lotteryId, config.stats, config.draws, config.riskProfile)
+  );
+  selected.sort((a, b) => b.totalScore - a.totalScore);
+
+  // ADAPTIVE: Record performance for self-learning
+  const portfolio = evaluatePortfolio(selected.map(s => s.numbers), rules.totalNumbers);
+  const avgScore = selected.length > 0 ? selected.reduce((s, g) => s + g.totalScore, 0) / selected.length : 0;
+  const avgROI = selected.length > 0
+    ? selected.reduce((s, g) => s + estimateROI(g.numbers, config.draws, config.lotteryId).riskAdjustedScore, 0) / selected.length
+    : 0;
+  recordPerformance(config.lotteryId, config.riskProfile, avgScore, avgROI, portfolio.diversityScore);
+
   return selected;
 }
 

@@ -9,6 +9,7 @@ import { computePatternProfile } from "./patternEngine";
 import { getLotteryRules } from "../knowledge/lotteriesKnowledge";
 import { AI_CONFIG } from "../core/aiConfig";
 import { computeSpecialNumberScore, computeHistoricalHitRate, computeClusterScore, computeHumanPatternPenalty, lightMonteCarlo } from "./advancedAnalysisEngine";
+import { estimateROI, detectContext, selfCalibrateWeights, applyContextAdjustments } from "./adaptiveEngine";
 import type { ScoredGame, GameScores, RiskProfile } from "../core/aiTypes";
 
 export function scoreGame(
@@ -24,6 +25,11 @@ export function scoreGame(
   const pattern = computePatternProfile(sorted, lotteryId, prevDraw);
   const riskConfig = AI_CONFIG.riskProfiles[riskProfile];
 
+  // ADAPTIVE: Self-calibrate weights from historical patterns
+  const adaptiveW = selfCalibrateWeights(draws, lotteryId);
+  const context = detectContext(draws, lotteryId);
+  const contextW = applyContextAdjustments(adaptiveW, context, riskProfile);
+
   // Statistical score: based on frequency alignment
   const selectedStats = sorted.map(n => stats.find(s => s.number === n)).filter(Boolean) as NumberStats[];
   const hotCount = selectedStats.filter(s => s.status === "hot").length;
@@ -32,8 +38,13 @@ export function scoreGame(
   const idealCold = Math.round(rules.pick * riskConfig.coldBias);
   const statScore = Math.max(0, 100 - Math.abs(hotCount - idealHot) * 8 - Math.abs(coldCount - idealCold) * 5);
 
-  // Structural score: pattern profile
-  const structScore = Math.round(pattern.overallScore * 100);
+  // Structural score: pattern profile (weighted by adaptive calibration)
+  const structScore = Math.round(
+    pattern.overallScore * 100 * 0.7 +
+    pattern.parityBalance * contextW.parityWeight * 10 +
+    pattern.sumProximity * contextW.sumWeight * 10 +
+    pattern.dispersalScore * contextW.dispersalWeight * 10
+  );
 
   // Coverage score: backtesting with advanced hit rate analysis
   const hitRate = computeHistoricalHitRate(sorted, draws, lotteryId);
@@ -51,28 +62,33 @@ export function scoreGame(
   // Special numbers score (primes/fibonacci alignment)
   const specialScore = computeSpecialNumberScore(sorted).specialScore;
 
-  // NEW: Cluster concentration score
+  // Cluster concentration score
   const clusterScore = computeClusterScore(sorted, rules.totalNumbers);
 
-  // NEW: Human pattern penalty (dates, arithmetic, visual lines)
+  // Human pattern penalty (dates, arithmetic, visual lines)
   const humanPenalty = computeHumanPatternPenalty(sorted);
 
-  // NEW: Lightweight Monte Carlo simulation
+  // Monte Carlo simulation
   const monteCarlo = lightMonteCarlo(sorted, draws, 50);
   const monteCarloBonus = Math.round(
     monteCarlo.consistency * 30 + monteCarlo.prizeRate * 20
   );
 
-  // Strategy fit with advanced metrics + cluster awareness
+  // ADAPTIVE: ROI estimation
+  const roi = estimateROI(sorted, draws, lotteryId);
+  const roiBonus = Math.round(roi.riskAdjustedScore * 15);
+
+  // Strategy fit with adaptive cluster/context awareness
   const strategyFit = Math.round(
-    (pattern.parityBalance * 16 +
-    pattern.sumProximity * 16 +
+    (pattern.parityBalance * contextW.parityWeight * 8 +
+    pattern.sumProximity * contextW.sumWeight * 8 +
     pattern.sequencePenalty * riskConfig.sequencePenalty * 10 +
-    pattern.dispersalScore * 13 +
+    pattern.dispersalScore * contextW.dispersalWeight * 7 +
     pattern.rowBalance * 7 +
     pattern.colBalance * 7 +
-    (statScore / 100) * 18 +
-    (clusterScore / 100) * 13)
+    (statScore / 100) * contextW.frequencyWeight * 10 +
+    (clusterScore / 100) * contextW.clusterWeight * 8 +
+    pattern.repeatScore * contextW.repeatWeight * 5)
   );
 
   // Probability score incorporating zone balance and co-occurrence potential
@@ -95,13 +111,13 @@ export function scoreGame(
     probScore * w.probability
   );
 
-  // Apply bonuses and penalties as overlay (no structural change)
-  const totalScore = Math.max(0, Math.min(100, rawScore + monteCarloBonus * 0.15 - humanPenalty * 0.4));
+  // Apply bonuses and penalties as overlay (adaptive ROI + Monte Carlo + human penalty)
+  const totalScore = Math.max(0, Math.min(100, rawScore + monteCarloBonus * 0.15 + roiBonus * 0.1 - humanPenalty * 0.4));
 
   const grade = totalScore >= 85 ? "S" : totalScore >= 70 ? "A" : totalScore >= 55 ? "B" :
     totalScore >= 40 ? "C" : totalScore >= 25 ? "D" : "F";
 
-  const explanation = buildExplanation(sorted, lotteryId, pattern, { statistical: statScore, structural: structScore, coverage: coverageScore, diversity: diversityScore, strategyFit, probability: probScore }, totalScore, grade, clusterScore, humanPenalty, monteCarlo);
+  const explanation = buildExplanation(sorted, lotteryId, pattern, { statistical: statScore, structural: structScore, coverage: coverageScore, diversity: diversityScore, strategyFit, probability: probScore }, totalScore, grade, clusterScore, humanPenalty, monteCarlo, roi, context);
 
   return {
     numbers: sorted,
@@ -121,7 +137,9 @@ function buildExplanation(
   grade: string,
   clusterScore?: number,
   humanPenalty?: number,
-  monteCarlo?: { avgHits: number; consistency: number; prizeRate: number }
+  monteCarlo?: { avgHits: number; consistency: number; prizeRate: number },
+  roi?: { expectedPrizeRate: number; consistencyScore: number; riskAdjustedScore: number; roiTier: string },
+  context?: { recentSumTrend: string; volatilityIndex: number; regimeStability: number }
 ): string[] {
   const lines: string[] = [];
   lines.push(`Score geral: ${total}/100 (${grade})`);
@@ -153,7 +171,6 @@ function buildExplanation(
   if (scores.coverage >= 70) lines.push("✅ Boa performance no backtesting histórico");
   else lines.push("⚠️ Performance abaixo da média no backtesting");
 
-  // NEW: Cluster and human pattern explanations
   if (clusterScore !== undefined) {
     if (clusterScore >= 70) lines.push("✅ Boa distribuição entre faixas numéricas");
     else lines.push("⚠️ Números concentrados em poucas faixas");
@@ -164,6 +181,16 @@ function buildExplanation(
   if (monteCarlo) {
     if (monteCarlo.consistency >= 0.6) lines.push(`✅ Consistência Monte Carlo: ${Math.round(monteCarlo.consistency * 100)}%`);
     if (monteCarlo.prizeRate >= 0.3) lines.push(`✅ Taxa de premiação simulada: ${Math.round(monteCarlo.prizeRate * 100)}%`);
+  }
+
+  // ADAPTIVE: ROI and context explanations
+  if (roi) {
+    const tierLabels: Record<string, string> = { excellent: "Excelente", good: "Bom", average: "Médio", below_average: "Abaixo da média" };
+    lines.push(`📊 ROI estimado: ${tierLabels[roi.roiTier] || roi.roiTier} (consistência ${Math.round(roi.consistencyScore * 100)}%)`);
+  }
+  if (context) {
+    if (context.volatilityIndex > 0.6) lines.push("⚡ Volatilidade alta detectada — pesos adaptativos ajustados");
+    if (context.regimeStability < 0.4) lines.push("🔄 Regime instável — tendências com menor peso");
   }
 
   return lines;
