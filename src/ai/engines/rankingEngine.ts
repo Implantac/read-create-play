@@ -82,8 +82,14 @@ export function scoreGame(
   // Cluster concentration score
   const clusterScore = computeClusterScore(sorted, rules.totalNumbers);
 
-  // Human pattern penalty (dates, arithmetic, visual lines)
-  const humanPenalty = computeHumanPatternPenalty(sorted);
+  // Human pattern penalty (dates, arithmetic, visual lines) — PROGRESSIVE
+  const progressivePenalty = computeProgressivePenalty(sorted, rules.totalNumbers);
+  const humanPenalty = progressivePenalty.totalPenalty;
+
+  // CO-OCCURRENCE: reward historically co-occurring pairs
+  const coOcc = computeCoOccurrence(draws, rules.totalNumbers, 30);
+  const coOccBonus = computeCoOccurrenceBonus(sorted, coOcc.topPairs);
+  const antiPairPenalty = computeAntiPairPenalty(sorted, coOcc.antiPairs, draws.length);
 
   // ADAPTIVE Monte Carlo — variable depth based on context
   const adaptiveSimCount = getAdaptiveSimCount(context, riskProfile, draws.length);
