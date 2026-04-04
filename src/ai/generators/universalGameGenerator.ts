@@ -12,6 +12,9 @@ import type { RiskProfile, IntentFilters, ScoredGame } from "../core/aiTypes";
 import { scoreGame } from "../engines/rankingEngine";
 import { buildAdvancedWeightMap, analyzeZoneDistribution, computeCoOccurrence, computeHumanPatternPenalty } from "../engines/advancedAnalysisEngine";
 import { optimizePortfolio, evaluatePortfolio, recordPerformance, estimateROI } from "../engines/adaptiveEngine";
+import { computeCycleProfiles, getCycleDueNumbers, getAcceleratingNumbers } from "../engines/cycleEngine";
+import { computeRegressionCandidates, getUpwardRegressionNumbers } from "../engines/regressionEngine";
+import { computeEntropyReport } from "../engines/entropyEngine";
 
 interface GeneratorConfig {
   lotteryId: string;
@@ -42,7 +45,14 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     topPairSet.get(p.b)!.add(p.a);
   }
 
-  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters, advancedWeights);
+  // CYCLE & REGRESSION: identify high-value numbers via cycle/regression analysis
+  const cycleProfiles = computeCycleProfiles(config.draws, config.lotteryId, 150);
+  const cycleDueNumbers = new Set(getCycleDueNumbers(cycleProfiles, Math.ceil(rules.totalNumbers * 0.3)));
+  const acceleratingNumbers = new Set(getAcceleratingNumbers(cycleProfiles, Math.ceil(rules.totalNumbers * 0.15)));
+  const regressionCandidates = computeRegressionCandidates(config.draws, config.stats, config.lotteryId, 80);
+  const upwardRegression = new Set(getUpwardRegressionNumbers(regressionCandidates, Math.ceil(rules.totalNumbers * 0.2)));
+
+  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters, advancedWeights, cycleDueNumbers, acceleratingNumbers, upwardRegression);
 
   // Generate candidates (10x requested count for filtering)
   const candidateCount = Math.max(config.count * 20, 500);
@@ -68,9 +78,13 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     if (config.filters.avoidSequences && pattern.sequencePenalty < 0.5) continue;
     if (pattern.sumProximity < 0.3) continue; // always filter extreme sums
 
-    // NEW: Reject human-like patterns (dates, arithmetic sequences)
+    // Reject human-like patterns (dates, arithmetic sequences)
     const humanPenalty = computeHumanPatternPenalty(game);
     if (humanPenalty > 25) continue;
+
+    // ENTROPY: reject games with poor information distribution
+    const entropy = computeEntropyReport(game, rules.totalNumbers);
+    if (entropy.compositeScore < 30) continue;
 
     // Advanced zone distribution filter
     const zoneSize = 10;
@@ -135,7 +149,10 @@ function buildWeightedPool(
   stats: NumberStats[],
   strategyFilters: { hotBias: number; coldBias: number },
   intentFilters: IntentFilters,
-  advancedWeights?: Map<number, number>
+  advancedWeights?: Map<number, number>,
+  cycleDueNumbers?: Set<number>,
+  acceleratingNumbers?: Set<number>,
+  upwardRegression?: Set<number>
 ): { number: number; weight: number }[] {
   return stats.map(s => {
     // Start with advanced weight if available (includes co-occurrence, gap, trend, regime)
@@ -148,6 +165,13 @@ function buildWeightedPool(
     // Intent-specific
     if (intentFilters.prioritizeHot && s.status === "hot") weight *= 1.5;
     if (intentFilters.prioritizeCold && s.status === "cold") weight *= 1.5;
+
+    // CYCLE: boost numbers that are due according to cycle analysis
+    if (cycleDueNumbers?.has(s.number)) weight *= 1.25;
+    if (acceleratingNumbers?.has(s.number)) weight *= 1.15;
+
+    // REGRESSION: boost underperforming numbers expected to regress upward
+    if (upwardRegression?.has(s.number)) weight *= 1.2;
 
     // Exclude
     if (intentFilters.excludeNumbers?.includes(s.number)) weight = 0;

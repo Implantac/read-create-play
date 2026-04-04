@@ -7,6 +7,9 @@ import { DrawResult } from "@/data/lotteries";
 import { NumberStats, computeFrequencyStats } from "@/engine/statistics";
 import { getLotteryRules, PRIMES, FIBONACCI, LOTOFACIL_FRAME, LOTOFACIL_CENTER } from "../knowledge/lotteriesKnowledge";
 import type { PatternAnalysis, HistoricalAnalysis } from "../core/aiTypes";
+import { computeCycleProfiles, getCycleDueNumbers, getAcceleratingNumbers } from "./cycleEngine";
+import { computeRegressionCandidates, getUpwardRegressionNumbers, getDownwardRegressionNumbers, computeMultiWindowRegression } from "./regressionEngine";
+import { multiWindowTrend } from "./advancedAnalysisEngine";
 
 /** Extended stats for AI engines — wraps existing computeFrequencyStats */
 export function computeExtendedStats(draws: DrawResult[], lotteryId: string): NumberStats[] {
@@ -127,9 +130,60 @@ export function analyzeHistory(
   patterns.push(`Pares médio: ${avgEven} (faixa ideal: ${rules.idealParityRange[0]}-${rules.idealParityRange[1]})`);
   patterns.push(`Repetição média do concurso anterior: ${avgRepeat}`);
 
+  // CYCLE ANALYSIS: identify numbers with strong periodic behavior
+  const cycleProfiles = computeCycleProfiles(draws, lotteryId, Math.max(window, 150));
+  const cycleDue = getCycleDueNumbers(cycleProfiles, 5);
+  const accelerating = getAcceleratingNumbers(cycleProfiles, 5);
+  if (cycleDue.length > 0) {
+    patterns.push(`📈 Números no pico do ciclo (esperados em breve): ${cycleDue.join(", ")}`);
+  }
+  if (accelerating.length > 0) {
+    patterns.push(`🚀 Números com ciclo acelerando: ${accelerating.join(", ")}`);
+  }
+
+  // REGRESSION ANALYSIS: identify numbers deviating from expected frequency
+  const regressionCandidates = computeRegressionCandidates(draws, stats, lotteryId, window);
+  const upwardRegression = getUpwardRegressionNumbers(regressionCandidates, 5);
+  const downwardRegression = getDownwardRegressionNumbers(regressionCandidates, 5);
+  if (upwardRegression.length > 0) {
+    patterns.push(`📊 Regressão à média (subindo): ${upwardRegression.join(", ")}`);
+  }
+  if (downwardRegression.length > 0) {
+    patterns.push(`📉 Sobreperformando (possível queda): ${downwardRegression.join(", ")}`);
+  }
+
+  // MULTI-WINDOW REGRESSION: cross-validated signals
+  const multiWindow = computeMultiWindowRegression(draws, stats, lotteryId);
+  const strongUp = multiWindow.filter(m => m.consensus === "strong_up").map(m => m.number).slice(0, 5);
+  if (strongUp.length > 0) {
+    patterns.push(`🎯 Consenso forte de regressão (3 janelas concordam): ${strongUp.join(", ")}`);
+  }
+
+  // TREND ANALYSIS: momentum signals
+  const trends = multiWindowTrend(draws, rules.totalNumbers);
+  const ascending = trends.filter(t => t.regime === "ascending" && t.acceleration > 0.02).slice(0, 5);
+  const descending = trends.filter(t => t.regime === "descending" && t.acceleration < -0.02).slice(0, 5);
+  if (ascending.length > 0) {
+    patterns.push(`⬆️ Tendência ascendente com aceleração: ${ascending.map(t => t.number).join(", ")}`);
+  }
+  if (descending.length > 0) {
+    patterns.push(`⬇️ Tendência descendente: ${descending.map(t => t.number).join(", ")}`);
+  }
+
+  // Enhanced recommendations
   recommendations.push(`Incluir mix de ${Math.ceil(rules.pick * 0.4)} quentes e ${Math.ceil(rules.pick * 0.25)} frios`);
   recommendations.push(`Manter soma entre ${rules.idealSumRange[0]} e ${rules.idealSumRange[1]}`);
   recommendations.push(`Limitar sequências consecutivas a ${rules.maxRecommendedSequence}`);
+
+  if (cycleDue.length > 0) {
+    recommendations.push(`Considerar inclusão dos números cíclicos: ${cycleDue.slice(0, 3).join(", ")}`);
+  }
+  if (strongUp.length > 0) {
+    recommendations.push(`Priorizar números com consenso de regressão: ${strongUp.slice(0, 3).join(", ")}`);
+  }
+  if (ascending.length > 0) {
+    recommendations.push(`Aproveitar momentum ascendente: ${ascending.map(t => t.number).slice(0, 3).join(", ")}`);
+  }
 
   return { window, hotNumbers, coldNumbers, dueNumbers, avgSum, avgEven, avgRepeat, patterns, recommendations };
 }
