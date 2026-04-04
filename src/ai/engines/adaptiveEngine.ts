@@ -655,15 +655,17 @@ export function optimizeWeightsFromHistory(
   lotteryId: string,
   riskProfile: string
 ): { adjustments: Partial<AdaptiveWeights>; confidence: number } {
-  const entries = performanceMemory.filter(
+  // Merge persistent + session memory
+  const persistent = loadPersistentMemory(lotteryId, riskProfile);
+  const session = performanceMemory.filter(
     e => e.lotteryId === lotteryId && e.riskProfile === riskProfile
   );
+  const entries = [...persistent, ...session];
 
   if (entries.length < 3) {
     return { adjustments: {}, confidence: 0 };
   }
 
-  // Find the best performing entries
   const sorted = [...entries].sort((a, b) => b.avgScore - a.avgScore);
   const topQuartile = sorted.slice(0, Math.max(1, Math.floor(sorted.length / 4)));
   const bottomQuartile = sorted.slice(-Math.max(1, Math.floor(sorted.length / 4)));
@@ -675,12 +677,9 @@ export function optimizeWeightsFromHistory(
 
   const adjustments: Partial<AdaptiveWeights> = {};
 
-  // If high-scoring batches had better ROI, boost frequency weight
   if (avgTopROI > avgBottomROI * 1.1) {
     adjustments.frequencyWeight = 1.1;
   }
-
-  // If high-scoring batches had better diversity, boost dispersal
   if (avgTopDiversity > avgBottomDiversity * 1.05) {
     adjustments.dispersalWeight = 1.1;
     adjustments.clusterWeight = 1.05;
@@ -689,5 +688,92 @@ export function optimizeWeightsFromHistory(
   const confidence = Math.min(1, entries.length / 20);
 
   return { adjustments, confidence };
+}
+
+// ═══════════════════════════════════════════════════════
+// 10. PERSISTENT PERFORMANCE MEMORY (localStorage)
+// ═══════════════════════════════════════════════════════
+
+const STORAGE_KEY = "titan_ai_perf_memory";
+const MAX_PERSISTENT_ENTRIES = 200;
+
+/** Save current session performance to localStorage for cross-session learning */
+export function persistPerformanceMemory(): void {
+  try {
+    if (typeof localStorage === "undefined" || performanceMemory.length === 0) return;
+
+    const existing = loadAllPersistentMemory();
+    const merged = [...existing, ...performanceMemory];
+
+    // Deduplicate by timestamp
+    const seen = new Set<number>();
+    const deduped = merged.filter(e => {
+      if (seen.has(e.timestamp)) return false;
+      seen.add(e.timestamp);
+      return true;
+    });
+
+    // Keep most recent entries
+    const trimmed = deduped
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, MAX_PERSISTENT_ENTRIES);
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
+  } catch {
+    // localStorage unavailable or full — fail silently
+  }
+}
+
+function loadAllPersistentMemory(): PerformanceEntry[] {
+  try {
+    if (typeof localStorage === "undefined") return [];
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw) as PerformanceEntry[];
+  } catch {
+    return [];
+  }
+}
+
+function loadPersistentMemory(lotteryId: string, riskProfile: string): PerformanceEntry[] {
+  return loadAllPersistentMemory().filter(
+    e => e.lotteryId === lotteryId && e.riskProfile === riskProfile
+  );
+}
+
+/** Get cross-session performance statistics */
+export function getCrossSessionStats(
+  lotteryId: string
+): { totalSessions: number; avgScore: number; bestProfile: string; learningCurve: number } {
+  const all = loadAllPersistentMemory().filter(e => e.lotteryId === lotteryId);
+  if (all.length === 0) {
+    return { totalSessions: 0, avgScore: 0, bestProfile: "balanced", learningCurve: 0 };
+  }
+
+  const avgScore = all.reduce((s, e) => s + e.avgScore, 0) / all.length;
+
+  // Find best performing profile
+  const profileScores = new Map<string, { total: number; count: number }>();
+  for (const e of all) {
+    const p = profileScores.get(e.riskProfile) || { total: 0, count: 0 };
+    p.total += e.avgScore;
+    p.count++;
+    profileScores.set(e.riskProfile, p);
+  }
+  let bestProfile = "balanced";
+  let bestAvg = 0;
+  for (const [profile, { total, count }] of profileScores) {
+    const avg = total / count;
+    if (avg > bestAvg) { bestAvg = avg; bestProfile = profile; }
+  }
+
+  // Learning curve: compare first half vs second half scores
+  const sorted = [...all].sort((a, b) => a.timestamp - b.timestamp);
+  const half = Math.floor(sorted.length / 2);
+  const firstHalfAvg = sorted.slice(0, half).reduce((s, e) => s + e.avgScore, 0) / Math.max(1, half);
+  const secondHalfAvg = sorted.slice(half).reduce((s, e) => s + e.avgScore, 0) / Math.max(1, sorted.length - half);
+  const learningCurve = secondHalfAvg - firstHalfAvg;
+
+  return { totalSessions: all.length, avgScore, bestProfile, learningCurve };
 }
 

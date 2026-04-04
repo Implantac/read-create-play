@@ -255,5 +255,151 @@ export function scoreAdvancedPatterns(
 ): number {
   const rules = getLotteryRules(lotteryId);
   const metrics = computeAdvancedPatterns(game, rules.totalNumbers);
-  return metrics.compositeScore;
+  const harmonic = computeHarmonicProfile(game, rules.totalNumbers);
+  // Blend classic composite with harmonic quality
+  return Math.round(metrics.compositeScore * 0.7 + harmonic.harmonicScore * 0.3);
+}
+
+// ═══════════════════════════════════════════════════════
+// HARMONIC & GOLDEN RATIO ANALYSIS
+// ═══════════════════════════════════════════════════════
+
+const PHI = (1 + Math.sqrt(5)) / 2; // Golden ratio ≈ 1.618
+
+export interface HarmonicProfile {
+  goldenRatioProximity: number;  // 0-1 how close gap ratios are to φ
+  modularBalance: number;        // 0-1 balance across modular residues
+  harmonicMean: number;          // harmonic mean of gaps
+  geometricSpread: number;       // geometric mean / arithmetic mean ratio
+  harmonicScore: number;         // 0-100 composite
+}
+
+/** Analyze harmonic properties — golden ratio proximity, modular patterns */
+export function computeHarmonicProfile(
+  numbers: number[],
+  totalNumbers: number
+): HarmonicProfile {
+  const sorted = [...numbers].sort((a, b) => a - b);
+  const pick = sorted.length;
+
+  // 1) Golden Ratio Proximity: measure how close consecutive gap ratios are to φ
+  const gaps: number[] = [];
+  for (let i = 1; i < sorted.length; i++) gaps.push(sorted[i] - sorted[i - 1]);
+
+  let phiScore = 0;
+  let phiCount = 0;
+  for (let i = 1; i < gaps.length; i++) {
+    if (gaps[i - 1] > 0) {
+      const ratio = gaps[i] / gaps[i - 1];
+      const invRatio = gaps[i - 1] / gaps[i];
+      // Closest to φ or 1/φ
+      const bestDist = Math.min(Math.abs(ratio - PHI), Math.abs(invRatio - PHI));
+      phiScore += Math.max(0, 1 - bestDist / PHI);
+      phiCount++;
+    }
+  }
+  const goldenRatioProximity = phiCount > 0 ? phiScore / phiCount : 0.5;
+
+  // 2) Modular Balance: check residues mod 3, 5, 7
+  const modScores: number[] = [];
+  for (const mod of [3, 5, 7]) {
+    if (mod > totalNumbers) continue;
+    const buckets = new Array(mod).fill(0);
+    for (const n of sorted) buckets[n % mod]++;
+    const ideal = pick / mod;
+    const dev = buckets.reduce((s, b) => s + Math.abs(b - ideal), 0) / mod;
+    modScores.push(Math.max(0, 1 - dev / ideal));
+  }
+  const modularBalance = modScores.length > 0
+    ? modScores.reduce((a, b) => a + b, 0) / modScores.length
+    : 0.5;
+
+  // 3) Harmonic mean of gaps — rewards more even spacing
+  const harmonicMean = gaps.length > 0
+    ? gaps.length / gaps.reduce((s, g) => s + 1 / Math.max(0.5, g), 0)
+    : 1;
+
+  // 4) Geometric spread: geometric mean / arithmetic mean ratio
+  //    Closer to 1 = more uniform gaps
+  const arithmeticMean = gaps.length > 0
+    ? gaps.reduce((a, b) => a + b, 0) / gaps.length
+    : 1;
+  const logSum = gaps.reduce((s, g) => s + Math.log(Math.max(0.5, g)), 0);
+  const geometricMean = gaps.length > 0 ? Math.exp(logSum / gaps.length) : 1;
+  const geometricSpread = arithmeticMean > 0 ? geometricMean / arithmeticMean : 0.5;
+
+  // Composite
+  const harmonicScore = Math.round(
+    goldenRatioProximity * 25 +
+    modularBalance * 30 +
+    Math.min(1, harmonicMean / (totalNumbers / (pick - 1))) * 20 +
+    geometricSpread * 25
+  );
+
+  return {
+    goldenRatioProximity,
+    modularBalance,
+    harmonicMean,
+    geometricSpread,
+    harmonicScore,
+  };
+}
+
+// ═══════════════════════════════════════════════════════
+// POSITIONAL SEQUENCE DETECTOR
+// ═══════════════════════════════════════════════════════
+
+export interface SequenceReport {
+  arithmeticRuns: number;       // count of arithmetic progressions (≥3 terms)
+  mirrorPairs: number;          // pairs symmetric around midpoint
+  terminalCluster: number;      // numbers in first/last 10% of range
+  positionalScore: number;      // 0-100
+}
+
+/** Detect positional patterns: arithmetic runs, mirror symmetry, edge clusters */
+export function detectPositionalPatterns(
+  numbers: number[],
+  totalNumbers: number
+): SequenceReport {
+  const sorted = [...numbers].sort((a, b) => a - b);
+  const mid = (totalNumbers + 1) / 2;
+  const edgeThreshold = Math.ceil(totalNumbers * 0.1);
+
+  // Arithmetic progressions (≥3 consecutive terms with same diff)
+  let arithmeticRuns = 0;
+  for (let i = 0; i < sorted.length - 2; i++) {
+    const d = sorted[i + 1] - sorted[i];
+    if (d > 0 && d <= 10) {
+      let len = 2;
+      for (let j = i + 2; j < sorted.length; j++) {
+        if (sorted[j] - sorted[j - 1] === d) len++;
+        else break;
+      }
+      if (len >= 3) arithmeticRuns++;
+    }
+  }
+
+  // Mirror pairs: n and (totalNumbers + 1 - n) both present
+  const numSet = new Set(sorted);
+  let mirrorPairs = 0;
+  for (const n of sorted) {
+    const mirror = totalNumbers + 1 - n;
+    if (mirror !== n && numSet.has(mirror) && n < mirror) mirrorPairs++;
+  }
+
+  // Terminal cluster
+  const terminalCluster = sorted.filter(
+    n => n <= edgeThreshold || n > totalNumbers - edgeThreshold
+  ).length;
+
+  // Score: penalize too many arithmetic runs, reward moderate mirror symmetry
+  const runPenalty = Math.min(30, arithmeticRuns * 12);
+  const mirrorBonus = Math.min(20, mirrorPairs * 8);
+  const terminalPenalty = Math.max(0, (terminalCluster / sorted.length - 0.25) * 40);
+
+  const positionalScore = Math.max(0, Math.min(100,
+    70 - runPenalty + mirrorBonus - terminalPenalty
+  ));
+
+  return { arithmeticRuns, mirrorPairs, terminalCluster, positionalScore };
 }
