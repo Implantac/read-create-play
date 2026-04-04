@@ -33,6 +33,7 @@ const EstatisticasPage = lazy(() => import("@/pages/EstatisticasPage"));
 const PerfilPage = lazy(() => import("@/pages/PerfilPage"));
 const ROIDashboardPage = lazy(() => import("@/pages/ROIDashboardPage"));
 const HistoricoApostasPage = lazy(() => import("@/pages/HistoricoApostasPage"));
+const JogosSalvosPage = lazy(() => import("@/pages/JogosSalvosPage"));
 const FechamentosPage = lazy(() => import("@/pages/FechamentosPage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage"));
