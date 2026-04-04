@@ -14,19 +14,27 @@ export function useNotificationPermission() {
 
   const requestPermission = useCallback(async () => {
     if (!supported) return "denied" as NotificationPermission;
-    const result = await Notification.requestPermission();
-    setPermission(result);
-    return result;
+    try {
+      const result = await Notification.requestPermission();
+      setPermission(result);
+      return result;
+    } catch {
+      return "denied" as NotificationPermission;
+    }
   }, [supported]);
 
   const sendNotification = useCallback(
     (title: string, options?: NotificationOptions) => {
       if (!supported || Notification.permission !== "granted") return null;
-      return new Notification(title, {
-        icon: "/favicon.png",
-        badge: "/favicon.png",
-        ...options,
-      });
+      try {
+        return new Notification(title, {
+          icon: "/favicon.png",
+          badge: "/favicon.png",
+          ...options,
+        });
+      } catch {
+        return null;
+      }
     },
     [supported]
   );

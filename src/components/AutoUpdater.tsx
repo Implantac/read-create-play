@@ -30,7 +30,7 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso }: Props) {
       const result = await fetchLatestDraw(lotteryId);
       setLastCheck(new Date());
 
-      if (result) {
+      if (result && Array.isArray(result.numbers) && result.numbers.length > 0) {
         setLatestFromApi(result);
         if (result.concurso > latestConcurso) {
           onNewDraw(result);
@@ -40,8 +40,9 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso }: Props) {
         }
         setIsOnline(true);
       } else {
+        setLatestFromApi(null);
         setIsOnline(false);
-        toast.error("Não foi possível conectar à API da Caixa");
+        toast.error("Não foi possível conectar à API de resultados");
       }
     } catch {
       setIsOnline(false);
