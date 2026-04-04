@@ -470,8 +470,9 @@ function GameCard({ game, index, copiedIdx, onCopy, onSave, expanded, onToggle }
 
   return (
     <div className="border rounded-lg p-3 hover:bg-muted/30 transition-colors">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         <Badge className={`${gradeColor} shrink-0 font-bold`}>{game.grade}</Badge>
+        {game.roiTier && <ROIBadge tier={game.roiTier} score={game.roiScore} />}
         <span className="font-mono text-sm flex-1">{game.numbers.join(" - ")}</span>
         <span className="text-sm font-semibold text-primary">{game.totalScore}pts</span>
         <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={onCopy}>
