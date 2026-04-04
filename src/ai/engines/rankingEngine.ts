@@ -10,9 +10,10 @@ import { getLotteryRules } from "../knowledge/lotteriesKnowledge";
 import { AI_CONFIG } from "../core/aiConfig";
 import { computeSpecialNumberScore, computeHistoricalHitRate, computeClusterScore, computeHumanPatternPenalty, lightMonteCarlo, computeCoOccurrence } from "./advancedAnalysisEngine";
 import { estimateROI, detectContext, selfCalibrateWeights, applyContextAdjustments, extractWinningPatterns, scoreAgainstWinningPatterns, getAdaptiveSimCount, optimizeWeightsFromHistory, recordPerformance, evaluatePortfolio, optimizePortfolio } from "./adaptiveEngine";
-import { smoothWeights, computeProgressivePenalty, computeCoOccurrenceBonus, computeAntiPairPenalty } from "./stabilityEngine";
+import { smoothWeights, computeProgressivePenalty, computeCoOccurrenceBonus, computeAntiPairPenalty, detectRegimeChange, computeHistoricalNorms, checkGameOutlier } from "./stabilityEngine";
 import { computeEntropyReport, computeConsecutiveEntropy, computeEdgeInteriorBalance } from "./entropyEngine";
-import { computeCycleProfiles, scoreByCycleAlignment } from "./cycleEngine";
+import { computeCycleProfiles, scoreByCycleAlignment, multiScaleCycleAnalysis, scoreByMultiScaleCycles, computeBayesianPredictions } from "./cycleEngine";
+import { scoreAdvancedPatterns } from "./patternEngine";
 import { computeRegressionCandidates, scoreByRegression, computeMultiWindowRegression, computeSmoothedTrends } from "./regressionEngine";
 import { computeRecencyWeightedFrequency } from "./probabilityEngine";
 import type { ScoredGame, GameScores, RiskProfile } from "../core/aiTypes";
@@ -105,6 +106,41 @@ export function scoreGame(
   const cycleProfiles = computeCycleProfiles(draws, lotteryId, 150);
   const cycleScore = scoreByCycleAlignment(sorted, cycleProfiles);
   const cycleBonus = Math.round((cycleScore - 50) * 0.2);
+
+  // MULTI-SCALE CYCLES: cross-validated short/medium/long term
+  const multiScaleSignals = multiScaleCycleAnalysis(draws, lotteryId);
+  const multiScaleCycleScore = scoreByMultiScaleCycles(sorted, multiScaleSignals);
+  const multiScaleCycleBonus = Math.round((multiScaleCycleScore - 50) * 0.15);
+
+  // BAYESIAN PREDICTIONS: posterior probability boost
+  const bayesianPreds = computeBayesianPredictions(cycleProfiles, draws, lotteryId);
+  let bayesianBonus = 0;
+  if (bayesianPreds.length > 0) {
+    const bayesMap = new Map(bayesianPreds.map(b => [b.number, b]));
+    let bScore = 0;
+    let bCount = 0;
+    for (const n of sorted) {
+      const b = bayesMap.get(n);
+      if (b) {
+        bScore += b.posteriorProbability / b.priorProbability; // likelihood ratio
+        bCount++;
+      }
+    }
+    bayesianBonus = bCount > 0 ? Math.round(Math.min(8, (bScore / bCount - 1) * 5)) : 0;
+  }
+
+  // ADVANCED PATTERN METRICS: primes, quadrants, gap variance
+  const advPatternScore = scoreAdvancedPatterns(sorted, lotteryId);
+  const advPatternBonus = Math.round((advPatternScore - 50) * 0.12);
+
+  // REGIME CHANGE DETECTION: adjust confidence if regime shifted
+  const regimeReport = detectRegimeChange(draws, rules.totalNumbers, rules.pick);
+  const regimePenalty = regimeReport.detected ? Math.round(regimeReport.shiftMagnitude * 5) : 0;
+
+  // OUTLIER FILTER: penalize statistical outliers
+  const histNorms = computeHistoricalNorms(draws, 100);
+  const outlierCheck = checkGameOutlier(sorted, histNorms);
+  const outlierPenalty = outlierCheck.isOutlier ? Math.round((outlierCheck.zScoreSum + outlierCheck.zScoreParity + outlierCheck.zScoreDispersal) * 2) : 0;
 
   // REGRESSION: favor numbers regressing toward the mean
   const regressionCandidates = computeRegressionCandidates(draws, stats, lotteryId, 80);
@@ -229,17 +265,22 @@ export function scoreGame(
     + monteCarloBonus * 0.10
     + roiBonus * 0.08
     + winPatternBonus * 0.08
-    + entropyBonus * 0.07
-    + cycleBonus * 0.07
+    + entropyBonus * 0.06
+    + cycleBonus * 0.06
+    + multiScaleCycleBonus * 0.05
+    + bayesianBonus * 0.04
+    + advPatternBonus * 0.04
     + regressionBonus * 0.06
-    + multiWindowBonus * 0.06
+    + multiWindowBonus * 0.05
     + recencyBonus * 0.05
     + forecastBonus * 0.05
     + consecutiveBonus * 0.03
     + edgeBonus * 0.03
-    + coOccBonus * 0.06
-    - humanPenalty * 0.35
-    - antiPairPenalty * 0.10
+    + coOccBonus * 0.05
+    - humanPenalty * 0.30
+    - antiPairPenalty * 0.08
+    - regimePenalty * 0.04
+    - outlierPenalty * 0.06
   ));
 
   const grade = totalScore >= 85 ? "S" : totalScore >= 70 ? "A" : totalScore >= 55 ? "B" :

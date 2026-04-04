@@ -219,3 +219,150 @@ export function computeAntiPairPenalty(
 
   return Math.min(15, Math.round(penalty));
 }
+
+// ═══════════════════════════════════════════════════════
+// 6. REGIME CHANGE DETECTOR — Detect statistical shifts
+// ═══════════════════════════════════════════════════════
+
+export interface RegimeChangeReport {
+  detected: boolean;
+  changePoint: number;       // approximate draw index where regime shifted
+  beforeAvgSum: number;
+  afterAvgSum: number;
+  beforeAvgParity: number;
+  afterAvgParity: number;
+  shiftMagnitude: number;    // 0-1 how dramatic the shift is
+  recommendation: string;
+}
+
+/** Detect if a regime change occurred in recent draws using CUSUM-like method */
+export function detectRegimeChange(
+  draws: { numbers: number[] }[],
+  totalNumbers: number,
+  pick: number
+): RegimeChangeReport {
+  const n = Math.min(100, draws.length);
+  if (n < 20) {
+    return { detected: false, changePoint: 0, beforeAvgSum: 0, afterAvgSum: 0, beforeAvgParity: 0, afterAvgParity: 0, shiftMagnitude: 0, recommendation: "Dados insuficientes" };
+  }
+
+  const sums = draws.slice(0, n).map(d => d.numbers.reduce((a, b) => a + b, 0));
+  const parities = draws.slice(0, n).map(d => d.numbers.filter(x => x % 2 === 0).length);
+  const globalAvgSum = sums.reduce((a, b) => a + b, 0) / sums.length;
+
+  // Find maximum mean-shift point (simplified change-point detection)
+  let bestSplit = 10;
+  let bestDiff = 0;
+
+  for (let split = 10; split < n - 10; split++) {
+    const before = sums.slice(split);
+    const after = sums.slice(0, split);
+    const avgBefore = before.reduce((a, b) => a + b, 0) / before.length;
+    const avgAfter = after.reduce((a, b) => a + b, 0) / after.length;
+    const diff = Math.abs(avgAfter - avgBefore);
+    if (diff > bestDiff) {
+      bestDiff = diff;
+      bestSplit = split;
+    }
+  }
+
+  const before = sums.slice(bestSplit);
+  const after = sums.slice(0, bestSplit);
+  const beforeParity = parities.slice(bestSplit);
+  const afterParity = parities.slice(0, bestSplit);
+
+  const avgSumBefore = before.reduce((a, b) => a + b, 0) / before.length;
+  const avgSumAfter = after.reduce((a, b) => a + b, 0) / after.length;
+  const avgParBefore = beforeParity.reduce((a, b) => a + b, 0) / beforeParity.length;
+  const avgParAfter = afterParity.reduce((a, b) => a + b, 0) / afterParity.length;
+
+  const sumRange = totalNumbers * pick * 0.3; // approximate range
+  const shiftMagnitude = Math.min(1, bestDiff / Math.max(1, sumRange * 0.1));
+  const detected = shiftMagnitude > 0.3;
+
+  const recommendation = detected
+    ? `Mudança de regime detectada ~${bestSplit} sorteios atrás. Soma média passou de ${Math.round(avgSumBefore)} para ${Math.round(avgSumAfter)}. Ajuste pesos para o regime atual.`
+    : "Regime estável — padrões consistentes nos últimos sorteios.";
+
+  return {
+    detected,
+    changePoint: bestSplit,
+    beforeAvgSum: avgSumBefore,
+    afterAvgSum: avgSumAfter,
+    beforeAvgParity: avgParBefore,
+    afterAvgParity: avgParAfter,
+    shiftMagnitude,
+    recommendation,
+  };
+}
+
+// ═══════════════════════════════════════════════════════
+// 7. OUTLIER FILTER — Reject anomalous game configurations
+// ═══════════════════════════════════════════════════════
+
+export interface OutlierCheckResult {
+  isOutlier: boolean;
+  reasons: string[];
+  zScoreSum: number;
+  zScoreParity: number;
+  zScoreDispersal: number;
+}
+
+/** Check if a game is a statistical outlier based on historical norms */
+export function checkGameOutlier(
+  game: number[],
+  historicalMeans: { avgSum: number; stdSum: number; avgParity: number; stdParity: number; avgDispersal: number; stdDispersal: number }
+): OutlierCheckResult {
+  const sorted = [...game].sort((a, b) => a - b);
+  const sum = game.reduce((a, b) => a + b, 0);
+  const parity = game.filter(n => n % 2 === 0).length;
+  const dispersal = sorted[sorted.length - 1] - sorted[0];
+
+  const zSum = historicalMeans.stdSum > 0 ? Math.abs(sum - historicalMeans.avgSum) / historicalMeans.stdSum : 0;
+  const zPar = historicalMeans.stdParity > 0 ? Math.abs(parity - historicalMeans.avgParity) / historicalMeans.stdParity : 0;
+  const zDisp = historicalMeans.stdDispersal > 0 ? Math.abs(dispersal - historicalMeans.avgDispersal) / historicalMeans.stdDispersal : 0;
+
+  const reasons: string[] = [];
+  if (zSum > 2.5) reasons.push(`Soma extrema (z=${zSum.toFixed(1)})`);
+  if (zPar > 2.5) reasons.push(`Paridade extrema (z=${zPar.toFixed(1)})`);
+  if (zDisp > 2.5) reasons.push(`Dispersão extrema (z=${zDisp.toFixed(1)})`);
+
+  return {
+    isOutlier: reasons.length > 0,
+    reasons,
+    zScoreSum: zSum,
+    zScoreParity: zPar,
+    zScoreDispersal: zDisp,
+  };
+}
+
+/** Compute historical means and std for outlier detection */
+export function computeHistoricalNorms(
+  draws: { numbers: number[] }[],
+  window: number = 100
+): { avgSum: number; stdSum: number; avgParity: number; stdParity: number; avgDispersal: number; stdDispersal: number } {
+  const subset = draws.slice(0, Math.min(window, draws.length));
+  if (subset.length < 10) {
+    return { avgSum: 0, stdSum: 1, avgParity: 0, stdParity: 1, avgDispersal: 0, stdDispersal: 1 };
+  }
+
+  const sums = subset.map(d => d.numbers.reduce((a, b) => a + b, 0));
+  const parities = subset.map(d => d.numbers.filter(n => n % 2 === 0).length);
+  const dispersals = subset.map(d => {
+    const s = [...d.numbers].sort((a, b) => a - b);
+    return s[s.length - 1] - s[0];
+  });
+
+  const mean = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
+  const std = (arr: number[], m: number) => Math.sqrt(arr.reduce((s, v) => s + (v - m) ** 2, 0) / arr.length);
+
+  const avgSum = mean(sums);
+  const avgParity = mean(parities);
+  const avgDispersal = mean(dispersals);
+
+  return {
+    avgSum, stdSum: std(sums, avgSum),
+    avgParity, stdParity: std(parities, avgParity),
+    avgDispersal, stdDispersal: std(dispersals, avgDispersal),
+  };
+}

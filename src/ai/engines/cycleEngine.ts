@@ -176,10 +176,8 @@ export function detectHarmonicPatterns(
   const patterns: HarmonicPattern[] = [];
 
   for (let num = 1; num <= rules.totalNumbers; num++) {
-    // Create binary presence array
     const presence = subset.map(d => d.numbers.includes(num) ? 1 : 0);
 
-    // Simple autocorrelation for candidate periods
     let bestPeriod = 0;
     let bestCorr = 0;
 
@@ -197,7 +195,6 @@ export function detectHarmonicPatterns(
       }
     }
 
-    // Expected baseline correlation
     const baseRate = presence.reduce((a, b) => a + b, 0) / presence.length;
     const expectedCorr = baseRate * baseRate;
     const harmonicStrength = expectedCorr > 0
@@ -205,7 +202,6 @@ export function detectHarmonicPatterns(
       : 0;
 
     if (harmonicStrength > 0.1 && bestPeriod > 0) {
-      // Find most recent appearance
       const lastIdx = presence.indexOf(1);
       const nextPredicted = Math.max(0, bestPeriod - lastIdx);
 
@@ -219,4 +215,157 @@ export function detectHarmonicPatterns(
   }
 
   return patterns.sort((a, b) => b.harmonicStrength - a.harmonicStrength);
+}
+
+// ═══════════════════════════════════════════════════════
+// 5. BAYESIAN CYCLE PREDICTION — Posterior probability of appearance
+// ═══════════════════════════════════════════════════════
+
+export interface BayesianPrediction {
+  number: number;
+  priorProbability: number;       // base rate
+  posteriorProbability: number;   // adjusted by cycle evidence
+  likelihoodRatio: number;        // how much cycle info shifts the prior
+  confidenceInterval: [number, number]; // 90% CI for next appearance gap
+}
+
+/** Use Bayesian updating to estimate next-draw appearance probability */
+export function computeBayesianPredictions(
+  profiles: NumberCycleProfile[],
+  draws: DrawResult[],
+  lotteryId: string
+): BayesianPrediction[] {
+  const rules = getLotteryRules(lotteryId);
+  const subset = draws.slice(0, Math.min(200, draws.length));
+  if (subset.length < 20 || profiles.length === 0) return [];
+
+  const predictions: BayesianPrediction[] = [];
+
+  for (const p of profiles) {
+    // Prior: base appearance rate = pick/totalNumbers
+    const prior = rules.pick / rules.totalNumbers;
+
+    // Likelihood: how likely is this gap length given the number's cycle?
+    // Model as exponential distribution with rate = 1/avgCycle
+    const rate = 1 / Math.max(1, p.avgCycle);
+    // P(gap >= currentGap | cycle) using survival function
+    const survivalProb = Math.exp(-rate * p.currentGap);
+    // Hazard rate: conditional probability of appearing NOW given survived this long
+    const hazardRate = rate; // constant for exponential
+
+    // Likelihood ratio: how much more likely to appear now vs baseline
+    const cyclePhaseFactor = p.cyclePhase > 1
+      ? 1 + (p.cyclePhase - 1) * p.consistency * 2
+      : 0.5 + p.cyclePhase * 0.5;
+
+    // Posterior using simplified Bayes
+    const likelihoodRatio = cyclePhaseFactor * (1 + p.recentAcceleration);
+    const unnormalized = prior * likelihoodRatio;
+    const posterior = Math.min(0.95, Math.max(0.01, unnormalized));
+
+    // Confidence interval: based on stdDev of gaps
+    const lowerGap = Math.max(0, Math.round(p.avgCycle - 1.645 * p.stdDevCycle));
+    const upperGap = Math.round(p.avgCycle + 1.645 * p.stdDevCycle);
+    const remainingLower = Math.max(0, lowerGap - p.currentGap);
+    const remainingUpper = Math.max(0, upperGap - p.currentGap);
+
+    predictions.push({
+      number: p.number,
+      priorProbability: prior,
+      posteriorProbability: posterior,
+      likelihoodRatio,
+      confidenceInterval: [remainingLower, remainingUpper],
+    });
+  }
+
+  return predictions.sort((a, b) => b.posteriorProbability - a.posteriorProbability);
+}
+
+// ═══════════════════════════════════════════════════════
+// 6. MULTI-SCALE CYCLE ANALYSIS — Short/Medium/Long term
+// ═══════════════════════════════════════════════════════
+
+export interface MultiScaleCycleSignal {
+  number: number;
+  shortTermDue: number;   // 0-100 based on last 30 draws
+  mediumTermDue: number;  // 0-100 based on last 80 draws
+  longTermDue: number;    // 0-100 based on last 200 draws
+  consensus: "strong_due" | "moderate_due" | "mixed" | "not_due";
+  compositeScore: number; // 0-100 weighted blend
+}
+
+/** Analyze cycle due-ness across multiple time horizons */
+export function multiScaleCycleAnalysis(
+  draws: DrawResult[],
+  lotteryId: string
+): MultiScaleCycleSignal[] {
+  const windows = [30, 80, 200];
+  const profilesByWindow = windows.map(w => computeCycleProfiles(draws, lotteryId, w));
+
+  if (profilesByWindow[0].length === 0) return [];
+
+  const rules = getLotteryRules(lotteryId);
+  const signals: MultiScaleCycleSignal[] = [];
+
+  for (let num = 1; num <= rules.totalNumbers; num++) {
+    const short = profilesByWindow[0].find(p => p.number === num);
+    const medium = profilesByWindow[1].find(p => p.number === num);
+    const long = profilesByWindow[2].find(p => p.number === num);
+
+    const shortDue = short?.dueScore ?? 50;
+    const mediumDue = medium?.dueScore ?? 50;
+    const longDue = long?.dueScore ?? 50;
+
+    // Consensus
+    const allHigh = shortDue >= 65 && mediumDue >= 60 && longDue >= 55;
+    const mostHigh = (shortDue >= 65 ? 1 : 0) + (mediumDue >= 60 ? 1 : 0) + (longDue >= 55 ? 1 : 0);
+    const allLow = shortDue < 40 && mediumDue < 40 && longDue < 40;
+
+    const consensus: MultiScaleCycleSignal["consensus"] =
+      allHigh ? "strong_due" :
+      mostHigh >= 2 ? "moderate_due" :
+      allLow ? "not_due" : "mixed";
+
+    // Weighted composite: short-term matters most
+    const compositeScore = Math.round(shortDue * 0.5 + mediumDue * 0.3 + longDue * 0.2);
+
+    signals.push({
+      number: num,
+      shortTermDue: shortDue,
+      mediumTermDue: mediumDue,
+      longTermDue: longDue,
+      consensus,
+      compositeScore,
+    });
+  }
+
+  return signals.sort((a, b) => b.compositeScore - a.compositeScore);
+}
+
+/** Score a game using multi-scale cycle consensus */
+export function scoreByMultiScaleCycles(
+  game: number[],
+  signals: MultiScaleCycleSignal[]
+): number {
+  if (signals.length === 0) return 50;
+
+  const signalMap = new Map(signals.map(s => [s.number, s]));
+  let totalScore = 0;
+  let count = 0;
+
+  for (const n of game) {
+    const s = signalMap.get(n);
+    if (!s) continue;
+
+    // Bonus for consensus
+    const consensusMultiplier =
+      s.consensus === "strong_due" ? 1.3 :
+      s.consensus === "moderate_due" ? 1.1 :
+      s.consensus === "not_due" ? 0.7 : 1.0;
+
+    totalScore += s.compositeScore * consensusMultiplier;
+    count++;
+  }
+
+  return count > 0 ? Math.min(100, Math.round(totalScore / count)) : 50;
 }
