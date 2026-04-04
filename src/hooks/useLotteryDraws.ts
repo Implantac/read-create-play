@@ -145,10 +145,10 @@ export function useLotteryDraws(lotteryId: string) {
         }
       }
 
-      await fetchDraws();
+      await fetchDraws().catch(() => {});
     } catch (e) {
       console.error("Sync error:", e);
-      toast.error("Erro ao sincronizar: " + (e instanceof Error ? e.message : "Erro desconhecido"));
+      toast.error("Erro ao sincronizar. Tente novamente.");
     } finally {
       setSyncing(false);
     }
