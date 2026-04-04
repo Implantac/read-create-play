@@ -78,9 +78,13 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     if (config.filters.avoidSequences && pattern.sequencePenalty < 0.5) continue;
     if (pattern.sumProximity < 0.3) continue; // always filter extreme sums
 
-    // NEW: Reject human-like patterns (dates, arithmetic sequences)
+    // Reject human-like patterns (dates, arithmetic sequences)
     const humanPenalty = computeHumanPatternPenalty(game);
     if (humanPenalty > 25) continue;
+
+    // ENTROPY: reject games with poor information distribution
+    const entropy = computeEntropyReport(game, rules.totalNumbers);
+    if (entropy.compositeScore < 30) continue;
 
     // Advanced zone distribution filter
     const zoneSize = 10;
