@@ -11,6 +11,9 @@ import { AI_CONFIG } from "../core/aiConfig";
 import { computeSpecialNumberScore, computeHistoricalHitRate, computeClusterScore, computeHumanPatternPenalty, lightMonteCarlo, computeCoOccurrence } from "./advancedAnalysisEngine";
 import { estimateROI, detectContext, selfCalibrateWeights, applyContextAdjustments, extractWinningPatterns, scoreAgainstWinningPatterns, getAdaptiveSimCount, optimizeWeightsFromHistory, recordPerformance, evaluatePortfolio, optimizePortfolio } from "./adaptiveEngine";
 import { smoothWeights, computeProgressivePenalty, computeCoOccurrenceBonus, computeAntiPairPenalty } from "./stabilityEngine";
+import { computeEntropyReport } from "./entropyEngine";
+import { computeCycleProfiles, scoreByCycleAlignment } from "./cycleEngine";
+import { computeRegressionCandidates, scoreByRegression } from "./regressionEngine";
 import type { ScoredGame, GameScores, RiskProfile } from "../core/aiTypes";
 
 export function scoreGame(
