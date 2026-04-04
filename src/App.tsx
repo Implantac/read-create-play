@@ -58,6 +58,7 @@ function App() {
           <Toaster />
           <Sonner />
           <VersionUpdateAlert />
+          <AutoInstallPrompt />
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <AuthProvider>
               <Suspense fallback={<RouteLoader />}>
