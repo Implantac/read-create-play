@@ -15,7 +15,7 @@ interface LotteryContextType {
   loadedCount: number;
   syncDraws: () => void;
   syncAllLotteries: () => void;
-  addDraw: (draw: DrawResult) => void;
+  addDraw: (draw: DrawResultWithPrizes) => void;
   stats: NumberStats[];
   sumData: ReturnType<typeof computeSumDistribution>;
 }

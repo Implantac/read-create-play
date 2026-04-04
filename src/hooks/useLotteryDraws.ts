@@ -34,20 +34,35 @@ export function useLotteryDraws(lotteryId: string) {
   const [loadedCount, setLoadedCount] = useState(0);
   const cancelRef = useRef<{ cancelled: boolean }>({ cancelled: false });
 
+  const sanitizeNumbers = useCallback((numbers: unknown): number[] => {
+    if (!Array.isArray(numbers)) return [];
+    return numbers
+      .map((value) => Number(value))
+      .filter((value) => Number.isInteger(value) && value >= 0);
+  }, []);
+
   const mapRows = useCallback((allData: any[]) => {
-    const mapped: DrawResult[] = allData.map((row: any) => ({
+    const validRows = allData
+      .filter((row: any) => Number.isInteger(row?.concurso))
+      .map((row: any) => ({
+        ...row,
+        numbers: sanitizeNumbers(row?.numbers),
+      }))
+      .filter((row: any) => row.numbers.length > 0);
+
+    const mapped: DrawResult[] = validRows.map((row: any) => ({
       concurso: row.concurso,
       date: row.draw_date || "",
-      numbers: row.numbers || [],
+      numbers: row.numbers,
     }));
-    const mappedWithPrizes: DrawResultWithPrizes[] = allData.map((row: any) => ({
+    const mappedWithPrizes: DrawResultWithPrizes[] = validRows.map((row: any) => ({
       concurso: row.concurso,
       date: row.draw_date || "",
-      numbers: row.numbers || [],
+      numbers: row.numbers,
       prizeTiers: row.prize_tiers as DrawPrizeData | null,
     }));
     return { mapped, mappedWithPrizes };
-  }, []);
+  }, [sanitizeNumbers]);
 
   const fetchDraws = useCallback(async () => {
     // Cancel any in-flight request
@@ -188,12 +203,37 @@ export function useLotteryDraws(lotteryId: string) {
     }
   }, [fetchDraws]);
 
-  const addDraw = useCallback((draw: DrawResult) => {
+  const addDraw = useCallback((draw: DrawResultWithPrizes) => {
+    const safeNumbers = sanitizeNumbers(draw?.numbers);
+    if (!Number.isInteger(draw?.concurso) || safeNumbers.length === 0) {
+      console.warn("Ignoring invalid draw payload:", draw);
+      return;
+    }
+
+    const normalizedDraw: DrawResultWithPrizes = {
+      ...draw,
+      date: draw.date || "",
+      numbers: safeNumbers,
+    };
+
+    let inserted = false;
+
     setDraws(prev => {
-      if (prev.some(d => d.concurso === draw.concurso)) return prev;
-      return [draw, ...prev].sort((a, b) => b.concurso - a.concurso);
+      if (prev.some(d => d.concurso === normalizedDraw.concurso)) return prev;
+      inserted = true;
+      return [normalizedDraw, ...prev].sort((a, b) => b.concurso - a.concurso);
     });
-  }, []);
+
+    setDrawsWithPrizes(prev => {
+      if (prev.some(d => d.concurso === normalizedDraw.concurso)) return prev;
+      return [normalizedDraw, ...prev].sort((a, b) => b.concurso - a.concurso);
+    });
+
+    if (inserted) {
+      setCount(prev => prev + 1);
+      setLoadedCount(prev => prev + 1);
+    }
+  }, [sanitizeNumbers]);
 
   useEffect(() => {
     fetchDraws();

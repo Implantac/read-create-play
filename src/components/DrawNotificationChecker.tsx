@@ -32,55 +32,69 @@ export function DrawNotificationChecker() {
   const notifiedConcursos = useRef<Set<string>>(new Set());
 
   const checkMatches = useCallback(() => {
-    if (!draws.length || !savedBets.length) return;
+    try {
+      if (!draws.length || !savedBets.length) return;
 
-    const latestDraw = draws[0];
-    if (latestDraw.concurso === lastCheckedConcurso) return;
+      const latestDraw = draws[0];
+      if (!latestDraw || !Number.isInteger(latestDraw.concurso) || !Array.isArray(latestDraw.numbers)) return;
+      if (latestDraw.concurso === lastCheckedConcurso) return;
 
-    const results: MatchResult[] = [];
-    const drawSet = new Set(latestDraw.numbers);
+      const validNumbers = latestDraw.numbers.filter((n) => Number.isInteger(n));
+      if (validNumbers.length === 0) return;
 
-    for (const bet of savedBets) {
-      const matched = bet.numbers.filter(n => drawSet.has(n));
-      if (matched.length >= Math.max(2, Math.floor(config.pick * 0.3))) {
-        results.push({
-          betId: bet.id,
-          betNumbers: bet.numbers,
-          matchedNumbers: matched,
-          matchCount: matched.length,
-          concurso: latestDraw.concurso,
-          strategy: bet.strategy,
-        });
-      }
-    }
+      const results: MatchResult[] = [];
+      const drawSet = new Set(validNumbers);
 
-    results.sort((a, b) => b.matchCount - a.matchCount);
-    setMatches(results);
-    setLastCheckedConcurso(latestDraw.concurso);
-    setDismissed(false);
-
-    // Send browser push notification
-    const notifKey = `${selectedLottery}-${latestDraw.concurso}`;
-    if (results.length > 0 && !notifiedConcursos.current.has(notifKey)) {
-      notifiedConcursos.current.add(notifKey);
-      const best = results[0];
-      const isWinner = best.matchCount >= config.pick;
-      const lotteryName = LOTTERIES.find(l => l.id === selectedLottery)?.name || selectedLottery;
-
-      // Play tier-based alert sound (different melody per match level)
-      playMatchAlert(best.matchCount, config.pick);
-
-      sendNotification(
-        isWinner
-          ? `🎉 Parabéns! Jogo premiado na ${lotteryName}!`
-          : `🔔 ${lotteryName} — ${results.length} aposta(s) com acertos!`,
-        {
-          body: isWinner
-            ? `Você acertou ${best.matchCount}/${config.pick} no concurso #${latestDraw.concurso}!`
-            : `Melhor resultado: ${best.matchCount}/${config.pick} acertos no concurso #${latestDraw.concurso}`,
-          tag: notifKey,
+      for (const bet of savedBets) {
+        const matched = bet.numbers.filter(n => drawSet.has(n));
+        if (matched.length >= Math.max(2, Math.floor(config.pick * 0.3))) {
+          results.push({
+            betId: bet.id,
+            betNumbers: bet.numbers,
+            matchedNumbers: matched,
+            matchCount: matched.length,
+            concurso: latestDraw.concurso,
+            strategy: bet.strategy,
+          });
         }
-      );
+      }
+
+      results.sort((a, b) => b.matchCount - a.matchCount);
+      setMatches(results);
+      setLastCheckedConcurso(latestDraw.concurso);
+      setDismissed(false);
+
+      const notifKey = `${selectedLottery}-${latestDraw.concurso}`;
+      if (results.length > 0 && !notifiedConcursos.current.has(notifKey)) {
+        notifiedConcursos.current.add(notifKey);
+        const best = results[0];
+        const isWinner = best.matchCount >= config.pick;
+        const lotteryName = LOTTERIES.find(l => l.id === selectedLottery)?.name || selectedLottery;
+
+        try {
+          playMatchAlert(best.matchCount, config.pick);
+        } catch (error) {
+          console.warn("Failed to play match alert", error);
+        }
+
+        try {
+          sendNotification(
+            isWinner
+              ? `🎉 Parabéns! Jogo premiado na ${lotteryName}!`
+              : `🔔 ${lotteryName} — ${results.length} aposta(s) com acertos!`,
+            {
+              body: isWinner
+                ? `Você acertou ${best.matchCount}/${config.pick} no concurso #${latestDraw.concurso}!`
+                : `Melhor resultado: ${best.matchCount}/${config.pick} acertos no concurso #${latestDraw.concurso}`,
+              tag: notifKey,
+            }
+          );
+        } catch (error) {
+          console.warn("Failed to send notification", error);
+        }
+      }
+    } catch (error) {
+      console.error("DrawNotificationChecker error:", error);
     }
   }, [draws, savedBets, config.pick, lastCheckedConcurso, selectedLottery, sendNotification]);
 
