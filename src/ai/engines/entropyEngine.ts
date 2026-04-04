@@ -170,7 +170,7 @@ export function computePortfolioEntropy(
   if (totalPicks === 0) return 0;
 
   let entropy = 0;
-  for (const [, count] of freq) {
+  freq.forEach((count) => {
     const p = count / totalPicks;
     if (p > 0) entropy -= p * Math.log2(p);
   }
