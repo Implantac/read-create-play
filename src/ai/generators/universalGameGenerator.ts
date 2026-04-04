@@ -8,13 +8,16 @@ import { NumberStats } from "@/engine/statistics";
 import { getLotteryRules } from "../knowledge/lotteriesKnowledge";
 import { getStrategy, getAllStrategyIds } from "../knowledge/strategiesKnowledge";
 import { computePatternProfile } from "../engines/patternEngine";
+import { scoreAdvancedPatterns } from "../engines/patternEngine";
 import type { RiskProfile, IntentFilters, ScoredGame } from "../core/aiTypes";
 import { scoreGame } from "../engines/rankingEngine";
 import { buildAdvancedWeightMap, analyzeZoneDistribution, computeCoOccurrence, computeHumanPatternPenalty } from "../engines/advancedAnalysisEngine";
 import { optimizePortfolio, evaluatePortfolio, recordPerformance, estimateROI } from "../engines/adaptiveEngine";
-import { computeCycleProfiles, getCycleDueNumbers, getAcceleratingNumbers } from "../engines/cycleEngine";
+import { computeCycleProfiles, getCycleDueNumbers, getAcceleratingNumbers, computeBayesianPredictions } from "../engines/cycleEngine";
+import { multiScaleCycleAnalysis } from "../engines/cycleEngine";
 import { computeRegressionCandidates, getUpwardRegressionNumbers } from "../engines/regressionEngine";
 import { computeEntropyReport } from "../engines/entropyEngine";
+import { computeHistoricalNorms, checkGameOutlier } from "../engines/stabilityEngine";
 
 interface GeneratorConfig {
   lotteryId: string;
