@@ -129,9 +129,17 @@ export function scoreGame(
     bayesianBonus = bCount > 0 ? Math.round(Math.min(8, (bScore / bCount - 1) * 5)) : 0;
   }
 
-  // ADVANCED PATTERN METRICS: primes, quadrants, gap variance
+  // ADVANCED PATTERN METRICS: primes, quadrants, gap variance + harmonics
   const advPatternScore = scoreAdvancedPatterns(sorted, lotteryId);
   const advPatternBonus = Math.round((advPatternScore - 50) * 0.12);
+
+  // HARMONIC ANALYSIS: golden ratio, modular balance, geometric spread
+  const harmonicProfile = computeHarmonicProfile(sorted, rules.totalNumbers);
+  const harmonicBonus = Math.round((harmonicProfile.harmonicScore - 50) * 0.1);
+
+  // POSITIONAL PATTERNS: arithmetic runs, mirror symmetry, terminal clusters
+  const positionalReport = detectPositionalPatterns(sorted, rules.totalNumbers);
+  const positionalBonus = Math.round((positionalReport.positionalScore - 50) * 0.08);
 
   // REGIME CHANGE DETECTION: adjust confidence if regime shifted
   const regimeReport = detectRegimeChange(draws, rules.totalNumbers, rules.pick);
