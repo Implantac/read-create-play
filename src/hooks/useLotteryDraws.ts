@@ -179,10 +179,10 @@ export function useLotteryDraws(lotteryId: string) {
         toast.warning(`${totalErrors} erros durante a importação`);
       }
 
-      await fetchDraws();
+      await fetchDraws().catch(() => {});
     } catch (e) {
       console.error("Sync all error:", e);
-      toast.error("Erro ao sincronizar todas as loterias");
+      toast.error("Erro ao sincronizar todas as loterias. Tente novamente.");
     } finally {
       setSyncing(false);
     }
