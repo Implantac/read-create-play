@@ -71,14 +71,16 @@ export function useInstallPrompt() {
   const install = useCallback(async () => {
     if (!deferredPrompt) return false;
 
-    await deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
-    if (choice.outcome === "accepted") {
-      setDeferredPrompt(null);
-      return true;
-    }
+    try {
+      await deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
 
-    return false;
+      setDeferredPrompt(null);
+      return choice.outcome === "accepted";
+    } catch {
+      setDeferredPrompt(null);
+      return false;
+    }
   }, [deferredPrompt]);
 
   return {
