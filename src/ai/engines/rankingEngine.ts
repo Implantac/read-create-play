@@ -15,7 +15,7 @@ import { computeEntropyReport, computeConsecutiveEntropy, computeEdgeInteriorBal
 import { computeCycleProfiles, scoreByCycleAlignment, multiScaleCycleAnalysis, scoreByMultiScaleCycles, computeBayesianPredictions } from "./cycleEngine";
 import { scoreAdvancedPatterns, computeHarmonicProfile, detectPositionalPatterns } from "./patternEngine";
 import { computeRegressionCandidates, scoreByRegression, computeMultiWindowRegression, computeSmoothedTrends } from "./regressionEngine";
-import { computeRecencyWeightedFrequency } from "./probabilityEngine";
+import { computeRecencyWeightedFrequency, computeCovarianceNetwork, scoreByCorrelationNetwork, computeTemporalVolatility, scoreByVolatility } from "./probabilityEngine";
 import type { ScoredGame, GameScores, RiskProfile } from "../core/aiTypes";
 
 export function scoreGame(
@@ -215,6 +215,16 @@ export function scoreGame(
   const consecutiveBonus = Math.round(consecutiveEntropy.score * 5);
   const edgeBonus = Math.round(edgeBalance * 4);
 
+  // CORRELATION NETWORK: reward leveraging correlated pairs
+  const covNetwork = computeCovarianceNetwork(draws, rules.totalNumbers, 0.1);
+  const correlationScore = scoreByCorrelationNetwork(sorted, covNetwork);
+  const correlationBonus = Math.round((correlationScore - 50) * 0.12);
+
+  // TEMPORAL VOLATILITY: prefer stable, predictable numbers
+  const volatilityProfiles = computeTemporalVolatility(draws, rules.totalNumbers);
+  const volatilityScore = scoreByVolatility(sorted, volatilityProfiles, riskProfile !== "aggressive");
+  const volatilityBonus = Math.round((volatilityScore - 50) * 0.08);
+
   // ADAPTIVE Monte Carlo — variable depth based on context
   const adaptiveSimCount = getAdaptiveSimCount(context, riskProfile, draws.length);
   const monteCarlo = lightMonteCarlo(sorted, draws, adaptiveSimCount);
@@ -287,6 +297,8 @@ export function scoreGame(
     + consecutiveBonus * 0.03
     + edgeBonus * 0.03
     + coOccBonus * 0.05
+    + correlationBonus * 0.04
+    + volatilityBonus * 0.03
     - humanPenalty * 0.30
     - antiPairPenalty * 0.08
     - regimePenalty * 0.04
