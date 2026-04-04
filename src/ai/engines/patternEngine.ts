@@ -144,5 +144,116 @@ export function detectHistoricalPatterns(draws: DrawResult[], lotteryId: string)
     patterns.push(`Moldura média: ${avgFrame.toFixed(1)} / Centro: ${(rules.pick - avgFrame).toFixed(1)}`);
   }
 
+  // Prime distribution
+  const primes = new Set([2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59]);
+  const primeCounts = recent.map(d => d.numbers.filter(n => primes.has(n)).length);
+  const avgPrimes = primeCounts.reduce((a, b) => a + b, 0) / primeCounts.length;
+  patterns.push(`Primos médio: ${avgPrimes.toFixed(1)} de ${rules.pick}`);
+
+  // Fibonacci proximity
+  const fibs = new Set([1,2,3,5,8,13,21,34,55]);
+  const fibCounts = recent.map(d => d.numbers.filter(n => fibs.has(n)).length);
+  const avgFibs = fibCounts.reduce((a, b) => a + b, 0) / fibCounts.length;
+  patterns.push(`Fibonacci médio: ${avgFibs.toFixed(1)}`);
+
   return patterns;
+}
+
+// ═══════════════════════════════════════════════════════
+// ADVANCED PATTERN METRICS
+// ═══════════════════════════════════════════════════════
+
+export interface AdvancedPatternMetrics {
+  primeRatio: number;          // 0-1
+  fibonacciCount: number;
+  multiplesOf5Count: number;
+  edgeRatio: number;           // numbers at edges of range
+  quadrantBalance: number;     // 0-1 how balanced across 4 quadrants
+  gapVariance: number;         // lower = more evenly spaced
+  digitSumBalance: number;     // balance of digit sums
+  compositeScore: number;      // 0-100
+}
+
+const PRIMES = new Set([2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59]);
+const FIBS = new Set([1,2,3,5,8,13,21,34,55]);
+
+/** Compute advanced structural metrics for a game */
+export function computeAdvancedPatterns(
+  numbers: number[],
+  totalNumbers: number
+): AdvancedPatternMetrics {
+  const sorted = [...numbers].sort((a, b) => a - b);
+  const pick = numbers.length;
+
+  // Prime ratio
+  const primeCount = sorted.filter(n => PRIMES.has(n)).length;
+  const expectedPrimes = pick * (PRIMES.size / totalNumbers);
+  const primeDev = Math.abs(primeCount - expectedPrimes) / Math.max(1, expectedPrimes);
+  const primeRatio = primeCount / pick;
+
+  // Fibonacci
+  const fibonacciCount = sorted.filter(n => FIBS.has(n)).length;
+
+  // Multiples of 5
+  const multiplesOf5Count = sorted.filter(n => n % 5 === 0).length;
+
+  // Edge ratio: numbers in first 20% or last 20% of range
+  const edgeThreshold = Math.ceil(totalNumbers * 0.2);
+  const edgeCount = sorted.filter(n => n <= edgeThreshold || n > totalNumbers - edgeThreshold).length;
+  const edgeRatio = edgeCount / pick;
+
+  // Quadrant balance: divide number range into 4 equal parts
+  const qSize = Math.ceil(totalNumbers / 4);
+  const quadrants = [0, 0, 0, 0];
+  for (const n of sorted) {
+    const q = Math.min(3, Math.floor((n - 1) / qSize));
+    quadrants[q]++;
+  }
+  const idealPerQ = pick / 4;
+  const qDeviation = quadrants.reduce((s, q) => s + Math.abs(q - idealPerQ), 0) / 4;
+  const quadrantBalance = Math.max(0, 1 - qDeviation / idealPerQ);
+
+  // Gap variance: measure evenness of spacing
+  const gaps: number[] = [];
+  for (let i = 1; i < sorted.length; i++) gaps.push(sorted[i] - sorted[i - 1]);
+  const avgGap = gaps.length > 0 ? gaps.reduce((a, b) => a + b, 0) / gaps.length : 1;
+  const gapVariance = gaps.length > 0
+    ? gaps.reduce((s, g) => s + (g - avgGap) ** 2, 0) / gaps.length
+    : 0;
+  const normalizedGapVar = Math.min(1, gapVariance / (avgGap * avgGap + 1));
+
+  // Digit sum balance: sum of digits of each number
+  const digitSums = sorted.map(n => {
+    let s = 0, x = n;
+    while (x > 0) { s += x % 10; x = Math.floor(x / 10); }
+    return s;
+  });
+  const avgDigitSum = digitSums.reduce((a, b) => a + b, 0) / digitSums.length;
+  const digitSumVar = digitSums.reduce((s, d) => s + (d - avgDigitSum) ** 2, 0) / digitSums.length;
+  const digitSumBalance = Math.max(0, 1 - Math.sqrt(digitSumVar) / Math.max(1, avgDigitSum));
+
+  // Composite: reward balanced games
+  const compositeScore = Math.round(
+    (1 - Math.min(1, primeDev)) * 15 +
+    quadrantBalance * 30 +
+    (1 - normalizedGapVar) * 25 +
+    digitSumBalance * 15 +
+    (1 - Math.abs(edgeRatio - 0.4) * 2) * 15
+  );
+
+  return {
+    primeRatio, fibonacciCount, multiplesOf5Count,
+    edgeRatio, quadrantBalance, gapVariance: normalizedGapVar,
+    digitSumBalance, compositeScore,
+  };
+}
+
+/** Score a game using advanced pattern metrics */
+export function scoreAdvancedPatterns(
+  game: number[],
+  lotteryId: string
+): number {
+  const rules = getLotteryRules(lotteryId);
+  const metrics = computeAdvancedPatterns(game, rules.totalNumbers);
+  return metrics.compositeScore;
 }
