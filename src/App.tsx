@@ -25,6 +25,7 @@ const ForgotPasswordPage = lazy(() => import("@/pages/ForgotPasswordPage"));
 const ResetPasswordPage = lazy(() => import("@/pages/ResetPasswordPage"));
 const IAAutonomaPage = lazy(() => import("@/pages/IAAutonomaPage"));
 const AIAnalystPage = lazy(() => import("@/pages/AIAnalystPage"));
+const AIChatPage = lazy(() => import("@/pages/AIChatPage"));
 const EstatisticasPage = lazy(() => import("@/pages/EstatisticasPage"));
 const PerfilPage = lazy(() => import("@/pages/PerfilPage"));
 const ROIDashboardPage = lazy(() => import("@/pages/ROIDashboardPage"));
@@ -76,6 +77,7 @@ function App() {
                     <Route path="/simulacoes" element={<SimulacoesPage />} />
                     <Route path="/ia-autonoma" element={<IAAutonomaPage />} />
                     <Route path="/ai-analyst" element={<AIAnalystPage />} />
+                    <Route path="/ai-chat" element={<AIChatPage />} />
                     <Route path="/estatisticas" element={<EstatisticasPage />} />
                     <Route path="/fechamentos" element={<FechamentosPage />} />
                     <Route path="/historico" element={<HistoricoPage />} />
