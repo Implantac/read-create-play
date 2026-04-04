@@ -173,7 +173,7 @@ export function computePortfolioEntropy(
   freq.forEach((count) => {
     const p = count / totalPicks;
     if (p > 0) entropy -= p * Math.log2(p);
-  }
+  });
 
   const maxEntropy = Math.log2(Math.min(freq.size, totalNumbers));
   return maxEntropy > 0 ? entropy / maxEntropy : 0;
