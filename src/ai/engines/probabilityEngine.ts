@@ -211,3 +211,185 @@ export function stressTestGame(
     },
   };
 }
+
+// ═══════════════════════════════════════════════════════
+// 7. COVARIANCE NETWORK — Pair correlation strength analysis
+// ═══════════════════════════════════════════════════════
+
+export interface CovarianceEdge {
+  a: number;
+  b: number;
+  correlation: number;  // -1 to 1 (Pearson-like for binary presence)
+  significance: number; // 0-1
+}
+
+/** Compute pairwise correlation matrix for number co-appearance */
+export function computeCovarianceNetwork(
+  draws: DrawResult[],
+  totalNumbers: number,
+  minCorrelation: number = 0.08
+): CovarianceEdge[] {
+  const n = Math.min(200, draws.length);
+  if (n < 30) return [];
+
+  // Build binary presence matrix
+  const presence: Uint8Array[] = [];
+  for (let num = 0; num <= totalNumbers; num++) {
+    presence.push(new Uint8Array(n));
+  }
+  for (let i = 0; i < n; i++) {
+    for (const num of draws[i].numbers) {
+      if (num >= 1 && num <= totalNumbers) presence[num][i] = 1;
+    }
+  }
+
+  // Compute means
+  const means = new Float64Array(totalNumbers + 1);
+  for (let num = 1; num <= totalNumbers; num++) {
+    let sum = 0;
+    for (let i = 0; i < n; i++) sum += presence[num][i];
+    means[num] = sum / n;
+  }
+
+  const edges: CovarianceEdge[] = [];
+
+  for (let a = 1; a <= totalNumbers; a++) {
+    for (let b = a + 1; b <= totalNumbers; b++) {
+      let cov = 0, varA = 0, varB = 0;
+      for (let i = 0; i < n; i++) {
+        const da = presence[a][i] - means[a];
+        const db = presence[b][i] - means[b];
+        cov += da * db;
+        varA += da * da;
+        varB += db * db;
+      }
+      const denom = Math.sqrt(varA * varB);
+      if (denom < 1e-10) continue;
+
+      const correlation = cov / denom;
+      if (Math.abs(correlation) < minCorrelation) continue;
+
+      // Significance via t-test approximation
+      const t = correlation * Math.sqrt((n - 2) / (1 - correlation * correlation + 1e-10));
+      const significance = Math.min(1, Math.abs(t) / 3); // rough p-value proxy
+
+      edges.push({ a, b, correlation, significance });
+    }
+  }
+
+  return edges.sort((x, y) => Math.abs(y.correlation) - Math.abs(x.correlation));
+}
+
+/** Score a game based on how well it leverages positive correlations */
+export function scoreByCorrelationNetwork(
+  game: number[],
+  edges: CovarianceEdge[]
+): number {
+  if (edges.length === 0) return 50;
+
+  const gameSet = new Set(game);
+  let positiveBoost = 0;
+  let negativePenalty = 0;
+  let matchCount = 0;
+
+  for (const edge of edges) {
+    if (gameSet.has(edge.a) && gameSet.has(edge.b)) {
+      matchCount++;
+      if (edge.correlation > 0) {
+        positiveBoost += edge.correlation * edge.significance;
+      } else {
+        negativePenalty += Math.abs(edge.correlation) * edge.significance;
+      }
+    }
+  }
+
+  if (matchCount === 0) return 50;
+
+  const netScore = (positiveBoost - negativePenalty * 0.5) / matchCount;
+  return Math.min(100, Math.max(0, Math.round(50 + netScore * 200)));
+}
+
+// ═══════════════════════════════════════════════════════
+// 8. TEMPORAL VOLATILITY — Measure number stability over time
+// ═══════════════════════════════════════════════════════
+
+export interface VolatilityProfile {
+  number: number;
+  volatility: number;        // 0-1, how erratic the frequency is
+  trendStability: number;    // 0-1, consistency of direction
+  regime: "stable" | "volatile" | "transitioning";
+}
+
+/** Compute volatility for each number using rolling window variance */
+export function computeTemporalVolatility(
+  draws: DrawResult[],
+  totalNumbers: number,
+  rollingWindow: number = 15
+): VolatilityProfile[] {
+  const n = Math.min(150, draws.length);
+  if (n < rollingWindow * 2) return [];
+
+  const profiles: VolatilityProfile[] = [];
+
+  for (let num = 1; num <= totalNumbers; num++) {
+    const rates: number[] = [];
+    for (let start = 0; start + rollingWindow <= n; start++) {
+      let count = 0;
+      for (let i = start; i < start + rollingWindow; i++) {
+        if (draws[i].numbers.includes(num)) count++;
+      }
+      rates.push(count / rollingWindow);
+    }
+
+    if (rates.length < 3) continue;
+
+    const mean = rates.reduce((a, b) => a + b, 0) / rates.length;
+    const variance = rates.reduce((s, r) => s + (r - mean) ** 2, 0) / rates.length;
+    const volatility = Math.min(1, Math.sqrt(variance) / Math.max(0.01, mean));
+
+    // Trend stability: count direction changes
+    let dirChanges = 0;
+    for (let i = 2; i < rates.length; i++) {
+      const prev = rates[i - 1] - rates[i - 2];
+      const curr = rates[i] - rates[i - 1];
+      if ((prev > 0 && curr < 0) || (prev < 0 && curr > 0)) dirChanges++;
+    }
+    const trendStability = Math.max(0, 1 - dirChanges / (rates.length - 2));
+
+    const regime: VolatilityProfile["regime"] =
+      volatility < 0.3 && trendStability > 0.6 ? "stable" :
+      volatility > 0.6 ? "volatile" : "transitioning";
+
+    profiles.push({ number: num, volatility, trendStability, regime });
+  }
+
+  return profiles;
+}
+
+/** Score a game preferring numbers with stable, predictable behavior */
+export function scoreByVolatility(
+  game: number[],
+  profiles: VolatilityProfile[],
+  preferStable: boolean = true
+): number {
+  if (profiles.length === 0) return 50;
+
+  const profileMap = new Map(profiles.map(p => [p.number, p]));
+  let score = 0;
+  let count = 0;
+
+  for (const n of game) {
+    const p = profileMap.get(n);
+    if (!p) continue;
+    count++;
+
+    if (preferStable) {
+      score += p.regime === "stable" ? 80 : p.regime === "transitioning" ? 55 : 30;
+    } else {
+      // High volatility = higher variance = potential for big wins
+      score += p.regime === "volatile" ? 75 : p.regime === "transitioning" ? 60 : 45;
+    }
+  }
+
+  return count > 0 ? Math.round(score / count) : 50;
+}
