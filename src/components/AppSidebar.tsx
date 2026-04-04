@@ -1,6 +1,6 @@
 import {
   BarChart3, Sparkles, FlaskConical, History, Zap, Grid3X3,
-  Brain, ShieldCheck, Crown, PieChart, TrendingUp, ClipboardCheck, Bot, Lock, Smartphone, MessageCircle,
+  Brain, ShieldCheck, Crown, PieChart, TrendingUp, ClipboardCheck, Bot, Lock, Smartphone, MessageCircle, Star,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { usePlanAccess, type Feature } from "@/hooks/usePlanAccess";
@@ -35,6 +35,7 @@ const mainItems: { title: string; url: string; icon: any; requiredFeature?: Feat
   { title: "Estatísticas", url: "/estatisticas", icon: PieChart },
   { title: "ROI", url: "/roi", icon: TrendingUp, requiredFeature: "roi_dashboard" },
   { title: "Minhas Apostas", url: "/minhas-apostas", icon: ClipboardCheck },
+  { title: "Jogos Salvos", url: "/jogos-salvos", icon: Star },
   { title: "Histórico", url: "/historico", icon: History },
   { title: "Instalar App", url: "/install", icon: Smartphone },
 ];

@@ -33,6 +33,7 @@ const EstatisticasPage = lazy(() => import("@/pages/EstatisticasPage"));
 const PerfilPage = lazy(() => import("@/pages/PerfilPage"));
 const ROIDashboardPage = lazy(() => import("@/pages/ROIDashboardPage"));
 const HistoricoApostasPage = lazy(() => import("@/pages/HistoricoApostasPage"));
+const JogosSalvosPage = lazy(() => import("@/pages/JogosSalvosPage"));
 const FechamentosPage = lazy(() => import("@/pages/FechamentosPage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage"));
@@ -88,6 +89,7 @@ function App() {
                     <Route path="/historico" element={<HistoricoPage />} />
                     <Route path="/roi" element={<ROIDashboardPage />} />
                     <Route path="/minhas-apostas" element={<HistoricoApostasPage />} />
+                    <Route path="/jogos-salvos" element={<JogosSalvosPage />} />
                     <Route path="/perfil" element={<PerfilPage />} />
                     <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
                   </Route>
