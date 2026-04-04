@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, forwardRef } from "react";
 import { Loader2 } from "lucide-react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LotteryProvider } from "@/contexts/LotteryContext";
@@ -39,63 +39,67 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 
-function RouteLoader() {
+const RouteLoader = forwardRef<HTMLDivElement>((_props, ref) => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
+    <div ref={ref} className="min-h-screen flex items-center justify-center bg-background">
       <Loader2 className="w-8 h-8 animate-spin text-primary" />
     </div>
   );
-}
+});
+RouteLoader.displayName = "RouteLoader";
 
-function App() {
+const App = forwardRef<HTMLDivElement>((_props, ref) => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AuthProvider>
-              <Suspense fallback={<RouteLoader />}>
-                <Routes>
-                  {/* Public */}
-                  <Route path="/landing" element={<LandingPage />} />
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/signup" element={<SignupPage />} />
-                  <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                  <Route path="/reset-password" element={<ResetPasswordPage />} />
-                  <Route path="/planos" element={<PlanosPage />} />
-                  <Route path="/suporte" element={<SuportePage />} />
-                  <Route path="/payment-success" element={<PaymentSuccessPage />} />
-                  <Route path="/install" element={<InstallPage />} />
+    <div ref={ref}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+              <AuthProvider>
+                <Suspense fallback={<RouteLoader />}>
+                  <Routes>
+                    {/* Public */}
+                    <Route path="/landing" element={<LandingPage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/signup" element={<SignupPage />} />
+                    <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                    <Route path="/reset-password" element={<ResetPasswordPage />} />
+                    <Route path="/planos" element={<PlanosPage />} />
+                    <Route path="/suporte" element={<SuportePage />} />
+                    <Route path="/payment-success" element={<PaymentSuccessPage />} />
+                    <Route path="/install" element={<InstallPage />} />
 
-                  {/* Protected */}
-                  <Route element={<ProtectedRoute><LotteryProvider><AppLayout /></LotteryProvider></ProtectedRoute>}>
-                    <Route path="/" element={<DashboardPage />} />
-                    <Route path="/gerador" element={<GeradorPage />} />
-                    <Route path="/estrategias" element={<EstrategiasPage />} />
-                    <Route path="/simulacoes" element={<SimulacoesPage />} />
-                    <Route path="/ia-autonoma" element={<IAAutonomaPage />} />
-                    <Route path="/ai-analyst" element={<AIAnalystPage />} />
-                    <Route path="/ai-chat" element={<AIChatPage />} />
-                    <Route path="/estatisticas" element={<EstatisticasPage />} />
-                    <Route path="/fechamentos" element={<FechamentosPage />} />
-                    <Route path="/historico" element={<HistoricoPage />} />
-                    <Route path="/roi" element={<ROIDashboardPage />} />
-                    <Route path="/minhas-apostas" element={<HistoricoApostasPage />} />
-                    <Route path="/perfil" element={<PerfilPage />} />
-                    <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
-                  </Route>
+                    {/* Protected */}
+                    <Route element={<ProtectedRoute><LotteryProvider><AppLayout /></LotteryProvider></ProtectedRoute>}>
+                      <Route path="/" element={<DashboardPage />} />
+                      <Route path="/gerador" element={<GeradorPage />} />
+                      <Route path="/estrategias" element={<EstrategiasPage />} />
+                      <Route path="/simulacoes" element={<SimulacoesPage />} />
+                      <Route path="/ia-autonoma" element={<IAAutonomaPage />} />
+                      <Route path="/ai-analyst" element={<AIAnalystPage />} />
+                      <Route path="/ai-chat" element={<AIChatPage />} />
+                      <Route path="/estatisticas" element={<EstatisticasPage />} />
+                      <Route path="/fechamentos" element={<FechamentosPage />} />
+                      <Route path="/historico" element={<HistoricoPage />} />
+                      <Route path="/roi" element={<ROIDashboardPage />} />
+                      <Route path="/minhas-apostas" element={<HistoricoApostasPage />} />
+                      <Route path="/perfil" element={<PerfilPage />} />
+                      <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
+                    </Route>
 
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
-            </AuthProvider>
-          </BrowserRouter>
-        </TooltipProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Suspense>
+              </AuthProvider>
+            </BrowserRouter>
+          </TooltipProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </div>
   );
-}
+});
+App.displayName = "App";
 
 export default App;
