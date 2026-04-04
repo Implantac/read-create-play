@@ -215,6 +215,16 @@ export function scoreGame(
   const consecutiveBonus = Math.round(consecutiveEntropy.score * 5);
   const edgeBonus = Math.round(edgeBalance * 4);
 
+  // CORRELATION NETWORK: reward leveraging correlated pairs
+  const covNetwork = computeCovarianceNetwork(draws, rules.totalNumbers, 0.1);
+  const correlationScore = scoreByCorrelationNetwork(sorted, covNetwork);
+  const correlationBonus = Math.round((correlationScore - 50) * 0.12);
+
+  // TEMPORAL VOLATILITY: prefer stable, predictable numbers
+  const volatilityProfiles = computeTemporalVolatility(draws, rules.totalNumbers);
+  const volatilityScore = scoreByVolatility(sorted, volatilityProfiles, riskProfile !== "aggressive");
+  const volatilityBonus = Math.round((volatilityScore - 50) * 0.08);
+
   // ADAPTIVE Monte Carlo — variable depth based on context
   const adaptiveSimCount = getAdaptiveSimCount(context, riskProfile, draws.length);
   const monteCarlo = lightMonteCarlo(sorted, draws, adaptiveSimCount);
