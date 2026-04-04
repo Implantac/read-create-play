@@ -842,8 +842,10 @@ Para cada aposta, aplique TODOS os 10 pilares profissionais e garanta que TODOS 
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        temperature: 0.25,
-      }),
+        temperature: 0.2,
+        reasoning: {
+          effort: "high",
+        },
     });
 
     if (!aiResponse.ok) {
