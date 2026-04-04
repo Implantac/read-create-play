@@ -8,13 +8,16 @@ import { NumberStats } from "@/engine/statistics";
 import { getLotteryRules } from "../knowledge/lotteriesKnowledge";
 import { getStrategy, getAllStrategyIds } from "../knowledge/strategiesKnowledge";
 import { computePatternProfile } from "../engines/patternEngine";
+import { scoreAdvancedPatterns } from "../engines/patternEngine";
 import type { RiskProfile, IntentFilters, ScoredGame } from "../core/aiTypes";
 import { scoreGame } from "../engines/rankingEngine";
 import { buildAdvancedWeightMap, analyzeZoneDistribution, computeCoOccurrence, computeHumanPatternPenalty } from "../engines/advancedAnalysisEngine";
 import { optimizePortfolio, evaluatePortfolio, recordPerformance, estimateROI } from "../engines/adaptiveEngine";
-import { computeCycleProfiles, getCycleDueNumbers, getAcceleratingNumbers } from "../engines/cycleEngine";
+import { computeCycleProfiles, getCycleDueNumbers, getAcceleratingNumbers, computeBayesianPredictions } from "../engines/cycleEngine";
+import { multiScaleCycleAnalysis } from "../engines/cycleEngine";
 import { computeRegressionCandidates, getUpwardRegressionNumbers } from "../engines/regressionEngine";
 import { computeEntropyReport } from "../engines/entropyEngine";
+import { computeHistoricalNorms, checkGameOutlier } from "../engines/stabilityEngine";
 
 interface GeneratorConfig {
   lotteryId: string;
@@ -52,7 +55,28 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
   const regressionCandidates = computeRegressionCandidates(config.draws, config.stats, config.lotteryId, 80);
   const upwardRegression = new Set(getUpwardRegressionNumbers(regressionCandidates, Math.ceil(rules.totalNumbers * 0.2)));
 
-  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters, advancedWeights, cycleDueNumbers, acceleratingNumbers, upwardRegression);
+  // BAYESIAN: boost numbers with high posterior probability
+  const bayesianPreds = computeBayesianPredictions(cycleProfiles, config.draws, config.lotteryId);
+  const bayesianHighProb = new Set(
+    bayesianPreds
+      .filter(b => b.posteriorProbability > b.priorProbability * 1.2)
+      .slice(0, Math.ceil(rules.totalNumbers * 0.25))
+      .map(b => b.number)
+  );
+
+  // MULTI-SCALE: numbers due across all time horizons
+  const multiScaleSignals = multiScaleCycleAnalysis(config.draws, config.lotteryId);
+  const strongDueNumbers = new Set(
+    multiScaleSignals
+      .filter(s => s.consensus === "strong_due" || s.consensus === "moderate_due")
+      .slice(0, Math.ceil(rules.totalNumbers * 0.3))
+      .map(s => s.number)
+  );
+
+  // OUTLIER NORMS: pre-compute for fast rejection
+  const histNorms = computeHistoricalNorms(config.draws, 100);
+
+  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters, advancedWeights, cycleDueNumbers, acceleratingNumbers, upwardRegression, bayesianHighProb, strongDueNumbers);
 
   // Generate candidates (10x requested count for filtering)
   const candidateCount = Math.max(config.count * 20, 500);
@@ -97,6 +121,14 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     // NEW: Reject high concentration in single zone
     const maxInZone = Math.max(...gamezones);
     if (maxInZone > rules.pick * 0.6) continue;
+
+    // OUTLIER FILTER: reject games that are statistical outliers
+    const outlierCheck = checkGameOutlier(game, histNorms);
+    if (outlierCheck.isOutlier) continue;
+
+    // ADVANCED PATTERN: reject games with poor structural quality
+    const advPattern = scoreAdvancedPatterns(game, config.lotteryId);
+    if (advPattern < 25) continue;
 
     // Co-occurrence bonus: prefer games with proven pairs
     let coOccBonus = 0;
@@ -152,10 +184,11 @@ function buildWeightedPool(
   advancedWeights?: Map<number, number>,
   cycleDueNumbers?: Set<number>,
   acceleratingNumbers?: Set<number>,
-  upwardRegression?: Set<number>
+  upwardRegression?: Set<number>,
+  bayesianHighProb?: Set<number>,
+  strongDueNumbers?: Set<number>
 ): { number: number; weight: number }[] {
   return stats.map(s => {
-    // Start with advanced weight if available (includes co-occurrence, gap, trend, regime)
     let weight = advancedWeights?.get(s.number) ?? 1;
 
     // Strategy bias overlay
@@ -172,6 +205,12 @@ function buildWeightedPool(
 
     // REGRESSION: boost underperforming numbers expected to regress upward
     if (upwardRegression?.has(s.number)) weight *= 1.2;
+
+    // BAYESIAN: boost numbers with high posterior probability
+    if (bayesianHighProb?.has(s.number)) weight *= 1.18;
+
+    // MULTI-SCALE: boost numbers due across all time horizons
+    if (strongDueNumbers?.has(s.number)) weight *= 1.15;
 
     // Exclude
     if (intentFilters.excludeNumbers?.includes(s.number)) weight = 0;

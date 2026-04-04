@@ -104,6 +104,8 @@ export interface SimulationResult {
   bestGame: { numbers: number[]; avgHits: number };
   worstGame: { numbers: number[]; avgHits: number };
   strategyComparison?: StrategyComparison[];
+  avgPrizeRate?: number;
+  avgStability?: number;
 }
 
 export interface SimulatedGameResult {
@@ -113,6 +115,9 @@ export interface SimulatedGameResult {
   minHits: number;
   hitDistribution: Record<number, number>;
   stabilityScore: number;
+  prizeRate?: number;
+  consistencyScore?: number;
+  prizeDistribution?: Record<number, number>;
 }
 
 export interface StrategyComparison {
