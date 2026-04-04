@@ -122,6 +122,14 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     const maxInZone = Math.max(...gamezones);
     if (maxInZone > rules.pick * 0.6) continue;
 
+    // OUTLIER FILTER: reject games that are statistical outliers
+    const outlierCheck = checkGameOutlier(game, histNorms);
+    if (outlierCheck.isOutlier) continue;
+
+    // ADVANCED PATTERN: reject games with poor structural quality
+    const advPattern = scoreAdvancedPatterns(game, config.lotteryId);
+    if (advPattern < 25) continue;
+
     // Co-occurrence bonus: prefer games with proven pairs
     let coOccBonus = 0;
     for (let i = 0; i < game.length; i++) {
