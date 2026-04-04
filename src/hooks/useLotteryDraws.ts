@@ -114,6 +114,11 @@ export function useLotteryDraws(lotteryId: string) {
       }
     } catch (e) {
       console.error("Error fetching draws:", e);
+      if (!signal.cancelled) {
+        setDraws([]);
+        setDrawsWithPrizes([]);
+        setLoadedCount(0);
+      }
     } finally {
       if (!signal.cancelled) setLoading(false);
     }
@@ -140,10 +145,10 @@ export function useLotteryDraws(lotteryId: string) {
         }
       }
 
-      await fetchDraws();
+      await fetchDraws().catch(() => {});
     } catch (e) {
       console.error("Sync error:", e);
-      toast.error("Erro ao sincronizar: " + (e instanceof Error ? e.message : "Erro desconhecido"));
+      toast.error("Erro ao sincronizar. Tente novamente.");
     } finally {
       setSyncing(false);
     }
@@ -174,10 +179,10 @@ export function useLotteryDraws(lotteryId: string) {
         toast.warning(`${totalErrors} erros durante a importação`);
       }
 
-      await fetchDraws();
+      await fetchDraws().catch(() => {});
     } catch (e) {
       console.error("Sync all error:", e);
-      toast.error("Erro ao sincronizar todas as loterias");
+      toast.error("Erro ao sincronizar todas as loterias. Tente novamente.");
     } finally {
       setSyncing(false);
     }

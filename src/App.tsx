@@ -10,6 +10,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { LotteryProvider } from "@/contexts/LotteryContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminGuard } from "@/components/AdminGuard";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const AppLayout = lazy(() => import("@/components/AppLayout").then((m) => ({ default: m.AppLayout })));
 const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
@@ -70,7 +71,7 @@ function App() {
                   <Route path="/install" element={<InstallPage />} />
 
                   {/* Protected */}
-                  <Route element={<ProtectedRoute><LotteryProvider><AppLayout /></LotteryProvider></ProtectedRoute>}>
+                  <Route element={<ProtectedRoute><LotteryProvider><ErrorBoundary><AppLayout /></ErrorBoundary></LotteryProvider></ProtectedRoute>}>
                     <Route path="/" element={<DashboardPage />} />
                     <Route path="/gerador" element={<GeradorPage />} />
                     <Route path="/estrategias" element={<EstrategiasPage />} />
