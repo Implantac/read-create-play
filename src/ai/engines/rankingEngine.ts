@@ -278,6 +278,8 @@ export function scoreGame(
     + multiScaleCycleBonus * 0.05
     + bayesianBonus * 0.04
     + advPatternBonus * 0.04
+    + harmonicBonus * 0.04
+    + positionalBonus * 0.03
     + regressionBonus * 0.06
     + multiWindowBonus * 0.05
     + recencyBonus * 0.05
