@@ -28,9 +28,11 @@ export default defineConfig(({ mode }) => ({
         display: "standalone",
         orientation: "portrait-primary",
         start_url: "/",
+        id: "/",
+        categories: ["utilities", "entertainment"],
         icons: [
-          { src: "/favicon.png", sizes: "192x192", type: "image/png" },
-          { src: "/favicon.png", sizes: "512x512", type: "image/png", purpose: "any maskable" },
+          { src: "/logo.png", sizes: "192x192", type: "image/png" },
+          { src: "/logo.png", sizes: "512x512", type: "image/png", purpose: "any maskable" },
         ],
       },
       workbox: {
