@@ -26,6 +26,7 @@ const QUICK_PROMPTS = [
   { emoji: "🔄", text: "Como funciona a análise de ciclos?" },
   { emoji: "💡", text: "Me dê uma estratégia conservadora" },
   { emoji: "⚡", text: "Qual a melhor abordagem para hoje?" },
+  { emoji: "❓", text: "Como usar o Titan Loterias?" },
 ];
 
 async function streamChat({
