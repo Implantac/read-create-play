@@ -186,8 +186,9 @@ const AIAnalystPage = () => {
                       {msg.response?.games && msg.response.games.length > 0 && (
                         <div className="mt-3 space-y-2">
                           {msg.response.games.slice(0, 5).map((g, gi) => (
-                            <div key={gi} className="flex items-center gap-2 bg-background/50 rounded-lg p-2">
+                            <div key={gi} className="flex items-center gap-2 bg-background/50 rounded-lg p-2 flex-wrap">
                               <Badge variant="outline" className="shrink-0">{g.grade}</Badge>
+                              {g.roiTier && <ROIBadge tier={g.roiTier} score={g.roiScore} />}
                               <span className="text-xs font-mono">{g.numbers.join("-")}</span>
                               <span className="text-xs text-muted-foreground ml-auto">{g.totalScore}pts</span>
                             </div>
