@@ -11,6 +11,7 @@ import { LotteryProvider } from "@/contexts/LotteryContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminGuard } from "@/components/AdminGuard";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { VersionUpdateAlert } from "@/components/VersionUpdateAlert";
 
 const AppLayout = lazy(() => import("@/components/AppLayout").then((m) => ({ default: m.AppLayout })));
 const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
@@ -55,6 +56,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <VersionUpdateAlert />
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <AuthProvider>
               <Suspense fallback={<RouteLoader />}>
