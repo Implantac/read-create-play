@@ -107,6 +107,41 @@ export function scoreGame(
   const cycleScore = scoreByCycleAlignment(sorted, cycleProfiles);
   const cycleBonus = Math.round((cycleScore - 50) * 0.2);
 
+  // MULTI-SCALE CYCLES: cross-validated short/medium/long term
+  const multiScaleSignals = multiScaleCycleAnalysis(draws, lotteryId);
+  const multiScaleCycleScore = scoreByMultiScaleCycles(sorted, multiScaleSignals);
+  const multiScaleCycleBonus = Math.round((multiScaleCycleScore - 50) * 0.15);
+
+  // BAYESIAN PREDICTIONS: posterior probability boost
+  const bayesianPreds = computeBayesianPredictions(cycleProfiles, draws, lotteryId);
+  let bayesianBonus = 0;
+  if (bayesianPreds.length > 0) {
+    const bayesMap = new Map(bayesianPreds.map(b => [b.number, b]));
+    let bScore = 0;
+    let bCount = 0;
+    for (const n of sorted) {
+      const b = bayesMap.get(n);
+      if (b) {
+        bScore += b.posteriorProbability / b.priorProbability; // likelihood ratio
+        bCount++;
+      }
+    }
+    bayesianBonus = bCount > 0 ? Math.round(Math.min(8, (bScore / bCount - 1) * 5)) : 0;
+  }
+
+  // ADVANCED PATTERN METRICS: primes, quadrants, gap variance
+  const advPatternScore = scoreAdvancedPatterns(sorted, lotteryId);
+  const advPatternBonus = Math.round((advPatternScore - 50) * 0.12);
+
+  // REGIME CHANGE DETECTION: adjust confidence if regime shifted
+  const regimeReport = detectRegimeChange(draws, rules.totalNumbers, rules.pick);
+  const regimePenalty = regimeReport.detected ? Math.round(regimeReport.shiftMagnitude * 5) : 0;
+
+  // OUTLIER FILTER: penalize statistical outliers
+  const histNorms = computeHistoricalNorms(draws, 100);
+  const outlierCheck = checkGameOutlier(sorted, histNorms);
+  const outlierPenalty = outlierCheck.isOutlier ? Math.round((outlierCheck.zScoreSum + outlierCheck.zScoreParity + outlierCheck.zScoreDispersal) * 2) : 0;
+
   // REGRESSION: favor numbers regressing toward the mean
   const regressionCandidates = computeRegressionCandidates(draws, stats, lotteryId, 80);
   const regressionStrategy = riskProfile === "momentum" ? "momentum" 
