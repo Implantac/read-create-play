@@ -178,3 +178,55 @@ export function computePortfolioEntropy(
   const maxEntropy = Math.log2(Math.min(freq.size, totalNumbers));
   return maxEntropy > 0 ? entropy / maxEntropy : 0;
 }
+
+// ═══════════════════════════════════════════════════════
+// 7. CONSECUTIVE PATTERN ENTROPY
+// ═══════════════════════════════════════════════════════
+
+/** Analyze entropy of consecutive number patterns (pairs, triples) */
+export function computeConsecutiveEntropy(numbers: number[]): { score: number; consecutivePairs: number; maxRun: number } {
+  const sorted = [...numbers].sort((a, b) => a - b);
+  let consecutivePairs = 0;
+  let maxRun = 1;
+  let currentRun = 1;
+
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i] === sorted[i - 1] + 1) {
+      consecutivePairs++;
+      currentRun++;
+      maxRun = Math.max(maxRun, currentRun);
+    } else {
+      currentRun = 1;
+    }
+  }
+
+  // Ideal: 1-3 consecutive pairs depending on game size
+  const idealPairs = Math.max(1, Math.floor(numbers.length * 0.15));
+  const pairScore = consecutivePairs <= idealPairs + 1
+    ? Math.max(0, 1 - Math.abs(consecutivePairs - idealPairs) * 0.2)
+    : Math.max(0, 1 - (consecutivePairs - idealPairs) * 0.3);
+
+  const runPenalty = maxRun > 3 ? (maxRun - 3) * 0.2 : 0;
+  const score = Math.max(0, Math.min(1, pairScore - runPenalty));
+
+  return { score, consecutivePairs, maxRun };
+}
+
+// ═══════════════════════════════════════════════════════
+// 8. EDGE-INTERIOR BALANCE
+// ═══════════════════════════════════════════════════════
+
+/** Measure balance between edge numbers (extremes) and interior */
+export function computeEdgeInteriorBalance(
+  numbers: number[],
+  totalNumbers: number
+): number {
+  const edgeThreshold = Math.ceil(totalNumbers * 0.2);
+  const edges = numbers.filter(n => n <= edgeThreshold || n > totalNumbers - edgeThreshold).length;
+  const interior = numbers.length - edges;
+
+  const idealEdgeRatio = (edgeThreshold * 2) / totalNumbers;
+  const actualEdgeRatio = edges / numbers.length;
+
+  return Math.max(0, 1 - Math.abs(actualEdgeRatio - idealEdgeRatio) * 3);
+}

@@ -11,9 +11,10 @@ import { AI_CONFIG } from "../core/aiConfig";
 import { computeSpecialNumberScore, computeHistoricalHitRate, computeClusterScore, computeHumanPatternPenalty, lightMonteCarlo, computeCoOccurrence } from "./advancedAnalysisEngine";
 import { estimateROI, detectContext, selfCalibrateWeights, applyContextAdjustments, extractWinningPatterns, scoreAgainstWinningPatterns, getAdaptiveSimCount, optimizeWeightsFromHistory, recordPerformance, evaluatePortfolio, optimizePortfolio } from "./adaptiveEngine";
 import { smoothWeights, computeProgressivePenalty, computeCoOccurrenceBonus, computeAntiPairPenalty } from "./stabilityEngine";
-import { computeEntropyReport } from "./entropyEngine";
+import { computeEntropyReport, computeConsecutiveEntropy, computeEdgeInteriorBalance } from "./entropyEngine";
 import { computeCycleProfiles, scoreByCycleAlignment } from "./cycleEngine";
-import { computeRegressionCandidates, scoreByRegression } from "./regressionEngine";
+import { computeRegressionCandidates, scoreByRegression, computeMultiWindowRegression, computeSmoothedTrends } from "./regressionEngine";
+import { computeRecencyWeightedFrequency } from "./probabilityEngine";
 import type { ScoredGame, GameScores, RiskProfile } from "../core/aiTypes";
 
 export function scoreGame(
@@ -96,6 +97,8 @@ export function scoreGame(
 
   // ENTROPY: information-theoretic quality assessment
   const entropyReport = computeEntropyReport(sorted, rules.totalNumbers);
+  const consecutiveEntropy = computeConsecutiveEntropy(sorted);
+  const edgeBalance = computeEdgeInteriorBalance(sorted, rules.totalNumbers);
   const entropyBonus = Math.round((entropyReport.compositeScore - 50) * 0.3);
 
   // CYCLE ALIGNMENT: how well numbers align with their natural cycles
@@ -110,6 +113,64 @@ export function scoreGame(
   const regressionScore = scoreByRegression(sorted, regressionCandidates, regressionStrategy);
   const regressionBonus = Math.round((regressionScore - 50) * 0.15);
 
+  // MULTI-WINDOW REGRESSION CONSENSUS: cross-validated signals
+  const multiWindowReg = computeMultiWindowRegression(draws, stats, lotteryId);
+  let multiWindowBonus = 0;
+  if (multiWindowReg.length > 0) {
+    const regMap = new Map(multiWindowReg.map(r => [r.number, r]));
+    let consensusScore = 0;
+    let consensusCount = 0;
+    for (const n of sorted) {
+      const r = regMap.get(n);
+      if (r) {
+        consensusCount++;
+        if (r.consensus === "strong_up") consensusScore += r.consensusStrength * 1.2;
+        else if (r.consensus === "up") consensusScore += r.consensusStrength * 0.8;
+        else if (r.consensus === "neutral") consensusScore += 0.4;
+        else if (r.consensus === "down") consensusScore -= r.consensusStrength * 0.3;
+        else consensusScore -= r.consensusStrength * 0.5;
+        // Trend acceleration bonus
+        if (r.trendAcceleration > 0.1) consensusScore += 0.15;
+      }
+    }
+    multiWindowBonus = consensusCount > 0
+      ? Math.round((consensusScore / consensusCount) * 12)
+      : 0;
+  }
+
+  // RECENCY-WEIGHTED FREQUENCY: boost numbers with recent momentum
+  const recencyWeights = computeRecencyWeightedFrequency(draws, rules.totalNumbers, 40);
+  let recencyBonus = 0;
+  for (const n of sorted) {
+    recencyBonus += (recencyWeights.get(n) || 0);
+  }
+  recencyBonus = Math.round((recencyBonus / sorted.length) * 8);
+
+  // SMOOTHED TREND FORECAST: Holt-Winters prediction alignment
+  const smoothedTrends = computeSmoothedTrends(draws, lotteryId);
+  let forecastBonus = 0;
+  if (smoothedTrends.length > 0) {
+    const trendMap = new Map(smoothedTrends.map(t => [t.number, t]));
+    let forecastScore = 0;
+    let forecastCount = 0;
+    for (const n of sorted) {
+      const t = trendMap.get(n);
+      if (t && t.forecastConfidence > 0.3) {
+        forecastCount++;
+        // Favor numbers with positive trend forecast
+        if (t.forecast > t.level) forecastScore += t.forecastConfidence * 0.8;
+        else forecastScore += (1 - t.forecastConfidence) * 0.3;
+      }
+    }
+    forecastBonus = forecastCount > 0
+      ? Math.round((forecastScore / forecastCount) * 8)
+      : 0;
+  }
+
+  // CONSECUTIVE & EDGE BALANCE: structural quality
+  const consecutiveBonus = Math.round(consecutiveEntropy.score * 5);
+  const edgeBonus = Math.round(edgeBalance * 4);
+
   // ADAPTIVE Monte Carlo — variable depth based on context
   const adaptiveSimCount = getAdaptiveSimCount(context, riskProfile, draws.length);
   const monteCarlo = lightMonteCarlo(sorted, draws, adaptiveSimCount);
@@ -123,7 +184,7 @@ export function scoreGame(
 
   // WINNING PATTERNS: Score against real historical winning patterns
   const winPatternScore = scoreAgainstWinningPatterns(sorted, winningPatterns, lotteryId);
-  const winPatternBonus = Math.round((winPatternScore - 50) * 0.2); // centered around 50
+  const winPatternBonus = Math.round((winPatternScore - 50) * 0.2);
 
   // Strategy fit with adaptive cluster/context awareness
   const strategyFit = Math.round(
@@ -140,14 +201,16 @@ export function scoreGame(
 
   // Probability score incorporating zone balance, entropy and co-occurrence
   const probScore = Math.round(
-    (pattern.sumProximity * 18 + 
-     pattern.parityBalance * 18 + 
-     pattern.dispersalScore * 18 + 
-     pattern.repeatScore * 10 +
-     (specialScore / 100) * 8 +
-     (clusterScore / 100) * 10 +
+    (pattern.sumProximity * 16 + 
+     pattern.parityBalance * 16 + 
+     pattern.dispersalScore * 16 + 
+     pattern.repeatScore * 8 +
+     (specialScore / 100) * 7 +
+     (clusterScore / 100) * 9 +
      (entropyReport.compositeScore / 100) * 10 +
-     (cycleScore / 100) * 8)
+     (cycleScore / 100) * 8 +
+     consecutiveEntropy.score * 5 +
+     edgeBalance * 5)
   );
 
   const w = AI_CONFIG.scoringWeights;
@@ -160,24 +223,29 @@ export function scoreGame(
     probScore * w.probability
   );
 
-  // Apply all overlays: Monte Carlo + ROI + winning patterns + entropy + cycle + regression + co-occurrence - penalties
+  // Apply all overlays with enhanced signals
   const totalScore = Math.max(0, Math.min(100,
     rawScore
-    + monteCarloBonus * 0.12
-    + roiBonus * 0.10
-    + winPatternBonus * 0.10
-    + entropyBonus * 0.08
-    + cycleBonus * 0.08
-    + regressionBonus * 0.07
-    + coOccBonus * 0.07
+    + monteCarloBonus * 0.10
+    + roiBonus * 0.08
+    + winPatternBonus * 0.08
+    + entropyBonus * 0.07
+    + cycleBonus * 0.07
+    + regressionBonus * 0.06
+    + multiWindowBonus * 0.06
+    + recencyBonus * 0.05
+    + forecastBonus * 0.05
+    + consecutiveBonus * 0.03
+    + edgeBonus * 0.03
+    + coOccBonus * 0.06
     - humanPenalty * 0.35
-    - antiPairPenalty * 0.12
+    - antiPairPenalty * 0.10
   ));
 
   const grade = totalScore >= 85 ? "S" : totalScore >= 70 ? "A" : totalScore >= 55 ? "B" :
     totalScore >= 40 ? "C" : totalScore >= 25 ? "D" : "F";
 
-  const explanation = buildExplanation(sorted, lotteryId, pattern, { statistical: statScore, structural: structScore, coverage: coverageScore, diversity: diversityScore, strategyFit, probability: probScore }, totalScore, grade, clusterScore, humanPenalty, monteCarlo, roi, context, entropyReport, cycleScore, regressionScore);
+  const explanation = buildExplanation(sorted, lotteryId, pattern, { statistical: statScore, structural: structScore, coverage: coverageScore, diversity: diversityScore, strategyFit, probability: probScore }, totalScore, grade, clusterScore, humanPenalty, monteCarlo, roi, context, entropyReport, cycleScore, regressionScore, multiWindowBonus, forecastBonus, consecutiveEntropy, edgeBalance);
 
   return {
     numbers: sorted,
@@ -204,7 +272,11 @@ function buildExplanation(
   context?: { recentSumTrend: string; volatilityIndex: number; regimeStability: number },
   entropyReport?: { compositeScore: number; zoneEntropy: number; gapEntropy: number; dispersionIndex: number; quadrantBalance: number },
   cycleScore?: number,
-  regressionScore?: number
+  regressionScore?: number,
+  multiWindowBonus?: number,
+  forecastBonus?: number,
+  consecutiveEntropy?: { score: number; consecutivePairs: number; maxRun: number },
+  edgeBalance?: number
 ): string[] {
   const lines: string[] = [];
   lines.push(`Score geral: ${total}/100 (${grade})`);
@@ -284,6 +356,28 @@ function buildExplanation(
   if (context) {
     if (context.volatilityIndex > 0.6) lines.push("⚡ Volatilidade alta detectada — pesos adaptativos ajustados");
     if (context.regimeStability < 0.4) lines.push("🔄 Regime instável — tendências com menor peso");
+  }
+
+  // MULTI-WINDOW & FORECAST insights
+  if (multiWindowBonus !== undefined && multiWindowBonus > 3) {
+    lines.push("✅ Consenso multi-janela positivo: sinais de regressão alinhados em 30/80/150 sorteios");
+  } else if (multiWindowBonus !== undefined && multiWindowBonus < -2) {
+    lines.push("⚠️ Sinais de regressão divergentes entre janelas temporais");
+  }
+
+  if (forecastBonus !== undefined && forecastBonus > 3) {
+    lines.push("📈 Previsão Holt-Winters favorável: tendência ascendente confirmada");
+  }
+
+  if (consecutiveEntropy) {
+    if (consecutiveEntropy.maxRun > 3) lines.push(`⚠️ Sequência longa de ${consecutiveEntropy.maxRun} consecutivos detectada`);
+    else if (consecutiveEntropy.consecutivePairs >= 1 && consecutiveEntropy.score > 0.7)
+      lines.push("✅ Padrão de consecutivos dentro do ideal histórico");
+  }
+
+  if (edgeBalance !== undefined) {
+    if (edgeBalance >= 0.7) lines.push("✅ Equilíbrio entre extremos e centro do volante");
+    else if (edgeBalance < 0.4) lines.push("⚠️ Desequilíbrio entre números extremos e centrais");
   }
 
   return lines;

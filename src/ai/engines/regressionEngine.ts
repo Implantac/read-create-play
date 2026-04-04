@@ -188,6 +188,7 @@ export interface MultiWindowRegression {
   longTermZ: number;   // 150+ draws
   consensus: "strong_up" | "up" | "neutral" | "down" | "strong_down";
   consensusStrength: number; // 0-1
+  trendAcceleration: number; // positive = accelerating upward
 }
 
 /** Cross-validate regression signals across multiple timeframes */
@@ -202,7 +203,6 @@ export function computeMultiWindowRegression(
 
   if (short.length === 0) return [];
 
-  const shortMap = new Map(short.map(c => [c.number, c]));
   const midMap = new Map(mid.map(c => [c.number, c]));
   const longMap = new Map(long.map(c => [c.number, c]));
 
@@ -216,25 +216,29 @@ export function computeMultiWindowRegression(
     const midZ = m?.zScore ?? 0;
     const longZ = l?.zScore ?? 0;
 
+    // Trend acceleration: is the z-score changing faster in short term?
+    const trendAcceleration = (shortZ - midZ) * 0.6 + (midZ - longZ) * 0.4;
+
     // Count how many windows agree on direction
     const upSignals = [shortZ < -1.5, midZ < -1.5, longZ < -1.5].filter(Boolean).length;
     const downSignals = [shortZ > 1.5, midZ > 1.5, longZ > 1.5].filter(Boolean).length;
 
+    // Enhanced consensus with acceleration factor
     let consensus: MultiWindowRegression["consensus"];
     let consensusStrength: number;
 
     if (upSignals >= 3) {
       consensus = "strong_up";
-      consensusStrength = 0.9;
+      consensusStrength = Math.min(1, 0.85 + Math.abs(trendAcceleration) * 0.1);
     } else if (upSignals >= 2) {
       consensus = "up";
-      consensusStrength = 0.6;
+      consensusStrength = 0.55 + Math.abs(trendAcceleration) * 0.1;
     } else if (downSignals >= 3) {
       consensus = "strong_down";
-      consensusStrength = 0.9;
+      consensusStrength = Math.min(1, 0.85 + Math.abs(trendAcceleration) * 0.1);
     } else if (downSignals >= 2) {
       consensus = "down";
-      consensusStrength = 0.6;
+      consensusStrength = 0.55 + Math.abs(trendAcceleration) * 0.1;
     } else {
       consensus = "neutral";
       consensusStrength = 0.3;
@@ -247,7 +251,70 @@ export function computeMultiWindowRegression(
       longTermZ: longZ,
       consensus,
       consensusStrength,
+      trendAcceleration,
     });
+  }
+
+  return results;
+}
+
+// ═══════════════════════════════════════════════════════
+// 5. EXPONENTIAL SMOOTHING (Holt-Winters inspired)
+// ═══════════════════════════════════════════════════════
+
+export interface SmoothedTrend {
+  number: number;
+  level: number;        // smoothed frequency level
+  trend: number;        // trend component (rising/falling)
+  forecast: number;     // predicted next-period frequency
+  forecastConfidence: number; // 0-1
+}
+
+/** Holt-Winters double exponential smoothing for frequency forecasting */
+export function computeSmoothedTrends(
+  draws: DrawResult[],
+  lotteryId: string,
+  alpha: number = 0.3,
+  beta: number = 0.15
+): SmoothedTrend[] {
+  const rules = getLotteryRules(lotteryId);
+  const windowSize = 10; // group draws into windows of 10
+  const totalWindows = Math.floor(Math.min(draws.length, 200) / windowSize);
+
+  if (totalWindows < 3) return [];
+
+  const results: SmoothedTrend[] = [];
+
+  for (let num = 1; num <= rules.totalNumbers; num++) {
+    // Build frequency time series (most recent first → reverse for chronological)
+    const freqSeries: number[] = [];
+    for (let w = totalWindows - 1; w >= 0; w--) {
+      const windowDraws = draws.slice(w * windowSize, (w + 1) * windowSize);
+      const count = windowDraws.filter(d => d.numbers.includes(num)).length;
+      freqSeries.push(count / windowSize);
+    }
+
+    if (freqSeries.length < 3) continue;
+
+    // Initialize Holt-Winters
+    let level = freqSeries[0];
+    let trend = freqSeries[1] - freqSeries[0];
+
+    // Apply smoothing
+    for (let t = 1; t < freqSeries.length; t++) {
+      const prevLevel = level;
+      level = alpha * freqSeries[t] + (1 - alpha) * (prevLevel + trend);
+      trend = beta * (level - prevLevel) + (1 - beta) * trend;
+    }
+
+    const forecast = level + trend;
+
+    // Confidence based on how well the model fits recent data
+    const lastActual = freqSeries[freqSeries.length - 1];
+    const fitError = Math.abs(level - lastActual);
+    const forecastConfidence = Math.max(0, Math.min(1, 1 - fitError * 3));
+
+    results.push({ number: num, level, trend, forecast, forecastConfidence });
   }
 
   return results;

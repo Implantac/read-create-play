@@ -80,7 +80,7 @@ export function chiSquareTest(stats: NumberStats[], totalDraws: number, pick: nu
   return { chiSquare: Math.round(chiSquare * 100) / 100, isUniform: chiSquare < criticalApprox };
 }
 
-/** Simple Markov transition probabilities (which number follows which) */
+/** Weighted Markov transition probabilities with recency decay */
 export function markovTransitions(
   draws: DrawResult[],
   totalNumbers: number,
@@ -91,11 +91,13 @@ export function markovTransitions(
   for (let i = 0; i < draws.length - 1; i++) {
     const current = draws[i].numbers;
     const next = draws[i + 1].numbers;
+    // Recency decay: recent transitions weigh more
+    const weight = 1 / (1 + i * 0.05);
     for (const n of current) {
       if (!transitions.has(n)) transitions.set(n, new Map());
       const tMap = transitions.get(n)!;
       for (const m of next) {
-        tMap.set(m, (tMap.get(m) || 0) + 1);
+        tMap.set(m, (tMap.get(m) || 0) + weight);
       }
     }
   }
@@ -106,6 +108,58 @@ export function markovTransitions(
     result.set(num, sorted.slice(0, topN).map(([n]) => n));
   }
   return result;
+}
+
+/** Conditional probability: P(number | condition met in previous draw) */
+export function conditionalProbability(
+  draws: DrawResult[],
+  totalNumbers: number,
+  condition: (draw: number[]) => boolean
+): Map<number, number> {
+  const freq = new Map<number, number>();
+  let conditionCount = 0;
+
+  for (let i = 0; i < draws.length - 1; i++) {
+    if (condition(draws[i + 1].numbers)) {
+      conditionCount++;
+      for (const n of draws[i].numbers) {
+        freq.set(n, (freq.get(n) || 0) + 1);
+      }
+    }
+  }
+
+  const probs = new Map<number, number>();
+  if (conditionCount === 0) return probs;
+  for (const [n, count] of freq) {
+    probs.set(n, count / conditionCount);
+  }
+  return probs;
+}
+
+/** Lag-weighted frequency: numbers that appeared recently get a recency boost */
+export function computeRecencyWeightedFrequency(
+  draws: DrawResult[],
+  totalNumbers: number,
+  window: number = 50
+): Map<number, number> {
+  const scores = new Map<number, number>();
+  const subset = draws.slice(0, Math.min(window, draws.length));
+
+  for (let i = 0; i < subset.length; i++) {
+    const decay = Math.exp(-i * 0.04); // exponential decay
+    for (const n of subset[i].numbers) {
+      scores.set(n, (scores.get(n) || 0) + decay);
+    }
+  }
+
+  // Normalize to 0-1
+  let max = 0;
+  for (const v of scores.values()) if (v > max) max = v;
+  if (max > 0) {
+    for (const [k, v] of scores) scores.set(k, v / max);
+  }
+
+  return scores;
 }
 
 /** Stress test — evaluate a game's robustness across multiple metrics */
