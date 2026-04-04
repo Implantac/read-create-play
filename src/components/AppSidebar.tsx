@@ -1,6 +1,6 @@
 import {
   BarChart3, Sparkles, FlaskConical, History, Zap, Grid3X3,
-  Brain, ShieldCheck, Crown, PieChart, TrendingUp, ClipboardCheck, Bot, Lock, Smartphone,
+  Brain, ShieldCheck, Crown, PieChart, TrendingUp, ClipboardCheck, Bot, Lock, Smartphone, MessageCircle,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { usePlanAccess, type Feature } from "@/hooks/usePlanAccess";
