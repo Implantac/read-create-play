@@ -145,7 +145,10 @@ function buildWeightedPool(
   stats: NumberStats[],
   strategyFilters: { hotBias: number; coldBias: number },
   intentFilters: IntentFilters,
-  advancedWeights?: Map<number, number>
+  advancedWeights?: Map<number, number>,
+  cycleDueNumbers?: Set<number>,
+  acceleratingNumbers?: Set<number>,
+  upwardRegression?: Set<number>
 ): { number: number; weight: number }[] {
   return stats.map(s => {
     // Start with advanced weight if available (includes co-occurrence, gap, trend, regime)
@@ -158,6 +161,13 @@ function buildWeightedPool(
     // Intent-specific
     if (intentFilters.prioritizeHot && s.status === "hot") weight *= 1.5;
     if (intentFilters.prioritizeCold && s.status === "cold") weight *= 1.5;
+
+    // CYCLE: boost numbers that are due according to cycle analysis
+    if (cycleDueNumbers?.has(s.number)) weight *= 1.25;
+    if (acceleratingNumbers?.has(s.number)) weight *= 1.15;
+
+    // REGRESSION: boost underperforming numbers expected to regress upward
+    if (upwardRegression?.has(s.number)) weight *= 1.2;
 
     // Exclude
     if (intentFilters.excludeNumbers?.includes(s.number)) weight = 0;
