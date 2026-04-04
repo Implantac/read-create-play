@@ -44,6 +44,7 @@ export function burstConfetti(e: React.MouseEvent) {
       transition: `all ${duration}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`,
     });
 
+    if (!document.body) continue;
     document.body.appendChild(particle);
 
     // Trigger animation in next frame
@@ -89,6 +90,7 @@ export function burstConfettiCenter(count = 60) {
       transition: `all ${duration}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`,
     });
 
+    if (!document.body) continue;
     document.body.appendChild(particle);
 
     requestAnimationFrame(() => {
