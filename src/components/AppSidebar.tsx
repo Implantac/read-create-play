@@ -28,6 +28,7 @@ const mainItems: { title: string; url: string; icon: any; requiredFeature?: Feat
   { title: "Gerador", url: "/gerador", icon: Sparkles },
   { title: "IA Autônoma", url: "/ia-autonoma", icon: Zap, requiredFeature: "ia_autonoma" },
   { title: "AI Analyst", url: "/ai-analyst", icon: Bot, requiredFeature: "ai_analyst" },
+  { title: "Chat IA", url: "/ai-chat", icon: MessageCircle },
   { title: "Estratégias IA", url: "/estrategias", icon: Brain, requiredFeature: "estrategias_basicas" },
   { title: "Simulações", url: "/simulacoes", icon: FlaskConical, requiredFeature: "simulacoes" },
   { title: "Fechamentos", url: "/fechamentos", icon: Grid3X3, requiredFeature: "fechamentos" },
