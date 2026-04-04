@@ -24,16 +24,19 @@ const LotteryContext = createContext<LotteryContextType | null>(null);
 
 export function LotteryProvider({ children }: { children: ReactNode }) {
   const [selectedLottery, setSelectedLottery] = useState("megasena");
-  const config = LOTTERIES.find(l => l.id === selectedLottery)!;
+  const config = useMemo(() => LOTTERIES.find(l => l.id === selectedLottery)!, [selectedLottery]);
   const { draws, drawsWithPrizes, loading, syncing, count, loadedCount, syncDraws, syncAllLotteries, addDraw } = useLotteryDraws(selectedLottery);
   const stats = useMemo(() => computeFrequencyStats(draws, config.numbers), [draws, config.numbers]);
   const sumData = useMemo(() => computeSumDistribution(draws), [draws]);
+  const handleSetLottery = useCallback((id: string) => setSelectedLottery(id), []);
+
+  const value = useMemo(() => ({
+    selectedLottery, setSelectedLottery: handleSetLottery,
+    config, draws, drawsWithPrizes, loading, syncing, count, loadedCount, syncDraws, syncAllLotteries, addDraw, stats, sumData,
+  }), [selectedLottery, handleSetLottery, config, draws, drawsWithPrizes, loading, syncing, count, loadedCount, syncDraws, syncAllLotteries, addDraw, stats, sumData]);
 
   return (
-    <LotteryContext.Provider value={{
-      selectedLottery, setSelectedLottery: useCallback((id: string) => setSelectedLottery(id), []),
-      config, draws, drawsWithPrizes, loading, syncing, count, loadedCount, syncDraws, syncAllLotteries, addDraw, stats, sumData,
-    }}>
+    <LotteryContext.Provider value={value}>
       {children}
     </LotteryContext.Provider>
   );
