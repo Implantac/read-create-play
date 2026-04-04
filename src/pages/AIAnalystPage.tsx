@@ -453,7 +453,25 @@ const AIAnalystPage = () => {
   );
 };
 
-// ═══ Sub-components ═══
+const roiConfig = {
+  excellent: { label: "ROI Alto", color: "bg-green-500/15 text-green-400 border-green-500/30", icon: "🔥" },
+  good: { label: "ROI Bom", color: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30", icon: "📈" },
+  average: { label: "ROI Médio", color: "bg-amber-500/15 text-amber-400 border-amber-500/30", icon: "📊" },
+  below_average: { label: "ROI Baixo", color: "bg-red-500/15 text-red-400 border-red-500/30", icon: "📉" },
+} as const;
+
+function ROIBadge({ tier, score }: { tier: string; score?: number }) {
+  const cfg = roiConfig[tier as keyof typeof roiConfig] || roiConfig.average;
+  return (
+    <Badge variant="outline" className={`${cfg.color} text-[10px] shrink-0 gap-0.5 px-1.5`}>
+      <span>{cfg.icon}</span>
+      <span>{cfg.label}</span>
+      {score != null && <span className="font-mono ml-0.5">{score}%</span>}
+    </Badge>
+  );
+}
+
+
 
 function GameCard({ game, index, copiedIdx, onCopy, onSave, expanded, onToggle }: {
   game: ScoredGame; index: number; copiedIdx: number | null;
