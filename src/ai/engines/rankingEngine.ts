@@ -15,7 +15,7 @@ import { computeEntropyReport, computeConsecutiveEntropy, computeEdgeInteriorBal
 import { computeCycleProfiles, scoreByCycleAlignment, multiScaleCycleAnalysis, scoreByMultiScaleCycles, computeBayesianPredictions } from "./cycleEngine";
 import { scoreAdvancedPatterns, computeHarmonicProfile, detectPositionalPatterns } from "./patternEngine";
 import { computeRegressionCandidates, scoreByRegression, computeMultiWindowRegression, computeSmoothedTrends } from "./regressionEngine";
-import { computeRecencyWeightedFrequency } from "./probabilityEngine";
+import { computeRecencyWeightedFrequency, computeCovarianceNetwork, scoreByCorrelationNetwork, computeTemporalVolatility, scoreByVolatility } from "./probabilityEngine";
 import type { ScoredGame, GameScores, RiskProfile } from "../core/aiTypes";
 
 export function scoreGame(
