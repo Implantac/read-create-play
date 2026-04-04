@@ -34,20 +34,35 @@ export function useLotteryDraws(lotteryId: string) {
   const [loadedCount, setLoadedCount] = useState(0);
   const cancelRef = useRef<{ cancelled: boolean }>({ cancelled: false });
 
+  const sanitizeNumbers = useCallback((numbers: unknown): number[] => {
+    if (!Array.isArray(numbers)) return [];
+    return numbers
+      .map((value) => Number(value))
+      .filter((value) => Number.isInteger(value) && value >= 0);
+  }, []);
+
   const mapRows = useCallback((allData: any[]) => {
-    const mapped: DrawResult[] = allData.map((row: any) => ({
+    const validRows = allData
+      .filter((row: any) => Number.isInteger(row?.concurso))
+      .map((row: any) => ({
+        ...row,
+        numbers: sanitizeNumbers(row?.numbers),
+      }))
+      .filter((row: any) => row.numbers.length > 0);
+
+    const mapped: DrawResult[] = validRows.map((row: any) => ({
       concurso: row.concurso,
       date: row.draw_date || "",
-      numbers: row.numbers || [],
+      numbers: row.numbers,
     }));
-    const mappedWithPrizes: DrawResultWithPrizes[] = allData.map((row: any) => ({
+    const mappedWithPrizes: DrawResultWithPrizes[] = validRows.map((row: any) => ({
       concurso: row.concurso,
       date: row.draw_date || "",
-      numbers: row.numbers || [],
+      numbers: row.numbers,
       prizeTiers: row.prize_tiers as DrawPrizeData | null,
     }));
     return { mapped, mappedWithPrizes };
-  }, []);
+  }, [sanitizeNumbers]);
 
   const fetchDraws = useCallback(async () => {
     // Cancel any in-flight request
