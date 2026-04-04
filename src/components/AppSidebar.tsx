@@ -35,6 +35,7 @@ const mainItems: { title: string; url: string; icon: any; requiredFeature?: Feat
   { title: "Estatísticas", url: "/estatisticas", icon: PieChart },
   { title: "ROI", url: "/roi", icon: TrendingUp, requiredFeature: "roi_dashboard" },
   { title: "Minhas Apostas", url: "/minhas-apostas", icon: ClipboardCheck },
+  { title: "Jogos Salvos", url: "/jogos-salvos", icon: Star },
   { title: "Histórico", url: "/historico", icon: History },
   { title: "Instalar App", url: "/install", icon: Smartphone },
 ];
