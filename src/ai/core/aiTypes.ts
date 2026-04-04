@@ -67,6 +67,8 @@ export interface ScoredGame {
   totalScore: number;
   grade: "S" | "A" | "B" | "C" | "D" | "F";
   explanation: string[];
+  roiTier?: "excellent" | "good" | "average" | "below_average";
+  roiScore?: number;
 }
 
 export interface GameScores {

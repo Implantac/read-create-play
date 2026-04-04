@@ -161,6 +161,8 @@ export function scoreGame(
     totalScore: Math.round(totalScore),
     grade,
     explanation,
+    roiTier: roi.roiTier,
+    roiScore: Math.round(roi.riskAdjustedScore * 100),
   };
 }
 
