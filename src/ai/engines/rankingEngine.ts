@@ -13,7 +13,7 @@ import { estimateROI, detectContext, selfCalibrateWeights, applyContextAdjustmen
 import { smoothWeights, computeProgressivePenalty, computeCoOccurrenceBonus, computeAntiPairPenalty, detectRegimeChange, computeHistoricalNorms, checkGameOutlier } from "./stabilityEngine";
 import { computeEntropyReport, computeConsecutiveEntropy, computeEdgeInteriorBalance } from "./entropyEngine";
 import { computeCycleProfiles, scoreByCycleAlignment, multiScaleCycleAnalysis, scoreByMultiScaleCycles, computeBayesianPredictions } from "./cycleEngine";
-import { scoreAdvancedPatterns } from "./patternEngine";
+import { scoreAdvancedPatterns, computeHarmonicProfile, detectPositionalPatterns } from "./patternEngine";
 import { computeRegressionCandidates, scoreByRegression, computeMultiWindowRegression, computeSmoothedTrends } from "./regressionEngine";
 import { computeRecencyWeightedFrequency } from "./probabilityEngine";
 import type { ScoredGame, GameScores, RiskProfile } from "../core/aiTypes";
