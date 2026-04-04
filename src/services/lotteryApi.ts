@@ -116,8 +116,7 @@ export async function fetchMultipleDraws(
     if (concurso < 1) break;
 
     promises.push(
-      fetch(`${API_PRIMARY}/${apiName}/${concurso}`)
-        .then(res => (res.ok ? res.json() : null))
+      fetchApiJson(`${apiName}/${concurso}`)
         .then(data => (data ? parseApiResult(data) : null))
         .catch(() => null)
     );

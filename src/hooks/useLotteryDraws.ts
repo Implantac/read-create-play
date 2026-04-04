@@ -203,12 +203,37 @@ export function useLotteryDraws(lotteryId: string) {
     }
   }, [fetchDraws]);
 
-  const addDraw = useCallback((draw: DrawResult) => {
+  const addDraw = useCallback((draw: DrawResultWithPrizes) => {
+    const safeNumbers = sanitizeNumbers(draw?.numbers);
+    if (!Number.isInteger(draw?.concurso) || safeNumbers.length === 0) {
+      console.warn("Ignoring invalid draw payload:", draw);
+      return;
+    }
+
+    const normalizedDraw: DrawResultWithPrizes = {
+      ...draw,
+      date: draw.date || "",
+      numbers: safeNumbers,
+    };
+
+    let inserted = false;
+
     setDraws(prev => {
-      if (prev.some(d => d.concurso === draw.concurso)) return prev;
-      return [draw, ...prev].sort((a, b) => b.concurso - a.concurso);
+      if (prev.some(d => d.concurso === normalizedDraw.concurso)) return prev;
+      inserted = true;
+      return [normalizedDraw, ...prev].sort((a, b) => b.concurso - a.concurso);
     });
-  }, []);
+
+    setDrawsWithPrizes(prev => {
+      if (prev.some(d => d.concurso === normalizedDraw.concurso)) return prev;
+      return [normalizedDraw, ...prev].sort((a, b) => b.concurso - a.concurso);
+    });
+
+    if (inserted) {
+      setCount(prev => prev + 1);
+      setLoadedCount(prev => prev + 1);
+    }
+  }, [sanitizeNumbers]);
 
   useEffect(() => {
     fetchDraws();
