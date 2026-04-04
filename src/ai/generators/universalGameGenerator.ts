@@ -55,7 +55,28 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
   const regressionCandidates = computeRegressionCandidates(config.draws, config.stats, config.lotteryId, 80);
   const upwardRegression = new Set(getUpwardRegressionNumbers(regressionCandidates, Math.ceil(rules.totalNumbers * 0.2)));
 
-  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters, advancedWeights, cycleDueNumbers, acceleratingNumbers, upwardRegression);
+  // BAYESIAN: boost numbers with high posterior probability
+  const bayesianPreds = computeBayesianPredictions(cycleProfiles, config.draws, config.lotteryId);
+  const bayesianHighProb = new Set(
+    bayesianPreds
+      .filter(b => b.posteriorProbability > b.priorProbability * 1.2)
+      .slice(0, Math.ceil(rules.totalNumbers * 0.25))
+      .map(b => b.number)
+  );
+
+  // MULTI-SCALE: numbers due across all time horizons
+  const multiScaleSignals = multiScaleCycleAnalysis(config.draws, config.lotteryId);
+  const strongDueNumbers = new Set(
+    multiScaleSignals
+      .filter(s => s.consensus === "strong_due" || s.consensus === "moderate_due")
+      .slice(0, Math.ceil(rules.totalNumbers * 0.3))
+      .map(s => s.number)
+  );
+
+  // OUTLIER NORMS: pre-compute for fast rejection
+  const histNorms = computeHistoricalNorms(config.draws, 100);
+
+  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters, advancedWeights, cycleDueNumbers, acceleratingNumbers, upwardRegression, bayesianHighProb, strongDueNumbers);
 
   // Generate candidates (10x requested count for filtering)
   const candidateCount = Math.max(config.count * 20, 500);
