@@ -45,7 +45,14 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     topPairSet.get(p.b)!.add(p.a);
   }
 
-  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters, advancedWeights);
+  // CYCLE & REGRESSION: identify high-value numbers via cycle/regression analysis
+  const cycleProfiles = computeCycleProfiles(config.draws, config.lotteryId, 150);
+  const cycleDueNumbers = new Set(getCycleDueNumbers(cycleProfiles, Math.ceil(rules.totalNumbers * 0.3)));
+  const acceleratingNumbers = new Set(getAcceleratingNumbers(cycleProfiles, Math.ceil(rules.totalNumbers * 0.15)));
+  const regressionCandidates = computeRegressionCandidates(config.draws, config.stats, config.lotteryId, 80);
+  const upwardRegression = new Set(getUpwardRegressionNumbers(regressionCandidates, Math.ceil(rules.totalNumbers * 0.2)));
+
+  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters, advancedWeights, cycleDueNumbers, acceleratingNumbers, upwardRegression);
 
   // Generate candidates (10x requested count for filtering)
   const candidateCount = Math.max(config.count * 20, 500);
