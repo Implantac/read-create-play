@@ -52,6 +52,10 @@ export default function PerfilPage() {
         headers: { Authorization: `Bearer ${session?.access_token}` },
       });
       if (error) throw error;
+      if (data?.error === "no_customer") {
+        toast({ title: "Nenhuma assinatura encontrada", description: "Assine um plano primeiro para gerenciar sua assinatura.", variant: "default" });
+        return;
+      }
       if (data?.url) {
         window.open(data.url, "_blank");
       } else {
