@@ -56,6 +56,7 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso }: Props) {
   useEffect(() => {
     setLatestFromApi(null);
     checkForUpdates().catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lotteryId]);
 
   // Auto-check every 5 minutes if enabled
