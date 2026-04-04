@@ -23,21 +23,21 @@ import {
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-const mainItems: { title: string; url: string; icon: any; requiredFeature?: Feature }[] = [
-  { title: "Dashboard", url: "/", icon: BarChart3 },
-  { title: "Gerador", url: "/gerador", icon: Sparkles },
-  { title: "IA Autônoma", url: "/ia-autonoma", icon: Zap, requiredFeature: "ia_autonoma" },
-  { title: "AI Analyst", url: "/ai-analyst", icon: Bot, requiredFeature: "ai_analyst" },
-  { title: "Chat IA", url: "/ai-chat", icon: MessageCircle },
-  { title: "Estratégias IA", url: "/estrategias", icon: Brain, requiredFeature: "estrategias_basicas" },
-  { title: "Simulações", url: "/simulacoes", icon: FlaskConical, requiredFeature: "simulacoes" },
-  { title: "Fechamentos", url: "/fechamentos", icon: Grid3X3, requiredFeature: "fechamentos" },
-  { title: "Estatísticas", url: "/estatisticas", icon: PieChart },
-  { title: "ROI", url: "/roi", icon: TrendingUp, requiredFeature: "roi_dashboard" },
-  { title: "Minhas Apostas", url: "/minhas-apostas", icon: ClipboardCheck },
-  { title: "Jogos Salvos", url: "/jogos-salvos", icon: Star },
-  { title: "Histórico", url: "/historico", icon: History },
-  { title: "Instalar App", url: "/install", icon: Smartphone },
+const mainItems: { title: string; url: string; icon: any; requiredFeature?: Feature; tooltip: string }[] = [
+  { title: "Dashboard", url: "/", icon: BarChart3, tooltip: "Visão geral com estatísticas, últimos resultados e resumo da loteria selecionada." },
+  { title: "Gerador", url: "/gerador", icon: Sparkles, tooltip: "Gere jogos inteligentes com filtros avançados baseados em análise estatística." },
+  { title: "IA Autônoma", url: "/ia-autonoma", icon: Zap, requiredFeature: "ia_autonoma", tooltip: "IA com aprendizado contínuo que analisa padrões e gera previsões evolutivas." },
+  { title: "AI Analyst", url: "/ai-analyst", icon: Bot, requiredFeature: "ai_analyst", tooltip: "Analista virtual que simula jogos, avalia qualidade e sugere estratégias personalizadas." },
+  { title: "Chat IA", url: "/ai-chat", icon: MessageCircle, tooltip: "Converse com o Titan IA para tirar dúvidas, pedir análises ou gerar jogos sob medida." },
+  { title: "Estratégias IA", url: "/estrategias", icon: Brain, requiredFeature: "estrategias_basicas", tooltip: "Explore estratégias como frequência, atraso, Markov e entropia para montar seus jogos." },
+  { title: "Simulações", url: "/simulacoes", icon: FlaskConical, requiredFeature: "simulacoes", tooltip: "Simule milhares de sorteios e avalie o desempenho das suas apostas com Monte Carlo." },
+  { title: "Fechamentos", url: "/fechamentos", icon: Grid3X3, requiredFeature: "fechamentos", tooltip: "Crie fechamentos matemáticos (wheeling) com garantia mínima de acertos." },
+  { title: "Estatísticas", url: "/estatisticas", icon: PieChart, tooltip: "Veja frequência, atraso, paridade, soma e distribuição detalhada dos números." },
+  { title: "ROI", url: "/roi", icon: TrendingUp, requiredFeature: "roi_dashboard", tooltip: "Acompanhe o retorno sobre investimento das suas apostas ao longo do tempo." },
+  { title: "Minhas Apostas", url: "/minhas-apostas", icon: ClipboardCheck, tooltip: "Confira e gerencie o histórico completo das suas apostas registradas." },
+  { title: "Jogos Salvos", url: "/jogos-salvos", icon: Star, tooltip: "Veja todos os seus jogos salvos agrupados por loteria e analise o desempenho deles." },
+  { title: "Histórico", url: "/historico", icon: History, tooltip: "Consulte todos os resultados passados dos sorteios da loteria selecionada." },
+  { title: "Instalar App", url: "/install", icon: Smartphone, tooltip: "Instale o Titan Loterias no seu celular para acesso rápido e notificações." },
 ];
 
 const PLAN_LABELS: Record<string, string> = {
