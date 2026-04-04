@@ -13,7 +13,7 @@ import { estimateROI, detectContext, selfCalibrateWeights, applyContextAdjustmen
 import { smoothWeights, computeProgressivePenalty, computeCoOccurrenceBonus, computeAntiPairPenalty, detectRegimeChange, computeHistoricalNorms, checkGameOutlier } from "./stabilityEngine";
 import { computeEntropyReport, computeConsecutiveEntropy, computeEdgeInteriorBalance } from "./entropyEngine";
 import { computeCycleProfiles, scoreByCycleAlignment, multiScaleCycleAnalysis, scoreByMultiScaleCycles, computeBayesianPredictions } from "./cycleEngine";
-import { scoreAdvancedPatterns } from "./patternEngine";
+import { scoreAdvancedPatterns, computeHarmonicProfile, detectPositionalPatterns } from "./patternEngine";
 import { computeRegressionCandidates, scoreByRegression, computeMultiWindowRegression, computeSmoothedTrends } from "./regressionEngine";
 import { computeRecencyWeightedFrequency } from "./probabilityEngine";
 import type { ScoredGame, GameScores, RiskProfile } from "../core/aiTypes";
@@ -129,9 +129,17 @@ export function scoreGame(
     bayesianBonus = bCount > 0 ? Math.round(Math.min(8, (bScore / bCount - 1) * 5)) : 0;
   }
 
-  // ADVANCED PATTERN METRICS: primes, quadrants, gap variance
+  // ADVANCED PATTERN METRICS: primes, quadrants, gap variance + harmonics
   const advPatternScore = scoreAdvancedPatterns(sorted, lotteryId);
   const advPatternBonus = Math.round((advPatternScore - 50) * 0.12);
+
+  // HARMONIC ANALYSIS: golden ratio, modular balance, geometric spread
+  const harmonicProfile = computeHarmonicProfile(sorted, rules.totalNumbers);
+  const harmonicBonus = Math.round((harmonicProfile.harmonicScore - 50) * 0.1);
+
+  // POSITIONAL PATTERNS: arithmetic runs, mirror symmetry, terminal clusters
+  const positionalReport = detectPositionalPatterns(sorted, rules.totalNumbers);
+  const positionalBonus = Math.round((positionalReport.positionalScore - 50) * 0.08);
 
   // REGIME CHANGE DETECTION: adjust confidence if regime shifted
   const regimeReport = detectRegimeChange(draws, rules.totalNumbers, rules.pick);
@@ -270,6 +278,8 @@ export function scoreGame(
     + multiScaleCycleBonus * 0.05
     + bayesianBonus * 0.04
     + advPatternBonus * 0.04
+    + harmonicBonus * 0.04
+    + positionalBonus * 0.03
     + regressionBonus * 0.06
     + multiWindowBonus * 0.05
     + recencyBonus * 0.05
