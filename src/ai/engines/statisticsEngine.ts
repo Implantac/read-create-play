@@ -7,6 +7,9 @@ import { DrawResult } from "@/data/lotteries";
 import { NumberStats, computeFrequencyStats } from "@/engine/statistics";
 import { getLotteryRules, PRIMES, FIBONACCI, LOTOFACIL_FRAME, LOTOFACIL_CENTER } from "../knowledge/lotteriesKnowledge";
 import type { PatternAnalysis, HistoricalAnalysis } from "../core/aiTypes";
+import { computeCycleProfiles, getCycleDueNumbers, getAcceleratingNumbers } from "./cycleEngine";
+import { computeRegressionCandidates, getUpwardRegressionNumbers, getDownwardRegressionNumbers, computeMultiWindowRegression } from "./regressionEngine";
+import { multiWindowTrend } from "./advancedAnalysisEngine";
 
 /** Extended stats for AI engines — wraps existing computeFrequencyStats */
 export function computeExtendedStats(draws: DrawResult[], lotteryId: string): NumberStats[] {
