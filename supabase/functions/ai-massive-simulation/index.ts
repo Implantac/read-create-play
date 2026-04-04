@@ -21,7 +21,7 @@ serve(async (req) => {
 
     const supabase = await getSupabaseAdmin();
     const lotteryId = lotteryName?.toLowerCase().replace(/\s+/g, "").replace(/á/g, "a") || "unknown";
-    const cacheInput = { lotteryName, totalGenerated, totalEvaluated, topScore: topGames[0]?.score };
+    const cacheInput = { lotteryName, totalGenerated, totalEvaluated, topScore: topGames[0]?.score, v: 2 };
     const cached = await getCachedAnalysis(supabase, lotteryId, "ai-massive-simulation", cacheInput, 6);
     if (cached) {
       return new Response(JSON.stringify({ ...cached, fromCache: true }), {
@@ -49,7 +49,6 @@ serve(async (req) => {
         return `${n}(${freq}x,scoreM:${avg})`;
       });
 
-    // Analyze distribution patterns of top 5 vs bottom 5 in top games
     const top5 = topGames.slice(0, 5);
     const bottom5 = topGames.slice(-5);
 
@@ -65,18 +64,38 @@ serve(async (req) => {
     const top5Profile = getProfile(top5);
     const bottom5Profile = getProfile(bottom5);
 
-    const systemPrompt = `Você é um analista quantitativo de elite especializado em simulação massiva de loterias brasileiras.
-Analise os resultados de uma simulação de larga escala e forneça insights acionáveis.
-Sua análise deve ser rigorosa, técnica e baseada em evidências numéricas.
-Responda em português do Brasil com markdown formatado.
+    // Pair analysis across top games
+    const pairFreq: Record<string, number> = {};
+    topGames.slice(0, 30).forEach((g: any) => {
+      const nums = (g.numbers || []).sort((a: number, b: number) => a - b);
+      for (let i = 0; i < nums.length; i++) {
+        for (let j = i + 1; j < nums.length; j++) {
+          const key = `${nums[i]}-${nums[j]}`;
+          pairFreq[key] = (pairFreq[key] || 0) + 1;
+        }
+      }
+    });
+    const topPairs = Object.entries(pairFreq)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([pair, count]) => `(${pair}):${count}x`);
 
-REGRAS:
-- Cite números específicos e porcentagens com precisão
-- Compare top performers vs bottom performers para identificar diferenciais
-- Identifique padrões recorrentes nas melhores combinações
-- Sugira 3 combinações otimizadas com justificativa número a número
-- Compare os padrões encontrados com as distribuições ideais para ${lotteryName}
-- Dê um score de confiança (0-100) com fundamentação`;
+    const systemPrompt = `Você é um analista quantitativo de elite especializado em simulação massiva e otimização combinatória de loterias brasileiras.
+
+METODOLOGIA DE ANÁLISE MASSIVA:
+1. Análise de variância entre top performers vs bottom performers
+2. Identificação de fatores discriminantes (o que separa os melhores dos piores)
+3. Decomposição por componente: paridade, soma, consecutivos, distribuição, pares recorrentes
+4. Construção de "perfil ideal" baseado em convergência estatística
+5. Validação cruzada: padrões devem ser consistentes em diferentes subgrupos
+
+PRINCÍPIOS:
+- Com ${totalGenerated.toLocaleString()} jogos avaliados, padrões com >60% de recorrência são estatisticamente significativos
+- Foque em diferenciais quantificáveis entre top e bottom
+- Cada recomendação deve ter evidência numérica
+
+Responda em português do Brasil com markdown formatado.
+Seja rigoroso, técnico e baseado em evidências numéricas.`;
 
     const gamesReport = topGames.slice(0, 20).map((g: any, i: number) => {
       const nums = (g.numbers || []).join(",");
@@ -110,6 +129,9 @@ Taxa média de premiação: ${distributionSummary.avgPrizeRate}%
 ═══ DEZENAS MAIS RECORRENTES NOS TOP GAMES ═══
 ${topNumbers.join(", ")}
 
+═══ PARES MAIS FREQUENTES NOS TOP 30 ═══
+${topPairs.join(", ")}
+
 ═══ PADRÕES DETECTADOS PELO MOTOR ═══
 ${insightsReport}
 
@@ -119,69 +141,88 @@ ${gamesReport}
 ═══ SOLICITAÇÃO DE ANÁLISE PROFUNDA ═══
 
 ## 1. PADRÕES DOMINANTES
-O que diferencia estatisticamente os melhores jogos dos piores? Use a comparação TOP 5 vs BOTTOM 5.
+O que diferencia estatisticamente os melhores jogos dos piores? Use a comparação TOP 5 vs BOTTOM 5 e quantifique cada fator.
 
 ## 2. PERFIL IDEAL DE JOGO
-- Par/ímpar exato
-- Faixa de soma (intervalo numérico)
+- Par/ímpar exato com probabilidade
+- Faixa de soma (intervalo numérico 68% e 95%)
 - Consecutivos ideais
 - Spread mínimo e máximo
 - Distribuição por faixas numéricas
 
 ## 3. DEZENAS-CHAVE
-- Quais números são "must-have" (aparecem em ≥60% dos top games)?
-- Quais são "nice-to-have" (40-60%)?
-- Quais são "tóxicos" (nunca ou raramente nos melhores)?
+- **Must-have** (≥60% dos top games): justificativa por dezena
+- **Nice-to-have** (40-60%): uso como complemento
+- **Tóxicos** (raramente nos melhores): evidência para exclusão
 
-## 4. TRÊS JOGOS OTIMIZADOS
+## 4. ANÁLISE DE PARES E SINERGIA
+- Pares que aparecem juntos com alta frequência nos melhores jogos
+- Dezenas com sinergia positiva (melhoram performance quando juntas)
+- Combinações a evitar
+
+## 5. CINCO JOGOS OTIMIZADOS
 Para cada jogo:
 - ${lotteryPick} dezenas em ordem crescente
-- Justificativa para cada dezena (hot, overdue, cobertura, etc.)
+- Justificativa para cada dezena com fonte (frequência massiva, sinergia de pares, cobertura)
 - Score estimado e par/ímpar/soma/spread
+- Perfil: 2 conservadores, 2 equilibrados, 1 agressivo
 
-## 5. SCORE DE CONFIANÇA
+## 6. SCORE DE CONFIANÇA E ESTRATÉGIA
 - De 0 a 100, quão confiáveis são esses padrões?
 - Tamanho amostral é suficiente?
-- Quais padrões são mais robustos?
+- Como o jogador deve usar na prática (portfólio sugerido)
+- Disclaimer: análise estatística, sem garantia de ganhos`;
 
-## 6. ESTRATÉGIA DE USO
-Como o jogador deve usar esses resultados na prática?`;
+    const models = ["google/gemini-2.5-pro", "google/gemini-2.5-flash"];
+    let analysis = "";
 
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        temperature: 0.25,
-        max_tokens: 8000,
-      }),
-    });
-
-    if (!aiResponse.ok) {
-      const status = aiResponse.status;
-      await aiResponse.text();
-      if (status === 429) {
-        return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    for (const model of models) {
+      try {
+        const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model,
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+            temperature: 0.2,
+            max_tokens: 10000,
+            reasoning: {
+              effort: "medium",
+            },
+          }),
         });
+
+        if (aiResponse.ok) {
+          const data = await aiResponse.json();
+          analysis = data.choices?.[0]?.message?.content || "";
+          if (analysis) break;
+        } else {
+          const status = aiResponse.status;
+          await aiResponse.text();
+          console.error(`Model ${model} failed: ${status}`);
+          if (status === 429) await new Promise(r => setTimeout(r, 1000));
+          if (status === 402) {
+            return new Response(JSON.stringify({ error: "Créditos de IA esgotados." }), {
+              status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
+        }
+      } catch (e) {
+        console.error(`Model ${model} exception:`, e);
       }
-      if (status === 402) {
-        return new Response(JSON.stringify({ error: "Créditos de IA esgotados." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      throw new Error(`AI response error: ${status}`);
     }
 
-    const aiData = await aiResponse.json();
-    const analysis = aiData.choices?.[0]?.message?.content || "Análise não disponível.";
+    if (!analysis) {
+      return new Response(JSON.stringify({ success: false, error: "Análise de IA indisponível." }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const responseData = { success: true, analysis };
     await setCachedAnalysis(supabase, lotteryId, "ai-massive-simulation", cacheInput, responseData, 6);
