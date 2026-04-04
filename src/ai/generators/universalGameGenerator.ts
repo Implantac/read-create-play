@@ -176,10 +176,11 @@ function buildWeightedPool(
   advancedWeights?: Map<number, number>,
   cycleDueNumbers?: Set<number>,
   acceleratingNumbers?: Set<number>,
-  upwardRegression?: Set<number>
+  upwardRegression?: Set<number>,
+  bayesianHighProb?: Set<number>,
+  strongDueNumbers?: Set<number>
 ): { number: number; weight: number }[] {
   return stats.map(s => {
-    // Start with advanced weight if available (includes co-occurrence, gap, trend, regime)
     let weight = advancedWeights?.get(s.number) ?? 1;
 
     // Strategy bias overlay
@@ -196,6 +197,12 @@ function buildWeightedPool(
 
     // REGRESSION: boost underperforming numbers expected to regress upward
     if (upwardRegression?.has(s.number)) weight *= 1.2;
+
+    // BAYESIAN: boost numbers with high posterior probability
+    if (bayesianHighProb?.has(s.number)) weight *= 1.18;
+
+    // MULTI-SCALE: boost numbers due across all time horizons
+    if (strongDueNumbers?.has(s.number)) weight *= 1.15;
 
     // Exclude
     if (intentFilters.excludeNumbers?.includes(s.number)) weight = 0;
