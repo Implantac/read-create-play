@@ -36,7 +36,7 @@ serve(async (req) => {
     if (customers.data.length === 0) {
       return new Response(JSON.stringify({ error: "no_customer", message: "Nenhuma assinatura encontrada. Assine um plano primeiro." }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 400,
+        status: 200,
       });
     }
 
