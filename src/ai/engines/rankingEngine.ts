@@ -358,6 +358,28 @@ function buildExplanation(
     if (context.regimeStability < 0.4) lines.push("🔄 Regime instável — tendências com menor peso");
   }
 
+  // MULTI-WINDOW & FORECAST insights
+  if (multiWindowBonus !== undefined && multiWindowBonus > 3) {
+    lines.push("✅ Consenso multi-janela positivo: sinais de regressão alinhados em 30/80/150 sorteios");
+  } else if (multiWindowBonus !== undefined && multiWindowBonus < -2) {
+    lines.push("⚠️ Sinais de regressão divergentes entre janelas temporais");
+  }
+
+  if (forecastBonus !== undefined && forecastBonus > 3) {
+    lines.push("📈 Previsão Holt-Winters favorável: tendência ascendente confirmada");
+  }
+
+  if (consecutiveEntropy) {
+    if (consecutiveEntropy.maxRun > 3) lines.push(`⚠️ Sequência longa de ${consecutiveEntropy.maxRun} consecutivos detectada`);
+    else if (consecutiveEntropy.consecutivePairs >= 1 && consecutiveEntropy.score > 0.7)
+      lines.push("✅ Padrão de consecutivos dentro do ideal histórico");
+  }
+
+  if (edgeBalance !== undefined) {
+    if (edgeBalance >= 0.7) lines.push("✅ Equilíbrio entre extremos e centro do volante");
+    else if (edgeBalance < 0.4) lines.push("⚠️ Desequilíbrio entre números extremos e centrais");
+  }
+
   return lines;
 }
 
