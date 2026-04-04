@@ -54,7 +54,7 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso }: Props) {
   // Auto-fetch on mount and when lottery changes
   useEffect(() => {
     setLatestFromApi(null);
-    checkForUpdates();
+    checkForUpdates().catch(() => {});
   }, [lotteryId]);
 
   // Auto-check every 5 minutes if enabled

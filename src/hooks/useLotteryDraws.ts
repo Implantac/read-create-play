@@ -114,6 +114,11 @@ export function useLotteryDraws(lotteryId: string) {
       }
     } catch (e) {
       console.error("Error fetching draws:", e);
+      if (!signal.cancelled) {
+        setDraws([]);
+        setDrawsWithPrizes([]);
+        setLoadedCount(0);
+      }
     } finally {
       if (!signal.cancelled) setLoading(false);
     }
