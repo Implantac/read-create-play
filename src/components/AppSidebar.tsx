@@ -113,31 +113,33 @@ export function AppSidebar() {
 
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <NavLink
-                        to={item.url}
-                        end={item.url === "/"}
-                        className={`rounded-lg px-3 py-2.5 text-sm transition-all duration-200 hover:bg-sidebar-accent/60 ${locked ? "text-muted-foreground/50" : "text-sidebar-foreground"}`}
-                        activeClassName="bg-primary/10 text-primary font-semibold glow-green"
-                      >
-                        <item.icon className="mr-3 h-4 w-4 shrink-0" />
-                        {!collapsed && (
-                          <>
-                            <span className="flex-1">{item.title}</span>
-                            {locked && (
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Lock className="h-3 w-3 text-muted-foreground/40 shrink-0 ml-1" />
-                                </TooltipTrigger>
-                                <TooltipContent side="right" className="text-xs">
-                                  Requer plano {PLAN_LABELS[minPlan!] || "Premium"}
-                                </TooltipContent>
-                              </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <SidebarMenuButton asChild>
+                          <NavLink
+                            to={item.url}
+                            end={item.url === "/"}
+                            className={`rounded-lg px-3 py-2.5 text-sm transition-all duration-200 hover:bg-sidebar-accent/60 ${locked ? "text-muted-foreground/50" : "text-sidebar-foreground"}`}
+                            activeClassName="bg-primary/10 text-primary font-semibold glow-green"
+                          >
+                            <item.icon className="mr-3 h-4 w-4 shrink-0" />
+                            {!collapsed && (
+                              <>
+                                <span className="flex-1">{item.title}</span>
+                                {locked && <Lock className="h-3 w-3 text-muted-foreground/40 shrink-0 ml-1" />}
+                              </>
                             )}
-                          </>
+                          </NavLink>
+                        </SidebarMenuButton>
+                      </TooltipTrigger>
+                      <TooltipContent side="right" className="max-w-[250px] text-xs">
+                        <p className="font-semibold mb-0.5">{item.title}</p>
+                        <p className="text-muted-foreground">{item.tooltip}</p>
+                        {locked && (
+                          <p className="text-amber-400 mt-1 text-[10px]">🔒 Requer plano {PLAN_LABELS[minPlan!] || "Premium"}</p>
                         )}
-                      </NavLink>
-                    </SidebarMenuButton>
+                      </TooltipContent>
+                    </Tooltip>
                   </SidebarMenuItem>
                 );
               })}
