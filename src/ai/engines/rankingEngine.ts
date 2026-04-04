@@ -272,7 +272,11 @@ function buildExplanation(
   context?: { recentSumTrend: string; volatilityIndex: number; regimeStability: number },
   entropyReport?: { compositeScore: number; zoneEntropy: number; gapEntropy: number; dispersionIndex: number; quadrantBalance: number },
   cycleScore?: number,
-  regressionScore?: number
+  regressionScore?: number,
+  multiWindowBonus?: number,
+  forecastBonus?: number,
+  consecutiveEntropy?: { score: number; consecutivePairs: number; maxRun: number },
+  edgeBalance?: number
 ): string[] {
   const lines: string[] = [];
   lines.push(`Score geral: ${total}/100 (${grade})`);
