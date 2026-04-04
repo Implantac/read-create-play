@@ -201,7 +201,10 @@ function buildExplanation(
   humanPenalty?: number,
   monteCarlo?: { avgHits: number; consistency: number; prizeRate: number },
   roi?: { expectedPrizeRate: number; consistencyScore: number; riskAdjustedScore: number; roiTier: string },
-  context?: { recentSumTrend: string; volatilityIndex: number; regimeStability: number }
+  context?: { recentSumTrend: string; volatilityIndex: number; regimeStability: number },
+  entropyReport?: { compositeScore: number; zoneEntropy: number; gapEntropy: number; dispersionIndex: number; quadrantBalance: number },
+  cycleScore?: number,
+  regressionScore?: number
 ): string[] {
   const lines: string[] = [];
   lines.push(`Score geral: ${total}/100 (${grade})`);
@@ -240,6 +243,34 @@ function buildExplanation(
   if (humanPenalty !== undefined && humanPenalty > 10) {
     lines.push("⚠️ Padrão comum detectado (datas/sequências aritméticas)");
   }
+
+  // ENTROPY insights
+  if (entropyReport) {
+    if (entropyReport.compositeScore >= 70) {
+      lines.push(`✅ Entropia informacional alta: ${entropyReport.compositeScore}/100 — excelente distribuição`);
+    } else if (entropyReport.compositeScore >= 45) {
+      lines.push(`📊 Entropia moderada: ${entropyReport.compositeScore}/100`);
+    } else {
+      lines.push(`⚠️ Entropia baixa: ${entropyReport.compositeScore}/100 — números mal distribuídos`);
+    }
+    if (entropyReport.quadrantBalance < 0.5) {
+      lines.push("⚠️ Desequilíbrio entre quadrantes do volante");
+    }
+  }
+
+  // CYCLE insights
+  if (cycleScore !== undefined) {
+    if (cycleScore >= 65) lines.push(`✅ Alinhamento cíclico forte: ${cycleScore}/100 — números no momento certo do ciclo`);
+    else if (cycleScore >= 45) lines.push(`📊 Alinhamento cíclico moderado: ${cycleScore}/100`);
+    else lines.push(`⚠️ Alinhamento cíclico fraco: ${cycleScore}/100 — números fora da janela ideal`);
+  }
+
+  // REGRESSION insights
+  if (regressionScore !== undefined) {
+    if (regressionScore >= 65) lines.push(`✅ Regressão à média favorável: ${regressionScore}/100`);
+    else if (regressionScore < 40) lines.push(`⚠️ Números com desvio estatístico significativo da média`);
+  }
+
   if (monteCarlo) {
     if (monteCarlo.consistency >= 0.6) lines.push(`✅ Consistência Monte Carlo: ${Math.round(monteCarlo.consistency * 100)}%`);
     if (monteCarlo.prizeRate >= 0.3) lines.push(`✅ Taxa de premiação simulada: ${Math.round(monteCarlo.prizeRate * 100)}%`);
