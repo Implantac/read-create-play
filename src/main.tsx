@@ -10,6 +10,16 @@ function isExtensionError(msg: string, filename?: string): boolean {
   return false;
 }
 
+function isPreviewRuntime(): boolean {
+  const host = window.location.hostname;
+  if (host.includes("id-preview--") || host.includes("lovableproject.com")) return true;
+  try {
+    return window.self !== window.top;
+  } catch {
+    return true;
+  }
+}
+
 // ── Global error handlers ────────────────────────────────
 window.addEventListener("error", (e) => {
   const msg = String(e.message || "");
@@ -53,6 +63,22 @@ window.addEventListener("unhandledrejection", (e) => {
 
 // Clear flag on successful load
 sessionStorage.removeItem("chunk-reloaded");
+
+if (isPreviewRuntime() && "serviceWorker" in navigator) {
+  navigator.serviceWorker.getRegistrations()
+    .then((registrations) => {
+      registrations.forEach((registration) => {
+        void registration.unregister();
+      });
+    })
+    .catch(() => undefined);
+
+  if ("caches" in window) {
+    caches.keys()
+      .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+      .catch(() => undefined);
+  }
+}
 
 // ── Mount app ────────────────────────────────────────────
 const rootEl = document.getElementById("root");

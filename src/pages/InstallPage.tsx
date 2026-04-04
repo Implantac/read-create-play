@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Smartphone, Monitor, Share, MoreVertical, Plus, Download, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 
 type Platform = "android" | "ios";
 
@@ -55,7 +56,36 @@ const steps = {
 
 const InstallPage = () => {
   const [platform, setPlatform] = useState<Platform>("android");
+  const [installing, setInstalling] = useState(false);
   const navigate = useNavigate();
+  const {
+    install,
+    isInstalled,
+    isPreviewHost,
+    canPromptInstall,
+    needsManualInstall,
+    platform: detectedPlatform,
+  } = useInstallPrompt();
+
+  useEffect(() => {
+    if (detectedPlatform) {
+      setPlatform(detectedPlatform);
+    }
+  }, [detectedPlatform]);
+
+  const handleInstall = async () => {
+    if (!canPromptInstall || installing) return;
+    setInstalling(true);
+    try {
+      await install();
+    } finally {
+      setInstalling(false);
+    }
+  };
+
+  const openPublishedApp = () => {
+    window.open("https://read-create-play.lovable.app/install", "_blank", "noopener,noreferrer");
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -72,6 +102,45 @@ const InstallPage = () => {
             </p>
           </div>
         </div>
+
+        <Card className="border-border">
+          <CardContent className="p-5 space-y-4">
+            <div className="space-y-1">
+              <h2 className="text-lg font-semibold text-foreground">Instalação rápida</h2>
+              <p className="text-sm text-muted-foreground">
+                {isInstalled
+                  ? "O app já está rodando em modo instalado neste dispositivo."
+                  : isPreviewHost
+                    ? "A instalação não fica disponível dentro do preview do editor. Abra a versão publicada no navegador do celular."
+                    : canPromptInstall
+                      ? "Seu dispositivo já permite instalar o app agora com um toque."
+                      : needsManualInstall
+                        ? "No iPhone e iPad, a instalação é manual pelo botão Compartilhar do Safari."
+                        : "Se o botão de instalar não aparecer, siga o passo a passo abaixo no navegador compatível."}
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              {canPromptInstall ? (
+                <Button onClick={handleInstall} className="sm:flex-1" disabled={installing}>
+                  {installing ? "Preparando instalação..." : "Instalar agora"}
+                </Button>
+              ) : null}
+
+              {isPreviewHost ? (
+                <Button onClick={openPublishedApp} variant="outline" className="sm:flex-1">
+                  Abrir versão publicada
+                </Button>
+              ) : null}
+
+              {isInstalled ? (
+                <Button onClick={() => navigate("/")} variant="outline" className="sm:flex-1">
+                  Abrir o app
+                </Button>
+              ) : null}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Platform toggle */}
         <div className="flex gap-2 p-1 bg-muted rounded-xl">
