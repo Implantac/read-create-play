@@ -94,6 +94,22 @@ export function scoreGame(
   const coOccBonus = computeCoOccurrenceBonus(sorted, coOcc.topPairs);
   const antiPairPenalty = computeAntiPairPenalty(sorted, coOcc.antiPairs, draws.length);
 
+  // ENTROPY: information-theoretic quality assessment
+  const entropyReport = computeEntropyReport(sorted, rules.totalNumbers);
+  const entropyBonus = Math.round((entropyReport.compositeScore - 50) * 0.3);
+
+  // CYCLE ALIGNMENT: how well numbers align with their natural cycles
+  const cycleProfiles = computeCycleProfiles(draws, lotteryId, 150);
+  const cycleScore = scoreByCycleAlignment(sorted, cycleProfiles);
+  const cycleBonus = Math.round((cycleScore - 50) * 0.2);
+
+  // REGRESSION: favor numbers regressing toward the mean
+  const regressionCandidates = computeRegressionCandidates(draws, stats, lotteryId, 80);
+  const regressionStrategy = riskProfile === "momentum" ? "momentum" 
+    : riskProfile === "regression" ? "contrarian" : "balanced";
+  const regressionScore = scoreByRegression(sorted, regressionCandidates, regressionStrategy);
+  const regressionBonus = Math.round((regressionScore - 50) * 0.15);
+
   // ADAPTIVE Monte Carlo — variable depth based on context
   const adaptiveSimCount = getAdaptiveSimCount(context, riskProfile, draws.length);
   const monteCarlo = lightMonteCarlo(sorted, draws, adaptiveSimCount);
@@ -122,14 +138,16 @@ export function scoreGame(
     pattern.repeatScore * contextW.repeatWeight * 5)
   );
 
-  // Probability score incorporating zone balance and co-occurrence potential
+  // Probability score incorporating zone balance, entropy and co-occurrence
   const probScore = Math.round(
-    (pattern.sumProximity * 22 + 
-     pattern.parityBalance * 22 + 
-     pattern.dispersalScore * 22 + 
-     pattern.repeatScore * 12 +
-     (specialScore / 100) * 10 +
-     (clusterScore / 100) * 12)
+    (pattern.sumProximity * 18 + 
+     pattern.parityBalance * 18 + 
+     pattern.dispersalScore * 18 + 
+     pattern.repeatScore * 10 +
+     (specialScore / 100) * 8 +
+     (clusterScore / 100) * 10 +
+     (entropyReport.compositeScore / 100) * 10 +
+     (cycleScore / 100) * 8)
   );
 
   const w = AI_CONFIG.scoringWeights;
@@ -142,15 +160,18 @@ export function scoreGame(
     probScore * w.probability
   );
 
-  // Apply all overlays: Monte Carlo + ROI + winning patterns + co-occurrence - penalties
+  // Apply all overlays: Monte Carlo + ROI + winning patterns + entropy + cycle + regression + co-occurrence - penalties
   const totalScore = Math.max(0, Math.min(100,
     rawScore
-    + monteCarloBonus * 0.15
-    + roiBonus * 0.1
-    + winPatternBonus * 0.1
-    + coOccBonus * 0.08
-    - humanPenalty * 0.4
-    - antiPairPenalty * 0.15
+    + monteCarloBonus * 0.12
+    + roiBonus * 0.10
+    + winPatternBonus * 0.10
+    + entropyBonus * 0.08
+    + cycleBonus * 0.08
+    + regressionBonus * 0.07
+    + coOccBonus * 0.07
+    - humanPenalty * 0.35
+    - antiPairPenalty * 0.12
   ));
 
   const grade = totalScore >= 85 ? "S" : totalScore >= 70 ? "A" : totalScore >= 55 ? "B" :
