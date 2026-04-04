@@ -26,4 +26,9 @@ window.addEventListener("unhandledrejection", (e) => {
 // Clear flag on successful load
 sessionStorage.removeItem("chunk-reloaded");
 
-createRoot(document.getElementById("root")!).render(<App />);
+const rootEl = document.getElementById("root");
+if (rootEl) {
+  createRoot(rootEl).render(<App />);
+} else {
+  console.warn("[Titan] Root element not found");
+}
