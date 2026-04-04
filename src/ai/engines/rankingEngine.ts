@@ -297,6 +297,8 @@ export function scoreGame(
     + consecutiveBonus * 0.03
     + edgeBonus * 0.03
     + coOccBonus * 0.05
+    + correlationBonus * 0.04
+    + volatilityBonus * 0.03
     - humanPenalty * 0.30
     - antiPairPenalty * 0.08
     - regimePenalty * 0.04
