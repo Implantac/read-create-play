@@ -12,6 +12,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminGuard } from "@/components/AdminGuard";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { VersionUpdateAlert } from "@/components/VersionUpdateAlert";
+import { AutoInstallPrompt } from "@/components/AutoInstallPrompt";
 
 const AppLayout = lazy(() => import("@/components/AppLayout").then((m) => ({ default: m.AppLayout })));
 const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
