@@ -265,17 +265,22 @@ export function scoreGame(
     + monteCarloBonus * 0.10
     + roiBonus * 0.08
     + winPatternBonus * 0.08
-    + entropyBonus * 0.07
-    + cycleBonus * 0.07
+    + entropyBonus * 0.06
+    + cycleBonus * 0.06
+    + multiScaleCycleBonus * 0.05
+    + bayesianBonus * 0.04
+    + advPatternBonus * 0.04
     + regressionBonus * 0.06
-    + multiWindowBonus * 0.06
+    + multiWindowBonus * 0.05
     + recencyBonus * 0.05
     + forecastBonus * 0.05
     + consecutiveBonus * 0.03
     + edgeBonus * 0.03
-    + coOccBonus * 0.06
-    - humanPenalty * 0.35
-    - antiPairPenalty * 0.10
+    + coOccBonus * 0.05
+    - humanPenalty * 0.30
+    - antiPairPenalty * 0.08
+    - regimePenalty * 0.04
+    - outlierPenalty * 0.06
   ));
 
   const grade = totalScore >= 85 ? "S" : totalScore >= 70 ? "A" : totalScore >= 55 ? "B" :
