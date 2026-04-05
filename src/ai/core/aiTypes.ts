@@ -106,6 +106,9 @@ export interface SimulationResult {
   strategyComparison?: StrategyComparison[];
   avgPrizeRate?: number;
   avgStability?: number;
+  confidenceInterval?: { lower: number; upper: number; confidence: number };
+  statisticalSignificance?: { tStatistic: number; significant: boolean; expectedRandom: number };
+  diversityScore?: number;
 }
 
 export interface SimulatedGameResult {
