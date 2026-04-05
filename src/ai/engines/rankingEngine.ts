@@ -372,7 +372,9 @@ function buildExplanation(
   multiWindowBonus?: number,
   forecastBonus?: number,
   consecutiveEntropy?: { score: number; consecutivePairs: number; maxRun: number },
-  edgeBalance?: number
+  edgeBalance?: number,
+  markovResult?: { markovScore: number; highProbCount: number; strongSignals: { number: number; probability: number }[] },
+  enhancedEntropy?: { uniformityScore: number; renyiEntropy: number; klDivergence: number }
 ): string[] {
   const lines: string[] = [];
   lines.push(`Score geral: ${total}/100 (${grade})`);
@@ -423,6 +425,26 @@ function buildExplanation(
     }
     if (entropyReport.quadrantBalance < 0.5) {
       lines.push("⚠️ Desequilíbrio entre quadrantes do volante");
+    }
+  }
+
+  // ENHANCED ENTROPY insights
+  if (enhancedEntropy) {
+    if (enhancedEntropy.uniformityScore >= 70) {
+      lines.push(`✅ Uniformidade estatística alta: ${enhancedEntropy.uniformityScore}/100 (Rényi + KL)`);
+    } else if (enhancedEntropy.klDivergence > 0.4) {
+      lines.push(`⚠️ Divergência KL elevada: distribuição distante do uniforme`);
+    }
+  }
+
+  // MARKOV insights
+  if (markovResult) {
+    if (markovResult.markovScore >= 65) {
+      lines.push(`✅ Alinhamento Markov forte: ${markovResult.markovScore}/100 — ${markovResult.highProbCount} números com alta probabilidade de transição`);
+    } else if (markovResult.markovScore >= 45) {
+      lines.push(`📊 Alinhamento Markov moderado: ${markovResult.markovScore}/100`);
+    } else {
+      lines.push(`⚠️ Baixa coerência com padrões de transição: ${markovResult.markovScore}/100`);
     }
   }
 
