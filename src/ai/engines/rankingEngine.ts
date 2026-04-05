@@ -97,11 +97,18 @@ export function scoreGame(
   const coOccBonus = computeCoOccurrenceBonus(sorted, coOcc.topPairs);
   const antiPairPenalty = computeAntiPairPenalty(sorted, coOcc.antiPairs, draws.length);
 
-  // ENTROPY: information-theoretic quality assessment
-  const entropyReport = computeEntropyReport(sorted, rules.totalNumbers);
+  // ENTROPY: information-theoretic quality assessment (enhanced)
+  const enhancedEntropy = computeEnhancedEntropyReport(sorted, rules.totalNumbers);
+  const entropyReport = enhancedEntropy; // backward compatible
   const consecutiveEntropy = computeConsecutiveEntropy(sorted);
   const edgeBalance = computeEdgeInteriorBalance(sorted, rules.totalNumbers);
   const entropyBonus = Math.round((entropyReport.compositeScore - 50) * 0.3);
+  const uniformityBonus = Math.round((enhancedEntropy.uniformityScore - 50) * 0.12);
+  const klPenalty = Math.round(enhancedEntropy.klDivergence * 8);
+
+  // JOINT ENTROPY: novelty relative to recent draws
+  const jointEnt = computeJointEntropy(sorted, draws, rules.totalNumbers, 10);
+  const jointEntropyBonus = Math.round(jointEnt.noveltyScore * 6 - jointEnt.redundancyPenalty * 10);
 
   // CYCLE ALIGNMENT: how well numbers align with their natural cycles
   const cycleProfiles = computeCycleProfiles(draws, lotteryId, 150);
