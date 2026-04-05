@@ -11,11 +11,12 @@ import { AI_CONFIG } from "../core/aiConfig";
 import { computeSpecialNumberScore, computeHistoricalHitRate, computeClusterScore, computeHumanPatternPenalty, lightMonteCarlo, computeCoOccurrence } from "./advancedAnalysisEngine";
 import { estimateROI, detectContext, selfCalibrateWeights, applyContextAdjustments, extractWinningPatterns, scoreAgainstWinningPatterns, getAdaptiveSimCount, optimizeWeightsFromHistory, recordPerformance, evaluatePortfolio, optimizePortfolio } from "./adaptiveEngine";
 import { smoothWeights, computeProgressivePenalty, computeCoOccurrenceBonus, computeAntiPairPenalty, detectRegimeChange, computeHistoricalNorms, checkGameOutlier } from "./stabilityEngine";
-import { computeEntropyReport, computeConsecutiveEntropy, computeEdgeInteriorBalance } from "./entropyEngine";
+import { computeEntropyReport, computeConsecutiveEntropy, computeEdgeInteriorBalance, computeEnhancedEntropyReport, computeJointEntropy } from "./entropyEngine";
 import { computeCycleProfiles, scoreByCycleAlignment, multiScaleCycleAnalysis, scoreByMultiScaleCycles, computeBayesianPredictions } from "./cycleEngine";
 import { scoreAdvancedPatterns, computeHarmonicProfile, detectPositionalPatterns } from "./patternEngine";
 import { computeRegressionCandidates, scoreByRegression, computeMultiWindowRegression, computeSmoothedTrends } from "./regressionEngine";
 import { computeRecencyWeightedFrequency, computeCovarianceNetwork, scoreByCorrelationNetwork, computeTemporalVolatility, scoreByVolatility } from "./probabilityEngine";
+import { buildTransitionMatrix, scoreByTransitionMatrix, buildPairTransitions, scoreByPairTransitions, computeStationaryDistribution, scoreByStationaryDist } from "./markovEngine";
 import type { ScoredGame, GameScores, RiskProfile } from "../core/aiTypes";
 
 export function scoreGame(
@@ -96,11 +97,18 @@ export function scoreGame(
   const coOccBonus = computeCoOccurrenceBonus(sorted, coOcc.topPairs);
   const antiPairPenalty = computeAntiPairPenalty(sorted, coOcc.antiPairs, draws.length);
 
-  // ENTROPY: information-theoretic quality assessment
-  const entropyReport = computeEntropyReport(sorted, rules.totalNumbers);
+  // ENTROPY: information-theoretic quality assessment (enhanced)
+  const enhancedEntropy = computeEnhancedEntropyReport(sorted, rules.totalNumbers);
+  const entropyReport = enhancedEntropy; // backward compatible
   const consecutiveEntropy = computeConsecutiveEntropy(sorted);
   const edgeBalance = computeEdgeInteriorBalance(sorted, rules.totalNumbers);
   const entropyBonus = Math.round((entropyReport.compositeScore - 50) * 0.3);
+  const uniformityBonus = Math.round((enhancedEntropy.uniformityScore - 50) * 0.12);
+  const klPenalty = Math.round(enhancedEntropy.klDivergence * 8);
+
+  // JOINT ENTROPY: novelty relative to recent draws
+  const jointEnt = computeJointEntropy(sorted, draws, rules.totalNumbers, 10);
+  const jointEntropyBonus = Math.round(jointEnt.noveltyScore * 6 - jointEnt.redundancyPenalty * 10);
 
   // CYCLE ALIGNMENT: how well numbers align with their natural cycles
   const cycleProfiles = computeCycleProfiles(draws, lotteryId, 150);
@@ -225,6 +233,25 @@ export function scoreGame(
   const volatilityScore = scoreByVolatility(sorted, volatilityProfiles, riskProfile !== "aggressive");
   const volatilityBonus = Math.round((volatilityScore - 50) * 0.08);
 
+  // MARKOV TRANSITION MATRIX: first-order transition probabilities
+  const transitionMatrix = buildTransitionMatrix(draws, lotteryId, 100);
+  const markovResult = prevDraw
+    ? scoreByTransitionMatrix(sorted, prevDraw, transitionMatrix)
+    : { markovScore: 50, avgTransitionProb: 0, highProbCount: 0, strongSignals: [] };
+  const markovBonus = Math.round((markovResult.markovScore - 50) * 0.15);
+
+  // PAIR TRANSITIONS: second-order Markov (pair → next number)
+  const pairTransitions = buildPairTransitions(draws, lotteryId, 30, 80);
+  const pairTransScore = prevDraw
+    ? scoreByPairTransitions(sorted, prevDraw, pairTransitions)
+    : 50;
+  const pairTransBonus = Math.round((pairTransScore - 50) * 0.1);
+
+  // STATIONARY DISTRIBUTION: long-term equilibrium alignment
+  const stationaryDist = computeStationaryDistribution(transitionMatrix, 50);
+  const stationaryScore = scoreByStationaryDist(sorted, stationaryDist);
+  const stationaryBonus = Math.round((stationaryScore - 50) * 0.08);
+
   // ADAPTIVE Monte Carlo — variable depth based on context
   const adaptiveSimCount = getAdaptiveSimCount(context, riskProfile, draws.length);
   const monteCarlo = lightMonteCarlo(sorted, draws, adaptiveSimCount);
@@ -299,16 +326,22 @@ export function scoreGame(
     + coOccBonus * 0.05
     + correlationBonus * 0.04
     + volatilityBonus * 0.03
+    + markovBonus * 0.06
+    + pairTransBonus * 0.04
+    + stationaryBonus * 0.03
+    + uniformityBonus * 0.04
+    + jointEntropyBonus * 0.03
     - humanPenalty * 0.30
     - antiPairPenalty * 0.08
     - regimePenalty * 0.04
     - outlierPenalty * 0.06
+    - klPenalty * 0.03
   ));
 
   const grade = totalScore >= 85 ? "S" : totalScore >= 70 ? "A" : totalScore >= 55 ? "B" :
     totalScore >= 40 ? "C" : totalScore >= 25 ? "D" : "F";
 
-  const explanation = buildExplanation(sorted, lotteryId, pattern, { statistical: statScore, structural: structScore, coverage: coverageScore, diversity: diversityScore, strategyFit, probability: probScore }, totalScore, grade, clusterScore, humanPenalty, monteCarlo, roi, context, entropyReport, cycleScore, regressionScore, multiWindowBonus, forecastBonus, consecutiveEntropy, edgeBalance);
+  const explanation = buildExplanation(sorted, lotteryId, pattern, { statistical: statScore, structural: structScore, coverage: coverageScore, diversity: diversityScore, strategyFit, probability: probScore }, totalScore, grade, clusterScore, humanPenalty, monteCarlo, roi, context, entropyReport, cycleScore, regressionScore, multiWindowBonus, forecastBonus, consecutiveEntropy, edgeBalance, markovResult, enhancedEntropy);
 
   return {
     numbers: sorted,
@@ -339,7 +372,9 @@ function buildExplanation(
   multiWindowBonus?: number,
   forecastBonus?: number,
   consecutiveEntropy?: { score: number; consecutivePairs: number; maxRun: number },
-  edgeBalance?: number
+  edgeBalance?: number,
+  markovResult?: { markovScore: number; highProbCount: number; strongSignals: { number: number; probability: number }[] },
+  enhancedEntropy?: { uniformityScore: number; renyiEntropy: number; klDivergence: number }
 ): string[] {
   const lines: string[] = [];
   lines.push(`Score geral: ${total}/100 (${grade})`);
@@ -390,6 +425,26 @@ function buildExplanation(
     }
     if (entropyReport.quadrantBalance < 0.5) {
       lines.push("⚠️ Desequilíbrio entre quadrantes do volante");
+    }
+  }
+
+  // ENHANCED ENTROPY insights
+  if (enhancedEntropy) {
+    if (enhancedEntropy.uniformityScore >= 70) {
+      lines.push(`✅ Uniformidade estatística alta: ${enhancedEntropy.uniformityScore}/100 (Rényi + KL)`);
+    } else if (enhancedEntropy.klDivergence > 0.4) {
+      lines.push(`⚠️ Divergência KL elevada: distribuição distante do uniforme`);
+    }
+  }
+
+  // MARKOV insights
+  if (markovResult) {
+    if (markovResult.markovScore >= 65) {
+      lines.push(`✅ Alinhamento Markov forte: ${markovResult.markovScore}/100 — ${markovResult.highProbCount} números com alta probabilidade de transição`);
+    } else if (markovResult.markovScore >= 45) {
+      lines.push(`📊 Alinhamento Markov moderado: ${markovResult.markovScore}/100`);
+    } else {
+      lines.push(`⚠️ Baixa coerência com padrões de transição: ${markovResult.markovScore}/100`);
     }
   }
 

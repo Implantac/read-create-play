@@ -223,10 +223,164 @@ export function computeEdgeInteriorBalance(
 ): number {
   const edgeThreshold = Math.ceil(totalNumbers * 0.2);
   const edges = numbers.filter(n => n <= edgeThreshold || n > totalNumbers - edgeThreshold).length;
-  const interior = numbers.length - edges;
 
   const idealEdgeRatio = (edgeThreshold * 2) / totalNumbers;
   const actualEdgeRatio = edges / numbers.length;
 
   return Math.max(0, 1 - Math.abs(actualEdgeRatio - idealEdgeRatio) * 3);
+}
+
+// ═══════════════════════════════════════════════════════
+// 9. RÉNYI ENTROPY — Generalized entropy (α=2 for collision entropy)
+// ═══════════════════════════════════════════════════════
+
+/** Rényi entropy of order α for zone distribution — captures collision probability */
+export function computeRenyiEntropy(
+  numbers: number[],
+  totalNumbers: number,
+  alpha: number = 2,
+  zoneCount: number = 5
+): number {
+  const zoneSize = Math.ceil(totalNumbers / zoneCount);
+  const zoneCounts = new Array(zoneCount).fill(0);
+
+  for (const n of numbers) {
+    const z = Math.min(zoneCount - 1, Math.floor((n - 1) / zoneSize));
+    zoneCounts[z]++;
+  }
+
+  if (alpha === 1) return computeZoneEntropy(numbers, totalNumbers, zoneCount);
+
+  let sumPAlpha = 0;
+  for (const c of zoneCounts) {
+    if (c > 0) {
+      const p = c / numbers.length;
+      sumPAlpha += Math.pow(p, alpha);
+    }
+  }
+
+  if (sumPAlpha === 0) return 0;
+  const renyi = (1 / (1 - alpha)) * Math.log2(sumPAlpha);
+  const maxRenyi = Math.log2(Math.min(zoneCount, numbers.length));
+  return maxRenyi > 0 ? Math.max(0, Math.min(1, renyi / maxRenyi)) : 0;
+}
+
+// ═══════════════════════════════════════════════════════
+// 10. KL DIVERGENCE — Distance from ideal uniform distribution
+// ═══════════════════════════════════════════════════════
+
+/** KL divergence of actual zone distribution from uniform (lower = better) */
+export function computeKLDivergence(
+  numbers: number[],
+  totalNumbers: number,
+  zoneCount: number = 5
+): number {
+  const zoneSize = Math.ceil(totalNumbers / zoneCount);
+  const zoneCounts = new Array(zoneCount).fill(0);
+
+  for (const n of numbers) {
+    const z = Math.min(zoneCount - 1, Math.floor((n - 1) / zoneSize));
+    zoneCounts[z]++;
+  }
+
+  const uniformP = 1 / zoneCount;
+  let kl = 0;
+  for (const c of zoneCounts) {
+    const p = Math.max(0.001, c / numbers.length); // avoid log(0)
+    kl += p * Math.log2(p / uniformP);
+  }
+
+  // Normalize: 0 = perfect uniform, 1 = very skewed
+  // Max KL for this case is log2(zoneCount) when all mass in one zone
+  const maxKL = Math.log2(zoneCount);
+  return maxKL > 0 ? Math.max(0, Math.min(1, kl / maxKL)) : 0;
+}
+
+// ═══════════════════════════════════════════════════════
+// 11. JOINT ENTROPY — Between consecutive draws
+// ═══════════════════════════════════════════════════════
+
+import { DrawResult } from "@/data/lotteries";
+
+/** Joint entropy between a candidate game and recent draws — measures novelty */
+export function computeJointEntropy(
+  candidate: number[],
+  recentDraws: DrawResult[],
+  totalNumbers: number,
+  windowSize: number = 10
+): { jointEntropy: number; noveltyScore: number; redundancyPenalty: number } {
+  const window = recentDraws.slice(0, Math.min(windowSize, recentDraws.length));
+  if (window.length === 0) return { jointEntropy: 1, noveltyScore: 1, redundancyPenalty: 0 };
+
+  const candidateSet = new Set(candidate);
+  
+  // Count how many recent draws each number appeared in
+  const recentFreq = new Map<number, number>();
+  for (const d of window) {
+    for (const n of d.numbers) {
+      recentFreq.set(n, (recentFreq.get(n) || 0) + 1);
+    }
+  }
+
+  // Joint distribution: how much of the candidate overlaps recent patterns
+  let overlapScore = 0;
+  let novelNumbers = 0;
+  for (const n of candidate) {
+    const freq = recentFreq.get(n) || 0;
+    const p = freq / window.length;
+    overlapScore += p;
+    if (freq === 0) novelNumbers++;
+  }
+
+  const avgOverlap = overlapScore / candidate.length;
+  
+  // Joint entropy: higher when candidate is independent from recent draws
+  const jointEntropy = Math.max(0, Math.min(1, 1 - avgOverlap * 0.7));
+  
+  // Novelty: proportion of numbers not seen recently
+  const noveltyScore = novelNumbers / candidate.length;
+  
+  // Redundancy: penalize games that are too similar to recent draws
+  let maxSingleOverlap = 0;
+  for (const d of window) {
+    const overlap = d.numbers.filter(n => candidateSet.has(n)).length;
+    maxSingleOverlap = Math.max(maxSingleOverlap, overlap / candidate.length);
+  }
+  const redundancyPenalty = maxSingleOverlap > 0.7 ? (maxSingleOverlap - 0.7) * 3 : 0;
+
+  return { jointEntropy, noveltyScore, redundancyPenalty };
+}
+
+// ═══════════════════════════════════════════════════════
+// 12. ENHANCED COMPOSITE with new metrics
+// ═══════════════════════════════════════════════════════
+
+export interface EnhancedEntropyReport extends EntropyReport {
+  renyiEntropy: number;    // 0-1 (collision entropy)
+  klDivergence: number;    // 0-1 (distance from uniform)
+  uniformityScore: number; // 0-100 combined uniformity metric
+}
+
+/** Full enhanced entropy report */
+export function computeEnhancedEntropyReport(
+  numbers: number[],
+  totalNumbers: number
+): EnhancedEntropyReport {
+  const base = computeEntropyReport(numbers, totalNumbers);
+  const renyiEntropy = computeRenyiEntropy(numbers, totalNumbers);
+  const klDivergence = computeKLDivergence(numbers, totalNumbers);
+
+  // Uniformity score: high Rényi + low KL + high Shannon = perfectly distributed
+  const uniformityScore = Math.round(
+    renyiEntropy * 35 +
+    (1 - klDivergence) * 35 +
+    base.zoneEntropy * 30
+  );
+
+  return {
+    ...base,
+    renyiEntropy,
+    klDivergence,
+    uniformityScore,
+  };
 }
