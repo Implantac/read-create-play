@@ -95,9 +95,19 @@ export function NumberPickerGrid({ config, stats, onSaveBet }: Props) {
 
       {/* Grid */}
       <div
-        className="grid gap-1.5"
-        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+        className="grid gap-1 sm:gap-1.5"
+        style={{
+          gridTemplateColumns: `repeat(var(--grid-cols), minmax(0, 1fr))`,
+          // @ts-ignore
+          "--grid-cols": cols,
+        } as React.CSSProperties}
       >
+        <style>{`
+          @media (max-width: 640px) {
+            .number-picker-grid { --grid-cols: ${mobileCols} !important; }
+          }
+        `}</style>
+        <div className="number-picker-grid contents">
         {Array.from({ length: config.numbers }, (_, i) => i + 1).map(n => {
           const stat = stats.find(s => s.number === n);
           const isSelected = selected.has(n);
