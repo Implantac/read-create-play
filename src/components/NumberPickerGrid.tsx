@@ -55,8 +55,10 @@ export function NumberPickerGrid({ config, stats, onSaveBet }: Props) {
     toast.success("Números copiados!");
   };
 
-  // Calculate grid columns based on total numbers
-  const cols = config.numbers <= 31 ? 8 : config.numbers <= 50 ? 10 : config.numbers <= 80 ? 10 : 10;
+  // Calculate grid columns — Lotofácil uses a 5x5 grid on mobile for perfect layout
+  const isLotofacil = config.numbers === 25;
+  const cols = isLotofacil ? 5 : config.numbers <= 31 ? 8 : config.numbers <= 50 ? 10 : 10;
+  const mobileCols = isLotofacil ? 5 : config.numbers <= 31 ? 6 : config.numbers <= 50 ? 8 : 8;
 
   return (
     <div className="rounded-xl glass-card p-5 space-y-4">
