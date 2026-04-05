@@ -185,5 +185,165 @@ export function analyzeHistory(
     recommendations.push(`Aproveitar momentum ascendente: ${ascending.map(t => t.number).slice(0, 3).join(", ")}`);
   }
 
+  // CHI-SQUARE TEST: assess randomness deviation
+  const chiSquare = computeChiSquare(subset, rules.totalNumbers, rules.pick);
+  if (chiSquare.significant) {
+    patterns.push(`⚠️ Teste Chi² indica desvio significativo da aleatoriedade (χ²=${chiSquare.value.toFixed(1)}, p<0.05)`);
+    recommendations.push("Distribuição não-uniforme detectada — explorar números sub-representados");
+  } else {
+    patterns.push(`✅ Teste Chi²: distribuição dentro do esperado (χ²=${chiSquare.value.toFixed(1)})`);
+  }
+
+  // AUTOCORRELATION: detect lag patterns
+  const autocorr = computeAutocorrelation(subset, rules.totalNumbers);
+  const significantLags = autocorr.filter(a => Math.abs(a.correlation) > 0.15);
+  if (significantLags.length > 0) {
+    patterns.push(`🔄 Autocorrelação significativa nos lags: ${significantLags.map(a => `${a.lag}(${a.correlation > 0 ? '+' : ''}${a.correlation.toFixed(2)})`).join(", ")}`);
+    recommendations.push(`Considerar padrões cíclicos de período ${significantLags[0].lag} concursos`);
+  }
+
+  // GAP DISTRIBUTION ANALYSIS
+  const gapAnalysis = analyzeGapDistribution(subset, rules.totalNumbers);
+  if (gapAnalysis.overdueNumbers.length > 0) {
+    patterns.push(`⏰ Números com atraso extremo (>2σ): ${gapAnalysis.overdueNumbers.slice(0, 5).join(", ")}`);
+    recommendations.push(`Forte candidato por atraso estatístico: ${gapAnalysis.overdueNumbers[0]}`);
+  }
+
   return { window, hotNumbers, coldNumbers, dueNumbers, avgSum, avgEven, avgRepeat, patterns, recommendations };
+}
+
+// ═══════════════════════════════════════════════════════
+// CHI-SQUARE UNIFORMITY TEST
+// ═══════════════════════════════════════════════════════
+
+interface ChiSquareResult {
+  value: number;
+  degreesOfFreedom: number;
+  significant: boolean; // p < 0.05
+}
+
+function computeChiSquare(draws: DrawResult[], totalNumbers: number, pick: number): ChiSquareResult {
+  const observed = new Array(totalNumbers).fill(0);
+  for (const d of draws) {
+    for (const n of d.numbers) {
+      if (n >= 1 && n <= totalNumbers) observed[n - 1]++;
+    }
+  }
+  const totalObs = draws.length * pick;
+  const expected = totalObs / totalNumbers;
+  
+  let chiSq = 0;
+  for (let i = 0; i < totalNumbers; i++) {
+    chiSq += (observed[i] - expected) ** 2 / expected;
+  }
+  
+  const df = totalNumbers - 1;
+  // Approximation: for df > 30, chi-square critical at p=0.05 ≈ df + 1.645*sqrt(2*df)
+  const critical = df > 30
+    ? df + 1.645 * Math.sqrt(2 * df)
+    : df * 1.5; // rough approximation for smaller df
+
+  return { value: chiSq, degreesOfFreedom: df, significant: chiSq > critical };
+}
+
+// ═══════════════════════════════════════════════════════
+// AUTOCORRELATION ANALYSIS
+// ═══════════════════════════════════════════════════════
+
+interface AutocorrelationResult {
+  lag: number;
+  correlation: number;
+}
+
+function computeAutocorrelation(draws: DrawResult[], totalNumbers: number): AutocorrelationResult[] {
+  if (draws.length < 20) return [];
+  
+  const results: AutocorrelationResult[] = [];
+  const maxLag = Math.min(10, Math.floor(draws.length / 4));
+  
+  // Create a time series: sum of each draw
+  const series = draws.map(d => d.numbers.reduce((a, b) => a + b, 0));
+  const mean = series.reduce((a, b) => a + b, 0) / series.length;
+  const variance = series.reduce((s, v) => s + (v - mean) ** 2, 0) / series.length;
+  
+  if (variance < 1e-6) return [];
+  
+  for (let lag = 1; lag <= maxLag; lag++) {
+    let cov = 0;
+    const n = series.length - lag;
+    for (let i = 0; i < n; i++) {
+      cov += (series[i] - mean) * (series[i + lag] - mean);
+    }
+    cov /= n;
+    results.push({ lag, correlation: cov / variance });
+  }
+  
+  return results;
+}
+
+// ═══════════════════════════════════════════════════════
+// GAP DISTRIBUTION ANALYSIS
+// ═══════════════════════════════════════════════════════
+
+interface GapAnalysis {
+  avgGap: number;
+  gapStdDev: number;
+  overdueNumbers: number[];
+  underperformingNumbers: number[];
+}
+
+function analyzeGapDistribution(draws: DrawResult[], totalNumbers: number): GapAnalysis {
+  if (draws.length < 10) return { avgGap: 0, gapStdDev: 0, overdueNumbers: [], underperformingNumbers: [] };
+  
+  // For each number, compute current gap (draws since last appearance)
+  const currentGaps: Map<number, number> = new Map();
+  const allGaps: Map<number, number[]> = new Map();
+  
+  for (let n = 1; n <= totalNumbers; n++) {
+    currentGaps.set(n, draws.length); // default: never appeared
+    allGaps.set(n, []);
+  }
+  
+  for (let i = 0; i < draws.length; i++) {
+    for (const n of draws[i].numbers) {
+      if (!allGaps.has(n)) continue;
+      const gaps = allGaps.get(n)!;
+      if (gaps.length === 0 && i > 0) {
+        currentGaps.set(n, i);
+      }
+      if (gaps.length > 0 || i > 0) {
+        // Track gap from previous appearance
+      }
+    }
+  }
+  
+  // Simplified: just track last appearance index
+  const lastSeen = new Map<number, number>();
+  for (let i = draws.length - 1; i >= 0; i--) {
+    for (const n of draws[i].numbers) {
+      if (!lastSeen.has(n)) lastSeen.set(n, draws.length - 1 - i);
+    }
+  }
+  
+  const gaps: number[] = [];
+  for (let n = 1; n <= totalNumbers; n++) {
+    gaps.push(lastSeen.get(n) ?? draws.length);
+  }
+  
+  const avgGap = gaps.reduce((a, b) => a + b, 0) / gaps.length;
+  const gapStdDev = Math.sqrt(gaps.reduce((s, g) => s + (g - avgGap) ** 2, 0) / gaps.length);
+  
+  const threshold = avgGap + 2 * gapStdDev;
+  const overdueNumbers: number[] = [];
+  const underperformingNumbers: number[] = [];
+  
+  for (let n = 1; n <= totalNumbers; n++) {
+    const gap = lastSeen.get(n) ?? draws.length;
+    if (gap > threshold) overdueNumbers.push(n);
+    if (gap > avgGap + gapStdDev) underperformingNumbers.push(n);
+  }
+  
+  overdueNumbers.sort((a, b) => (lastSeen.get(b) ?? 0) - (lastSeen.get(a) ?? 0));
+  
+  return { avgGap, gapStdDev, overdueNumbers, underperformingNumbers };
 }

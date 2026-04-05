@@ -108,6 +108,34 @@ export function simulateGames(
   const avgPrizeRate = gameResults.reduce((s, g) => s + (g.prizeRate || 0), 0) / gameResults.length;
   const avgStability = gameResults.reduce((s, g) => s + g.stabilityScore, 0) / gameResults.length;
 
+  // Confidence interval (95%) for avgHits using CLT
+  const allAvgs = gameResults.map(g => g.avgHits);
+  const meanOfAvgs = allAvgs.reduce((a, b) => a + b, 0) / allAvgs.length;
+  const stdOfAvgs = allAvgs.length > 1
+    ? Math.sqrt(allAvgs.reduce((s, a) => s + (a - meanOfAvgs) ** 2, 0) / (allAvgs.length - 1))
+    : 0;
+  const marginOfError = 1.96 * stdOfAvgs / Math.sqrt(Math.max(1, allAvgs.length));
+
+  // Statistical significance: is portfolio better than random?
+  const expectedRandomHits = rules.pick * rules.pick / rules.totalNumbers;
+  const tStatistic = allAvgs.length > 1
+    ? (meanOfAvgs - expectedRandomHits) / (stdOfAvgs / Math.sqrt(allAvgs.length) + 1e-9)
+    : 0;
+  const isSignificant = Math.abs(tStatistic) > 1.96;
+
+  // Portfolio diversity: avg pairwise overlap
+  let totalOverlap = 0;
+  let pairCount = 0;
+  for (let i = 0; i < games.length; i++) {
+    for (let j = i + 1; j < games.length; j++) {
+      const setJ = new Set(games[j]);
+      totalOverlap += games[i].filter(n => setJ.has(n)).length;
+      pairCount++;
+    }
+  }
+  const avgOverlap = pairCount > 0 ? totalOverlap / pairCount : 0;
+  const diversityScore = Math.max(0, Math.round(100 - (avgOverlap / rules.pick) * 150));
+
   return {
     totalSimulations: iterations * games.length,
     games: gameResults.sort((a, b) => b.avgHits - a.avgHits),
@@ -117,6 +145,17 @@ export function simulateGames(
     worstGame: { numbers: worstGame.numbers, avgHits: worstGame.avgHits },
     avgPrizeRate,
     avgStability,
+    confidenceInterval: {
+      lower: Math.max(0, meanOfAvgs - marginOfError),
+      upper: meanOfAvgs + marginOfError,
+      confidence: 0.95,
+    },
+    statisticalSignificance: {
+      tStatistic,
+      significant: isSignificant,
+      expectedRandom: expectedRandomHits,
+    },
+    diversityScore,
   };
 }
 

@@ -356,6 +356,89 @@ export interface SequenceReport {
   positionalScore: number;      // 0-100
 }
 
+/** Detect diagonal patterns on grid layout */
+export function detectDiagonalPatterns(
+  numbers: number[],
+  gridRows: number,
+  gridCols: number
+): { mainDiagCount: number; antiDiagCount: number; diagonalScore: number } {
+  if (gridCols === 0 || gridRows === 0) return { mainDiagCount: 0, antiDiagCount: 0, diagonalScore: 50 };
+  
+  const numSet = new Set(numbers);
+  let mainDiagCount = 0;
+  let antiDiagCount = 0;
+  
+  // Main diagonal: cells where row === col
+  for (let i = 0; i < Math.min(gridRows, gridCols); i++) {
+    const n = i * gridCols + i + 1;
+    if (numSet.has(n)) mainDiagCount++;
+  }
+  
+  // Anti-diagonal: cells where row + col === gridCols - 1
+  for (let i = 0; i < Math.min(gridRows, gridCols); i++) {
+    const n = i * gridCols + (gridCols - 1 - i) + 1;
+    if (numSet.has(n)) antiDiagCount++;
+  }
+  
+  const maxDiag = Math.min(gridRows, gridCols);
+  const idealDiag = Math.round(numbers.length / (gridRows * gridCols / maxDiag));
+  const diagDev = Math.abs(mainDiagCount - idealDiag) + Math.abs(antiDiagCount - idealDiag);
+  const diagonalScore = Math.max(0, 100 - diagDev * 15);
+  
+  return { mainDiagCount, antiDiagCount, diagonalScore };
+}
+
+/** Detect Fibonacci-based spacing patterns */
+export function detectFibonacciSpacing(numbers: number[]): { fibGaps: number; fibScore: number } {
+  const sorted = [...numbers].sort((a, b) => a - b);
+  const fibSet = new Set([1, 2, 3, 5, 8, 13, 21, 34]);
+  
+  let fibGaps = 0;
+  for (let i = 1; i < sorted.length; i++) {
+    const gap = sorted[i] - sorted[i - 1];
+    if (fibSet.has(gap)) fibGaps++;
+  }
+  
+  // Score: moderate fibonacci gaps are interesting
+  const ratio = fibGaps / Math.max(1, sorted.length - 1);
+  const fibScore = Math.round(Math.min(100, ratio * 120 + 20));
+  
+  return { fibGaps, fibScore };
+}
+
+/** Detect prime number clustering patterns */
+export function detectPrimeClusters(
+  numbers: number[],
+  totalNumbers: number
+): { primeClusterScore: number; consecutivePrimes: number; primeGapPattern: string } {
+  const primeSet = new Set([2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79]);
+  const sorted = [...numbers].sort((a, b) => a - b);
+  const primes = sorted.filter(n => primeSet.has(n));
+  
+  // Consecutive primes in selection
+  let maxConsecPrimes = 0;
+  let curConsec = 0;
+  const allPrimesOrdered = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79].filter(p => p <= totalNumbers);
+  
+  for (let i = 0; i < allPrimesOrdered.length; i++) {
+    if (new Set(numbers).has(allPrimesOrdered[i])) {
+      curConsec++;
+      maxConsecPrimes = Math.max(maxConsecPrimes, curConsec);
+    } else {
+      curConsec = 0;
+    }
+  }
+  
+  const expectedPrimeRatio = allPrimesOrdered.length / totalNumbers;
+  const actualPrimeRatio = primes.length / numbers.length;
+  const deviation = Math.abs(actualPrimeRatio - expectedPrimeRatio);
+  
+  const primeClusterScore = Math.max(0, Math.round(100 - deviation * 300 - maxConsecPrimes * 5));
+  const primeGapPattern = maxConsecPrimes >= 3 ? "clustered" : maxConsecPrimes >= 2 ? "moderate" : "dispersed";
+  
+  return { primeClusterScore, consecutivePrimes: maxConsecPrimes, primeGapPattern };
+}
+
 /** Detect positional patterns: arithmetic runs, mirror symmetry, edge clusters */
 export function detectPositionalPatterns(
   numbers: number[],
