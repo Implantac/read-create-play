@@ -95,19 +95,14 @@ export function NumberPickerGrid({ config, stats, onSaveBet }: Props) {
 
       {/* Grid */}
       <div
-        className="grid gap-1 sm:gap-1.5"
-        style={{
-          gridTemplateColumns: `repeat(var(--grid-cols), minmax(0, 1fr))`,
-          // @ts-ignore
-          "--grid-cols": cols,
-        } as React.CSSProperties}
+        className="number-picker-responsive grid gap-1 sm:gap-1.5"
+        style={{ gridTemplateColumns: `repeat(${mobileCols}, minmax(0, 1fr))` }}
       >
         <style>{`
-          @media (max-width: 640px) {
-            .number-picker-grid { --grid-cols: ${mobileCols} !important; }
+          @media (min-width: 641px) {
+            .number-picker-responsive { grid-template-columns: repeat(${cols}, minmax(0, 1fr)) !important; }
           }
         `}</style>
-        <div className="number-picker-grid contents">
         {Array.from({ length: config.numbers }, (_, i) => i + 1).map(n => {
           const stat = stats.find(s => s.number === n);
           const isSelected = selected.has(n);
@@ -120,9 +115,9 @@ export function NumberPickerGrid({ config, stats, onSaveBet }: Props) {
               whileTap={{ scale: 0.9 }}
               onClick={() => toggle(n)}
               className={`
-                relative aspect-square rounded-lg text-xs font-mono font-bold
+                relative aspect-square rounded-lg text-[11px] sm:text-xs font-mono font-bold
                 flex items-center justify-center transition-all duration-150
-                border
+                border min-w-0
                 ${isSelected
                   ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/30 scale-105"
                   : isHot
