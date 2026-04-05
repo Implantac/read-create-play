@@ -61,7 +61,7 @@ export function NumberPickerGrid({ config, stats, onSaveBet }: Props) {
   const mobileCols = isLotofacil ? 5 : config.numbers <= 31 ? 6 : config.numbers <= 50 ? 8 : 8;
 
   return (
-    <div className="rounded-xl glass-card p-5 space-y-4">
+    <div className="rounded-xl glass-card p-3 sm:p-5 space-y-3 sm:space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-neon-cyan/10 border border-neon-cyan/20 flex items-center justify-center">
