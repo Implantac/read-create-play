@@ -233,6 +233,25 @@ export function scoreGame(
   const volatilityScore = scoreByVolatility(sorted, volatilityProfiles, riskProfile !== "aggressive");
   const volatilityBonus = Math.round((volatilityScore - 50) * 0.08);
 
+  // MARKOV TRANSITION MATRIX: first-order transition probabilities
+  const transitionMatrix = buildTransitionMatrix(draws, lotteryId, 100);
+  const markovResult = prevDraw
+    ? scoreByTransitionMatrix(sorted, prevDraw, transitionMatrix)
+    : { markovScore: 50, avgTransitionProb: 0, highProbCount: 0, strongSignals: [] };
+  const markovBonus = Math.round((markovResult.markovScore - 50) * 0.15);
+
+  // PAIR TRANSITIONS: second-order Markov (pair → next number)
+  const pairTransitions = buildPairTransitions(draws, lotteryId, 30, 80);
+  const pairTransScore = prevDraw
+    ? scoreByPairTransitions(sorted, prevDraw, pairTransitions)
+    : 50;
+  const pairTransBonus = Math.round((pairTransScore - 50) * 0.1);
+
+  // STATIONARY DISTRIBUTION: long-term equilibrium alignment
+  const stationaryDist = computeStationaryDistribution(transitionMatrix, 50);
+  const stationaryScore = scoreByStationaryDist(sorted, stationaryDist);
+  const stationaryBonus = Math.round((stationaryScore - 50) * 0.08);
+
   // ADAPTIVE Monte Carlo — variable depth based on context
   const adaptiveSimCount = getAdaptiveSimCount(context, riskProfile, draws.length);
   const monteCarlo = lightMonteCarlo(sorted, draws, adaptiveSimCount);
