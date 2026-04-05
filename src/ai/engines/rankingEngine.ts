@@ -326,16 +326,22 @@ export function scoreGame(
     + coOccBonus * 0.05
     + correlationBonus * 0.04
     + volatilityBonus * 0.03
+    + markovBonus * 0.06
+    + pairTransBonus * 0.04
+    + stationaryBonus * 0.03
+    + uniformityBonus * 0.04
+    + jointEntropyBonus * 0.03
     - humanPenalty * 0.30
     - antiPairPenalty * 0.08
     - regimePenalty * 0.04
     - outlierPenalty * 0.06
+    - klPenalty * 0.03
   ));
 
   const grade = totalScore >= 85 ? "S" : totalScore >= 70 ? "A" : totalScore >= 55 ? "B" :
     totalScore >= 40 ? "C" : totalScore >= 25 ? "D" : "F";
 
-  const explanation = buildExplanation(sorted, lotteryId, pattern, { statistical: statScore, structural: structScore, coverage: coverageScore, diversity: diversityScore, strategyFit, probability: probScore }, totalScore, grade, clusterScore, humanPenalty, monteCarlo, roi, context, entropyReport, cycleScore, regressionScore, multiWindowBonus, forecastBonus, consecutiveEntropy, edgeBalance);
+  const explanation = buildExplanation(sorted, lotteryId, pattern, { statistical: statScore, structural: structScore, coverage: coverageScore, diversity: diversityScore, strategyFit, probability: probScore }, totalScore, grade, clusterScore, humanPenalty, monteCarlo, roi, context, entropyReport, cycleScore, regressionScore, multiWindowBonus, forecastBonus, consecutiveEntropy, edgeBalance, markovResult, enhancedEntropy);
 
   return {
     numbers: sorted,
