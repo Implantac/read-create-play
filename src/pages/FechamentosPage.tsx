@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ExtremeCoveragePanel } from "@/components/ExtremeCoveragePanel";
 import {
   WHEELING_MATRICES,
   WheelingMatrixId,
@@ -149,6 +151,22 @@ export default function FechamentosPage() {
       <LotteryContextBanner />
 
       <PlanGate feature="fechamentos" fallbackMessage="Fechamentos Matemáticos — matrizes otimizadas com garantia de acertos">
+
+      <Tabs defaultValue="extreme" className="w-full">
+        <TabsList className="w-full grid grid-cols-2 mb-4">
+          <TabsTrigger value="extreme" className="gap-1.5">
+            ⚡ Cobertura Extrema
+          </TabsTrigger>
+          <TabsTrigger value="matrices" className="gap-1.5">
+            📐 Matrizes Pré-Calculadas
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="extreme">
+          <ExtremeCoveragePanel />
+        </TabsContent>
+
+        <TabsContent value="matrices" className="space-y-4">
       {/* Available matrices for current lottery */}
       <Card className="bg-card/80 backdrop-blur border-border">
         <CardHeader className="pb-3">
@@ -437,6 +455,8 @@ export default function FechamentosPage() {
           </motion.div>
         )}
       </AnimatePresence>
+        </TabsContent>
+      </Tabs>
       </PlanGate>
     </div>
   );
