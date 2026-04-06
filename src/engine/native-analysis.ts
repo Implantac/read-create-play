@@ -624,6 +624,7 @@ export function generateNativeBets(
 
   const bets: number[][] = [];
   const scores: number[] = [];
+  const qualityDetails: string[][] = [];
   const seenKeys = new Set<string>();
 
   // Strategy profiles for diverse generation
