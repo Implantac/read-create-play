@@ -216,6 +216,21 @@ export function runMassiveSimBatch(job: MassiveSimJob): MassiveSimResult {
 
   let totalEvaluated = 0;
 
+  // Binary insert helper for top-N (avoids full re-sort)
+  function binaryInsert(arr: SimulatedGame[], item: SimulatedGame, maxLen: number): void {
+    const score = item.score;
+    let lo = 0, hi = arr.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >>> 1;
+      if (arr[mid].score > score) lo = mid + 1;
+      else hi = mid;
+    }
+    if (lo < maxLen) {
+      arr.splice(lo, 0, item);
+      if (arr.length > maxLen) arr.length = maxLen;
+    }
+  }
+
   for (let g = 0; g < totalGames; g++) {
     // Generate game based on mode
     let gameNumbers: number[];
@@ -230,9 +245,8 @@ export function runMassiveSimBatch(job: MassiveSimJob): MassiveSimResult {
     // Convert to bitset for fast comparison
     const gameBitset = toBitset(gameNumbers);
 
-    // Evaluate against ALL historical draws
-    const hitDist: Record<number, number> = {};
-    for (let h = 0; h <= config.pick; h++) hitDist[h] = 0;
+    // Use typed array for hit distribution (faster than object)
+    const hitDistArr = new Uint32Array(config.pick + 1);
 
     let totalHits = 0;
     let bestHit = 0;
@@ -241,7 +255,7 @@ export function runMassiveSimBatch(job: MassiveSimJob): MassiveSimResult {
 
     for (let d = 0; d < drawCount; d++) {
       const hits = bitsetIntersectionCount(gameBitset, drawBitsets[d]);
-      hitDist[hits] = (hitDist[hits] || 0) + 1;
+      hitDistArr[hits]++;
       totalHits += hits;
       hitSquaredSum += hits * hits;
       if (hits > bestHit) bestHit = hits;
@@ -257,7 +271,7 @@ export function runMassiveSimBatch(job: MassiveSimJob): MassiveSimResult {
     // Pattern analysis
     const pattern = analyzePattern(gameNumbers, config.numbers);
 
-    // Composite score: weighted combination of metrics
+    // Composite score
     const score =
       avgHits * 30 +
       bestHit * 20 +
@@ -265,30 +279,24 @@ export function runMassiveSimBatch(job: MassiveSimJob): MassiveSimResult {
       (1 / (1 + stability)) * 15 +
       (pattern.rangeSpread / config.numbers) * 10;
 
-    // Keep only top N games
+    // Keep only top N games via binary insert
     if (topGames.length < topN || score > minTopScore) {
+      // Convert typed array to object only for stored games
+      const hitDistribution: Record<number, number> = {};
+      for (let h = 0; h <= config.pick; h++) hitDistribution[h] = hitDistArr[h];
+
       const game: SimulatedGame = {
         numbers: gameNumbers,
         totalHits, avgHits: Math.round(avgHits * 1000) / 1000,
         bestHit, prizeCount,
-        hitDistribution: hitDist,
+        hitDistribution,
         stability: Math.round(stability * 1000) / 1000,
         score: Math.round(score * 100) / 100,
         ...pattern,
       };
 
-      if (topGames.length < topN) {
-        topGames.push(game);
-        if (topGames.length === topN) {
-          topGames.sort((a, b) => b.score - a.score);
-          minTopScore = topGames[topGames.length - 1].score;
-        }
-      } else {
-        // Replace worst game
-        topGames[topGames.length - 1] = game;
-        topGames.sort((a, b) => b.score - a.score);
-        minTopScore = topGames[topGames.length - 1].score;
-      }
+      binaryInsert(topGames, game, topN);
+      minTopScore = topGames.length >= topN ? topGames[topGames.length - 1].score : -Infinity;
     }
   }
 
