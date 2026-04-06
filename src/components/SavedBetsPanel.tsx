@@ -37,7 +37,7 @@ export function SavedBetsPanel() {
   }
 
   return (
-    <div className="rounded-xl glass-card p-5 space-y-4">
+    <div className="rounded-xl glass-card p-3 sm:p-5 space-y-3 sm:space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
@@ -67,32 +67,49 @@ export function SavedBetsPanel() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20, height: 0 }}
               transition={{ delay: i * 0.03 }}
-              className="flex items-center gap-2 p-3 rounded-lg bg-secondary/30 border border-border/30 hover:border-border/60 transition-colors group"
+              className="flex flex-col sm:flex-row sm:items-center gap-2 p-2.5 sm:p-3 rounded-lg bg-secondary/30 border border-border/30 hover:border-border/60 transition-colors group"
             >
-              <div className="shrink-0 w-12">
-                {bet.grade && (
-                  <span className={`text-xs font-bold px-1.5 py-0.5 rounded border ${
-                    bet.grade === "S" ? "text-yellow-400 bg-yellow-400/10 border-yellow-400/30" :
-                    bet.grade === "A" ? "text-emerald-400 bg-emerald-400/10 border-emerald-400/30" :
-                    "text-blue-400 bg-blue-400/10 border-blue-400/30"
-                  }`}>
-                    {bet.grade}
-                  </span>
-                )}
-              </div>
-
-              <div className="flex flex-wrap gap-1 flex-1">
-                {bet.numbers.map(n => {
-                  const stat = stats.find(s => s.number === n);
-                  const ballClass =
-                    stat?.status === "hot" ? "lottery-ball-hot" :
-                    stat?.status === "cold" ? "lottery-ball-cold" : "";
-                  return (
-                    <span key={n} className={`lottery-ball text-[10px] w-7 h-7 ${ballClass}`}>
-                      {String(n).padStart(2, "0")}
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="shrink-0 w-8 sm:w-12">
+                  {bet.grade && (
+                    <span className={`text-[10px] sm:text-xs font-bold px-1 sm:px-1.5 py-0.5 rounded border ${
+                      bet.grade === "S" ? "text-yellow-400 bg-yellow-400/10 border-yellow-400/30" :
+                      bet.grade === "A" ? "text-emerald-400 bg-emerald-400/10 border-emerald-400/30" :
+                      "text-blue-400 bg-blue-400/10 border-blue-400/30"
+                    }`}>
+                      {bet.grade}
                     </span>
-                  );
-                })}
+                  )}
+                </div>
+
+                <div className="flex flex-wrap gap-1 flex-1">
+                  {bet.numbers.map(n => {
+                    const stat = stats.find(s => s.number === n);
+                    const ballClass =
+                      stat?.status === "hot" ? "lottery-ball-hot" :
+                      stat?.status === "cold" ? "lottery-ball-cold" : "";
+                    return (
+                      <span key={n} className={`lottery-ball text-[9px] sm:text-[10px] w-6 h-6 sm:w-7 sm:h-7 ${ballClass}`}>
+                        {String(n).padStart(2, "0")}
+                      </span>
+                    );
+                  })}
+                </div>
+
+                <div className="flex items-center gap-1 shrink-0 sm:hidden">
+                  <button
+                    onClick={() => copyBet(bet.numbers, bet.id)}
+                    className="text-muted-foreground hover:text-primary transition-colors p-1 rounded-md"
+                  >
+                    {copied === bet.id ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
+                  </button>
+                  <button
+                    onClick={() => deleteBet(bet.id)}
+                    className="text-muted-foreground hover:text-destructive transition-colors p-1 rounded-md"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
 
               <div className="shrink-0 text-[10px] text-muted-foreground hidden sm:block">
@@ -100,7 +117,7 @@ export function SavedBetsPanel() {
                 {bet.score && <span className="font-mono">{bet.score}pts</span>}
               </div>
 
-              <div className="flex items-center gap-1 shrink-0">
+              <div className="hidden sm:flex items-center gap-1 shrink-0">
                 <ShareBetButton numbers={bet.numbers} config={config} strategy={bet.strategy} grade={bet.grade} compact />
                 <button
                   onClick={() => copyBet(bet.numbers, bet.id)}
