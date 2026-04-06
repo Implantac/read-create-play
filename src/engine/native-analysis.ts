@@ -835,8 +835,8 @@ export function generateNativeBets(
 
   // Build rich analysis text
   const strategyNames = ['Conservadora', 'Equilibrada', 'Agressiva', 'Markov', 'Ciclos', 'Anti-Padrão', 'Cobertura', 'Momentum'];
-  let analysis = `⚡ **${bets.length} apostas** geradas pelo motor nativo v2.0\n`;
-  analysis += `📊 Metodologia: Frequência + Markov + Ciclos + Co-ocorrência + Entropia\n\n`;
+  let analysis = `⚡ **${bets.length} apostas** geradas pelo motor nativo v3.0\n`;
+  analysis += `📊 Metodologia: Frequência + Markov + Bayes + Ciclos + Co-ocorrência + Entropia + MI\n\n`;
 
   bets.forEach((b, i) => {
     const profIdx = i % strategyProfiles.length;
@@ -848,7 +848,7 @@ export function generateNativeBets(
     analysis += `**Jogo ${i + 1}** (${strat}): Soma=${sum}, P=${evens}/I=${config.pick - evens}, Rep=${repeats}, Primos=${primes}, Score=${scores[i]}\n`;
   });
 
-  return { bets, analysis, quality: { avgScore, scores, grade } };
+  return { bets, analysis, quality: { avgScore, scores, details: qualityDetails, grade } };
 }
 
 // ═══════════════════════════════════════════
