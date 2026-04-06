@@ -177,12 +177,15 @@ export default function PlanosPage() {
           Escolha seu plano
         </div>
         <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight mb-3">
-          Desbloqueie o poder da{" "}
-          <span className="gradient-brand-text">análise inteligente</span>
+          Pare de apostar no escuro.{" "}
+          <span className="gradient-brand-text">Use inteligência.</span>
         </h1>
-        <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto">
-          Motor estatístico, IA preditiva e algoritmos avançados para maximizar suas chances
+        <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto mb-3">
+          Motor estatístico, IA preditiva e algoritmos avançados — tudo para você tomar decisões melhores.
         </p>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold animate-pulse">
+          🔥 7 dias grátis em todos os planos pagos — sem cartão
+        </div>
       </motion.div>
 
       {/* Billing Toggle */}

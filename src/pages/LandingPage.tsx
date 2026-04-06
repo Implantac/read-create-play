@@ -538,6 +538,9 @@ export default function LandingPage() {
       {/* Demo video */}
       <DemoVideo />
 
+      {/* Comparison: Traditional vs Titan */}
+      <ComparisonSection />
+
       {/* Screens showcase carousel */}
       <ScreensShowcase />
 
