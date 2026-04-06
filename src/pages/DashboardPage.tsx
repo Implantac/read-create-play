@@ -13,8 +13,11 @@ import { AutoUpdater } from "@/components/AutoUpdater";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
+import { ComplianceDisclaimer } from "@/components/ComplianceDisclaimer";
+import { WorkflowSteps } from "@/components/WorkflowSteps";
+import { AIInsightsCard } from "@/components/AIInsightsCard";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown } from "lucide-react";
+import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, X, Save, Crown, Clover } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -30,13 +33,6 @@ const item = {
   hidden: { opacity: 0, y: 16 },
   show: { opacity: 1, y: 0 },
 };
-
-const quickLinks = [
-  { title: "Gerador", description: "Gerar jogos inteligentes", icon: Sparkles, url: "/gerador", color: "text-primary" },
-  { title: "Simulações", description: "Testar contra o histórico", icon: FlaskConical, url: "/simulacoes", color: "text-neon-blue" },
-  { title: "Estatísticas", description: "Análise consolidada", icon: PieChart, url: "/estatisticas", color: "text-accent" },
-  { title: "Estratégias IA", description: "Machine Learning e IA", icon: Brain, url: "/estrategias", color: "text-neon-purple" },
-];
 
 const DashboardPage = () => {
   const { config, draws, drawsWithPrizes, loading, syncing, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery } = useLotteryContext();
@@ -69,15 +65,17 @@ const DashboardPage = () => {
       setGeneratingLucky(false);
     }, 800);
   }, [stats, draws, selectedLottery]);
+
   return (
     <div className="space-y-6">
       <PageHeader
         title="Dashboard"
-        description={`Análise estatística completa — ${config.name}`}
+        description={`Plataforma de análise estatística e inteligência para loterias — ${config.name}`}
         icon={BarChart3}
         badge={draws.length > 0 ? `${draws.length} sorteios` : undefined}
       />
       <LotteryContextBanner />
+      <ComplianceDisclaimer compact />
 
       {/* Trial countdown banner */}
       {profile?.plan === "free" && !isTrialExpired && !isAdmin && !isSuperAdmin && (
@@ -109,7 +107,6 @@ const DashboardPage = () => {
               </Button>
             </Link>
           </div>
-          {/* Progress bar */}
           <div className="mt-3 h-1.5 rounded-full bg-muted/50 overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
@@ -141,82 +138,10 @@ const DashboardPage = () => {
         <>
           <AutoUpdater lotteryId={selectedLottery} onNewDraw={handleNewDraw} latestConcurso={draws[0]?.concurso || 0} />
 
-          {/* 🍀 GERAR JOGO DA SORTE */}
-          <motion.div variants={item} className="relative">
-            <div className="glass-card rounded-xl border border-primary/20 p-5 flex flex-col sm:flex-row items-center gap-4">
-              <div className="flex-1 text-center sm:text-left">
-                <h3 className="text-lg font-bold text-foreground flex items-center gap-2 justify-center sm:justify-start">
-                  <Clover className="w-5 h-5 text-primary" />
-                  Jogo da Sorte
-                </h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                  IA gera 1 jogo otimizado com estratégia aleatória para {config.name}
-                </p>
-              </div>
-              <Button
-                onClick={generateLuckyGame}
-                disabled={generatingLucky || stats.length === 0}
-                className="bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all"
-                size="lg"
-              >
-                {generatingLucky ? (
-                  <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Gerando...</>
-                ) : (
-                  <><Sparkles className="w-4 h-4 mr-2" /> GERAR JOGO DA SORTE</>
-                )}
-              </Button>
-            </div>
+          {/* Workflow Steps */}
+          <WorkflowSteps />
 
-            <AnimatePresence>
-              {luckyGame && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="mt-3 glass-card rounded-xl border border-accent/30 p-4"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <span className="text-xs text-muted-foreground">Estratégia: </span>
-                      <span className="text-xs font-semibold text-primary">{luckyGame.strategy}</span>
-                      <span className="ml-3 text-xs text-muted-foreground">Score: </span>
-                      <span className="text-xs font-bold text-accent">{luckyGame.score.toFixed(1)}/100</span>
-                    </div>
-                    <button onClick={() => setLuckyGame(null)} className="text-muted-foreground hover:text-foreground">
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {luckyGame.numbers.map(n => (
-                      <span key={n} className="w-9 h-9 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-sm font-bold text-primary">
-                        {String(n).padStart(2, "0")}
-                      </span>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-
-          <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {quickLinks.map(link => (
-              <motion.div key={link.url} variants={item}>
-                <Link
-                  to={link.url}
-                  className="flex items-center gap-3 rounded-xl glass-card p-4 border border-border hover:border-primary/30 transition-all duration-300 hover:translate-y-[-2px] group"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-primary/5 border border-primary/10 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-                    <link.icon className={`w-5 h-5 ${link.color}`} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-foreground">{link.title}</p>
-                    <p className="text-[10px] text-muted-foreground truncate">{link.description}</p>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
-
+          {/* Stats cards */}
           <motion.div
             key={selectedLottery}
             variants={container}
@@ -229,6 +154,67 @@ const DashboardPage = () => {
             <motion.div variants={item}><StatsCard title="Números Frios" value={coldNumbers} icon={Snowflake} color="blue" subtitle="Abaixo da média" /></motion.div>
             <motion.div variants={item}><StatsCard title="Atraso Médio" value={`${avgDelay}d`} icon={TrendingUp} color="amber" subtitle="Concursos sem aparecer" /></motion.div>
           </motion.div>
+
+          {/* AI Insights + Lucky Game */}
+          <div className="grid lg:grid-cols-2 gap-6">
+            <AIInsightsCard stats={stats} draws={draws} lotteryName={config.name} />
+
+            <motion.div variants={item} className="relative">
+              <div className="glass-card rounded-xl border border-primary/20 p-5 flex flex-col gap-4 h-full">
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                    <Clover className="w-5 h-5 text-primary" />
+                    Jogo da Sorte
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    IA gera 1 jogo otimizado com estratégia aleatória para {config.name}
+                  </p>
+                </div>
+                <Button
+                  onClick={generateLuckyGame}
+                  disabled={generatingLucky || stats.length === 0}
+                  className="bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all w-full"
+                  size="lg"
+                >
+                  {generatingLucky ? (
+                    <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Gerando...</>
+                  ) : (
+                    <><Sparkles className="w-4 h-4 mr-2" /> GERAR JOGO DA SORTE</>
+                  )}
+                </Button>
+
+                <AnimatePresence>
+                  {luckyGame && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="rounded-xl border border-accent/30 bg-accent/5 p-4"
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <span className="text-xs text-muted-foreground">Estratégia: </span>
+                          <span className="text-xs font-semibold text-primary">{luckyGame.strategy}</span>
+                          <span className="ml-3 text-xs text-muted-foreground">Score: </span>
+                          <span className="text-xs font-bold text-accent">{luckyGame.score.toFixed(1)}/100</span>
+                        </div>
+                        <button onClick={() => setLuckyGame(null)} className="text-muted-foreground hover:text-foreground">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {luckyGame.numbers.map(n => (
+                          <span key={n} className="w-9 h-9 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-sm font-bold text-primary">
+                            {String(n).padStart(2, "0")}
+                          </span>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          </div>
 
           {/* Saved bets limit card */}
           {limit !== Infinity && (
@@ -264,7 +250,6 @@ const DashboardPage = () => {
                   )}
                 </div>
               </div>
-              {/* Progress bar */}
               <div className="mt-3 h-1.5 rounded-full bg-muted/50 overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${isAtLimit ? "bg-destructive" : "bg-primary"}`}
