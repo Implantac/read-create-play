@@ -553,7 +553,7 @@ export function generateNativeBets(
   config: LotteryConfig,
   draws: DrawResult[],
   count: number
-): { bets: number[][]; analysis: string; quality: { avgScore: number; scores: number[]; grade: string } } {
+): { bets: number[][]; analysis: string; quality: { avgScore: number; scores: number[]; details?: string[][]; grade: string } } {
   const rules = getLotteryRules(config.id);
   const minNum = config.name === "Super Sete" ? 0 : 1;
   const allNums = Array.from({ length: config.numbers - minNum + 1 }, (_, i) => i + minNum);
