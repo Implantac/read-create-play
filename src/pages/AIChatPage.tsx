@@ -34,6 +34,7 @@ const QUICK_PROMPTS = [
 async function streamChat({
   messages,
   lotteryId,
+  userContext,
   onDelta,
   onDone,
   onError,
@@ -41,6 +42,7 @@ async function streamChat({
 }: {
   messages: { role: string; content: string }[];
   lotteryId: string;
+  userContext?: string;
   onDelta: (text: string) => void;
   onDone: () => void;
   onError: (err: string) => void;
