@@ -20,7 +20,7 @@ import {
   CoverageProfile,
   CoverageObjective,
   CoveragePriority,
-} from "@/engine/coverage";
+} from "@/engine/coverage/index";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { exportToPdf } from "@/engine/pdf-export";
 import { toast } from "sonner";
