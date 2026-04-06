@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { DrawResult } from "@/data/lotteries";
+import { DrawResult, LOTTERIES } from "@/data/lotteries";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { toast } from "sonner";
 
