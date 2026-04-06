@@ -342,6 +342,8 @@ export function scoreGame(
     + stationaryBonus * 0.03
     + uniformityBonus * 0.04
     + jointEntropyBonus * 0.03
+    + bayesNetBonus * 0.05
+    + miBonus * 0.03
     - humanPenalty * 0.30
     - antiPairPenalty * 0.08
     - regimePenalty * 0.04
