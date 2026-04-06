@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { DrawResult } from "@/data/lotteries";
 import { fetchLatestDraw, LatestDrawResult } from "@/services/lotteryApi";
 import { DrawPrizeData } from "@/hooks/useLotteryDraws";
