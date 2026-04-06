@@ -39,6 +39,7 @@ const LandingPage = lazy(() => import("./pages/LandingPage"));
 const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage"));
 const SuportePage = lazy(() => import("./pages/SuportePage"));
 const InstallPage = lazy(() => import("./pages/InstallPage"));
+const StrategyLabPage = lazy(() => import("./pages/StrategyLabPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
