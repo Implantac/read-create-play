@@ -16,7 +16,8 @@ import { computeCycleProfiles, scoreByCycleAlignment, multiScaleCycleAnalysis, s
 import { scoreAdvancedPatterns, computeHarmonicProfile, detectPositionalPatterns } from "./patternEngine";
 import { computeRegressionCandidates, scoreByRegression, computeMultiWindowRegression, computeSmoothedTrends } from "./regressionEngine";
 import { computeRecencyWeightedFrequency, computeCovarianceNetwork, scoreByCorrelationNetwork, computeTemporalVolatility, scoreByVolatility } from "./probabilityEngine";
-import { buildTransitionMatrix, scoreByTransitionMatrix, buildPairTransitions, scoreByPairTransitions, computeStationaryDistribution, scoreByStationaryDist } from "./markovEngine";
+import { buildTransitionMatrix, scoreByTransitionMatrix, buildPairTransitions, scoreByPairTransitions, computeStationaryDistribution, scoreByStationaryDist, buildRecencyWeightedMatrix, scoreByRecencyWeightedMatrix, computeVelocityProfiles, scoreByVelocity } from "./markovEngine";
+import { buildConditionalNetwork, scoreByBayesianNetwork, computeMutualInformation, scoreByMutualInformation } from "./bayesianNetworkEngine";
 import type { ScoredGame, GameScores, RiskProfile } from "../core/aiTypes";
 
 export function scoreGame(
@@ -252,6 +253,28 @@ export function scoreGame(
   const stationaryScore = scoreByStationaryDist(sorted, stationaryDist);
   const stationaryBonus = Math.round((stationaryScore - 50) * 0.08);
 
+  // BAYESIAN NETWORK: conditional dependency modeling
+  const bayesNetwork = buildConditionalNetwork(draws, lotteryId, 120);
+  const bayesNetScore = scoreByBayesianNetwork(sorted, bayesNetwork);
+  const bayesNetBonus = Math.round((bayesNetScore.networkScore - 50) * 0.12);
+
+  // MUTUAL INFORMATION: self-predictability scoring
+  const miScores = computeMutualInformation(draws, lotteryId, 100);
+  const miScore = scoreByMutualInformation(sorted, miScores);
+  const miBonus = Math.round((miScore - 50) * 0.06);
+
+  // RECENCY-WEIGHTED MARKOV: transitions with exponential decay
+  const rwMatrix = buildRecencyWeightedMatrix(draws, lotteryId, 100, 0.03);
+  const rwMarkovScore = prevDraw
+    ? scoreByRecencyWeightedMatrix(sorted, prevDraw, rwMatrix)
+    : 50;
+  const rwMarkovBonus = Math.round((rwMarkovScore - 50) * 0.08);
+
+  // VELOCITY PREDICTOR: favor accelerating numbers
+  const velocityProfiles = computeVelocityProfiles(draws, lotteryId);
+  const velocityScore = scoreByVelocity(sorted, velocityProfiles, riskProfile !== "regression");
+  const velocityBonus = Math.round((velocityScore - 50) * 0.06);
+
   // ADAPTIVE Monte Carlo — variable depth based on context
   const adaptiveSimCount = getAdaptiveSimCount(context, riskProfile, draws.length);
   const monteCarlo = lightMonteCarlo(sorted, draws, adaptiveSimCount);
@@ -331,6 +354,10 @@ export function scoreGame(
     + stationaryBonus * 0.03
     + uniformityBonus * 0.04
     + jointEntropyBonus * 0.03
+    + bayesNetBonus * 0.05
+    + miBonus * 0.03
+    + rwMarkovBonus * 0.04
+    + velocityBonus * 0.03
     - humanPenalty * 0.30
     - antiPairPenalty * 0.08
     - regimePenalty * 0.04
@@ -341,7 +368,7 @@ export function scoreGame(
   const grade = totalScore >= 85 ? "S" : totalScore >= 70 ? "A" : totalScore >= 55 ? "B" :
     totalScore >= 40 ? "C" : totalScore >= 25 ? "D" : "F";
 
-  const explanation = buildExplanation(sorted, lotteryId, pattern, { statistical: statScore, structural: structScore, coverage: coverageScore, diversity: diversityScore, strategyFit, probability: probScore }, totalScore, grade, clusterScore, humanPenalty, monteCarlo, roi, context, entropyReport, cycleScore, regressionScore, multiWindowBonus, forecastBonus, consecutiveEntropy, edgeBalance, markovResult, enhancedEntropy);
+  const explanation = buildExplanation(sorted, lotteryId, pattern, { statistical: statScore, structural: structScore, coverage: coverageScore, diversity: diversityScore, strategyFit, probability: probScore }, totalScore, grade, clusterScore, humanPenalty, monteCarlo, roi, context, entropyReport, cycleScore, regressionScore, multiWindowBonus, forecastBonus, consecutiveEntropy, edgeBalance, markovResult, enhancedEntropy, bayesNetScore);
 
   return {
     numbers: sorted,
@@ -374,7 +401,8 @@ function buildExplanation(
   consecutiveEntropy?: { score: number; consecutivePairs: number; maxRun: number },
   edgeBalance?: number,
   markovResult?: { markovScore: number; highProbCount: number; strongSignals: { number: number; probability: number }[] },
-  enhancedEntropy?: { uniformityScore: number; renyiEntropy: number; klDivergence: number }
+  enhancedEntropy?: { uniformityScore: number; renyiEntropy: number; klDivergence: number },
+  bayesNetScore?: { networkScore: number; centralityCount: number; internalConsistency: number }
 ): string[] {
   const lines: string[] = [];
   lines.push(`Score geral: ${total}/100 (${grade})`);
@@ -496,6 +524,20 @@ function buildExplanation(
   if (edgeBalance !== undefined) {
     if (edgeBalance >= 0.7) lines.push("✅ Equilíbrio entre extremos e centro do volante");
     else if (edgeBalance < 0.4) lines.push("⚠️ Desequilíbrio entre números extremos e centrais");
+  }
+
+  // BAYESIAN NETWORK insights
+  if (bayesNetScore) {
+    if (bayesNetScore.networkScore >= 65) {
+      lines.push(`✅ Rede Bayesiana favorável: ${bayesNetScore.networkScore}/100 — ${bayesNetScore.centralityCount} números de alta centralidade`);
+    } else if (bayesNetScore.networkScore >= 45) {
+      lines.push(`📊 Rede Bayesiana moderada: ${bayesNetScore.networkScore}/100`);
+    } else {
+      lines.push(`⚠️ Baixa coerência na rede condicional: ${bayesNetScore.networkScore}/100`);
+    }
+    if (bayesNetScore.internalConsistency >= 0.7) {
+      lines.push("✅ Alta consistência interna: números se reforçam mutuamente");
+    }
   }
 
   return lines;

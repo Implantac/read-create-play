@@ -218,7 +218,174 @@ export function scoreByPairTransitions(
 }
 
 // ═══════════════════════════════════════════════════════
-// 4. STATIONARY DISTRIBUTION — Long-term expected frequencies
+// 4.5. RECENCY-WEIGHTED MARKOV — Recent transitions count more
+// ═══════════════════════════════════════════════════════
+
+export interface RecencyWeightedTransition {
+  matrix: Map<number, Map<number, number>>;
+  totalNumbers: number;
+}
+
+/** Build Markov matrix with exponential decay: recent draws get more weight */
+export function buildRecencyWeightedMatrix(
+  draws: DrawResult[],
+  lotteryId: string,
+  windowSize: number = 100,
+  decayRate: number = 0.03
+): RecencyWeightedTransition {
+  const rules = getLotteryRules(lotteryId);
+  const window = draws.slice(0, Math.min(windowSize, draws.length));
+  const matrix = new Map<number, Map<number, number>>();
+
+  for (let i = 1; i <= rules.totalNumbers; i++) {
+    matrix.set(i, new Map());
+  }
+
+  for (let t = 0; t < window.length - 1; t++) {
+    const current = window[t].numbers;
+    const next = window[t + 1].numbers;
+    const weight = Math.exp(-decayRate * t); // exponential decay
+
+    for (const from of current) {
+      const row = matrix.get(from)!;
+      for (const to of next) {
+        row.set(to, (row.get(to) || 0) + weight);
+      }
+    }
+  }
+
+  // Normalize
+  for (const [, row] of matrix) {
+    const total = Array.from(row.values()).reduce((a, b) => a + b, 0);
+    if (total > 0) {
+      for (const [to, count] of row) row.set(to, count / total);
+    }
+  }
+
+  return { matrix, totalNumbers: rules.totalNumbers };
+}
+
+/** Score a candidate game using recency-weighted Markov transitions */
+export function scoreByRecencyWeightedMatrix(
+  candidate: number[],
+  lastDraw: number[],
+  rwMatrix: RecencyWeightedTransition
+): number {
+  if (lastDraw.length === 0) return 50;
+  const baseProb = 1 / rwMatrix.totalNumbers;
+
+  let totalProb = 0;
+  for (const n of candidate) {
+    let prob = 0;
+    let count = 0;
+    for (const from of lastDraw) {
+      const row = rwMatrix.matrix.get(from);
+      if (row) {
+        prob += row.get(n) || 0;
+        count++;
+      }
+    }
+    totalProb += count > 0 ? prob / count : 0;
+  }
+
+  const avgProb = totalProb / candidate.length;
+  const ratio = avgProb / Math.max(baseProb, 0.0001);
+  return Math.round(Math.min(100, Math.max(0, 40 + ratio * 20)));
+}
+
+// ═══════════════════════════════════════════════════════
+// 4.6. VELOCITY PREDICTOR — Numbers accelerating or decelerating
+// ═══════════════════════════════════════════════════════
+
+export interface VelocityProfile {
+  number: number;
+  /** Recent frequency rate (per draw) */
+  recentRate: number;
+  /** Older frequency rate (per draw) */
+  olderRate: number;
+  /** Velocity: change in rate */
+  velocity: number;
+  /** Acceleration: change in velocity */
+  acceleration: number;
+  /** Predicted next period frequency */
+  predictedRate: number;
+}
+
+/** Compute velocity and acceleration for each number */
+export function computeVelocityProfiles(
+  draws: DrawResult[],
+  lotteryId: string
+): VelocityProfile[] {
+  const rules = getLotteryRules(lotteryId);
+  if (draws.length < 30) return [];
+
+  const windowSize = 10;
+  const periods = Math.min(5, Math.floor(draws.length / windowSize));
+  if (periods < 3) return [];
+
+  const profiles: VelocityProfile[] = [];
+
+  for (let num = 1; num <= rules.totalNumbers; num++) {
+    const rates: number[] = [];
+    for (let p = 0; p < periods; p++) {
+      const slice = draws.slice(p * windowSize, (p + 1) * windowSize);
+      const count = slice.filter(d => d.numbers.includes(num)).length;
+      rates.push(count / windowSize);
+    }
+
+    const recentRate = rates[0];
+    const olderRate = rates.slice(1).reduce((a, b) => a + b, 0) / (rates.length - 1);
+
+    // Velocity: most recent rate change
+    const velocity = rates.length >= 2 ? rates[0] - rates[1] : 0;
+
+    // Acceleration: change in velocity
+    let acceleration = 0;
+    if (rates.length >= 3) {
+      const v1 = rates[0] - rates[1];
+      const v2 = rates[1] - rates[2];
+      acceleration = v1 - v2;
+    }
+
+    // Linear prediction
+    const predictedRate = Math.max(0, recentRate + velocity);
+
+    profiles.push({ number: num, recentRate, olderRate, velocity, acceleration, predictedRate });
+  }
+
+  return profiles;
+}
+
+/** Score a game by velocity alignment — prefer accelerating numbers */
+export function scoreByVelocity(
+  numbers: number[],
+  velocities: VelocityProfile[],
+  preferAccelerating: boolean = true
+): number {
+  if (velocities.length === 0) return 50;
+
+  const velMap = new Map(velocities.map(v => [v.number, v]));
+  let totalScore = 0;
+
+  for (const n of numbers) {
+    const v = velMap.get(n);
+    if (!v) continue;
+
+    if (preferAccelerating) {
+      // Reward positive velocity and acceleration
+      totalScore += v.velocity * 5 + v.acceleration * 3 + v.predictedRate * 2;
+    } else {
+      // Pure predicted rate
+      totalScore += v.predictedRate * 3;
+    }
+  }
+
+  const avgScore = totalScore / numbers.length;
+  return Math.round(Math.min(100, Math.max(0, 50 + avgScore * 30)));
+}
+
+// ═══════════════════════════════════════════════════════
+// 5. STATIONARY DISTRIBUTION — Long-term expected frequencies
 // ═══════════════════════════════════════════════════════
 
 /** Estimate stationary distribution via power iteration */
