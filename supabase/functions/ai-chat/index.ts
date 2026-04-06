@@ -94,6 +94,8 @@ serve(async (req) => {
 
 Loteria atual do contexto: ${lotteryId || "lotofacil"}
 
+${userContext ? `═══ MEMÓRIA E APRENDIZADO DO USUÁRIO ═══\n${userContext}` : ""}
+
 ═══ GUIA DE USO DO TITAN LOTERIAS ═══
 Quando o usuário perguntar como usar o app, explique:
 
