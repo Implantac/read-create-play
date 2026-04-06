@@ -4,6 +4,7 @@ import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
+import { BayesianNetworkPanel } from "@/components/BayesianNetworkPanel";
 import { Brain, Loader2 } from "lucide-react";
 
 const StrategySimulatorPanel = lazy(() => import("@/components/StrategySimulatorPanel").then(m => ({ default: m.StrategySimulatorPanel })));
