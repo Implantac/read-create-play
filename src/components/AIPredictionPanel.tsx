@@ -182,17 +182,19 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
                 transition={{ delay: i * 0.08 }}
                 className="flex flex-col gap-1.5 p-3 rounded-lg bg-secondary/30 border border-primary/10 hover:border-primary/30 transition-colors group"
               >
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-primary font-mono w-6 font-semibold">#{i + 1}</span>
-                  {quality?.scores?.[i] !== undefined && (
-                    <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
-                      quality.scores[i] >= 90 ? "bg-yellow-500/20 text-yellow-400" :
-                      quality.scores[i] >= 80 ? "bg-green-500/20 text-green-400" :
-                      quality.scores[i] >= 70 ? "bg-blue-500/20 text-blue-400" :
-                      "bg-muted text-muted-foreground"
-                    }`}>{quality.scores[i]}pts</span>
-                  )}
-                  <div className="flex flex-wrap gap-1.5 flex-1">
+                <div className="flex items-start sm:items-center gap-1.5 sm:gap-2 flex-col sm:flex-row">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] sm:text-xs text-primary font-mono font-semibold">#{i + 1}</span>
+                    {quality?.scores?.[i] !== undefined && (
+                      <span className={`text-[9px] sm:text-[10px] font-mono px-1.5 py-0.5 rounded ${
+                        quality.scores[i] >= 90 ? "bg-yellow-500/20 text-yellow-400" :
+                        quality.scores[i] >= 80 ? "bg-green-500/20 text-green-400" :
+                        quality.scores[i] >= 70 ? "bg-blue-500/20 text-blue-400" :
+                        "bg-muted text-muted-foreground"
+                      }`}>{quality.scores[i]}pts</span>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-1 sm:gap-1.5 flex-1">
                     {bet.map(n => {
                       const stat = stats.find(s => s.number === n);
                       const ballClass =
@@ -202,13 +204,13 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
                           ? "lottery-ball-cold"
                           : "";
                       return (
-                        <span key={n} className={`lottery-ball text-xs w-8 h-8 ${ballClass}`}>
+                        <span key={n} className={`lottery-ball text-[10px] sm:text-xs w-7 h-7 sm:w-8 sm:h-8 ${ballClass}`}>
                           {String(n).padStart(2, "0")}
                         </span>
                       );
                     })}
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 self-end sm:self-auto">
                     {onSaveBet && (
                       <button
                         onClick={() => handleSave(bet, i)}

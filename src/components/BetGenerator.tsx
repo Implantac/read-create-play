@@ -265,21 +265,21 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
               <GameAnalysisBlock numbers={bet.numbers} stats={stats} config={config} draws={draws} />
 
               {/* Actions */}
-              <div className="flex items-center gap-2 pt-1">
+              <div className="flex items-center gap-1 sm:gap-2 pt-1 flex-wrap">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => regenerateSingle(i)}
-                  className="h-7 text-[10px] text-muted-foreground hover:text-primary px-2"
+                  className="h-7 text-[9px] sm:text-[10px] text-muted-foreground hover:text-primary px-1.5 sm:px-2"
                 >
                   <RefreshCw className="w-3 h-3 mr-1" />
-                  Gerar novamente
+                  <span className="hidden xs:inline">Gerar </span>novamente
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => copyBet(bet.numbers, i)}
-                  className="h-7 text-[10px] text-muted-foreground hover:text-primary px-2"
+                  className="h-7 text-[9px] sm:text-[10px] text-muted-foreground hover:text-primary px-1.5 sm:px-2"
                 >
                   {copied === i ? <Check className="w-3 h-3 mr-1 text-primary" /> : <Copy className="w-3 h-3 mr-1" />}
                   Copiar
@@ -292,7 +292,7 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
                       onSaveBet(bet.numbers, "Gerador Inteligente", bet.report.overall, bet.report.grade);
                       toast.success("Aposta salva!");
                     }}
-                    className="h-7 text-[10px] text-muted-foreground hover:text-primary px-2"
+                    className="h-7 text-[9px] sm:text-[10px] text-muted-foreground hover:text-primary px-1.5 sm:px-2"
                   >
                     <Shield className="w-3 h-3 mr-1" />
                     Salvar
