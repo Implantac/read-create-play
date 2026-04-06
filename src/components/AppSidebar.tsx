@@ -1,12 +1,12 @@
 import {
   BarChart3, Sparkles, FlaskConical, History, Zap, Grid3X3,
   Brain, ShieldCheck, Crown, PieChart, TrendingUp, ClipboardCheck, Bot, Lock, Smartphone, MessageCircle, Star,
+  Search, Dices, CheckCircle,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { usePlanAccess, type Feature } from "@/hooks/usePlanAccess";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLotteryContext } from "@/contexts/LotteryContext";
-import { LOTTERIES } from "@/data/lotteries";
 import {
   Sidebar,
   SidebarContent,
@@ -23,21 +23,46 @@ import {
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-const mainItems: { title: string; url: string; icon: any; requiredFeature?: Feature; tooltip: string }[] = [
-  { title: "Dashboard", url: "/", icon: BarChart3, tooltip: "Visão geral com estatísticas, últimos resultados e resumo da loteria selecionada." },
-  { title: "Gerador", url: "/gerador", icon: Sparkles, tooltip: "Gere jogos inteligentes com filtros avançados baseados em análise estatística." },
-  { title: "IA Autônoma", url: "/ia-autonoma", icon: Zap, requiredFeature: "ia_autonoma", tooltip: "IA com aprendizado contínuo que analisa padrões e gera previsões evolutivas." },
-  { title: "AI Analyst", url: "/ai-analyst", icon: Bot, requiredFeature: "ai_analyst", tooltip: "Analista virtual que simula jogos, avalia qualidade e sugere estratégias personalizadas." },
-  { title: "Chat IA", url: "/ai-chat", icon: MessageCircle, tooltip: "Converse com o Titan IA para tirar dúvidas, pedir análises ou gerar jogos sob medida." },
-  { title: "Estratégias IA", url: "/estrategias", icon: Brain, requiredFeature: "estrategias_basicas", tooltip: "Explore estratégias como frequência, atraso, Markov e entropia para montar seus jogos." },
-  { title: "Simulações", url: "/simulacoes", icon: FlaskConical, requiredFeature: "simulacoes", tooltip: "Simule milhares de sorteios e avalie o desempenho das suas apostas com Monte Carlo." },
-  { title: "Fechamentos", url: "/fechamentos", icon: Grid3X3, requiredFeature: "fechamentos", tooltip: "Crie fechamentos matemáticos (wheeling) com garantia mínima de acertos." },
-  { title: "Estatísticas", url: "/estatisticas", icon: PieChart, tooltip: "Veja frequência, atraso, paridade, soma e distribuição detalhada dos números." },
-  { title: "ROI", url: "/roi", icon: TrendingUp, requiredFeature: "roi_dashboard", tooltip: "Acompanhe o retorno sobre investimento das suas apostas ao longo do tempo." },
-  { title: "Minhas Apostas", url: "/minhas-apostas", icon: ClipboardCheck, tooltip: "Confira e gerencie o histórico completo das suas apostas registradas." },
-  { title: "Jogos Salvos", url: "/jogos-salvos", icon: Star, tooltip: "Veja todos os seus jogos salvos agrupados por loteria e analise o desempenho deles." },
-  { title: "Histórico", url: "/historico", icon: History, tooltip: "Consulte todos os resultados passados dos sorteios da loteria selecionada." },
-  { title: "Instalar App", url: "/install", icon: Smartphone, tooltip: "Instale o Titan Loterias no seu celular para acesso rápido e notificações." },
+type NavItem = { title: string; url: string; icon: any; requiredFeature?: Feature; tooltip: string };
+
+const workflowGroups: { label: string; stepNumber: number; items: NavItem[] }[] = [
+  {
+    label: "Analisar",
+    stepNumber: 1,
+    items: [
+      { title: "Dashboard", url: "/", icon: BarChart3, tooltip: "Visão geral com estatísticas, últimos resultados e resumo da loteria selecionada." },
+      { title: "Estatísticas", url: "/estatisticas", icon: PieChart, tooltip: "Frequência, atraso, paridade, soma e distribuição detalhada dos números." },
+      { title: "Histórico", url: "/historico", icon: History, tooltip: "Consulte todos os resultados passados dos sorteios." },
+    ],
+  },
+  {
+    label: "Simular",
+    stepNumber: 2,
+    items: [
+      { title: "Simulações", url: "/simulacoes", icon: FlaskConical, requiredFeature: "simulacoes", tooltip: "Simule milhares de sorteios e avalie desempenho com Monte Carlo." },
+      { title: "Estratégias IA", url: "/estrategias", icon: Brain, requiredFeature: "estrategias_basicas", tooltip: "Explore estratégias como frequência, atraso, Markov e entropia." },
+      { title: "ROI", url: "/roi", icon: TrendingUp, requiredFeature: "roi_dashboard", tooltip: "Acompanhe o retorno sobre investimento das suas apostas." },
+    ],
+  },
+  {
+    label: "Gerar",
+    stepNumber: 3,
+    items: [
+      { title: "Gerador", url: "/gerador", icon: Sparkles, tooltip: "Gere jogos inteligentes com filtros avançados baseados em análise estatística." },
+      { title: "Fechamentos", url: "/fechamentos", icon: Grid3X3, requiredFeature: "fechamentos", tooltip: "Crie fechamentos matemáticos (wheeling) com garantia mínima de acertos." },
+      { title: "IA Autônoma", url: "/ia-autonoma", icon: Zap, requiredFeature: "ia_autonoma", tooltip: "IA com aprendizado contínuo que analisa padrões e gera previsões evolutivas." },
+    ],
+  },
+  {
+    label: "Validar",
+    stepNumber: 4,
+    items: [
+      { title: "AI Analyst", url: "/ai-analyst", icon: Bot, requiredFeature: "ai_analyst", tooltip: "Analista virtual que simula jogos, avalia qualidade e sugere estratégias." },
+      { title: "Chat IA", url: "/ai-chat", icon: MessageCircle, tooltip: "Converse com o Titan IA para tirar dúvidas ou pedir análises." },
+      { title: "Minhas Apostas", url: "/minhas-apostas", icon: ClipboardCheck, tooltip: "Confira e gerencie o histórico completo das suas apostas." },
+      { title: "Jogos Salvos", url: "/jogos-salvos", icon: Star, tooltip: "Veja seus jogos salvos e analise o desempenho deles." },
+    ],
+  },
 ];
 
 const PLAN_LABELS: Record<string, string> = {
@@ -78,7 +103,7 @@ export function AppSidebar() {
                 )}
               </div>
               <p className="text-[10px] text-muted-foreground font-mono tracking-wider uppercase">
-                Motor v4.0
+                Inteligência para Loterias
               </p>
             </div>
           )}
@@ -101,48 +126,73 @@ export function AppSidebar() {
           )}
         </div>
 
+        {workflowGroups.map((group) => (
+          <SidebarGroup key={group.label}>
+            <SidebarGroupLabel className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground/60 mb-1 flex items-center gap-1.5">
+              <span className="w-4 h-4 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[9px] font-bold text-primary">
+                {group.stepNumber}
+              </span>
+              {!collapsed && group.label}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item) => {
+                  const locked = item.requiredFeature ? !hasAccess(item.requiredFeature) : false;
+                  const minPlan = item.requiredFeature ? getMinPlan(item.requiredFeature) : null;
+
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <SidebarMenuButton asChild>
+                            <NavLink
+                              to={item.url}
+                              end={item.url === "/"}
+                              className={`rounded-lg px-3 py-2.5 text-sm transition-all duration-200 hover:bg-sidebar-accent/60 ${locked ? "text-muted-foreground/50" : "text-sidebar-foreground"}`}
+                              activeClassName="bg-primary/10 text-primary font-semibold glow-green"
+                            >
+                              <item.icon className="mr-3 h-4 w-4 shrink-0" />
+                              {!collapsed && (
+                                <>
+                                  <span className="flex-1">{item.title}</span>
+                                  {locked && <Lock className="h-3 w-3 text-muted-foreground/40 shrink-0 ml-1" />}
+                                </>
+                              )}
+                            </NavLink>
+                          </SidebarMenuButton>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="max-w-[250px] text-xs">
+                          <p className="font-semibold mb-0.5">{item.title}</p>
+                          <p className="text-muted-foreground">{item.tooltip}</p>
+                          {locked && (
+                            <p className="text-amber-400 mt-1 text-[10px]">🔒 Requer plano {PLAN_LABELS[minPlan!] || "Premium"}</p>
+                          )}
+                        </TooltipContent>
+                      </Tooltip>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
+
+        {/* Extra */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground/60 mb-1">
-            Análise
-          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {mainItems.map((item) => {
-                const locked = item.requiredFeature ? !hasAccess(item.requiredFeature) : false;
-                const minPlan = item.requiredFeature ? getMinPlan(item.requiredFeature) : null;
-
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <SidebarMenuButton asChild>
-                          <NavLink
-                            to={item.url}
-                            end={item.url === "/"}
-                            className={`rounded-lg px-3 py-2.5 text-sm transition-all duration-200 hover:bg-sidebar-accent/60 ${locked ? "text-muted-foreground/50" : "text-sidebar-foreground"}`}
-                            activeClassName="bg-primary/10 text-primary font-semibold glow-green"
-                          >
-                            <item.icon className="mr-3 h-4 w-4 shrink-0" />
-                            {!collapsed && (
-                              <>
-                                <span className="flex-1">{item.title}</span>
-                                {locked && <Lock className="h-3 w-3 text-muted-foreground/40 shrink-0 ml-1" />}
-                              </>
-                            )}
-                          </NavLink>
-                        </SidebarMenuButton>
-                      </TooltipTrigger>
-                      <TooltipContent side="right" className="max-w-[250px] text-xs">
-                        <p className="font-semibold mb-0.5">{item.title}</p>
-                        <p className="text-muted-foreground">{item.tooltip}</p>
-                        {locked && (
-                          <p className="text-amber-400 mt-1 text-[10px]">🔒 Requer plano {PLAN_LABELS[minPlan!] || "Premium"}</p>
-                        )}
-                      </TooltipContent>
-                    </Tooltip>
-                  </SidebarMenuItem>
-                );
-              })}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink
+                    to="/install"
+                    className="rounded-lg px-3 py-2.5 text-sm transition-all duration-200 hover:bg-sidebar-accent/60 text-sidebar-foreground"
+                    activeClassName="bg-primary/10 text-primary font-semibold glow-green"
+                  >
+                    <Smartphone className="mr-3 h-4 w-4 shrink-0" />
+                    {!collapsed && <span>Instalar App</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
