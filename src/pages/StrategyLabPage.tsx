@@ -3,7 +3,7 @@ import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PageHeader } from "@/components/PageHeader";
 import { PlanGate } from "@/components/PlanGate";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -17,6 +17,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   runStrategyLab,
   getStrategiesForLottery,
@@ -35,7 +41,8 @@ import {
   Play, ChevronDown, ChevronUp, Sparkles, Crown,
   Gauge, Layers, Award, Crosshair, RotateCcw,
   ArrowRight, Star, Percent, Hash, Copy, Save, Dices,
-  Check,
+  Check, Settings2, Eye, Download, ChevronRight,
+  Activity, CircleDot, Brain,
 } from "lucide-react";
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
@@ -43,12 +50,12 @@ import {
   ResponsiveContainer, Cell, Legend,
 } from "recharts";
 
-const PROFILE_INFO: Record<EvolutionProfile, { label: string; desc: string; icon: any }> = {
-  economico: { label: "Econômico", desc: "Menos jogos, menor custo", icon: Shield },
-  equilibrado: { label: "Equilibrado", desc: "Melhor custo-benefício", icon: Target },
-  agressivo: { label: "Agressivo", desc: "Máxima performance", icon: Zap },
-  profissional: { label: "Profissional", desc: "Análise completa", icon: Award },
-  cobertura_extrema: { label: "Cobertura Extrema", desc: "Máxima cobertura numérica", icon: Layers },
+const PROFILE_INFO: Record<EvolutionProfile, { label: string; desc: string; icon: any; color: string }> = {
+  economico: { label: "Econômico", desc: "Menos jogos, menor custo", icon: Shield, color: "text-blue-500" },
+  equilibrado: { label: "Equilibrado", desc: "Melhor custo-benefício", icon: Target, color: "text-primary" },
+  agressivo: { label: "Agressivo", desc: "Máxima performance", icon: Zap, color: "text-amber-500" },
+  profissional: { label: "Profissional", desc: "Análise completa", icon: Award, color: "text-purple-500" },
+  cobertura_extrema: { label: "Cobertura Extrema", desc: "Máxima cobertura numérica", icon: Layers, color: "text-rose-500" },
 };
 
 const RANK_COLORS = [
@@ -58,13 +65,13 @@ const RANK_COLORS = [
   "hsl(var(--muted-foreground))",
 ];
 
-const container = {
+const stagger = {
   hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.05 } },
+  show: { opacity: 1, transition: { staggerChildren: 0.06 } },
 };
-const item = {
-  hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0 },
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
 
 export default function StrategyLabPage() {
@@ -79,10 +86,10 @@ export default function StrategyLabPage() {
   const [activeTab, setActiveTab] = useState("ranking");
   const [showDetails, setShowDetails] = useState<string | null>(null);
   const [labHistory, setLabHistory] = useState<{ timestamp: number; winner: string; score: number }[]>([]);
+  const [configOpen, setConfigOpen] = useState(true);
 
   const available = useMemo(() => getStrategiesForLottery(config.id), [config.id]);
 
-  // Reset when lottery changes
   const prevLotteryRef = useRef(selectedLottery);
   useEffect(() => {
     if (prevLotteryRef.current !== selectedLottery) {
@@ -92,7 +99,6 @@ export default function StrategyLabPage() {
     }
   }, [selectedLottery]);
 
-  // Auto-select all on first load
   useEffect(() => {
     if (selectedStrategies.length === 0 && available.length > 0) {
       setSelectedStrategies(available.map(s => s.id));
@@ -131,7 +137,6 @@ export default function StrategyLabPage() {
     setResult(null);
     setProgress(0);
 
-    // Simulate progress
     const progressInterval = setInterval(() => {
       setProgress(prev => Math.min(prev + Math.random() * 15, 90));
     }, 100);
@@ -148,6 +153,7 @@ export default function StrategyLabPage() {
         const res = runStrategyLab(labConfig, draws, config);
         setResult(res);
         setProgress(100);
+        setConfigOpen(false);
 
         if (res.bestStrategy) {
           setLabHistory(prev => [{
@@ -174,7 +180,6 @@ export default function StrategyLabPage() {
     return <Minus className="w-3.5 h-3.5 text-muted-foreground" />;
   };
 
-  // Chart data
   const radarData = useMemo(() => {
     if (!result || result.rankings.length === 0) return [];
     const top = result.rankings.slice(0, 5);
@@ -205,212 +210,255 @@ export default function StrategyLabPage() {
 
   const radarColors = ["hsl(var(--primary))", "#eab308", "#f97316", "#06b6d4", "#a855f7"];
 
+  const totalGamesGenerated = useMemo(() =>
+    result?.generatedGames.reduce((t, sg) => t + sg.games.length, 0) || 0
+  , [result]);
+
   return (
     <PlanGate feature="estrategias_ml">
       <div className="space-y-6">
-        <PageHeader
-          title="Laboratório de Estratégias"
-          description={`Motor autoevolutivo — ${config.name}: teste, compare e descubra as melhores estratégias`}
-          icon={FlaskConical}
-          badge={result ? `${result.rankings.length} testadas` : undefined}
-        />
+        {/* Hero Header */}
+        <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/8 via-background to-accent/5 p-6 md:p-8">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="relative flex flex-col md:flex-row md:items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-primary/15 flex items-center justify-center shrink-0 ring-2 ring-primary/20">
+              <FlaskConical className="w-7 h-7 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h1 className="text-xl md:text-2xl font-black text-foreground tracking-tight">
+                Laboratório de Estratégias
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Motor autoevolutivo para <span className="text-primary font-semibold">{config.name}</span> — teste, compare e descubra as melhores estratégias com backtesting real
+              </p>
+            </div>
+            {result && (
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="text-xs gap-1.5 py-1.5 px-3">
+                  <Activity className="w-3 h-3" />
+                  {result.rankings.length} testadas
+                </Badge>
+                <Badge className="text-xs gap-1.5 py-1.5 px-3 bg-primary/10 text-primary border-primary/20">
+                  <Dices className="w-3 h-3" />
+                  {totalGamesGenerated} jogos
+                </Badge>
+              </div>
+            )}
+          </div>
+        </div>
+
         <LotteryContextBanner />
 
-        {/* Summary Cards */}
-        {result && result.bestStrategy && (
-          <motion.div
-            variants={container}
-            initial="hidden"
-            animate="show"
-            className="grid grid-cols-2 lg:grid-cols-4 gap-4"
-          >
-            <motion.div variants={item}>
-              <SummaryCard
-                icon={Crown}
-                label="Melhor Estratégia"
-                value={result.bestStrategy.strategyName}
-                sub={`Score ${result.bestStrategy.metrics.globalScore.toFixed(1)}`}
-                accent
-              />
-            </motion.div>
-            <motion.div variants={item}>
-              <SummaryCard
-                icon={Crosshair}
-                label="Melhor Acerto"
-                value={`${result.bestStrategy.metrics.bestHits}`}
-                sub={`de ${config.pick} possíveis`}
-              />
-            </motion.div>
-            <motion.div variants={item}>
-              <SummaryCard
-                icon={Gauge}
-                label="Consistência Top"
-                value={`${(result.bestStrategy.metrics.consistency * 100).toFixed(0)}%`}
-                sub="da melhor estratégia"
-              />
-            </motion.div>
-            <motion.div variants={item}>
-              <SummaryCard
-                icon={Zap}
-                label="Tempo de Análise"
-                value={`${result.elapsedMs}ms`}
-                sub={`${result.rankings.length} estratégias`}
-              />
-            </motion.div>
-          </motion.div>
-        )}
-
-        {/* Config Panel */}
-        <Card className="bg-card/80 backdrop-blur border-border">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground">
-              <FlaskConical className="w-4 h-4 text-primary" />
-              Configuração do Laboratório
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            {/* Strategy selection */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-muted-foreground font-medium">
-                  Estratégias ({selectedStrategies.length}/{available.length})
-                </span>
-                <div className="flex gap-1">
-                  <Button variant="ghost" size="sm" onClick={selectAll} className="text-xs h-7">
-                    Todas
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={clearAll} className="text-xs h-7 text-muted-foreground">
-                    Limpar
-                  </Button>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5 max-h-[220px] overflow-y-auto pr-1">
-                {available.map(s => {
-                  const isSelected = selectedStrategies.includes(s.id);
-                  return (
-                    <label
-                      key={s.id}
-                      className={`flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer text-xs transition-all ${
-                        isSelected
-                          ? "border-primary/40 bg-primary/5"
-                          : "border-border hover:bg-muted/20"
-                      }`}
-                    >
-                      <Checkbox
-                        checked={isSelected}
-                        onCheckedChange={() => toggleStrategy(s.id)}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-foreground truncate">{s.name}</div>
-                        <div className="text-[10px] text-muted-foreground truncate">{s.description}</div>
+        {/* Winner Spotlight */}
+        <AnimatePresence>
+          {result && result.bestStrategy && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+            >
+              <Card className="relative overflow-hidden border-primary/30 bg-gradient-to-r from-primary/8 via-primary/4 to-transparent">
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-primary rounded-l-lg" />
+                <CardContent className="p-5 md:p-6">
+                  <div className="flex flex-col md:flex-row md:items-center gap-4">
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className="w-16 h-16 rounded-2xl bg-primary/15 flex items-center justify-center text-3xl ring-2 ring-primary/20">
+                        🏆
                       </div>
-                      <Badge variant="outline" className={`text-[9px] shrink-0 ${
-                        s.category === "ai" ? "border-primary/30 text-primary" :
-                        s.category === "math" ? "border-accent/30 text-accent" :
-                        s.category === "hybrid" ? "border-amber-500/30 text-amber-500" :
-                        ""
-                      }`}>
-                        {s.category}
-                      </Badge>
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Parameters */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <label className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
-                  <Hash className="w-3 h-3" />
-                  Jogos por Estratégia
-                </label>
-                <Slider
-                  value={[gamesPerStrategy]}
-                  onValueChange={([v]) => { setGamesPerStrategy(v); setResult(null); }}
-                  min={3}
-                  max={30}
-                  step={1}
-                />
-                <span className="text-xs font-mono font-bold text-primary">{gamesPerStrategy} jogos</span>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
-                  <Target className="w-3 h-3" />
-                  Perfil de Análise
-                </label>
-                <Select value={profile} onValueChange={(v) => { setProfile(v as EvolutionProfile); setResult(null); }}>
-                  <SelectTrigger className="h-9 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(PROFILE_INFO).map(([k, v]) => (
-                      <SelectItem key={k} value={k} className="text-xs">
-                        <div className="flex items-center gap-2">
-                          <v.icon className="w-3 h-3" />
-                          <span>{v.label}</span>
-                          <span className="text-muted-foreground">— {v.desc}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
-                  <BarChart3 className="w-3 h-3" />
-                  Base de Dados
-                </label>
-                <div className="p-2.5 rounded-lg bg-muted/20 border border-border">
-                  <div className="text-xs font-mono font-bold text-foreground">
-                    {draws?.length.toLocaleString() || 0} sorteios
+                      <div>
+                        <p className="text-[10px] uppercase tracking-widest text-primary font-bold">Campeã do Lab</p>
+                        <h2 className="text-lg font-black text-foreground">{result.bestStrategy.strategyName}</h2>
+                        <p className="text-xs text-muted-foreground mt-0.5">{result.bestStrategy.explanation}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-4 gap-3 md:gap-4">
+                      <MetricBox label="Score" value={result.bestStrategy.metrics.globalScore.toFixed(1)} accent />
+                      <MetricBox label="Média" value={result.bestStrategy.metrics.avgHits.toFixed(2)} />
+                      <MetricBox label="Melhor" value={`${result.bestStrategy.metrics.bestHits}/${config.pick}`} />
+                      <MetricBox label="Consist." value={`${(result.bestStrategy.metrics.consistency * 100).toFixed(0)}%`} />
+                    </div>
                   </div>
-                  <div className="text-[10px] text-muted-foreground">
-                    #{drawRange[0]} → #{drawRange[1]}
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Config Panel — Collapsible after first run */}
+        <Collapsible open={configOpen} onOpenChange={setConfigOpen}>
+          <Card className="bg-card/80 backdrop-blur border-border">
+            <CollapsibleTrigger asChild>
+              <CardHeader className="pb-3 cursor-pointer hover:bg-muted/5 transition-colors">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground">
+                    <Settings2 className="w-4 h-4 text-primary" />
+                    Configuração do Laboratório
+                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    {!configOpen && selectedStrategies.length > 0 && (
+                      <span className="text-[10px] text-muted-foreground">
+                        {selectedStrategies.length} estratégias • {gamesPerStrategy} jogos • {PROFILE_INFO[profile].label}
+                      </span>
+                    )}
+                    <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${configOpen ? "rotate-180" : ""}`} />
                   </div>
                 </div>
-              </div>
-            </div>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="space-y-5 pt-0">
+                {/* Strategy selection */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-muted-foreground font-medium">
+                      Estratégias ({selectedStrategies.length}/{available.length})
+                    </span>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="sm" onClick={selectAll} className="text-xs h-7">
+                        Todas
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={clearAll} className="text-xs h-7 text-muted-foreground">
+                        Limpar
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5 max-h-[250px] overflow-y-auto pr-1 scrollbar-thin">
+                    {available.map(s => {
+                      const isSelected = selectedStrategies.includes(s.id);
+                      return (
+                        <label
+                          key={s.id}
+                          className={`flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer text-xs transition-all duration-200 ${
+                            isSelected
+                              ? "border-primary/40 bg-primary/5 shadow-sm shadow-primary/5"
+                              : "border-border hover:bg-muted/20 hover:border-muted-foreground/20"
+                          }`}
+                        >
+                          <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={() => toggleStrategy(s.id)}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="font-semibold text-foreground truncate">{s.name}</div>
+                            <div className="text-[10px] text-muted-foreground truncate mt-0.5">{s.description}</div>
+                          </div>
+                          <Badge variant="outline" className={`text-[9px] shrink-0 ${
+                            s.category === "ai" ? "border-primary/30 text-primary bg-primary/5" :
+                            s.category === "math" ? "border-blue-500/30 text-blue-500 bg-blue-500/5" :
+                            s.category === "hybrid" ? "border-amber-500/30 text-amber-500 bg-amber-500/5" :
+                            "border-muted-foreground/20"
+                          }`}>
+                            {s.category === "ai" ? "🤖 IA" :
+                             s.category === "math" ? "📐 Math" :
+                             s.category === "hybrid" ? "⚡ Hybrid" :
+                             s.category}
+                          </Badge>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
 
-            {/* Run button with progress */}
-            <div className="space-y-2">
-              <Button
-                onClick={runLab}
-                disabled={running || selectedStrategies.length === 0}
-                className="w-full gap-2 h-12 text-sm font-bold"
-                size="lg"
-              >
-                {running ? (
-                  <>
-                    <Zap className="w-4 h-4 animate-pulse" />
-                    Processando {selectedStrategies.length} estratégias...
-                  </>
-                ) : (
-                  <>
-                    <Play className="w-4 h-4" />
-                    Executar Laboratório
-                    <Badge variant="secondary" className="ml-1 text-[10px]">
-                      {selectedStrategies.length} × {gamesPerStrategy} jogos
-                    </Badge>
-                  </>
-                )}
-              </Button>
-              {running && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                >
-                  <Progress value={progress} className="h-2" />
-                  <p className="text-[10px] text-muted-foreground text-center mt-1">
-                    Gerando jogos, backtestando contra {draws?.length} sorteios e calculando métricas...
-                  </p>
-                </motion.div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                <Separator />
+
+                {/* Parameters */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="space-y-2.5">
+                    <label className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
+                      <Hash className="w-3 h-3" />
+                      Jogos por Estratégia
+                    </label>
+                    <Slider
+                      value={[gamesPerStrategy]}
+                      onValueChange={([v]) => { setGamesPerStrategy(v); setResult(null); }}
+                      min={3}
+                      max={30}
+                      step={1}
+                    />
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-muted-foreground">3</span>
+                      <span className="text-sm font-mono font-black text-primary">{gamesPerStrategy}</span>
+                      <span className="text-[10px] text-muted-foreground">30</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <label className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
+                      <Target className="w-3 h-3" />
+                      Perfil de Análise
+                    </label>
+                    <Select value={profile} onValueChange={(v) => { setProfile(v as EvolutionProfile); setResult(null); }}>
+                      <SelectTrigger className="h-10 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(PROFILE_INFO).map(([k, v]) => (
+                          <SelectItem key={k} value={k} className="text-xs">
+                            <div className="flex items-center gap-2">
+                              <v.icon className={`w-3.5 h-3.5 ${v.color}`} />
+                              <span className="font-medium">{v.label}</span>
+                              <span className="text-muted-foreground">— {v.desc}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <label className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
+                      <BarChart3 className="w-3 h-3" />
+                      Base de Dados
+                    </label>
+                    <div className="p-3 rounded-xl bg-muted/15 border border-border">
+                      <div className="text-sm font-mono font-bold text-foreground">
+                        {draws?.length.toLocaleString() || 0} sorteios
+                      </div>
+                      <div className="text-[10px] text-muted-foreground mt-0.5">
+                        Concurso #{drawRange[0]} → #{drawRange[1]}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Run button */}
+                <div className="space-y-3">
+                  <Button
+                    onClick={runLab}
+                    disabled={running || selectedStrategies.length === 0}
+                    className="w-full gap-2.5 h-13 text-sm font-bold rounded-xl shadow-lg shadow-primary/10 hover:shadow-primary/20 transition-shadow"
+                    size="lg"
+                  >
+                    {running ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                        Processando {selectedStrategies.length} estratégias...
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-5 h-5" />
+                        Executar Laboratório
+                        <Badge variant="secondary" className="ml-1 text-[10px] bg-primary-foreground/15">
+                          {selectedStrategies.length} × {gamesPerStrategy} = {selectedStrategies.length * gamesPerStrategy} jogos
+                        </Badge>
+                      </>
+                    )}
+                  </Button>
+                  {running && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-1.5">
+                      <Progress value={progress} className="h-2.5 rounded-full" />
+                      <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                        <span>Gerando, backtestando e calculando métricas...</span>
+                        <span className="font-mono font-bold">{progress.toFixed(0)}%</span>
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
 
         {/* Results */}
         <AnimatePresence>
@@ -421,8 +469,8 @@ export default function StrategyLabPage() {
               exit={{ opacity: 0 }}
               className="space-y-5"
             >
-              {/* Insights */}
-              <Card className="bg-gradient-to-br from-primary/5 to-accent/5 backdrop-blur border-primary/20">
+              {/* Insights Strip */}
+              <Card className="bg-gradient-to-br from-primary/5 to-accent/5 backdrop-blur border-primary/15">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground">
                     <Lightbulb className="w-4 h-4 text-primary" />
@@ -430,48 +478,66 @@ export default function StrategyLabPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                     {result.insights.map((insight, i) => (
-                      <div key={i} className="flex items-start gap-2 p-2 rounded-lg bg-background/50">
-                        <ArrowRight className="w-3 h-3 text-primary mt-0.5 shrink-0" />
-                        <p className="text-xs text-foreground">{insight}</p>
-                      </div>
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.05 }}
+                        className="flex items-start gap-2 p-2.5 rounded-xl bg-background/60 border border-border/50"
+                      >
+                        <CircleDot className="w-3 h-3 text-primary mt-0.5 shrink-0" />
+                        <p className="text-xs text-foreground leading-relaxed">{insight}</p>
+                      </motion.div>
                     ))}
                   </div>
                 </CardContent>
               </Card>
 
-               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="w-full grid grid-cols-5">
-                  <TabsTrigger value="ranking" className="text-xs gap-1">
-                    <Trophy className="w-3.5 h-3.5" /> Ranking
+              {/* Main Tabs */}
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="w-full grid grid-cols-5 h-11">
+                  <TabsTrigger value="ranking" className="text-xs gap-1.5 data-[state=active]:shadow-sm">
+                    <Trophy className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Ranking</span>
                   </TabsTrigger>
-                  <TabsTrigger value="games" className="text-xs gap-1">
-                    <Dices className="w-3.5 h-3.5" /> Jogos
+                  <TabsTrigger value="games" className="text-xs gap-1.5 data-[state=active]:shadow-sm">
+                    <Dices className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Jogos</span>
+                    <Badge variant="secondary" className="text-[8px] h-4 px-1 ml-0.5 hidden lg:inline-flex">
+                      {totalGamesGenerated}
+                    </Badge>
                   </TabsTrigger>
-                  <TabsTrigger value="charts" className="text-xs gap-1">
-                    <BarChart3 className="w-3.5 h-3.5" /> Gráficos
+                  <TabsTrigger value="charts" className="text-xs gap-1.5 data-[state=active]:shadow-sm">
+                    <BarChart3 className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Gráficos</span>
                   </TabsTrigger>
-                  <TabsTrigger value="suggestions" className="text-xs gap-1">
-                    <Sparkles className="w-3.5 h-3.5" /> Evolução
+                  <TabsTrigger value="suggestions" className="text-xs gap-1.5 data-[state=active]:shadow-sm">
+                    <Brain className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Evolução</span>
                   </TabsTrigger>
-                  <TabsTrigger value="comparison" className="text-xs gap-1">
-                    <Layers className="w-3.5 h-3.5" /> Tabela
+                  <TabsTrigger value="comparison" className="text-xs gap-1.5 data-[state=active]:shadow-sm">
+                    <Layers className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Tabela</span>
                   </TabsTrigger>
                 </TabsList>
 
                 {/* Ranking Tab */}
-                <TabsContent value="ranking" className="space-y-2 mt-4">
-                  {result.rankings.map((r) => (
-                    <RankingCard
-                      key={r.strategyId}
-                      entry={r}
-                      pick={config.pick}
-                      isExpanded={showDetails === r.strategyId}
-                      onToggle={() => setShowDetails(showDetails === r.strategyId ? null : r.strategyId)}
-                      trendIcon={trendIcon}
-                    />
-                  ))}
+                <TabsContent value="ranking" className="space-y-2.5 mt-4">
+                  <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-2.5">
+                    {result.rankings.map((r) => (
+                      <motion.div key={r.strategyId} variants={fadeUp}>
+                        <RankingCard
+                          entry={r}
+                          pick={config.pick}
+                          isExpanded={showDetails === r.strategyId}
+                          onToggle={() => setShowDetails(showDetails === r.strategyId ? null : r.strategyId)}
+                          trendIcon={trendIcon}
+                        />
+                      </motion.div>
+                    ))}
+                  </motion.div>
                 </TabsContent>
 
                 {/* Generated Games Tab */}
@@ -486,7 +552,6 @@ export default function StrategyLabPage() {
                 {/* Charts Tab */}
                 <TabsContent value="charts" className="mt-4 space-y-4">
                   <div className="grid lg:grid-cols-2 gap-4">
-                    {/* Radar Chart */}
                     <Card className="bg-card/80 backdrop-blur border-border">
                       <CardHeader className="pb-2">
                         <CardTitle className="text-xs font-semibold flex items-center gap-2">
@@ -517,15 +582,12 @@ export default function StrategyLabPage() {
                                 strokeWidth={2}
                               />
                             ))}
-                            <Legend
-                              wrapperStyle={{ fontSize: 10 }}
-                            />
+                            <Legend wrapperStyle={{ fontSize: 10 }} />
                           </RadarChart>
                         </ResponsiveContainer>
                       </CardContent>
                     </Card>
 
-                    {/* Bar Chart */}
                     <Card className="bg-card/80 backdrop-blur border-border">
                       <CardHeader className="pb-2">
                         <CardTitle className="text-xs font-semibold flex items-center gap-2">
@@ -547,7 +609,7 @@ export default function StrategyLabPage() {
                                 if (!payload || payload.length === 0) return null;
                                 const d = payload[0].payload;
                                 return (
-                                  <div className="bg-popover border border-border rounded-lg p-2 text-xs shadow-lg">
+                                  <div className="bg-popover border border-border rounded-lg p-2.5 text-xs shadow-lg">
                                     <p className="font-semibold text-foreground">{d.fullName}</p>
                                     <p className="text-muted-foreground">Score: <span className="font-mono text-primary font-bold">{d.score}</span></p>
                                     <p className="text-muted-foreground">Média acertos: <span className="font-mono">{d.avgHits}</span></p>
@@ -555,12 +617,12 @@ export default function StrategyLabPage() {
                                 );
                               }}
                             />
-                            <Bar dataKey="score" radius={[0, 4, 4, 0]}>
-                              {barData.map((entry, i) => (
+                            <Bar dataKey="score" radius={[0, 6, 6, 0]}>
+                              {barData.map((_, i) => (
                                 <Cell
                                   key={i}
                                   fill={RANK_COLORS[Math.min(i, RANK_COLORS.length - 1)]}
-                                  fillOpacity={0.8}
+                                  fillOpacity={0.85}
                                 />
                               ))}
                             </Bar>
@@ -570,7 +632,6 @@ export default function StrategyLabPage() {
                     </Card>
                   </div>
 
-                  {/* Hit distribution of winner */}
                   {result.bestStrategy && (
                     <Card className="bg-card/80 backdrop-blur border-border">
                       <CardHeader className="pb-2">
@@ -626,117 +687,123 @@ export default function StrategyLabPage() {
                 </TabsContent>
 
                 {/* Evolution Suggestions Tab */}
-                <TabsContent value="suggestions" className="space-y-2 mt-4">
+                <TabsContent value="suggestions" className="space-y-2.5 mt-4">
                   {result.suggestions.length === 0 ? (
-                    <div className="text-center py-12">
-                      <Sparkles className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
-                      <p className="text-sm text-muted-foreground">Sem sugestões de evolução no momento.</p>
-                      <p className="text-xs text-muted-foreground mt-1">Execute o laboratório com mais estratégias para gerar recomendações.</p>
+                    <div className="text-center py-16">
+                      <div className="w-14 h-14 rounded-2xl bg-muted/20 flex items-center justify-center mx-auto mb-4">
+                        <Brain className="w-7 h-7 text-muted-foreground" />
+                      </div>
+                      <p className="text-sm font-medium text-muted-foreground">Sem sugestões de evolução</p>
+                      <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">Execute com mais estratégias para gerar recomendações do motor evolutivo.</p>
                     </div>
                   ) : (
-                    result.suggestions.map((s, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.05 }}
-                      >
-                        <Card className={`bg-card/80 backdrop-blur border-border ${
-                          s.type === "promote" ? "border-l-2 border-l-green-500" :
-                          s.type === "discard" ? "border-l-2 border-l-destructive" :
-                          s.type === "combine" ? "border-l-2 border-l-primary" :
-                          "border-l-2 border-l-amber-500"
-                        }`}>
-                          <CardContent className="p-3">
-                            <div className="flex items-start gap-3">
-                              <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-                                s.type === "promote" ? "bg-green-500/10 text-green-500" :
-                                s.type === "discard" ? "bg-destructive/10 text-destructive" :
-                                s.type === "combine" ? "bg-primary/10 text-primary" :
-                                "bg-amber-500/10 text-amber-500"
-                              }`}>
-                                {s.type === "promote" ? <TrendingUp className="w-4 h-4" /> :
-                                 s.type === "discard" ? <TrendingDown className="w-4 h-4" /> :
-                                 s.type === "combine" ? <Sparkles className="w-4 h-4" /> :
-                                 <RotateCcw className="w-4 h-4" />}
-                              </div>
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <Badge variant="outline" className={`text-[9px] ${
-                                    s.type === "promote" ? "border-green-500/30 text-green-500" :
-                                    s.type === "discard" ? "border-destructive/30 text-destructive" :
-                                    s.type === "combine" ? "border-primary/30 text-primary" :
-                                    "border-amber-500/30 text-amber-500"
-                                  }`}>
-                                    {s.type === "promote" ? "Promover" :
-                                     s.type === "discard" ? "Descartar" :
-                                     s.type === "combine" ? "Combinar" : "Ajustar"}
-                                  </Badge>
-                                  <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-                                    <Percent className="w-3 h-3" />
-                                    Confiança: {(s.confidence * 100).toFixed(0)}%
-                                  </span>
-                                  {s.expectedImprovement > 0 && (
-                                    <span className="text-[10px] text-green-500 font-semibold">
-                                      +{s.expectedImprovement}% estimado
-                                    </span>
-                                  )}
+                    <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-2.5">
+                      {result.suggestions.map((s, i) => (
+                        <motion.div key={i} variants={fadeUp}>
+                          <Card className={`bg-card/80 backdrop-blur border-border overflow-hidden ${
+                            s.type === "promote" ? "border-l-[3px] border-l-green-500" :
+                            s.type === "discard" ? "border-l-[3px] border-l-destructive" :
+                            s.type === "combine" ? "border-l-[3px] border-l-primary" :
+                            "border-l-[3px] border-l-amber-500"
+                          }`}>
+                            <CardContent className="p-4">
+                              <div className="flex items-start gap-3">
+                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                                  s.type === "promote" ? "bg-green-500/10 text-green-500" :
+                                  s.type === "discard" ? "bg-destructive/10 text-destructive" :
+                                  s.type === "combine" ? "bg-primary/10 text-primary" :
+                                  "bg-amber-500/10 text-amber-500"
+                                }`}>
+                                  {s.type === "promote" ? <TrendingUp className="w-5 h-5" /> :
+                                   s.type === "discard" ? <TrendingDown className="w-5 h-5" /> :
+                                   s.type === "combine" ? <Sparkles className="w-5 h-5" /> :
+                                   <RotateCcw className="w-5 h-5" />}
                                 </div>
-                                <p className="text-xs text-foreground mt-1.5">{s.reason}</p>
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <Badge variant="outline" className={`text-[9px] font-bold ${
+                                      s.type === "promote" ? "border-green-500/30 text-green-500 bg-green-500/5" :
+                                      s.type === "discard" ? "border-destructive/30 text-destructive bg-destructive/5" :
+                                      s.type === "combine" ? "border-primary/30 text-primary bg-primary/5" :
+                                      "border-amber-500/30 text-amber-500 bg-amber-500/5"
+                                    }`}>
+                                      {s.type === "promote" ? "✓ Promover" :
+                                       s.type === "discard" ? "✗ Descartar" :
+                                       s.type === "combine" ? "⚡ Combinar" : "↻ Ajustar"}
+                                    </Badge>
+                                    <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                      Confiança: <span className="font-mono font-bold">{(s.confidence * 100).toFixed(0)}%</span>
+                                    </span>
+                                    {s.expectedImprovement > 0 && (
+                                      <Badge variant="secondary" className="text-[9px] bg-green-500/10 text-green-600 border-green-500/20">
+                                        +{s.expectedImprovement}% estimado
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-foreground mt-2 leading-relaxed">{s.reason}</p>
+                                </div>
                               </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    ))
+                            </CardContent>
+                          </Card>
+                        </motion.div>
+                      ))}
+                    </motion.div>
                   )}
                 </TabsContent>
 
                 {/* Comparison Table Tab */}
                 <TabsContent value="comparison" className="mt-4">
-                  <Card className="bg-card/80 backdrop-blur border-border overflow-x-auto">
+                  <Card className="bg-card/80 backdrop-blur border-border overflow-hidden">
                     <CardContent className="p-0">
-                      <table className="w-full text-xs">
-                        <thead>
-                          <tr className="border-b border-border bg-muted/30">
-                            <th className="text-left p-3 text-muted-foreground font-semibold">#</th>
-                            <th className="text-left p-3 text-muted-foreground font-semibold">Estratégia</th>
-                            <th className="text-right p-3 text-muted-foreground font-semibold">Score</th>
-                            <th className="text-right p-3 text-muted-foreground font-semibold">Média</th>
-                            <th className="text-right p-3 text-muted-foreground font-semibold">Melhor</th>
-                            <th className="text-right p-3 text-muted-foreground font-semibold">Consist.</th>
-                            <th className="text-right p-3 text-muted-foreground font-semibold">Divers.</th>
-                            <th className="text-right p-3 text-muted-foreground font-semibold">Cobert.</th>
-                            <th className="text-right p-3 text-muted-foreground font-semibold">Prêmios</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {result.rankings.map(r => (
-                            <tr key={r.strategyId} className={`border-b border-border/30 hover:bg-muted/10 transition-colors ${
-                              r.rank === 1 ? "bg-primary/5" : ""
-                            }`}>
-                              <td className="p-3">
-                                <span className={`font-mono font-bold ${
-                                  r.rank === 1 ? "text-primary" :
-                                  r.rank === 2 ? "text-yellow-500" :
-                                  r.rank === 3 ? "text-orange-500" :
-                                  "text-muted-foreground"
-                                }`}>
-                                  {r.rank <= 3 ? ["🥇", "🥈", "🥉"][r.rank - 1] : r.rank}
-                                </span>
-                              </td>
-                              <td className="p-3 font-medium text-foreground">{r.strategyName}</td>
-                              <td className="p-3 text-right font-mono font-bold text-primary">{r.metrics.globalScore.toFixed(1)}</td>
-                              <td className="p-3 text-right font-mono text-foreground">{r.metrics.avgHits.toFixed(2)}</td>
-                              <td className="p-3 text-right font-mono text-foreground">{r.metrics.bestHits}</td>
-                              <td className="p-3 text-right font-mono text-foreground">{(r.metrics.consistency * 100).toFixed(0)}%</td>
-                              <td className="p-3 text-right font-mono text-foreground">{r.metrics.diversityScore.toFixed(0)}%</td>
-                              <td className="p-3 text-right font-mono text-foreground">{r.metrics.coverageScore.toFixed(0)}%</td>
-                              <td className="p-3 text-right font-mono text-foreground">{r.metrics.totalPrizes}</td>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-xs">
+                          <thead>
+                            <tr className="border-b border-border bg-muted/20">
+                              <th className="text-left p-3.5 text-muted-foreground font-semibold">#</th>
+                              <th className="text-left p-3.5 text-muted-foreground font-semibold">Estratégia</th>
+                              <th className="text-right p-3.5 text-muted-foreground font-semibold">Score</th>
+                              <th className="text-right p-3.5 text-muted-foreground font-semibold">Média</th>
+                              <th className="text-right p-3.5 text-muted-foreground font-semibold">Melhor</th>
+                              <th className="text-right p-3.5 text-muted-foreground font-semibold">Consist.</th>
+                              <th className="text-right p-3.5 text-muted-foreground font-semibold hidden md:table-cell">Divers.</th>
+                              <th className="text-right p-3.5 text-muted-foreground font-semibold hidden md:table-cell">Cobert.</th>
+                              <th className="text-right p-3.5 text-muted-foreground font-semibold">Prêmios</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody>
+                            {result.rankings.map(r => (
+                              <tr key={r.strategyId} className={`border-b border-border/30 hover:bg-muted/10 transition-colors ${
+                                r.rank === 1 ? "bg-primary/5" : ""
+                              }`}>
+                                <td className="p-3.5">
+                                  <span className={`font-mono font-bold ${
+                                    r.rank === 1 ? "text-primary" :
+                                    r.rank === 2 ? "text-yellow-500" :
+                                    r.rank === 3 ? "text-orange-500" :
+                                    "text-muted-foreground"
+                                  }`}>
+                                    {r.rank <= 3 ? ["🥇", "🥈", "🥉"][r.rank - 1] : r.rank}
+                                  </span>
+                                </td>
+                                <td className="p-3.5 font-medium text-foreground">{r.strategyName}</td>
+                                <td className="p-3.5 text-right">
+                                  <span className="font-mono font-bold text-primary">{r.metrics.globalScore.toFixed(1)}</span>
+                                </td>
+                                <td className="p-3.5 text-right font-mono text-foreground">{r.metrics.avgHits.toFixed(2)}</td>
+                                <td className="p-3.5 text-right font-mono text-foreground">{r.metrics.bestHits}</td>
+                                <td className="p-3.5 text-right font-mono text-foreground">{(r.metrics.consistency * 100).toFixed(0)}%</td>
+                                <td className="p-3.5 text-right font-mono text-foreground hidden md:table-cell">{r.metrics.diversityScore.toFixed(0)}%</td>
+                                <td className="p-3.5 text-right font-mono text-foreground hidden md:table-cell">{r.metrics.coverageScore.toFixed(0)}%</td>
+                                <td className="p-3.5 text-right">
+                                  <span className={`font-mono ${r.metrics.totalPrizes > 0 ? "text-primary font-bold" : "text-foreground"}`}>
+                                    {r.metrics.totalPrizes}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </CardContent>
                   </Card>
                 </TabsContent>
@@ -757,10 +824,10 @@ export default function StrategyLabPage() {
             <CardContent>
               <div className="flex flex-wrap gap-2">
                 {labHistory.map((h, i) => (
-                  <Badge key={i} variant="outline" className="text-[10px] gap-1">
+                  <Badge key={i} variant="outline" className="text-[10px] gap-1.5 py-1 px-2.5">
                     <Crown className="w-2.5 h-2.5 text-primary" />
-                    {h.winner} — {h.score.toFixed(1)}
-                    <span className="text-muted-foreground ml-1">
+                    {h.winner} — <span className="font-mono font-bold">{h.score.toFixed(1)}</span>
+                    <span className="text-muted-foreground">
                       {new Date(h.timestamp).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                     </span>
                   </Badge>
@@ -778,27 +845,11 @@ export default function StrategyLabPage() {
 // SUB-COMPONENTS
 // ═══════════════════════════════════════════════════════
 
-function SummaryCard({ icon: Icon, label, value, sub, accent }: {
-  icon: any; label: string; value: string; sub: string; accent?: boolean;
-}) {
+function MetricBox({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className={`rounded-xl border p-4 ${
-      accent
-        ? "bg-gradient-to-br from-primary/10 to-accent/5 border-primary/30"
-        : "bg-card/80 border-border"
-    }`}>
-      <div className="flex items-center gap-2 mb-2">
-        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-          accent ? "bg-primary/15" : "bg-muted/30"
-        }`}>
-          <Icon className={`w-4 h-4 ${accent ? "text-primary" : "text-muted-foreground"}`} />
-        </div>
-        <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">{label}</span>
-      </div>
-      <div className={`text-sm font-bold truncate ${accent ? "text-primary" : "text-foreground"}`}>
-        {value}
-      </div>
-      <div className="text-[10px] text-muted-foreground mt-0.5">{sub}</div>
+    <div className={`text-center p-2.5 rounded-xl border ${accent ? "bg-primary/10 border-primary/20" : "bg-muted/10 border-border"}`}>
+      <div className={`text-base font-mono font-black ${accent ? "text-primary" : "text-foreground"}`}>{value}</div>
+      <div className="text-[9px] text-muted-foreground mt-0.5">{label}</div>
     </div>
   );
 }
@@ -808,14 +859,16 @@ function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }: {
   onToggle: () => void; trendIcon: (t: string) => JSX.Element;
 }) {
   const scorePercent = Math.min(100, r.metrics.globalScore);
+  const gradeColor = r.metrics.globalScore >= 70 ? "text-green-500" :
+                     r.metrics.globalScore >= 40 ? "text-amber-500" : "text-destructive";
 
   return (
-    <Card className={`bg-card/80 backdrop-blur border-border transition-all ${
-      r.rank === 1 ? "ring-1 ring-primary/30 bg-primary/[0.03]" : ""
+    <Card className={`bg-card/80 backdrop-blur border-border transition-all hover:shadow-md ${
+      r.rank === 1 ? "ring-1 ring-primary/30 bg-primary/[0.03] shadow-sm shadow-primary/5" : ""
     }`}>
-      <CardContent className="p-3">
+      <CardContent className="p-4">
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm shrink-0 ${
+          <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-black text-sm shrink-0 ${
             r.rank === 1 ? "bg-primary/15 text-primary ring-2 ring-primary/20" :
             r.rank === 2 ? "bg-yellow-500/15 text-yellow-500" :
             r.rank === 3 ? "bg-orange-500/15 text-orange-500" :
@@ -828,25 +881,25 @@ function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }: {
               <span className="text-sm font-bold text-foreground">{r.strategyName}</span>
               {trendIcon(r.trend)}
               {r.rank === 1 && (
-                <Badge className="text-[9px] bg-primary/10 text-primary border-primary/20">
-                  MELHOR
+                <Badge className="text-[9px] bg-primary/10 text-primary border-primary/20 font-bold">
+                  CAMPEÃ
                 </Badge>
               )}
             </div>
-            <div className="flex items-center gap-1 mt-1.5">
-              <div className="flex-1 h-1.5 rounded-full bg-muted/30 overflow-hidden max-w-[120px]">
+            <div className="flex items-center gap-2 mt-2">
+              <div className="flex-1 h-2 rounded-full bg-muted/30 overflow-hidden max-w-[140px]">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${scorePercent}%` }}
                   transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="h-full rounded-full bg-primary"
+                  className="h-full rounded-full bg-gradient-to-r from-primary/80 to-primary"
                 />
               </div>
-              <span className="text-xs font-mono font-bold text-primary ml-1">
+              <span className={`text-xs font-mono font-black ${gradeColor}`}>
                 {r.metrics.globalScore.toFixed(1)}
               </span>
             </div>
-            <div className="flex items-center gap-3 mt-1">
+            <div className="flex items-center gap-3 mt-1.5 flex-wrap">
               <MetricPill label="Média" value={r.metrics.avgHits.toFixed(2)} />
               <MetricPill label="Melhor" value={`${r.metrics.bestHits}/${pick}`} />
               <MetricPill label="Consist." value={`${(r.metrics.consistency * 100).toFixed(0)}%`} />
@@ -856,7 +909,7 @@ function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }: {
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0 shrink-0"
+            className="h-9 w-9 p-0 shrink-0 rounded-lg"
             onClick={onToggle}
           >
             {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -869,25 +922,25 @@ function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }: {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="mt-3 pt-3 border-t border-border space-y-3 overflow-hidden"
+              className="mt-4 pt-4 border-t border-border space-y-3 overflow-hidden"
             >
-              <p className="text-xs text-muted-foreground">{r.explanation}</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{r.explanation}</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <MiniMetric label="Diversidade" value={`${r.metrics.diversityScore.toFixed(0)}%`} />
                 <MiniMetric label="Cobertura" value={`${r.metrics.coverageScore.toFixed(0)}%`} />
                 <MiniMetric label="Redundância" value={`${(r.metrics.redundancyIndex * 100).toFixed(0)}%`} />
                 <MiniMetric label="Premiações" value={r.metrics.totalPrizes.toString()} />
               </div>
-              <div className="text-[10px] text-muted-foreground bg-muted/10 p-2 rounded-lg">
-                <span className="font-semibold">Distribuição de acertos: </span>
+              <div className="text-[10px] text-muted-foreground bg-muted/10 p-3 rounded-xl border border-border/50">
+                <span className="font-semibold text-foreground">Distribuição de acertos: </span>
                 {Object.entries(r.metrics.hitDistribution)
                   .sort(([a], [b]) => Number(b) - Number(a))
                   .slice(0, 8)
                   .map(([hits, count]) => (
-                    <span key={hits} className="inline-flex items-center gap-0.5 mr-2">
-                      <span className="font-mono text-foreground">{hits}</span>
+                    <span key={hits} className="inline-flex items-center gap-0.5 mr-2.5">
+                      <span className="font-mono text-foreground font-medium">{hits}</span>
                       <span className="text-muted-foreground">→</span>
-                      <span className="font-mono text-primary">{count}×</span>
+                      <span className="font-mono text-primary font-bold">{count}×</span>
                     </span>
                   ))}
               </div>
@@ -902,16 +955,16 @@ function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }: {
 function MetricPill({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <span className="text-[10px] text-muted-foreground">
-      {label}: <span className={`font-mono ${highlight ? "text-primary font-bold" : "text-foreground"}`}>{value}</span>
+      {label}: <span className={`font-mono ${highlight ? "text-primary font-bold" : "text-foreground font-medium"}`}>{value}</span>
     </span>
   );
 }
 
 function MiniMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="p-2.5 rounded-lg bg-muted/10 border border-border text-center">
+    <div className="p-3 rounded-xl bg-muted/10 border border-border text-center">
       <div className="text-sm font-mono font-bold text-foreground">{value}</div>
-      <div className="text-[9px] text-muted-foreground">{label}</div>
+      <div className="text-[9px] text-muted-foreground mt-0.5">{label}</div>
     </div>
   );
 }
@@ -930,6 +983,7 @@ function GeneratedGamesPanel({ generatedGames, lotteryId, pick }: {
   );
   const [savingGame, setSavingGame] = useState<string | null>(null);
   const [copiedGame, setCopiedGame] = useState<string | null>(null);
+  const [savedGames, setSavedGames] = useState<Set<string>>(new Set());
 
   const handleCopy = useCallback((game: number[], gameKey: string) => {
     navigator.clipboard.writeText(game.join(", "));
@@ -954,7 +1008,8 @@ function GeneratedGamesPanel({ generatedGames, lotteryId, pick }: {
         label: `Lab ${strategyName}`,
       });
       if (error) throw error;
-      toast.success("Jogo salvo com sucesso!");
+      setSavedGames(prev => new Set(prev).add(gameKey));
+      toast.success("Jogo salvo!");
     } catch {
       toast.error("Erro ao salvar jogo");
     } finally {
@@ -978,147 +1033,187 @@ function GeneratedGamesPanel({ generatedGames, lotteryId, pick }: {
       }));
       const { error } = await supabase.from("saved_bets").insert(inserts);
       if (error) throw error;
+      const newSaved = new Set(savedGames);
+      sg.games.forEach((_, i) => newSaved.add(`${sg.strategyId}-${i}`));
+      setSavedGames(newSaved);
       toast.success(`${sg.games.length} jogos salvos!`);
     } catch {
       toast.error("Erro ao salvar jogos");
     }
-  }, [lotteryId]);
+  }, [lotteryId, savedGames]);
 
   if (generatedGames.length === 0) {
     return (
-      <div className="text-center py-12">
-        <Dices className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
-        <p className="text-sm text-muted-foreground">Nenhum jogo gerado ainda.</p>
+      <div className="text-center py-16">
+        <div className="w-14 h-14 rounded-2xl bg-muted/20 flex items-center justify-center mx-auto mb-4">
+          <Dices className="w-7 h-7 text-muted-foreground" />
+        </div>
+        <p className="text-sm font-medium text-muted-foreground">Nenhum jogo gerado</p>
+        <p className="text-xs text-muted-foreground mt-1">Execute o laboratório para gerar jogos.</p>
       </div>
     );
   }
 
+  const totalGames = generatedGames.reduce((t, sg) => t + sg.games.length, 0);
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-xs text-muted-foreground">
-          {generatedGames.reduce((t, sg) => t + sg.games.length, 0)} jogos gerados em {generatedGames.length} estratégias — ordenados por ranking
-        </p>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary" className="text-[10px] gap-1 py-1">
+            <Dices className="w-3 h-3" />
+            {totalGames} jogos
+          </Badge>
+          <span className="text-[10px] text-muted-foreground">
+            em {generatedGames.length} estratégias — ordenados por ranking
+          </span>
+        </div>
       </div>
 
-      {generatedGames.map((sg, sIdx) => {
-        const isExpanded = expandedStrategy === sg.strategyId;
-        return (
-          <Card key={sg.strategyId} className={`bg-card/80 backdrop-blur border-border transition-all ${
-            sIdx === 0 ? "ring-1 ring-primary/30" : ""
-          }`}>
-            <CardContent className="p-0">
-              <button
-                className="w-full flex items-center gap-3 p-4 text-left hover:bg-muted/10 transition-colors"
-                onClick={() => setExpandedStrategy(isExpanded ? null : sg.strategyId)}
-              >
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
-                  sIdx === 0 ? "bg-primary/15 text-primary" :
-                  sIdx === 1 ? "bg-yellow-500/15 text-yellow-500" :
-                  sIdx === 2 ? "bg-orange-500/15 text-orange-500" :
-                  "bg-muted/20 text-muted-foreground"
-                }`}>
-                  {sIdx <= 2 ? ["🥇", "🥈", "🥉"][sIdx] : sIdx + 1}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-foreground">{sg.strategyName}</span>
-                    <Badge variant="outline" className="text-[9px]">
-                      {sg.games.length} jogos
-                    </Badge>
-                    <Badge variant="secondary" className="text-[9px]">
-                      Score {sg.metrics.globalScore.toFixed(1)}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center gap-3 mt-0.5">
-                    <span className="text-[10px] text-muted-foreground">
-                      Média: <span className="font-mono text-foreground">{sg.metrics.avgHits.toFixed(2)}</span>
-                    </span>
-                    <span className="text-[10px] text-muted-foreground">
-                      Melhor: <span className="font-mono text-foreground">{sg.metrics.bestHits}/{pick}</span>
-                    </span>
-                  </div>
-                </div>
-                {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
-              </button>
-
-              <AnimatePresence>
-                {isExpanded && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    className="overflow-hidden"
+      <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-2.5">
+        {generatedGames.map((sg, sIdx) => {
+          const isExpanded = expandedStrategy === sg.strategyId;
+          return (
+            <motion.div key={sg.strategyId} variants={fadeUp}>
+              <Card className={`bg-card/80 backdrop-blur border-border transition-all overflow-hidden ${
+                sIdx === 0 ? "ring-1 ring-primary/30 shadow-sm shadow-primary/5" : "hover:shadow-sm"
+              }`}>
+                <CardContent className="p-0">
+                  <button
+                    className="w-full flex items-center gap-3 p-4 text-left hover:bg-muted/5 transition-colors"
+                    onClick={() => setExpandedStrategy(isExpanded ? null : sg.strategyId)}
                   >
-                    <div className="px-4 pb-4 space-y-3">
-                      <div className="flex justify-end">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-xs gap-1.5 h-7"
-                          onClick={() => handleSaveAll(sg)}
-                        >
-                          <Save className="w-3 h-3" />
-                          Salvar todos ({sg.games.length})
-                        </Button>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 ${
+                      sIdx === 0 ? "bg-primary/15 text-primary ring-2 ring-primary/20" :
+                      sIdx === 1 ? "bg-yellow-500/15 text-yellow-500" :
+                      sIdx === 2 ? "bg-orange-500/15 text-orange-500" :
+                      "bg-muted/20 text-muted-foreground"
+                    }`}>
+                      {sIdx <= 2 ? ["🥇", "🥈", "🥉"][sIdx] : sIdx + 1}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-bold text-foreground">{sg.strategyName}</span>
+                        <Badge variant="outline" className="text-[9px] gap-1">
+                          <Dices className="w-2.5 h-2.5" />
+                          {sg.games.length} jogos
+                        </Badge>
+                        <Badge variant="secondary" className="text-[9px] font-mono font-bold">
+                          {sg.metrics.globalScore.toFixed(1)} pts
+                        </Badge>
                       </div>
-
-                      <div className="grid gap-2">
-                        {sg.games.map((game, gIdx) => {
-                          const gameKey = `${sg.strategyId}-${gIdx}`;
-                          return (
-                            <div
-                              key={gIdx}
-                              className="flex items-center gap-3 p-3 rounded-lg bg-muted/10 border border-border group hover:border-primary/20 transition-colors"
-                            >
-                              <span className="text-[10px] font-mono text-muted-foreground w-6 text-right shrink-0">
-                                #{gIdx + 1}
-                              </span>
-                              <div className="flex flex-wrap gap-1.5 flex-1">
-                                {game.map((num) => (
-                                  <span
-                                    key={num}
-                                    className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20"
-                                  >
-                                    {num.toString().padStart(2, "0")}
-                                  </span>
-                                ))}
-                              </div>
-                              <div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-7 w-7 p-0"
-                                  onClick={() => handleCopy(game, gameKey)}
-                                >
-                                  {copiedGame === gameKey ? (
-                                    <Check className="w-3.5 h-3.5 text-green-500" />
-                                  ) : (
-                                    <Copy className="w-3.5 h-3.5" />
-                                  )}
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-7 w-7 p-0"
-                                  disabled={savingGame === gameKey}
-                                  onClick={() => handleSave(game, sg.strategyName, gameKey)}
-                                >
-                                  <Save className="w-3.5 h-3.5" />
-                                </Button>
-                              </div>
-                            </div>
-                          );
-                        })}
+                      <div className="flex items-center gap-4 mt-1">
+                        <span className="text-[10px] text-muted-foreground">
+                          Média: <span className="font-mono text-foreground font-medium">{sg.metrics.avgHits.toFixed(2)}</span>
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">
+                          Melhor: <span className="font-mono text-foreground font-medium">{sg.metrics.bestHits}/{pick}</span>
+                        </span>
+                        {sg.metrics.totalPrizes > 0 && (
+                          <span className="text-[10px] text-primary font-semibold">
+                            🎯 {sg.metrics.totalPrizes} prêmios
+                          </span>
+                        )}
                       </div>
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </CardContent>
-          </Card>
-        );
-      })}
+                    <ChevronRight className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`} />
+                  </button>
+
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="overflow-hidden"
+                      >
+                        <Separator />
+                        <div className="p-4 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">
+                              Jogos gerados
+                            </span>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs gap-1.5 h-8 rounded-lg"
+                              onClick={() => handleSaveAll(sg)}
+                            >
+                              <Save className="w-3 h-3" />
+                              Salvar todos ({sg.games.length})
+                            </Button>
+                          </div>
+
+                          <div className="grid gap-2">
+                            {sg.games.map((game, gIdx) => {
+                              const gameKey = `${sg.strategyId}-${gIdx}`;
+                              const isSaved = savedGames.has(gameKey);
+                              return (
+                                <div
+                                  key={gIdx}
+                                  className={`flex items-center gap-3 p-3 rounded-xl border group transition-all duration-200 ${
+                                    isSaved
+                                      ? "bg-primary/5 border-primary/20"
+                                      : "bg-muted/5 border-border hover:border-primary/20 hover:bg-muted/10"
+                                  }`}
+                                >
+                                  <span className="text-[10px] font-mono text-muted-foreground w-6 text-right shrink-0 font-bold">
+                                    #{gIdx + 1}
+                                  </span>
+                                  <div className="flex flex-wrap gap-1.5 flex-1">
+                                    {game.map((num) => (
+                                      <span
+                                        key={num}
+                                        className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/15 shadow-sm"
+                                      >
+                                        {num.toString().padStart(2, "0")}
+                                      </span>
+                                    ))}
+                                  </div>
+                                  <div className="flex gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-8 w-8 p-0 rounded-lg"
+                                      onClick={() => handleCopy(game, gameKey)}
+                                      title="Copiar"
+                                    >
+                                      {copiedGame === gameKey ? (
+                                        <Check className="w-3.5 h-3.5 text-green-500" />
+                                      ) : (
+                                        <Copy className="w-3.5 h-3.5" />
+                                      )}
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-8 w-8 p-0 rounded-lg"
+                                      disabled={savingGame === gameKey || isSaved}
+                                      onClick={() => handleSave(game, sg.strategyName, gameKey)}
+                                      title="Salvar"
+                                    >
+                                      {isSaved ? (
+                                        <Check className="w-3.5 h-3.5 text-primary" />
+                                      ) : (
+                                        <Save className="w-3.5 h-3.5" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </CardContent>
+              </Card>
+            </motion.div>
+          );
+        })}
+      </motion.div>
     </div>
   );
 }
