@@ -71,26 +71,26 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
       
       <div className="relative z-10">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
               <Brain className="w-4 h-4 text-primary" />
             </div>
-            <div>
-              <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+            <div className="min-w-0">
+              <h3 className="text-xs sm:text-sm font-semibold text-foreground flex items-center gap-1.5 flex-wrap">
                 IA Nativa v2.0
-                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                <span className="text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
                   Motor Estatístico
                 </span>
               </h3>
-              <p className="text-[10px] text-muted-foreground mt-0.5">
-                Frequência + Markov + Ciclos + Co-ocorrência + Entropia — sem custo de créditos
+              <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-0.5 line-clamp-1">
+                Frequência + Markov + Ciclos + Entropia
               </p>
             </div>
           </div>
-          {quality && (
-            <div className="flex items-center gap-2">
-              <span className={`text-xs font-bold px-2 py-1 rounded-md ${
+          <div className="flex items-center gap-1.5 sm:gap-2 ml-10 sm:ml-0">
+            {quality && (
+              <span className={`text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md ${
                 quality.grade === "S" ? "bg-yellow-500/20 text-yellow-400" :
                 quality.grade === "A" ? "bg-green-500/20 text-green-400" :
                 quality.grade === "B" ? "bg-blue-500/20 text-blue-400" :
@@ -98,13 +98,13 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
               }`}>
                 {quality.grade} ({quality.avgScore}pts)
               </span>
-            </div>
-          )}
-          {bets.length > 0 && (
-            <Button size="sm" variant="outline" onClick={copyAll} className="text-xs border-border/50">
-              <Copy className="w-3 h-3 mr-1" /> Copiar todas
-            </Button>
-          )}
+            )}
+            {bets.length > 0 && (
+              <Button size="sm" variant="outline" onClick={copyAll} className="text-[10px] sm:text-xs h-7 sm:h-8 border-border/50">
+                <Copy className="w-3 h-3 mr-1" /> Copiar
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Count selector + Generate */}
