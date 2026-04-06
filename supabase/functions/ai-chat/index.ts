@@ -9,7 +9,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages, lotteryId } = await req.json();
+    const { messages, lotteryId, userContext } = await req.json();
 
     const systemPrompt = `Você é o **Titan IA**, o analista estatístico de elite do Titan Loterias — a plataforma mais avançada de análise de loterias brasileiras. Você possui conhecimento profundo em estatística, probabilidade, teoria da informação e modelagem preditiva.
 
@@ -93,6 +93,8 @@ serve(async (req) => {
 - Detectar padrões e anomalias
 
 Loteria atual do contexto: ${lotteryId || "lotofacil"}
+
+${userContext ? `═══ MEMÓRIA E APRENDIZADO DO USUÁRIO ═══\n${userContext}` : ""}
 
 ═══ GUIA DE USO DO TITAN LOTERIAS ═══
 Quando o usuário perguntar como usar o app, explique:

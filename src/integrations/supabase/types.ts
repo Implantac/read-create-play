@@ -71,6 +71,93 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_strategy_performance: {
+        Row: {
+          avg_hits: number
+          avg_score: number
+          best_hits: number
+          consistency: number
+          created_at: string
+          id: string
+          last_used_at: string
+          lottery_id: string
+          strategy: string
+          total_games: number
+          total_simulations: number
+          updated_at: string
+          user_id: string
+          win_rate: number
+        }
+        Insert: {
+          avg_hits?: number
+          avg_score?: number
+          best_hits?: number
+          consistency?: number
+          created_at?: string
+          id?: string
+          last_used_at?: string
+          lottery_id: string
+          strategy: string
+          total_games?: number
+          total_simulations?: number
+          updated_at?: string
+          user_id: string
+          win_rate?: number
+        }
+        Update: {
+          avg_hits?: number
+          avg_score?: number
+          best_hits?: number
+          consistency?: number
+          created_at?: string
+          id?: string
+          last_used_at?: string
+          lottery_id?: string
+          strategy?: string
+          total_games?: number
+          total_simulations?: number
+          updated_at?: string
+          user_id?: string
+          win_rate?: number
+        }
+        Relationships: []
+      }
+      ai_user_memory: {
+        Row: {
+          confidence: number
+          created_at: string
+          id: string
+          key: string
+          lottery_id: string
+          memory_type: string
+          updated_at: string
+          user_id: string
+          value: Json
+        }
+        Insert: {
+          confidence?: number
+          created_at?: string
+          id?: string
+          key: string
+          lottery_id: string
+          memory_type: string
+          updated_at?: string
+          user_id: string
+          value?: Json
+        }
+        Update: {
+          confidence?: number
+          created_at?: string
+          id?: string
+          key?: string
+          lottery_id?: string
+          memory_type?: string
+          updated_at?: string
+          user_id?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       lottery_draws: {
         Row: {
           concurso: number

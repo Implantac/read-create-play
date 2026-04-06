@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserLearning } from "@/hooks/useUserLearning";
 import { PageHeader } from "@/components/PageHeader";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { MessageCircle, Send, Trash2, Sparkles, Bot, User, StopCircle, Copy, Check } from "lucide-react";
@@ -32,6 +34,7 @@ const QUICK_PROMPTS = [
 async function streamChat({
   messages,
   lotteryId,
+  userContext,
   onDelta,
   onDone,
   onError,
@@ -39,6 +42,7 @@ async function streamChat({
 }: {
   messages: { role: string; content: string }[];
   lotteryId: string;
+  userContext?: string;
   onDelta: (text: string) => void;
   onDone: () => void;
   onError: (err: string) => void;
@@ -51,7 +55,7 @@ async function streamChat({
         "Content-Type": "application/json",
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages, lotteryId }),
+      body: JSON.stringify({ messages, lotteryId, userContext: userContext || "" }),
       signal,
     });
 
@@ -133,6 +137,8 @@ async function streamChat({
 
 const AIChatPage = () => {
   const { config } = useLotteryContext();
+  const { user } = useAuth();
+  const { userContext, refresh: refreshLearning } = useUserLearning(config.id);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
@@ -141,6 +147,11 @@ const AIChatPage = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const assistantBufferRef = useRef("");
+
+  // Load user learning on mount
+  useEffect(() => {
+    if (user?.id) refreshLearning();
+  }, [user?.id, config.id]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -190,6 +201,7 @@ const AIChatPage = () => {
     await streamChat({
       messages: newMessages.map((m) => ({ role: m.role, content: m.content })),
       lotteryId: config.id,
+      userContext,
       onDelta: upsertAssistant,
       onDone: () => setIsStreaming(false),
       onError: (err) => {
