@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserLearning } from "@/hooks/useUserLearning";
 import { PageHeader } from "@/components/PageHeader";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { MessageCircle, Send, Trash2, Sparkles, Bot, User, StopCircle, Copy, Check } from "lucide-react";
