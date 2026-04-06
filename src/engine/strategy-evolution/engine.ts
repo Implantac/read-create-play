@@ -14,6 +14,7 @@ import {
   LabConfig,
   LabResult,
   StrategyParams,
+  StrategyGames,
 } from "./types";
 import { getStrategiesForLottery, getStrategy, STRATEGY_REGISTRY } from "./strategies-registry";
 
@@ -292,6 +293,7 @@ export function runStrategyLab(
       bestStrategy: null,
       insights: ["Sem sorteios disponíveis no intervalo selecionado."],
       elapsedMs: Math.round(performance.now() - start),
+      generatedGames: [],
     };
   }
 
@@ -305,7 +307,7 @@ export function runStrategyLab(
     : available;
 
   // Generate games and backtest each strategy
-  const results: { def: StrategyDefinition; metrics: StrategyMetrics }[] = [];
+  const results: { def: StrategyDefinition; metrics: StrategyMetrics; games: number[][] }[] = [];
 
   for (const def of selectedDefs) {
     // Generate games using the strategy
@@ -323,7 +325,7 @@ export function runStrategyLab(
     }
 
     const metrics = backtestStrategy(def, games, draws, config);
-    results.push({ def, metrics });
+    results.push({ def, metrics, games });
   }
 
   // Build ranking
@@ -335,6 +337,17 @@ export function runStrategyLab(
   // Generate insights
   const insights = generateInsights(rankings, labConfig.lotteryId);
 
+  // Build generated games sorted by ranking order
+  const generatedGames: StrategyGames[] = rankings.map(r => {
+    const entry = results.find(res => res.def.id === r.strategyId)!;
+    return {
+      strategyId: r.strategyId,
+      strategyName: r.strategyName,
+      games: entry.games,
+      metrics: entry.metrics,
+    };
+  });
+
   return {
     config: labConfig,
     rankings,
@@ -342,6 +355,7 @@ export function runStrategyLab(
     bestStrategy: rankings[0] || null,
     insights,
     elapsedMs: Math.round(performance.now() - start),
+    generatedGames,
   };
 }
 
