@@ -42,6 +42,7 @@ const workflowGroups: { label: string; stepNumber: number; items: NavItem[] }[] 
       { title: "Simulações", url: "/simulacoes", icon: FlaskConical, requiredFeature: "simulacoes", tooltip: "Simule milhares de sorteios e avalie desempenho com Monte Carlo." },
       { title: "Estratégias IA", url: "/estrategias", icon: Brain, requiredFeature: "estrategias_basicas", tooltip: "Explore estratégias como frequência, atraso, Markov e entropia." },
       { title: "ROI", url: "/roi", icon: TrendingUp, requiredFeature: "roi_dashboard", tooltip: "Acompanhe o retorno sobre investimento das suas apostas." },
+      { title: "Laboratório", url: "/laboratorio", icon: Search, requiredFeature: "estrategias_ml", tooltip: "Motor autoevolutivo: teste, compare e descubra as melhores estratégias." },
     ],
   },
   {

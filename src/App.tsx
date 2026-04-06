@@ -39,6 +39,7 @@ const LandingPage = lazy(() => import("./pages/LandingPage"));
 const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage"));
 const SuportePage = lazy(() => import("./pages/SuportePage"));
 const InstallPage = lazy(() => import("./pages/InstallPage"));
+const StrategyLabPage = lazy(() => import("./pages/StrategyLabPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -91,6 +92,7 @@ function App() {
                     <Route path="/minhas-apostas" element={<HistoricoApostasPage />} />
                     <Route path="/jogos-salvos" element={<JogosSalvosPage />} />
                     <Route path="/perfil" element={<PerfilPage />} />
+                    <Route path="/laboratorio" element={<StrategyLabPage />} />
                     <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
                   </Route>
 
