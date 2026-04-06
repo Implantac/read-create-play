@@ -92,6 +92,7 @@ function App() {
                     <Route path="/minhas-apostas" element={<HistoricoApostasPage />} />
                     <Route path="/jogos-salvos" element={<JogosSalvosPage />} />
                     <Route path="/perfil" element={<PerfilPage />} />
+                    <Route path="/laboratorio" element={<StrategyLabPage />} />
                     <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
                   </Route>
 
