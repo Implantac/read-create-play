@@ -387,7 +387,8 @@ function buildExplanation(
   consecutiveEntropy?: { score: number; consecutivePairs: number; maxRun: number },
   edgeBalance?: number,
   markovResult?: { markovScore: number; highProbCount: number; strongSignals: { number: number; probability: number }[] },
-  enhancedEntropy?: { uniformityScore: number; renyiEntropy: number; klDivergence: number }
+  enhancedEntropy?: { uniformityScore: number; renyiEntropy: number; klDivergence: number },
+  bayesNetScore?: { networkScore: number; centralityCount: number; internalConsistency: number }
 ): string[] {
   const lines: string[] = [];
   lines.push(`Score geral: ${total}/100 (${grade})`);
