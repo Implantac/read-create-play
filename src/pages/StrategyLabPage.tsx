@@ -441,10 +441,13 @@ export default function StrategyLabPage() {
                 </CardContent>
               </Card>
 
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="w-full grid grid-cols-4">
+               <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="w-full grid grid-cols-5">
                   <TabsTrigger value="ranking" className="text-xs gap-1">
                     <Trophy className="w-3.5 h-3.5" /> Ranking
+                  </TabsTrigger>
+                  <TabsTrigger value="games" className="text-xs gap-1">
+                    <Dices className="w-3.5 h-3.5" /> Jogos
                   </TabsTrigger>
                   <TabsTrigger value="charts" className="text-xs gap-1">
                     <BarChart3 className="w-3.5 h-3.5" /> Gráficos
