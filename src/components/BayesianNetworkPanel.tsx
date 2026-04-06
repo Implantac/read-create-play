@@ -21,7 +21,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 interface Props {
   config: LotteryConfig;
   draws: DrawResult[];
-  stats: FrequencyStats[];
+  stats: NumberStats[];
 }
 
 function circleLayout(count: number, cx: number, cy: number, r: number) {
