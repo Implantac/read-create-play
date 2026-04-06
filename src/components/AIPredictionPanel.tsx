@@ -108,13 +108,13 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
         </div>
 
         {/* Count selector + Generate */}
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-1.5 sm:gap-2 mb-4 flex-wrap">
           <div className="flex items-center gap-1">
             {[1, 3, 5, 10].map(n => (
               <button
                 key={n}
                 onClick={() => setCount(n)}
-                className={`text-xs px-3 py-1.5 rounded-md border transition-all ${
+                className={`text-[11px] sm:text-xs px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-md border transition-all ${
                   count === n
                     ? "border-primary text-primary bg-primary/10"
                     : "border-border text-muted-foreground hover:text-foreground"
@@ -128,7 +128,7 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
             onClick={generate}
             disabled={loading}
             size="sm"
-            className="text-xs gap-1.5 bg-primary hover:bg-primary/90"
+            className="text-[11px] sm:text-xs gap-1.5 bg-primary hover:bg-primary/90 h-8"
           >
             {loading ? (
               <>
