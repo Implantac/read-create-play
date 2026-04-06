@@ -243,7 +243,7 @@ export function useLotteryDraws(lotteryId: string) {
       setCount(prev => prev + 1);
       setLoadedCount(prev => prev + 1);
     }
-  }, [sanitizeNumbers]);
+  }, [sanitizeNumbers, lotteryId]);
 
   useEffect(() => {
     fetchDraws();
