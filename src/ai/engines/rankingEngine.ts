@@ -16,7 +16,7 @@ import { computeCycleProfiles, scoreByCycleAlignment, multiScaleCycleAnalysis, s
 import { scoreAdvancedPatterns, computeHarmonicProfile, detectPositionalPatterns } from "./patternEngine";
 import { computeRegressionCandidates, scoreByRegression, computeMultiWindowRegression, computeSmoothedTrends } from "./regressionEngine";
 import { computeRecencyWeightedFrequency, computeCovarianceNetwork, scoreByCorrelationNetwork, computeTemporalVolatility, scoreByVolatility } from "./probabilityEngine";
-import { buildTransitionMatrix, scoreByTransitionMatrix, buildPairTransitions, scoreByPairTransitions, computeStationaryDistribution, scoreByStationaryDist } from "./markovEngine";
+import { buildTransitionMatrix, scoreByTransitionMatrix, buildPairTransitions, scoreByPairTransitions, computeStationaryDistribution, scoreByStationaryDist, buildRecencyWeightedMatrix, scoreByRecencyWeightedMatrix, computeVelocityProfiles, scoreByVelocity } from "./markovEngine";
 import { buildConditionalNetwork, scoreByBayesianNetwork, computeMutualInformation, scoreByMutualInformation } from "./bayesianNetworkEngine";
 import type { ScoredGame, GameScores, RiskProfile } from "../core/aiTypes";
 
