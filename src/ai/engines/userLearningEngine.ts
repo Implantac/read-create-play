@@ -62,20 +62,18 @@ export async function upsertUserMemory(
   userId: string,
   entry: UserMemoryEntry
 ): Promise<void> {
+  const record = {
+    user_id: userId,
+    lottery_id: entry.lottery_id,
+    memory_type: entry.memory_type,
+    key: entry.key,
+    value: entry.value as unknown,
+    confidence: entry.confidence,
+    updated_at: new Date().toISOString(),
+  };
   const { error } = await supabase
     .from("ai_user_memory")
-    .upsert(
-      {
-        user_id: userId,
-        lottery_id: entry.lottery_id,
-        memory_type: entry.memory_type,
-        key: entry.key,
-        value: entry.value as Record<string, unknown>,
-        confidence: entry.confidence,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id,lottery_id,memory_type,key" }
-    );
+    .upsert(record as any, { onConflict: "user_id,lottery_id,memory_type,key" });
 
   if (error) console.error("[UserLearning] upsert memory error:", error.message);
 }
