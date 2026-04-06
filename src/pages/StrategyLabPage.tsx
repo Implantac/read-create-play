@@ -474,6 +474,15 @@ export default function StrategyLabPage() {
                   ))}
                 </TabsContent>
 
+                {/* Generated Games Tab */}
+                <TabsContent value="games" className="space-y-4 mt-4">
+                  <GeneratedGamesPanel
+                    generatedGames={result.generatedGames}
+                    lotteryId={config.id}
+                    pick={config.pick}
+                  />
+                </TabsContent>
+
                 {/* Charts Tab */}
                 <TabsContent value="charts" className="mt-4 space-y-4">
                   <div className="grid lg:grid-cols-2 gap-4">
