@@ -66,7 +66,7 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
   };
 
   return (
-    <div className="rounded-xl glass-card p-5 border border-primary/20 relative overflow-hidden">
+    <div className="rounded-xl glass-card p-3 sm:p-5 border border-primary/20 relative overflow-hidden">
       {/* Glow effect */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
       
