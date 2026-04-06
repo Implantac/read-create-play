@@ -24,7 +24,9 @@ import {
   LabResult,
   EvolutionProfile,
   RankingEntry,
+  StrategyGames,
 } from "@/engine/strategy-evolution";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -32,7 +34,8 @@ import {
   Zap, BarChart3, Lightbulb, Target, Shield,
   Play, ChevronDown, ChevronUp, Sparkles, Crown,
   Gauge, Layers, Award, Crosshair, RotateCcw,
-  ArrowRight, Star, Percent, Hash,
+  ArrowRight, Star, Percent, Hash, Copy, Save, Dices,
+  Check,
 } from "lucide-react";
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
