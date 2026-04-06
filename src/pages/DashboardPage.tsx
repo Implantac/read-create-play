@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { StatsCard } from "@/components/StatsCard";
 import { FrequencyChart } from "@/components/FrequencyChart";
@@ -43,6 +43,16 @@ const DashboardPage = () => {
   const { profile, trialDaysLeft, isTrialExpired, isAdmin, isSuperAdmin } = useAuth();
   const [luckyGame, setLuckyGame] = useState<{ numbers: number[]; score: number; strategy: string } | null>(null);
   const [generatingLucky, setGeneratingLucky] = useState(false);
+
+  // Reset lucky game when lottery changes
+  const prevLotteryRef = useRef(selectedLottery);
+  useEffect(() => {
+    if (prevLotteryRef.current !== selectedLottery) {
+      setLuckyGame(null);
+      setGeneratingLucky(false);
+      prevLotteryRef.current = selectedLottery;
+    }
+  }, [selectedLottery]);
 
   const hotNumbers = useMemo(() => stats.filter(s => s.status === "hot").length, [stats]);
   const coldNumbers = useMemo(() => stats.filter(s => s.status === "cold").length, [stats]);
@@ -143,19 +153,19 @@ const DashboardPage = () => {
       )}
 
       {draws.length > 0 && (
-        <>
-          <AutoUpdater lotteryId={selectedLottery} onNewDraw={handleNewDraw} latestConcurso={draws[0]?.concurso || 0} />
+        <div key={selectedLottery}>
+          <AutoUpdater key={`auto-${selectedLottery}`} lotteryId={selectedLottery} onNewDraw={handleNewDraw} latestConcurso={draws[0]?.concurso || 0} />
 
           {/* Workflow Steps */}
           <WorkflowSteps />
 
           {/* Stats cards */}
           <motion.div
-            key={selectedLottery}
+            key={`stats-${selectedLottery}`}
             variants={container}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6"
           >
             <motion.div variants={item}><StatsCard title="Total Concursos" value={draws.length} icon={BarChart3} color="green" subtitle="Resultados históricos" /></motion.div>
             <motion.div variants={item}><StatsCard title="Números Quentes" value={hotNumbers} icon={Flame} color="red" subtitle="Acima da média" /></motion.div>
@@ -164,7 +174,7 @@ const DashboardPage = () => {
           </motion.div>
 
           {/* AI Insights + Lucky Game */}
-          <div className="grid lg:grid-cols-2 gap-6">
+          <div className="grid lg:grid-cols-2 gap-6 mt-6">
             <AIInsightsCard stats={stats} draws={draws} lotteryName={config.name} />
 
             <motion.div variants={item} className="relative">
@@ -226,7 +236,7 @@ const DashboardPage = () => {
 
           {/* Saved bets limit card */}
           {limit !== Infinity && (
-            <motion.div variants={item} className="glass-card rounded-xl border border-border/50 p-5">
+            <motion.div variants={item} className="glass-card rounded-xl border border-border/50 p-5 mt-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center">
@@ -267,26 +277,26 @@ const DashboardPage = () => {
             </motion.div>
           )}
 
-          <motion.div variants={container} initial="hidden" animate="show" className="grid lg:grid-cols-2 gap-6">
+          <motion.div variants={container} initial="hidden" animate="show" className="grid lg:grid-cols-2 gap-6 mt-6">
             <motion.div variants={item}><FrequencyChart stats={stats} /></motion.div>
             <motion.div variants={item}><HeatmapGrid stats={stats} totalNumbers={config.numbers} /></motion.div>
           </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-6">
+          <div className="grid lg:grid-cols-2 gap-6 mt-6">
             <ParityChart draws={draws} />
             <ConsecutiveChart draws={draws} />
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-6">
+          <div className="grid lg:grid-cols-2 gap-6 mt-6">
             <RangeDistribution draws={draws} config={config} />
             <DelayChart stats={stats} />
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-6">
+          <div className="grid lg:grid-cols-2 gap-6 mt-6">
             <SumChart data={sumData} />
-            <RecentDraws draws={drawsWithPrizes} />
+            <RecentDraws key={`recent-${selectedLottery}`} draws={drawsWithPrizes} />
           </div>
-        </>
+        </div>
       )}
     </div>
   );
