@@ -114,7 +114,7 @@ export function OnboardingGuide() {
 
   const handleStartExploring = () => {
     handleComplete();
-    navigate("/app/dashboard");
+    navigate("/");
   };
 
   const step = steps[currentStep];
