@@ -12,6 +12,7 @@ import { AnimatedCounter } from "@/components/AnimatedCounter";
 import { FloatingCTA } from "@/components/FloatingCTA";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { SocialProofBar } from "@/components/SocialProofBar";
+import { ComparisonSection } from "@/components/ComparisonSection";
 import { FloatingLotteryBalls } from "@/components/FloatingLotteryBalls";
 import { burstConfetti } from "@/lib/confetti";
 import {
@@ -377,13 +378,13 @@ export default function LandingPage() {
             </motion.div>
 
             <motion.h1 custom={1} variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
-              Análise estatística avançada para{" "}
-              <span className="gradient-brand-text">decisões estratégicas</span>
+              Pare de apostar no escuro.{" "}
+              <span className="gradient-brand-text">Use dados reais.</span>
             </motion.h1>
 
             <motion.p custom={2} variants={fadeUp} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Plataforma profissional de análise, simulação e geração estratégica de jogos
-              para loterias brasileiras. Dados reais, IA aplicada e transparência total.
+              A plataforma profissional que analisa 10.000+ sorteios com IA para gerar
+              apostas mais inteligentes. Sem promessas — só dados, lógica e transparência.
             </motion.p>
 
             <motion.div custom={3} variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
@@ -536,6 +537,9 @@ export default function LandingPage() {
 
       {/* Demo video */}
       <DemoVideo />
+
+      {/* Comparison: Traditional vs Titan */}
+      <ComparisonSection />
 
       {/* Screens showcase carousel */}
       <ScreensShowcase />
@@ -946,11 +950,11 @@ export default function LandingPage() {
               <Zap className="w-7 h-7 text-primary-foreground" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-              Comece agora e veja o poder da IA{" "}
-              <span className="gradient-brand-text">nas suas apostas</span>
+              Enquanto você lê isso, a IA já analisou{" "}
+              <span className="gradient-brand-text">847 padrões</span>
             </h2>
             <p className="text-muted-foreground">
-              Milhares de jogadores já estão usando dados reais para fazer apostas mais inteligentes. Não fique de fora.
+              Milhares de jogadores já estão usando inteligência de dados para apostar melhor. Comece agora — é grátis por 7 dias.
             </p>
             <motion.div
               whileHover={{ scale: 1.06, boxShadow: "0 0 30px hsl(var(--primary) / 0.5)" }}
