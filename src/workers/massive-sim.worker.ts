@@ -168,6 +168,22 @@ function computeDistributionSummary(games: any[], drawCount: number) {
   };
 }
 
+// ─── Binary insert for top-N (avoids O(N log N) full sort) ───
+function binaryInsert(arr: any[], item: any, maxLen: number): void {
+  const score = item.score;
+  // Find insertion point (descending order)
+  let lo = 0, hi = arr.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1;
+    if (arr[mid].score > score) lo = mid + 1;
+    else hi = mid;
+  }
+  if (lo < maxLen) {
+    arr.splice(lo, 0, item);
+    if (arr.length > maxLen) arr.length = maxLen;
+  }
+}
+
 // ─── Main simulation ───
 function runBatch(job: any) {
   const { config, draws, stats, totalGames, mode, topN } = job;
@@ -194,14 +210,16 @@ function runBatch(job: any) {
     }
 
     const gameBitset = toBitset(gameNumbers);
-    const hitDist: Record<number, number> = {};
-    for (let h = 0; h <= config.pick; h++) hitDist[h] = 0;
-
     let totalHits = 0, bestHit = 0, prizeCount = 0, hitSquaredSum = 0;
+
+    // Use typed array for hit distribution (faster than object)
+    const hitDistArr = new Uint32Array(config.pick + 1);
+
     for (let d = 0; d < drawCount; d++) {
       const hits = bitsetIntersectionCount(gameBitset, drawBitsets[d]);
-      hitDist[hits] = (hitDist[hits] || 0) + 1;
-      totalHits += hits; hitSquaredSum += hits * hits;
+      hitDistArr[hits]++;
+      totalHits += hits;
+      hitSquaredSum += hits * hits;
       if (hits > bestHit) bestHit = hits;
       if (hits >= prizeThreshold) prizeCount++;
     }
@@ -214,19 +232,17 @@ function runBatch(job: any) {
     const score = avgHits * 30 + bestHit * 20 + (prizeCount / drawCount) * 100 * 25 + (1 / (1 + stability)) * 15 + (pattern.rangeSpread / config.numbers) * 10;
 
     if (topGames.length < topN || score > minTopScore) {
+      // Convert typed array to object only for stored games
+      const hitDist: Record<number, number> = {};
+      for (let h = 0; h <= config.pick; h++) hitDist[h] = hitDistArr[h];
+
       const game = { numbers: gameNumbers, totalHits, avgHits: Math.round(avgHits * 1000) / 1000, bestHit, prizeCount, hitDistribution: hitDist, stability: Math.round(stability * 1000) / 1000, score: Math.round(score * 100) / 100, ...pattern };
-      if (topGames.length < topN) {
-        topGames.push(game);
-        if (topGames.length === topN) { topGames.sort((a, b) => b.score - a.score); minTopScore = topGames[topGames.length - 1].score; }
-      } else {
-        topGames[topGames.length - 1] = game;
-        topGames.sort((a, b) => b.score - a.score);
-        minTopScore = topGames[topGames.length - 1].score;
-      }
+
+      binaryInsert(topGames, game, topN);
+      minTopScore = topGames.length >= topN ? topGames[topGames.length - 1].score : -Infinity;
     }
   }
 
-  topGames.sort((a, b) => b.score - a.score);
   const elapsedMs = Math.round(performance.now() - start);
   return { topGames, totalGenerated: totalGames, totalEvaluated, elapsedMs, opsPerSecond: Math.round(totalEvaluated / (elapsedMs / 1000)), patternInsights: generatePatternInsights(topGames, config), distributionSummary: computeDistributionSummary(topGames, drawCount) };
 }
