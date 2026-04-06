@@ -17,6 +17,7 @@ import { scoreAdvancedPatterns, computeHarmonicProfile, detectPositionalPatterns
 import { computeRegressionCandidates, scoreByRegression, computeMultiWindowRegression, computeSmoothedTrends } from "./regressionEngine";
 import { computeRecencyWeightedFrequency, computeCovarianceNetwork, scoreByCorrelationNetwork, computeTemporalVolatility, scoreByVolatility } from "./probabilityEngine";
 import { buildTransitionMatrix, scoreByTransitionMatrix, buildPairTransitions, scoreByPairTransitions, computeStationaryDistribution, scoreByStationaryDist } from "./markovEngine";
+import { buildConditionalNetwork, scoreByBayesianNetwork, computeMutualInformation, scoreByMutualInformation } from "./bayesianNetworkEngine";
 import type { ScoredGame, GameScores, RiskProfile } from "../core/aiTypes";
 
 export function scoreGame(
