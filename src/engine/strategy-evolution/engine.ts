@@ -293,6 +293,7 @@ export function runStrategyLab(
       bestStrategy: null,
       insights: ["Sem sorteios disponíveis no intervalo selecionado."],
       elapsedMs: Math.round(performance.now() - start),
+      generatedGames: [],
     };
   }
 
