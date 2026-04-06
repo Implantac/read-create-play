@@ -4,6 +4,7 @@ import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
+import { BayesianNetworkPanel } from "@/components/BayesianNetworkPanel";
 import { Brain, Loader2 } from "lucide-react";
 
 const StrategySimulatorPanel = lazy(() => import("@/components/StrategySimulatorPanel").then(m => ({ default: m.StrategySimulatorPanel })));
@@ -39,6 +40,9 @@ const EstrategiasPage = () => {
         <EmptyState description="Importe os sorteios primeiro no Dashboard para usar as estratégias." />
       ) : (
         <>
+          {/* Bayesian Network Visualization */}
+          <BayesianNetworkPanel config={config} draws={draws} stats={stats} />
+
           {/* PREMIUM: Basic strategies */}
           <PlanGate feature="estrategias_basicas" fallbackMessage="Simulador de Estratégias">
             <Suspense fallback={<LazyFallback />}>
