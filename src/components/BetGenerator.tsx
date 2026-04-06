@@ -244,9 +244,9 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
               <Progress value={bet.report.overall} className="h-1.5" />
 
               {/* Numbers */}
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1 sm:gap-1.5">
                 {bet.numbers.map(n => (
-                  <span key={n} className="lottery-ball text-xs w-8 h-8">
+                  <span key={n} className="lottery-ball text-[10px] sm:text-xs w-7 h-7 sm:w-8 sm:h-8">
                     {String(n).padStart(2, "0")}
                   </span>
                 ))}
