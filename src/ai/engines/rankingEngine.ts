@@ -512,6 +512,20 @@ function buildExplanation(
     else if (edgeBalance < 0.4) lines.push("⚠️ Desequilíbrio entre números extremos e centrais");
   }
 
+  // BAYESIAN NETWORK insights
+  if (bayesNetScore) {
+    if (bayesNetScore.networkScore >= 65) {
+      lines.push(`✅ Rede Bayesiana favorável: ${bayesNetScore.networkScore}/100 — ${bayesNetScore.centralityCount} números de alta centralidade`);
+    } else if (bayesNetScore.networkScore >= 45) {
+      lines.push(`📊 Rede Bayesiana moderada: ${bayesNetScore.networkScore}/100`);
+    } else {
+      lines.push(`⚠️ Baixa coerência na rede condicional: ${bayesNetScore.networkScore}/100`);
+    }
+    if (bayesNetScore.internalConsistency >= 0.7) {
+      lines.push("✅ Alta consistência interna: números se reforçam mutuamente");
+    }
+  }
+
   return lines;
 }
 
