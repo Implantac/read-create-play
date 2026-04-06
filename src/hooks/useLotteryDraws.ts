@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { DrawResult } from "@/data/lotteries";
+import { DrawResult, LOTTERIES } from "@/data/lotteries";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { toast } from "sonner";
 
@@ -210,6 +210,17 @@ export function useLotteryDraws(lotteryId: string) {
       return;
     }
 
+    // Validate draw belongs to current lottery using expected draw number counts
+    const DRAW_NUMBER_COUNTS: Record<string, number> = {
+      megasena: 6, lotofacil: 15, quina: 5, lotomania: 20,
+      duplasena: 12, timemania: 7, diadesorte: 7, supersete: 7,
+    };
+    const expectedCount = DRAW_NUMBER_COUNTS[lotteryId];
+    if (expectedCount && safeNumbers.length !== expectedCount) {
+      console.warn(`Draw has ${safeNumbers.length} numbers but ${lotteryId} expects ${expectedCount}. Ignoring.`);
+      return;
+    }
+
     const normalizedDraw: DrawResultWithPrizes = {
       ...draw,
       date: draw.date || "",
@@ -233,7 +244,7 @@ export function useLotteryDraws(lotteryId: string) {
       setCount(prev => prev + 1);
       setLoadedCount(prev => prev + 1);
     }
-  }, [sanitizeNumbers]);
+  }, [sanitizeNumbers, lotteryId]);
 
   useEffect(() => {
     fetchDraws();

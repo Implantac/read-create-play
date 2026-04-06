@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { DrawResult } from "@/data/lotteries";
 import { fetchLatestDraw, LatestDrawResult } from "@/services/lotteryApi";
 import { DrawPrizeData } from "@/hooks/useLotteryDraws";
@@ -24,10 +24,18 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso }: Props) {
   const [autoEnabled, setAutoEnabled] = useState(false);
   const [latestFromApi, setLatestFromApi] = useState<LatestDrawResult | null>(null);
 
+  const lotteryIdRef = useRef(lotteryId);
+  lotteryIdRef.current = lotteryId;
+
   const checkForUpdates = useCallback(async () => {
+    const requestedLottery = lotteryId;
     setLoading(true);
     try {
-      const result = await fetchLatestDraw(lotteryId);
+      const result = await fetchLatestDraw(requestedLottery);
+
+      // Guard: if user switched lottery while we were fetching, discard
+      if (lotteryIdRef.current !== requestedLottery) return;
+
       setLastCheck(new Date());
 
       if (result && Array.isArray(result.numbers) && result.numbers.length > 0) {
@@ -45,10 +53,11 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso }: Props) {
         toast.error("Não foi possível conectar à API de resultados");
       }
     } catch {
+      if (lotteryIdRef.current !== requestedLottery) return;
       setIsOnline(false);
       toast.error("Erro ao buscar resultados");
     } finally {
-      setLoading(false);
+      if (lotteryIdRef.current === requestedLottery) setLoading(false);
     }
   }, [lotteryId, latestConcurso, onNewDraw]);
 
