@@ -915,3 +915,210 @@ function MiniMetric({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+// ═══════════════════════════════════════════════════════
+// GENERATED GAMES PANEL
+// ═══════════════════════════════════════════════════════
+
+function GeneratedGamesPanel({ generatedGames, lotteryId, pick }: {
+  generatedGames: StrategyGames[];
+  lotteryId: string;
+  pick: number;
+}) {
+  const [expandedStrategy, setExpandedStrategy] = useState<string | null>(
+    generatedGames[0]?.strategyId || null
+  );
+  const [savingGame, setSavingGame] = useState<string | null>(null);
+  const [copiedGame, setCopiedGame] = useState<string | null>(null);
+
+  const handleCopy = useCallback((game: number[], gameKey: string) => {
+    navigator.clipboard.writeText(game.join(", "));
+    setCopiedGame(gameKey);
+    toast.success("Jogo copiado!");
+    setTimeout(() => setCopiedGame(null), 2000);
+  }, []);
+
+  const handleSave = useCallback(async (game: number[], strategyName: string, gameKey: string) => {
+    setSavingGame(gameKey);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Faça login para salvar jogos");
+        return;
+      }
+      const { error } = await supabase.from("saved_bets").insert({
+        user_id: user.id,
+        lottery_id: lotteryId,
+        numbers: game,
+        strategy: `Lab: ${strategyName}`,
+        label: `Lab ${strategyName}`,
+      });
+      if (error) throw error;
+      toast.success("Jogo salvo com sucesso!");
+    } catch {
+      toast.error("Erro ao salvar jogo");
+    } finally {
+      setSavingGame(null);
+    }
+  }, [lotteryId]);
+
+  const handleSaveAll = useCallback(async (sg: StrategyGames) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Faça login para salvar jogos");
+        return;
+      }
+      const inserts = sg.games.map((game, i) => ({
+        user_id: user.id,
+        lottery_id: lotteryId,
+        numbers: game,
+        strategy: `Lab: ${sg.strategyName}`,
+        label: `Lab ${sg.strategyName} #${i + 1}`,
+      }));
+      const { error } = await supabase.from("saved_bets").insert(inserts);
+      if (error) throw error;
+      toast.success(`${sg.games.length} jogos salvos!`);
+    } catch {
+      toast.error("Erro ao salvar jogos");
+    }
+  }, [lotteryId]);
+
+  if (generatedGames.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <Dices className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
+        <p className="text-sm text-muted-foreground">Nenhum jogo gerado ainda.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-muted-foreground">
+          {generatedGames.reduce((t, sg) => t + sg.games.length, 0)} jogos gerados em {generatedGames.length} estratégias — ordenados por ranking
+        </p>
+      </div>
+
+      {generatedGames.map((sg, sIdx) => {
+        const isExpanded = expandedStrategy === sg.strategyId;
+        return (
+          <Card key={sg.strategyId} className={`bg-card/80 backdrop-blur border-border transition-all ${
+            sIdx === 0 ? "ring-1 ring-primary/30" : ""
+          }`}>
+            <CardContent className="p-0">
+              <button
+                className="w-full flex items-center gap-3 p-4 text-left hover:bg-muted/10 transition-colors"
+                onClick={() => setExpandedStrategy(isExpanded ? null : sg.strategyId)}
+              >
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
+                  sIdx === 0 ? "bg-primary/15 text-primary" :
+                  sIdx === 1 ? "bg-yellow-500/15 text-yellow-500" :
+                  sIdx === 2 ? "bg-orange-500/15 text-orange-500" :
+                  "bg-muted/20 text-muted-foreground"
+                }`}>
+                  {sIdx <= 2 ? ["🥇", "🥈", "🥉"][sIdx] : sIdx + 1}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-foreground">{sg.strategyName}</span>
+                    <Badge variant="outline" className="text-[9px]">
+                      {sg.games.length} jogos
+                    </Badge>
+                    <Badge variant="secondary" className="text-[9px]">
+                      Score {sg.metrics.globalScore.toFixed(1)}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-3 mt-0.5">
+                    <span className="text-[10px] text-muted-foreground">
+                      Média: <span className="font-mono text-foreground">{sg.metrics.avgHits.toFixed(2)}</span>
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      Melhor: <span className="font-mono text-foreground">{sg.metrics.bestHits}/{pick}</span>
+                    </span>
+                  </div>
+                </div>
+                {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+              </button>
+
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="px-4 pb-4 space-y-3">
+                      <div className="flex justify-end">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-xs gap-1.5 h-7"
+                          onClick={() => handleSaveAll(sg)}
+                        >
+                          <Save className="w-3 h-3" />
+                          Salvar todos ({sg.games.length})
+                        </Button>
+                      </div>
+
+                      <div className="grid gap-2">
+                        {sg.games.map((game, gIdx) => {
+                          const gameKey = `${sg.strategyId}-${gIdx}`;
+                          return (
+                            <div
+                              key={gIdx}
+                              className="flex items-center gap-3 p-3 rounded-lg bg-muted/10 border border-border group hover:border-primary/20 transition-colors"
+                            >
+                              <span className="text-[10px] font-mono text-muted-foreground w-6 text-right shrink-0">
+                                #{gIdx + 1}
+                              </span>
+                              <div className="flex flex-wrap gap-1.5 flex-1">
+                                {game.map((num) => (
+                                  <span
+                                    key={num}
+                                    className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20"
+                                  >
+                                    {num.toString().padStart(2, "0")}
+                                  </span>
+                                ))}
+                              </div>
+                              <div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-7 w-7 p-0"
+                                  onClick={() => handleCopy(game, gameKey)}
+                                >
+                                  {copiedGame === gameKey ? (
+                                    <Check className="w-3.5 h-3.5 text-green-500" />
+                                  ) : (
+                                    <Copy className="w-3.5 h-3.5" />
+                                  )}
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-7 w-7 p-0"
+                                  disabled={savingGame === gameKey}
+                                  onClick={() => handleSave(game, sg.strategyName, gameKey)}
+                                >
+                                  <Save className="w-3.5 h-3.5" />
+                                </Button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </CardContent>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
