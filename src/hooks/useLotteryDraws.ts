@@ -210,14 +210,15 @@ export function useLotteryDraws(lotteryId: string) {
       return;
     }
 
-    // Validate that the draw belongs to the current lottery by checking expected number count
-    const config = LOTTERIES.find(l => l.id === lotteryId);
-    if (config) {
-      const expectedCount = lotteryId === "duplasena" ? config.pick * 2 : config.pick;
-      if (safeNumbers.length !== expectedCount) {
-        console.warn(`Draw has ${safeNumbers.length} numbers but ${lotteryId} expects ${expectedCount}. Ignoring.`);
-        return;
-      }
+    // Validate draw belongs to current lottery using expected draw number counts
+    const DRAW_NUMBER_COUNTS: Record<string, number> = {
+      megasena: 6, lotofacil: 15, quina: 5, lotomania: 20,
+      duplasena: 12, timemania: 7, diadesorte: 7, supersete: 7,
+    };
+    const expectedCount = DRAW_NUMBER_COUNTS[lotteryId];
+    if (expectedCount && safeNumbers.length !== expectedCount) {
+      console.warn(`Draw has ${safeNumbers.length} numbers but ${lotteryId} expects ${expectedCount}. Ignoring.`);
+      return;
     }
 
     const normalizedDraw: DrawResultWithPrizes = {
