@@ -8,6 +8,8 @@
 import { NumberStats } from "./statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { getLotteryRules, PRIMES, FIBONACCI, LOTOFACIL_FRAME, LOTOFACIL_CENTER } from "@/ai/knowledge/lotteriesKnowledge";
+import { buildConditionalNetwork, scoreByBayesianNetwork, computeMutualInformation } from "@/ai/engines/bayesianNetworkEngine";
+import { computeZoneEntropy, computeGapEntropy } from "@/ai/engines/entropyEngine";
 
 // ═══════════════════════════════════════════
 // ADVANCED HELPERS
