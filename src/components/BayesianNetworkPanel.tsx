@@ -13,7 +13,7 @@ import {
   type ConditionalTrend,
 } from "@/ai/engines/bayesianNetworkEngine";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { FrequencyStats } from "@/engine/statistics";
+import { NumberStats } from "@/engine/statistics";
 import { Network, Zap, TrendingUp, TrendingDown, Minus, Info, Eye, EyeOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { TooltipProvider } from "@/components/ui/tooltip";
