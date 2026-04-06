@@ -143,16 +143,16 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
   };
 
   return (
-    <div className="rounded-xl glass-card p-5 space-y-5">
+    <div className="rounded-xl glass-card p-3 sm:p-5 space-y-4 sm:space-y-5">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-          <Sparkles className="w-5 h-5 text-primary" />
+      <div className="flex items-center gap-2 sm:gap-3">
+        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
         </div>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <h3 className="text-sm font-bold text-foreground">Gerador de Apostas Inteligentes</h3>
-          <p className="text-[11px] text-muted-foreground mt-0.5">
-            Gere apostas com melhor distribuição estatística — evite padrões comuns de jogadores
+          <p className="text-[10px] sm:text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
+            Gere apostas com melhor distribuição estatística
           </p>
         </div>
       </div>
