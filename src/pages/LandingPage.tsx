@@ -378,13 +378,13 @@ export default function LandingPage() {
             </motion.div>
 
             <motion.h1 custom={1} variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
-              Análise estatística avançada para{" "}
-              <span className="gradient-brand-text">decisões estratégicas</span>
+              Pare de apostar no escuro.{" "}
+              <span className="gradient-brand-text">Use dados reais.</span>
             </motion.h1>
 
             <motion.p custom={2} variants={fadeUp} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Plataforma profissional de análise, simulação e geração estratégica de jogos
-              para loterias brasileiras. Dados reais, IA aplicada e transparência total.
+              A plataforma profissional que analisa 10.000+ sorteios com IA para gerar
+              apostas mais inteligentes. Sem promessas — só dados, lógica e transparência.
             </motion.p>
 
             <motion.div custom={3} variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
