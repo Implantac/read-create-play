@@ -92,6 +92,13 @@ export interface LabConfig {
   profile: EvolutionProfile;
 }
 
+export interface StrategyGames {
+  strategyId: string;
+  strategyName: string;
+  games: number[][];
+  metrics: StrategyMetrics;
+}
+
 export interface LabResult {
   config: LabConfig;
   rankings: RankingEntry[];
@@ -99,4 +106,5 @@ export interface LabResult {
   bestStrategy: RankingEntry | null;
   insights: string[];
   elapsedMs: number;
+  generatedGames: StrategyGames[];
 }

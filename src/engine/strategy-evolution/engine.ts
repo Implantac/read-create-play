@@ -14,6 +14,7 @@ import {
   LabConfig,
   LabResult,
   StrategyParams,
+  StrategyGames,
 } from "./types";
 import { getStrategiesForLottery, getStrategy, STRATEGY_REGISTRY } from "./strategies-registry";
 
