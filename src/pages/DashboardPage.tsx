@@ -44,6 +44,13 @@ const DashboardPage = () => {
   const [luckyGame, setLuckyGame] = useState<{ numbers: number[]; score: number; strategy: string } | null>(null);
   const [generatingLucky, setGeneratingLucky] = useState(false);
 
+  // Reset lucky game when lottery changes
+  const prevLotteryRef = useState(selectedLottery)[0];
+  if (prevLotteryRef !== selectedLottery) {
+    setLuckyGame(null);
+    setGeneratingLucky(false);
+  }
+
   const hotNumbers = useMemo(() => stats.filter(s => s.status === "hot").length, [stats]);
   const coldNumbers = useMemo(() => stats.filter(s => s.status === "cold").length, [stats]);
   const avgDelay = useMemo(() => stats.length > 0 ? Math.round(stats.reduce((a, s) => a + s.lastSeen, 0) / stats.length) : 0, [stats]);
