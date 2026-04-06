@@ -950,11 +950,11 @@ export default function LandingPage() {
               <Zap className="w-7 h-7 text-primary-foreground" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-              Comece agora e veja o poder da IA{" "}
-              <span className="gradient-brand-text">nas suas apostas</span>
+              Enquanto você lê isso, a IA já analisou{" "}
+              <span className="gradient-brand-text">847 padrões</span>
             </h2>
             <p className="text-muted-foreground">
-              Milhares de jogadores já estão usando dados reais para fazer apostas mais inteligentes. Não fique de fora.
+              Milhares de jogadores já estão usando inteligência de dados para apostar melhor. Comece agora — é grátis por 7 dias.
             </p>
             <motion.div
               whileHover={{ scale: 1.06, boxShadow: "0 0 30px hsl(var(--primary) / 0.5)" }}
