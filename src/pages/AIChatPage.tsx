@@ -137,6 +137,8 @@ async function streamChat({
 
 const AIChatPage = () => {
   const { config } = useLotteryContext();
+  const { user } = useAuth();
+  const { userContext, refresh: refreshLearning } = useUserLearning(config.id);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
@@ -145,6 +147,11 @@ const AIChatPage = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const assistantBufferRef = useRef("");
+
+  // Load user learning on mount
+  useEffect(() => {
+    if (user?.id) refreshLearning();
+  }, [user?.id, config.id]);
 
   useEffect(() => {
     if (scrollRef.current) {
