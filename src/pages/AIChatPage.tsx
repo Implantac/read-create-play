@@ -201,6 +201,7 @@ const AIChatPage = () => {
     await streamChat({
       messages: newMessages.map((m) => ({ role: m.role, content: m.content })),
       lotteryId: config.id,
+      userContext,
       onDelta: upsertAssistant,
       onDone: () => setIsStreaming(false),
       onError: (err) => {
