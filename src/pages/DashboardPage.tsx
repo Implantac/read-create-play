@@ -45,11 +45,14 @@ const DashboardPage = () => {
   const [generatingLucky, setGeneratingLucky] = useState(false);
 
   // Reset lucky game when lottery changes
-  const prevLotteryRef = useState(selectedLottery)[0];
-  if (prevLotteryRef !== selectedLottery) {
-    setLuckyGame(null);
-    setGeneratingLucky(false);
-  }
+  const prevLotteryRef = useRef(selectedLottery);
+  useEffect(() => {
+    if (prevLotteryRef.current !== selectedLottery) {
+      setLuckyGame(null);
+      setGeneratingLucky(false);
+      prevLotteryRef.current = selectedLottery;
+    }
+  }, [selectedLottery]);
 
   const hotNumbers = useMemo(() => stats.filter(s => s.status === "hot").length, [stats]);
   const coldNumbers = useMemo(() => stats.filter(s => s.status === "cold").length, [stats]);
