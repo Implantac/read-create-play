@@ -24,6 +24,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { usePlanAccess } from "@/hooks/usePlanAccess";
+import { OnboardingGuide } from "@/components/OnboardingGuide";
 
 const container = {
   hidden: { opacity: 0 },
@@ -68,6 +69,7 @@ const DashboardPage = () => {
 
   return (
     <div className="space-y-6">
+      <OnboardingGuide />
       <PageHeader
         title="Dashboard"
         description={`Plataforma de análise estatística e inteligência para loterias — ${config.name}`}

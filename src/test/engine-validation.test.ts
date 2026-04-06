@@ -4,8 +4,8 @@
 import { describe, it, expect } from "vitest";
 import { computeFrequencyStats, NumberStats } from "@/engine/statistics";
 import { generateByStrategy, Strategy, STRATEGIES } from "@/engine/strategies";
-import { runExtremeCoverage } from "@/engine/coverage/index";
-import { CoverageConfig } from "@/engine/coverage/types";
+import { runExtremeCoverage } from "@/engine/extreme-coverage";
+import { CoverageConfig } from "@/engine/extreme-coverage";
 import { runStrategyLab, getStrategiesForLottery, STRATEGY_REGISTRY } from "@/engine/strategy-evolution";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 
