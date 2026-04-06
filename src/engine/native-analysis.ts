@@ -583,6 +583,12 @@ export function generateNativeBets(
   // Build co-occurrence map
   const cooccMap = buildCooccurrenceMap(draws, 100);
 
+  // Build Bayesian conditional network
+  const bayesNetwork = buildConditionalNetwork(draws, config.id, 120);
+
+  // Compute mutual information scores
+  const miScores = computeMutualInformation(draws, config.id, 100);
+
   // Repeat analysis
   const [minRepeat, maxRepeat] = idealRepeatCount(config);
 
