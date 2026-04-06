@@ -55,7 +55,7 @@ async function streamChat({
         "Content-Type": "application/json",
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages, lotteryId }),
+      body: JSON.stringify({ messages, lotteryId, userContext: userContext || "" }),
       signal,
     });
 
