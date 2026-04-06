@@ -40,6 +40,9 @@ const EstrategiasPage = () => {
         <EmptyState description="Importe os sorteios primeiro no Dashboard para usar as estratégias." />
       ) : (
         <>
+          {/* Bayesian Network Visualization */}
+          <BayesianNetworkPanel config={config} draws={draws} stats={stats} />
+
           {/* PREMIUM: Basic strategies */}
           <PlanGate feature="estrategias_basicas" fallbackMessage="Simulador de Estratégias">
             <Suspense fallback={<LazyFallback />}>
