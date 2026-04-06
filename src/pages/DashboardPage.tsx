@@ -69,6 +69,7 @@ const DashboardPage = () => {
 
   return (
     <div className="space-y-6">
+      <OnboardingGuide />
       <PageHeader
         title="Dashboard"
         description={`Plataforma de análise estatística e inteligência para loterias — ${config.name}`}
