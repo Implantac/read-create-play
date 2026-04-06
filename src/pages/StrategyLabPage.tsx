@@ -108,11 +108,12 @@ export default function StrategyLabPage() {
   };
 
   return (
-    <PlanGate requiredPlan="starter">
+    <PlanGate feature="estrategias_ml">
       <div className="space-y-6">
         <PageHeader
           title="Laboratório de Estratégias"
           description="Motor autoevolutivo: teste, compare e descubra as melhores estratégias por loteria"
+          icon={FlaskConical}
         />
         <LotteryContextBanner />
 
