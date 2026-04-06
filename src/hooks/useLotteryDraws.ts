@@ -70,6 +70,11 @@ export function useLotteryDraws(lotteryId: string) {
     const signal = { cancelled: false };
     cancelRef.current = signal;
 
+    // Immediately clear stale data from the previous lottery
+    setDraws([]);
+    setDrawsWithPrizes([]);
+    setLoadedCount(0);
+    setCount(0);
     setLoading(true);
     try {
       const { data: initialData, error: initialError, count: totalCount } = await supabase
