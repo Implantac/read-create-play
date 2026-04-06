@@ -210,6 +210,16 @@ export function useLotteryDraws(lotteryId: string) {
       return;
     }
 
+    // Validate that the draw belongs to the current lottery by checking expected number count
+    const config = LOTTERIES.find(l => l.id === lotteryId);
+    if (config) {
+      const expectedCount = lotteryId === "duplasena" ? config.pick * 2 : config.pick;
+      if (safeNumbers.length !== expectedCount) {
+        console.warn(`Draw has ${safeNumbers.length} numbers but ${lotteryId} expects ${expectedCount}. Ignoring.`);
+        return;
+      }
+    }
+
     const normalizedDraw: DrawResultWithPrizes = {
       ...draw,
       date: draw.date || "",
