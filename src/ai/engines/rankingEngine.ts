@@ -263,6 +263,18 @@ export function scoreGame(
   const miScore = scoreByMutualInformation(sorted, miScores);
   const miBonus = Math.round((miScore - 50) * 0.06);
 
+  // RECENCY-WEIGHTED MARKOV: transitions with exponential decay
+  const rwMatrix = buildRecencyWeightedMatrix(draws, lotteryId, 100, 0.03);
+  const rwMarkovScore = prevDraw
+    ? scoreByRecencyWeightedMatrix(sorted, prevDraw, rwMatrix)
+    : 50;
+  const rwMarkovBonus = Math.round((rwMarkovScore - 50) * 0.08);
+
+  // VELOCITY PREDICTOR: favor accelerating numbers
+  const velocityProfiles = computeVelocityProfiles(draws, lotteryId);
+  const velocityScore = scoreByVelocity(sorted, velocityProfiles, riskProfile !== "regression");
+  const velocityBonus = Math.round((velocityScore - 50) * 0.06);
+
   // ADAPTIVE Monte Carlo — variable depth based on context
   const adaptiveSimCount = getAdaptiveSimCount(context, riskProfile, draws.length);
   const monteCarlo = lightMonteCarlo(sorted, draws, adaptiveSimCount);
