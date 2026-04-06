@@ -24,6 +24,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { usePlanAccess } from "@/hooks/usePlanAccess";
+import { OnboardingGuide } from "@/components/OnboardingGuide";
 
 const container = {
   hidden: { opacity: 0 },
