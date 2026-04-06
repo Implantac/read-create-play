@@ -731,17 +731,21 @@ export function generateNativeBets(
     });
     if (!isDiverse) continue;
 
-    // ═══ SCORING (0-100) ═══
+    // ═══ SCORING v3.0 (0-100) ═══
     let score = 0;
+    const details: string[] = [];
 
     // Sum adherence (0-20)
-    score += sumScore(candidate, config.id) * 20;
+    const sumSc = sumScore(candidate, config.id) * 20;
+    score += sumSc;
+    if (sumSc >= 18) details.push("✅ Soma ideal");
+    else if (sumSc < 10) details.push("⚠ Soma fora da faixa");
 
     // Parity balance (0-15)
     if (rules.idealParityRange) {
       const [minP, maxP] = rules.idealParityRange;
-      if (evens >= minP && evens <= maxP) score += 15;
-      else score += 8;
+      if (evens >= minP && evens <= maxP) { score += 15; details.push(`✅ ${evens}P/${config.pick - evens}I`); }
+      else { score += 8; details.push(`⚠ ${evens}P/${config.pick - evens}I`); }
     } else {
       score += (1 - Math.abs(evens / config.pick - 0.5) * 2) * 15;
     }
@@ -756,7 +760,9 @@ export function generateNativeBets(
 
     // Markov alignment (0-10)
     const markovCount = candidate.filter(n => markovSet.has(n)).length;
-    score += Math.min(10, (markovCount / config.pick) * 15);
+    const markovSc = Math.min(10, (markovCount / config.pick) * 15);
+    score += markovSc;
+    if (markovCount >= 3) details.push(`🔗 ${markovCount} Markov`);
 
     // Co-occurrence boost (0-10)
     const coocBoost = cooccurrenceBoost(candidate, cooccMap);
@@ -768,6 +774,7 @@ export function generateNativeBets(
       return s && s.cycleScore > 1.2;
     }).length;
     score += Math.min(5, overdueCount * 2);
+    if (overdueCount >= 2) details.push(`⏰ ${overdueCount} overdue`);
 
     // Consecutive penalty
     if (mSeq > 2) score -= (mSeq - 2) * 3;
@@ -787,10 +794,40 @@ export function generateNativeBets(
     const pr = primeRatio(candidate);
     if (pr >= 0.2 && pr <= 0.5) score += 3;
 
+    // ═══ NEW v3.0: Bayesian Network bonus (0-8) ═══
+    if (bayesNetwork.length > 0) {
+      const bayesResult = scoreByBayesianNetwork(candidate, bayesNetwork);
+      const bayesBonusVal = Math.min(8, Math.max(0, (bayesResult.networkScore - 40) * 0.15));
+      score += bayesBonusVal;
+      if (bayesResult.networkScore >= 65) details.push("🧠 Bayes+");
+      if (bayesResult.internalConsistency >= 0.7) details.push("🔄 Coerente");
+    }
+
+    // ═══ NEW v3.0: Zone Entropy bonus (0-5) ═══
+    const zoneEnt = computeZoneEntropy(candidate, config.numbers, 5);
+    const gapEnt = computeGapEntropy(candidate);
+    const entropySc = Math.min(5, (zoneEnt + gapEnt) * 3);
+    score += entropySc;
+    if (zoneEnt >= 0.85) details.push("📐 Entropia alta");
+
+    // ═══ NEW v3.0: Mutual Information bonus (0-4) ═══
+    if (miScores.size > 0) {
+      let totalMI = 0;
+      for (const n of candidate) totalMI += miScores.get(n) || 0;
+      const avgMI = totalMI / candidate.length;
+      const allMI = [...miScores.values()];
+      const globalAvgMI = allMI.reduce((a, b) => a + b, 0) / allMI.length;
+      if (globalAvgMI > 0) {
+        const miBonus = Math.min(4, Math.max(0, (avgMI / globalAvgMI - 0.8) * 6));
+        score += miBonus;
+      }
+    }
+
     score = Math.max(0, Math.min(100, Math.round(score)));
     seenKeys.add(key);
     bets.push(candidate);
     scores.push(score);
+    qualityDetails.push(details);
   }
 
   const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
