@@ -253,6 +253,16 @@ export function scoreGame(
   const stationaryScore = scoreByStationaryDist(sorted, stationaryDist);
   const stationaryBonus = Math.round((stationaryScore - 50) * 0.08);
 
+  // BAYESIAN NETWORK: conditional dependency modeling
+  const bayesNetwork = buildConditionalNetwork(draws, lotteryId, 120);
+  const bayesNetScore = scoreByBayesianNetwork(sorted, bayesNetwork);
+  const bayesNetBonus = Math.round((bayesNetScore.networkScore - 50) * 0.12);
+
+  // MUTUAL INFORMATION: self-predictability scoring
+  const miScores = computeMutualInformation(draws, lotteryId, 100);
+  const miScore = scoreByMutualInformation(sorted, miScores);
+  const miBonus = Math.round((miScore - 50) * 0.06);
+
   // ADAPTIVE Monte Carlo — variable depth based on context
   const adaptiveSimCount = getAdaptiveSimCount(context, riskProfile, draws.length);
   const monteCarlo = lightMonteCarlo(sorted, draws, adaptiveSimCount);
