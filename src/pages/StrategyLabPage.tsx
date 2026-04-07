@@ -678,6 +678,7 @@ export default function StrategyLabPage() {
                     <span className="hidden sm:inline">Tabela</span>
                   </TabsTrigger>
                 </TabsList>
+                </div>
 
                 {/* ★ Best Games Tab — NEW */}
                 <TabsContent value="bestgames" className="mt-4 space-y-4">
