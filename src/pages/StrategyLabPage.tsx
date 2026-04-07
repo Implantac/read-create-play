@@ -587,6 +587,7 @@ export default function StrategyLabPage() {
                     lotteryId={config.id}
                     lotteryName={config.name}
                     pick={config.pick}
+                    maxNum={config.numbers}
                   />
                 </TabsContent>
 
