@@ -1,11 +1,11 @@
 import { lazy, Suspense } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PlanGate } from "@/components/PlanGate";
-import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { BayesianNetworkPanel } from "@/components/BayesianNetworkPanel";
-import { Brain, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Brain, Loader2, Cpu, Sparkles, Target, Layers } from "lucide-react";
 
 const StrategySimulatorPanel = lazy(() => import("@/components/StrategySimulatorPanel").then(m => ({ default: m.StrategySimulatorPanel })));
 const StrategyComparatorPanel = lazy(() => import("@/components/StrategyComparatorPanel").then(m => ({ default: m.StrategyComparatorPanel })));
@@ -28,22 +28,43 @@ const EstrategiasPage = () => {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Estratégias IA"
-        description="Machine Learning, otimização genética e análise preditiva"
-        icon={Brain}
-        badge="ML"
-      />
+      {/* Enhanced Header */}
+      <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/8 via-background to-accent/5 p-6 md:p-8">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="relative flex flex-col md:flex-row md:items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-primary/15 flex items-center justify-center shrink-0 ring-2 ring-primary/20">
+            <Brain className="w-7 h-7 text-primary" />
+          </div>
+          <div className="flex-1">
+            <h1 className="text-xl md:text-2xl font-black text-foreground tracking-tight">
+              Estratégias IA
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Machine Learning, otimização genética e análise preditiva para{" "}
+              <span className="text-primary font-semibold">{config.name}</span>
+            </p>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Badge variant="secondary" className="text-xs gap-1.5 py-1.5 px-3">
+              <Cpu className="w-3 h-3" />
+              8 módulos
+            </Badge>
+            <Badge className="text-xs gap-1.5 py-1.5 px-3 bg-primary/10 text-primary border-primary/20">
+              <Sparkles className="w-3 h-3" />
+              ML
+            </Badge>
+          </div>
+        </div>
+      </div>
+
       <LotteryContextBanner />
 
       {draws.length === 0 ? (
         <EmptyState description="Importe os sorteios primeiro no Dashboard para usar as estratégias." />
       ) : (
         <>
-          {/* Bayesian Network Visualization */}
           <BayesianNetworkPanel config={config} draws={draws} stats={stats} />
 
-          {/* PREMIUM: Basic strategies */}
           <PlanGate feature="estrategias_basicas" fallbackMessage="Simulador de Estratégias">
             <Suspense fallback={<LazyFallback />}>
               <StrategySimulatorPanel stats={stats} config={config} draws={draws} />
@@ -68,7 +89,6 @@ const EstrategiasPage = () => {
             </Suspense>
           </PlanGate>
 
-          {/* PROFESSIONAL: Advanced */}
           <PlanGate feature="otimizacao" fallbackMessage="Otimização com Algoritmo Genético + SA">
             <Suspense fallback={<LazyFallback />}>
               <OptimizationPanel stats={stats} config={config} draws={draws} />
