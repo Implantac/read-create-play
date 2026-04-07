@@ -908,58 +908,8 @@ export default function StrategyLabPage() {
                 </TabsContent>
 
                 {/* Comparison Table Tab */}
-                <TabsContent value="comparison" className="mt-4">
-                  <Card className="bg-card/80 backdrop-blur border-border">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-xs font-semibold flex items-center gap-2">
-                        <Layers className="w-3.5 h-3.5 text-primary" />
-                        Tabela Comparativa
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="overflow-x-auto -mx-4 px-4">
-                        <table className="w-full text-xs">
-                          <thead>
-                            <tr className="border-b border-border">
-                              <th className="text-left py-2.5 px-2 text-muted-foreground font-medium">#</th>
-                              <th className="text-left py-2.5 px-2 text-muted-foreground font-medium">Estratégia</th>
-                              <th className="text-center py-2.5 px-2 text-muted-foreground font-medium">Score</th>
-                              <th className="text-center py-2.5 px-2 text-muted-foreground font-medium">Média</th>
-                              <th className="text-center py-2.5 px-2 text-muted-foreground font-medium hidden sm:table-cell">Melhor</th>
-                              <th className="text-center py-2.5 px-2 text-muted-foreground font-medium hidden sm:table-cell">Consist.</th>
-                              <th className="text-center py-2.5 px-2 text-muted-foreground font-medium hidden md:table-cell">Divers.</th>
-                              <th className="text-center py-2.5 px-2 text-muted-foreground font-medium hidden md:table-cell">Cobert.</th>
-                              <th className="text-center py-2.5 px-2 text-muted-foreground font-medium">Prêmios</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {result.rankings.map(r => (
-                              <tr key={r.strategyId} className={`border-b border-border/50 transition-colors hover:bg-muted/5 ${r.rank === 1 ? "bg-primary/[0.03]" : ""}`}>
-                                <td className="py-2.5 px-2 font-bold text-muted-foreground">{r.rank <= 3 ? ["🥇", "🥈", "🥉"][r.rank - 1] : r.rank}</td>
-                                <td className="py-2.5 px-2 font-semibold text-foreground">{r.strategyName}</td>
-                                <td className="py-2.5 px-2 text-center">
-                                  <span className={`font-mono font-bold ${
-                                    r.metrics.globalScore >= 70 ? "text-green-500" :
-                                    r.metrics.globalScore >= 40 ? "text-amber-500" : "text-destructive"
-                                  }`}>{r.metrics.globalScore.toFixed(1)}</span>
-                                </td>
-                                <td className="py-2.5 px-2 text-center font-mono text-foreground">{r.metrics.avgHits.toFixed(2)}</td>
-                                <td className="py-2.5 px-2 text-center font-mono text-foreground hidden sm:table-cell">{r.metrics.bestHits}/{config.pick}</td>
-                                <td className="py-2.5 px-2 text-center font-mono text-foreground hidden sm:table-cell">{(r.metrics.consistency * 100).toFixed(0)}%</td>
-                                <td className="py-2.5 px-2 text-center font-mono text-foreground hidden md:table-cell">{r.metrics.diversityScore.toFixed(0)}%</td>
-                                <td className="py-2.5 px-2 text-center font-mono text-foreground hidden md:table-cell">{r.metrics.coverageScore.toFixed(0)}%</td>
-                                <td className="py-2.5 px-2 text-center">
-                                  <span className={`font-mono font-bold ${r.metrics.totalPrizes > 0 ? "text-primary" : "text-muted-foreground"}`}>
-                                    {r.metrics.totalPrizes}
-                                  </span>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </CardContent>
-                  </Card>
+                <TabsContent value="comparison" className="mt-4 space-y-4">
+                  <ComparisonTablePanel rankings={result.rankings} pick={config.pick} />
                 </TabsContent>
               </Tabs>
             </motion.div>
