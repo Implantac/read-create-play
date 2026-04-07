@@ -1031,11 +1031,16 @@ function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }: {
             {r.rank <= 3 ? ["🥇", "🥈", "🥉"][r.rank - 1] : r.rank}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm font-bold text-foreground">{r.strategyName}</span>
               {trendIcon(r.trend)}
               {r.rank === 1 && (
                 <Badge className="text-[9px] bg-primary/10 text-primary border-primary/20 font-bold">CAMPEÃ</Badge>
+              )}
+              {r.metrics.consistency > 0.7 && (
+                <Badge variant="outline" className="text-[9px] border-green-500/30 text-green-500 bg-green-500/5">
+                  ✓ Confiável
+                </Badge>
               )}
             </div>
             <div className="flex items-center gap-2 mt-2">
