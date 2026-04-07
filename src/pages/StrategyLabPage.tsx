@@ -1744,7 +1744,7 @@ function GeneratedGamesPanel({ generatedGames, lotteryId, pick, maxNum, rankedGa
                                   </div>
                                   <div className="flex flex-wrap gap-1.5 flex-1">
                                     {game.map((num) => (
-                                      <NumberBall key={num} num={num} maxNum={maxNum} pick={pick} />
+                                      <NumberBall key={num} num={num} maxNum={maxNum} />
                                     ))}
                                   </div>
                                   <div className="flex gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
