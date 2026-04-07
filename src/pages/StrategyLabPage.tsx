@@ -80,7 +80,7 @@ const fadeUp = {
 // ═══════════════════════════════════════════════════════
 
 export default function StrategyLabPage() {
-  const { config, draws, selectedLottery } = useLotteryContext();
+  const { config, draws, selectedLottery, stats } = useLotteryContext();
 
   const [selectedStrategies, setSelectedStrategies] = useState<string[]>([]);
   const [gamesPerStrategy, setGamesPerStrategy] = useState(10);
