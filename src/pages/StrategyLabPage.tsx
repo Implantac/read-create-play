@@ -20,7 +20,7 @@ import {
   runStrategyLab, getStrategiesForLottery,
   LabConfig, LabResult, EvolutionProfile, RankingEntry, StrategyGames,
 } from "@/engine/strategy-evolution";
-import { rankAllGames, exportGamesCSV, GameQuality } from "@/engine/strategy-evolution/game-quality";
+import { rankAllGames, exportGamesCSV, GameQuality, analyzeCombination, CombinationAnalysis } from "@/engine/strategy-evolution/game-quality";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
