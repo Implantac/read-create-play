@@ -1371,10 +1371,11 @@ function BestGamesPanel({ rankedGames, lotteryId, lotteryName, pick, maxNum }: {
 // GENERATED GAMES PANEL (per strategy)
 // ═══════════════════════════════════════════════════════
 
-function GeneratedGamesPanel({ generatedGames, lotteryId, pick, rankedGames }: {
+function GeneratedGamesPanel({ generatedGames, lotteryId, pick, maxNum, rankedGames }: {
   generatedGames: StrategyGames[];
   lotteryId: string;
   pick: number;
+  maxNum: number;
   rankedGames: GameQuality[];
 }) {
   const [expandedStrategy, setExpandedStrategy] = useState<string | null>(
