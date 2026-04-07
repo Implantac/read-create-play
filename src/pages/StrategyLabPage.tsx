@@ -1,37 +1,26 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
-import { PageHeader } from "@/components/PageHeader";
 import { PlanGate } from "@/components/PlanGate";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
+  Collapsible, CollapsibleContent, CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import {
-  runStrategyLab,
-  getStrategiesForLottery,
-  LabConfig,
-  LabResult,
-  EvolutionProfile,
-  RankingEntry,
-  StrategyGames,
+  runStrategyLab, getStrategiesForLottery,
+  LabConfig, LabResult, EvolutionProfile, RankingEntry, StrategyGames,
 } from "@/engine/strategy-evolution";
+import { rankAllGames, exportGamesCSV, GameQuality } from "@/engine/strategy-evolution/game-quality";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -42,13 +31,17 @@ import {
   Gauge, Layers, Award, Crosshair, RotateCcw,
   ArrowRight, Star, Percent, Hash, Copy, Save, Dices,
   Check, Settings2, Eye, Download, ChevronRight,
-  Activity, CircleDot, Brain,
+  Activity, CircleDot, Brain, FileDown, RefreshCw,
 } from "lucide-react";
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip,
   ResponsiveContainer, Cell, Legend,
 } from "recharts";
+
+// ═══════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════
 
 const PROFILE_INFO: Record<EvolutionProfile, { label: string; desc: string; icon: any; color: string }> = {
   economico: { label: "Econômico", desc: "Menos jogos, menor custo", icon: Shield, color: "text-blue-500" },
@@ -65,6 +58,14 @@ const RANK_COLORS = [
   "hsl(var(--muted-foreground))",
 ];
 
+const GRADE_STYLES: Record<string, string> = {
+  S: "bg-primary/15 text-primary border-primary/25 ring-1 ring-primary/10",
+  A: "bg-green-500/15 text-green-500 border-green-500/25",
+  B: "bg-amber-500/15 text-amber-500 border-amber-500/25",
+  C: "bg-orange-500/15 text-orange-500 border-orange-500/25",
+  D: "bg-destructive/15 text-destructive border-destructive/25",
+};
+
 const stagger = {
   hidden: { opacity: 0 },
   show: { opacity: 1, transition: { staggerChildren: 0.06 } },
@@ -73,6 +74,10 @@ const fadeUp = {
   hidden: { opacity: 0, y: 16 },
   show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
+
+// ═══════════════════════════════════════════════════════
+// MAIN PAGE
+// ═══════════════════════════════════════════════════════
 
 export default function StrategyLabPage() {
   const { config, draws, selectedLottery } = useLotteryContext();
@@ -89,6 +94,12 @@ export default function StrategyLabPage() {
   const [configOpen, setConfigOpen] = useState(true);
 
   const available = useMemo(() => getStrategiesForLottery(config.id), [config.id]);
+
+  // Ranked quality games across ALL strategies
+  const rankedGames = useMemo(() => {
+    if (!result) return [];
+    return rankAllGames(result.generatedGames, config);
+  }, [result, config]);
 
   const prevLotteryRef = useRef(selectedLottery);
   useEffect(() => {
@@ -164,7 +175,7 @@ export default function StrategyLabPage() {
         }
 
         toast.success(`${res.rankings.length} estratégias testadas em ${res.elapsedMs}ms`);
-        setActiveTab("ranking");
+        setActiveTab("bestgames");
       } catch (err) {
         console.error(err);
         toast.error("Erro ao executar laboratório");
@@ -173,6 +184,19 @@ export default function StrategyLabPage() {
       setRunning(false);
     }, 200);
   }, [draws, config, selectedStrategies, gamesPerStrategy, drawRange, profile]);
+
+  const handleExportCSV = useCallback(() => {
+    if (rankedGames.length === 0) return;
+    const csv = exportGamesCSV(rankedGames, config.name);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `lab-${config.id}-${Date.now()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("CSV exportado!");
+  }, [rankedGames, config]);
 
   const trendIcon = (t: string) => {
     if (t === "up") return <TrendingUp className="w-3.5 h-3.5 text-green-500" />;
@@ -214,6 +238,10 @@ export default function StrategyLabPage() {
     result?.generatedGames.reduce((t, sg) => t + sg.games.length, 0) || 0
   , [result]);
 
+  const bestGamesCount = useMemo(() =>
+    rankedGames.filter(g => g.grade === "S" || g.grade === "A").length
+  , [rankedGames]);
+
   return (
     <PlanGate feature="estrategias_ml">
       <div className="space-y-6">
@@ -229,21 +257,29 @@ export default function StrategyLabPage() {
                 Laboratório de Estratégias
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Motor autoevolutivo para <span className="text-primary font-semibold">{config.name}</span> — teste, compare e descubra as melhores estratégias com backtesting real
+                Motor autoevolutivo para <span className="text-primary font-semibold">{config.name}</span> — teste, compare e receba jogos elaborados com backtesting real
               </p>
             </div>
-            {result && (
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="text-xs gap-1.5 py-1.5 px-3">
-                  <Activity className="w-3 h-3" />
-                  {result.rankings.length} testadas
-                </Badge>
-                <Badge className="text-xs gap-1.5 py-1.5 px-3 bg-primary/10 text-primary border-primary/20">
-                  <Dices className="w-3 h-3" />
-                  {totalGamesGenerated} jogos
-                </Badge>
-              </div>
-            )}
+            <div className="flex items-center gap-2 flex-wrap">
+              {result && (
+                <>
+                  <Badge variant="secondary" className="text-xs gap-1.5 py-1.5 px-3">
+                    <Activity className="w-3 h-3" />
+                    {result.rankings.length} testadas
+                  </Badge>
+                  <Badge className="text-xs gap-1.5 py-1.5 px-3 bg-primary/10 text-primary border-primary/20">
+                    <Dices className="w-3 h-3" />
+                    {totalGamesGenerated} jogos
+                  </Badge>
+                  {bestGamesCount > 0 && (
+                    <Badge className="text-xs gap-1.5 py-1.5 px-3 bg-green-500/10 text-green-500 border-green-500/20">
+                      <Star className="w-3 h-3" />
+                      {bestGamesCount} nota A+
+                    </Badge>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </div>
 
@@ -285,7 +321,7 @@ export default function StrategyLabPage() {
           )}
         </AnimatePresence>
 
-        {/* Config Panel — Collapsible after first run */}
+        {/* Config Panel */}
         <Collapsible open={configOpen} onOpenChange={setConfigOpen}>
           <Card className="bg-card/80 backdrop-blur border-border">
             <CollapsibleTrigger asChild>
@@ -315,12 +351,8 @@ export default function StrategyLabPage() {
                       Estratégias ({selectedStrategies.length}/{available.length})
                     </span>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="sm" onClick={selectAll} className="text-xs h-7">
-                        Todas
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={clearAll} className="text-xs h-7 text-muted-foreground">
-                        Limpar
-                      </Button>
+                      <Button variant="ghost" size="sm" onClick={selectAll} className="text-xs h-7">Todas</Button>
+                      <Button variant="ghost" size="sm" onClick={clearAll} className="text-xs h-7 text-muted-foreground">Limpar</Button>
                     </div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5 max-h-[250px] overflow-y-auto pr-1 scrollbar-thin">
@@ -335,10 +367,7 @@ export default function StrategyLabPage() {
                               : "border-border hover:bg-muted/20 hover:border-muted-foreground/20"
                           }`}
                         >
-                          <Checkbox
-                            checked={isSelected}
-                            onCheckedChange={() => toggleStrategy(s.id)}
-                          />
+                          <Checkbox checked={isSelected} onCheckedChange={() => toggleStrategy(s.id)} />
                           <div className="flex-1 min-w-0">
                             <div className="font-semibold text-foreground truncate">{s.name}</div>
                             <div className="text-[10px] text-muted-foreground truncate mt-0.5">{s.description}</div>
@@ -469,6 +498,28 @@ export default function StrategyLabPage() {
               exit={{ opacity: 0 }}
               className="space-y-5"
             >
+              {/* Action bar */}
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-[10px] gap-1 py-1">
+                    ⏱ {result.elapsedMs}ms
+                  </Badge>
+                  <Badge variant="outline" className="text-[10px] gap-1 py-1">
+                    {draws?.length} sorteios analisados
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" className="text-xs gap-1.5 h-8" onClick={handleExportCSV}>
+                    <FileDown className="w-3 h-3" />
+                    Exportar CSV
+                  </Button>
+                  <Button variant="outline" size="sm" className="text-xs gap-1.5 h-8" onClick={() => { setConfigOpen(false); runLab(); }}>
+                    <RefreshCw className="w-3 h-3" />
+                    Re-executar
+                  </Button>
+                </div>
+              </div>
+
               {/* Insights Strip */}
               <Card className="bg-gradient-to-br from-primary/5 to-accent/5 backdrop-blur border-primary/15">
                 <CardHeader className="pb-2">
@@ -497,7 +548,16 @@ export default function StrategyLabPage() {
 
               {/* Main Tabs */}
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="w-full grid grid-cols-5 h-11">
+                <TabsList className="w-full grid grid-cols-6 h-11">
+                  <TabsTrigger value="bestgames" className="text-xs gap-1.5 data-[state=active]:shadow-sm">
+                    <Star className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Melhores</span>
+                    {bestGamesCount > 0 && (
+                      <Badge variant="secondary" className="text-[8px] h-4 px-1 ml-0.5 hidden lg:inline-flex">
+                        {bestGamesCount}
+                      </Badge>
+                    )}
+                  </TabsTrigger>
                   <TabsTrigger value="ranking" className="text-xs gap-1.5 data-[state=active]:shadow-sm">
                     <Trophy className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Ranking</span>
@@ -505,9 +565,6 @@ export default function StrategyLabPage() {
                   <TabsTrigger value="games" className="text-xs gap-1.5 data-[state=active]:shadow-sm">
                     <Dices className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Jogos</span>
-                    <Badge variant="secondary" className="text-[8px] h-4 px-1 ml-0.5 hidden lg:inline-flex">
-                      {totalGamesGenerated}
-                    </Badge>
                   </TabsTrigger>
                   <TabsTrigger value="charts" className="text-xs gap-1.5 data-[state=active]:shadow-sm">
                     <BarChart3 className="w-3.5 h-3.5" />
@@ -522,6 +579,16 @@ export default function StrategyLabPage() {
                     <span className="hidden sm:inline">Tabela</span>
                   </TabsTrigger>
                 </TabsList>
+
+                {/* ★ Best Games Tab — NEW */}
+                <TabsContent value="bestgames" className="mt-4 space-y-4">
+                  <BestGamesPanel
+                    rankedGames={rankedGames}
+                    lotteryId={config.id}
+                    lotteryName={config.name}
+                    pick={config.pick}
+                  />
+                </TabsContent>
 
                 {/* Ranking Tab */}
                 <TabsContent value="ranking" className="space-y-2.5 mt-4">
@@ -546,6 +613,7 @@ export default function StrategyLabPage() {
                     generatedGames={result.generatedGames}
                     lotteryId={config.id}
                     pick={config.pick}
+                    rankedGames={rankedGames}
                   />
                 </TabsContent>
 
@@ -563,24 +631,10 @@ export default function StrategyLabPage() {
                         <ResponsiveContainer width="100%" height={300}>
                           <RadarChart data={radarData}>
                             <PolarGrid stroke="hsl(var(--border))" />
-                            <PolarAngleAxis
-                              dataKey="metric"
-                              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
-                            />
-                            <PolarRadiusAxis
-                              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 8 }}
-                              domain={[0, "auto"]}
-                            />
+                            <PolarAngleAxis dataKey="metric" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} />
+                            <PolarRadiusAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 8 }} domain={[0, "auto"]} />
                             {topNames.map((name, i) => (
-                              <Radar
-                                key={name}
-                                name={name}
-                                dataKey={name}
-                                stroke={radarColors[i]}
-                                fill={radarColors[i]}
-                                fillOpacity={0.1}
-                                strokeWidth={2}
-                              />
+                              <Radar key={name} name={name} dataKey={name} stroke={radarColors[i]} fill={radarColors[i]} fillOpacity={0.1} strokeWidth={2} />
                             ))}
                             <Legend wrapperStyle={{ fontSize: 10 }} />
                           </RadarChart>
@@ -598,12 +652,8 @@ export default function StrategyLabPage() {
                       <CardContent>
                         <ResponsiveContainer width="100%" height={300}>
                           <BarChart data={barData} layout="vertical" margin={{ left: 10, right: 20 }}>
-                            <XAxis type="number" domain={[0, 100]}
-                              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
-                            />
-                            <YAxis type="category" dataKey="name" width={100}
-                              tick={{ fill: "hsl(var(--foreground))", fontSize: 10 }}
-                            />
+                            <XAxis type="number" domain={[0, 100]} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} />
+                            <YAxis type="category" dataKey="name" width={100} tick={{ fill: "hsl(var(--foreground))", fontSize: 10 }} />
                             <RechartsTooltip
                               content={({ payload }) => {
                                 if (!payload || payload.length === 0) return null;
@@ -619,11 +669,7 @@ export default function StrategyLabPage() {
                             />
                             <Bar dataKey="score" radius={[0, 6, 6, 0]}>
                               {barData.map((_, i) => (
-                                <Cell
-                                  key={i}
-                                  fill={RANK_COLORS[Math.min(i, RANK_COLORS.length - 1)]}
-                                  fillOpacity={0.85}
-                                />
+                                <Cell key={i} fill={RANK_COLORS[Math.min(i, RANK_COLORS.length - 1)]} fillOpacity={0.85} />
                               ))}
                             </Bar>
                           </BarChart>
@@ -694,7 +740,7 @@ export default function StrategyLabPage() {
                         <Brain className="w-7 h-7 text-muted-foreground" />
                       </div>
                       <p className="text-sm font-medium text-muted-foreground">Sem sugestões de evolução</p>
-                      <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">Execute com mais estratégias para gerar recomendações do motor evolutivo.</p>
+                      <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">Execute com mais estratégias para gerar recomendações.</p>
                     </div>
                   ) : (
                     <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-2.5">
@@ -717,30 +763,33 @@ export default function StrategyLabPage() {
                                   {s.type === "promote" ? <TrendingUp className="w-5 h-5" /> :
                                    s.type === "discard" ? <TrendingDown className="w-5 h-5" /> :
                                    s.type === "combine" ? <Sparkles className="w-5 h-5" /> :
-                                   <RotateCcw className="w-5 h-5" />}
+                                   <Gauge className="w-5 h-5" />}
                                 </div>
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 flex-wrap">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                                     <Badge variant="outline" className={`text-[9px] font-bold ${
-                                      s.type === "promote" ? "border-green-500/30 text-green-500 bg-green-500/5" :
-                                      s.type === "discard" ? "border-destructive/30 text-destructive bg-destructive/5" :
-                                      s.type === "combine" ? "border-primary/30 text-primary bg-primary/5" :
-                                      "border-amber-500/30 text-amber-500 bg-amber-500/5"
+                                      s.type === "promote" ? "text-green-500 border-green-500/30" :
+                                      s.type === "discard" ? "text-destructive border-destructive/30" :
+                                      s.type === "combine" ? "text-primary border-primary/30" :
+                                      "text-amber-500 border-amber-500/30"
                                     }`}>
-                                      {s.type === "promote" ? "✓ Promover" :
-                                       s.type === "discard" ? "✗ Descartar" :
-                                       s.type === "combine" ? "⚡ Combinar" : "↻ Ajustar"}
+                                      {s.type === "promote" ? "PROMOVER" :
+                                       s.type === "discard" ? "DESCARTAR" :
+                                       s.type === "combine" ? "COMBINAR" :
+                                       "AJUSTAR"}
                                     </Badge>
-                                    <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-                                      Confiança: <span className="font-mono font-bold">{(s.confidence * 100).toFixed(0)}%</span>
-                                    </span>
-                                    {s.expectedImprovement > 0 && (
-                                      <Badge variant="secondary" className="text-[9px] bg-green-500/10 text-green-600 border-green-500/20">
-                                        +{s.expectedImprovement}% estimado
-                                      </Badge>
+                                    {s.confidence > 0 && (
+                                      <span className="text-[9px] text-muted-foreground font-mono">
+                                        Confiança: {(s.confidence * 100).toFixed(0)}%
+                                      </span>
                                     )}
                                   </div>
-                                  <p className="text-xs text-foreground mt-2 leading-relaxed">{s.reason}</p>
+                                  <p className="text-xs text-foreground leading-relaxed">{s.reason}</p>
+                                  {s.expectedImprovement > 0 && (
+                                    <p className="text-[10px] text-primary mt-1 font-medium">
+                                      ↗ Melhoria esperada: ~{s.expectedImprovement}%
+                                    </p>
+                                  )}
                                 </div>
                               </div>
                             </CardContent>
@@ -753,49 +802,47 @@ export default function StrategyLabPage() {
 
                 {/* Comparison Table Tab */}
                 <TabsContent value="comparison" className="mt-4">
-                  <Card className="bg-card/80 backdrop-blur border-border overflow-hidden">
-                    <CardContent className="p-0">
-                      <div className="overflow-x-auto">
+                  <Card className="bg-card/80 backdrop-blur border-border">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-xs font-semibold flex items-center gap-2">
+                        <Layers className="w-3.5 h-3.5 text-primary" />
+                        Tabela Comparativa
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="overflow-x-auto -mx-4 px-4">
                         <table className="w-full text-xs">
                           <thead>
-                            <tr className="border-b border-border bg-muted/20">
-                              <th className="text-left p-3.5 text-muted-foreground font-semibold">#</th>
-                              <th className="text-left p-3.5 text-muted-foreground font-semibold">Estratégia</th>
-                              <th className="text-right p-3.5 text-muted-foreground font-semibold">Score</th>
-                              <th className="text-right p-3.5 text-muted-foreground font-semibold">Média</th>
-                              <th className="text-right p-3.5 text-muted-foreground font-semibold">Melhor</th>
-                              <th className="text-right p-3.5 text-muted-foreground font-semibold">Consist.</th>
-                              <th className="text-right p-3.5 text-muted-foreground font-semibold hidden md:table-cell">Divers.</th>
-                              <th className="text-right p-3.5 text-muted-foreground font-semibold hidden md:table-cell">Cobert.</th>
-                              <th className="text-right p-3.5 text-muted-foreground font-semibold">Prêmios</th>
+                            <tr className="border-b border-border">
+                              <th className="text-left py-2.5 px-2 text-muted-foreground font-medium">#</th>
+                              <th className="text-left py-2.5 px-2 text-muted-foreground font-medium">Estratégia</th>
+                              <th className="text-center py-2.5 px-2 text-muted-foreground font-medium">Score</th>
+                              <th className="text-center py-2.5 px-2 text-muted-foreground font-medium">Média</th>
+                              <th className="text-center py-2.5 px-2 text-muted-foreground font-medium hidden sm:table-cell">Melhor</th>
+                              <th className="text-center py-2.5 px-2 text-muted-foreground font-medium hidden sm:table-cell">Consist.</th>
+                              <th className="text-center py-2.5 px-2 text-muted-foreground font-medium hidden md:table-cell">Divers.</th>
+                              <th className="text-center py-2.5 px-2 text-muted-foreground font-medium hidden md:table-cell">Cobert.</th>
+                              <th className="text-center py-2.5 px-2 text-muted-foreground font-medium">Prêmios</th>
                             </tr>
                           </thead>
                           <tbody>
                             {result.rankings.map(r => (
-                              <tr key={r.strategyId} className={`border-b border-border/30 hover:bg-muted/10 transition-colors ${
-                                r.rank === 1 ? "bg-primary/5" : ""
-                              }`}>
-                                <td className="p-3.5">
+                              <tr key={r.strategyId} className={`border-b border-border/50 transition-colors hover:bg-muted/5 ${r.rank === 1 ? "bg-primary/[0.03]" : ""}`}>
+                                <td className="py-2.5 px-2 font-bold text-muted-foreground">{r.rank <= 3 ? ["🥇", "🥈", "🥉"][r.rank - 1] : r.rank}</td>
+                                <td className="py-2.5 px-2 font-semibold text-foreground">{r.strategyName}</td>
+                                <td className="py-2.5 px-2 text-center">
                                   <span className={`font-mono font-bold ${
-                                    r.rank === 1 ? "text-primary" :
-                                    r.rank === 2 ? "text-yellow-500" :
-                                    r.rank === 3 ? "text-orange-500" :
-                                    "text-muted-foreground"
-                                  }`}>
-                                    {r.rank <= 3 ? ["🥇", "🥈", "🥉"][r.rank - 1] : r.rank}
-                                  </span>
+                                    r.metrics.globalScore >= 70 ? "text-green-500" :
+                                    r.metrics.globalScore >= 40 ? "text-amber-500" : "text-destructive"
+                                  }`}>{r.metrics.globalScore.toFixed(1)}</span>
                                 </td>
-                                <td className="p-3.5 font-medium text-foreground">{r.strategyName}</td>
-                                <td className="p-3.5 text-right">
-                                  <span className="font-mono font-bold text-primary">{r.metrics.globalScore.toFixed(1)}</span>
-                                </td>
-                                <td className="p-3.5 text-right font-mono text-foreground">{r.metrics.avgHits.toFixed(2)}</td>
-                                <td className="p-3.5 text-right font-mono text-foreground">{r.metrics.bestHits}</td>
-                                <td className="p-3.5 text-right font-mono text-foreground">{(r.metrics.consistency * 100).toFixed(0)}%</td>
-                                <td className="p-3.5 text-right font-mono text-foreground hidden md:table-cell">{r.metrics.diversityScore.toFixed(0)}%</td>
-                                <td className="p-3.5 text-right font-mono text-foreground hidden md:table-cell">{r.metrics.coverageScore.toFixed(0)}%</td>
-                                <td className="p-3.5 text-right">
-                                  <span className={`font-mono ${r.metrics.totalPrizes > 0 ? "text-primary font-bold" : "text-foreground"}`}>
+                                <td className="py-2.5 px-2 text-center font-mono text-foreground">{r.metrics.avgHits.toFixed(2)}</td>
+                                <td className="py-2.5 px-2 text-center font-mono text-foreground hidden sm:table-cell">{r.metrics.bestHits}/{config.pick}</td>
+                                <td className="py-2.5 px-2 text-center font-mono text-foreground hidden sm:table-cell">{(r.metrics.consistency * 100).toFixed(0)}%</td>
+                                <td className="py-2.5 px-2 text-center font-mono text-foreground hidden md:table-cell">{r.metrics.diversityScore.toFixed(0)}%</td>
+                                <td className="py-2.5 px-2 text-center font-mono text-foreground hidden md:table-cell">{r.metrics.coverageScore.toFixed(0)}%</td>
+                                <td className="py-2.5 px-2 text-center">
+                                  <span className={`font-mono font-bold ${r.metrics.totalPrizes > 0 ? "text-primary" : "text-muted-foreground"}`}>
                                     {r.metrics.totalPrizes}
                                   </span>
                                 </td>
@@ -881,9 +928,7 @@ function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }: {
               <span className="text-sm font-bold text-foreground">{r.strategyName}</span>
               {trendIcon(r.trend)}
               {r.rank === 1 && (
-                <Badge className="text-[9px] bg-primary/10 text-primary border-primary/20 font-bold">
-                  CAMPEÃ
-                </Badge>
+                <Badge className="text-[9px] bg-primary/10 text-primary border-primary/20 font-bold">CAMPEÃ</Badge>
               )}
             </div>
             <div className="flex items-center gap-2 mt-2">
@@ -895,9 +940,7 @@ function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }: {
                   className="h-full rounded-full bg-gradient-to-r from-primary/80 to-primary"
                 />
               </div>
-              <span className={`text-xs font-mono font-black ${gradeColor}`}>
-                {r.metrics.globalScore.toFixed(1)}
-              </span>
+              <span className={`text-xs font-mono font-black ${gradeColor}`}>{r.metrics.globalScore.toFixed(1)}</span>
             </div>
             <div className="flex items-center gap-3 mt-1.5 flex-wrap">
               <MetricPill label="Média" value={r.metrics.avgHits.toFixed(2)} />
@@ -906,12 +949,7 @@ function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }: {
               <MetricPill label="Prêmios" value={r.metrics.totalPrizes.toString()} highlight={r.metrics.totalPrizes > 0} />
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-9 w-9 p-0 shrink-0 rounded-lg"
-            onClick={onToggle}
-          >
+          <Button variant="ghost" size="sm" className="h-9 w-9 p-0 shrink-0 rounded-lg" onClick={onToggle}>
             {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </Button>
         </div>
@@ -970,13 +1008,232 @@ function MiniMetric({ label, value }: { label: string; value: string }) {
 }
 
 // ═══════════════════════════════════════════════════════
-// GENERATED GAMES PANEL
+// ★ BEST GAMES PANEL — Curated top games across all strategies
 // ═══════════════════════════════════════════════════════
 
-function GeneratedGamesPanel({ generatedGames, lotteryId, pick }: {
+function BestGamesPanel({ rankedGames, lotteryId, lotteryName, pick }: {
+  rankedGames: GameQuality[];
+  lotteryId: string;
+  lotteryName: string;
+  pick: number;
+}) {
+  const [savingGame, setSavingGame] = useState<string | null>(null);
+  const [copiedGame, setCopiedGame] = useState<string | null>(null);
+  const [savedGames, setSavedGames] = useState<Set<string>>(new Set());
+  const [showCount, setShowCount] = useState(15);
+
+  const topGames = useMemo(() => rankedGames.slice(0, showCount), [rankedGames, showCount]);
+
+  const gradeGroups = useMemo(() => {
+    const groups: Record<string, number> = { S: 0, A: 0, B: 0, C: 0, D: 0 };
+    rankedGames.forEach(g => groups[g.grade]++);
+    return groups;
+  }, [rankedGames]);
+
+  const handleCopy = useCallback((game: number[], key: string) => {
+    navigator.clipboard.writeText(game.join(", "));
+    setCopiedGame(key);
+    toast.success("Jogo copiado!");
+    setTimeout(() => setCopiedGame(null), 2000);
+  }, []);
+
+  const handleSave = useCallback(async (gq: GameQuality, key: string) => {
+    setSavingGame(key);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { toast.error("Faça login para salvar"); return; }
+      const { error } = await supabase.from("saved_bets").insert({
+        user_id: user.id,
+        lottery_id: lotteryId,
+        numbers: gq.game,
+        strategy: `Lab: ${gq.strategyName}`,
+        label: `Lab ${gq.strategyName} [${gq.grade}]`,
+        score: Math.round(gq.overallScore),
+        grade: gq.grade,
+      });
+      if (error) throw error;
+      setSavedGames(prev => new Set(prev).add(key));
+      toast.success("Jogo salvo!");
+    } catch {
+      toast.error("Erro ao salvar jogo");
+    } finally {
+      setSavingGame(null);
+    }
+  }, [lotteryId]);
+
+  const handleSaveBest = useCallback(async () => {
+    const best = rankedGames.filter(g => g.grade === "S" || g.grade === "A");
+    if (best.length === 0) { toast.info("Nenhum jogo com nota S ou A"); return; }
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { toast.error("Faça login para salvar"); return; }
+      const inserts = best.map((gq, i) => ({
+        user_id: user.id,
+        lottery_id: lotteryId,
+        numbers: gq.game,
+        strategy: `Lab: ${gq.strategyName}`,
+        label: `Lab Best #${i + 1} [${gq.grade}]`,
+        score: Math.round(gq.overallScore),
+        grade: gq.grade,
+      }));
+      const { error } = await supabase.from("saved_bets").insert(inserts);
+      if (error) throw error;
+      const ns = new Set(savedGames);
+      best.forEach((_, i) => ns.add(`best-${i}`));
+      setSavedGames(ns);
+      toast.success(`${best.length} melhores jogos salvos!`);
+    } catch {
+      toast.error("Erro ao salvar jogos");
+    }
+  }, [rankedGames, lotteryId, savedGames]);
+
+  if (rankedGames.length === 0) {
+    return (
+      <div className="text-center py-16">
+        <div className="w-14 h-14 rounded-2xl bg-muted/20 flex items-center justify-center mx-auto mb-4">
+          <Star className="w-7 h-7 text-muted-foreground" />
+        </div>
+        <p className="text-sm font-medium text-muted-foreground">Execute o laboratório para ver os melhores jogos.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Summary */}
+      <Card className="bg-gradient-to-r from-primary/5 via-background to-accent/5 border-primary/15">
+        <CardContent className="p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-primary/15 flex items-center justify-center ring-2 ring-primary/20">
+                <Star className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-sm font-black text-foreground">Melhores Jogos Elaborados</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {rankedGames.length} jogos analisados por qualidade estrutural — {lotteryName}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              {Object.entries(gradeGroups).filter(([, v]) => v > 0).map(([grade, count]) => (
+                <Badge key={grade} variant="outline" className={`text-[10px] font-mono font-bold ${GRADE_STYLES[grade]}`}>
+                  {grade}: {count}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Actions */}
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <span className="text-[10px] text-muted-foreground">
+          Mostrando top {Math.min(showCount, rankedGames.length)} de {rankedGames.length} jogos — ordenados por qualidade
+        </span>
+        <Button variant="outline" size="sm" className="text-xs gap-1.5 h-8" onClick={handleSaveBest}>
+          <Save className="w-3 h-3" />
+          Salvar todos nota A+ ({gradeGroups.S + gradeGroups.A})
+        </Button>
+      </div>
+
+      {/* Games */}
+      <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-2">
+        {topGames.map((gq, i) => {
+          const key = `best-${i}`;
+          const isSaved = savedGames.has(key);
+          return (
+            <motion.div key={i} variants={fadeUp}>
+              <div className={`flex items-center gap-3 p-3.5 rounded-xl border group transition-all duration-200 ${
+                isSaved ? "bg-primary/5 border-primary/20" :
+                gq.grade === "S" ? "bg-primary/[0.02] border-primary/15 hover:border-primary/30" :
+                "bg-card/80 border-border hover:border-muted-foreground/20"
+              }`}>
+                {/* Rank & Grade */}
+                <div className="flex flex-col items-center gap-1 shrink-0 w-10">
+                  <span className="text-[10px] font-mono text-muted-foreground font-bold">#{i + 1}</span>
+                  <Badge variant="outline" className={`text-[10px] font-mono font-black px-1.5 py-0 h-5 ${GRADE_STYLES[gq.grade]}`}>
+                    {gq.grade}
+                  </Badge>
+                </div>
+
+                {/* Numbers */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap gap-1.5">
+                    {gq.game.map((num) => (
+                      <span
+                        key={num}
+                        className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold border shadow-sm ${
+                          gq.grade === "S" ? "bg-primary/15 text-primary border-primary/20" :
+                          gq.grade === "A" ? "bg-green-500/10 text-green-600 border-green-500/15" :
+                          "bg-muted/20 text-foreground border-border"
+                        }`}
+                      >
+                        {num.toString().padStart(2, "0")}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                    <span className="text-[9px] text-muted-foreground">
+                      Estratégia: <span className="font-semibold text-foreground">{gq.strategyName}</span>
+                    </span>
+                    <span className="text-[9px] text-muted-foreground">
+                      Par/Ímp: <span className="font-mono text-foreground">{gq.parityBalance.toFixed(0)}</span>
+                    </span>
+                    <span className="text-[9px] text-muted-foreground">
+                      Faixas: <span className="font-mono text-foreground">{gq.rangeBalance.toFixed(0)}</span>
+                    </span>
+                    <span className="text-[9px] text-muted-foreground">
+                      Soma: <span className="font-mono text-foreground">{gq.sumScore.toFixed(0)}</span>
+                    </span>
+                    <span className="text-[9px] text-primary font-mono font-bold">
+                      {gq.overallScore.toFixed(1)} pts
+                    </span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg" onClick={() => handleCopy(gq.game, key)}>
+                    {copiedGame === key ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                  </Button>
+                  <Button
+                    variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg"
+                    disabled={savingGame === key || isSaved}
+                    onClick={() => handleSave(gq, key)}
+                  >
+                    {isSaved ? <Check className="w-3.5 h-3.5 text-primary" /> : <Save className="w-3.5 h-3.5" />}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
+      </motion.div>
+
+      {showCount < rankedGames.length && (
+        <Button
+          variant="outline"
+          className="w-full text-xs gap-2"
+          onClick={() => setShowCount(prev => Math.min(prev + 15, rankedGames.length))}
+        >
+          <ChevronDown className="w-3.5 h-3.5" />
+          Ver mais ({rankedGames.length - showCount} restantes)
+        </Button>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// GENERATED GAMES PANEL (per strategy)
+// ═══════════════════════════════════════════════════════
+
+function GeneratedGamesPanel({ generatedGames, lotteryId, pick, rankedGames }: {
   generatedGames: StrategyGames[];
   lotteryId: string;
   pick: number;
+  rankedGames: GameQuality[];
 }) {
   const [expandedStrategy, setExpandedStrategy] = useState<string | null>(
     generatedGames[0]?.strategyId || null
@@ -984,6 +1241,15 @@ function GeneratedGamesPanel({ generatedGames, lotteryId, pick }: {
   const [savingGame, setSavingGame] = useState<string | null>(null);
   const [copiedGame, setCopiedGame] = useState<string | null>(null);
   const [savedGames, setSavedGames] = useState<Set<string>>(new Set());
+
+  // Create a lookup for game grades
+  const gameGradeLookup = useMemo(() => {
+    const map = new Map<string, GameQuality>();
+    for (const gq of rankedGames) {
+      map.set(gq.game.join(","), gq);
+    }
+    return map;
+  }, [rankedGames]);
 
   const handleCopy = useCallback((game: number[], gameKey: string) => {
     navigator.clipboard.writeText(game.join(", "));
@@ -996,16 +1262,16 @@ function GeneratedGamesPanel({ generatedGames, lotteryId, pick }: {
     setSavingGame(gameKey);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast.error("Faça login para salvar jogos");
-        return;
-      }
+      if (!user) { toast.error("Faça login para salvar jogos"); return; }
+      const gq = gameGradeLookup.get(game.join(","));
       const { error } = await supabase.from("saved_bets").insert({
         user_id: user.id,
         lottery_id: lotteryId,
         numbers: game,
         strategy: `Lab: ${strategyName}`,
-        label: `Lab ${strategyName}`,
+        label: `Lab ${strategyName}${gq ? ` [${gq.grade}]` : ""}`,
+        score: gq ? Math.round(gq.overallScore) : null,
+        grade: gq?.grade || null,
       });
       if (error) throw error;
       setSavedGames(prev => new Set(prev).add(gameKey));
@@ -1015,22 +1281,24 @@ function GeneratedGamesPanel({ generatedGames, lotteryId, pick }: {
     } finally {
       setSavingGame(null);
     }
-  }, [lotteryId]);
+  }, [lotteryId, gameGradeLookup]);
 
   const handleSaveAll = useCallback(async (sg: StrategyGames) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast.error("Faça login para salvar jogos");
-        return;
-      }
-      const inserts = sg.games.map((game, i) => ({
-        user_id: user.id,
-        lottery_id: lotteryId,
-        numbers: game,
-        strategy: `Lab: ${sg.strategyName}`,
-        label: `Lab ${sg.strategyName} #${i + 1}`,
-      }));
+      if (!user) { toast.error("Faça login para salvar jogos"); return; }
+      const inserts = sg.games.map((game, i) => {
+        const gq = gameGradeLookup.get(game.join(","));
+        return {
+          user_id: user.id,
+          lottery_id: lotteryId,
+          numbers: game,
+          strategy: `Lab: ${sg.strategyName}`,
+          label: `Lab ${sg.strategyName} #${i + 1}${gq ? ` [${gq.grade}]` : ""}`,
+          score: gq ? Math.round(gq.overallScore) : null,
+          grade: gq?.grade || null,
+        };
+      });
       const { error } = await supabase.from("saved_bets").insert(inserts);
       if (error) throw error;
       const newSaved = new Set(savedGames);
@@ -1040,7 +1308,7 @@ function GeneratedGamesPanel({ generatedGames, lotteryId, pick }: {
     } catch {
       toast.error("Erro ao salvar jogos");
     }
-  }, [lotteryId, savedGames]);
+  }, [lotteryId, savedGames, gameGradeLookup]);
 
   if (generatedGames.length === 0) {
     return (
@@ -1049,7 +1317,6 @@ function GeneratedGamesPanel({ generatedGames, lotteryId, pick }: {
           <Dices className="w-7 h-7 text-muted-foreground" />
         </div>
         <p className="text-sm font-medium text-muted-foreground">Nenhum jogo gerado</p>
-        <p className="text-xs text-muted-foreground mt-1">Execute o laboratório para gerar jogos.</p>
       </div>
     );
   }
@@ -1058,16 +1325,14 @@ function GeneratedGamesPanel({ generatedGames, lotteryId, pick }: {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Badge variant="secondary" className="text-[10px] gap-1 py-1">
-            <Dices className="w-3 h-3" />
-            {totalGames} jogos
-          </Badge>
-          <span className="text-[10px] text-muted-foreground">
-            em {generatedGames.length} estratégias — ordenados por ranking
-          </span>
-        </div>
+      <div className="flex items-center gap-2">
+        <Badge variant="secondary" className="text-[10px] gap-1 py-1">
+          <Dices className="w-3 h-3" />
+          {totalGames} jogos
+        </Badge>
+        <span className="text-[10px] text-muted-foreground">
+          em {generatedGames.length} estratégias — ordenados por ranking
+        </span>
       </div>
 
       <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-2.5">
@@ -1134,12 +1399,7 @@ function GeneratedGamesPanel({ generatedGames, lotteryId, pick }: {
                             <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">
                               Jogos gerados
                             </span>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="text-xs gap-1.5 h-8 rounded-lg"
-                              onClick={() => handleSaveAll(sg)}
-                            >
+                            <Button variant="outline" size="sm" className="text-xs gap-1.5 h-8 rounded-lg" onClick={() => handleSaveAll(sg)}>
                               <Save className="w-3 h-3" />
                               Salvar todos ({sg.games.length})
                             </Button>
@@ -1149,18 +1409,23 @@ function GeneratedGamesPanel({ generatedGames, lotteryId, pick }: {
                             {sg.games.map((game, gIdx) => {
                               const gameKey = `${sg.strategyId}-${gIdx}`;
                               const isSaved = savedGames.has(gameKey);
+                              const gq = gameGradeLookup.get(game.join(","));
                               return (
                                 <div
                                   key={gIdx}
                                   className={`flex items-center gap-3 p-3 rounded-xl border group transition-all duration-200 ${
-                                    isSaved
-                                      ? "bg-primary/5 border-primary/20"
-                                      : "bg-muted/5 border-border hover:border-primary/20 hover:bg-muted/10"
+                                    isSaved ? "bg-primary/5 border-primary/20" :
+                                    "bg-muted/5 border-border hover:border-primary/20 hover:bg-muted/10"
                                   }`}
                                 >
-                                  <span className="text-[10px] font-mono text-muted-foreground w-6 text-right shrink-0 font-bold">
-                                    #{gIdx + 1}
-                                  </span>
+                                  <div className="flex flex-col items-center gap-0.5 shrink-0 w-8">
+                                    <span className="text-[10px] font-mono text-muted-foreground font-bold">#{gIdx + 1}</span>
+                                    {gq && (
+                                      <Badge variant="outline" className={`text-[8px] font-mono font-black px-1 py-0 h-4 ${GRADE_STYLES[gq.grade]}`}>
+                                        {gq.grade}
+                                      </Badge>
+                                    )}
+                                  </div>
                                   <div className="flex flex-wrap gap-1.5 flex-1">
                                     {game.map((num) => (
                                       <span
@@ -1172,32 +1437,15 @@ function GeneratedGamesPanel({ generatedGames, lotteryId, pick }: {
                                     ))}
                                   </div>
                                   <div className="flex gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-8 w-8 p-0 rounded-lg"
-                                      onClick={() => handleCopy(game, gameKey)}
-                                      title="Copiar"
-                                    >
-                                      {copiedGame === gameKey ? (
-                                        <Check className="w-3.5 h-3.5 text-green-500" />
-                                      ) : (
-                                        <Copy className="w-3.5 h-3.5" />
-                                      )}
+                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg" onClick={() => handleCopy(game, gameKey)}>
+                                      {copiedGame === gameKey ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
                                     </Button>
                                     <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-8 w-8 p-0 rounded-lg"
+                                      variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg"
                                       disabled={savingGame === gameKey || isSaved}
                                       onClick={() => handleSave(game, sg.strategyName, gameKey)}
-                                      title="Salvar"
                                     >
-                                      {isSaved ? (
-                                        <Check className="w-3.5 h-3.5 text-primary" />
-                                      ) : (
-                                        <Save className="w-3.5 h-3.5" />
-                                      )}
+                                      {isSaved ? <Check className="w-3.5 h-3.5 text-primary" /> : <Save className="w-3.5 h-3.5" />}
                                     </Button>
                                   </div>
                                 </div>
