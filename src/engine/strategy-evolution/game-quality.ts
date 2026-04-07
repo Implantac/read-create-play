@@ -88,7 +88,7 @@ export function scoreGame(
   let gapScore = 70;
   if (stats && stats.length > 0) {
     const statsMap = new Map(stats.map(s => [s.number, s]));
-    const gaps = game.map(n => statsMap.get(n)?.currentGap ?? 0);
+    const gaps = game.map(n => statsMap.get(n)?.lastSeen ?? 0);
     if (gaps.length > 1) {
       const avgGap = gaps.reduce((s, g) => s + g, 0) / gaps.length;
       const gapVariance = gaps.reduce((s, g) => s + (g - avgGap) ** 2, 0) / gaps.length;
