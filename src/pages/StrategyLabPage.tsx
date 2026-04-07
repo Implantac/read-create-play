@@ -614,6 +614,7 @@ export default function StrategyLabPage() {
                     generatedGames={result.generatedGames}
                     lotteryId={config.id}
                     pick={config.pick}
+                    maxNum={config.numbers}
                     rankedGames={rankedGames}
                   />
                 </TabsContent>
