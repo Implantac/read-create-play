@@ -647,7 +647,8 @@ export default function StrategyLabPage() {
 
               {/* Main Tabs */}
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="w-full grid grid-cols-7 h-11">
+                <div className="overflow-x-auto -mx-1 px-1 scrollbar-thin">
+                  <TabsList className="inline-flex w-full min-w-[560px] sm:min-w-0 sm:grid sm:grid-cols-7 h-11">
                   <TabsTrigger value="bestgames" className="text-xs gap-1 data-[state=active]:shadow-sm">
                     <Star className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Melhores</span>
