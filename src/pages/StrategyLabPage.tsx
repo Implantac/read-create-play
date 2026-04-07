@@ -1795,6 +1795,26 @@ function GeneratedGamesPanel({ generatedGames, lotteryId, pick, maxNum, rankedGa
 // ═══════════════════════════════════════════════════════
 
 function CombinationAnalysisPanel({ analysis, maxNum }: { analysis: CombinationAnalysis | null; maxNum: number }) {
+  // Build heatmap data — frequency of each number across all games
+  const heatmapData = useMemo(() => {
+    if (!analysis) return [];
+    const data: { num: number; count: number; pct: number }[] = [];
+    const maxCount = Math.max(...analysis.numberFrequency.values(), 1);
+    for (let n = 1; n <= maxNum; n++) {
+      const count = analysis.numberFrequency.get(n) || 0;
+      data.push({ num: n, count, pct: (count / maxCount) * 100 });
+    }
+    return data;
+  }, [analysis, maxNum]);
+
+  const barChartData = useMemo(() => {
+    if (!analysis) return [];
+    return [...analysis.numberFrequency.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 20)
+      .map(([num, count]) => ({ num: num.toString().padStart(2, "0"), count }));
+  }, [analysis]);
+
   if (!analysis) {
     return (
       <div className="text-center py-16">
@@ -1805,24 +1825,6 @@ function CombinationAnalysisPanel({ analysis, maxNum }: { analysis: CombinationA
       </div>
     );
   }
-
-  // Build heatmap data — frequency of each number across all games
-  const heatmapData = useMemo(() => {
-    const data: { num: number; count: number; pct: number }[] = [];
-    const maxCount = Math.max(...analysis.numberFrequency.values(), 1);
-    for (let n = 1; n <= maxNum; n++) {
-      const count = analysis.numberFrequency.get(n) || 0;
-      data.push({ num: n, count, pct: (count / maxCount) * 100 });
-    }
-    return data;
-  }, [analysis, maxNum]);
-
-  const barChartData = useMemo(() =>
-    [...analysis.numberFrequency.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 20)
-      .map(([num, count]) => ({ num: num.toString().padStart(2, "0"), count })),
-  [analysis]);
 
   return (
     <div className="space-y-4">
