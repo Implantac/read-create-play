@@ -249,6 +249,44 @@ export default function StrategyLabPage() {
     rankedGames.filter(g => g.grade === "S" || g.grade === "A").length
   , [rankedGames]);
 
+  // Executive summary data
+  const executiveSummary = useMemo(() => {
+    if (!result || rankedGames.length === 0) return null;
+    const sCount = rankedGames.filter(g => g.grade === "S").length;
+    const aCount = rankedGames.filter(g => g.grade === "A").length;
+    const avgScore = rankedGames.reduce((s, g) => s + g.overallScore, 0) / rankedGames.length;
+    const bestStrategy = result.rankings[0];
+    const worstStrategy = result.rankings[result.rankings.length - 1];
+    const scoreDiff = bestStrategy && worstStrategy
+      ? bestStrategy.metrics.globalScore - worstStrategy.metrics.globalScore
+      : 0;
+    const consistentCount = result.rankings.filter(r => r.metrics.consistency > 0.6).length;
+    const prizeCount = result.rankings.filter(r => r.metrics.totalPrizes > 0).length;
+    
+    // Generate actionable recommendations
+    const recommendations: { icon: string; text: string; priority: "high" | "medium" | "low" }[] = [];
+    if (sCount + aCount > 0) {
+      recommendations.push({ icon: "🎯", text: `Use os ${sCount + aCount} jogos nota S/A como base principal de apostas`, priority: "high" });
+    }
+    if (bestStrategy && bestStrategy.metrics.consistency > 0.7) {
+      recommendations.push({ icon: "🔄", text: `${bestStrategy.strategyName} é confiável — priorize para apostas recorrentes`, priority: "high" });
+    }
+    if (scoreDiff > 30) {
+      recommendations.push({ icon: "⚠️", text: `Grande variação entre estratégias (${scoreDiff.toFixed(0)} pts) — foque nas top 3`, priority: "medium" });
+    }
+    if (consistentCount < result.rankings.length * 0.3) {
+      recommendations.push({ icon: "📊", text: "Poucas estratégias consistentes — aumente o volume de jogos para estabilizar", priority: "medium" });
+    }
+    if (prizeCount > 0) {
+      recommendations.push({ icon: "💰", text: `${prizeCount} estratégia(s) geraram premiações no backtesting — resultados promissores`, priority: "low" });
+    }
+    if (combinationAnalysis && combinationAnalysis.coveragePercent < 60) {
+      recommendations.push({ icon: "🔢", text: "Cobertura numérica baixa — considere adicionar mais estratégias de dispersão", priority: "medium" });
+    }
+
+    return { sCount, aCount, avgScore, scoreDiff, consistentCount, prizeCount, recommendations };
+  }, [result, rankedGames, combinationAnalysis]);
+
   return (
     <PlanGate feature="estrategias_ml">
       <div className="space-y-6">
@@ -527,35 +565,90 @@ export default function StrategyLabPage() {
                 </div>
               </div>
 
-              {/* Insights Strip */}
-              <Card className="bg-gradient-to-br from-primary/5 to-accent/5 backdrop-blur border-primary/15">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground">
-                    <Lightbulb className="w-4 h-4 text-primary" />
-                    Insights da Análise
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                    {result.insights.map((insight, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, x: -8 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.05 }}
-                        className="flex items-start gap-2 p-2.5 rounded-xl bg-background/60 border border-border/50"
-                      >
-                        <CircleDot className="w-3 h-3 text-primary mt-0.5 shrink-0" />
-                        <p className="text-xs text-foreground leading-relaxed">{insight}</p>
-                      </motion.div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Executive Summary */}
+              {executiveSummary && (
+                <Card className="bg-gradient-to-br from-primary/5 via-background to-accent/5 backdrop-blur border-primary/15 overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary via-primary/40 to-transparent" />
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground">
+                      <Lightbulb className="w-4 h-4 text-primary" />
+                      Resumo Executivo
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Key metrics row */}
+                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                      <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 text-center">
+                        <div className="text-lg font-black font-mono text-primary">{executiveSummary.sCount}</div>
+                        <div className="text-[9px] text-muted-foreground">Nota S</div>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-green-500/10 border border-green-500/20 text-center">
+                        <div className="text-lg font-black font-mono text-green-500">{executiveSummary.aCount}</div>
+                        <div className="text-[9px] text-muted-foreground">Nota A</div>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-muted/10 border border-border text-center">
+                        <div className="text-lg font-black font-mono text-foreground">{executiveSummary.avgScore.toFixed(1)}</div>
+                        <div className="text-[9px] text-muted-foreground">Score Médio</div>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-muted/10 border border-border text-center">
+                        <div className="text-lg font-black font-mono text-foreground">{executiveSummary.consistentCount}</div>
+                        <div className="text-[9px] text-muted-foreground">Consistentes</div>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-muted/10 border border-border text-center">
+                        <div className="text-lg font-black font-mono text-foreground">{executiveSummary.prizeCount}</div>
+                        <div className="text-[9px] text-muted-foreground">Com Prêmios</div>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-muted/10 border border-border text-center">
+                        <div className="text-lg font-black font-mono text-foreground">{executiveSummary.scoreDiff.toFixed(0)}</div>
+                        <div className="text-[9px] text-muted-foreground">Δ Score</div>
+                      </div>
+                    </div>
+
+                    {/* Recommendations */}
+                    {executiveSummary.recommendations.length > 0 && (
+                      <div className="space-y-1.5">
+                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">Recomendações</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                          {executiveSummary.recommendations.map((rec, i) => (
+                            <motion.div
+                              key={i}
+                              initial={{ opacity: 0, x: -8 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: i * 0.05 }}
+                              className={`flex items-start gap-2 p-2.5 rounded-xl border ${
+                                rec.priority === "high" ? "bg-primary/5 border-primary/20" :
+                                rec.priority === "medium" ? "bg-amber-500/5 border-amber-500/15" :
+                                "bg-background/60 border-border/50"
+                              }`}
+                            >
+                              <span className="text-sm shrink-0">{rec.icon}</span>
+                              <p className="text-xs text-foreground leading-relaxed">{rec.text}</p>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Insights */}
+                    <div className="space-y-1.5">
+                      <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">Insights</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
+                        {result.insights.map((insight, i) => (
+                          <div key={i} className="flex items-start gap-2 p-2 rounded-lg bg-background/60 border border-border/50">
+                            <CircleDot className="w-3 h-3 text-primary mt-0.5 shrink-0" />
+                            <p className="text-[11px] text-foreground leading-relaxed">{insight}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Main Tabs */}
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="w-full grid grid-cols-7 h-11">
+                <div className="overflow-x-auto -mx-1 px-1 scrollbar-thin">
+                  <TabsList className="inline-flex w-full min-w-[560px] sm:min-w-0 sm:grid sm:grid-cols-7 h-11">
                   <TabsTrigger value="bestgames" className="text-xs gap-1 data-[state=active]:shadow-sm">
                     <Star className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Melhores</span>
@@ -585,6 +678,7 @@ export default function StrategyLabPage() {
                     <span className="hidden sm:inline">Tabela</span>
                   </TabsTrigger>
                 </TabsList>
+                </div>
 
                 {/* ★ Best Games Tab — NEW */}
                 <TabsContent value="bestgames" className="mt-4 space-y-4">
@@ -937,11 +1031,16 @@ function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }: {
             {r.rank <= 3 ? ["🥇", "🥈", "🥉"][r.rank - 1] : r.rank}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm font-bold text-foreground">{r.strategyName}</span>
               {trendIcon(r.trend)}
               {r.rank === 1 && (
                 <Badge className="text-[9px] bg-primary/10 text-primary border-primary/20 font-bold">CAMPEÃ</Badge>
+              )}
+              {r.metrics.consistency > 0.7 && (
+                <Badge variant="outline" className="text-[9px] border-green-500/30 text-green-500 bg-green-500/5">
+                  ✓ Confiável
+                </Badge>
               )}
             </div>
             <div className="flex items-center gap-2 mt-2">
