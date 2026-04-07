@@ -1026,7 +1026,7 @@ function QualityBar({ label, value, icon }: { label: string; value: number; icon
   );
 }
 
-function NumberBall({ num, maxNum, pick }: { num: number; maxNum: number; pick: number }) {
+function NumberBall({ num, maxNum }: { num: number; maxNum: number }) {
   const quarterSize = Math.ceil(maxNum / 4);
   const q = Math.min(3, Math.floor((num - 1) / quarterSize));
   const colors = [
@@ -1039,6 +1039,123 @@ function NumberBall({ num, maxNum, pick }: { num: number; maxNum: number; pick: 
     <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold border shadow-sm ${colors[q]}`}>
       {num.toString().padStart(2, "0")}
     </span>
+  );
+}
+
+/** Mini bar for grade distribution */
+function GradeDistributionBar({ groups, total }: { groups: Record<string, number>; total: number }) {
+  const grades = ["S", "A", "B", "C", "D"] as const;
+  const barColors: Record<string, string> = {
+    S: "bg-primary", A: "bg-green-500", B: "bg-amber-500", C: "bg-orange-500", D: "bg-destructive",
+  };
+  if (total === 0) return null;
+  return (
+    <div className="space-y-1.5">
+      <div className="flex h-3 rounded-full overflow-hidden bg-muted/20">
+        {grades.map(g => {
+          const pct = (groups[g] / total) * 100;
+          if (pct === 0) return null;
+          return (
+            <div
+              key={g}
+              className={`${barColors[g]} transition-all duration-500`}
+              style={{ width: `${pct}%` }}
+              title={`${g}: ${groups[g]} (${pct.toFixed(0)}%)`}
+            />
+          );
+        })}
+      </div>
+      <div className="flex items-center justify-between text-[9px] text-muted-foreground">
+        {grades.filter(g => groups[g] > 0).map(g => (
+          <span key={g} className="flex items-center gap-0.5">
+            <span className={`w-1.5 h-1.5 rounded-full ${barColors[g]}`} />
+            <span className="font-mono font-bold">{g}</span>
+            <span>{((groups[g] / total) * 100).toFixed(0)}%</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Smart Pick — highlighted TOP 3 card */
+function SmartPickCard({ gq, rank, maxNum, onCopy, onSave, isSaved }: {
+  gq: GameQuality; rank: number; maxNum: number;
+  onCopy: () => void; onSave: () => void; isSaved: boolean;
+}) {
+  const medals = ["🥇", "🥈", "🥉"];
+  const ringColors = [
+    "ring-primary/40 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-primary/30",
+    "ring-yellow-500/30 bg-gradient-to-br from-yellow-500/8 via-transparent to-transparent border-yellow-500/20",
+    "ring-orange-500/25 bg-gradient-to-br from-orange-500/6 via-transparent to-transparent border-orange-400/15",
+  ];
+  const evens = gq.game.filter(n => n % 2 === 0).length;
+  const odds = gq.game.length - evens;
+  const sum = gq.game.reduce((s, n) => s + n, 0);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: rank * 0.1, duration: 0.4 }}
+    >
+      <Card className={`relative overflow-hidden ring-1 ${ringColors[rank]} transition-shadow hover:shadow-lg`}>
+        {rank === 0 && <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary via-primary/60 to-transparent" />}
+        <CardContent className="p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">{medals[rank]}</span>
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">
+                  {rank === 0 ? "Melhor jogo" : `#${rank + 1} Smart Pick`}
+                </p>
+                <p className="text-xs text-muted-foreground truncate max-w-[150px]">{gq.strategyName}</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <Badge variant="outline" className={`text-xs font-mono font-black ${GRADE_STYLES[gq.grade]}`}>
+                {gq.grade}
+              </Badge>
+              <p className="text-lg font-mono font-black text-primary mt-0.5">{gq.overallScore.toFixed(1)}</p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-1.5 justify-center py-1">
+            {gq.game.map(num => <NumberBall key={num} num={num} maxNum={maxNum} />)}
+          </div>
+
+          {/* Quick stats row */}
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="p-1.5 rounded-lg bg-muted/10 border border-border/50">
+              <div className="text-[10px] text-muted-foreground">Par/Ímpar</div>
+              <div className="text-xs font-mono font-bold text-foreground">{evens}/{odds}</div>
+            </div>
+            <div className="p-1.5 rounded-lg bg-muted/10 border border-border/50">
+              <div className="text-[10px] text-muted-foreground">Soma</div>
+              <div className="text-xs font-mono font-bold text-foreground">{sum}</div>
+            </div>
+            <div className="p-1.5 rounded-lg bg-muted/10 border border-border/50">
+              <div className="text-[10px] text-muted-foreground">Faixas</div>
+              <div className="text-xs font-mono font-bold text-foreground">{gq.rangeBalance.toFixed(0)}%</div>
+            </div>
+          </div>
+
+          <div className="flex gap-1.5">
+            <Button variant="outline" size="sm" className="flex-1 text-xs gap-1.5 h-8 rounded-lg" onClick={onCopy}>
+              <Copy className="w-3 h-3" /> Copiar
+            </Button>
+            <Button
+              size="sm"
+              className="flex-1 text-xs gap-1.5 h-8 rounded-lg"
+              disabled={isSaved}
+              onClick={onSave}
+            >
+              {isSaved ? <><Check className="w-3 h-3" /> Salvo</> : <><Save className="w-3 h-3" /> Salvar</>}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
 
@@ -1074,6 +1191,12 @@ function BestGamesPanel({ rankedGames, lotteryId, lotteryName, pick, maxNum }: {
     if (rankedGames.length === 0) return 0;
     return rankedGames.reduce((s, g) => s + g.overallScore, 0) / rankedGames.length;
   }, [rankedGames]);
+
+  const top3 = useMemo(() => rankedGames.slice(0, 3), [rankedGames]);
+  const restGames = useMemo(() => {
+    if (!gradeFilter) return rankedGames.slice(3);
+    return rankedGames.filter(g => g.grade === gradeFilter).filter(g => !top3.includes(g));
+  }, [rankedGames, gradeFilter, top3]);
 
   const handleCopy = useCallback((game: number[], key: string) => {
     navigator.clipboard.writeText(game.join(", "));
@@ -1167,6 +1290,13 @@ function BestGamesPanel({ rankedGames, lotteryId, lotteryName, pick, maxNum }: {
     });
   }, []);
 
+  const selectAllVisible = useCallback(() => {
+    const keys = topGames.map((gq) => `best-${rankedGames.indexOf(gq)}`);
+    setSelectedGames(new Set(keys));
+  }, [topGames, rankedGames]);
+
+  const deselectAll = useCallback(() => setSelectedGames(new Set()), []);
+
   if (rankedGames.length === 0) {
     return (
       <div className="text-center py-16">
@@ -1179,9 +1309,33 @@ function BestGamesPanel({ rankedGames, lotteryId, lotteryName, pick, maxNum }: {
   }
 
   return (
-    <div className="space-y-4">
-      {/* Summary KPIs */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div className="space-y-5">
+      {/* ★ Smart Pick — TOP 3 hero */}
+      {top3.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles className="w-4 h-4 text-primary" />
+            <h3 className="text-sm font-bold text-foreground">Smart Pick — Top 3</h3>
+            <span className="text-[10px] text-muted-foreground">Melhores jogos de todas as estratégias</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {top3.map((gq, i) => (
+              <SmartPickCard
+                key={i}
+                gq={gq}
+                rank={i}
+                maxNum={maxNum}
+                onCopy={() => handleCopy(gq.game, `smart-${i}`)}
+                onSave={() => handleSave(gq, `smart-${i}`)}
+                isSaved={savedGames.has(`smart-${i}`)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* KPIs + Grade Distribution */}
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         <Card className="bg-card/80 border-border">
           <CardContent className="p-3 text-center">
             <div className="text-2xl font-black text-foreground font-mono">{rankedGames.length}</div>
@@ -1206,6 +1360,11 @@ function BestGamesPanel({ rankedGames, lotteryId, lotteryName, pick, maxNum }: {
               {rankedGames.length > 0 ? rankedGames[0].overallScore.toFixed(1) : "—"}
             </div>
             <div className="text-[10px] text-muted-foreground mt-0.5">Melhor Score</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-card/80 border-border col-span-2 sm:col-span-1">
+          <CardContent className="p-3">
+            <GradeDistributionBar groups={gradeGroups} total={rankedGames.length} />
           </CardContent>
         </Card>
       </div>
@@ -1236,10 +1395,20 @@ function BestGamesPanel({ rankedGames, lotteryId, lotteryName, pick, maxNum }: {
 
       {/* Actions */}
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <span className="text-[10px] text-muted-foreground">
-          Mostrando {Math.min(showCount, filteredGames.length)} de {filteredGames.length} jogos
-          {gradeFilter && ` (nota ${gradeFilter})`}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] text-muted-foreground">
+            Mostrando {Math.min(showCount + 3, filteredGames.length)} de {filteredGames.length} jogos
+            {gradeFilter && ` (nota ${gradeFilter})`}
+          </span>
+          <Button variant="ghost" size="sm" className="text-[10px] h-6 px-2" onClick={selectAllVisible}>
+            Selecionar todos
+          </Button>
+          {selectedGames.size > 0 && (
+            <Button variant="ghost" size="sm" className="text-[10px] h-6 px-2 text-muted-foreground" onClick={deselectAll}>
+              Limpar seleção
+            </Button>
+          )}
+        </div>
         <div className="flex items-center gap-2">
           {selectedGames.size > 0 && (
             <Button variant="default" size="sm" className="text-xs gap-1.5 h-8" onClick={handleSaveSelected}>
@@ -1263,22 +1432,23 @@ function BestGamesPanel({ rankedGames, lotteryId, lotteryName, pick, maxNum }: {
         <span className="text-muted-foreground/60">— faixas numéricas</span>
       </div>
 
-      {/* Games */}
+      {/* Remaining Games List (after top 3) */}
       <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-2">
-        {topGames.map((gq, i) => {
-          const key = `best-${rankedGames.indexOf(gq)}`;
+        {(gradeFilter ? filteredGames : restGames).slice(0, showCount).map((gq, i) => {
+          const globalIdx = rankedGames.indexOf(gq);
+          const key = `best-${globalIdx}`;
           const isSaved = savedGames.has(key);
           const isExpanded = expandedGame === key;
           const isSelected = selectedGames.has(key);
+          const displayRank = gradeFilter ? i + 1 : i + 4;
           return (
-            <motion.div key={i} variants={fadeUp}>
+            <motion.div key={globalIdx} variants={fadeUp}>
               <div className={`rounded-xl border transition-all duration-200 ${
                 isSaved ? "bg-primary/5 border-primary/20" :
                 isSelected ? "bg-accent/10 border-primary/30 ring-1 ring-primary/20" :
                 "bg-muted/5 border-border hover:border-primary/20 hover:bg-muted/10"
               }`}>
-                <div className="flex items-center gap-3 p-3.5 group">
-                  {/* Checkbox for selection */}
+                <div className="flex items-center gap-2 sm:gap-3 p-3 sm:p-3.5 group">
                   <Checkbox
                     checked={isSelected}
                     onCheckedChange={() => toggleSelect(key)}
@@ -1286,36 +1456,36 @@ function BestGamesPanel({ rankedGames, lotteryId, lotteryName, pick, maxNum }: {
                   />
 
                   {/* Rank + Grade */}
-                  <div className="flex flex-col items-center gap-1 shrink-0 w-10">
-                    <span className="text-[10px] font-mono text-muted-foreground font-bold">#{i + 1}</span>
+                  <div className="flex flex-col items-center gap-1 shrink-0 w-9">
+                    <span className="text-[10px] font-mono text-muted-foreground font-bold">#{displayRank}</span>
                     <Badge variant="outline" className={`text-[9px] font-mono font-black px-1.5 py-0 h-5 ${GRADE_STYLES[gq.grade]}`}>
                       {gq.grade}
                     </Badge>
                   </div>
 
                   {/* Numbers */}
-                  <div className="flex flex-wrap gap-1.5 flex-1">
+                  <div className="flex flex-wrap gap-1 sm:gap-1.5 flex-1 min-w-0">
                     {gq.game.map((num) => (
-                      <NumberBall key={num} num={num} maxNum={maxNum} pick={pick} />
+                      <NumberBall key={num} num={num} maxNum={maxNum} />
                     ))}
                   </div>
 
-                  {/* Score + Strategy */}
-                  <div className="hidden sm:flex flex-col items-end gap-0.5 shrink-0">
+                  {/* Score + Strategy — visible on all sizes */}
+                  <div className="flex flex-col items-end gap-0.5 shrink-0">
                     <span className="text-sm font-mono font-black text-primary">{gq.overallScore.toFixed(1)}</span>
-                    <span className="text-[9px] text-muted-foreground truncate max-w-[100px]">{gq.strategyName}</span>
+                    <span className="text-[9px] text-muted-foreground truncate max-w-[80px] sm:max-w-[100px]">{gq.strategyName}</span>
                   </div>
 
                   {/* Actions */}
-                  <div className="flex gap-1 shrink-0">
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg" onClick={() => setExpandedGame(isExpanded ? null : key)}>
+                  <div className="flex gap-0.5 sm:gap-1 shrink-0">
+                    <Button variant="ghost" size="sm" className="h-7 w-7 sm:h-8 sm:w-8 p-0 rounded-lg" onClick={() => setExpandedGame(isExpanded ? null : key)}>
                       <Eye className={`w-3.5 h-3.5 ${isExpanded ? "text-primary" : ""}`} />
                     </Button>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg" onClick={() => handleCopy(gq.game, key)}>
+                    <Button variant="ghost" size="sm" className="h-7 w-7 sm:h-8 sm:w-8 p-0 rounded-lg" onClick={() => handleCopy(gq.game, key)}>
                       {copiedGame === key ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
                     </Button>
                     <Button
-                      variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg"
+                      variant="ghost" size="sm" className="h-7 w-7 sm:h-8 sm:w-8 p-0 rounded-lg"
                       disabled={savingGame === key || isSaved}
                       onClick={() => handleSave(gq, key)}
                     >
@@ -1335,9 +1505,12 @@ function BestGamesPanel({ rankedGames, lotteryId, lotteryName, pick, maxNum }: {
                       className="overflow-hidden"
                     >
                       <div className="px-4 pb-4 pt-1 border-t border-border/50 space-y-2.5">
-                        <div className="flex items-center gap-2 mb-2 sm:hidden">
+                        <div className="flex items-center gap-3 mb-2">
                           <span className="text-xs font-mono font-bold text-primary">{gq.overallScore.toFixed(1)} pts</span>
                           <span className="text-[10px] text-muted-foreground">— {gq.strategyName}</span>
+                          <span className="text-[10px] text-muted-foreground ml-auto">
+                            Soma: <span className="font-mono font-bold text-foreground">{gq.game.reduce((s, n) => s + n, 0)}</span>
+                          </span>
                         </div>
                         <QualityBar label="Paridade" value={gq.parityBalance} icon={<Percent className="w-2.5 h-2.5" />} />
                         <QualityBar label="Faixas" value={gq.rangeBalance} icon={<Layers className="w-2.5 h-2.5" />} />
@@ -1353,14 +1526,14 @@ function BestGamesPanel({ rankedGames, lotteryId, lotteryName, pick, maxNum }: {
         })}
       </motion.div>
 
-      {showCount < filteredGames.length && (
+      {showCount < (gradeFilter ? filteredGames : restGames).length && (
         <Button
           variant="outline"
           className="w-full text-xs gap-2"
-          onClick={() => setShowCount(prev => Math.min(prev + 15, filteredGames.length))}
+          onClick={() => setShowCount(prev => Math.min(prev + 15, rankedGames.length))}
         >
           <ChevronDown className="w-3.5 h-3.5" />
-          Ver mais ({filteredGames.length - showCount} restantes)
+          Ver mais ({(gradeFilter ? filteredGames : restGames).length - showCount} restantes)
         </Button>
       )}
     </div>
@@ -1571,7 +1744,7 @@ function GeneratedGamesPanel({ generatedGames, lotteryId, pick, maxNum, rankedGa
                                   </div>
                                   <div className="flex flex-wrap gap-1.5 flex-1">
                                     {game.map((num) => (
-                                      <NumberBall key={num} num={num} maxNum={maxNum} pick={pick} />
+                                      <NumberBall key={num} num={num} maxNum={maxNum} />
                                     ))}
                                   </div>
                                   <div className="flex gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
