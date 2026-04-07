@@ -1527,6 +1527,8 @@ function BestGamesPanel({ rankedGames, lotteryId, lotteryName, pick, maxNum }: {
                         <QualityBar label="Faixas" value={gq.rangeBalance} icon={<Layers className="w-2.5 h-2.5" />} />
                         <QualityBar label="Soma" value={gq.sumScore} icon={<Hash className="w-2.5 h-2.5" />} />
                         <QualityBar label="Consecutivas" value={gq.consecutiveScore} icon={<Activity className="w-2.5 h-2.5" />} />
+                        <QualityBar label="Frequência" value={gq.frequencyScore} icon={<TrendingUp className="w-2.5 h-2.5" />} />
+                        <QualityBar label="Gap Mix" value={gq.gapScore} icon={<Gauge className="w-2.5 h-2.5" />} />
                       </div>
                     </motion.div>
                   )}
