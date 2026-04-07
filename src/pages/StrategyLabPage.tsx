@@ -1569,12 +1569,7 @@ function GeneratedGamesPanel({ generatedGames, lotteryId, pick, rankedGames }: {
                                   </div>
                                   <div className="flex flex-wrap gap-1.5 flex-1">
                                     {game.map((num) => (
-                                      <span
-                                        key={num}
-                                        className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/15 shadow-sm"
-                                      >
-                                        {num.toString().padStart(2, "0")}
-                                      </span>
+                                      <NumberBall key={num} num={num} maxNum={config.numbers} pick={pick} />
                                     ))}
                                   </div>
                                   <div className="flex gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
