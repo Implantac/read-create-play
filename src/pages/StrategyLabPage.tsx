@@ -555,33 +555,32 @@ export default function StrategyLabPage() {
 
               {/* Main Tabs */}
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="w-full grid grid-cols-6 h-11">
-                  <TabsTrigger value="bestgames" className="text-xs gap-1.5 data-[state=active]:shadow-sm">
+                <TabsList className="w-full grid grid-cols-7 h-11">
+                  <TabsTrigger value="bestgames" className="text-xs gap-1 data-[state=active]:shadow-sm">
                     <Star className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Melhores</span>
-                    {bestGamesCount > 0 && (
-                      <Badge variant="secondary" className="text-[8px] h-4 px-1 ml-0.5 hidden lg:inline-flex">
-                        {bestGamesCount}
-                      </Badge>
-                    )}
                   </TabsTrigger>
-                  <TabsTrigger value="ranking" className="text-xs gap-1.5 data-[state=active]:shadow-sm">
+                  <TabsTrigger value="ranking" className="text-xs gap-1 data-[state=active]:shadow-sm">
                     <Trophy className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Ranking</span>
                   </TabsTrigger>
-                  <TabsTrigger value="games" className="text-xs gap-1.5 data-[state=active]:shadow-sm">
+                  <TabsTrigger value="games" className="text-xs gap-1 data-[state=active]:shadow-sm">
                     <Dices className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Jogos</span>
                   </TabsTrigger>
-                  <TabsTrigger value="charts" className="text-xs gap-1.5 data-[state=active]:shadow-sm">
+                  <TabsTrigger value="analysis" className="text-xs gap-1 data-[state=active]:shadow-sm">
+                    <Crosshair className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Análise</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="charts" className="text-xs gap-1 data-[state=active]:shadow-sm">
                     <BarChart3 className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Gráficos</span>
                   </TabsTrigger>
-                  <TabsTrigger value="suggestions" className="text-xs gap-1.5 data-[state=active]:shadow-sm">
+                  <TabsTrigger value="suggestions" className="text-xs gap-1 data-[state=active]:shadow-sm">
                     <Brain className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Evolução</span>
                   </TabsTrigger>
-                  <TabsTrigger value="comparison" className="text-xs gap-1.5 data-[state=active]:shadow-sm">
+                  <TabsTrigger value="comparison" className="text-xs gap-1 data-[state=active]:shadow-sm">
                     <Layers className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Tabela</span>
                   </TabsTrigger>
