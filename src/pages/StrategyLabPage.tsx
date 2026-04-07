@@ -98,8 +98,15 @@ export default function StrategyLabPage() {
   // Ranked quality games across ALL strategies
   const rankedGames = useMemo(() => {
     if (!result) return [];
-    return rankAllGames(result.generatedGames, config);
-  }, [result, config]);
+    return rankAllGames(result.generatedGames, config, stats);
+  }, [result, config, stats]);
+
+  const combinationAnalysis = useMemo((): CombinationAnalysis | null => {
+    if (!result) return null;
+    const allGames = result.generatedGames.flatMap(sg => sg.games);
+    if (allGames.length === 0) return null;
+    return analyzeCombination(allGames, config.numbers);
+  }, [result, config.numbers]);
 
   const prevLotteryRef = useRef(selectedLottery);
   useEffect(() => {
