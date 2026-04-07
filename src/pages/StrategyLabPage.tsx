@@ -249,6 +249,44 @@ export default function StrategyLabPage() {
     rankedGames.filter(g => g.grade === "S" || g.grade === "A").length
   , [rankedGames]);
 
+  // Executive summary data
+  const executiveSummary = useMemo(() => {
+    if (!result || rankedGames.length === 0) return null;
+    const sCount = rankedGames.filter(g => g.grade === "S").length;
+    const aCount = rankedGames.filter(g => g.grade === "A").length;
+    const avgScore = rankedGames.reduce((s, g) => s + g.overallScore, 0) / rankedGames.length;
+    const bestStrategy = result.rankings[0];
+    const worstStrategy = result.rankings[result.rankings.length - 1];
+    const scoreDiff = bestStrategy && worstStrategy
+      ? bestStrategy.metrics.globalScore - worstStrategy.metrics.globalScore
+      : 0;
+    const consistentCount = result.rankings.filter(r => r.metrics.consistency > 0.6).length;
+    const prizeCount = result.rankings.filter(r => r.metrics.totalPrizes > 0).length;
+    
+    // Generate actionable recommendations
+    const recommendations: { icon: string; text: string; priority: "high" | "medium" | "low" }[] = [];
+    if (sCount + aCount > 0) {
+      recommendations.push({ icon: "🎯", text: `Use os ${sCount + aCount} jogos nota S/A como base principal de apostas`, priority: "high" });
+    }
+    if (bestStrategy && bestStrategy.metrics.consistency > 0.7) {
+      recommendations.push({ icon: "🔄", text: `${bestStrategy.strategyName} é confiável — priorize para apostas recorrentes`, priority: "high" });
+    }
+    if (scoreDiff > 30) {
+      recommendations.push({ icon: "⚠️", text: `Grande variação entre estratégias (${scoreDiff.toFixed(0)} pts) — foque nas top 3`, priority: "medium" });
+    }
+    if (consistentCount < result.rankings.length * 0.3) {
+      recommendations.push({ icon: "📊", text: "Poucas estratégias consistentes — aumente o volume de jogos para estabilizar", priority: "medium" });
+    }
+    if (prizeCount > 0) {
+      recommendations.push({ icon: "💰", text: `${prizeCount} estratégia(s) geraram premiações no backtesting — resultados promissores`, priority: "low" });
+    }
+    if (combinationAnalysis && combinationAnalysis.coveragePercent < 60) {
+      recommendations.push({ icon: "🔢", text: "Cobertura numérica baixa — considere adicionar mais estratégias de dispersão", priority: "medium" });
+    }
+
+    return { sCount, aCount, avgScore, scoreDiff, consistentCount, prizeCount, recommendations };
+  }, [result, rankedGames, combinationAnalysis]);
+
   return (
     <PlanGate feature="estrategias_ml">
       <div className="space-y-6">
