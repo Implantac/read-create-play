@@ -625,6 +625,11 @@ export default function StrategyLabPage() {
                   />
                 </TabsContent>
 
+                {/* Combination Analysis Tab */}
+                <TabsContent value="analysis" className="mt-4 space-y-4">
+                  <CombinationAnalysisPanel analysis={combinationAnalysis} maxNum={config.numbers} />
+                </TabsContent>
+
                 {/* Charts Tab */}
                 <TabsContent value="charts" className="mt-4 space-y-4">
                   <div className="grid lg:grid-cols-2 gap-4">
