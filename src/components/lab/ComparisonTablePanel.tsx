@@ -189,8 +189,7 @@ export function ComparisonTablePanel({ rankings, pick }: { rankings: RankingEntr
               <CardContent className="space-y-3">
                 {metrics.map(metric => {
                   const values = compareList.map(r => {
-                    const metricsObj = r.metrics as Record<string, number>;
-                    const v = metricsObj[metric.key];
+                    const v = (r.metrics as unknown as Record<string, number>)[metric.key];
                     return { name: r.strategyName, value: v, pct: (v / metric.max) * 100 };
                   });
                   const maxVal = Math.max(...values.map(v => v.value));
