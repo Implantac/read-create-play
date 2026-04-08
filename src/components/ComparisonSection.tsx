@@ -33,11 +33,11 @@ export function ComparisonSection() {
           className="text-center mb-14"
         >
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-            Método tradicional vs{" "}
-            <span className="gradient-brand-text">Titan Loterias</span>
+            Apostar no escuro vs{" "}
+            <span className="gradient-brand-text">apostar com dados</span>
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Veja a diferença entre apostar no escuro e usar inteligência de dados.
+            Dois jogadores, o mesmo jogo. A diferença? Um usa inteligência de dados.
           </p>
         </motion.div>
 
@@ -86,7 +86,7 @@ export function ComparisonSection() {
             viewport={{ once: true }}
             className="text-center mt-10"
           >
-            <Button size="lg" onClick={handleCta} className="gradient-brand text-primary-foreground shadow-lg shadow-primary/20 gap-2 px-8 h-11">
+            <Button size="lg" onClick={handleCta} className="gradient-brand text-primary-foreground shadow-lg shadow-primary/20 gap-2 px-8 h-12 font-bold">
               Quero jogar com inteligência <ArrowRight className="w-4 h-4" />
             </Button>
           </motion.div>
