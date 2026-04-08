@@ -355,7 +355,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                     <CardContent className="pt-3 pb-3 px-3">
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-semibold text-sm">{altStrategyNames[idx] || `Alt ${idx + 1}`}</span>
-                        {bayesScore && <Badge variant="outline" className="text-[10px] font-mono">B:{bayesScore.totalScore}</Badge>}
+                        {bayesScore && <Badge variant="outline" className="text-[10px] font-mono">B:{bayesScore.networkScore}</Badge>}
                       </div>
                       <div className="flex flex-wrap gap-1.5 mb-2">
                         {game.map(n => (
@@ -500,7 +500,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
             <Card>
               <CardContent className="pt-4 pb-3">
                 <p className="text-xs text-muted-foreground mb-1">Score Bayes do Jogo</p>
-                <p className="text-2xl font-bold text-primary">{report.bayesianGameScores[0]?.totalScore || "—"}/100</p>
+                <p className="text-2xl font-bold text-primary">{report.bayesianGameScores[0]?.networkScore || "—"}/100</p>
                 <p className="text-[10px] text-muted-foreground">Jogo principal</p>
               </CardContent>
             </Card>
