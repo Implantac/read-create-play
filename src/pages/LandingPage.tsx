@@ -190,9 +190,9 @@ const lotteries = ["Mega-Sena", "Lotofácil", "Quina", "Lotomania", "Dupla Sena"
 
 const stats = [
   { value: "10.000+", label: "Sorteios analisados" },
-  { value: "8", label: "Loterias suportadas" },
+  { value: "8", label: "Loterias cobertas" },
   { value: "14+", label: "Algoritmos de IA" },
-  { value: "5.000+", label: "Jogadores ativos" },
+  { value: "5.000+", label: "Jogadores no Brasil" },
 ];
 
 const plans = [
@@ -202,7 +202,7 @@ const plans = [
     annualPrice: "R$ 0",
     period: "/mês",
     annualPeriod: "/mês",
-    features: ["Dashboard básico", "Frequência e atraso", "1 loteria", "Gerador simples"],
+    features: ["Dashboard com estatísticas", "Frequência e atraso de números", "1 loteria completa", "Gerador básico de jogos"],
     cta: "Começar Grátis",
     highlight: false,
   },
@@ -214,14 +214,14 @@ const plans = [
     period: "/mês",
     annualPeriod: "/mês",
     features: [
-      "Todas as loterias",
-      "IA e Machine Learning",
-      "Gerador profissional",
-      "Backtesting completo",
-      "Simulação massiva",
-      "Suporte prioritário",
+      "Todas as 8 loterias",
+      "IA + Machine Learning",
+      "Gerador profissional com filtros",
+      "Backtesting contra histórico real",
+      "Simulação Monte Carlo massiva",
+      "Suporte prioritário por chat",
     ],
-    cta: "Começar teste grátis",
+    cta: "Testar grátis por 7 dias",
     highlight: true,
   },
   {
@@ -232,13 +232,13 @@ const plans = [
     period: "/mês",
     annualPeriod: "/mês",
     features: [
-      "Tudo do Pro",
-      "Motor HP exclusivo",
-      "Algoritmos genéticos",
+      "Tudo do Pro incluso",
+      "Motor HP de alta performance",
+      "Algoritmos genéticos avançados",
       "Otimizador combinatorial",
-      "Suporte prioritário",
+      "Suporte prioritário dedicado",
     ],
-    cta: "Começar teste grátis",
+    cta: "Testar grátis por 7 dias",
     highlight: false,
   },
   {
@@ -248,10 +248,10 @@ const plans = [
     period: " único",
     annualPeriod: " único",
     features: [
-      "Tudo incluso para sempre",
+      "Acesso completo para sempre",
       "Todas as atualizações futuras",
-      "Prioridade máxima",
-      "Sem mensalidades",
+      "Prioridade máxima no suporte",
+      "Zero mensalidades",
     ],
     cta: "Garantir acesso vitalício",
     highlight: false,
