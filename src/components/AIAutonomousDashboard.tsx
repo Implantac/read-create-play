@@ -298,9 +298,9 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
           </div>
           {report.bayesianGameScores[0] && (
             <div className="flex flex-wrap gap-2 mb-3 text-xs text-muted-foreground">
-              <Badge variant="outline" className="text-[10px]">Bayes: {report.bayesianGameScores[0].totalScore}/100</Badge>
+              <Badge variant="outline" className="text-[10px]">Bayes: {report.bayesianGameScores[0].networkScore}/100</Badge>
               <Badge variant="outline" className="text-[10px]">Posterior: {report.bayesianGameScores[0].avgPosterior.toFixed(2)}</Badge>
-              <Badge variant="outline" className="text-[10px]">Centralidade: {report.bayesianGameScores[0].networkCentrality.toFixed(2)}</Badge>
+              <Badge variant="outline" className="text-[10px]">Centralidade: {report.bayesianGameScores[0].centralityCount}</Badge>
             </div>
           )}
           <div className="flex gap-2 mt-3">
