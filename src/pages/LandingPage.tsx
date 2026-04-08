@@ -2,6 +2,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import Autoplay from "embla-carousel-autoplay";
 import { useState, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useABTest, heroVariants } from "@/hooks/useABTest";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 
@@ -269,6 +270,8 @@ const credibilityItems = [
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const abVariant = useABTest();
+  const hero = heroVariants[abVariant];
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
@@ -378,12 +381,12 @@ export default function LandingPage() {
             </motion.div>
 
             <motion.h1 custom={1} variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
-              Pare de jogar no escuro.{" "}
-              <span className="gradient-brand-text">Jogue com inteligência.</span>
+              {hero.headline}{" "}
+              <span className="gradient-brand-text">{hero.headlineHighlight}</span>
             </motion.h1>
 
             <motion.p custom={2} variants={fadeUp} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Analise 10.000+ sorteios reais, gere combinações otimizadas por IA e teste suas estratégias antes de apostar. Sem promessas mágicas — só dados, lógica e transparência.
+              {hero.subheadline}
             </motion.p>
 
             <motion.div custom={3} variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
@@ -394,7 +397,7 @@ export default function LandingPage() {
                 className="rounded-md"
               >
                 <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-8 h-14 w-full font-bold">
-                  Começar Grátis por 7 Dias <ChevronRight className="w-4 h-4" />
+                  {hero.cta} <ChevronRight className="w-4 h-4" />
                 </Button>
               </motion.div>
               <Button
