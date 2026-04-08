@@ -52,3 +52,21 @@ export const floatingCtaVariants = {
   B: "Começar com Dados Reais",
   C: "Testar Gratuitamente",
 };
+
+export const midCtaVariants = {
+  A: "Criar Conta Grátis",
+  B: "Começar com Dados Reais",
+  C: "Testar Sem Compromisso",
+};
+
+export const finalCtaVariants = {
+  A: "Começar Grátis Agora",
+  B: "Quero Apostar com Inteligência",
+  C: "Acessar Plataforma Grátis",
+};
+
+export const iaCtaVariants = {
+  A: "Ativar IA Grátis por 7 Dias",
+  B: "Experimentar a IA Agora",
+  C: "Testar IA Gratuitamente",
+};
