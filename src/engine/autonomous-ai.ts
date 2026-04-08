@@ -1,5 +1,6 @@
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { NumberStats } from "./statistics";
+import { buildConditionalNetwork, scoreByBayesianNetwork, computeMutualInformation, type ConditionalNode, type BayesianNetworkScore } from "@/ai/engines/bayesianNetworkEngine";
 
 export interface AINumberRanking {
   number: number;
