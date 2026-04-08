@@ -105,6 +105,9 @@ export interface AutonomousAIReport {
   entropyAnalysis: EntropyAnalysis;
   chiSquareResult: ChiSquareResult;
   topTriplets: TripletPattern[];
+  bayesianNodes: ConditionalNode[];
+  bayesianGameScores: BayesianNetworkScore[];
+  mutualInformation: { a: number; b: number; mi: number }[];
   parityProfile: { even: number; odd: number; idealEven: number; idealOdd: number };
   sumProfile: { avg: number; stdDev: number; min: number; max: number; recent: number; trend: string };
   consecutiveProfile: { avgConsecutive: number; pctWithConsecutive: number };
@@ -113,6 +116,7 @@ export interface AutonomousAIReport {
   lastUpdated: string;
   drawsAnalyzed: number;
   suggestedNumbers: number[];
+  alternativeGames: number[][];
   avoidNumbers: number[];
   confidenceScore: number;
 }
