@@ -261,10 +261,10 @@ const plans = [
 
 /* ── Credibility badges ── */
 const credibilityItems = [
-  { icon: Cpu, label: "Machine Learning", desc: "Modelos treinados com dados reais" },
-  { icon: Dices, label: "Simulação Monte Carlo", desc: "Milhões de cenários testados" },
-  { icon: Brain, label: "14+ Algoritmos", desc: "Análise profunda e otimização" },
-  { icon: Shield, label: "Dados Oficiais", desc: "Sincronização direta com a Caixa" },
+  { icon: Cpu, label: "Machine Learning", desc: "Modelos treinados com 10.000+ sorteios reais" },
+  { icon: Dices, label: "Monte Carlo", desc: "Simule milhões de cenários em segundos" },
+  { icon: Brain, label: "14+ Algoritmos", desc: "Frequência, atraso, paridade e mais" },
+  { icon: Shield, label: "Dados da Caixa", desc: "Atualizados automaticamente a cada sorteio" },
 ];
 
 export default function LandingPage() {
@@ -406,6 +406,11 @@ export default function LandingPage() {
                 <Play className="w-4 h-4" /> Ver como funciona
               </Button>
             </motion.div>
+
+            {/* Trust micro-copy */}
+            <motion.p custom={3.5} variants={fadeUp} className="text-xs text-muted-foreground/60 -mt-1">
+              Sem cartão de crédito • Setup em 30 segundos
+            </motion.p>
 
             {/* Micro social proof */}
             <motion.div custom={4} variants={fadeUp} className="pt-6 flex items-center justify-center gap-3">
@@ -902,11 +907,11 @@ export default function LandingPage() {
             className="text-center mb-14"
           >
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              Perguntas{" "}
-              <span className="gradient-brand-text">frequentes</span>
+              Dúvidas?{" "}
+              <span className="gradient-brand-text">A gente responde</span>
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Tire suas dúvidas antes de começar.
+              As perguntas mais comuns de quem está começando.
             </p>
           </motion.div>
 
@@ -918,12 +923,12 @@ export default function LandingPage() {
           >
             <Accordion type="single" collapsible className="space-y-3">
               {[
-                { q: "O Titan garante que vou ganhar na loteria?", a: "Não. Loterias são jogos de azar e nenhuma ferramenta pode garantir prêmios. O que fazemos é usar inteligência artificial para analisar padrões reais e gerar apostas estatisticamente mais inteligentes. Você joga com dados, não com palpite." },
-                { q: "Posso testar antes de pagar?", a: "Sim! Você tem 7 dias gratuitos com acesso completo. Se não gostar, não precisa pagar nada." },
-                { q: "Quais loterias são suportadas?", a: "Mega-Sena, Lotofácil, Quina, Lotomania, Dupla Sena, Timemania, Dia de Sorte e Super Sete. Todas com dados oficiais sincronizados da Caixa." },
-                { q: "Como funciona a inteligência artificial?", a: "Nossos modelos analisam padrões em milhares de sorteios — frequência, atraso, paridade, distribuição — e geram combinações otimizadas automaticamente. Você não precisa entender estatística." },
-                { q: "Posso cancelar meu plano a qualquer momento?", a: "Sim! Cancele quando quiser, sem multas ou burocracia. Seus dados ficam salvos caso queira voltar." },
-                { q: "Preciso instalar algum app?", a: "Não. O Titan funciona 100% no navegador, em qualquer dispositivo — computador, tablet ou celular." },
+                { q: "O Titan garante que vou ganhar na loteria?", a: "Não — e desconfie de quem promete isso. Loterias são jogos de azar. O que o Titan faz é usar IA para analisar padrões reais em 10.000+ sorteios e gerar combinações estatisticamente mais inteligentes. Você troca palpite por dados." },
+                { q: "Posso testar antes de pagar?", a: "Sim! São 7 dias grátis com acesso completo a todos os recursos. Sem cartão de crédito. Se não gostar, é só não continuar." },
+                { q: "Quais loterias são suportadas?", a: "Todas as 8 principais: Mega-Sena, Lotofácil, Quina, Lotomania, Dupla Sena, Timemania, Dia de Sorte e Super Sete. Dados oficiais da Caixa, sincronizados automaticamente." },
+                { q: "Como funciona a IA?", a: "14+ algoritmos analisam frequência, atraso, paridade, soma e distribuição de milhares de sorteios. A partir disso, geram combinações otimizadas automaticamente. Você não precisa entender estatística — a IA cuida disso." },
+                { q: "Posso cancelar quando quiser?", a: "Sim, sem multa e sem burocracia. Um clique e pronto. Seus dados ficam salvos caso queira voltar." },
+                { q: "Preciso instalar algum aplicativo?", a: "Não. O Titan roda 100% no navegador — computador, tablet ou celular. Também pode ser instalado como PWA para acesso rápido." },
               ].map((item, i) => (
                 <AccordionItem key={i} value={`faq-${i}`} className="glass-card border border-border/30 rounded-xl px-5 data-[state=open]:border-primary/20">
                   <AccordionTrigger className="text-sm font-medium text-foreground hover:no-underline gap-3">

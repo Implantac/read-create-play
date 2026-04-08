@@ -6,12 +6,12 @@ import { useCallback } from "react";
 import { burstConfetti } from "@/lib/confetti";
 
 const comparisons = [
-  { traditional: "Escolhe números por palpite ou data", titan: "Gera combinações com análise de 10.000+ sorteios" },
-  { traditional: "Joga sempre os mesmos números", titan: "Adapta estratégias com IA a cada novo resultado" },
-  { traditional: "Não sabe se a combinação é boa", titan: "Score de qualidade e backtesting antes de apostar" },
-  { traditional: "Gasta sem controle", titan: "Fechamentos otimizados que reduzem custo" },
-  { traditional: "Zero informação sobre probabilidades", titan: "Simulação Monte Carlo com milhões de cenários" },
-  { traditional: "Repete erros sem perceber", titan: "Ranking de estratégias mostra o que funciona" },
+  { traditional: "Escolhe números por palpite ou data de aniversário", titan: "Combinações geradas por 14+ algoritmos com 10.000+ sorteios" },
+  { traditional: "Joga sempre os mesmos números há anos", titan: "Estratégias que se adaptam a cada novo resultado" },
+  { traditional: "Não tem como saber se a combinação é boa", titan: "Score de qualidade + backtesting contra histórico real" },
+  { traditional: "Gasta mais do que deveria sem perceber", titan: "Fechamentos otimizados que reduzem custo por aposta" },
+  { traditional: "Nenhuma noção de probabilidade real", titan: "Simulação Monte Carlo com milhões de cenários" },
+  { traditional: "Repete os mesmos erros sem saber", titan: "Ranking de estratégias mostra o que realmente funciona" },
 ];
 
 export function ComparisonSection() {
