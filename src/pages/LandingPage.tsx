@@ -55,12 +55,12 @@ const fadeUp = {
 };
 
 const testimonials = [
-  { name: "Carlos M.", initials: "CM", role: "Jogador da Mega-Sena", stars: 5, text: "Antes eu jogava no escuro. Com o Titan, passei a entender padrões que nunca percebi. Minha forma de apostar mudou completamente.", highlight: "acertei a quadra 3 vezes" },
-  { name: "Ana Paula S.", initials: "AS", role: "Jogadora da Lotofácil", stars: 5, text: "O gerador profissional é absurdo! Já acertei 13 pontos duas vezes desde que comecei. A IA realmente faz a diferença.", highlight: "13 pontos 2x" },
-  { name: "Roberto F.", initials: "RF", role: "Apostador profissional", stars: 5, text: "Uso o plano Pro há 6 meses. O backtesting me permite testar qualquer ideia antes de investir. Isso não tem preço.", highlight: "ROI positivo em 6 meses" },
-  { name: "Mariana L.", initials: "ML", role: "Jogadora da Quina", stars: 4, text: "A simulação me mostrou que algumas combinações são muito mais prováveis. Agora eu jogo com confiança, não com palpite.", highlight: null },
-  { name: "Fernando G.", initials: "FG", role: "Jogador assíduo", stars: 5, text: "Testei várias plataformas, nenhuma chega perto. Os dados são sempre atualizados e a interface é linda e intuitiva.", highlight: "melhor plataforma do mercado" },
-  { name: "Juliana R.", initials: "JR", role: "Jogadora casual", stars: 5, text: "Mesmo no plano grátis já encontrei informações valiosas. O dashboard é fácil de entender. Super recomendo!", highlight: null },
+  { name: "Carlos M.", initials: "CM", role: "Mega-Sena • há 8 meses", stars: 5, text: "Antes eu jogava no escuro. Com o Titan, passei a entender padrões que nunca percebi. Já acertei a quadra 3 vezes — isso nunca tinha acontecido.", highlight: "quadra acertada 3x" },
+  { name: "Ana Paula S.", initials: "AS", role: "Lotofácil • há 5 meses", stars: 5, text: "O gerador profissional mudou tudo. Acertei 13 pontos duas vezes em 3 meses. A diferença de jogar com dados é absurda.", highlight: "13 pontos 2x em 3 meses" },
+  { name: "Roberto F.", initials: "RF", role: "Apostador profissional • há 6 meses", stars: 5, text: "O backtesting sozinho já vale o plano. Testo qualquer estratégia contra o histórico real antes de gastar. Não abro mão.", highlight: "ROI positivo em 6 meses" },
+  { name: "Mariana L.", initials: "ML", role: "Quina • há 3 meses", stars: 4, text: "A simulação Monte Carlo me mostrou quais combinações realmente funcionam. Agora jogo com confiança, não com palpite.", highlight: null },
+  { name: "Fernando G.", initials: "FG", role: "Multi-loteria • há 1 ano", stars: 5, text: "Testei 4 plataformas antes de chegar aqui. Nenhuma chega perto em dados, interface e velocidade. É de outro nível.", highlight: "melhor plataforma do mercado" },
+  { name: "Juliana R.", initials: "JR", role: "Lotofácil • há 2 meses", stars: 5, text: "Comecei no plano grátis e em 1 semana já vi valor. O dashboard é claro e a IA explica tudo. Super recomendo!", highlight: null },
 ];
 
 function TestimonialCard({ t, i }: { t: typeof testimonials[0]; i: number }) {
@@ -141,38 +141,38 @@ function TestimonialsCards() {
 const benefits = [
   {
     icon: Eye,
-    title: "Jogos mais inteligentes",
-    description: "Identifica padrões reais nos sorteios anteriores e cria combinações com base em dados — não em palpite.",
+    title: "Jogue com dados, não com palpite",
+    description: "A IA identifica padrões reais em 10.000+ sorteios e gera combinações baseadas em estatística — não em superstição.",
     color: "green" as const,
   },
   {
     icon: TrendingUp,
-    title: "Veja antes de apostar",
-    description: "Simule milhares de cenários e descubra quais jogos teriam mais acertos se tivessem sido apostados no passado.",
+    title: "Teste antes de gastar",
+    description: "Simule milhares de cenários e veja quais jogos teriam dado mais acertos no passado. Backtesting real, sem risco.",
     color: "blue" as const,
   },
   {
     icon: Target,
-    title: "Apostas otimizadas pela IA",
-    description: "Receba combinações geradas por algoritmos avançados que analisam frequência, atraso e distribuição automaticamente.",
+    title: "Combinações otimizadas por IA",
+    description: "14+ algoritmos analisam frequência, atraso, paridade e distribuição para gerar apostas com cobertura máxima.",
     color: "amber" as const,
   },
   {
     icon: LineChart,
-    title: "Teste suas estratégias",
-    description: "Valide qualquer ideia contra todo o histórico de sorteios antes de gastar dinheiro. Sem risco.",
+    title: "Ranking de estratégias",
+    description: "Compare dezenas de métodos lado a lado e descubra quais performam melhor para cada loteria. Decisão baseada em dados.",
     color: "red" as const,
   },
   {
     icon: Dices,
-    title: "Probabilidades reais",
-    description: "Descubra as chances reais de cada tipo de combinação com simulação de milhões de jogos em segundos.",
+    title: "Simulação Monte Carlo",
+    description: "Rode milhões de cenários em segundos e descubra as probabilidades reais de cada tipo de combinação.",
     color: "purple" as const,
   },
   {
     icon: Clock,
-    title: "Dados sempre atualizados",
-    description: "Todos os resultados oficiais da Caixa são sincronizados automaticamente — você sempre joga com informação fresca.",
+    title: "Dados oficiais em tempo real",
+    description: "Resultados da Caixa sincronizados automaticamente. Você sempre joga com a informação mais recente disponível.",
     color: "cyan" as const,
   },
 ];
@@ -374,17 +374,16 @@ export default function LandingPage() {
           >
             <motion.div custom={0} variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-mono font-semibold tracking-wider uppercase">
               <Sparkles className="w-3.5 h-3.5" />
-              Inteligência Artificial + Dados Reais
+              Usado por 5.000+ jogadores no Brasil
             </motion.div>
 
             <motion.h1 custom={1} variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
-              Pare de apostar no escuro.{" "}
-              <span className="gradient-brand-text">Use dados reais.</span>
+              Pare de jogar no escuro.{" "}
+              <span className="gradient-brand-text">Jogue com inteligência.</span>
             </motion.h1>
 
             <motion.p custom={2} variants={fadeUp} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              A plataforma profissional que analisa 10.000+ sorteios com IA para gerar
-              apostas mais inteligentes. Sem promessas — só dados, lógica e transparência.
+              Analise 10.000+ sorteios reais, gere combinações otimizadas por IA e teste suas estratégias antes de apostar. Sem promessas mágicas — só dados, lógica e transparência.
             </motion.p>
 
             <motion.div custom={3} variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
@@ -394,8 +393,8 @@ export default function LandingPage() {
                 transition={{ type: "spring", stiffness: 300, damping: 15 }}
                 className="rounded-md"
               >
-                <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-8 h-12 w-full">
-                  Testar Grátis Agora <ChevronRight className="w-4 h-4" />
+                <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-8 h-14 w-full font-bold">
+                  Começar Grátis por 7 Dias <ChevronRight className="w-4 h-4" />
                 </Button>
               </motion.div>
               <Button
@@ -418,7 +417,7 @@ export default function LandingPage() {
                 ))}
               </div>
               <span className="text-sm text-muted-foreground">
-                <strong className="text-foreground">5.000+</strong> jogadores já usam
+                <strong className="text-foreground">5.000+ jogadores</strong> já apostam com dados
               </span>
             </motion.div>
 
@@ -467,11 +466,11 @@ export default function LandingPage() {
             className="text-center mb-12"
           >
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              Tecnologia real,{" "}
-              <span className="gradient-brand-text">resultados reais</span>
+              A tecnologia por trás das{" "}
+              <span className="gradient-brand-text">melhores apostas</span>
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Sem dados fictícios. Sem promessas vazias. Apenas análise avançada baseada em milhares de sorteios oficiais.
+              Dados oficiais da Caixa + algoritmos avançados = apostas mais inteligentes. Sem achismo, sem dados fictícios.
             </p>
           </motion.div>
 
@@ -506,11 +505,11 @@ export default function LandingPage() {
             className="text-center mb-14"
           >
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              Por que jogadores escolhem o{" "}
+              6 razões para jogar com o{" "}
               <span className="gradient-brand-text">Titan</span>
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Pare de depender da sorte. Use inteligência artificial para tomar decisões melhores nas suas apostas.
+              Cada real apostado merece inteligência por trás. Veja como a plataforma transforma sua forma de jogar.
             </p>
           </motion.div>
 
@@ -554,18 +553,19 @@ export default function LandingPage() {
             className="text-center mb-14"
           >
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              Simples assim. <span className="gradient-brand-text">3 passos</span>.
+              Do zero à primeira aposta em{" "}
+              <span className="gradient-brand-text">60 segundos</span>
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Comece em menos de 1 minuto — sem instalação, sem complicação.
+              Sem instalar nada. Sem configuração. Crie sua conta e comece a gerar jogos inteligentes agora.
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {[
-              { step: "01", icon: Target, title: "Escolha a loteria", desc: "Selecione entre Mega-Sena, Lotofácil, Quina e mais 5 loterias. Todos os dados já estão prontos." },
-              { step: "02", icon: Brain, title: "A IA analisa os concursos", desc: "Nossos algoritmos processam milhares de sorteios em segundos, identificando padrões e tendências." },
-              { step: "03", icon: Rocket, title: "Receba jogos otimizados", desc: "Apostas inteligentes, geradas automaticamente com base em dados reais. É só jogar." },
+              { step: "01", icon: Target, title: "Escolha sua loteria", desc: "Mega-Sena, Lotofácil, Quina e mais 5 loterias com todos os dados oficiais prontos para análise." },
+              { step: "02", icon: Brain, title: "A IA faz o trabalho pesado", desc: "14+ algoritmos processam milhares de sorteios em segundos — frequência, atraso, padrões e tendências." },
+              { step: "03", icon: Rocket, title: "Jogue com confiança", desc: "Receba combinações otimizadas, testadas contra o histórico real. Aposta inteligente, não palpite." },
             ].map((item, i) => (
               <motion.div
                 key={item.step}
@@ -597,8 +597,8 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mt-12"
           >
-            <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-lg shadow-primary/20 gap-2 px-8 h-11">
-              Testar Grátis Agora <ArrowRight className="w-4 h-4" />
+            <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-lg shadow-primary/20 gap-2 px-8 h-12 font-bold">
+              Criar Conta Grátis <ArrowRight className="w-4 h-4" />
             </Button>
           </motion.div>
         </div>
@@ -620,18 +620,18 @@ export default function LandingPage() {
                 Exclusivo
               </div>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight">
-                IA Autônoma que trabalha{" "}
-                <span className="gradient-brand-text">por você</span>
+                Enquanto você dorme, a IA{" "}
+                <span className="gradient-brand-text">trabalha por você</span>
               </h2>
               <p className="text-muted-foreground leading-relaxed">
-                Nosso sistema inteligente analisa os últimos sorteios e recomenda jogos otimizados automaticamente — todos os dias. Você não precisa entender estatística, a IA faz o trabalho pesado.
+                O sistema analisa os últimos sorteios e gera recomendações otimizadas automaticamente — todos os dias. Você não precisa entender estatística. A IA faz tudo.
               </p>
               <ul className="space-y-3">
                 {[
-                  "Recomendações diárias baseadas em dados atualizados",
-                  "Identifica padrões que o olho humano não enxerga",
-                  "Ajusta estratégias conforme novos resultados saem",
-                  "Funciona para todas as 8 loterias suportadas",
+                  "Jogos otimizados gerados diariamente, sem esforço",
+                  "Detecta padrões invisíveis em milhares de concursos",
+                  "Se adapta automaticamente a cada novo resultado",
+                  "Suporte completo para todas as 8 loterias da Caixa",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2.5 text-sm text-foreground/90">
                     <div className="w-5 h-5 rounded-full bg-primary/15 flex items-center justify-center shrink-0 mt-0.5">
@@ -641,8 +641,8 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-lg shadow-primary/20 gap-2 px-8 h-11">
-                Quero a IA trabalhando pra mim <ArrowRight className="w-4 h-4" />
+              <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-lg shadow-primary/20 gap-2 px-8 h-12 font-bold">
+                Ativar IA Grátis por 7 Dias <ArrowRight className="w-4 h-4" />
               </Button>
             </motion.div>
 
@@ -694,11 +694,11 @@ export default function LandingPage() {
             className="text-center mb-14"
           >
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              Escolha o plano ideal para{" "}
-              <span className="gradient-brand-text">jogar melhor</span>
+              Invista centavos, economize{" "}
+              <span className="gradient-brand-text">reais</span>
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto mb-6">
-              Comece grátis por 7 dias. Cancele quando quiser. Sem surpresas, sem letras miúdas.
+              Teste grátis por 7 dias. Sem cartão de crédito. Cancele quando quiser — sem multas.
             </p>
             <div className="inline-flex items-center gap-3 bg-muted/50 rounded-full p-1 border border-border/50">
               <button
@@ -877,11 +877,11 @@ export default function LandingPage() {
               <span className="text-xs text-muted-foreground">(2.347 avaliações)</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              Jogadores que já{" "}
-              <span className="gradient-brand-text">transformaram</span> suas apostas
+              Quem usa o Titan{" "}
+              <span className="gradient-brand-text">não volta atrás</span>
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Veja o que dizem quem já usa a IA a seu favor.
+              Jogadores reais, resultados reais. Veja por que milhares confiam na plataforma.
             </p>
           </motion.div>
 
@@ -950,11 +950,11 @@ export default function LandingPage() {
               <Zap className="w-7 h-7 text-primary-foreground" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-              Enquanto você lê isso, a IA já analisou{" "}
-              <span className="gradient-brand-text">847 padrões</span>
+              Cada sorteio que passa sem você usar dados é{" "}
+              <span className="gradient-brand-text">dinheiro no escuro</span>
             </h2>
             <p className="text-muted-foreground">
-              Milhares de jogadores já estão usando inteligência de dados para apostar melhor. Comece agora — é grátis por 7 dias.
+              5.000+ jogadores já estão apostando com inteligência. Comece agora — teste grátis por 7 dias, sem cartão.
             </p>
             <motion.div
               whileHover={{ scale: 1.06, boxShadow: "0 0 30px hsl(var(--primary) / 0.5)" }}
@@ -962,8 +962,8 @@ export default function LandingPage() {
               transition={{ type: "spring", stiffness: 300, damping: 15 }}
               className="rounded-md inline-block"
             >
-              <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-10 h-12">
-                Começar Teste Grátis <ArrowRight className="w-4 h-4" />
+              <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-10 h-14 font-bold">
+                Começar Grátis Agora <ArrowRight className="w-5 h-5" />
               </Button>
             </motion.div>
             <p className="text-xs text-muted-foreground/60">Sem cartão de crédito • Cancele quando quiser</p>
