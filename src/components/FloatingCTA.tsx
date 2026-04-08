@@ -4,10 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { burstConfetti } from "@/lib/confetti";
+import { useABTest, floatingCtaVariants } from "@/hooks/useABTest";
 
 export function FloatingCTA() {
   const [visible, setVisible] = useState(false);
   const navigate = useNavigate();
+  const variant = useABTest();
+  const ctaText = floatingCtaVariants[variant];
 
   useEffect(() => {
     const onScroll = () => {
@@ -38,7 +41,7 @@ export function FloatingCTA() {
             onClick={handleClick}
             className="gradient-brand text-primary-foreground shadow-2xl shadow-primary/30 gap-2 px-6 h-12 text-sm font-bold"
           >
-            Começar Grátis <ArrowRight className="w-4 h-4" />
+            {ctaText} <ArrowRight className="w-4 h-4" />
           </Button>
         </motion.div>
       )}
