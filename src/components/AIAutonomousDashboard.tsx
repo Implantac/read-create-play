@@ -9,10 +9,13 @@ import { NumberStats } from "@/engine/statistics";
 import { runAutonomousAnalysis, AutonomousAIReport } from "@/engine/autonomous-ai";
 import { generateAutonomousAnalysis } from "@/engine/native-analysis";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Brain, TrendingUp, TrendingDown, Zap, Target, RefreshCw, Sparkles,
   AlertTriangle, CheckCircle, ArrowUp, ArrowDown, Minus, Loader2,
-  Activity, Trophy, GitBranch, Link2, Timer, Gauge, Dice1, TriangleAlert, FlaskConical
+  Activity, Trophy, GitBranch, Link2, Timer, Gauge, Dice1, TriangleAlert, FlaskConical,
+  Save, Network, Bookmark, Copy, Star
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -31,7 +34,9 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [savingGame, setSavingGame] = useState<string | null>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   useEffect(() => {
     if (draws.length > 0 && stats.length > 0) {
@@ -67,6 +72,35 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
         toast({ title: "Atualizado", description: "Análise recalculada." });
       }, 500);
     }
+  };
+
+  const saveGame = async (numbers: number[], strategy: string) => {
+    if (!user) {
+      toast({ title: "Login necessário", description: "Faça login para salvar jogos.", variant: "destructive" });
+      return;
+    }
+    const key = numbers.join(',');
+    setSavingGame(key);
+    try {
+      const { error } = await supabase.from("saved_bets").insert({
+        user_id: user.id,
+        lottery_id: config.id,
+        numbers,
+        strategy,
+        label: `IA Autônoma — ${strategy}`,
+      });
+      if (error) throw error;
+      toast({ title: "Salvo!", description: `Jogo salvo com sucesso.` });
+    } catch (err: any) {
+      toast({ title: "Erro ao salvar", description: err.message, variant: "destructive" });
+    } finally {
+      setSavingGame(null);
+    }
+  };
+
+  const copyGame = (numbers: number[]) => {
+    navigator.clipboard.writeText(numbers.map(n => String(n).padStart(2, "0")).join(", "));
+    toast({ title: "Copiado!", description: "Dezenas copiadas para a área de transferência." });
   };
 
   if (!report) {
@@ -122,19 +156,30 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
     fill: m.acceleration > 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 60%)",
   }));
 
-  // Entropy chart data
   const entropyZoneData = report.entropyAnalysis.entropyByZone.map(z => ({
     name: z.zone,
     entropia: z.entropy,
     normalizada: Math.round(z.normalized * 100),
   }));
 
-  // Chi-square deviation chart
   const chiDeviationData = report.chiSquareResult.topDeviations.slice(0, 12).map(d => ({
     name: String(d.number).padStart(2, "0"),
     residual: d.residual,
     fill: d.residual > 0 ? "hsl(142, 76%, 36%)" : "hsl(0, 84%, 60%)",
   }));
+
+  // Bayesian data
+  const bayesianChartData = report.bayesianNodes
+    .sort((a, b) => b.posterior - a.posterior)
+    .slice(0, 20)
+    .map(n => ({
+      name: String(n.number).padStart(2, "0"),
+      posterior: Math.round(n.posterior * 100),
+      prior: Math.round(n.prior * 100),
+      centrality: Math.round(n.centrality * 10) / 10,
+    }));
+
+  const altStrategyNames = ["Momentum", "Overdue", "Bayesiana", "Markov", "Contrária"];
 
   return (
     <div className="space-y-6">
@@ -149,7 +194,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
               <div>
                 <CardTitle className="text-xl">IA Autônoma — {config.name}</CardTitle>
                 <CardDescription>
-                  {report.drawsAnalyzed} concursos · Confiança: {report.confidenceScore}/100 · {new Date(report.lastUpdated).toLocaleString("pt-BR")}
+                  {report.drawsAnalyzed} concursos · Confiança: {report.confidenceScore}/100 · Bayesian + Markov + Entropia + χ²
                 </CardDescription>
               </div>
             </div>
@@ -168,7 +213,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
       </Card>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-7 gap-3">
         <Card className="border-primary/15">
           <CardContent className="pt-3 pb-2 px-3">
             <div className="flex items-center gap-2 mb-1">
@@ -214,6 +259,15 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
             <p className="text-xl font-bold text-yellow-500">{report.chiSquareResult.pValue.toFixed(3)}</p>
           </CardContent>
         </Card>
+        <Card className="border-blue-500/15">
+          <CardContent className="pt-3 pb-2 px-3">
+            <div className="flex items-center gap-2 mb-1">
+              <Network className="h-3.5 w-3.5 text-blue-500" />
+              <span className="text-[10px] text-muted-foreground">Bayes Nodes</span>
+            </div>
+            <p className="text-xl font-bold text-blue-500">{report.bayesianNodes.filter(n => n.posterior > 0.6).length}</p>
+          </CardContent>
+        </Card>
         <Card className="border-purple-500/15">
           <CardContent className="pt-3 pb-2 px-3">
             <div className="flex items-center gap-2 mb-1">
@@ -225,13 +279,13 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
         </Card>
       </div>
 
-      {/* Suggested Numbers */}
+      {/* Suggested Numbers + Save */}
       <Card className="border-primary/20">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <Zap className="h-5 w-5 text-primary" />
-            Jogo Sugerido pela IA ({config.pick} dezenas)
-            <Badge variant="secondary" className="text-[10px]">Multi-critério + Entropia + χ²</Badge>
+            Jogo Principal ({config.pick} dezenas)
+            <Badge variant="secondary" className="text-[10px]">Bayesian + Markov + Entropia + χ²</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -242,6 +296,29 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
               </span>
             ))}
           </div>
+          {report.bayesianGameScores[0] && (
+            <div className="flex flex-wrap gap-2 mb-3 text-xs text-muted-foreground">
+              <Badge variant="outline" className="text-[10px]">Bayes: {report.bayesianGameScores[0].totalScore}/100</Badge>
+              <Badge variant="outline" className="text-[10px]">Posterior: {report.bayesianGameScores[0].avgPosterior.toFixed(2)}</Badge>
+              <Badge variant="outline" className="text-[10px]">Centralidade: {report.bayesianGameScores[0].networkCentrality.toFixed(2)}</Badge>
+            </div>
+          )}
+          <div className="flex gap-2 mt-3">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => saveGame(report.suggestedNumbers, "IA Principal")}
+              disabled={savingGame === report.suggestedNumbers.join(',') || !user}
+              className="gap-2"
+            >
+              {savingGame === report.suggestedNumbers.join(',') ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+              Salvar Jogo
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => copyGame(report.suggestedNumbers)} className="gap-2">
+              <Copy className="h-3.5 w-3.5" /> Copiar
+            </Button>
+          </div>
+
           {report.avoidNumbers.length > 0 && (
             <div className="mt-3 pt-3 border-t border-border">
               <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
@@ -259,10 +336,62 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
         </CardContent>
       </Card>
 
+      {/* Alternative Games */}
+      {report.alternativeGames.length > 0 && (
+        <Card className="border-accent/20">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Star className="h-5 w-5 text-accent" />
+              Jogos Alternativos ({report.alternativeGames.length} estratégias)
+            </CardTitle>
+            <CardDescription>Jogos gerados por estratégias diversas para maximizar cobertura</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {report.alternativeGames.map((game, idx) => {
+                const bayesScore = report.bayesianGameScores[idx + 1];
+                return (
+                  <Card key={idx} className="border-border">
+                    <CardContent className="pt-3 pb-3 px-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-semibold text-sm">{altStrategyNames[idx] || `Alt ${idx + 1}`}</span>
+                        {bayesScore && <Badge variant="outline" className="text-[10px] font-mono">B:{bayesScore.totalScore}</Badge>}
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 mb-2">
+                        {game.map(n => (
+                          <span key={n} className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-accent/10 text-accent font-bold text-xs border border-accent/20">
+                            {String(n).padStart(2, "0")}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex gap-1.5">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 text-[10px] gap-1 px-2"
+                          onClick={() => saveGame(game, altStrategyNames[idx] || `Alt ${idx + 1}`)}
+                          disabled={savingGame === game.join(',') || !user}
+                        >
+                          <Save className="h-3 w-3" /> Salvar
+                        </Button>
+                        <Button size="sm" variant="ghost" className="h-7 text-[10px] gap-1 px-2" onClick={() => copyGame(game)}>
+                          <Copy className="h-3 w-3" /> Copiar
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Main Tabs */}
       <Tabs defaultValue="ranking" className="space-y-4">
         <TabsList className="flex flex-wrap h-auto gap-1">
           <TabsTrigger value="ranking">Ranking</TabsTrigger>
+          <TabsTrigger value="bayesian">Bayesian</TabsTrigger>
           <TabsTrigger value="entropy">Entropia</TabsTrigger>
           <TabsTrigger value="chisquare">χ² Test</TabsTrigger>
           <TabsTrigger value="markov">Markov</TabsTrigger>
@@ -278,7 +407,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
         <TabsContent value="ranking" className="space-y-4">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">Ranking Probabilístico — Top 20 (com Entropia & Markov)</CardTitle>
+              <CardTitle className="text-base">Ranking Probabilístico — Top 20 (Bayesian + Entropia + Markov)</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={350}>
@@ -349,6 +478,107 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Bayesian Tab - NEW */}
+        <TabsContent value="bayesian" className="space-y-4">
+          <div className="grid md:grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="pt-4 pb-3">
+                <p className="text-xs text-muted-foreground mb-1">Nós com Alto Posterior</p>
+                <p className="text-2xl font-bold text-blue-500">{report.bayesianNodes.filter(n => n.posterior > 0.6).length}</p>
+                <p className="text-[10px] text-muted-foreground">Posterior &gt; 0.60</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-4 pb-3">
+                <p className="text-xs text-muted-foreground mb-1">Centralidade Máxima</p>
+                <p className="text-2xl font-bold">{report.bayesianNodes.length > 0 ? Math.max(...report.bayesianNodes.map(n => n.centrality)).toFixed(1) : "—"}</p>
+                <p className="text-[10px] text-muted-foreground">Nó mais influente na rede</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-4 pb-3">
+                <p className="text-xs text-muted-foreground mb-1">Score Bayes do Jogo</p>
+                <p className="text-2xl font-bold text-primary">{report.bayesianGameScores[0]?.totalScore || "—"}/100</p>
+                <p className="text-[10px] text-muted-foreground">Jogo principal</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {bayesianChartData.length > 0 && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Network className="h-4 w-4 text-blue-500" />
+                  Probabilidade Posterior vs Prior — Top 20
+                </CardTitle>
+                <CardDescription>Prior = frequência base | Posterior = ajustado por dependências condicionais</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={350}>
+                  <BarChart data={bayesianChartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "hsl(var(--foreground))" }} />
+                    <Legend />
+                    <Bar dataKey="posterior" name="Posterior (%)" fill="hsl(220, 70%, 55%)" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="prior" name="Prior (%)" fill="hsl(var(--muted-foreground))" radius={[4, 4, 0, 0]} opacity={0.4} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
+
+          {report.bayesianNodes.length > 0 && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Top Influenciadores (Maior Centralidade)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="max-h-[300px] overflow-y-auto space-y-1.5">
+                  {report.bayesianNodes
+                    .sort((a, b) => b.centrality - a.centrality)
+                    .slice(0, 15)
+                    .map((node, i) => (
+                      <div key={node.number} className="flex items-center gap-3 py-1.5 px-2 rounded bg-muted/30">
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-500/15 text-blue-500 font-bold text-xs border border-blue-500/30">
+                          {String(node.number).padStart(2, "0")}
+                        </span>
+                        <div className="flex-1">
+                          <Progress value={node.posterior * 100} className="h-1.5" />
+                        </div>
+                        <div className="text-right text-[10px] space-x-2">
+                          <span className="font-mono text-muted-foreground">P={node.posterior.toFixed(2)}</span>
+                          <span className="font-mono text-muted-foreground">C={node.centrality.toFixed(1)}</span>
+                          <span className="font-mono text-muted-foreground">Conds={node.conditionals.length}</span>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {report.mutualInformation.length > 0 && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Informação Mútua — Auto-correlação Temporal</CardTitle>
+                <CardDescription>Dezenas com alta MI têm padrões temporais mais previsíveis</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {report.mutualInformation.slice(0, 20).map((mi, i) => (
+                    <div key={i} className={`text-center p-2 rounded-lg border ${mi.mi > 0.05 ? "border-blue-500/30 bg-blue-500/5" : "border-border bg-muted/20"}`}>
+                      <span className="font-bold text-sm block">{String(mi.a).padStart(2, "0")}</span>
+                      <span className={`text-[10px] ${mi.mi > 0.05 ? "text-blue-500" : "text-muted-foreground"}`}>MI={mi.mi.toFixed(3)}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         {/* Entropy Tab */}
@@ -892,7 +1122,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                 Análise da IA Autônoma
               </CardTitle>
               <CardDescription>
-                Análise profunda com Entropia, χ², Markov, Trios, Coocorrência, Gaps + 10 Jogos Otimizados
+                Análise profunda com Bayesian + Entropia + χ² + Markov + Trios + Coocorrência + Gaps + 10 Jogos Otimizados
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -903,13 +1133,11 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                       {aiAnalysis}
                     </div>
                   </div>
-                  {/* Extract and highlight games */}
                   {(() => {
                     const extractGames = (text: string) => {
                       const games: { numbers: number[]; confidence: number; strategy: string }[] = [];
                       const lines = text.split("\n");
                       
-                      // Method 1: GAME_START/GAME_END blocks (fallback format)
                       let inGameBlock = false;
                       let blockLines: string[] = [];
                       for (const line of lines) {
@@ -920,7 +1148,6 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                         }
                         if (line.trim() === "GAME_END") {
                           inGameBlock = false;
-                          // Parse block
                           let strategy = "", confidence = 0, numbers: number[] = [];
                           for (const bl of blockLines) {
                             const jogoMatch = bl.match(/Jogo\s+\d+\s*[-—–:]\s*(.+?)(?:\(|$)/i);
@@ -940,7 +1167,6 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                       
                       if (games.length >= 3) return games;
                       
-                      // Method 2: AI format - detect "Jogo X" headers
                       for (let i = 0; i < lines.length; i++) {
                         const line = lines[i];
                         const isGameHeader = /(?:\*\*\s*)?Jogo\s+\d+/i.test(line) || /^\d+[.)]\s*(?:\*\*)?(?:Jogo|Aposta)/i.test(line);
@@ -1003,12 +1229,26 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                                         )}
                                       </div>
                                     </div>
-                                    <div className="flex flex-wrap gap-1.5">
+                                    <div className="flex flex-wrap gap-1.5 mb-2">
                                       {game.numbers.map((n, ni) => (
                                         <span key={ni} className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/15 text-primary font-bold text-xs border border-primary/30">
                                           {String(n).padStart(2, "0")}
                                         </span>
                                       ))}
+                                    </div>
+                                    <div className="flex gap-1.5">
+                                      <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        className="h-7 text-[10px] gap-1 px-2"
+                                        onClick={() => saveGame(game.numbers, game.strategy || `Jogo ${idx + 1}`)}
+                                        disabled={!user}
+                                      >
+                                        <Save className="h-3 w-3" /> Salvar
+                                      </Button>
+                                      <Button size="sm" variant="ghost" className="h-7 text-[10px] gap-1 px-2" onClick={() => copyGame(game.numbers)}>
+                                        <Copy className="h-3 w-3" /> Copiar
+                                      </Button>
                                     </div>
                                   </CardContent>
                                 </Card>
