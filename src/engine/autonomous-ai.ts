@@ -813,6 +813,12 @@ export function runAutonomousAnalysis(
   const chiSquareResult = computeChiSquare(draws, config);
   const topTriplets = computeTriplets(draws, config);
 
+  // Bayesian network analysis
+  const bayesianNodes = buildConditionalNetwork(draws, config.id, 150);
+  const mutualInformation = computeMutualInformation(draws, config.id, 100)
+    .slice(0, 30)
+    .map(mi => ({ a: mi.a, b: mi.b, mi: mi.mi }));
+
   const rankings = computeRankings(stats, draws, config, markovTransitions, topCooccurrences, momentumTimeline, entropyAnalysis);
   const patterns = detectPatterns(draws, config, stats, gapAnalysis, entropyAnalysis, chiSquareResult, topTriplets);
   const strategies = evaluateStrategies(draws, config, stats, markovTransitions);
@@ -856,13 +862,20 @@ export function runAutonomousAnalysis(
     deviation: Math.round(((count - expectedPerZone) / expectedPerZone) * 100),
   }));
 
-  // Smart number suggestion — multi-criteria with entropy and chi-square
+  // Smart number suggestion — multi-criteria with Bayesian boost
   const topRanked = rankings.slice(0, Math.ceil(config.pick * 0.4)).map(r => r.number);
   const overdueReady = gapAnalysis.filter(g => g.predictedReturn <= 2 && g.currentGap > g.avgGap * 0.8).slice(0, Math.ceil(config.pick * 0.2)).map(g => g.number);
   const markovPicks = markovTransitions.slice(0, Math.ceil(config.pick * 0.2)).map(t => t.to);
   const tripletPicks = topTriplets.length > 0 ? topTriplets[0].numbers : [];
+  
+  // Bayesian high-posterior picks
+  const bayesPicks = bayesianNodes
+    .filter(n => n.posterior > 0.6)
+    .sort((a, b) => b.posterior - a.posterior)
+    .slice(0, Math.ceil(config.pick * 0.15))
+    .map(n => n.number);
 
-  const candidateSet = new Set([...topRanked, ...overdueReady, ...markovPicks, ...tripletPicks]);
+  const candidateSet = new Set([...topRanked, ...overdueReady, ...markovPicks, ...tripletPicks, ...bayesPicks]);
   let suggestedNumbers = [...candidateSet].slice(0, config.pick);
   if (suggestedNumbers.length < config.pick) {
     for (const r of rankings) {
@@ -871,6 +884,9 @@ export function runAutonomousAnalysis(
     }
   }
   suggestedNumbers = suggestedNumbers.slice(0, config.pick).sort((a, b) => a - b);
+
+  // Generate 5 alternative games with diverse strategies
+  const alternativeGames = generateAlternativeGames(rankings, gapAnalysis, markovTransitions, bayesianNodes, config);
 
   // Avoid numbers
   const avoidNumbers = rankings
