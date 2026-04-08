@@ -888,7 +888,39 @@ export function runAutonomousAnalysis(
   suggestedNumbers = suggestedNumbers.slice(0, config.pick).sort((a, b) => a - b);
 
   // Generate 5 alternative games with diverse strategies
-  const alternativeGames = generateAlternativeGames(rankings, gapAnalysis, markovTransitions, bayesianNodes, config);
+  const alternativeGames: number[][] = [];
+  const seenKeys = new Set<string>();
+  seenKeys.add(suggestedNumbers.join(','));
+  
+  // Strategy pools for alternatives
+  const pools = [
+    rankings.filter(r => r.trend === "subindo").map(r => r.number), // momentum
+    gapAnalysis.filter(g => g.predictedReturn <= 2).map(g => g.number), // overdue
+    bayesianNodes.sort((a, b) => b.posterior - a.posterior).map(n => n.number), // bayesian
+    markovTransitions.slice(0, 20).map(t => t.to), // markov
+    rankings.slice().reverse().slice(0, Math.ceil(config.numbers * 0.6)).map(r => r.number), // contrarian
+  ];
+  
+  for (const pool of pools) {
+    if (alternativeGames.length >= 5) break;
+    const candidates = pool.length >= config.pick ? pool.slice(0, config.pick) : [...pool];
+    // Fill from rankings
+    for (const r of rankings) {
+      if (candidates.length >= config.pick) break;
+      if (!candidates.includes(r.number)) candidates.push(r.number);
+    }
+    const game = candidates.slice(0, config.pick).sort((a, b) => a - b);
+    const key = game.join(',');
+    if (!seenKeys.has(key)) {
+      seenKeys.add(key);
+      alternativeGames.push(game);
+    }
+  }
+
+  // Bayesian game scores
+  const bayesianGameScores = [suggestedNumbers, ...alternativeGames].map(game => 
+    scoreByBayesianNetwork(game, bayesianNodes)
+  );
 
   // Avoid numbers
   const avoidNumbers = rankings
@@ -902,8 +934,9 @@ export function runAutonomousAnalysis(
   const strategyConsistency = strategies.length > 0
     ? strategies.reduce((a, s) => a + (s.consistency || 50), 0) / strategies.length
     : 50;
-  const entropyBonus = entropyAnalysis.normalizedEntropy < 0.95 ? 10 : 0; // exploitable bias
-  const confidenceScore = Math.round(dataQuality * 0.35 + strategyConsistency * 0.5 + entropyBonus + (chiSquareResult.isUniform ? 0 : 5));
+  const entropyBonus = entropyAnalysis.normalizedEntropy < 0.95 ? 10 : 0;
+  const bayesianBonus = bayesianNodes.length > 0 ? 5 : 0;
+  const confidenceScore = Math.round(dataQuality * 0.30 + strategyConsistency * 0.45 + entropyBonus + bayesianBonus + (chiSquareResult.isUniform ? 0 : 5));
 
   return {
     rankings,
@@ -916,6 +949,9 @@ export function runAutonomousAnalysis(
     entropyAnalysis,
     chiSquareResult,
     topTriplets,
+    bayesianNodes,
+    bayesianGameScores,
+    mutualInformation,
     parityProfile: {
       even: Math.round(avgEven * 10) / 10,
       odd: Math.round((config.pick - avgEven) * 10) / 10,
@@ -936,6 +972,7 @@ export function runAutonomousAnalysis(
     lastUpdated: new Date().toISOString(),
     drawsAnalyzed: draws.length,
     suggestedNumbers,
+    alternativeGames,
     avoidNumbers,
     confidenceScore,
   };
