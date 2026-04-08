@@ -2,7 +2,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import Autoplay from "embla-carousel-autoplay";
 import { useState, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useABTest, heroVariants } from "@/hooks/useABTest";
+import { useABTest, heroVariants, midCtaVariants, finalCtaVariants, iaCtaVariants } from "@/hooks/useABTest";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 
@@ -606,7 +606,7 @@ export default function LandingPage() {
             className="text-center mt-12"
           >
             <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-lg shadow-primary/20 gap-2 px-8 h-12 font-bold">
-              Criar Conta Grátis <ArrowRight className="w-4 h-4" />
+              {midCtaVariants[abVariant]} <ArrowRight className="w-4 h-4" />
             </Button>
           </motion.div>
         </div>
@@ -650,7 +650,7 @@ export default function LandingPage() {
                 ))}
               </ul>
               <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-lg shadow-primary/20 gap-2 px-8 h-12 font-bold">
-                Ativar IA Grátis por 7 Dias <ArrowRight className="w-4 h-4" />
+                {iaCtaVariants[abVariant]} <ArrowRight className="w-4 h-4" />
               </Button>
             </motion.div>
 
@@ -971,7 +971,7 @@ export default function LandingPage() {
               className="rounded-md inline-block"
             >
               <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-10 h-14 font-bold">
-                Começar Grátis Agora <ArrowRight className="w-5 h-5" />
+                {finalCtaVariants[abVariant]} <ArrowRight className="w-5 h-5" />
               </Button>
             </motion.div>
             <p className="text-xs text-muted-foreground/60">Sem cartão de crédito • Cancele quando quiser</p>
