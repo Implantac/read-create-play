@@ -815,9 +815,11 @@ export function runAutonomousAnalysis(
 
   // Bayesian network analysis
   const bayesianNodes = buildConditionalNetwork(draws, config.id, 150);
-  const mutualInformation = computeMutualInformation(draws, config.id, 100)
-    .slice(0, 30)
-    .map(mi => ({ a: mi.a, b: mi.b, mi: mi.mi }));
+  const miMap = computeMutualInformation(draws, config.id, 100);
+  const mutualInformation = [...miMap.entries()]
+    .map(([num, mi]) => ({ a: num, b: num, mi }))
+    .sort((a, b) => b.mi - a.mi)
+    .slice(0, 30);
 
   const rankings = computeRankings(stats, draws, config, markovTransitions, topCooccurrences, momentumTimeline, entropyAnalysis);
   const patterns = detectPatterns(draws, config, stats, gapAnalysis, entropyAnalysis, chiSquareResult, topTriplets);
