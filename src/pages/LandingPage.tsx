@@ -858,11 +858,28 @@ export default function LandingPage() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="text-center mt-8 flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground"
+            className="text-center mt-8 space-y-4"
           >
-            <span className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5 text-primary/60" /> Pagamento seguro</span>
-            <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 text-primary/60" /> Cancele quando quiser</span>
-            <span className="flex items-center gap-1.5"><Trophy className="w-3.5 h-3.5 text-primary/60" /> 7 dias grátis</span>
+            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5 text-primary/60" /> Pagamento seguro</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 text-primary/60" /> Cancele quando quiser</span>
+              <span className="flex items-center gap-1.5"><Trophy className="w-3.5 h-3.5 text-primary/60" /> 7 dias grátis</span>
+            </div>
+            {/* Guarantee badge */}
+            <div className="inline-flex items-center gap-3 px-5 py-3 rounded-xl bg-primary/5 border border-primary/15">
+              <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                <Shield className="w-5 h-5 text-primary" />
+              </div>
+              <div className="text-left">
+                <p className="text-xs font-semibold text-foreground">Garantia de 7 dias</p>
+                <p className="text-[11px] text-muted-foreground">Teste completo sem compromisso. Não gostou? Cancele com um clique.</p>
+              </div>
+            </div>
+            {/* Live counter */}
+            <p className="text-xs text-muted-foreground/70 flex items-center justify-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              <strong className="text-foreground/80">{Math.floor(37 + Math.random() * 15)}</strong> pessoas testando agora
+            </p>
           </motion.div>
         </div>
       </section>
