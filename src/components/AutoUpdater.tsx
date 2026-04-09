@@ -78,9 +78,11 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso, onSyncTrigge
     }
   }, [lotteryId, latestConcurso, onNewDraw, persistAndSync]);
 
-  // Auto-fetch on mount and when lottery changes
+  // Auto-fetch on mount and when lottery changes — also trigger background sync
   useEffect(() => {
     setLatestFromApi(null);
+    // Always trigger a background DB sync on lottery change to ensure DB is up to date
+    persistAndSync(lotteryId);
     checkForUpdates().catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lotteryId]);
