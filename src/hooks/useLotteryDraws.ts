@@ -33,6 +33,7 @@ export function useLotteryDraws(lotteryId: string) {
   const [count, setCount] = useState(0);
   const [loadedCount, setLoadedCount] = useState(0);
   const cancelRef = useRef<{ cancelled: boolean }>({ cancelled: false });
+  const currentLotteryRef = useRef(lotteryId);
 
   const sanitizeNumbers = useCallback((numbers: unknown): number[] => {
     if (!Array.isArray(numbers)) return [];
@@ -63,8 +64,6 @@ export function useLotteryDraws(lotteryId: string) {
     }));
     return { mapped, mappedWithPrizes };
   }, [sanitizeNumbers]);
-
-  const currentLotteryRef = useRef(lotteryId);
 
   const fetchDraws = useCallback(async () => {
     // Cancel any in-flight request
