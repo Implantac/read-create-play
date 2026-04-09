@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { DrawResult } from "@/data/lotteries";
 import { fetchLatestDraw, LatestDrawResult } from "@/services/lotteryApi";
 import { DrawPrizeData } from "@/hooks/useLotteryDraws";
+import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, Wifi, WifiOff, Clock, CheckCircle2, Trophy, Users, DollarSign, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,13 +12,14 @@ interface Props {
   lotteryId: string;
   onNewDraw: (draw: DrawResult) => void;
   latestConcurso: number;
+  onSyncTriggered?: () => void;
 }
 
 function formatCurrency(value: number): string {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso }: Props) {
+export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso, onSyncTriggered }: Props) {
   const [loading, setLoading] = useState(false);
   const [lastCheck, setLastCheck] = useState<Date | null>(null);
   const [isOnline, setIsOnline] = useState(true);
@@ -26,6 +28,19 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso }: Props) {
 
   const lotteryIdRef = useRef(lotteryId);
   lotteryIdRef.current = lotteryId;
+
+  const persistAndSync = useCallback(async (lotteryId: string) => {
+    try {
+      // Trigger the sync edge function to persist new draws to the database
+      await supabase.functions.invoke("sync-lottery-draws", {
+        body: { lottery_id: lotteryId },
+      });
+      // Notify parent to refetch from DB so state is fully consistent
+      onSyncTriggered?.();
+    } catch (e) {
+      console.warn("Background sync failed:", e);
+    }
+  }, [onSyncTriggered]);
 
   const checkForUpdates = useCallback(async () => {
     const requestedLottery = lotteryId;
@@ -43,6 +58,8 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso }: Props) {
         if (result.concurso > latestConcurso) {
           onNewDraw(result);
           toast.success(`Novo resultado! Concurso #${result.concurso}`);
+          // Also persist to database so it's not lost on next page load
+          persistAndSync(requestedLottery);
         } else {
           toast.info("Nenhum resultado novo disponível");
         }
@@ -59,11 +76,13 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso }: Props) {
     } finally {
       if (lotteryIdRef.current === requestedLottery) setLoading(false);
     }
-  }, [lotteryId, latestConcurso, onNewDraw]);
+  }, [lotteryId, latestConcurso, onNewDraw, persistAndSync]);
 
-  // Auto-fetch on mount and when lottery changes
+  // Auto-fetch on mount and when lottery changes — also trigger background sync
   useEffect(() => {
     setLatestFromApi(null);
+    // Always trigger a background DB sync on lottery change to ensure DB is up to date
+    persistAndSync(lotteryId);
     checkForUpdates().catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lotteryId]);
