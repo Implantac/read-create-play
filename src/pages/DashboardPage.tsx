@@ -37,7 +37,7 @@ const item = {
 };
 
 const DashboardPage = () => {
-  const { config, draws, drawsWithPrizes, loading, syncing, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery } = useLotteryContext();
+  const { config, draws, drawsWithPrizes, loading, syncing, stats, sumData, syncDraws, syncAllLotteries, addDraw, refetchDraws, selectedLottery } = useLotteryContext();
   const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
   const { currentPlan } = usePlanAccess();
   const { profile, trialDaysLeft, isTrialExpired, isAdmin, isSuperAdmin } = useAuth();
