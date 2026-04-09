@@ -64,17 +64,24 @@ export function useLotteryDraws(lotteryId: string) {
     return { mapped, mappedWithPrizes };
   }, [sanitizeNumbers]);
 
+  const currentLotteryRef = useRef(lotteryId);
+
   const fetchDraws = useCallback(async () => {
     // Cancel any in-flight request
     cancelRef.current.cancelled = true;
     const signal = { cancelled: false };
     cancelRef.current = signal;
 
-    // Immediately clear stale data from the previous lottery
-    setDraws([]);
-    setDrawsWithPrizes([]);
-    setLoadedCount(0);
-    setCount(0);
+    const isLotteryChange = currentLotteryRef.current !== lotteryId;
+    currentLotteryRef.current = lotteryId;
+
+    // Only clear data when switching lotteries (not on refetch)
+    if (isLotteryChange) {
+      setDraws([]);
+      setDrawsWithPrizes([]);
+      setLoadedCount(0);
+      setCount(0);
+    }
     setLoading(true);
     try {
       const { data: initialData, error: initialError, count: totalCount } = await supabase
