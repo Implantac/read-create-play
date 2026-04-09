@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { DrawResult } from "@/data/lotteries";
 import { fetchLatestDraw, LatestDrawResult } from "@/services/lotteryApi";
 import { DrawPrizeData } from "@/hooks/useLotteryDraws";
+import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, Wifi, WifiOff, Clock, CheckCircle2, Trophy, Users, DollarSign, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ interface Props {
   lotteryId: string;
   onNewDraw: (draw: DrawResult) => void;
   latestConcurso: number;
+  onSyncTriggered?: () => void;
 }
 
 function formatCurrency(value: number): string {
