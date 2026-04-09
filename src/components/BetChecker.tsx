@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { DrawResult } from "@/data/lotteries";
 import { checkBetAgainstDraws, MatchResult, getPrizeTiers } from "@/services/lotteryApi";
 import { DrawResultWithPrizes, DrawPrizeData } from "@/hooks/useLotteryDraws";
@@ -8,7 +8,7 @@ import {
   BarChart3, Target, ArrowUpRight, ChevronDown, ChevronUp,
   Award, DollarSign, Sparkles, CheckCircle2, AlertTriangle,
   Copy, Save, Grid3X3, ArrowDown, ArrowUp, Minus, ListChecks,
-  FileDown, RotateCcw, Hash, Eye, Dice1
+  FileDown, RotateCcw, Hash, Eye, Dice1, Info
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -127,6 +127,27 @@ interface AIImprovement {
   expectedGain: string;
 }
 
+/** Lottery-specific helper text for the UI */
+function getLotteryHint(lotteryId: string): string | null {
+  switch (lotteryId) {
+    case "supersete": return "Super Sete: a conferência é posicional — cada coluna é comparada individualmente.";
+    case "lotomania": return "Lotomania: acertar 0 números também dá prêmio!";
+    case "duplasena": return "Dupla Sena: a conferência considera o 1º sorteio. Verifique também o 2º sorteio.";
+    default: return null;
+  }
+}
+
+/* ─── Grid column calculator ─── */
+function getGridCols(lotteryId: string, maxNumbers: number): { desktop: number; mobile: number } {
+  if (lotteryId === "supersete") return { desktop: 10, mobile: 5 };
+  if (lotteryId === "lotomania") return { desktop: 10, mobile: 8 };
+  if (maxNumbers <= 10) return { desktop: 5, mobile: 5 };
+  if (maxNumbers <= 25) return { desktop: 5, mobile: 5 };
+  if (maxNumbers <= 31) return { desktop: 8, mobile: 6 };
+  if (maxNumbers <= 50) return { desktop: 10, mobile: 8 };
+  return { desktop: 10, mobile: 8 };
+}
+
 function ScoreRing({ score, size = 48 }: { score: number; size?: number }) {
   const r = (size - 6) / 2;
   const circumference = 2 * Math.PI * r;
@@ -168,14 +189,19 @@ function TrendBadge({ trend, recentAvg, previousAvg }: { trend: "up" | "down" | 
 
 /* ─── Quick Check Result Card ─── */
 function QuickCheckResult({
-  bet, draw, lotteryId, onClose
+  bet, draw, lotteryId, onClose, prizeTiers
 }: {
   bet: number[]; draw: DrawResult; lotteryId: string; onClose: () => void;
+  prizeTiers?: DrawPrizeData | null;
 }) {
   const { hits, matched } = matchBetAgainstDraw(bet, draw.numbers, lotteryId);
   const prize = getEstimatedPrize(lotteryId, hits);
+  const realPrize = getRealPrizeLabel(prizeTiers, hits);
   const maxHits = getMaxPossibleHits(lotteryId, bet.length);
   const pct = maxHits > 0 ? Math.round((hits / maxHits) * 100) : 0;
+
+  // For Lotomania, 0 hits is also a prize
+  const hasLotomania0Prize = lotteryId === "lotomania" && hits === 0;
 
   return (
     <motion.div
@@ -183,15 +209,15 @@ function QuickCheckResult({
       animate={{ opacity: 1, scale: 1, y: 0 }}
       className="rounded-xl border-2 overflow-hidden"
       style={{
-        borderColor: prize ? "hsl(var(--primary))" : hits > 0 ? "hsl(var(--border))" : "hsl(var(--destructive) / 0.3)"
+        borderColor: (prize || hasLotomania0Prize) ? "hsl(var(--primary))" : hits > 0 ? "hsl(var(--border))" : "hsl(var(--destructive) / 0.3)"
       }}
     >
       {/* Result header */}
       <div className={`px-4 py-3 flex items-center justify-between ${
-        prize ? "bg-primary/10" : "bg-muted/30"
+        (prize || hasLotomania0Prize) ? "bg-primary/10" : "bg-muted/30"
       }`}>
         <div className="flex items-center gap-3">
-          {prize ? (
+          {(prize || hasLotomania0Prize) ? (
             <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
               <Trophy className="w-5 h-5 text-primary" />
             </div>
@@ -207,7 +233,7 @@ function QuickCheckResult({
           <div>
             <p className="text-sm font-bold text-foreground">
               {hits} de {maxHits} acertos
-              {prize && <span className="ml-2 text-primary">🎉</span>}
+              {(prize || hasLotomania0Prize) && <span className="ml-2 text-primary">🎉</span>}
             </p>
             <p className="text-[11px] text-muted-foreground">
               Concurso #{draw.concurso} — {draw.date}
@@ -238,13 +264,17 @@ function QuickCheckResult({
 
         {/* Numbers comparison */}
         <div className="space-y-2">
-          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Seus números</p>
+          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+            Seus números {lotteryId === "supersete" && <span className="normal-case text-primary">(posicional)</span>}
+          </p>
           <div className="flex flex-wrap gap-1.5">
-            {bet.map(n => {
-              const isMatch = matched.includes(n);
+            {bet.map((n, idx) => {
+              const isMatch = lotteryId === "supersete"
+                ? (draw.numbers[idx] === n)
+                : matched.includes(n);
               return (
                 <motion.span
-                  key={n}
+                  key={`${n}-${idx}`}
                   initial={{ scale: 0.8 }}
                   animate={{ scale: 1 }}
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-mono font-bold border-2 transition-all ${
@@ -263,11 +293,13 @@ function QuickCheckResult({
         <div className="space-y-2">
           <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Números sorteados</p>
           <div className="flex flex-wrap gap-1.5">
-            {draw.numbers.map(n => {
-              const isMatch = matched.includes(n);
+            {draw.numbers.map((n, idx) => {
+              const isMatch = lotteryId === "supersete"
+                ? (bet[idx] === n)
+                : matched.includes(n);
               return (
                 <span
-                  key={n}
+                  key={`${n}-${idx}`}
                   className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-mono font-bold border ${
                     isMatch
                       ? "bg-primary/15 text-primary border-primary/40 font-black"
@@ -281,17 +313,26 @@ function QuickCheckResult({
           </div>
         </div>
 
-        {/* Prize info */}
-        {prize && (
+        {/* Prize info - show real prize if available */}
+        {(prize || hasLotomania0Prize) && (
           <motion.div
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/20"
           >
-            <DollarSign className="w-5 h-5 text-primary" />
-            <div>
-              <p className="text-xs font-bold text-primary">{prize.label}</p>
-              <p className="text-[10px] text-muted-foreground">Estimativa de prêmio</p>
+            <DollarSign className="w-5 h-5 text-primary shrink-0" />
+            <div className="flex-1">
+              {realPrize ? (
+                <>
+                  <p className="text-xs font-bold text-green-400">{realPrize}</p>
+                  <p className="text-[10px] text-muted-foreground">Valor real do concurso</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs font-bold text-primary">{prize?.label || "Prêmio (R$6)"}</p>
+                  <p className="text-[10px] text-muted-foreground">Estimativa de prêmio</p>
+                </>
+              )}
             </div>
           </motion.div>
         )}
@@ -317,6 +358,8 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
   const { savedBets, saveBet } = useSavedBets(lotteryId);
   const selectedDraws = useMemo(() => draws.slice(0, drawRange), [draws, drawRange]);
   const lastDraw = useMemo(() => draws.length > 0 ? draws[0] : null, [draws]);
+  const lotteryHint = useMemo(() => getLotteryHint(lotteryId), [lotteryId]);
+  const gridColsConfig = useMemo(() => getGridCols(lotteryId, maxNumbers), [lotteryId, maxNumbers]);
 
   const prizeDataMap = useMemo(() => {
     if (!drawsWithPrizes) return new Map<number, DrawPrizeData | null>();
@@ -324,6 +367,13 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
     drawsWithPrizes.forEach(d => map.set(d.concurso, d.prizeTiers || null));
     return map;
   }, [drawsWithPrizes]);
+
+  // Prize data for last draw (for quick check)
+  const lastDrawPrizeTiers = useMemo(() => {
+    if (!lastDraw || !drawsWithPrizes) return null;
+    const found = drawsWithPrizes.find(d => d.concurso === lastDraw.concurso);
+    return found?.prizeTiers || null;
+  }, [lastDraw, drawsWithPrizes]);
 
   useEffect(() => {
     setSelectedNumbers([]);
@@ -338,12 +388,8 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
     setActiveTab("quick");
   }, [lotteryId]);
 
-  useEffect(() => {
-    if (hasRunPerformance && selectedDraws.length > 0) {
-      const timer = setTimeout(() => runPerformanceCheck(), 50);
-      return () => clearTimeout(timer);
-    }
-  }, [drawRange, selectedDraws]);
+  // Use a ref to avoid stale closure in the drawRange effect
+  const performanceRef = useRef({ hasRunPerformance, runPerformanceCheck: () => {} });
 
   const prizeTiers = getPrizeTiers(lotteryId);
   const minPrizeHits = prizeTiers.length > 0
@@ -352,7 +398,8 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
 
   const handleInput = (val: string) => {
     setInputValue(val);
-    const nums = val.split(/[,\s\-]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n) && n >= (lotteryId === "lotomania" ? 0 : 1) && n <= maxNumbers);
+    const minNum = lotteryId === "lotomania" ? 0 : 1;
+    const nums = val.split(/[,\s\-]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n) && n >= minNum && n <= maxNumbers);
     if (nums.length > 0 && (val.endsWith(" ") || val.endsWith(",") || val.endsWith("-"))) {
       const unique = [...new Set([...selectedNumbers, ...nums])].sort((a, b) => a - b);
       if (unique.length <= pick) {
@@ -364,7 +411,8 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
   };
 
   const addFromInput = () => {
-    const nums = inputValue.split(/[,\s\-]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n) && n >= (lotteryId === "lotomania" ? 0 : 1) && n <= maxNumbers);
+    const minNum = lotteryId === "lotomania" ? 0 : 1;
+    const nums = inputValue.split(/[,\s\-]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n) && n >= minNum && n <= maxNumbers);
     if (nums.length === 0) return;
     const unique = [...new Set([...selectedNumbers, ...nums])].sort((a, b) => a - b);
     if (unique.length > pick) { toast.error(`Máximo de ${pick} números`); return; }
@@ -396,7 +444,6 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
     toast.success(`Aposta "${bet.label || bet.strategy || "salva"}" carregada`);
   };
 
-  // Quick check against last draw
   const quickCheck = () => {
     if (selectedNumbers.length < 1) { toast.error("Selecione pelo menos 1 número"); return; }
     if (!lastDraw) { toast.error("Nenhum sorteio disponível"); return; }
@@ -408,7 +455,7 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
     const matches = draws.map(draw => {
       const { hits, matched } = matchBetAgainstDraw(selectedNumbers, draw.numbers, lotteryId);
       return { concurso: draw.concurso, date: draw.date, drawnNumbers: draw.numbers, matchedNumbers: matched, matchCount: hits };
-    }).filter(r => r.matchCount > 0).sort((a, b) => b.matchCount - a.matchCount);
+    }).filter(r => r.matchCount > 0 || (lotteryId === "lotomania" && r.matchCount === 0)).sort((a, b) => b.matchCount - a.matchCount);
     setResults(matches);
     setActiveTab("check");
     toast.success(`${matches.length} concursos com acertos encontrados`);
@@ -437,7 +484,7 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
     return { trend, recentAvg, previousAvg };
   };
 
-  const runPerformanceCheck = () => {
+  const runPerformanceCheck = useCallback(() => {
     const allBets: { numbers: number[]; label: string }[] = [];
     if (selectedNumbers.length > 0) allBets.push({ numbers: [...selectedNumbers], label: `Seleção atual (${selectedNumbers.length} nº)` });
     savedBets.forEach((bet, i) => allBets.push({ numbers: [...bet.numbers], label: bet.label || bet.strategy || `Aposta salva #${i + 1}` }));
@@ -481,7 +528,17 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
     setActiveTab("performance");
     setHasRunPerformance(true);
     toast.success(`${perfs.length} apostas conferidas contra ${selectedDraws.length} sorteios reais`);
-  };
+  }, [selectedNumbers, savedBets, selectedDraws, lotteryId, pick, prizeDataMap]);
+
+  // Update ref for the effect
+  performanceRef.current = { hasRunPerformance, runPerformanceCheck };
+
+  useEffect(() => {
+    if (performanceRef.current.hasRunPerformance && selectedDraws.length > 0) {
+      const timer = setTimeout(() => performanceRef.current.runPerformanceCheck(), 50);
+      return () => clearTimeout(timer);
+    }
+  }, [drawRange, selectedDraws]);
 
   const runCheckAll = () => {
     if (savedBets.length === 0) { toast.error("Nenhuma aposta salva"); return; }
@@ -537,7 +594,6 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
     { key: "improve" as const, label: "IA", icon: Brain, desc: "Melhorias" },
   ];
 
-  const gridCols = maxNumbers <= 10 ? 5 : maxNumbers <= 31 ? 8 : maxNumbers <= 50 ? 10 : 10;
   const startNum = lotteryId === "lotomania" ? 0 : 1;
   const totalNums = lotteryId === "lotomania" ? maxNumbers + 1 : maxNumbers;
 
@@ -564,6 +620,14 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
         </div>
       </div>
 
+      {/* Lottery-specific hint */}
+      {lotteryHint && (
+        <div className="mx-4 sm:mx-5 mb-2 flex items-start gap-2 p-2.5 rounded-lg bg-accent/5 border border-accent/15 text-[10px] text-accent">
+          <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+          <span>{lotteryHint}</span>
+        </div>
+      )}
+
       {/* ─── Number Input Area ─── */}
       <div className="px-4 sm:px-5 space-y-3">
         {/* Input field */}
@@ -574,7 +638,7 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
               value={inputValue}
               onChange={e => handleInput(e.target.value)}
               onKeyDown={e => e.key === "Enter" && addFromInput()}
-              placeholder={`Digite: 5, 12, 23... (${selectedNumbers.length}/${pick})`}
+              placeholder={`Digite: ${startNum === 0 ? "0, 5, 12" : "5, 12, 23"}... (${selectedNumbers.length}/${pick})`}
               className="bg-muted/50 border-border/50 text-sm pl-9"
             />
           </div>
@@ -620,9 +684,14 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
               className="overflow-hidden"
             >
               <div
-                className="grid gap-1 sm:gap-1.5 p-3 rounded-xl bg-muted/20 border border-border/30"
-                style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}
+                className="number-checker-grid grid gap-1 sm:gap-1.5 p-3 rounded-xl bg-muted/20 border border-border/30"
+                style={{ gridTemplateColumns: `repeat(${gridColsConfig.mobile}, minmax(0, 1fr))` }}
               >
+                <style>{`
+                  @media (min-width: 641px) {
+                    .number-checker-grid { grid-template-columns: repeat(${gridColsConfig.desktop}, minmax(0, 1fr)) !important; }
+                  }
+                `}</style>
                 {Array.from({ length: totalNums }, (_, i) => i + startNum).map(n => {
                   const isSelected = selectedNumbers.includes(n);
                   const isInLastDraw = lastDraw?.numbers.includes(n);
@@ -726,6 +795,7 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
               draw={quickCheckResult.draw}
               lotteryId={lotteryId}
               onClose={() => setQuickCheckResult(null)}
+              prizeTiers={lastDrawPrizeTiers}
             />
           </div>
         )}
@@ -768,8 +838,8 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                   <span className="text-[10px] text-muted-foreground">{lastDraw.date}</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
-                  {lastDraw.numbers.map(n => (
-                    <span key={n} className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-mono font-bold bg-accent/15 text-accent border border-accent/30">
+                  {lastDraw.numbers.map((n, idx) => (
+                    <span key={`${n}-${idx}`} className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-mono font-bold bg-accent/15 text-accent border border-accent/30">
                       {String(n).padStart(2, "0")}
                     </span>
                   ))}
@@ -830,8 +900,8 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                         <span className="text-sm font-bold text-accent">{r.matchCount}</span>
                       </div>
                       <div className="flex flex-wrap gap-0.5 ml-auto">
-                        {r.matchedNumbers.map(n => (
-                          <span key={n} className="lottery-ball text-[9px] w-5 h-5">{String(n).padStart(2, "0")}</span>
+                        {r.matchedNumbers.map((n, idx) => (
+                          <span key={`${n}-${idx}`} className="lottery-ball text-[9px] w-5 h-5">{String(n).padStart(2, "0")}</span>
                         ))}
                       </div>
                     </motion.div>
@@ -972,11 +1042,11 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                               {/* Numbers with last draw match */}
                               <div className="flex items-center gap-2">
                                 <div className="flex flex-wrap gap-1">
-                                  {perf.numbers.map(n => {
+                                  {perf.numbers.map((n, idx) => {
                                     const lastDrawResult = perf.results[0];
                                     const isHitLastDraw = lastDrawResult?.matched.includes(n) || false;
                                     return (
-                                      <span key={n} className={`text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-mono font-bold ${
+                                      <span key={`${n}-${idx}`} className={`text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-mono font-bold ${
                                         isHitLastDraw
                                           ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-sm shadow-primary/30"
                                           : "lottery-ball"
@@ -1093,10 +1163,10 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                       <div className="space-y-2">
                         <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Original</p>
                         <div className="flex flex-wrap gap-1">
-                          {imp.original.map(n => {
+                          {imp.original.map((n, idx) => {
                             const removed = !imp.suggested.includes(n);
                             return (
-                              <span key={n} className={`text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-mono border ${
+                              <span key={`${n}-${idx}`} className={`text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-mono border ${
                                 removed ? "bg-destructive/15 text-destructive border-destructive/30 line-through" : "bg-muted/40 text-foreground/70 border-border/30"
                               }`}>{String(n).padStart(2, "0")}</span>
                             );
@@ -1108,10 +1178,10 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                           <ArrowUpRight className="w-3 h-3" /> Sugerida
                         </p>
                         <div className="flex flex-wrap gap-1">
-                          {imp.suggested.map(n => {
+                          {imp.suggested.map((n, idx) => {
                             const added = !imp.original.includes(n);
                             return (
-                              <span key={n} className={`lottery-ball text-[10px] w-6 h-6 ${
+                              <span key={`${n}-${idx}`} className={`lottery-ball text-[10px] w-6 h-6 ${
                                 added ? "ring-2 ring-green-400/60 ring-offset-1 ring-offset-background" : ""
                               }`}>{String(n).padStart(2, "0")}</span>
                             );
