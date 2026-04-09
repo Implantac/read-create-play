@@ -16,6 +16,7 @@ interface LotteryContextType {
   syncDraws: () => void;
   syncAllLotteries: () => void;
   addDraw: (draw: DrawResultWithPrizes) => void;
+  refetchDraws: () => void;
   stats: NumberStats[];
   sumData: ReturnType<typeof computeSumDistribution>;
 }
@@ -25,15 +26,15 @@ const LotteryContext = createContext<LotteryContextType | null>(null);
 export function LotteryProvider({ children }: { children: ReactNode }) {
   const [selectedLottery, setSelectedLottery] = useState("megasena");
   const config = useMemo(() => LOTTERIES.find(l => l.id === selectedLottery)!, [selectedLottery]);
-  const { draws, drawsWithPrizes, loading, syncing, count, loadedCount, syncDraws, syncAllLotteries, addDraw } = useLotteryDraws(selectedLottery);
+  const { draws, drawsWithPrizes, loading, syncing, count, loadedCount, syncDraws, syncAllLotteries, addDraw, refetch } = useLotteryDraws(selectedLottery);
   const stats = useMemo(() => computeFrequencyStats(draws, config.numbers), [draws, config.numbers]);
   const sumData = useMemo(() => computeSumDistribution(draws), [draws]);
   const handleSetLottery = useCallback((id: string) => setSelectedLottery(id), []);
 
   const value = useMemo(() => ({
     selectedLottery, setSelectedLottery: handleSetLottery,
-    config, draws, drawsWithPrizes, loading, syncing, count, loadedCount, syncDraws, syncAllLotteries, addDraw, stats, sumData,
-  }), [selectedLottery, handleSetLottery, config, draws, drawsWithPrizes, loading, syncing, count, loadedCount, syncDraws, syncAllLotteries, addDraw, stats, sumData]);
+    config, draws, drawsWithPrizes, loading, syncing, count, loadedCount, syncDraws, syncAllLotteries, addDraw, refetchDraws: refetch, stats, sumData,
+  }), [selectedLottery, handleSetLottery, config, draws, drawsWithPrizes, loading, syncing, count, loadedCount, syncDraws, syncAllLotteries, addDraw, refetch, stats, sumData]);
 
   return (
     <LotteryContext.Provider value={value}>
