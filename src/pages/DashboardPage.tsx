@@ -154,7 +154,7 @@ const DashboardPage = () => {
 
       {draws.length > 0 && (
         <div key={selectedLottery}>
-          <AutoUpdater key={`auto-${selectedLottery}`} lotteryId={selectedLottery} onNewDraw={handleNewDraw} latestConcurso={draws[0]?.concurso || 0} />
+          <AutoUpdater key={`auto-${selectedLottery}`} lotteryId={selectedLottery} onNewDraw={handleNewDraw} latestConcurso={draws[0]?.concurso || 0} onSyncTriggered={refetchDraws} />
 
           {/* Workflow Steps */}
           <WorkflowSteps />
