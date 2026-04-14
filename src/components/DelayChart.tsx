@@ -1,14 +1,14 @@
+import { memo, useMemo } from "react";
 import { NumberStats } from "@/engine/statistics";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { CHART_TOOLTIP_STYLE, CHART_AXIS_TICK, CHART_COLORS } from "@/lib/chart-theme";
-import { useMemo } from "react";
 import { Clock } from "lucide-react";
 
 interface Props {
   stats: NumberStats[];
 }
 
-export function DelayChart({ stats }: Props) {
+export const DelayChart = memo(function DelayChart({ stats }: Props) {
   const data = useMemo(() => {
     return [...stats]
       .sort((a, b) => b.lastSeen - a.lastSeen)
@@ -57,4 +57,4 @@ export function DelayChart({ stats }: Props) {
       </div>
     </div>
   );
-}
+});

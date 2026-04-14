@@ -1,3 +1,4 @@
+import { memo, useMemo } from "react";
 import { NumberStats } from "@/engine/statistics";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { CHART_TOOLTIP_STYLE, CHART_AXIS_TICK, CHART_COLORS } from "@/lib/chart-theme";
@@ -7,20 +8,20 @@ interface Props {
   stats: NumberStats[];
 }
 
-export function FrequencyChart({ stats }: Props) {
-  const data = stats.map(s => ({
+const getColor = (status: string) => {
+  switch (status) {
+    case "hot": return CHART_COLORS.red;
+    case "cold": return CHART_COLORS.blue;
+    default: return CHART_COLORS.green;
+  }
+};
+
+export const FrequencyChart = memo(function FrequencyChart({ stats }: Props) {
+  const data = useMemo(() => stats.map(s => ({
     name: String(s.number).padStart(2, "0"),
     freq: s.frequency,
     status: s.status,
-  }));
-
-  const getColor = (status: string) => {
-    switch (status) {
-      case "hot": return CHART_COLORS.red;
-      case "cold": return CHART_COLORS.blue;
-      default: return CHART_COLORS.green;
-    }
-  };
+  })), [stats]);
 
   return (
     <div className="rounded-xl glass-card p-5 space-y-4">
@@ -59,4 +60,4 @@ export function FrequencyChart({ stats }: Props) {
       </div>
     </div>
   );
-}
+});
