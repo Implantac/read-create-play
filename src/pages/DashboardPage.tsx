@@ -27,6 +27,7 @@ import { usePlanAccess } from "@/hooks/usePlanAccess";
 import { OnboardingGuide } from "@/components/OnboardingGuide";
 import { UpgradeBanner } from "@/components/UpgradeBanner";
 import { DashboardSkeleton } from "@/components/DashboardSkeleton";
+import { PersonalPerformanceCard } from "@/components/PersonalPerformanceCard";
 
 const container = {
   hidden: { opacity: 0 },
@@ -230,6 +231,11 @@ const DashboardPage = () => {
                 </AnimatePresence>
               </div>
             </motion.div>
+          </div>
+
+          {/* Personal Performance Card */}
+          <div className="mt-6">
+            <PersonalPerformanceCard />
           </div>
 
           {/* Saved bets limit card */}
