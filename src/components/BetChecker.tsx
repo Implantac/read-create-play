@@ -28,10 +28,23 @@ interface Props {
   pick: number;
 }
 
+interface ExtendedMatchResult extends MatchResult {
+  secondDrawHits: number;
+  secondDrawMatched: number[];
+  secondDrawNumbers: number[];
+  bestMatchCount: number;
+}
+
+interface PerfResult {
+  concurso: number; date: string; hits: number; matched: number[]; prize: string; prizeValue: number; realPrize?: string;
+  secondHits?: number; secondMatched?: number[]; secondPrize?: string; secondPrizeValue?: number;
+  bestHits?: number;
+}
+
 interface BetPerformance {
   numbers: number[];
   label: string;
-  results: { concurso: number; date: string; hits: number; matched: number[]; prize: string; prizeValue: number; realPrize?: string }[];
+  results: PerfResult[];
   avgHits: number;
   bestHit: number;
   prizeHits: number;
@@ -419,7 +432,7 @@ function DrawComparisonBlock({
 export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick }: Props) {
   const [inputValue, setInputValue] = useState("");
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
-  const [results, setResults] = useState<MatchResult[] | null>(null);
+  const [results, setResults] = useState<ExtendedMatchResult[] | null>(null);
   const [performances, setPerformances] = useState<BetPerformance[]>([]);
   const [aiImprovements, setAiImprovements] = useState<AIImprovement[]>([]);
   const [loadingAI, setLoadingAI] = useState(false);
@@ -527,10 +540,21 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
 
   const check = () => {
     if (selectedNumbers.length < 1) { toast.error("Adicione pelo menos 1 número"); return; }
-    const matches = draws.map(draw => {
+    const isDupla = lotteryId === "duplasena";
+    const matches: ExtendedMatchResult[] = draws.map(draw => {
       const { hits, matched } = matchBetAgainstDraw(selectedNumbers, draw.numbers, lotteryId);
-      return { concurso: draw.concurso, date: draw.date, drawnNumbers: draw.numbers, matchedNumbers: matched, matchCount: hits };
-    }).filter(r => r.matchCount > 0 || (lotteryId === "lotomania" && r.matchCount === 0)).sort((a, b) => b.matchCount - a.matchCount);
+      const second = isDupla && draw.secondDrawNumbers?.length
+        ? matchBetAgainstDraw(selectedNumbers, draw.secondDrawNumbers, lotteryId)
+        : null;
+      const bestCount = second ? Math.max(hits, second.hits) : hits;
+      return {
+        concurso: draw.concurso, date: draw.date, drawnNumbers: draw.numbers,
+        matchedNumbers: matched, matchCount: hits,
+        secondDrawHits: second?.hits ?? 0, secondDrawMatched: second?.matched ?? [],
+        secondDrawNumbers: draw.secondDrawNumbers ?? [], bestMatchCount: bestCount,
+      };
+    }).filter(r => r.bestMatchCount > 0 || (lotteryId === "lotomania" && r.matchCount === 0))
+      .sort((a, b) => b.bestMatchCount - a.bestMatchCount);
     setResults(matches);
     setActiveTab("check");
     toast.success(`${matches.length} concursos com acertos encontrados`);
@@ -566,22 +590,44 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
     if (allBets.length === 0) { toast.error("Nenhuma aposta para conferir."); return; }
     if (selectedDraws.length === 0) { toast.error("Nenhum sorteio disponível."); return; }
 
+    const isDupla = lotteryId === "duplasena";
     const maxHits = getMaxPossibleHits(lotteryId, pick);
     const perfs: BetPerformance[] = allBets.map(bet => {
       let totalPrizeValue = 0;
-      const betResults = selectedDraws.map(draw => {
+      const betResults: PerfResult[] = selectedDraws.map(draw => {
         const { hits, matched } = matchBetAgainstDraw(bet.numbers, draw.numbers, lotteryId);
         const prizeInfo = getEstimatedPrize(lotteryId, hits);
         if (prizeInfo) totalPrizeValue += prizeInfo.value;
         const realPrize = getRealPrizeLabel(prizeDataMap.get(draw.concurso), hits);
-        return { concurso: draw.concurso, date: draw.date, hits, matched, prize: prizeInfo?.label || "", prizeValue: prizeInfo?.value || 0, realPrize };
+
+        // 2nd draw for Dupla Sena
+        let secondHits: number | undefined;
+        let secondMatched: number[] | undefined;
+        let secondPrize: string | undefined;
+        let secondPrizeValue: number | undefined;
+        let bestHitsForDraw = hits;
+        if (isDupla && draw.secondDrawNumbers?.length) {
+          const s = matchBetAgainstDraw(bet.numbers, draw.secondDrawNumbers, lotteryId);
+          secondHits = s.hits;
+          secondMatched = s.matched;
+          const sp = getEstimatedPrize(lotteryId, s.hits);
+          if (sp) { secondPrize = sp.label; secondPrizeValue = sp.value; totalPrizeValue += sp.value; }
+          bestHitsForDraw = Math.max(hits, s.hits);
+        }
+
+        return {
+          concurso: draw.concurso, date: draw.date, hits, matched,
+          prize: prizeInfo?.label || "", prizeValue: prizeInfo?.value || 0, realPrize,
+          secondHits, secondMatched, secondPrize, secondPrizeValue,
+          bestHits: isDupla ? bestHitsForDraw : undefined,
+        };
       });
 
       const drawCount = selectedDraws.length;
       const totalHits = betResults.reduce((s, r) => s + r.hits, 0);
       const avgHits = drawCount > 0 ? totalHits / drawCount : 0;
-      const bestHit = betResults.length > 0 ? Math.max(...betResults.map(r => r.hits)) : 0;
-      const prizeHits = betResults.filter(r => r.prizeValue > 0).length;
+      const bestHit = betResults.length > 0 ? Math.max(...betResults.map(r => r.bestHits ?? r.hits)) : 0;
+      const prizeHits = betResults.filter(r => r.prizeValue > 0 || (r.secondPrizeValue && r.secondPrizeValue > 0)).length;
       const effectiveMax = Math.min(bet.numbers.length, maxHits);
       const score = effectiveMax > 0 && drawCount > 0
         ? Math.round((avgHits / effectiveMax) * 40 + (bestHit / effectiveMax) * 30 + (prizeHits / drawCount) * 30)
@@ -962,25 +1008,43 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                       <p className="text-xs">Nenhum acerto nos {draws.length} concursos</p>
                     </div>
                   )}
-                  {results.slice(0, 50).map((r, i) => (
+                  {results.slice(0, 50).map((r, i) => {
+                    const isDupla = lotteryId === "duplasena" && r.secondDrawNumbers.length > 0;
+                    return (
                     <motion.div key={r.concurso} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.015 }}
-                      className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/30 border border-border/20 hover:bg-muted/50 transition-colors"
+                      className="p-2.5 rounded-lg bg-muted/30 border border-border/20 hover:bg-muted/50 transition-colors space-y-1.5"
                     >
-                      <div className="text-xs min-w-[70px]">
-                        <span className="font-mono font-medium text-foreground">#{r.concurso}</span>
-                        <span className="text-muted-foreground ml-1 text-[10px] hidden sm:inline">{r.date}</span>
+                      <div className="flex items-center gap-3">
+                        <div className="text-xs min-w-[70px]">
+                          <span className="font-mono font-medium text-foreground">#{r.concurso}</span>
+                          <span className="text-muted-foreground ml-1 text-[10px] hidden sm:inline">{r.date}</span>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Trophy className="w-3 h-3 text-accent" />
+                          <span className="text-sm font-bold text-accent">
+                            {isDupla ? `${r.matchCount}|${r.secondDrawHits}` : r.matchCount}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-0.5 ml-auto">
+                          {r.matchedNumbers.map((n, idx) => (
+                            <span key={`${n}-${idx}`} className="lottery-ball text-[9px] w-5 h-5">{String(n).padStart(2, "0")}</span>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <Trophy className="w-3 h-3 text-accent" />
-                        <span className="text-sm font-bold text-accent">{r.matchCount}</span>
-                      </div>
-                      <div className="flex flex-wrap gap-0.5 ml-auto">
-                        {r.matchedNumbers.map((n, idx) => (
-                          <span key={`${n}-${idx}`} className="lottery-ball text-[9px] w-5 h-5">{String(n).padStart(2, "0")}</span>
-                        ))}
-                      </div>
+                      {isDupla && r.secondDrawHits > 0 && (
+                        <div className="flex items-center gap-3 pl-[70px]">
+                          <Badge variant="outline" className="text-[8px] px-1.5 py-0">2º</Badge>
+                          <span className="text-[10px] text-muted-foreground font-mono">{r.secondDrawHits} acertos</span>
+                          <div className="flex flex-wrap gap-0.5 ml-auto">
+                            {r.secondDrawMatched.map((n, idx) => (
+                              <span key={`s-${n}-${idx}`} className="lottery-ball text-[9px] w-5 h-5 opacity-80">{String(n).padStart(2, "0")}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </motion.div>
-                  ))}
+                    );
+                  })}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -1137,40 +1201,62 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
 
                               {/* Hit distribution bar */}
                               <div className="space-y-1.5">
-                                <span className="text-[10px] text-muted-foreground">Distribuição de acertos</span>
+                                <span className="text-[10px] text-muted-foreground">
+                                  Distribuição de acertos{lotteryId === "duplasena" ? " (melhor dos 2 sorteios)" : ""}
+                                </span>
                                 <div className="flex gap-0.5 h-5 rounded-md overflow-hidden bg-muted/30">
-                                  {perf.results.map((r, ri) => (
-                                    <div key={ri} className={`transition-all ${r.prize ? "bg-primary/60" : r.hits > 0 ? "bg-primary/30" : "bg-muted/20"}`}
-                                      style={{ width: `${100 / perf.results.length}%` }}
-                                      title={`#${r.concurso}: ${r.hits} acertos${r.prize ? ` → ${r.prize}` : ""}`}
-                                    />
-                                  ))}
+                                  {perf.results.map((r, ri) => {
+                                    const best = r.bestHits ?? r.hits;
+                                    const hasPrize = r.prize || r.secondPrize;
+                                    return (
+                                      <div key={ri} className={`transition-all ${hasPrize ? "bg-primary/60" : best > 0 ? "bg-primary/30" : "bg-muted/20"}`}
+                                        style={{ width: `${100 / perf.results.length}%` }}
+                                        title={`#${r.concurso}: 1º ${r.hits}${r.secondHits !== undefined ? ` | 2º ${r.secondHits}` : ""} acertos${hasPrize ? " → Premiado!" : ""}`}
+                                      />
+                                    );
+                                  })}
                                 </div>
                               </div>
 
                               {/* Chart */}
                               <BetHitsChart results={perf.results} avgHits={perf.avgHits} pick={pick} />
 
-                              {/* Prize details */}
-                              {perf.results.some(r => r.prize) && (
+                              {/* Prize details (1st + 2nd draw) */}
+                              {perf.results.some(r => r.prize || r.secondPrize) && (
                                 <div className="space-y-1">
                                   <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                                     <DollarSign className="w-3 h-3" /> Prêmios conquistados
                                   </span>
-                                  {perf.results.filter(r => r.prize).map(r => (
-                                    <div key={`p-${r.concurso}`} className="flex items-center justify-between text-[10px] px-2.5 py-1.5 rounded-lg bg-primary/5 border border-primary/10">
-                                      <div className="flex items-center gap-2">
-                                        <CheckCircle2 className="w-3 h-3 text-primary" />
-                                        <span className="text-muted-foreground font-mono">#{r.concurso}</span>
-                                        <span className="text-foreground">{r.hits} acertos</span>
-                                      </div>
-                                      <div className="text-right">
-                                        {r.realPrize ? (
-                                          <span className="font-semibold text-green-400">{r.realPrize}</span>
-                                        ) : (
-                                          <span className="font-semibold text-primary">{r.prize}</span>
-                                        )}
-                                      </div>
+                                  {perf.results.filter(r => r.prize || r.secondPrize).map(r => (
+                                    <div key={`p-${r.concurso}`} className="space-y-1">
+                                      {r.prize && (
+                                        <div className="flex items-center justify-between text-[10px] px-2.5 py-1.5 rounded-lg bg-primary/5 border border-primary/10">
+                                          <div className="flex items-center gap-2">
+                                            <CheckCircle2 className="w-3 h-3 text-primary" />
+                                            <span className="text-muted-foreground font-mono">#{r.concurso}</span>
+                                            {r.secondPrize && <Badge variant="outline" className="text-[7px] px-1 py-0">1º</Badge>}
+                                            <span className="text-foreground">{r.hits} acertos</span>
+                                          </div>
+                                          <div className="text-right">
+                                            {r.realPrize ? (
+                                              <span className="font-semibold text-green-400">{r.realPrize}</span>
+                                            ) : (
+                                              <span className="font-semibold text-primary">{r.prize}</span>
+                                            )}
+                                          </div>
+                                        </div>
+                                      )}
+                                      {r.secondPrize && (
+                                        <div className="flex items-center justify-between text-[10px] px-2.5 py-1.5 rounded-lg bg-accent/5 border border-accent/10">
+                                          <div className="flex items-center gap-2">
+                                            <CheckCircle2 className="w-3 h-3 text-accent" />
+                                            <span className="text-muted-foreground font-mono">#{r.concurso}</span>
+                                            <Badge variant="outline" className="text-[7px] px-1 py-0">2º</Badge>
+                                            <span className="text-foreground">{r.secondHits} acertos</span>
+                                          </div>
+                                          <span className="font-semibold text-accent">{r.secondPrize}</span>
+                                        </div>
+                                      )}
                                     </div>
                                   ))}
                                 </div>
