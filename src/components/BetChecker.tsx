@@ -626,8 +626,8 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
       const drawCount = selectedDraws.length;
       const totalHits = betResults.reduce((s, r) => s + r.hits, 0);
       const avgHits = drawCount > 0 ? totalHits / drawCount : 0;
-      const bestHit = betResults.length > 0 ? Math.max(...betResults.map(r => r.hits)) : 0;
-      const prizeHits = betResults.filter(r => r.prizeValue > 0).length;
+      const bestHit = betResults.length > 0 ? Math.max(...betResults.map(r => r.bestHits ?? r.hits)) : 0;
+      const prizeHits = betResults.filter(r => r.prizeValue > 0 || (r.secondPrizeValue && r.secondPrizeValue > 0)).length;
       const effectiveMax = Math.min(bet.numbers.length, maxHits);
       const score = effectiveMax > 0 && drawCount > 0
         ? Math.round((avgHits / effectiveMax) * 40 + (bestHit / effectiveMax) * 30 + (prizeHits / drawCount) * 30)
