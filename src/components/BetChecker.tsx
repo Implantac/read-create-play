@@ -451,8 +451,9 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
   const handleInput = (val: string) => {
     setInputValue(val);
     const minNum = lotteryId === "lotomania" ? 0 : 1;
-    const nums = val.split(/[,\s\-]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n) && n >= minNum && n <= maxNumbers);
-    if (nums.length > 0 && (val.endsWith(" ") || val.endsWith(",") || val.endsWith("-"))) {
+    const nums = val.split(/[,\s\-;]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n) && n >= minNum && n <= maxNumbers);
+    // Auto-add when typing with separator at end
+    if (nums.length > 0 && (val.endsWith(" ") || val.endsWith(",") || val.endsWith("-") || val.endsWith(";"))) {
       const unique = [...new Set([...selectedNumbers, ...nums])].sort((a, b) => a - b);
       if (unique.length <= pick) {
         setSelectedNumbers(unique);
@@ -460,6 +461,25 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
         setResults(null);
       }
     }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text");
+    const minNum = lotteryId === "lotomania" ? 0 : 1;
+    const nums = pasted.split(/[,\s\-;]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n) && n >= minNum && n <= maxNumbers);
+    if (nums.length === 0) return;
+    const unique = [...new Set([...selectedNumbers, ...nums])].sort((a, b) => a - b);
+    if (unique.length > pick) {
+      const trimmed = unique.slice(0, pick);
+      setSelectedNumbers(trimmed);
+      toast.info(`Limitado a ${pick} números`);
+    } else {
+      setSelectedNumbers(unique);
+    }
+    setInputValue("");
+    setResults(null);
+    setQuickCheckResult(null);
   };
 
   const addFromInput = () => {
@@ -719,8 +739,9 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
             <Input
               value={inputValue}
               onChange={e => handleInput(e.target.value)}
+              onPaste={handlePaste}
               onKeyDown={e => e.key === "Enter" && addFromInput()}
-              placeholder={`${startNum === 0 ? "0, 5, 12" : "5, 12, 23"}... (${selectedNumbers.length}/${pick})`}
+              placeholder={`Cole ou digite: ${startNum === 0 ? "0, 5, 12" : "5, 12, 23"}... (${selectedNumbers.length}/${pick})`}
               className="bg-muted/30 border-border/40 text-sm pl-9 h-11 rounded-xl focus:border-primary/50"
             />
           </div>
