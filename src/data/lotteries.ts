@@ -22,4 +22,5 @@ export interface DrawResult {
   concurso: number;
   date: string;
   numbers: number[];
+  secondDrawNumbers?: number[];
 }
