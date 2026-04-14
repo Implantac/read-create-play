@@ -237,11 +237,8 @@ IMPORTANTE: Nunca responda em texto corrido sem formatação. Toda resposta deve
           ...messages,
         ],
         stream: true,
-        max_tokens: 4096,
+        max_tokens: 12000,
         temperature: 0.6,
-        reasoning: {
-          effort: "medium",
-        },
       }),
     });
 
