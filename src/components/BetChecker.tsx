@@ -132,7 +132,7 @@ function getLotteryHint(lotteryId: string): string | null {
   switch (lotteryId) {
     case "supersete": return "Super Sete: a conferência é posicional — cada coluna é comparada individualmente.";
     case "lotomania": return "Lotomania: acertar 0 números também dá prêmio!";
-    case "duplasena": return "Dupla Sena: a conferência considera o 1º sorteio. Verifique também o 2º sorteio.";
+    case "duplasena": return "Dupla Sena: conferência automática do 1º e 2º sorteio.";
     default: return null;
   }
 }
