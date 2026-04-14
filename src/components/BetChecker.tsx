@@ -451,8 +451,9 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
   const handleInput = (val: string) => {
     setInputValue(val);
     const minNum = lotteryId === "lotomania" ? 0 : 1;
-    const nums = val.split(/[,\s\-]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n) && n >= minNum && n <= maxNumbers);
-    if (nums.length > 0 && (val.endsWith(" ") || val.endsWith(",") || val.endsWith("-"))) {
+    const nums = val.split(/[,\s\-;]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n) && n >= minNum && n <= maxNumbers);
+    // Auto-add when typing with separator at end
+    if (nums.length > 0 && (val.endsWith(" ") || val.endsWith(",") || val.endsWith("-") || val.endsWith(";"))) {
       const unique = [...new Set([...selectedNumbers, ...nums])].sort((a, b) => a - b);
       if (unique.length <= pick) {
         setSelectedNumbers(unique);
@@ -460,6 +461,25 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
         setResults(null);
       }
     }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text");
+    const minNum = lotteryId === "lotomania" ? 0 : 1;
+    const nums = pasted.split(/[,\s\-;]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n) && n >= minNum && n <= maxNumbers);
+    if (nums.length === 0) return;
+    const unique = [...new Set([...selectedNumbers, ...nums])].sort((a, b) => a - b);
+    if (unique.length > pick) {
+      const trimmed = unique.slice(0, pick);
+      setSelectedNumbers(trimmed);
+      toast.info(`Limitado a ${pick} números`);
+    } else {
+      setSelectedNumbers(unique);
+    }
+    setInputValue("");
+    setResults(null);
+    setQuickCheckResult(null);
   };
 
   const addFromInput = () => {
