@@ -318,7 +318,7 @@ const AIChatPage = () => {
                       // Strong
                       "[&_strong]:text-foreground [&_strong]:font-semibold",
                     )}>
-                      <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                     </div>
                   ) : (
                     <p className="whitespace-pre-wrap">{msg.content}</p>
