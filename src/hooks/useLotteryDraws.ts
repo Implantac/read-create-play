@@ -55,11 +55,13 @@ export function useLotteryDraws(lotteryId: string) {
       concurso: row.concurso,
       date: row.draw_date || "",
       numbers: row.numbers,
+      secondDrawNumbers: (row.prize_tiers as any)?.secondDrawNumbers || undefined,
     }));
     const mappedWithPrizes: DrawResultWithPrizes[] = validRows.map((row: any) => ({
       concurso: row.concurso,
       date: row.draw_date || "",
       numbers: row.numbers,
+      secondDrawNumbers: (row.prize_tiers as any)?.secondDrawNumbers || undefined,
       prizeTiers: row.prize_tiers as DrawPrizeData | null,
     }));
     return { mapped, mappedWithPrizes };

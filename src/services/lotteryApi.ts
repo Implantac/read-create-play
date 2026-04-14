@@ -78,10 +78,16 @@ function parseApiResult(raw: CaixaApiResult): LatestDrawResult {
     };
   }
 
+  // Parse Dupla Sena 2nd draw numbers
+  const secondDrawNumbers = raw.listaDezenasSegundoSorteio && raw.listaDezenasSegundoSorteio.length > 0
+    ? raw.listaDezenasSegundoSorteio.map(d => parseInt(d, 10)).filter(n => !isNaN(n))
+    : undefined;
+
   return {
     concurso: raw.concurso,
     date: raw.data || "",
     numbers: dezenas.map(d => parseInt(d, 10)).filter(n => !isNaN(n)),
+    secondDrawNumbers,
     prizeTiers,
   };
 }
