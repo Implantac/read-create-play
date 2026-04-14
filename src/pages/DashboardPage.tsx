@@ -26,6 +26,7 @@ import { useSavedBets } from "@/hooks/useSavedBets";
 import { usePlanAccess } from "@/hooks/usePlanAccess";
 import { OnboardingGuide } from "@/components/OnboardingGuide";
 import { UpgradeBanner } from "@/components/UpgradeBanner";
+import { DashboardSkeleton } from "@/components/DashboardSkeleton";
 
 const container = {
   hidden: { opacity: 0 },
