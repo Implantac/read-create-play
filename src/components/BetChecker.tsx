@@ -1201,40 +1201,62 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
 
                               {/* Hit distribution bar */}
                               <div className="space-y-1.5">
-                                <span className="text-[10px] text-muted-foreground">Distribuição de acertos</span>
+                                <span className="text-[10px] text-muted-foreground">
+                                  Distribuição de acertos{lotteryId === "duplasena" ? " (melhor dos 2 sorteios)" : ""}
+                                </span>
                                 <div className="flex gap-0.5 h-5 rounded-md overflow-hidden bg-muted/30">
-                                  {perf.results.map((r, ri) => (
-                                    <div key={ri} className={`transition-all ${r.prize ? "bg-primary/60" : r.hits > 0 ? "bg-primary/30" : "bg-muted/20"}`}
-                                      style={{ width: `${100 / perf.results.length}%` }}
-                                      title={`#${r.concurso}: ${r.hits} acertos${r.prize ? ` → ${r.prize}` : ""}`}
-                                    />
-                                  ))}
+                                  {perf.results.map((r, ri) => {
+                                    const best = r.bestHits ?? r.hits;
+                                    const hasPrize = r.prize || r.secondPrize;
+                                    return (
+                                      <div key={ri} className={`transition-all ${hasPrize ? "bg-primary/60" : best > 0 ? "bg-primary/30" : "bg-muted/20"}`}
+                                        style={{ width: `${100 / perf.results.length}%` }}
+                                        title={`#${r.concurso}: 1º ${r.hits}${r.secondHits !== undefined ? ` | 2º ${r.secondHits}` : ""} acertos${hasPrize ? " → Premiado!" : ""}`}
+                                      />
+                                    );
+                                  })}
                                 </div>
                               </div>
 
                               {/* Chart */}
                               <BetHitsChart results={perf.results} avgHits={perf.avgHits} pick={pick} />
 
-                              {/* Prize details */}
-                              {perf.results.some(r => r.prize) && (
+                              {/* Prize details (1st + 2nd draw) */}
+                              {perf.results.some(r => r.prize || r.secondPrize) && (
                                 <div className="space-y-1">
                                   <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                                     <DollarSign className="w-3 h-3" /> Prêmios conquistados
                                   </span>
-                                  {perf.results.filter(r => r.prize).map(r => (
-                                    <div key={`p-${r.concurso}`} className="flex items-center justify-between text-[10px] px-2.5 py-1.5 rounded-lg bg-primary/5 border border-primary/10">
-                                      <div className="flex items-center gap-2">
-                                        <CheckCircle2 className="w-3 h-3 text-primary" />
-                                        <span className="text-muted-foreground font-mono">#{r.concurso}</span>
-                                        <span className="text-foreground">{r.hits} acertos</span>
-                                      </div>
-                                      <div className="text-right">
-                                        {r.realPrize ? (
-                                          <span className="font-semibold text-green-400">{r.realPrize}</span>
-                                        ) : (
-                                          <span className="font-semibold text-primary">{r.prize}</span>
-                                        )}
-                                      </div>
+                                  {perf.results.filter(r => r.prize || r.secondPrize).map(r => (
+                                    <div key={`p-${r.concurso}`} className="space-y-1">
+                                      {r.prize && (
+                                        <div className="flex items-center justify-between text-[10px] px-2.5 py-1.5 rounded-lg bg-primary/5 border border-primary/10">
+                                          <div className="flex items-center gap-2">
+                                            <CheckCircle2 className="w-3 h-3 text-primary" />
+                                            <span className="text-muted-foreground font-mono">#{r.concurso}</span>
+                                            {r.secondPrize && <Badge variant="outline" className="text-[7px] px-1 py-0">1º</Badge>}
+                                            <span className="text-foreground">{r.hits} acertos</span>
+                                          </div>
+                                          <div className="text-right">
+                                            {r.realPrize ? (
+                                              <span className="font-semibold text-green-400">{r.realPrize}</span>
+                                            ) : (
+                                              <span className="font-semibold text-primary">{r.prize}</span>
+                                            )}
+                                          </div>
+                                        </div>
+                                      )}
+                                      {r.secondPrize && (
+                                        <div className="flex items-center justify-between text-[10px] px-2.5 py-1.5 rounded-lg bg-accent/5 border border-accent/10">
+                                          <div className="flex items-center gap-2">
+                                            <CheckCircle2 className="w-3 h-3 text-accent" />
+                                            <span className="text-muted-foreground font-mono">#{r.concurso}</span>
+                                            <Badge variant="outline" className="text-[7px] px-1 py-0">2º</Badge>
+                                            <span className="text-foreground">{r.secondHits} acertos</span>
+                                          </div>
+                                          <span className="font-semibold text-accent">{r.secondPrize}</span>
+                                        </div>
+                                      )}
                                     </div>
                                   ))}
                                 </div>
