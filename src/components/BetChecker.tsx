@@ -739,8 +739,9 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
             <Input
               value={inputValue}
               onChange={e => handleInput(e.target.value)}
+              onPaste={handlePaste}
               onKeyDown={e => e.key === "Enter" && addFromInput()}
-              placeholder={`${startNum === 0 ? "0, 5, 12" : "5, 12, 23"}... (${selectedNumbers.length}/${pick})`}
+              placeholder={`Cole ou digite: ${startNum === 0 ? "0, 5, 12" : "5, 12, 23"}... (${selectedNumbers.length}/${pick})`}
               className="bg-muted/30 border-border/40 text-sm pl-9 h-11 rounded-xl focus:border-primary/50"
             />
           </div>
