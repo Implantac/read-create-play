@@ -294,7 +294,29 @@ const AIChatPage = () => {
                   )}
                 >
                   {msg.role === "assistant" ? (
-                    <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:mb-2 [&>ul]:mb-2 [&>ol]:mb-2 [&>h1]:text-base [&>h2]:text-sm [&>h3]:text-sm [&>table]:text-xs">
+                    <div className={cn(
+                      "prose prose-sm dark:prose-invert max-w-none",
+                      // Headings
+                      "[&>h2]:text-sm [&>h2]:font-bold [&>h2]:mt-4 [&>h2]:mb-2 [&>h2]:text-primary [&>h2]:border-b [&>h2]:border-primary/20 [&>h2]:pb-1",
+                      "[&>h3]:text-sm [&>h3]:font-semibold [&>h3]:mt-3 [&>h3]:mb-1.5 [&>h3]:text-foreground",
+                      // Paragraphs & lists
+                      "[&>p]:mb-2 [&>p]:leading-relaxed",
+                      "[&>ul]:mb-2 [&>ul]:space-y-1 [&>ol]:mb-2 [&>ol]:space-y-1",
+                      "[&_li]:leading-relaxed",
+                      // Tables
+                      "[&>table]:text-xs [&>table]:w-full [&>table]:my-3 [&>table]:border-collapse",
+                      "[&_th]:bg-primary/10 [&_th]:text-primary [&_th]:font-semibold [&_th]:px-3 [&_th]:py-1.5 [&_th]:text-left [&_th]:border [&_th]:border-border",
+                      "[&_td]:px-3 [&_td]:py-1.5 [&_td]:border [&_td]:border-border [&_td]:text-foreground",
+                      "[&_tr:nth-child(even)]:bg-muted/30",
+                      // Blockquotes
+                      "[&>blockquote]:border-l-4 [&>blockquote]:border-primary/40 [&>blockquote]:bg-primary/5 [&>blockquote]:pl-4 [&>blockquote]:py-2 [&>blockquote]:my-3 [&>blockquote]:rounded-r-lg [&>blockquote]:text-muted-foreground [&>blockquote]:italic",
+                      // Horizontal rules
+                      "[&>hr]:my-4 [&>hr]:border-border/50",
+                      // Code
+                      "[&_code]:bg-muted [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-xs [&_code]:text-primary",
+                      // Strong
+                      "[&_strong]:text-foreground [&_strong]:font-semibold",
+                    )}>
                       <ReactMarkdown>{msg.content}</ReactMarkdown>
                     </div>
                   ) : (
