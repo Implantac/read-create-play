@@ -590,15 +590,37 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
     if (allBets.length === 0) { toast.error("Nenhuma aposta para conferir."); return; }
     if (selectedDraws.length === 0) { toast.error("Nenhum sorteio disponível."); return; }
 
+    const isDupla = lotteryId === "duplasena";
     const maxHits = getMaxPossibleHits(lotteryId, pick);
     const perfs: BetPerformance[] = allBets.map(bet => {
       let totalPrizeValue = 0;
-      const betResults = selectedDraws.map(draw => {
+      const betResults: PerfResult[] = selectedDraws.map(draw => {
         const { hits, matched } = matchBetAgainstDraw(bet.numbers, draw.numbers, lotteryId);
         const prizeInfo = getEstimatedPrize(lotteryId, hits);
         if (prizeInfo) totalPrizeValue += prizeInfo.value;
         const realPrize = getRealPrizeLabel(prizeDataMap.get(draw.concurso), hits);
-        return { concurso: draw.concurso, date: draw.date, hits, matched, prize: prizeInfo?.label || "", prizeValue: prizeInfo?.value || 0, realPrize };
+
+        // 2nd draw for Dupla Sena
+        let secondHits: number | undefined;
+        let secondMatched: number[] | undefined;
+        let secondPrize: string | undefined;
+        let secondPrizeValue: number | undefined;
+        let bestHitsForDraw = hits;
+        if (isDupla && draw.secondDrawNumbers?.length) {
+          const s = matchBetAgainstDraw(bet.numbers, draw.secondDrawNumbers, lotteryId);
+          secondHits = s.hits;
+          secondMatched = s.matched;
+          const sp = getEstimatedPrize(lotteryId, s.hits);
+          if (sp) { secondPrize = sp.label; secondPrizeValue = sp.value; totalPrizeValue += sp.value; }
+          bestHitsForDraw = Math.max(hits, s.hits);
+        }
+
+        return {
+          concurso: draw.concurso, date: draw.date, hits, matched,
+          prize: prizeInfo?.label || "", prizeValue: prizeInfo?.value || 0, realPrize,
+          secondHits, secondMatched, secondPrize, secondPrizeValue,
+          bestHits: isDupla ? bestHitsForDraw : undefined,
+        };
       });
 
       const drawCount = selectedDraws.length;
