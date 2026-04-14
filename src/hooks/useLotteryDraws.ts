@@ -28,6 +28,7 @@ export interface DrawResultWithPrizes extends DrawResult {
 export function useLotteryDraws(lotteryId: string) {
   const [draws, setDraws] = useState<DrawResult[]>([]);
   const [drawsWithPrizes, setDrawsWithPrizes] = useState<DrawResultWithPrizes[]>([]);
+  const [dataLotteryId, setDataLotteryId] = useState(lotteryId);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [count, setCount] = useState(0);
@@ -103,10 +104,12 @@ export function useLotteryDraws(lotteryId: string) {
         setDraws(mapped);
         setDrawsWithPrizes(mappedWithPrizes);
         setLoadedCount(initialData.length);
+        setDataLotteryId(lotteryId);
       } else {
         setDraws([]);
         setDrawsWithPrizes([]);
         setLoadedCount(0);
+        setDataLotteryId(lotteryId);
       }
 
       setLoading(false);
@@ -138,6 +141,7 @@ export function useLotteryDraws(lotteryId: string) {
           const { mapped, mappedWithPrizes } = mapRows(allData);
           setDraws(mapped);
           setDrawsWithPrizes(mappedWithPrizes);
+          setDataLotteryId(lotteryId);
         }
       }
     } catch (e) {
@@ -146,6 +150,7 @@ export function useLotteryDraws(lotteryId: string) {
         setDraws([]);
         setDrawsWithPrizes([]);
         setLoadedCount(0);
+        setDataLotteryId(lotteryId);
       }
     } finally {
       if (!signal.cancelled) setLoading(false);
@@ -266,13 +271,15 @@ export function useLotteryDraws(lotteryId: string) {
     };
   }, [fetchDraws]);
 
+  const hasCurrentLotteryData = dataLotteryId === lotteryId;
+
   return {
-    draws,
-    drawsWithPrizes,
+    draws: hasCurrentLotteryData ? draws : [],
+    drawsWithPrizes: hasCurrentLotteryData ? drawsWithPrizes : [],
     loading,
     syncing,
-    count,
-    loadedCount,
+    count: hasCurrentLotteryData ? count : 0,
+    loadedCount: hasCurrentLotteryData ? loadedCount : 0,
     syncDraws,
     syncAllLotteries,
     addDraw,
