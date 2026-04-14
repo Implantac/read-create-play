@@ -1008,25 +1008,43 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                       <p className="text-xs">Nenhum acerto nos {draws.length} concursos</p>
                     </div>
                   )}
-                  {results.slice(0, 50).map((r, i) => (
+                  {results.slice(0, 50).map((r, i) => {
+                    const isDupla = lotteryId === "duplasena" && r.secondDrawNumbers.length > 0;
+                    return (
                     <motion.div key={r.concurso} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.015 }}
-                      className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/30 border border-border/20 hover:bg-muted/50 transition-colors"
+                      className="p-2.5 rounded-lg bg-muted/30 border border-border/20 hover:bg-muted/50 transition-colors space-y-1.5"
                     >
-                      <div className="text-xs min-w-[70px]">
-                        <span className="font-mono font-medium text-foreground">#{r.concurso}</span>
-                        <span className="text-muted-foreground ml-1 text-[10px] hidden sm:inline">{r.date}</span>
+                      <div className="flex items-center gap-3">
+                        <div className="text-xs min-w-[70px]">
+                          <span className="font-mono font-medium text-foreground">#{r.concurso}</span>
+                          <span className="text-muted-foreground ml-1 text-[10px] hidden sm:inline">{r.date}</span>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Trophy className="w-3 h-3 text-accent" />
+                          <span className="text-sm font-bold text-accent">
+                            {isDupla ? `${r.matchCount}|${r.secondDrawHits}` : r.matchCount}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-0.5 ml-auto">
+                          {r.matchedNumbers.map((n, idx) => (
+                            <span key={`${n}-${idx}`} className="lottery-ball text-[9px] w-5 h-5">{String(n).padStart(2, "0")}</span>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <Trophy className="w-3 h-3 text-accent" />
-                        <span className="text-sm font-bold text-accent">{r.matchCount}</span>
-                      </div>
-                      <div className="flex flex-wrap gap-0.5 ml-auto">
-                        {r.matchedNumbers.map((n, idx) => (
-                          <span key={`${n}-${idx}`} className="lottery-ball text-[9px] w-5 h-5">{String(n).padStart(2, "0")}</span>
-                        ))}
-                      </div>
+                      {isDupla && r.secondDrawHits > 0 && (
+                        <div className="flex items-center gap-3 pl-[70px]">
+                          <Badge variant="outline" className="text-[8px] px-1.5 py-0">2º</Badge>
+                          <span className="text-[10px] text-muted-foreground font-mono">{r.secondDrawHits} acertos</span>
+                          <div className="flex flex-wrap gap-0.5 ml-auto">
+                            {r.secondDrawMatched.map((n, idx) => (
+                              <span key={`s-${n}-${idx}`} className="lottery-ball text-[9px] w-5 h-5 opacity-80">{String(n).padStart(2, "0")}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </motion.div>
-                  ))}
+                    );
+                  })}
                 </motion.div>
               )}
             </AnimatePresence>
