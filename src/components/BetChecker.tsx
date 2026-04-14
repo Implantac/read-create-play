@@ -540,10 +540,21 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
 
   const check = () => {
     if (selectedNumbers.length < 1) { toast.error("Adicione pelo menos 1 número"); return; }
-    const matches = draws.map(draw => {
+    const isDupla = lotteryId === "duplasena";
+    const matches: ExtendedMatchResult[] = draws.map(draw => {
       const { hits, matched } = matchBetAgainstDraw(selectedNumbers, draw.numbers, lotteryId);
-      return { concurso: draw.concurso, date: draw.date, drawnNumbers: draw.numbers, matchedNumbers: matched, matchCount: hits };
-    }).filter(r => r.matchCount > 0 || (lotteryId === "lotomania" && r.matchCount === 0)).sort((a, b) => b.matchCount - a.matchCount);
+      const second = isDupla && draw.secondDrawNumbers?.length
+        ? matchBetAgainstDraw(selectedNumbers, draw.secondDrawNumbers, lotteryId)
+        : null;
+      const bestCount = second ? Math.max(hits, second.hits) : hits;
+      return {
+        concurso: draw.concurso, date: draw.date, drawnNumbers: draw.numbers,
+        matchedNumbers: matched, matchCount: hits,
+        secondDrawHits: second?.hits ?? 0, secondDrawMatched: second?.matched ?? [],
+        secondDrawNumbers: draw.secondDrawNumbers ?? [], bestMatchCount: bestCount,
+      };
+    }).filter(r => r.bestMatchCount > 0 || (lotteryId === "lotomania" && r.matchCount === 0))
+      .sort((a, b) => b.bestMatchCount - a.bestMatchCount);
     setResults(matches);
     setActiveTab("check");
     toast.success(`${matches.length} concursos com acertos encontrados`);
