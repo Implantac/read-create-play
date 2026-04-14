@@ -70,6 +70,7 @@ window.addEventListener("unhandledrejection", (e) => {
 
 // Clear flag on successful load
 sessionStorage.removeItem("chunk-reloaded");
+sessionStorage.removeItem("react-queue-reloaded");
 
 if (isPreviewRuntime() && "serviceWorker" in navigator) {
   navigator.serviceWorker.getRegistrations()
