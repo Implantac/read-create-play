@@ -28,10 +28,23 @@ interface Props {
   pick: number;
 }
 
+interface ExtendedMatchResult extends MatchResult {
+  secondDrawHits: number;
+  secondDrawMatched: number[];
+  secondDrawNumbers: number[];
+  bestMatchCount: number;
+}
+
+interface PerfResult {
+  concurso: number; date: string; hits: number; matched: number[]; prize: string; prizeValue: number; realPrize?: string;
+  secondHits?: number; secondMatched?: number[]; secondPrize?: string; secondPrizeValue?: number;
+  bestHits?: number;
+}
+
 interface BetPerformance {
   numbers: number[];
   label: string;
-  results: { concurso: number; date: string; hits: number; matched: number[]; prize: string; prizeValue: number; realPrize?: string }[];
+  results: PerfResult[];
   avgHits: number;
   bestHit: number;
   prizeHits: number;
