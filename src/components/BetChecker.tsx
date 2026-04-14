@@ -432,7 +432,7 @@ function DrawComparisonBlock({
 export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick }: Props) {
   const [inputValue, setInputValue] = useState("");
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
-  const [results, setResults] = useState<MatchResult[] | null>(null);
+  const [results, setResults] = useState<ExtendedMatchResult[] | null>(null);
   const [performances, setPerformances] = useState<BetPerformance[]>([]);
   const [aiImprovements, setAiImprovements] = useState<AIImprovement[]>([]);
   const [loadingAI, setLoadingAI] = useState(false);
