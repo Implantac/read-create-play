@@ -51,6 +51,13 @@ window.addEventListener("unhandledrejection", (e) => {
     e.preventDefault();
     return;
   }
+  // Auto-recover from React internal queue corruption (HMR-related)
+  if (msg.includes("Should have a queue") && !sessionStorage.getItem("react-queue-reloaded")) {
+    sessionStorage.setItem("react-queue-reloaded", "1");
+    e.preventDefault();
+    location.reload();
+    return;
+  }
   // Auto-reload on stale chunk errors
   if (
     msg.includes("Failed to fetch dynamically imported module") &&
