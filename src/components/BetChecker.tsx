@@ -200,6 +200,17 @@ function QuickCheckResult({
   const maxHits = getMaxPossibleHits(lotteryId, bet.length);
   const pct = maxHits > 0 ? Math.round((hits / maxHits) * 100) : 0;
 
+  // Dupla Sena 2nd draw
+  const has2ndDraw = lotteryId === "duplasena" && draw.secondDrawNumbers && draw.secondDrawNumbers.length > 0;
+  const secondResult = has2ndDraw ? matchBetAgainstDraw(bet, draw.secondDrawNumbers!, lotteryId) : null;
+  const secondPrize = secondResult ? getEstimatedPrize(lotteryId, secondResult.hits) : null;
+  const secondMaxHits = maxHits;
+  const secondPct = secondResult && secondMaxHits > 0 ? Math.round((secondResult.hits / secondMaxHits) * 100) : 0;
+  const bestHitsOverall = secondResult ? Math.max(hits, secondResult.hits) : hits;
+  const bestPrize = secondResult
+    ? (hits >= (secondResult?.hits ?? 0) ? prize : secondPrize)
+    : prize;
+
   // For Lotomania, 0 hits is also a prize
   const hasLotomania0Prize = lotteryId === "lotomania" && hits === 0;
 
@@ -209,19 +220,19 @@ function QuickCheckResult({
       animate={{ opacity: 1, scale: 1, y: 0 }}
       className="rounded-xl border-2 overflow-hidden"
       style={{
-        borderColor: (prize || hasLotomania0Prize) ? "hsl(var(--primary))" : hits > 0 ? "hsl(var(--border))" : "hsl(var(--destructive) / 0.3)"
+        borderColor: (bestPrize || hasLotomania0Prize) ? "hsl(var(--primary))" : bestHitsOverall > 0 ? "hsl(var(--border))" : "hsl(var(--destructive) / 0.3)"
       }}
     >
       {/* Result header */}
       <div className={`px-4 py-3 flex items-center justify-between ${
-        (prize || hasLotomania0Prize) ? "bg-primary/10" : "bg-muted/30"
+        (bestPrize || hasLotomania0Prize) ? "bg-primary/10" : "bg-muted/30"
       }`}>
         <div className="flex items-center gap-3">
-          {(prize || hasLotomania0Prize) ? (
+          {(bestPrize || hasLotomania0Prize) ? (
             <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
               <Trophy className="w-5 h-5 text-primary" />
             </div>
-          ) : hits > 0 ? (
+          ) : bestHitsOverall > 0 ? (
             <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
               <Target className="w-5 h-5 text-muted-foreground" />
             </div>
@@ -232,8 +243,8 @@ function QuickCheckResult({
           )}
           <div>
             <p className="text-sm font-bold text-foreground">
-              {hits} de {maxHits} acertos
-              {(prize || hasLotomania0Prize) && <span className="ml-2 text-primary">🎉</span>}
+              {has2ndDraw ? `1º: ${hits} | 2º: ${secondResult!.hits} de ${maxHits}` : `${hits} de ${maxHits} acertos`}
+              {(bestPrize || hasLotomania0Prize) && <span className="ml-2 text-primary">🎉</span>}
             </p>
             <p className="text-[11px] text-muted-foreground">
               Concurso #{draw.concurso} — {draw.date}
@@ -246,98 +257,162 @@ function QuickCheckResult({
       </div>
 
       <div className="p-4 space-y-4">
-        {/* Progress bar */}
-        <div className="space-y-1">
-          <div className="flex justify-between text-[10px] text-muted-foreground">
-            <span>Aproveitamento</span>
-            <span className="font-mono font-bold text-foreground">{pct}%</span>
-          </div>
-          <div className="h-2 rounded-full bg-muted overflow-hidden">
-            <motion.div
-              className={`h-full rounded-full ${prize ? "bg-primary" : hits > 0 ? "bg-muted-foreground" : "bg-destructive/50"}`}
-              initial={{ width: 0 }}
-              animate={{ width: `${pct}%` }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
+        {/* 1st Draw */}
+        <DrawComparisonBlock
+          label={has2ndDraw ? "1º Sorteio" : undefined}
+          bet={bet}
+          drawnNumbers={draw.numbers}
+          matched={matched}
+          hits={hits}
+          maxHits={maxHits}
+          pct={pct}
+          prize={prize}
+          realPrize={realPrize}
+          hasLotomania0Prize={hasLotomania0Prize}
+          lotteryId={lotteryId}
+        />
+
+        {/* 2nd Draw for Dupla Sena */}
+        {has2ndDraw && secondResult && (
+          <>
+            <div className="border-t border-border/40 pt-3" />
+            <DrawComparisonBlock
+              label="2º Sorteio"
+              bet={bet}
+              drawnNumbers={draw.secondDrawNumbers!}
+              matched={secondResult.matched}
+              hits={secondResult.hits}
+              maxHits={secondMaxHits}
+              pct={secondPct}
+              prize={secondPrize}
+              realPrize={undefined}
+              hasLotomania0Prize={false}
+              lotteryId={lotteryId}
             />
-          </div>
-        </div>
-
-        {/* Numbers comparison */}
-        <div className="space-y-2">
-          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-            Seus números {lotteryId === "supersete" && <span className="normal-case text-primary">(posicional)</span>}
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {bet.map((n, idx) => {
-              const isMatch = lotteryId === "supersete"
-                ? (draw.numbers[idx] === n)
-                : matched.includes(n);
-              return (
-                <motion.span
-                  key={`${n}-${idx}`}
-                  initial={{ scale: 0.8 }}
-                  animate={{ scale: 1 }}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-mono font-bold border-2 transition-all ${
-                    isMatch
-                      ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/30 ring-2 ring-primary/20"
-                      : "bg-muted/50 text-muted-foreground border-border/50"
-                  }`}
-                >
-                  {String(n).padStart(2, "0")}
-                </motion.span>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Números sorteados</p>
-          <div className="flex flex-wrap gap-1.5">
-            {draw.numbers.map((n, idx) => {
-              const isMatch = lotteryId === "supersete"
-                ? (bet[idx] === n)
-                : matched.includes(n);
-              return (
-                <span
-                  key={`${n}-${idx}`}
-                  className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-mono font-bold border ${
-                    isMatch
-                      ? "bg-primary/15 text-primary border-primary/40 font-black"
-                      : "bg-card text-foreground/60 border-border/30"
-                  }`}
-                >
-                  {String(n).padStart(2, "0")}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Prize info - show real prize if available */}
-        {(prize || hasLotomania0Prize) && (
-          <motion.div
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/20"
-          >
-            <DollarSign className="w-5 h-5 text-primary shrink-0" />
-            <div className="flex-1">
-              {realPrize ? (
-                <>
-                  <p className="text-xs font-bold text-green-400">{realPrize}</p>
-                  <p className="text-[10px] text-muted-foreground">Valor real do concurso</p>
-                </>
-              ) : (
-                <>
-                  <p className="text-xs font-bold text-primary">{prize?.label || "Prêmio (R$6)"}</p>
-                  <p className="text-[10px] text-muted-foreground">Estimativa de prêmio</p>
-                </>
-              )}
-            </div>
-          </motion.div>
+          </>
         )}
       </div>
     </motion.div>
+  );
+}
+
+/* ─── Reusable draw comparison block (for 1st/2nd draw) ─── */
+function DrawComparisonBlock({
+  label, bet, drawnNumbers, matched, hits, maxHits, pct, prize, realPrize, hasLotomania0Prize, lotteryId
+}: {
+  label?: string;
+  bet: number[];
+  drawnNumbers: number[];
+  matched: number[];
+  hits: number;
+  maxHits: number;
+  pct: number;
+  prize: { value: number; label: string } | null;
+  realPrize?: string;
+  hasLotomania0Prize: boolean;
+  lotteryId: string;
+}) {
+  return (
+    <div className="space-y-3">
+      {label && (
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider">{label}</Badge>
+          <span className="text-xs font-bold text-foreground">{hits} de {maxHits} acertos</span>
+          {prize && <span className="text-[10px] text-primary font-semibold">🎉 Premiado!</span>}
+        </div>
+      )}
+
+      {/* Progress bar */}
+      <div className="space-y-1">
+        <div className="flex justify-between text-[10px] text-muted-foreground">
+          <span>Aproveitamento{label ? ` (${label})` : ""}</span>
+          <span className="font-mono font-bold text-foreground">{pct}%</span>
+        </div>
+        <div className="h-2 rounded-full bg-muted overflow-hidden">
+          <motion.div
+            className={`h-full rounded-full ${prize ? "bg-primary" : hits > 0 ? "bg-muted-foreground" : "bg-destructive/50"}`}
+            initial={{ width: 0 }}
+            animate={{ width: `${pct}%` }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          />
+        </div>
+      </div>
+
+      {/* Numbers comparison */}
+      <div className="space-y-2">
+        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+          Seus números {lotteryId === "supersete" && <span className="normal-case text-primary">(posicional)</span>}
+        </p>
+        <div className="flex flex-wrap gap-1.5">
+          {bet.map((n, idx) => {
+            const isMatch = lotteryId === "supersete"
+              ? (drawnNumbers[idx] === n)
+              : matched.includes(n);
+            return (
+              <motion.span
+                key={`${n}-${idx}`}
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-mono font-bold border-2 transition-all ${
+                  isMatch
+                    ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/30 ring-2 ring-primary/20"
+                    : "bg-muted/50 text-muted-foreground border-border/50"
+                }`}
+              >
+                {String(n).padStart(2, "0")}
+              </motion.span>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Números sorteados</p>
+        <div className="flex flex-wrap gap-1.5">
+          {drawnNumbers.map((n, idx) => {
+            const isMatch = lotteryId === "supersete"
+              ? (bet[idx] === n)
+              : matched.includes(n);
+            return (
+              <span
+                key={`${n}-${idx}`}
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-mono font-bold border ${
+                  isMatch
+                    ? "bg-primary/15 text-primary border-primary/40 font-black"
+                    : "bg-card text-foreground/60 border-border/30"
+                }`}
+              >
+                {String(n).padStart(2, "0")}
+              </span>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Prize info */}
+      {(prize || hasLotomania0Prize) && (
+        <motion.div
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-3 p-3 rounded-lg bg-primary/10 border border-primary/20"
+        >
+          <DollarSign className="w-5 h-5 text-primary shrink-0" />
+          <div className="flex-1">
+            {realPrize ? (
+              <>
+                <p className="text-xs font-bold text-primary">{realPrize}</p>
+                <p className="text-[10px] text-muted-foreground">Valor real do concurso</p>
+              </>
+            ) : (
+              <>
+                <p className="text-xs font-bold text-primary">{prize?.label || "Prêmio (R$6)"}</p>
+                <p className="text-[10px] text-muted-foreground">Estimativa de prêmio</p>
+              </>
+            )}
+          </div>
+        </motion.div>
+      )}
+    </div>
   );
 }
 
