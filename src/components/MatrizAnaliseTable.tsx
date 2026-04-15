@@ -2,7 +2,8 @@ import { memo, useMemo, useState } from "react";
 import { MatrixRow } from "@/engine/matrix-analysis";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, TrendingUp, TrendingDown, Minus, Filter } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowUpDown, ArrowUp, ArrowDown, TrendingUp, TrendingDown, Minus, Filter, TableProperties } from "lucide-react";
 
 interface Props {
   data: MatrixRow[];
@@ -17,13 +18,35 @@ const TrendIcon = ({ trend }: { trend: "up" | "stable" | "down" }) => {
   return <Minus className="w-3.5 h-3.5 text-muted-foreground" />;
 };
 
-const SignalDot = ({ signal }: { signal: "green" | "yellow" | "red" }) => {
-  const colors = {
-    green: "bg-emerald-400 shadow-emerald-400/40",
-    yellow: "bg-amber-400 shadow-amber-400/40",
-    red: "bg-red-400 shadow-red-400/40",
+const SignalBadge = ({ signal }: { signal: "green" | "yellow" | "red" }) => {
+  const config = {
+    green: { label: "Alta", className: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25 hover:bg-emerald-500/20" },
+    yellow: { label: "Neutra", className: "bg-amber-500/15 text-amber-400 border-amber-500/25 hover:bg-amber-500/20" },
+    red: { label: "Baixa", className: "bg-red-500/15 text-red-400 border-red-500/25 hover:bg-red-500/20" },
   };
-  return <span className={`inline-block w-3 h-3 rounded-full shadow-lg ${colors[signal]}`} />;
+  const c = config[signal];
+  return <Badge variant="outline" className={`text-[10px] px-1.5 py-0 font-mono ${c.className}`}>{c.label}</Badge>;
+};
+
+const ScoreBar = ({ score }: { score: number }) => {
+  const color = score >= 70 ? "from-emerald-500 to-emerald-400" : score >= 40 ? "from-amber-500 to-amber-400" : "from-red-500 to-red-400";
+  const bgColor = score >= 70 ? "text-emerald-400" : score >= 40 ? "text-amber-400" : "text-red-400";
+  return (
+    <div className="flex items-center gap-2 min-w-[100px]">
+      <div className="flex-1 h-2 rounded-full bg-muted/50 overflow-hidden">
+        <div
+          className={`h-full rounded-full bg-gradient-to-r ${color} transition-all duration-500`}
+          style={{ width: `${score}%` }}
+        />
+      </div>
+      <span className={`text-xs font-bold font-mono w-7 text-right ${bgColor}`}>{score}</span>
+    </div>
+  );
+};
+
+const SortIcon = ({ active, asc }: { active: boolean; asc: boolean }) => {
+  if (!active) return <ArrowUpDown className="w-3 h-3 text-muted-foreground/50" />;
+  return asc ? <ArrowUp className="w-3 h-3 text-primary" /> : <ArrowDown className="w-3 h-3 text-primary" />;
 };
 
 export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Props) {
@@ -39,12 +62,12 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
       case "hot": rows = rows.filter(r => r.trend === "up"); break;
     }
     rows.sort((a, b) => {
-      const av = a[sortKey] as number;
-      const bv = b[sortKey] as number;
       if (sortKey === "trend") {
         const order = { up: 3, stable: 2, down: 1 };
         return sortAsc ? order[a.trend] - order[b.trend] : order[b.trend] - order[a.trend];
       }
+      const av = a[sortKey] as number;
+      const bv = b[sortKey] as number;
       return sortAsc ? av - bv : bv - av;
     });
     return rows;
@@ -55,15 +78,37 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
     else { setSortKey(key); setSortAsc(key === "rank"); }
   };
 
-  const filters: { label: string; value: FilterMode }[] = [
-    { label: "Todas", value: "all" },
-    { label: "🟢 Top", value: "top" },
-    { label: "⏳ Atrasadas", value: "delayed" },
-    { label: "🔥 Quentes", value: "hot" },
+  const filters: { label: string; value: FilterMode; count: number }[] = [
+    { label: "Todas", value: "all", count: data.length },
+    { label: "🟢 Top", value: "top", count: data.filter(r => r.signal === "green").length },
+    { label: "⏳ Atrasadas", value: "delayed", count: data.filter(r => r.currentDelay >= r.avgDelay).length },
+    { label: "🔥 Quentes", value: "hot", count: data.filter(r => r.trend === "up").length },
+  ];
+
+  const columns: [SortKey, string][] = [
+    ["rank", "#"],
+    ["number", "Dezena"],
+    ["score", "Score"],
+    ["freqTotal", "Freq. Total"],
+    ["freqRecent30", "Freq. 30"],
+    ["currentDelay", "Atraso"],
+    ["trend", "Tendência"],
   ];
 
   return (
     <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
+          <TableProperties className="w-4 h-4 text-primary" />
+        </div>
+        <div className="flex-1">
+          <h3 className="text-sm font-semibold text-foreground">Ranking Completo</h3>
+          <p className="text-[10px] text-muted-foreground mt-0.5">Classificação detalhada de todas as dezenas</p>
+        </div>
+      </div>
+
+      {/* Filters */}
       <div className="flex items-center gap-2 flex-wrap">
         <Filter className="w-4 h-4 text-muted-foreground" />
         {filters.map(f => (
@@ -72,31 +117,28 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
             size="sm"
             variant={filter === f.value ? "default" : "outline"}
             onClick={() => setFilter(f.value)}
-            className="h-7 text-xs px-3"
+            className="h-7 text-xs px-3 gap-1.5"
           >
             {f.label}
+            <span className="text-[10px] opacity-70">({f.count})</span>
           </Button>
         ))}
-        <span className="text-xs text-muted-foreground ml-auto">{filtered.length} dezenas</span>
+        <span className="text-xs text-muted-foreground ml-auto font-mono">{filtered.length} resultados</span>
       </div>
 
-      <div className="rounded-xl border border-border overflow-hidden">
+      <div className="rounded-xl border border-border/50 overflow-hidden glass-card">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/30">
-              {([
-                ["rank", "#"],
-                ["number", "Dezena"],
-                ["score", "Score"],
-                ["freqTotal", "Freq. Total"],
-                ["freqRecent30", "Freq. 30"],
-                ["currentDelay", "Atraso"],
-                ["trend", "Tendência"],
-              ] as [SortKey, string][]).map(([key, label]) => (
-                <TableHead key={key} className="cursor-pointer select-none whitespace-nowrap" onClick={() => toggleSort(key)}>
-                  <span className="flex items-center gap-1">
+            <TableRow className="bg-muted/20 hover:bg-muted/20">
+              {columns.map(([key, label]) => (
+                <TableHead
+                  key={key}
+                  className="cursor-pointer select-none whitespace-nowrap hover:text-foreground transition-colors"
+                  onClick={() => toggleSort(key)}
+                >
+                  <span className="flex items-center gap-1.5">
                     {label}
-                    <ArrowUpDown className="w-3 h-3 text-muted-foreground" />
+                    <SortIcon active={sortKey === key} asc={sortAsc} />
                   </span>
                 </TableHead>
               ))}
@@ -104,43 +146,53 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.map(row => (
-              <TableRow key={row.number} className="hover:bg-muted/20 transition-colors">
-                <TableCell className="font-mono text-xs text-muted-foreground">{row.rank}º</TableCell>
+            {filtered.map((row, i) => (
+              <TableRow
+                key={row.number}
+                className={`hover:bg-muted/20 transition-colors ${i % 2 === 0 ? "bg-transparent" : "bg-muted/5"}`}
+              >
+                <TableCell className="font-mono text-xs text-muted-foreground w-12">
+                  <span className={`${row.rank <= 3 ? "text-amber-400 font-bold" : ""}`}>
+                    {row.rank}º
+                  </span>
+                </TableCell>
                 <TableCell>
-                  <span className={`inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold ${
-                    row.signal === "green" ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20" :
-                    row.signal === "red" ? "bg-red-500/15 text-red-400 border border-red-500/20" :
-                    "bg-amber-500/15 text-amber-400 border border-amber-500/20"
+                  <span className={`inline-flex items-center justify-center w-9 h-9 rounded-xl text-xs font-bold transition-all ${
+                    row.signal === "green"
+                      ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 shadow-sm shadow-emerald-500/10"
+                      : row.signal === "red"
+                      ? "bg-red-500/15 text-red-400 border border-red-500/20 shadow-sm shadow-red-500/10"
+                      : "bg-amber-500/15 text-amber-400 border border-amber-500/20 shadow-sm shadow-amber-500/10"
                   }`}>
                     {String(row.number).padStart(2, "0")}
                   </span>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-2">
-                    <div className="w-16 h-2 rounded-full bg-muted overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all ${
-                          row.score >= 70 ? "bg-emerald-400" : row.score >= 40 ? "bg-amber-400" : "bg-red-400"
-                        }`}
-                        style={{ width: `${row.score}%` }}
-                      />
-                    </div>
-                    <span className="text-xs font-bold font-mono">{row.score}</span>
-                  </div>
+                  <ScoreBar score={row.score} />
                 </TableCell>
                 <TableCell className="text-xs font-mono">{row.freqTotal}</TableCell>
                 <TableCell className="text-xs font-mono">{row.freqRecent30}</TableCell>
-                <TableCell className="text-xs font-mono">{row.currentDelay}</TableCell>
+                <TableCell>
+                  <span className={`text-xs font-mono ${
+                    row.currentDelay >= row.avgDelay ? "text-red-400" : "text-muted-foreground"
+                  }`}>
+                    {row.currentDelay}
+                    {row.currentDelay >= row.avgDelay && (
+                      <span className="text-[9px] ml-1 text-red-400/70">⚠</span>
+                    )}
+                  </span>
+                </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-1.5">
                     <TrendIcon trend={row.trend} />
-                    <span className="text-[10px] text-muted-foreground capitalize">{
+                    <span className="text-[10px] text-muted-foreground">{
                       row.trend === "up" ? "Subindo" : row.trend === "down" ? "Caindo" : "Estável"
                     }</span>
                   </div>
                 </TableCell>
-                <TableCell><SignalDot signal={row.signal} /></TableCell>
+                <TableCell>
+                  <SignalBadge signal={row.signal} />
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
