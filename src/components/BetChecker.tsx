@@ -478,6 +478,7 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
+    pasteJustHandled.current = true;
     const pasted = e.clipboardData.getData("text");
     const minNum = lotteryId === "lotomania" ? 0 : 1;
     const nums = pasted.split(/[,\s\-;]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n) && n >= minNum && n <= maxNumbers);
@@ -493,6 +494,7 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
     setInputValue("");
     setResults(null);
     setQuickCheckResult(null);
+    toast.success(`${nums.length} números colados`);
   };
 
   const addFromInput = () => {
