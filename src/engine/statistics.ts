@@ -57,13 +57,18 @@ export function computeFrequencyStats(draws: DrawResult[], totalNumbers: number)
   const total = draws.length;
   const avgFreq = total > 0 ? draws[0].numbers.length / totalNumbers : 0;
 
+  // Dynamic threshold: high pick-ratio lotteries (e.g. Lotofácil 15/25)
+  // have tighter distributions, so we use a smaller deviation margin
+  const pickRatio = avgFreq; // e.g. 0.6 for Lotofácil, 0.1 for Mega Sena
+  const hotColdMargin = pickRatio > 0.4 ? 0.05 : pickRatio > 0.2 ? 0.10 : 0.15;
+
   const stats: NumberStats[] = [];
   for (let n = 1; n <= totalNumbers; n++) {
     const pct = total > 0 ? (freq[n] / total) * 100 : 0;
     const avgPct = avgFreq * 100;
     let status: "hot" | "cold" | "normal" = "normal";
-    if (pct > avgPct * 1.15) status = "hot";
-    else if (pct < avgPct * 0.85) status = "cold";
+    if (pct > avgPct * (1 + hotColdMargin)) status = "hot";
+    else if (pct < avgPct * (1 - hotColdMargin)) status = "cold";
 
     // Gap analysis
     const gaps: number[] = [];
