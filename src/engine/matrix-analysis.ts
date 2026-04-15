@@ -1,6 +1,6 @@
 /**
- * Matriz de Análise — Core scoring engine
- * Score = (0.35 × FreqNorm) + (0.25 × RecentNorm) + (0.20 × LowDelayNorm) + (0.20 × TrendNorm)
+ * Matriz de Análise — Core scoring engine (v2)
+ * Score = (0.30 × FreqNorm) + (0.25 × RecentNorm) + (0.20 × LowDelayNorm) + (0.15 × TrendNorm) + (0.10 × ConsistencyNorm)
  */
 import { DrawResult } from "@/data/lotteries";
 
@@ -10,10 +10,13 @@ export interface MatrixRow {
   freqPercent: number;
   freqRecent10: number;
   freqRecent30: number;
+  freqRecent50: number;
   currentDelay: number;
   avgDelay: number;
+  peakStreak: number;
   trend: "up" | "stable" | "down";
   trendValue: number;
+  consistency: number;
   score: number;
   rank: number;
   signal: "green" | "yellow" | "red";
@@ -26,6 +29,7 @@ export function computeMatrixAnalysis(draws: DrawResult[], totalNumbers: number)
   const freq = new Array(totalNumbers + 1).fill(0);
   const freq10 = new Array(totalNumbers + 1).fill(0);
   const freq30 = new Array(totalNumbers + 1).fill(0);
+  const freq50 = new Array(totalNumbers + 1).fill(0);
   const lastSeen = new Array(totalNumbers + 1).fill(total);
   const appearances: number[][] = Array.from({ length: totalNumbers + 1 }, () => []);
 
@@ -41,6 +45,7 @@ export function computeMatrixAnalysis(draws: DrawResult[], totalNumbers: number)
       freq[n]++;
       if (i < 10) freq10[n]++;
       if (i < 30) freq30[n]++;
+      if (i < 50) freq50[n]++;
       if (i < lastSeen[n]) lastSeen[n] = i;
       appearances[n].push(i);
 
@@ -59,6 +64,29 @@ export function computeMatrixAnalysis(draws: DrawResult[], totalNumbers: number)
     if (sorted.length > 0) gaps.unshift(sorted[0]);
 
     const avgDelay = gaps.length > 0 ? gaps.reduce((a, b) => a + b, 0) / gaps.length : total;
+
+    // Peak streak: max consecutive draws where number appeared
+    let peakStreak = 0;
+    let currentStreak = 0;
+    for (let i = 0; i < total; i++) {
+      if (appearances[n].includes(i)) {
+        currentStreak++;
+        if (currentStreak > peakStreak) peakStreak = currentStreak;
+      } else {
+        currentStreak = 0;
+      }
+    }
+
+    // Consistency: low stddev of gaps = high consistency
+    let consistency = 0;
+    if (gaps.length > 1) {
+      const mean = gaps.reduce((a, b) => a + b, 0) / gaps.length;
+      const variance = gaps.reduce((a, g) => a + (g - mean) ** 2, 0) / gaps.length;
+      const stddev = Math.sqrt(variance);
+      // Invert: lower stddev = more consistent = higher value
+      consistency = mean > 0 ? Math.max(0, 100 - (stddev / mean) * 100) : 0;
+    }
+
     const w1Rate = w1[n] / 10;
     const w2Rate = w2[n] / 20;
     const w3Rate = w3[n] / 30;
@@ -71,10 +99,13 @@ export function computeMatrixAnalysis(draws: DrawResult[], totalNumbers: number)
       freqPercent: total > 0 ? (freq[n] / total) * 100 : 0,
       freqRecent10: freq10[n],
       freqRecent30: freq30[n],
+      freqRecent50: freq50[n],
       currentDelay: lastSeen[n],
       avgDelay: Math.round(avgDelay * 10) / 10,
+      peakStreak,
       trend,
       trendValue,
+      consistency,
     });
   }
 
@@ -93,15 +124,17 @@ export function computeMatrixAnalysis(draws: DrawResult[], totalNumbers: number)
   const maxDelay = Math.max(...delays) || 1;
   const lowDelayNorm = delays.map(d => ((maxDelay - d) / maxDelay) * 100);
   const trendNorm = normalize(rawRows.map(r => r.trendValue));
+  const consistencyNorm = normalize(rawRows.map(r => r.consistency));
 
-  // Compute scores
+  // Compute scores (5 pillars)
   const scored: MatrixRow[] = rawRows.map((r, i) => ({
     ...r,
     score: Math.round(
-      0.35 * freqNorm[i] +
+      0.30 * freqNorm[i] +
       0.25 * recentNorm[i] +
       0.20 * lowDelayNorm[i] +
-      0.20 * trendNorm[i]
+      0.15 * trendNorm[i] +
+      0.10 * consistencyNorm[i]
     ),
     rank: 0,
     signal: "yellow" as const,
