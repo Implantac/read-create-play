@@ -57,18 +57,9 @@ export function computeFrequencyStats(draws: DrawResult[], totalNumbers: number)
   const total = draws.length;
   const avgFreq = total > 0 ? draws[0].numbers.length / totalNumbers : 0;
 
-  // Dynamic threshold: high pick-ratio lotteries (e.g. Lotofácil 15/25)
-  // have tighter distributions, so we use a smaller deviation margin
-  const pickRatio = avgFreq; // e.g. 0.6 for Lotofácil, 0.1 for Mega Sena
-  const hotColdMargin = pickRatio > 0.4 ? 0.05 : pickRatio > 0.2 ? 0.10 : 0.15;
-
   const stats: NumberStats[] = [];
   for (let n = 1; n <= totalNumbers; n++) {
     const pct = total > 0 ? (freq[n] / total) * 100 : 0;
-    const avgPct = avgFreq * 100;
-    let status: "hot" | "cold" | "normal" = "normal";
-    if (pct > avgPct * (1 + hotColdMargin)) status = "hot";
-    else if (pct < avgPct * (1 - hotColdMargin)) status = "cold";
 
     // Gap analysis
     const gaps: number[] = [];
@@ -104,7 +95,7 @@ export function computeFrequencyStats(draws: DrawResult[], totalNumbers: number)
       percentage: pct,
       lastSeen: lastSeen[n],
       recentFreq: recentFreq[n],
-      status,
+      status: "normal", // will be set below
       avgGap,
       maxGap,
       stdDev,
@@ -114,6 +105,25 @@ export function computeFrequencyStats(draws: DrawResult[], totalNumbers: number)
       cycleScore,
     });
   }
+
+  // Percentile-based hot/cold classification (top 30% hot, bottom 30% cold)
+  // This works reliably for all lotteries regardless of pick ratio
+  if (stats.length > 0) {
+    const sortedByFreq = [...stats].sort((a, b) => b.frequency - a.frequency);
+    const hotThresholdIdx = Math.ceil(stats.length * 0.3);
+    const coldThresholdIdx = Math.ceil(stats.length * 0.7);
+    const hotMinFreq = sortedByFreq[hotThresholdIdx - 1]?.frequency ?? 0;
+    const coldMaxFreq = sortedByFreq[coldThresholdIdx]?.frequency ?? Infinity;
+    
+    for (const s of stats) {
+      if (s.frequency >= hotMinFreq && hotMinFreq > coldMaxFreq) {
+        s.status = "hot";
+      } else if (s.frequency <= coldMaxFreq && coldMaxFreq < hotMinFreq) {
+        s.status = "cold";
+      }
+    }
+  }
+
   return stats;
 }
 
