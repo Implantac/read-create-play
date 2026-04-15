@@ -450,6 +450,11 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
     : 3;
 
   const handleInput = (val: string) => {
+    // Skip if paste handler just ran (prevents double-processing)
+    if (pasteJustHandled.current) {
+      pasteJustHandled.current = false;
+      return;
+    }
     setInputValue(val);
     const minNum = lotteryId === "lotomania" ? 0 : 1;
     const nums = val.split(/[,\s\-;]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n) && n >= minNum && n <= maxNumbers);
