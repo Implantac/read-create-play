@@ -64,7 +64,7 @@ const MatrizAnalisePage = () => {
           <div>
             <p className="font-semibold text-foreground mb-1">Como o Score Funciona</p>
             <p>
-              Score = (35% × Frequência Total) + (25% × Frequência Recente) + (20% × Baixo Atraso) + (20% × Tendência).
+              Score = (30% × Frequência Total) + (25% × Frequência Recente) + (20% × Baixo Atraso) + (15% × Tendência) + (10% × Consistência Histórica).
               Todos os valores são normalizados de 0 a 100. O ranking final determina a classificação no Farol.
             </p>
           </div>
