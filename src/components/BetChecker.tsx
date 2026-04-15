@@ -452,14 +452,21 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
     setInputValue(val);
     const minNum = lotteryId === "lotomania" ? 0 : 1;
     const nums = val.split(/[,\s\-;]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n) && n >= minNum && n <= maxNumbers);
-    // Auto-add when typing with separator at end
-    if (nums.length > 0 && (val.endsWith(" ") || val.endsWith(",") || val.endsWith("-") || val.endsWith(";"))) {
+    // Auto-add when multiple numbers detected (paste fallback) or separator at end
+    const hasMultipleNums = nums.length >= 2;
+    const endsWithSep = val.endsWith(" ") || val.endsWith(",") || val.endsWith("-") || val.endsWith(";");
+    if (nums.length > 0 && (hasMultipleNums || endsWithSep)) {
       const unique = [...new Set([...selectedNumbers, ...nums])].sort((a, b) => a - b);
-      if (unique.length <= pick) {
+      if (unique.length > pick) {
+        const trimmed = unique.slice(0, pick);
+        setSelectedNumbers(trimmed);
+        toast.info(`Limitado a ${pick} números`);
+      } else {
         setSelectedNumbers(unique);
-        setInputValue("");
-        setResults(null);
       }
+      setInputValue("");
+      setResults(null);
+      setQuickCheckResult(null);
     }
   };
 
