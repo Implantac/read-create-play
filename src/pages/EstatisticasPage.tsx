@@ -155,22 +155,22 @@ const EstatisticasPage = () => {
 
       {/* Charts */}
       <div className="grid lg:grid-cols-2 gap-6">
-        <FrequencyChart stats={stats} />
-        <HeatmapGrid stats={stats} totalNumbers={config.numbers} />
+        <Suspense fallback={<ChartFallback />}><FrequencyChart stats={stats} /></Suspense>
+        <Suspense fallback={<ChartFallback />}><HeatmapGrid stats={stats} totalNumbers={config.numbers} /></Suspense>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        <ParityChart draws={filteredDraws} />
-        <ConsecutiveChart draws={filteredDraws} />
+        <Suspense fallback={<ChartFallback />}><ParityChart draws={filteredDraws} /></Suspense>
+        <Suspense fallback={<ChartFallback />}><ConsecutiveChart draws={filteredDraws} /></Suspense>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        <RangeDistribution draws={filteredDraws} config={config} />
-        <DelayChart stats={stats} />
+        <Suspense fallback={<ChartFallback />}><RangeDistribution draws={filteredDraws} config={config} /></Suspense>
+        <Suspense fallback={<ChartFallback />}><DelayChart stats={stats} /></Suspense>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        <SumChart data={sumData} />
+        <Suspense fallback={<ChartFallback />}><SumChart data={sumData} /></Suspense>
         <TrendsList stats={stats} />
       </div>
     </div>
