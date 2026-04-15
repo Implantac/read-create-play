@@ -1,19 +1,26 @@
-import { useState, useMemo, memo } from "react";
+import { useState, useMemo, memo, lazy, Suspense } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
-import { FrequencyChart } from "@/components/FrequencyChart";
-import { HeatmapGrid } from "@/components/HeatmapGrid";
-import { SumChart } from "@/components/SumChart";
-import { ParityChart } from "@/components/ParityChart";
-import { ConsecutiveChart } from "@/components/ConsecutiveChart";
-import { RangeDistribution } from "@/components/RangeDistribution";
-import { DelayChart } from "@/components/DelayChart";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { StatsCard } from "@/components/StatsCard";
 import { computeFrequencyStats, computeSumDistribution } from "@/engine/statistics";
-import { PieChart, Flame, Snowflake, TrendingUp, BarChart3, Clock, Target, Sigma, Filter } from "lucide-react";
+import { PieChart, Flame, Snowflake, TrendingUp, BarChart3, Clock, Target, Sigma, Filter, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+const FrequencyChart = lazy(() => import("@/components/FrequencyChart").then(m => ({ default: m.FrequencyChart })));
+const HeatmapGrid = lazy(() => import("@/components/HeatmapGrid").then(m => ({ default: m.HeatmapGrid })));
+const SumChart = lazy(() => import("@/components/SumChart").then(m => ({ default: m.SumChart })));
+const ParityChart = lazy(() => import("@/components/ParityChart").then(m => ({ default: m.ParityChart })));
+const ConsecutiveChart = lazy(() => import("@/components/ConsecutiveChart").then(m => ({ default: m.ConsecutiveChart })));
+const RangeDistribution = lazy(() => import("@/components/RangeDistribution").then(m => ({ default: m.RangeDistribution })));
+const DelayChart = lazy(() => import("@/components/DelayChart").then(m => ({ default: m.DelayChart })));
+
+const ChartFallback = () => (
+  <div className="flex items-center justify-center py-12 rounded-xl glass-card">
+    <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+  </div>
+);
 
 const PERIOD_OPTIONS = [
   { label: "Todos", value: 0 },
