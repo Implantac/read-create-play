@@ -32,6 +32,7 @@ const workflowGroups: { label: string; stepNumber: number; items: NavItem[] }[] 
     items: [
       { title: "Dashboard", url: "/", icon: BarChart3, tooltip: "Visão geral com estatísticas, últimos resultados e resumo da loteria selecionada." },
       { title: "Estatísticas", url: "/estatisticas", icon: PieChart, tooltip: "Frequência, atraso, paridade, soma e distribuição detalhada dos números." },
+      { title: "Matriz de Análise", url: "/matriz", icon: Grid3X3, tooltip: "Score inteligente, farol de dezenas e desdobramento automático." },
       { title: "Histórico", url: "/historico", icon: History, tooltip: "Consulte todos os resultados passados dos sorteios." },
     ],
   },

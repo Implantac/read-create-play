@@ -40,6 +40,7 @@ const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage"));
 const SuportePage = lazy(() => import("./pages/SuportePage"));
 const InstallPage = lazy(() => import("./pages/InstallPage"));
 const StrategyLabPage = lazy(() => import("./pages/StrategyLabPage"));
+const MatrizAnalisePage = lazy(() => import("./pages/MatrizAnalisePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -86,6 +87,7 @@ function App() {
                     <Route path="/ai-analyst" element={<AIAnalystPage />} />
                     <Route path="/ai-chat" element={<AIChatPage />} />
                     <Route path="/estatisticas" element={<EstatisticasPage />} />
+                    <Route path="/matriz" element={<MatrizAnalisePage />} />
                     <Route path="/fechamentos" element={<FechamentosPage />} />
                     <Route path="/historico" element={<HistoricoPage />} />
                     <Route path="/roi" element={<ROIDashboardPage />} />
