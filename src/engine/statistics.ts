@@ -60,10 +60,6 @@ export function computeFrequencyStats(draws: DrawResult[], totalNumbers: number)
   const stats: NumberStats[] = [];
   for (let n = 1; n <= totalNumbers; n++) {
     const pct = total > 0 ? (freq[n] / total) * 100 : 0;
-    const avgPct = avgFreq * 100;
-    let status: "hot" | "cold" | "normal" = "normal";
-    if (pct > avgPct * 1.15) status = "hot";
-    else if (pct < avgPct * 0.85) status = "cold";
 
     // Gap analysis
     const gaps: number[] = [];
@@ -99,7 +95,7 @@ export function computeFrequencyStats(draws: DrawResult[], totalNumbers: number)
       percentage: pct,
       lastSeen: lastSeen[n],
       recentFreq: recentFreq[n],
-      status,
+      status: "normal", // will be set below
       avgGap,
       maxGap,
       stdDev,
@@ -109,6 +105,25 @@ export function computeFrequencyStats(draws: DrawResult[], totalNumbers: number)
       cycleScore,
     });
   }
+
+  // Percentile-based hot/cold classification (top 30% hot, bottom 30% cold)
+  // This works reliably for all lotteries regardless of pick ratio
+  if (stats.length > 0) {
+    const sortedByFreq = [...stats].sort((a, b) => b.frequency - a.frequency);
+    const hotThresholdIdx = Math.ceil(stats.length * 0.3);
+    const coldThresholdIdx = Math.ceil(stats.length * 0.7);
+    const hotMinFreq = sortedByFreq[hotThresholdIdx - 1]?.frequency ?? 0;
+    const coldMaxFreq = sortedByFreq[coldThresholdIdx]?.frequency ?? Infinity;
+    
+    for (const s of stats) {
+      if (s.frequency >= hotMinFreq && hotMinFreq > coldMaxFreq) {
+        s.status = "hot";
+      } else if (s.frequency <= coldMaxFreq && coldMaxFreq < hotMinFreq) {
+        s.status = "cold";
+      }
+    }
+  }
+
   return stats;
 }
 
