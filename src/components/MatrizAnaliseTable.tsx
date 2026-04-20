@@ -49,6 +49,34 @@ const SortIcon = ({ active, asc }: { active: boolean; asc: boolean }) => {
   return asc ? <ArrowUp className="w-3 h-3 text-primary" /> : <ArrowDown className="w-3 h-3 text-primary" />;
 };
 
+/** Sparkline de presença nos últimos 30 sorteios.
+ *  pattern[0] = mais recente. Renderiza barras: cheia se saiu, vazia se não. */
+const Sparkline = ({ pattern }: { pattern: boolean[] }) => {
+  // Reverte para ordem cronológica (esquerda = antigo, direita = recente)
+  const ordered = [...pattern].reverse();
+  const hits = pattern.filter(Boolean).length;
+  const total = pattern.length || 1;
+  const intensity = hits / total;
+  const colorClass =
+    intensity >= 0.4 ? "bg-emerald-400" : intensity >= 0.2 ? "bg-amber-400" : "bg-red-400/70";
+  return (
+    <div
+      className="flex items-end gap-[1px] h-6 w-[78px]"
+      title={`${hits}/${total} aparições nos últimos sorteios`}
+    >
+      {ordered.map((hit, i) => (
+        <div
+          key={i}
+          className={`flex-1 rounded-sm transition-colors ${
+            hit ? colorClass : "bg-muted/30"
+          }`}
+          style={{ height: hit ? "100%" : "25%" }}
+        />
+      ))}
+    </div>
+  );
+};
+
 export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Props) {
   const [sortKey, setSortKey] = useState<SortKey>("rank");
   const [sortAsc, setSortAsc] = useState(true);
