@@ -170,6 +170,7 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
                   </span>
                 </TableHead>
               ))}
+              <TableHead className="whitespace-nowrap">Últimos 30</TableHead>
               <TableHead>Farol</TableHead>
             </TableRow>
           </TableHeader>
