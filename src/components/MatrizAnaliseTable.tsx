@@ -220,6 +220,9 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
                   </div>
                 </TableCell>
                 <TableCell>
+                  <Sparkline pattern={row.recentPattern} />
+                </TableCell>
+                <TableCell>
                   <SignalBadge signal={row.signal} />
                 </TableCell>
               </TableRow>
