@@ -303,6 +303,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_blocked: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
