@@ -17,6 +17,8 @@ export interface MatrixRow {
   trend: "up" | "stable" | "down";
   trendValue: number;
   consistency: number;
+  /** Presença nos últimos 30 sorteios (índice 0 = mais recente) */
+  recentPattern: boolean[];
   score: number;
   rank: number;
   signal: "green" | "yellow" | "red";
