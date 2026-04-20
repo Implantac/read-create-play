@@ -95,6 +95,12 @@ export function computeMatrixAnalysis(draws: DrawResult[], totalNumbers: number)
     const trendValue = (w1Rate - w2Rate) * 50;
     const trend: "up" | "stable" | "down" = trendValue > 1 ? "up" : trendValue < -1 ? "down" : "stable";
 
+    // Pattern dos últimos 30 sorteios (índice 0 = mais recente)
+    const recentPattern: boolean[] = [];
+    const windowSize = Math.min(30, total);
+    const apprSet = new Set(appearances[n]);
+    for (let i = 0; i < windowSize; i++) recentPattern.push(apprSet.has(i));
+
     rawRows.push({
       number: n,
       freqTotal: freq[n],
@@ -108,6 +114,7 @@ export function computeMatrixAnalysis(draws: DrawResult[], totalNumbers: number)
       trend,
       trendValue,
       consistency,
+      recentPattern,
     });
   }
 
