@@ -141,7 +141,12 @@ const MatrizAnalisePage = () => {
         </div>
 
         {/* Farol */}
-        <FarolDezenas data={matrixData} totalNumbers={config.numbers} />
+        <FarolDezenas
+          data={matrixData}
+          totalNumbers={config.numbers}
+          pickSize={config.pick}
+          onSaveBet={(numbers, strategy, score) => handleSaveBet(numbers, strategy, score)}
+        />
 
         {/* Matrix Table */}
         <MatrizAnaliseTable data={matrixData} />
