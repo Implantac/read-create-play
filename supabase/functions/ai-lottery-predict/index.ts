@@ -850,6 +850,7 @@ Para cada aposta, aplique TODOS os 10 pilares profissionais e garanta que TODOS 
         reasoning: {
           effort: "high",
         },
+      }),
     });
 
     if (!aiResponse.ok) {
