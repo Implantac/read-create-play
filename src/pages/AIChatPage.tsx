@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserLearning } from "@/hooks/useUserLearning";
