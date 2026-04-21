@@ -19,6 +19,19 @@ export async function requireUser(req: Request): Promise<{ userId: string } | nu
 
   const { data, error } = await supabase.auth.getUser(token);
   if (error || !data?.user) return null;
+
+  // Check if user is blocked
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("blocked")
+    .eq("id", data.user.id)
+    .single();
+
+  if (profileError || profile?.blocked) {
+    console.log(`User ${data.user.id} is blocked or profile not found.`);
+    return null;
+  }
+
   return { userId: data.user.id };
 }
 
