@@ -20,13 +20,13 @@ interface SimulationBet {
   prizeCount?: number;
   stability?: number;
   score?: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface SimulationData {
-  bets: any[];
+  bets: SimulationBet[];
   totalDraws: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface DistributionSummary {
@@ -35,26 +35,26 @@ interface DistributionSummary {
   avgSpread: number;
   avgPrizeRate: number;
   bestHitOverall: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface PatternInsights {
   dominantParity?: string;
   sumTrend?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface AutonomousReport {
-  rankings?: any[];
-  patterns?: any[];
-  shifts?: any[];
-  entropyAnalysis?: any;
-  chiSquareResult?: any;
-  gapAnalysis?: any[];
-  markovTransitions?: any[];
-  topCooccurrences?: any[];
+  rankings?: ScoredGame[];
+  patterns?: unknown[];
+  shifts?: unknown[];
+  entropyAnalysis?: unknown;
+  chiSquareResult?: unknown;
+  gapAnalysis?: unknown[];
+  markovTransitions?: unknown[];
+  topCooccurrences?: unknown[];
   confidenceScore?: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // ═══════════════════════════════════════════
