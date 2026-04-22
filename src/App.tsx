@@ -101,7 +101,7 @@ function App() {
 
                   <Route path="*" element={<NotFound />} />
                 </Routes>
-              </Suspense>
+              </SafeSuspense>
             </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>
