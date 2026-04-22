@@ -43,7 +43,6 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso, onSyncTrigge
     const now = Date.now();
     const lastSync = lastSyncRef.current[lid] || 0;
     if (now - lastSync < SYNC_COOLDOWN_MS) {
-      console.log(`[AutoUpdater] sync skipped for ${lid} (cooldown)`);
       return;
     }
     lastSyncRef.current[lid] = now;
