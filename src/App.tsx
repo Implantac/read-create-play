@@ -78,7 +78,7 @@ function App() {
                   <Route path="/install" element={<InstallPage />} />
 
                   {/* Protected */}
-                  <Route element={<ProtectedRoute><LotteryProvider><ErrorBoundary><AppLayout /></ErrorBoundary></LotteryProvider></ProtectedRoute>}>
+                  <Route element={<ProtectedRoute><LotteryProvider><AppLayout /></LotteryProvider></ProtectedRoute>}>
                     <Route path="/" element={<DashboardPage />} />
                     <Route path="/gerador" element={<GeradorPage />} />
                     <Route path="/estrategias" element={<EstrategiasPage />} />
