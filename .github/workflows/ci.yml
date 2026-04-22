@@ -26,7 +26,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .eslintcache
-          key: ${{ runner.os }}-lint-${{ hashFiles('package-lock.json', 'package.json', 'eslint.config.js', 'tsconfig.json', '.github/workflows/ci.yml') }}
+          key: ${{ runner.os }}-lint-${{ hashFiles('package-lock.json', 'package.json', 'eslint.config.js', 'tsconfig*.json', '.github/workflows/ci.yml') }}
           restore-keys: |
             ${{ runner.os }}-lint-
 
@@ -57,7 +57,7 @@ jobs:
           path: |
             node_modules/.vitest
             node_modules/.vite
-          key: ${{ runner.os }}-test-${{ hashFiles('package-lock.json', 'package.json', 'vitest.config.ts', 'vite.config.ts', 'tsconfig.json', '.github/workflows/ci.yml') }}
+          key: ${{ runner.os }}-test-${{ hashFiles('package-lock.json', 'package.json', 'vitest.config.ts', 'vite.config.ts', 'tsconfig*.json', '.github/workflows/ci.yml') }}
           restore-keys: |
             ${{ runner.os }}-test-
 
@@ -97,7 +97,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: dist
-          key: ${{ runner.os }}-build-${{ hashFiles('package-lock.json', 'package.json', 'src/**', 'public/**', 'vite.config.ts', 'tsconfig.json', 'tailwind.config.ts', 'postcss.config.js', '.github/workflows/ci.yml') }}
+          key: ${{ runner.os }}-build-${{ hashFiles('package-lock.json', 'package.json', 'src/**', 'public/**', 'vite.config.ts', 'tsconfig*.json', 'tailwind.config.ts', 'postcss.config.js', 'components.json', '.github/workflows/ci.yml') }}
           restore-keys: |
             ${{ runner.os }}-build-
 
