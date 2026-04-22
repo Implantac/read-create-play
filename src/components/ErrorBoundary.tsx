@@ -165,24 +165,39 @@ export class ErrorBoundary extends Component<Props, State> {
               )}
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3 mt-2">
+          <div className="flex flex-col gap-4 mt-4 w-full max-w-sm">
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <Button 
+                onClick={this.handleReload} 
+                variant="default" 
+                className="gap-2 shadow-sm w-full sm:w-auto min-w-[180px]"
+                disabled={this.state.cooldownRemaining > 0 || this.state.retryCount >= MAX_RETRIES}
+              >
+                <RefreshCw className={`w-4 h-4 ${this.state.cooldownRemaining > 0 ? "animate-spin" : ""}`} />
+                {this.state.retryCount >= MAX_RETRIES ? "Limite Excedido" : "Tentar Novamente"}
+              </Button>
+
+              <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
+                <p className="text-xs font-medium text-foreground">
+                  {isChunkError ? "Instabilidade de conexão" : (this.props.fallbackMessage || "Ocorreu um erro")}
+                </p>
+                <p className="text-[11px] text-muted-foreground leading-tight">
+                  {this.state.retryCount >= MAX_RETRIES 
+                    ? "Limite excedido. Recarregue a página." 
+                    : this.state.cooldownRemaining > 0 
+                      ? `Disponível em ${this.state.cooldownRemaining}s` 
+                      : `${MAX_RETRIES - this.state.retryCount} tentativas restantes`}
+                </p>
+              </div>
+            </div>
+
             <Button 
-              onClick={this.handleReload} 
-              variant="default" 
-              className="gap-2 shadow-sm min-w-[200px]"
-              disabled={this.state.cooldownRemaining > 0 || this.state.retryCount >= MAX_RETRIES}
+              onClick={() => window.location.reload()} 
+              variant="outline" 
+              size="sm"
+              className="gap-2 w-full sm:w-fit self-center sm:self-start text-xs border-dashed"
             >
-              <RefreshCw className={`w-4 h-4 ${this.state.cooldownRemaining > 0 ? "animate-spin" : ""}`} />
-              {this.state.retryCount >= MAX_RETRIES ? (
-                "Limite de tentativas atingido"
-              ) : this.state.cooldownRemaining > 0 ? (
-                `Tentar carregar novamente (${MAX_RETRIES - this.state.retryCount} tentativas - ${this.state.cooldownRemaining}s)`
-              ) : (
-                `Tentar carregar novamente (${MAX_RETRIES - this.state.retryCount} tentativas restantes)`
-              )}
-            </Button>
-            <Button onClick={() => window.location.reload()} variant="outline" className="gap-2">
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="w-3 h-3" />
               Recarregar página inteira
             </Button>
           </div>
