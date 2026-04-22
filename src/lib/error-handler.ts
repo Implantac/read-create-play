@@ -8,7 +8,7 @@ export function refineError(error: any): RefinedError {
   const message = error?.message || error?.toString() || "";
   
   // Timeout error
-  if (message.includes("timeout") || message.includes("deadline exceeded") || error?.name === "TimeoutError") {
+  if (message.toLowerCase().includes("timeout") || message.toLowerCase().includes("deadline exceeded") || error?.name === "TimeoutError") {
     return {
       title: "Tempo esgotado",
       description: "A conexão demorou muito para responder.",
@@ -19,8 +19,8 @@ export function refineError(error: any): RefinedError {
   // Network/Connection error
   if (
     message.includes("Failed to fetch") || 
-    message.includes("Network Error") || 
-    message.includes("network error") ||
+    message.toLowerCase().includes("network error") || 
+    message.toLowerCase().includes("connection refused") ||
     !window.navigator.onLine
   ) {
     return {
@@ -34,37 +34,38 @@ export function refineError(error: any): RefinedError {
   if (error?.code) {
     // PostgREST/Supabase error codes
     // https://postgrest.org/en/stable/errors.html
-    if (error.code.startsWith("PGRST")) {
+    if (error.code.startsWith("PGRST") || error.code === "42P01") {
       return {
-        title: "Erro no processamento de dados",
-        description: "Ocorreu um problema ao buscar ou salvar informações.",
-        recommendation: "Tente atualizar a página. Se o erro persistir, entre em contato com o suporte."
+        title: "Erro de processamento",
+        description: "Ocorreu um problema ao acessar o banco de dados.",
+        recommendation: "Tente atualizar a página. Se o erro persistir, nossa equipe técnica já foi notificada."
       };
     }
     
-    // Auth errors (often 400 range codes)
-    if (error.status === 401 || error.status === 403) {
+    // Auth errors
+    if (error.code === "invalid_credentials" || error.status === 401) {
       return {
-        title: "Acesso não autorizado",
-        description: "Sua sessão pode ter expirado ou você não tem permissão para esta ação.",
-        recommendation: "Tente fazer login novamente para reestabelecer seu acesso."
+        title: "Acesso negado",
+        description: "Suas credenciais são inválidas ou sua sessão expirou.",
+        recommendation: "Por favor, faça login novamente para continuar."
       };
     }
   }
 
-  // General API/Server errors
+  // General API/Server errors (5xx)
   if (error?.status >= 500) {
     return {
       title: "Instabilidade no servidor",
-      description: "Nosso servidor está enfrentando dificuldades técnicas no momento.",
-      recommendation: "Já estamos cientes. Por favor, tente novamente em alguns minutos."
+      description: "Nosso servidor está enfrentando dificuldades técnicas momentâneas.",
+      recommendation: "Estamos trabalhando nisso. Por favor, tente novamente em alguns minutos."
     };
   }
 
   // Default error
   return {
     title: "Ops! Algo deu errado",
-    description: message || "Ocorreu um erro inesperado.",
-    recommendation: "Tente novamente ou recarregue a página para resolver o problema."
+    description: message && message.length < 100 ? message : "Ocorreu um erro inesperado ao processar sua solicitação.",
+    recommendation: "Tente realizar a operação novamente ou recarregue a página."
   };
 }
+
