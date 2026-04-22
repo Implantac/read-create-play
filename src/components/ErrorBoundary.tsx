@@ -11,16 +11,26 @@ interface State {
   hasError: boolean;
   error: Error | null;
   retryKey: number;
+  retryCount: number;
+  cooldownRemaining: number;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
+  private timer: number | null = null;
+
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false, error: null, retryKey: 0 };
+    this.state = { 
+      hasError: false, 
+      error: null, 
+      retryKey: 0,
+      retryCount: 0,
+      cooldownRemaining: 0
+    };
   }
 
-  static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error, retryKey: 0 };
+  static getDerivedStateFromError(error: Error): Partial<State> {
+    return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
