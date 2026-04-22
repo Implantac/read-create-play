@@ -1,6 +1,7 @@
 import { Component, ErrorInfo, ReactNode } from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 
 interface Props {
   children: ReactNode;
@@ -13,6 +14,7 @@ interface State {
   retryKey: number;
   retryCount: number;
   cooldownRemaining: number;
+  cooldownDuration: number;
 }
 
 const MAX_RETRIES = 5;
@@ -30,6 +32,7 @@ export class ErrorBoundary extends Component<Props, State> {
     
     let initialRetryCount = 0;
     let initialCooldownRemaining = 0;
+    let initialCooldownDuration = 0;
 
     try {
       const storedRetryCount = sessionStorage.getItem(STORAGE_KEYS.RETRY_COUNT);
@@ -44,6 +47,10 @@ export class ErrorBoundary extends Component<Props, State> {
         const now = Date.now();
         if (endsAt > now) {
           initialCooldownRemaining = Math.ceil((endsAt - now) / 1000);
+          // Recalculate duration based on retryCount
+          initialCooldownDuration = initialRetryCount > 1 
+            ? Math.min(Math.pow(2, initialRetryCount - 1) + 1, 30) 
+            : 0;
         }
       }
     } catch (e) {
@@ -55,7 +62,8 @@ export class ErrorBoundary extends Component<Props, State> {
       error: null, 
       retryKey: 0,
       retryCount: initialRetryCount,
-      cooldownRemaining: initialCooldownRemaining
+      cooldownRemaining: initialCooldownRemaining,
+      cooldownDuration: initialCooldownDuration
     };
 
   }
@@ -94,7 +102,8 @@ export class ErrorBoundary extends Component<Props, State> {
       
       return {
         retryCount: nextRetryCount,
-        cooldownRemaining: nextCooldown
+        cooldownRemaining: nextCooldown,
+        cooldownDuration: nextCooldown
       };
     });
   }
@@ -177,17 +186,25 @@ export class ErrorBoundary extends Component<Props, State> {
                 {this.state.retryCount >= MAX_RETRIES ? "Limite Excedido" : "Tentar Novamente"}
               </Button>
 
-              <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
+              <div className="flex flex-col items-center sm:items-start text-center sm:text-left min-w-[140px]">
                 <p className="text-xs font-medium text-foreground">
                   {isChunkError ? "Instabilidade de conexão" : (this.props.fallbackMessage || "Ocorreu um erro")}
                 </p>
-                <p className="text-[11px] text-muted-foreground leading-tight">
-                  {this.state.retryCount >= MAX_RETRIES 
-                    ? "Limite excedido. Recarregue a página." 
-                    : this.state.cooldownRemaining > 0 
-                      ? `Disponível em ${this.state.cooldownRemaining}s` 
-                      : `${MAX_RETRIES - this.state.retryCount} tentativas restantes`}
-                </p>
+                <div className="w-full mt-1 space-y-1">
+                  <p className="text-[11px] text-muted-foreground leading-tight">
+                    {this.state.retryCount >= MAX_RETRIES 
+                      ? "Limite excedido. Recarregue a página." 
+                      : this.state.cooldownRemaining > 0 
+                        ? `Disponível em ${this.state.cooldownRemaining}s` 
+                        : `${MAX_RETRIES - this.state.retryCount} tentativas restantes`}
+                  </p>
+                  {this.state.cooldownRemaining > 0 && this.state.cooldownDuration > 0 && (
+                    <Progress 
+                      value={((this.state.cooldownDuration - this.state.cooldownRemaining) / this.state.cooldownDuration) * 100} 
+                      className="h-1 bg-secondary"
+                    />
+                  )}
+                </div>
               </div>
             </div>
 
