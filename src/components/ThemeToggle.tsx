@@ -15,7 +15,7 @@ export function ThemeToggle() {
     if (profile?.theme_preference && profile.theme_preference !== "system") {
       setTheme(profile.theme_preference);
     }
-  }, [profile?.theme_preference]);
+  }, [profile?.theme_preference, setTheme]);
 
   const handleToggle = useCallback(() => {
     const next = theme === "dark" ? "light" : "dark";
