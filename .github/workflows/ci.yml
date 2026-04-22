@@ -26,7 +26,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .eslintcache
-          key: ${{ runner.os }}-lint-${{ hashFiles('package-lock.json', 'eslint.config.js') }}-${{ github.run_id }}
+          key: ${{ runner.os }}-lint-${{ hashFiles('package-lock.json', 'eslint.config.js') }}
           restore-keys: |
             ${{ runner.os }}-lint-${{ hashFiles('package-lock.json', 'eslint.config.js') }}-
             ${{ runner.os }}-lint-
@@ -58,7 +58,7 @@ jobs:
           path: |
             node_modules/.vitest
             node_modules/.vite
-          key: ${{ runner.os }}-test-${{ hashFiles('package-lock.json', 'vitest.config.ts', 'vite.config.ts') }}-${{ github.run_id }}
+          key: ${{ runner.os }}-test-${{ hashFiles('package-lock.json', 'vitest.config.ts', 'vite.config.ts') }}
           restore-keys: |
             ${{ runner.os }}-test-${{ hashFiles('package-lock.json', 'vitest.config.ts', 'vite.config.ts') }}-
             ${{ runner.os }}-test-
@@ -99,7 +99,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: dist
-          key: ${{ runner.os }}-build-${{ hashFiles('package-lock.json', 'src/**', 'public/**', 'vite.config.ts', 'tsconfig.json') }}-${{ github.run_id }}
+          key: ${{ runner.os }}-build-${{ hashFiles('package-lock.json', 'src/**', 'public/**', 'vite.config.ts', 'tsconfig.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ hashFiles('package-lock.json', 'src/**', 'public/**', 'vite.config.ts', 'tsconfig.json') }}-
             ${{ runner.os }}-build-
