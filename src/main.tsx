@@ -98,23 +98,6 @@ if ("serviceWorker" in navigator) {
     })
     .catch(() => undefined);
 }
-
-if (isPreviewRuntime() && "serviceWorker" in navigator) {
-  navigator.serviceWorker.getRegistrations()
-    .then((registrations) => {
-      registrations.forEach((registration) => {
-        void registration.unregister();
-      });
-    })
-    .catch(() => undefined);
-
-  if ("caches" in window) {
-    caches.keys()
-      .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
-      .catch(() => undefined);
-  }
-}
-
 // ── Mount app ────────────────────────────────────────────
 const rootEl = document.getElementById("root");
 if (rootEl) {
