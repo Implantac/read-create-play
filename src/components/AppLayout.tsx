@@ -4,6 +4,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { LotterySelector } from "@/components/LotterySelector";
 import { Button } from "@/components/ui/button";
 import { Database, Loader2, LogOut, User, RefreshCw } from "lucide-react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
