@@ -33,7 +33,6 @@ export function refineError(error: any): RefinedError {
   // API/Supabase specific errors
   if (error?.code) {
     // PostgREST/Supabase error codes
-    // https://postgrest.org/en/stable/errors.html
     if (error.code.startsWith("PGRST") || error.code === "42P01") {
       return {
         title: "Erro de processamento",
@@ -68,4 +67,13 @@ export function refineError(error: any): RefinedError {
     recommendation: "Tente realizar a operação novamente ou recarregue a página."
   };
 }
+
+/**
+ * Returns a formatted string combining description and recommendation
+ */
+export function formatErrorMessage(error: any): string {
+  const refined = refineError(error);
+  return `${refined.description} ${refined.recommendation}`;
+}
+
 
