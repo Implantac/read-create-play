@@ -7,9 +7,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-and-test:
+  lint:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,28 +22,46 @@ jobs:
       - name: Install dependencies
         run: npm ci --prefer-offline --no-audit --progress=false
 
-      - name: Cache build and tools output
+      - name: Cache ESLint
         uses: actions/cache@v4
-        id: build-cache
         with:
-          path: |
-            dist
-            .eslintcache
-            node_modules/.vite
-            node_modules/.vitest
-          key: ${{ runner.os }}-build-${{ hashFiles('src/**', 'public/**', 'package-lock.json', 'vite.config.ts', 'vitest.config.ts', 'tsconfig.json', 'eslint.config.js') }}
+          path: .eslintcache
+          key: ${{ runner.os }}-lint-${{ hashFiles('package-lock.json', 'eslint.config.js') }}-${{ github.run_id }}
           restore-keys: |
-            ${{ runner.os }}-build-
-
-      - name: Build (Development)
-        if: steps.build-cache.outputs.cache-hit != 'true'
-        run: npm run build:dev
+            ${{ runner.os }}-lint-${{ hashFiles('package-lock.json', 'eslint.config.js') }}-
+            ${{ runner.os }}-lint-
 
       - name: Run ESLint
         run: npm run lint
 
       - name: Run Typecheck
         run: npm run typecheck
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit --progress=false
+
+      - name: Cache Vitest
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules/.vitest
+            node_modules/.vite
+          key: ${{ runner.os }}-test-${{ hashFiles('package-lock.json', 'vitest.config.ts', 'vite.config.ts') }}-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-test-${{ hashFiles('package-lock.json', 'vitest.config.ts', 'vite.config.ts') }}-
+            ${{ runner.os }}-test-
 
       - name: Run tests with coverage
         run: npm run test:coverage
@@ -53,8 +70,6 @@ jobs:
         run: |
           echo "## Coverage Summary" >> $GITHUB_STEP_SUMMARY
           npx vitest run --coverage --reporter=json-summary
-          # Assuming vitest-coverage-report-action could be used here but let's stick to basics
-          # For now, let the user know the artifact is available
           echo "Coverage report uploaded as an artifact." >> $GITHUB_STEP_SUMMARY
         if: always()
 
@@ -64,3 +79,30 @@ jobs:
           name: coverage-report
           path: coverage/
         if: always()
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit --progress=false
+
+      - name: Cache Build
+        uses: actions/cache@v4
+        with:
+          path: dist
+          key: ${{ runner.os }}-build-${{ hashFiles('package-lock.json', 'src/**', 'public/**', 'vite.config.ts', 'tsconfig.json') }}-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ hashFiles('package-lock.json', 'src/**', 'public/**', 'vite.config.ts', 'tsconfig.json') }}-
+            ${{ runner.os }}-build-
+
+      - name: Build (Development)
+        run: npm run build:dev
