@@ -15,6 +15,8 @@ interface State {
   cooldownRemaining: number;
 }
 
+const MAX_RETRIES = 5;
+
 const STORAGE_KEYS = {
   RETRY_COUNT: 'error_retry_count',
   COOLDOWN_ENDS_AT: 'error_cooldown_ends_at'
