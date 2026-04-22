@@ -11,6 +11,7 @@ import { getLotteryRules, PRIMES, FIBONACCI, LOTOFACIL_FRAME, LOTOFACIL_CENTER }
 import { buildConditionalNetwork, scoreByBayesianNetwork, computeMutualInformation } from "@/ai/engines/bayesianNetworkEngine";
 import { computeZoneEntropy, computeGapEntropy } from "@/ai/engines/entropyEngine";
 import { PatternReport } from "./pattern-detector";
+import type { ScoredGame } from "@/ai/core/aiTypes";
 
 interface SimulationBet {
   bet?: number[];
@@ -20,13 +21,13 @@ interface SimulationBet {
   prizeCount?: number;
   stability?: number;
   score?: number;
-  [key: string]: unknown;
+  [key: string]: any;
 }
 
 interface SimulationData {
-  bets: SimulationBet[];
+  bets: any[];
   totalDraws: number;
-  [key: string]: unknown;
+  [key: string]: any;
 }
 
 interface DistributionSummary {
@@ -35,26 +36,26 @@ interface DistributionSummary {
   avgSpread: number;
   avgPrizeRate: number;
   bestHitOverall: number;
-  [key: string]: unknown;
+  [key: string]: any;
 }
 
 interface PatternInsights {
   dominantParity?: string;
   sumTrend?: string;
-  [key: string]: unknown;
+  [key: string]: any;
 }
 
 interface AutonomousReport {
   rankings?: ScoredGame[];
-  patterns?: unknown[];
-  shifts?: unknown[];
-  entropyAnalysis?: unknown;
-  chiSquareResult?: unknown;
-  gapAnalysis?: unknown[];
-  markovTransitions?: unknown[];
-  topCooccurrences?: unknown[];
+  patterns?: any[];
+  shifts?: any[];
+  entropyAnalysis?: any;
+  chiSquareResult?: any;
+  gapAnalysis?: any[];
+  markovTransitions?: any[];
+  topCooccurrences?: any[];
   confidenceScore?: number;
-  [key: string]: unknown;
+  [key: string]: any;
 }
 
 // ═══════════════════════════════════════════
