@@ -15,18 +15,53 @@ interface State {
   cooldownRemaining: number;
 }
 
+const STORAGE_KEYS = {
+  RETRY_COUNT: 'error_retry_count',
+  COOLDOWN_ENDS_AT: 'error_cooldown_ends_at'
+};
+
 export class ErrorBoundary extends Component<Props, State> {
   private timer: number | null = null;
 
   constructor(props: Props) {
     super(props);
+    
+    let initialRetryCount = 0;
+    let initialCooldownRemaining = 0;
+
+    try {
+      const storedRetryCount = sessionStorage.getItem(STORAGE_KEYS.RETRY_COUNT);
+      const storedCooldownEndsAt = sessionStorage.getItem(STORAGE_KEYS.COOLDOWN_ENDS_AT);
+
+      if (storedRetryCount) {
+        initialRetryCount = parseInt(storedRetryCount, 10);
+      }
+
+      if (storedCooldownEndsAt) {
+        const endsAt = parseInt(storedCooldownEndsAt, 10);
+        const now = Date.now();
+        if (endsAt > now) {
+          initialCooldownRemaining = Math.ceil((endsAt - now) / 1000);
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to load ErrorBoundary state from sessionStorage", e);
+    }
+
     this.state = { 
       hasError: false, 
       error: null, 
       retryKey: 0,
-      retryCount: 0,
-      cooldownRemaining: 0
+      retryCount: initialRetryCount,
+      cooldownRemaining: initialCooldownRemaining
     };
+
+  }
+
+  componentDidMount() {
+    if (this.state.cooldownRemaining > 0) {
+      this.startCooldownTimer();
+    }
   }
 
   static getDerivedStateFromError(error: Error): Partial<State> {
@@ -41,6 +76,16 @@ export class ErrorBoundary extends Component<Props, State> {
       // Cooldown increases with retry count: 2s, 5s, 10s, 20s, max 30s
       const nextCooldown = nextRetryCount > 1 ? Math.min(Math.pow(2, nextRetryCount - 1) + 1, 30) : 0;
       
+      try {
+        sessionStorage.setItem(STORAGE_KEYS.RETRY_COUNT, nextRetryCount.toString());
+        if (nextCooldown > 0) {
+          const endsAt = Date.now() + nextCooldown * 1000;
+          sessionStorage.setItem(STORAGE_KEYS.COOLDOWN_ENDS_AT, endsAt.toString());
+        }
+      } catch (e) {
+        console.warn("Failed to save ErrorBoundary state to sessionStorage", e);
+      }
+
       if (nextCooldown > 0) {
         this.startCooldownTimer();
       }
@@ -57,14 +102,21 @@ export class ErrorBoundary extends Component<Props, State> {
     
     this.timer = window.setInterval(() => {
       this.setState(prevState => {
-        if (prevState.cooldownRemaining <= 1) {
+        const nextCooldownRemaining = prevState.cooldownRemaining - 1;
+        
+        if (nextCooldownRemaining <= 0) {
           if (this.timer) {
             window.clearInterval(this.timer);
             this.timer = null;
           }
+          try {
+            sessionStorage.removeItem(STORAGE_KEYS.COOLDOWN_ENDS_AT);
+          } catch (e) {
+            console.warn("Failed to remove cooldown state from sessionStorage", e);
+          }
           return { cooldownRemaining: 0 };
         }
-        return { cooldownRemaining: prevState.cooldownRemaining - 1 };
+        return { cooldownRemaining: nextCooldownRemaining };
       });
     }, 1000);
   };
