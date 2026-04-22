@@ -99,14 +99,21 @@ export class ErrorBoundary extends Component<Props, State> {
     
     this.timer = window.setInterval(() => {
       this.setState(prevState => {
-        if (prevState.cooldownRemaining <= 1) {
+        const nextCooldownRemaining = prevState.cooldownRemaining - 1;
+        
+        if (nextCooldownRemaining <= 0) {
           if (this.timer) {
             window.clearInterval(this.timer);
             this.timer = null;
           }
+          try {
+            sessionStorage.removeItem(STORAGE_KEYS.COOLDOWN_ENDS_AT);
+          } catch (e) {
+            console.warn("Failed to remove cooldown state from sessionStorage", e);
+          }
           return { cooldownRemaining: 0 };
         }
-        return { cooldownRemaining: prevState.cooldownRemaining - 1 };
+        return { cooldownRemaining: nextCooldownRemaining };
       });
     }, 1000);
   };
