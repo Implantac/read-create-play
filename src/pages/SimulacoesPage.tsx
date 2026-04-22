@@ -97,29 +97,29 @@ const SimulacoesPage = () => {
 
             <ComparativeSimulatorPanel stats={stats} config={config} draws={draws} />
 
-            <Suspense fallback={<LazyFallback />}>
+            <SafeSuspense fallback={<LazyFallback />}>
               <HistoricalSimulatorPanel config={config} draws={draws} stats={stats} />
-            </Suspense>
+            </SafeSuspense>
 
-            <Suspense fallback={<LazyFallback />}>
+            <SafeSuspense fallback={<LazyFallback />}>
               <MassiveSimulationDashboard stats={stats} config={config} draws={draws} />
-            </Suspense>
+            </SafeSuspense>
 
-            <Suspense fallback={<LazyFallback />}>
+            <SafeSuspense fallback={<LazyFallback />}>
               <IntelligentSimulatorPanel config={config} draws={draws} stats={stats} />
-            </Suspense>
+            </SafeSuspense>
 
-            <Suspense fallback={<LazyFallback />}>
+            <SafeSuspense fallback={<LazyFallback />}>
               <MassiveSimulatorPanel stats={stats} config={config} draws={draws} />
-            </Suspense>
+            </SafeSuspense>
 
             <div className="grid lg:grid-cols-2 gap-6">
-              <Suspense fallback={<LazyFallback />}>
+              <SafeSuspense fallback={<LazyFallback />}>
                 <GameSimulator stats={stats} config={config} draws={draws} />
-              </Suspense>
-              <Suspense fallback={<LazyFallback />}>
+              </SafeSuspense>
+              <SafeSuspense fallback={<LazyFallback />}>
                 <BacktestPanel stats={stats} config={config} draws={draws} />
-              </Suspense>
+              </SafeSuspense>
             </div>
           </>
         </PlanGate>
