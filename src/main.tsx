@@ -75,9 +75,29 @@ window.addEventListener("unhandledrejection", (e) => {
   }
 });
 
-// Clear flag on successful load
-sessionStorage.removeItem("chunk-reloaded");
-sessionStorage.removeItem("react-queue-reloaded");
+// Clear flags after a successful load (delay ensures the page actually rendered)
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    sessionStorage.removeItem("chunk-reloaded");
+    sessionStorage.removeItem("react-queue-reloaded");
+  }, 2000);
+});
+
+// Proactively unregister stale service workers in preview/published to prevent chunk mismatches
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.getRegistrations()
+    .then((regs) => {
+      const host = window.location.hostname;
+      const isPreview = host.includes("id-preview--") || host.includes("lovableproject.com");
+      if (isPreview) {
+        regs.forEach((r) => void r.unregister());
+        if ("caches" in window) {
+          caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))).catch(() => undefined);
+        }
+      }
+    })
+    .catch(() => undefined);
+}
 
 if (isPreviewRuntime() && "serviceWorker" in navigator) {
   navigator.serviceWorker.getRegistrations()
