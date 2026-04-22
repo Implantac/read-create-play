@@ -217,10 +217,12 @@ export function useLotteryDraws(lotteryId: string) {
       }
 
       await fetchDraws().catch(() => {});
-    } catch (e) {
+    } catch (e: any) {
       console.error("Sync all error:", e);
-      toast.error("Erro ao sincronizar todas as loterias. Tente novamente.");
+      const refined = refineError(e);
+      toast.error(`${refined.title}: ${refined.description} ${refined.recommendation}`);
     } finally {
+
       setSyncing(false);
     }
   }, [fetchDraws]);
