@@ -143,7 +143,11 @@ export function BestGamesPanel({ rankedGames, lotteryId, lotteryName, pick, maxN
   const toggleSelect = useCallback((key: string) => {
     setSelectedGames(prev => {
       const n = new Set(prev);
-      n.has(key) ? n.delete(key) : n.add(key);
+      if (n.has(key)) {
+        n.delete(key);
+      } else {
+        n.add(key);
+      }
       return n;
     });
   }, []);
