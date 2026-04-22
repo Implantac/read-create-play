@@ -65,7 +65,7 @@ function App() {
           <AutoInstallPrompt />
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <AuthProvider>
-              <Suspense fallback={<RouteLoader />}>
+              <SafeSuspense fallback={<RouteLoader />} errorMessage="Não foi possível carregar esta página">
                 <Routes>
                   {/* Public */}
                   <Route path="/landing" element={<LandingPage />} />
