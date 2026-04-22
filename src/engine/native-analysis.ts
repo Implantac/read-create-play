@@ -10,6 +10,52 @@ import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { getLotteryRules, PRIMES, FIBONACCI, LOTOFACIL_FRAME, LOTOFACIL_CENTER } from "@/ai/knowledge/lotteriesKnowledge";
 import { buildConditionalNetwork, scoreByBayesianNetwork, computeMutualInformation } from "@/ai/engines/bayesianNetworkEngine";
 import { computeZoneEntropy, computeGapEntropy } from "@/ai/engines/entropyEngine";
+import { PatternReport } from "./pattern-detector";
+
+interface SimulationBet {
+  bet?: number[];
+  numbers?: number[];
+  avgHits: number;
+  bestHit: number;
+  prizeCount?: number;
+  stability?: number;
+  score?: number;
+  [key: string]: any;
+}
+
+interface SimulationData {
+  bets: any[];
+  totalDraws: number;
+  [key: string]: any;
+}
+
+interface DistributionSummary {
+  avgSum: number;
+  avgEvenRatio: number;
+  avgSpread: number;
+  avgPrizeRate: number;
+  bestHitOverall: number;
+  [key: string]: any;
+}
+
+interface PatternInsights {
+  dominantParity?: string;
+  sumTrend?: string;
+  [key: string]: any;
+}
+
+interface AutonomousReport {
+  rankings?: any[];
+  patterns?: any[];
+  shifts?: any[];
+  entropyAnalysis?: any;
+  chiSquareResult?: any;
+  gapAnalysis?: any[];
+  markovTransitions?: any[];
+  topCooccurrences?: any[];
+  confidenceScore?: number;
+  [key: string]: any;
+}
 
 // ═══════════════════════════════════════════
 // ADVANCED HELPERS
@@ -137,7 +183,7 @@ function fibRatio(game: number[]): number {
 // PATTERN ANALYSIS (text report)
 // ═══════════════════════════════════════════
 export function generatePatternAnalysis(
-  report: any,
+  report: PatternReport,
   config: LotteryConfig,
   drawCount: number
 ): string {
@@ -161,7 +207,7 @@ export function generatePatternAnalysis(
   }
   if (consecutivePatterns?.length) {
     const mostCommon = consecutivePatterns[0];
-    md += `### Sequências Consecutivas\nPadrão mais comum: **${mostCommon.count}** ocorrências com ${mostCommon.consecutive} consecutivos (${mostCommon.percentage.toFixed(1)}%)\n\n`;
+    md += `### Sequências Consecutivas\nPadrão mais comum: **${mostCommon.occurrences}** ocorrências com ${mostCommon.consecutiveCount} consecutivos (${mostCommon.percentage.toFixed(1)}%)\n\n`;
   }
   if (spatialDistribution?.sectors?.length) {
     md += `### Distribuição Espacial\n`;
@@ -204,7 +250,7 @@ export function generatePatternAnalysis(
 // SIMULATION ANALYSIS (text report)
 // ═══════════════════════════════════════════
 export function generateSimulationAnalysis(
-  simulationData: any,
+  simulationData: SimulationData,
   config: LotteryConfig
 ): string {
   const bets = simulationData.bets || [];
@@ -251,9 +297,9 @@ export function generateSimulationAnalysis(
 // MASSIVE SIMULATION ANALYSIS (text report)
 // ═══════════════════════════════════════════
 export function generateMassiveSimAnalysis(
-  topGames: any[],
-  patternInsights: any,
-  distributionSummary: any,
+  topGames: SimulationBet[],
+  patternInsights: PatternInsights,
+  distributionSummary: DistributionSummary,
   config: LotteryConfig,
   totalGenerated: number,
   totalEvaluated: number
@@ -318,7 +364,7 @@ export function generateMassiveSimAnalysis(
 // AUTONOMOUS AI ANALYSIS (text report + 10 games)
 // ═══════════════════════════════════════════
 export function generateAutonomousAnalysis(
-  report: any,
+  report: AutonomousReport,
   config: LotteryConfig
 ): string {
   const topRankings = report.rankings?.slice(0, 25) || [];
