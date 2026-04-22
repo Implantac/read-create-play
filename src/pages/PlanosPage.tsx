@@ -10,6 +10,8 @@ import { PlanCard, type PlanData } from "@/components/plans/PlanCard";
 import { PlanFAQ } from "@/components/plans/PlanFAQ";
 import { PlanTrustBar } from "@/components/plans/PlanTrustBar";
 import { PlanComparisonTable } from "@/components/plans/PlanComparisonTable";
+import { refineError } from "@/lib/error-handler";
+
 
 const basePlans = [
   {
@@ -141,8 +143,10 @@ export default function PlanosPage() {
       if (error) throw error;
       if (data?.url) window.open(data.url, "_blank");
     } catch (e: any) {
-      toast.error("Erro ao iniciar checkout: " + (e.message || "Tente novamente"));
+      const refined = refineError(e);
+      toast.error(`${refined.title}: ${refined.description} ${refined.recommendation}`);
     } finally {
+
       setLoadingPlan(null);
     }
   };
@@ -157,8 +161,10 @@ export default function PlanosPage() {
       if (error) throw error;
       if (data?.url) window.open(data.url, "_blank");
     } catch (e: any) {
-      toast.error("Erro ao abrir portal: " + (e.message || "Tente novamente"));
+      const refined = refineError(e);
+      toast.error(`${refined.title}: ${refined.description} ${refined.recommendation}`);
     } finally {
+
       setLoadingPlan(null);
     }
   };

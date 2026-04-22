@@ -2,6 +2,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { DrawResult, LOTTERIES } from "@/data/lotteries";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { toast } from "sonner";
+import { refineError } from "@/lib/error-handler";
+
 
 export interface PrizeTierInfo {
   descricao: string;
@@ -179,10 +181,12 @@ export function useLotteryDraws(lotteryId: string) {
       }
 
       await fetchDraws().catch(() => {});
-    } catch (e) {
+    } catch (e: any) {
       console.error("Sync error:", e);
-      toast.error("Erro ao sincronizar. Tente novamente.");
+      const refined = refineError(e);
+      toast.error(`${refined.title}: ${refined.description} ${refined.recommendation}`);
     } finally {
+
       setSyncing(false);
     }
   }, [lotteryId, fetchDraws]);
@@ -213,10 +217,12 @@ export function useLotteryDraws(lotteryId: string) {
       }
 
       await fetchDraws().catch(() => {});
-    } catch (e) {
+    } catch (e: any) {
       console.error("Sync all error:", e);
-      toast.error("Erro ao sincronizar todas as loterias. Tente novamente.");
+      const refined = refineError(e);
+      toast.error(`${refined.title}: ${refined.description} ${refined.recommendation}`);
     } finally {
+
       setSyncing(false);
     }
   }, [fetchDraws]);
