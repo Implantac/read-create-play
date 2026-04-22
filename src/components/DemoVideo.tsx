@@ -3,6 +3,10 @@ import { useRef, useState, useCallback, useEffect } from "react";
 import { Play, Pause, Volume2, VolumeX } from "lucide-react";
 import { createAmbientTrack } from "@/lib/ambient-audio";
 
+// Bump this version when re-rendering /titan-demo.mp4 to bust browser/SW cache.
+const DEMO_VIDEO_VERSION = "v2";
+const DEMO_VIDEO_SRC = `/titan-demo.mp4?v=${DEMO_VIDEO_VERSION}`;
+
 export function DemoVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
