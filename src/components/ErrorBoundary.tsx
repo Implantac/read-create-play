@@ -11,23 +11,71 @@ interface State {
   hasError: boolean;
   error: Error | null;
   retryKey: number;
+  retryCount: number;
+  cooldownRemaining: number;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
+  private timer: number | null = null;
+
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false, error: null, retryKey: 0 };
+    this.state = { 
+      hasError: false, 
+      error: null, 
+      retryKey: 0,
+      retryCount: 0,
+      cooldownRemaining: 0
+    };
   }
 
-  static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error, retryKey: 0 };
+  static getDerivedStateFromError(error: Error): Partial<State> {
+    return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("[ErrorBoundary]", error, errorInfo);
+    
+    this.setState(prevState => {
+      const nextRetryCount = prevState.retryCount + 1;
+      // Cooldown increases with retry count: 2s, 5s, 10s, 20s, max 30s
+      const nextCooldown = nextRetryCount > 1 ? Math.min(Math.pow(2, nextRetryCount - 1) + 1, 30) : 0;
+      
+      if (nextCooldown > 0) {
+        this.startCooldownTimer();
+      }
+      
+      return {
+        retryCount: nextRetryCount,
+        cooldownRemaining: nextCooldown
+      };
+    });
+  }
+
+  startCooldownTimer = () => {
+    if (this.timer) window.clearInterval(this.timer);
+    
+    this.timer = window.setInterval(() => {
+      this.setState(prevState => {
+        if (prevState.cooldownRemaining <= 1) {
+          if (this.timer) {
+            window.clearInterval(this.timer);
+            this.timer = null;
+          }
+          return { cooldownRemaining: 0 };
+        }
+        return { cooldownRemaining: prevState.cooldownRemaining - 1 };
+      });
+    }, 1000);
+  };
+
+  componentWillUnmount() {
+    if (this.timer) window.clearInterval(this.timer);
   }
 
   handleReload = () => {
+    if (this.state.cooldownRemaining > 0) return;
+
     this.setState((prevState) => ({ 
       hasError: false, 
       error: null,
@@ -56,12 +104,24 @@ export class ErrorBoundary extends Component<Props, State> {
               {isChunkError 
                 ? "Não foi possível carregar alguns arquivos necessários. Isso pode acontecer devido a uma conexão instável ou uma nova atualização do sistema."
                 : "Ocorreu um erro inesperado ao carregar esta seção."}
+              {this.state.retryCount > 1 && (
+                <span className="block mt-1 font-medium text-destructive/80">
+                  Tentativa {this.state.retryCount} falhou.
+                </span>
+              )}
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 mt-2">
-            <Button onClick={this.handleReload} variant="default" className="gap-2 shadow-sm">
-              <RefreshCw className="w-4 h-4" />
-              Tentar carregar novamente
+            <Button 
+              onClick={this.handleReload} 
+              variant="default" 
+              className="gap-2 shadow-sm min-w-[200px]"
+              disabled={this.state.cooldownRemaining > 0}
+            >
+              <RefreshCw className={`w-4 h-4 ${this.state.cooldownRemaining > 0 ? "animate-spin" : ""}`} />
+              {this.state.cooldownRemaining > 0 
+                ? `Aguarde (${this.state.cooldownRemaining}s)` 
+                : "Tentar carregar novamente"}
             </Button>
             <Button onClick={() => window.location.reload()} variant="outline" className="gap-2">
               <RefreshCw className="w-4 h-4" />
