@@ -20,11 +20,13 @@ interface SimulationBet {
   prizeCount?: number;
   stability?: number;
   score?: number;
+  [key: string]: any;
 }
 
 interface SimulationData {
   bets: SimulationBet[];
   totalDraws: number;
+  [key: string]: any;
 }
 
 interface DistributionSummary {
@@ -33,23 +35,26 @@ interface DistributionSummary {
   avgSpread: number;
   avgPrizeRate: number;
   bestHitOverall: number;
+  [key: string]: any;
 }
 
 interface PatternInsights {
   dominantParity?: string;
   sumTrend?: string;
+  [key: string]: any;
 }
 
 interface AutonomousReport extends Partial<PatternReport> {
-  rankings?: Array<{ number: number; compositeScore: number }>;
-  patterns?: Array<{ type?: string; name?: string; description?: string; score?: number }>;
-  shifts?: Array<{ number: number; direction: string; shift: number }>;
-  entropyAnalysis?: { entropy?: number };
-  chiSquareResult?: { chiSquare?: number; pValue?: number };
-  gapAnalysis?: Array<{ number: number; currentGap: number; avgGap: number; isOverdue?: boolean }>;
-  markovTransitions?: Array<{ from: number; to: number; count: number }>;
-  topCooccurrences?: Array<any>;
+  rankings?: any[];
+  patterns?: any[];
+  shifts?: any[];
+  entropyAnalysis?: any;
+  chiSquareResult?: any;
+  gapAnalysis?: any[];
+  markovTransitions?: any[];
+  topCooccurrences?: any[];
   confidenceScore?: number;
+  [key: string]: any;
 }
 
 // ═══════════════════════════════════════════
@@ -202,7 +207,7 @@ export function generatePatternAnalysis(
   }
   if (consecutivePatterns?.length) {
     const mostCommon = consecutivePatterns[0];
-    md += `### Sequências Consecutivas\nPadrão mais comum: **${mostCommon.count}** ocorrências com ${mostCommon.consecutive} consecutivos (${mostCommon.percentage.toFixed(1)}%)\n\n`;
+    md += `### Sequências Consecutivas\nPadrão mais comum: **${mostCommon.occurrences}** ocorrências com ${mostCommon.consecutiveCount} consecutivos (${mostCommon.percentage.toFixed(1)}%)\n\n`;
   }
   if (spatialDistribution?.sectors?.length) {
     md += `### Distribuição Espacial\n`;
