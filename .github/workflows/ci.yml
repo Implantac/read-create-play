@@ -26,8 +26,9 @@ jobs:
           path: |
             ~/.npm
             node_modules
-          key: ${{ runner.os }}-npm-deps-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-npm-deps-${{ github.ref_name }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
+            ${{ runner.os }}-npm-deps-${{ github.ref_name }}-
             ${{ runner.os }}-npm-deps-
 
       - name: Install dependencies
