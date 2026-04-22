@@ -32,6 +32,7 @@ export class ErrorBoundary extends Component<Props, State> {
     
     let initialRetryCount = 0;
     let initialCooldownRemaining = 0;
+    let initialCooldownDuration = 0;
 
     try {
       const storedRetryCount = sessionStorage.getItem(STORAGE_KEYS.RETRY_COUNT);
@@ -46,18 +47,20 @@ export class ErrorBoundary extends Component<Props, State> {
         const now = Date.now();
         if (endsAt > now) {
           initialCooldownRemaining = Math.ceil((endsAt - now) / 1000);
+          // Recalculate duration based on retryCount
+          initialCooldownDuration = initialRetryCount > 1 
+            ? Math.min(Math.pow(2, initialRetryCount - 1) + 1, 30) 
+            : 0;
         }
       }
-    } catch (e) {
-      console.warn("Failed to load ErrorBoundary state from sessionStorage", e);
-    }
-
+...
     this.state = { 
       hasError: false, 
       error: null, 
       retryKey: 0,
       retryCount: initialRetryCount,
-      cooldownRemaining: initialCooldownRemaining
+      cooldownRemaining: initialCooldownRemaining,
+      cooldownDuration: initialCooldownDuration
     };
 
   }
