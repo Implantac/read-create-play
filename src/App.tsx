@@ -13,6 +13,7 @@ import { AdminGuard } from "@/components/AdminGuard";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { VersionUpdateAlert } from "@/components/VersionUpdateAlert";
 import { AutoInstallPrompt } from "@/components/AutoInstallPrompt";
+import { SafeSuspense } from "@/components/SafeSuspense";
 
 const AppLayout = lazy(() => import("@/components/AppLayout").then((m) => ({ default: m.AppLayout })));
 const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
@@ -64,7 +65,7 @@ function App() {
           <AutoInstallPrompt />
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <AuthProvider>
-              <Suspense fallback={<RouteLoader />}>
+              <SafeSuspense fallback={<RouteLoader />} errorMessage="Não foi possível carregar esta página">
                 <Routes>
                   {/* Public */}
                   <Route path="/landing" element={<LandingPage />} />
@@ -78,7 +79,7 @@ function App() {
                   <Route path="/install" element={<InstallPage />} />
 
                   {/* Protected */}
-                  <Route element={<ProtectedRoute><LotteryProvider><ErrorBoundary><AppLayout /></ErrorBoundary></LotteryProvider></ProtectedRoute>}>
+                  <Route element={<ProtectedRoute><LotteryProvider><AppLayout /></LotteryProvider></ProtectedRoute>}>
                     <Route path="/" element={<DashboardPage />} />
                     <Route path="/gerador" element={<GeradorPage />} />
                     <Route path="/estrategias" element={<EstrategiasPage />} />
@@ -100,7 +101,7 @@ function App() {
 
                   <Route path="*" element={<NotFound />} />
                 </Routes>
-              </Suspense>
+              </SafeSuspense>
             </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>

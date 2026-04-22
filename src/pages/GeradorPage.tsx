@@ -1,4 +1,5 @@
-import { lazy, Suspense } from "react";
+import { lazy } from "react";
+import { SafeSuspense } from "@/components/SafeSuspense";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { SelectedBetsProvider } from "@/contexts/SelectedBetsContext";
 import { BetGenerator } from "@/components/BetGenerator";
@@ -68,65 +69,65 @@ const GeradorPage = () => {
 
             {/* PREMIUM: Advanced generators */}
             <PlanGate feature="gerador_avancado" fallbackMessage="Análise de Robustez e Score">
-              <Suspense fallback={<LazyFallback />}>
+              <SafeSuspense fallback={<LazyFallback />}>
                 <RobustnessRadarPanel stats={stats} config={config} draws={draws} lotteryId={selectedLottery} />
-              </Suspense>
+              </SafeSuspense>
             </PlanGate>
 
             <PlanGate feature="gerador_avancado" fallbackMessage="Gerador Extremo com filtros avançados">
-              <Suspense fallback={<LazyFallback />}>
+              <SafeSuspense fallback={<LazyFallback />}>
                 <ExtremeGeneratorPanel stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
-              </Suspense>
+              </SafeSuspense>
             </PlanGate>
 
             <PlanGate feature="gerador_avancado" fallbackMessage="Predição com IA avançada">
-              <Suspense fallback={<LazyFallback />}>
+              <SafeSuspense fallback={<LazyFallback />}>
                 <AIPredictionPanel config={config} stats={stats} draws={draws} onSaveBet={handleSaveBet} />
-              </Suspense>
+              </SafeSuspense>
             </PlanGate>
 
             <PlanGate feature="gerador_avancado" fallbackMessage="Gerador Inteligente com análise multi-critério">
-              <Suspense fallback={<LazyFallback />}>
+              <SafeSuspense fallback={<LazyFallback />}>
                 <IntelligentGeneratorPanel stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
-              </Suspense>
+              </SafeSuspense>
             </PlanGate>
 
             <PlanGate feature="gerador_avancado" fallbackMessage="Gerador Evolutivo com algoritmo genético">
-              <Suspense fallback={<LazyFallback />}>
+              <SafeSuspense fallback={<LazyFallback />}>
                 <EvolutiveGeneratorPanel stats={stats} config={config} draws={draws} lotteryId={selectedLottery} />
-              </Suspense>
+              </SafeSuspense>
             </PlanGate>
 
             <PlanGate feature="gerador_profissional" fallbackMessage="Gerador Profissional com filtros avançados">
-              <Suspense fallback={<LazyFallback />}>
+              <SafeSuspense fallback={<LazyFallback />}>
                 <ProfessionalGeneratorPanel stats={stats} config={config} draws={draws} />
-              </Suspense>
+              </SafeSuspense>
             </PlanGate>
 
             <PlanGate feature="gerador_avancado" fallbackMessage="Gerador Aprimorado e Monte Carlo">
               <div className="grid lg:grid-cols-2 gap-6">
-                <Suspense fallback={<LazyFallback />}>
+                <SafeSuspense fallback={<LazyFallback />}>
                   <EnhancedBetGenerator stats={stats} config={config} onSaveBet={handleSaveBet} />
-                </Suspense>
-                <Suspense fallback={<LazyFallback />}>
+                </SafeSuspense>
+                <SafeSuspense fallback={<LazyFallback />}>
                   <MonteCarloPanel stats={stats} config={config} />
-                </Suspense>
+                </SafeSuspense>
               </div>
             </PlanGate>
 
             <PlanGate feature="gerador_avancado" fallbackMessage="Otimizador de Apostas">
-              <Suspense fallback={<LazyFallback />}>
+              <SafeSuspense fallback={<LazyFallback />}>
                 <BetOptimizerPanel stats={stats} config={config} draws={draws} />
-              </Suspense>
+              </SafeSuspense>
             </PlanGate>
 
             {/* Bulk check results appear here */}
             <BulkCheckBar />
 
             {/* Bet Checker stays FREE */}
-            <Suspense fallback={<LazyFallback />}>
+            <SafeSuspense fallback={<LazyFallback />}>
               <BetChecker draws={draws} drawsWithPrizes={drawsWithPrizes} lotteryId={selectedLottery} maxNumbers={config.numbers} pick={config.pick} />
-            </Suspense>
+            </SafeSuspense>
           </>
         )}
       </div>
