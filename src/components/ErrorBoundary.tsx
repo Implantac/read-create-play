@@ -53,7 +53,10 @@ export class ErrorBoundary extends Component<Props, State> {
             : 0;
         }
       }
-...
+    } catch (e) {
+      console.warn("Failed to load ErrorBoundary state from sessionStorage", e);
+    }
+
     this.state = { 
       hasError: false, 
       error: null, 
