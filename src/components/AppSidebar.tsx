@@ -1,7 +1,7 @@
 import {
   BarChart3, Sparkles, FlaskConical, History, Zap, Grid3X3,
   Brain, ShieldCheck, Crown, PieChart, TrendingUp, ClipboardCheck, Bot, Lock, Smartphone, MessageCircle, Star,
-  Search, Dices, CheckCircle,
+  Search, Dices, CheckCircle, type LucideIcon
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { usePlanAccess, type Feature } from "@/hooks/usePlanAccess";
@@ -23,7 +23,7 @@ import {
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-type NavItem = { title: string; url: string; icon: any; requiredFeature?: Feature; tooltip: string };
+type NavItem = { title: string; url: string; icon: LucideIcon; requiredFeature?: Feature; tooltip: string };
 
 const workflowGroups: { label: string; stepNumber: number; items: NavItem[] }[] = [
   {
