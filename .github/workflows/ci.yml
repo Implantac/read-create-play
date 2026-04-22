@@ -26,5 +26,21 @@ jobs:
       - name: Build (Development)
         run: npm run build:dev
 
-      - name: Run tests
-        run: npm run test
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+      - name: Add coverage summary to job summary
+        run: |
+          echo "## Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          npx vitest run --coverage --reporter=json-summary
+          # Assuming vitest-coverage-report-action could be used here but let's stick to basics
+          # For now, let the user know the artifact is available
+          echo "Coverage report uploaded as an artifact." >> $GITHUB_STEP_SUMMARY
+        if: always()
+
+      - name: Upload coverage reports to GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+        if: always()
