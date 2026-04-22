@@ -26,7 +26,7 @@ export default function PerfilPage() {
     if (user) {
       supabase
         .from("profiles")
-        .update({ theme_preference: newTheme } as any)
+        .update({ theme_preference: newTheme })
         .eq("id", user.id)
         .then();
     }
@@ -61,8 +61,9 @@ export default function PerfilPage() {
       } else {
         throw new Error("URL do portal não recebida");
       }
-    } catch (err: any) {
-      toast({ title: "Erro ao abrir portal", description: err.message, variant: "destructive" });
+    } catch (err) {
+      const error = err as Error;
+      toast({ title: "Erro ao abrir portal", description: error.message, variant: "destructive" });
     } finally {
       setOpeningPortal(false);
     }
@@ -98,8 +99,9 @@ export default function PerfilPage() {
 
       setAvatarUrl(url);
       toast({ title: "Avatar atualizado com sucesso!" });
-    } catch (err: any) {
-      toast({ title: "Erro ao enviar avatar", description: err.message, variant: "destructive" });
+    } catch (err) {
+      const error = err as Error;
+      toast({ title: "Erro ao enviar avatar", description: error.message, variant: "destructive" });
     } finally {
       setUploading(false);
     }
@@ -116,8 +118,9 @@ export default function PerfilPage() {
 
       if (error) throw error;
       toast({ title: "Perfil atualizado com sucesso!" });
-    } catch (err: any) {
-      toast({ title: "Erro ao salvar", description: err.message, variant: "destructive" });
+    } catch (err) {
+      const error = err as Error;
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -289,8 +292,9 @@ export default function PerfilPage() {
                 toast({ title: "Senha alterada com sucesso!" });
                 setNewPassword("");
                 setConfirmPassword("");
-              } catch (err: any) {
-                toast({ title: "Erro ao alterar senha", description: err.message, variant: "destructive" });
+              } catch (err) {
+                const error = err as Error;
+                toast({ title: "Erro ao alterar senha", description: error.message, variant: "destructive" });
               } finally {
                 setChangingPassword(false);
               }
