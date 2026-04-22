@@ -113,7 +113,8 @@ export function DemoVideo() {
 
           <video
             ref={videoRef}
-            src="/titan-demo.mp4"
+            src={DEMO_VIDEO_SRC}
+            key={DEMO_VIDEO_VERSION}
             className="w-full aspect-video bg-background"
             muted
             playsInline
