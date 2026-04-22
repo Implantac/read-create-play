@@ -21,6 +21,42 @@ function isPreviewRuntime(): boolean {
 }
 
 // ── Global error handlers ────────────────────────────────
+function handleChunkError(msg: string) {
+  if (!msg.includes("Failed to fetch dynamically imported module") && !msg.includes("Should have a queue")) {
+    return false;
+  }
+
+  const reloadKey = msg.includes("Should have a queue") ? "react-queue-reloaded" : "chunk-reloaded";
+  const reloadCount = parseInt(sessionStorage.getItem(reloadKey) || "0", 10);
+
+  if (reloadCount < 2) {
+    const nextCount = reloadCount + 1;
+    sessionStorage.setItem(reloadKey, nextCount.toString());
+    
+    const reason = msg.includes("Should have a queue") 
+      ? "React internal queue corruption (HMR-related)" 
+      : "Stale chunk/module fetch error (deploy mismatch)";
+      
+    console.warn(`[Auto-Recover] Attempt ${nextCount}: ${reason}. Reloading...`);
+
+    // Add backoff for the second attempt
+    const delay = nextCount === 1 ? 0 : 1500;
+    
+    setTimeout(() => {
+      location.reload();
+    }, delay);
+    
+    return true;
+  }
+  
+  if (reloadCount >= 2) {
+    console.error(`[Auto-Recover] Failed to recover after ${reloadCount} attempts. Keeping app state for debugging.`);
+    sessionStorage.removeItem(reloadKey); // Reset for next time user manually reloads
+  }
+  
+  return false;
+}
+
 window.addEventListener("error", (e) => {
   const msg = String(e.message || "");
   // Ignore browser-extension noise
@@ -28,20 +64,9 @@ window.addEventListener("error", (e) => {
     e.preventDefault();
     return;
   }
-  // Auto-recover from React internal queue corruption (HMR-related)
-  if (msg.includes("Should have a queue") && !sessionStorage.getItem("react-queue-reloaded")) {
-    sessionStorage.setItem("react-queue-reloaded", "1");
+  
+  if (handleChunkError(msg)) {
     e.preventDefault();
-    location.reload();
-    return;
-  }
-  // Auto-reload on stale chunk errors (deploy cache mismatch)
-  if (
-    msg.includes("Failed to fetch dynamically imported module") &&
-    !sessionStorage.getItem("chunk-reloaded")
-  ) {
-    sessionStorage.setItem("chunk-reloaded", "1");
-    location.reload();
   }
 });
 
@@ -52,26 +77,16 @@ window.addEventListener("unhandledrejection", (e) => {
     e.preventDefault();
     return;
   }
+  
   // Suppress null-DOM errors that slip through (defensive)
   if (msg.includes("appendChild") || msg.includes("Cannot read properties of null")) {
-    if (import.meta.env.DEV) console.warn("[safe-dom] Suppressed:", msg);
+    if (isPreviewRuntime()) console.warn("[safe-dom] Suppressed:", msg);
     e.preventDefault();
     return;
   }
-  // Auto-recover from React internal queue corruption (HMR-related)
-  if (msg.includes("Should have a queue") && !sessionStorage.getItem("react-queue-reloaded")) {
-    sessionStorage.setItem("react-queue-reloaded", "1");
+
+  if (handleChunkError(msg)) {
     e.preventDefault();
-    location.reload();
-    return;
-  }
-  // Auto-reload on stale chunk errors
-  if (
-    msg.includes("Failed to fetch dynamically imported module") &&
-    !sessionStorage.getItem("chunk-reloaded")
-  ) {
-    sessionStorage.setItem("chunk-reloaded", "1");
-    location.reload();
   }
 });
 
