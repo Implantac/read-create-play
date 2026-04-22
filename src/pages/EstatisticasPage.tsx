@@ -1,4 +1,5 @@
-import { useState, useMemo, memo, lazy, Suspense } from "react";
+import { useState, useMemo, memo, lazy } from "react";
+import { SafeSuspense } from "@/components/SafeSuspense";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
