@@ -1,4 +1,5 @@
-import { lazy, Suspense } from "react";
+import { lazy } from "react";
+import { SafeSuspense } from "@/components/SafeSuspense";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { SelectedBetsProvider } from "@/contexts/SelectedBetsContext";
 import { BetGenerator } from "@/components/BetGenerator";
