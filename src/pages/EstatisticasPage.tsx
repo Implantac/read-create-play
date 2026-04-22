@@ -156,22 +156,22 @@ const EstatisticasPage = () => {
 
       {/* Charts */}
       <div className="grid lg:grid-cols-2 gap-6">
-        <Suspense fallback={<ChartFallback />}><FrequencyChart stats={stats} /></Suspense>
-        <Suspense fallback={<ChartFallback />}><HeatmapGrid stats={stats} totalNumbers={config.numbers} /></Suspense>
+        <SafeSuspense fallback={<ChartFallback />}><FrequencyChart stats={stats} /></SafeSuspense>
+        <SafeSuspense fallback={<ChartFallback />}><HeatmapGrid stats={stats} totalNumbers={config.numbers} /></SafeSuspense>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        <Suspense fallback={<ChartFallback />}><ParityChart draws={filteredDraws} /></Suspense>
-        <Suspense fallback={<ChartFallback />}><ConsecutiveChart draws={filteredDraws} /></Suspense>
+        <SafeSuspense fallback={<ChartFallback />}><ParityChart draws={filteredDraws} /></SafeSuspense>
+        <SafeSuspense fallback={<ChartFallback />}><ConsecutiveChart draws={filteredDraws} /></SafeSuspense>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        <Suspense fallback={<ChartFallback />}><RangeDistribution draws={filteredDraws} config={config} /></Suspense>
-        <Suspense fallback={<ChartFallback />}><DelayChart stats={stats} /></Suspense>
+        <SafeSuspense fallback={<ChartFallback />}><RangeDistribution draws={filteredDraws} config={config} /></SafeSuspense>
+        <SafeSuspense fallback={<ChartFallback />}><DelayChart stats={stats} /></SafeSuspense>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        <Suspense fallback={<ChartFallback />}><SumChart data={sumData} /></Suspense>
+        <SafeSuspense fallback={<ChartFallback />}><SumChart data={sumData} /></SafeSuspense>
         <TrendsList stats={stats} />
       </div>
     </div>
