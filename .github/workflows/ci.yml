@@ -23,7 +23,17 @@ jobs:
       - name: Install dependencies
         run: npm ci --prefer-offline --no-audit --progress=false
 
+      - name: Cache build output
+        uses: actions/cache@v4
+        id: build-cache
+        with:
+          path: dist
+          key: ${{ runner.os }}-build-${{ hashFiles('src/**', 'public/**', 'package-lock.json', 'vite.config.ts', 'tsconfig.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
       - name: Build (Development)
+        if: steps.build-cache.outputs.cache-hit != 'true'
         run: npm run build:dev
 
       - name: Run ESLint
