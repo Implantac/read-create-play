@@ -10,6 +10,47 @@ import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { getLotteryRules, PRIMES, FIBONACCI, LOTOFACIL_FRAME, LOTOFACIL_CENTER } from "@/ai/knowledge/lotteriesKnowledge";
 import { buildConditionalNetwork, scoreByBayesianNetwork, computeMutualInformation } from "@/ai/engines/bayesianNetworkEngine";
 import { computeZoneEntropy, computeGapEntropy } from "@/ai/engines/entropyEngine";
+import { PatternReport } from "./pattern-detector";
+
+interface SimulationBet {
+  bet?: number[];
+  numbers?: number[];
+  avgHits: number;
+  bestHit: number;
+  prizeCount?: number;
+  stability?: number;
+  score?: number;
+}
+
+interface SimulationData {
+  bets: SimulationBet[];
+  totalDraws: number;
+}
+
+interface DistributionSummary {
+  avgSum: number;
+  avgEvenRatio: number;
+  avgSpread: number;
+  avgPrizeRate: number;
+  bestHitOverall: number;
+}
+
+interface PatternInsights {
+  dominantParity?: string;
+  sumTrend?: string;
+}
+
+interface AutonomousReport extends Partial<PatternReport> {
+  rankings?: Array<{ number: number; compositeScore: number }>;
+  patterns?: Array<{ type?: string; name?: string; description?: string; score?: number }>;
+  shifts?: Array<{ number: number; direction: string; shift: number }>;
+  entropyAnalysis?: { entropy?: number };
+  chiSquareResult?: { chiSquare?: number; pValue?: number };
+  gapAnalysis?: Array<{ number: number; currentGap: number; avgGap: number; isOverdue?: boolean }>;
+  markovTransitions?: Array<{ from: number; to: number; count: number }>;
+  topCooccurrences?: Array<any>;
+  confidenceScore?: number;
+}
 
 // ═══════════════════════════════════════════
 // ADVANCED HELPERS
@@ -137,7 +178,7 @@ function fibRatio(game: number[]): number {
 // PATTERN ANALYSIS (text report)
 // ═══════════════════════════════════════════
 export function generatePatternAnalysis(
-  report: any,
+  report: PatternReport,
   config: LotteryConfig,
   drawCount: number
 ): string {
@@ -204,7 +245,7 @@ export function generatePatternAnalysis(
 // SIMULATION ANALYSIS (text report)
 // ═══════════════════════════════════════════
 export function generateSimulationAnalysis(
-  simulationData: any,
+  simulationData: SimulationData,
   config: LotteryConfig
 ): string {
   const bets = simulationData.bets || [];
@@ -251,9 +292,9 @@ export function generateSimulationAnalysis(
 // MASSIVE SIMULATION ANALYSIS (text report)
 // ═══════════════════════════════════════════
 export function generateMassiveSimAnalysis(
-  topGames: any[],
-  patternInsights: any,
-  distributionSummary: any,
+  topGames: SimulationBet[],
+  patternInsights: PatternInsights,
+  distributionSummary: DistributionSummary,
   config: LotteryConfig,
   totalGenerated: number,
   totalEvaluated: number
@@ -318,7 +359,7 @@ export function generateMassiveSimAnalysis(
 // AUTONOMOUS AI ANALYSIS (text report + 10 games)
 // ═══════════════════════════════════════════
 export function generateAutonomousAnalysis(
-  report: any,
+  report: AutonomousReport,
   config: LotteryConfig
 ): string {
   const topRankings = report.rankings?.slice(0, 25) || [];
