@@ -11,6 +11,7 @@ import { getLotteryRules, PRIMES, FIBONACCI, LOTOFACIL_FRAME, LOTOFACIL_CENTER }
 import { buildConditionalNetwork, scoreByBayesianNetwork, computeMutualInformation } from "@/ai/engines/bayesianNetworkEngine";
 import { computeZoneEntropy, computeGapEntropy } from "@/ai/engines/entropyEngine";
 import { PatternReport } from "./pattern-detector";
+import type { AINumberRanking } from "./autonomous-ai";
 
 interface SimulationBet {
   bet?: number[];
@@ -45,7 +46,7 @@ interface PatternInsights {
 }
 
 interface AutonomousReport {
-  rankings?: any[];
+  rankings?: AINumberRanking[];
   patterns?: any[];
   shifts?: any[];
   entropyAnalysis?: any;

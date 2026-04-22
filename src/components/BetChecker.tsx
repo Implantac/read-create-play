@@ -499,7 +499,7 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
 
   const addFromInput = () => {
     const minNum = lotteryId === "lotomania" ? 0 : 1;
-    const nums = inputValue.split(/[,\s\-]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n) && n >= minNum && n <= maxNumbers);
+    const nums = inputValue.split(/[,\s-]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n) && n >= minNum && n <= maxNumbers);
     if (nums.length === 0) return;
     const unique = [...new Set([...selectedNumbers, ...nums])].sort((a, b) => a - b);
     if (unique.length > pick) { toast.error(`Máximo de ${pick} números`); return; }
@@ -678,7 +678,7 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
       );
       setAiImprovements(improvements);
       toast.success("Motor nativo gerou sugestões de melhoria!");
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("Native improvement error:", e);
       toast.error("Erro ao gerar melhorias");
     } finally {

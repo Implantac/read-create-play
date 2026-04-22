@@ -59,8 +59,8 @@ export function ComparativeSimulatorPanel({ stats, config, draws }: Props) {
 
   const addGame = () => {
     const nums = inputValue
-      .replace(/[^\d,\s\-]/g, "")
-      .split(/[\s,\-]+/)
+      .replace(/[^\d,\s-]/g, "")
+      .split(/[\s,-]+/)
       .map(Number)
       .filter(n => n >= 1 && n <= config.numbers);
 

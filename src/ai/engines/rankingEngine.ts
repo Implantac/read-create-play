@@ -46,7 +46,7 @@ export function scoreGame(
   if (learned.confidence > 0.3) {
     for (const [key, mult] of Object.entries(learned.adjustments)) {
       if (key in contextW) {
-        (contextW as any)[key] *= mult as number;
+        (contextW as unknown as Record<string, number>)[key] *= mult as number;
       }
     }
   }
