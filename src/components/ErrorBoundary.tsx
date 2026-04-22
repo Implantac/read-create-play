@@ -80,7 +80,26 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("[ErrorBoundary]", error, errorInfo);
-    
+
+    // Auto-recover from stale chunk errors (deploy mismatch / cache invalidation)
+    const msg = error?.message || "";
+    const isChunkLoadError =
+      error?.name === "ChunkLoadError" ||
+      msg.includes("Failed to fetch dynamically imported module") ||
+      msg.includes("Importing a module script failed") ||
+      msg.toLowerCase().includes("loading chunk");
+
+    if (isChunkLoadError) {
+      const reloadKey = "chunk-reloaded";
+      const reloadCount = parseInt(sessionStorage.getItem(reloadKey) || "0", 10);
+      if (reloadCount < 2) {
+        sessionStorage.setItem(reloadKey, (reloadCount + 1).toString());
+        console.warn("[ErrorBoundary] Stale chunk detected. Auto-reloading...");
+        setTimeout(() => location.reload(), reloadCount === 0 ? 0 : 1500);
+        return;
+      }
+    }
+
     this.setState(prevState => {
       const nextRetryCount = prevState.retryCount + 1;
       // Cooldown increases with retry count: 2s, 5s, 10s, 20s, max 30s
