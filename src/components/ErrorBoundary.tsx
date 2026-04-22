@@ -15,6 +15,8 @@ interface State {
   cooldownRemaining: number;
 }
 
+const MAX_RETRIES = 5;
+
 const STORAGE_KEYS = {
   RETRY_COUNT: 'error_retry_count',
   COOLDOWN_ENDS_AT: 'error_cooldown_ends_at'
@@ -168,12 +170,16 @@ export class ErrorBoundary extends Component<Props, State> {
               onClick={this.handleReload} 
               variant="default" 
               className="gap-2 shadow-sm min-w-[200px]"
-              disabled={this.state.cooldownRemaining > 0}
+              disabled={this.state.cooldownRemaining > 0 || this.state.retryCount >= MAX_RETRIES}
             >
               <RefreshCw className={`w-4 h-4 ${this.state.cooldownRemaining > 0 ? "animate-spin" : ""}`} />
-              {this.state.cooldownRemaining > 0 
-                ? `Aguarde (${this.state.cooldownRemaining}s)` 
-                : "Tentar carregar novamente"}
+              {this.state.retryCount >= MAX_RETRIES ? (
+                "Limite de tentativas atingido"
+              ) : this.state.cooldownRemaining > 0 ? (
+                `Tentar carregar novamente (${MAX_RETRIES - this.state.retryCount} tentativas - ${this.state.cooldownRemaining}s)`
+              ) : (
+                `Tentar carregar novamente (${MAX_RETRIES - this.state.retryCount} tentativas restantes)`
+              )}
             </Button>
             <Button onClick={() => window.location.reload()} variant="outline" className="gap-2">
               <RefreshCw className="w-4 h-4" />
