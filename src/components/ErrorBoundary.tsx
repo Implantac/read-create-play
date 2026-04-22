@@ -14,6 +14,7 @@ interface State {
   retryKey: number;
   retryCount: number;
   cooldownRemaining: number;
+  cooldownDuration: number;
 }
 
 const MAX_RETRIES = 5;
