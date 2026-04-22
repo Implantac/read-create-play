@@ -179,13 +179,13 @@ export class ErrorBoundary extends Component<Props, State> {
 
               <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
                 <p className="text-xs font-medium text-foreground">
-                  {this.state.cooldownRemaining > 0 ? "Aguardando processamento" : "Status das tentativas"}
+                  {isChunkError ? "Instabilidade de conexão" : (this.props.fallbackMessage || "Ocorreu um erro")}
                 </p>
                 <p className="text-[11px] text-muted-foreground leading-tight">
                   {this.state.retryCount >= MAX_RETRIES 
-                    ? "Por favor, recarregue a página inteira." 
+                    ? "Limite excedido. Recarregue a página." 
                     : this.state.cooldownRemaining > 0 
-                      ? `Próxima tentativa em ${this.state.cooldownRemaining}s` 
+                      ? `Disponível em ${this.state.cooldownRemaining}s` 
                       : `${MAX_RETRIES - this.state.retryCount} tentativas restantes`}
                 </p>
               </div>
