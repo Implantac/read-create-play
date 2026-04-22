@@ -56,7 +56,10 @@ export class ErrorBoundary extends Component<Props, State> {
       cooldownRemaining: initialCooldownRemaining
     };
 
-    if (initialCooldownRemaining > 0) {
+  }
+
+  componentDidMount() {
+    if (this.state.cooldownRemaining > 0) {
       this.startCooldownTimer();
     }
   }
