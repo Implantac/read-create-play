@@ -26,6 +26,12 @@ jobs:
       - name: Build (Development)
         run: npm run build:dev
 
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run Typecheck
+        run: npm run typecheck
+
       - name: Run tests with coverage
         run: npm run test:coverage
 
