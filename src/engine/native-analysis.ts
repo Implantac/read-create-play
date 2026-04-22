@@ -24,7 +24,7 @@ interface SimulationBet {
 }
 
 interface SimulationData {
-  bets: SimulationBet[];
+  bets: any[];
   totalDraws: number;
   [key: string]: any;
 }
@@ -44,7 +44,7 @@ interface PatternInsights {
   [key: string]: any;
 }
 
-interface AutonomousReport extends Partial<PatternReport> {
+interface AutonomousReport {
   rankings?: any[];
   patterns?: any[];
   shifts?: any[];
