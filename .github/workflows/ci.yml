@@ -32,7 +32,7 @@ jobs:
             ${{ runner.os }}-npm-deps-
 
       - name: Install dependencies
-        run: npm ci --prefer-offline --no-audit
+        run: npm ci --prefer-offline --no-audit --progress=false
 
       - name: Build (Development)
         run: npm run build:dev
