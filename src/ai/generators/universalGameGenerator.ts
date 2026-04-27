@@ -18,6 +18,7 @@ import { multiScaleCycleAnalysis } from "../engines/cycleEngine";
 import { computeRegressionCandidates, getUpwardRegressionNumbers } from "../engines/regressionEngine";
 import { computeEntropyReport } from "../engines/entropyEngine";
 import { computeHistoricalNorms, checkGameOutlier } from "../engines/stabilityEngine";
+import { applyJackpotMasterBoost, scoreJackpotAlignment } from "../knowledge/jackpotMasterStrategies";
 
 interface GeneratorConfig {
   lotteryId: string;
