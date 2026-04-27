@@ -18,6 +18,7 @@ import { multiScaleCycleAnalysis } from "../engines/cycleEngine";
 import { computeRegressionCandidates, getUpwardRegressionNumbers } from "../engines/regressionEngine";
 import { computeEntropyReport } from "../engines/entropyEngine";
 import { computeHistoricalNorms, checkGameOutlier } from "../engines/stabilityEngine";
+import { applyJackpotMasterBoost, scoreJackpotAlignment } from "../knowledge/jackpotMasterStrategies";
 
 interface GeneratorConfig {
   lotteryId: string;
@@ -35,9 +36,11 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
   const prevDraw = config.draws.length > 0 ? config.draws[0].numbers : undefined;
 
   // Build advanced weighted pool using multi-dimensional analysis
-  const advancedWeights = buildAdvancedWeightMap(
+  let advancedWeights = buildAdvancedWeightMap(
     config.stats, config.draws, config.lotteryId, strategy.engineWeights
   );
+  // MASTER STRATEGIES: alinhar pesos ao perfil vencedor da modalidade
+  advancedWeights = applyJackpotMasterBoost(advancedWeights, config.stats, config.draws, config.lotteryId);
   const zoneAnalysis = analyzeZoneDistribution(config.draws, config.lotteryId);
   const coOcc = computeCoOccurrence(config.draws, rules.totalNumbers, 30);
   const topPairSet = new Map<number, Set<number>>();
@@ -130,6 +133,10 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     const advPattern = scoreAdvancedPatterns(game, config.lotteryId);
     if (advPattern < 25) continue;
 
+    // MASTER ALIGNMENT: rejeita jogos pouco aderentes ao perfil vencedor da modalidade
+    const alignment = scoreJackpotAlignment(game, config.draws, config.lotteryId);
+    if (alignment.score < 45) continue;
+
     // Co-occurrence bonus: prefer games with proven pairs
     let coOccBonus = 0;
     for (let i = 0; i < game.length; i++) {
@@ -140,6 +147,9 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
         }
       }
     }
+
+    // Soma o alinhamento mestre ao bônus para priorizar jogos profissionalmente sólidos
+    coOccBonus += alignment.score / 25;
 
     candidates.push({ game, coOccBonus });
   }
