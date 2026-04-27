@@ -308,6 +308,75 @@ export const MASTER_PRINCIPLES = [
 ] as const;
 
 // ═══════════════════════════════════════════════════════════════════
+// CONFIGURAÇÃO DINÂMICA — NÍVEL DE ANTI-POPULARIDADE
+// (controla a intensidade das penalidades para datas e múltiplos de 5)
+// ═══════════════════════════════════════════════════════════════════
+
+export type AntiPopularityLevel = "light" | "standard" | "aggressive";
+
+export interface AntiPopularityProfile {
+  /** Multiplicador aplicado a números 1-31 em Mega/Quina (datas) */
+  datesMultiplier: number;
+  /** Multiplicador aplicado a múltiplos de 5 em loterias de universo grande */
+  multiplesOfFiveMultiplier: number;
+  /** Rótulo amigável para UI */
+  label: string;
+  /** Descrição curta */
+  description: string;
+}
+
+export const ANTI_POPULARITY_PROFILES: Record<AntiPopularityLevel, AntiPopularityProfile> = {
+  light: {
+    datesMultiplier: 0.96,
+    multiplesOfFiveMultiplier: 0.98,
+    label: "Leve",
+    description: "Penalidades suaves: prioriza acerto sem reduzir muito a popularidade.",
+  },
+  standard: {
+    datesMultiplier: 0.92,
+    multiplesOfFiveMultiplier: 0.95,
+    label: "Padrão",
+    description: "Equilíbrio entre acerto e redução de rateio (recomendado).",
+  },
+  aggressive: {
+    datesMultiplier: 0.78,
+    multiplesOfFiveMultiplier: 0.85,
+    label: "Agressivo",
+    description: "Penalidades fortes: maximiza valor do prêmio reduzindo padrões populares.",
+  },
+};
+
+const STORAGE_KEY = "titan:anti-popularity-level";
+let _antiPopLevel: AntiPopularityLevel = "standard";
+
+// Hidrata do localStorage no boot (browser-only)
+if (typeof window !== "undefined") {
+  try {
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    if (saved === "light" || saved === "standard" || saved === "aggressive") {
+      _antiPopLevel = saved;
+    }
+  } catch {
+    /* noop */
+  }
+}
+
+export function getAntiPopularityLevel(): AntiPopularityLevel {
+  return _antiPopLevel;
+}
+
+export function setAntiPopularityLevel(level: AntiPopularityLevel): void {
+  _antiPopLevel = level;
+  if (typeof window !== "undefined") {
+    try { window.localStorage.setItem(STORAGE_KEY, level); } catch { /* noop */ }
+  }
+}
+
+export function getAntiPopularityProfile(): AntiPopularityProfile {
+  return ANTI_POPULARITY_PROFILES[_antiPopLevel];
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // ENGINE: APLICA O PERFIL VENCEDOR COMO BOOST DE PESOS
 // ═══════════════════════════════════════════════════════════════════
 
@@ -364,14 +433,17 @@ export function applyJackpotMasterBoost(
       if (LOTOFACIL_FRAME.has(n)) multiplier *= 1.08;
     }
 
-    // Penalidade anti-popular: datas (1-31) na Mega/Quina
+    // Penalidade anti-popular dinâmica (intensidade controlada pelo usuário)
+    const antiPop = getAntiPopularityProfile();
+
+    // Datas (1-31) na Mega/Quina — comuns em apostas casuais (aniversários)
     if ((lotteryId === "megasena" || lotteryId === "quina") && n <= 31) {
-      multiplier *= 0.92;
+      multiplier *= antiPop.datesMultiplier;
     }
 
-    // Penalidade anti-popular: múltiplos de 5 em loterias de universo grande
+    // Múltiplos de 5 em loterias de universo grande — padrão visual popular
     if ((lotteryId === "megasena" || lotteryId === "quina" || lotteryId === "lotomania") && n % 5 === 0) {
-      multiplier *= 0.95;
+      multiplier *= antiPop.multiplesOfFiveMultiplier;
     }
 
     const current = boosted.get(n) ?? 1;
