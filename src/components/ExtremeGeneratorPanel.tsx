@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { AntiPopularitySelector } from "@/components/AntiPopularitySelector";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { NumberStats } from "@/engine/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";

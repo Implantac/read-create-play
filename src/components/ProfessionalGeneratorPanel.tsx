@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { AntiPopularitySelector } from "@/components/AntiPopularitySelector";
 import { NumberStats } from "@/engine/statistics";
 import { exportToPdf } from "@/engine/pdf-export";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
