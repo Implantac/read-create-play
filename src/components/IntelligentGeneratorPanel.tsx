@@ -25,6 +25,13 @@ import {
 } from "recharts";
 import { toast } from "sonner";
 import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
+import {
+  ANTI_POPULARITY_PROFILES,
+  AntiPopularityLevel,
+  getAntiPopularityLevel,
+  setAntiPopularityLevel,
+} from "@/ai/knowledge/jackpotMasterStrategies";
+import { Shield } from "lucide-react";
 
 interface Props {
   stats: NumberStats[];
