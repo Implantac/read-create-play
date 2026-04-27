@@ -183,6 +183,7 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
           </div>
         </div>
 
+        <Button
           onClick={handleGenerate}
           disabled={isGenerating || draws.length === 0}
           className="w-full"
