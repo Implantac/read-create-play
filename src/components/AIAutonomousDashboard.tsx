@@ -212,6 +212,8 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
         </CardHeader>
       </Card>
 
+      <AntiPopularitySelector />
+
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-7 gap-3">
         <Card className="border-primary/15">

@@ -342,6 +342,11 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
         )}
       </AnimatePresence>
 
+      {/* Anti-Popularidade */}
+      <div className="mb-4">
+        <AntiPopularitySelector />
+      </div>
+
       {/* Generate button */}
       <div className="flex items-center gap-3 flex-wrap mb-4">
         <Button

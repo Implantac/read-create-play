@@ -164,7 +164,9 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
         </div>
       </div>
 
-      <Tabs defaultValue="generator" className="w-full">
+      <AntiPopularitySelector />
+
+      <Tabs defaultValue="generator" className="w-full mt-4">
         <TabsList className="grid w-full grid-cols-2 mb-4">
           <TabsTrigger value="generator" className="text-xs gap-1">
             <Sparkles className="w-3 h-3" /> Gerador Pro
