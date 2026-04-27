@@ -59,6 +59,15 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
   const [topResults, setTopResults] = useState(20);
   const [simulateHistory, setSimulateHistory] = useState(true);
   const [selectedBet, setSelectedBet] = useState<IntelligentBet | null>(null);
+  const [antiPopLevel, setAntiPopLevelState] = useState<AntiPopularityLevel>(() => getAntiPopularityLevel());
+
+  const handleAntiPopChange = (level: AntiPopularityLevel) => {
+    setAntiPopularityLevel(level);
+    setAntiPopLevelState(level);
+    toast.success(`Anti-popularidade: ${ANTI_POPULARITY_PROFILES[level].label}`, {
+      description: ANTI_POPULARITY_PROFILES[level].description,
+    });
+  };
 
   const handleGenerate = () => {
     setIsGenerating(true);
