@@ -433,14 +433,17 @@ export function applyJackpotMasterBoost(
       if (LOTOFACIL_FRAME.has(n)) multiplier *= 1.08;
     }
 
-    // Penalidade anti-popular: datas (1-31) na Mega/Quina
+    // Penalidade anti-popular dinâmica (intensidade controlada pelo usuário)
+    const antiPop = getAntiPopularityProfile();
+
+    // Datas (1-31) na Mega/Quina — comuns em apostas casuais (aniversários)
     if ((lotteryId === "megasena" || lotteryId === "quina") && n <= 31) {
-      multiplier *= 0.92;
+      multiplier *= antiPop.datesMultiplier;
     }
 
-    // Penalidade anti-popular: múltiplos de 5 em loterias de universo grande
+    // Múltiplos de 5 em loterias de universo grande — padrão visual popular
     if ((lotteryId === "megasena" || lotteryId === "quina" || lotteryId === "lotomania") && n % 5 === 0) {
-      multiplier *= 0.95;
+      multiplier *= antiPop.multiplesOfFiveMultiplier;
     }
 
     const current = boosted.get(n) ?? 1;
