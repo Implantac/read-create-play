@@ -133,6 +133,10 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     const advPattern = scoreAdvancedPatterns(game, config.lotteryId);
     if (advPattern < 25) continue;
 
+    // MASTER ALIGNMENT: rejeita jogos pouco aderentes ao perfil vencedor da modalidade
+    const alignment = scoreJackpotAlignment(game, config.draws, config.lotteryId);
+    if (alignment.score < 45) continue;
+
     // Co-occurrence bonus: prefer games with proven pairs
     let coOccBonus = 0;
     for (let i = 0; i < game.length; i++) {
@@ -143,6 +147,9 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
         }
       }
     }
+
+    // Soma o alinhamento mestre ao bônus para priorizar jogos profissionalmente sólidos
+    coOccBonus += alignment.score / 25;
 
     candidates.push({ game, coOccBonus });
   }
