@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { AntiPopularitySelector } from "@/components/AntiPopularitySelector";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -211,6 +212,8 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
           </div>
         </CardHeader>
       </Card>
+
+      <AntiPopularitySelector />
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-7 gap-3">

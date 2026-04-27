@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { AntiPopularitySelector } from "@/components/AntiPopularitySelector";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { NumberStats } from "@/engine/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
@@ -341,6 +342,11 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Anti-Popularidade */}
+      <div className="mb-4">
+        <AntiPopularitySelector />
+      </div>
 
       {/* Generate button */}
       <div className="flex items-center gap-3 flex-wrap mb-4">
