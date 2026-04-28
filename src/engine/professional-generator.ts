@@ -220,9 +220,12 @@ export function generateProfessionalBets(
   }
 
   // Step 7: Rank by combined score (quality + statistical + diversity bonus)
+  // Step 7: Rank by combined score (quality + statistical + diversity bonus + anti-popularity)
   allBets.sort((a, b) => {
-    const scoreA = a.quality.overall * 0.5 + a.statisticalScore * 0.5;
-    const scoreB = b.quality.overall * 0.5 + b.statisticalScore * 0.5;
+    const penA = computeAntiPopularityPenalty(a.numbers, config.id);
+    const penB = computeAntiPopularityPenalty(b.numbers, config.id);
+    const scoreA = (a.quality.overall * 0.5 + a.statisticalScore * 0.5) * penA;
+    const scoreB = (b.quality.overall * 0.5 + b.statisticalScore * 0.5) * penB;
     return scoreB - scoreA;
   });
 
