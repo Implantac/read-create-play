@@ -3,6 +3,7 @@ import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { evaluateBetQuality, BetQualityReport } from "./bet-quality";
 import { generateByStrategy, Strategy } from "./strategies";
 import { analyzeFrameCenter, computeIdealFrameCenter, analyzeRowDistribution } from "./generation-filters";
+import { computeAntiPopularityPenalty } from "@/ai/knowledge/jackpotMasterStrategies";
 
 // ═══════════════════════════════════════════════════════
 // GERADOR PROFISSIONAL DE APOSTAS
