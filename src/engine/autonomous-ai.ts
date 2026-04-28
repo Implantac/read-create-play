@@ -455,7 +455,7 @@ function computeRankings(
     const accel = momentumMap[s.number] || 0;
     const momentumBonus = (accel / maxAccel) * 15;
 
-    const compositeScore = Math.round(
+    const rawComposite = Math.round(
       frequencyScore * 0.15 +
       recencyScore * 0.12 +
       trendScore * 0.15 +
