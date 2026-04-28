@@ -2,6 +2,7 @@ import { NumberStats, computeFrequencyStats, generateSmartBet } from "./statisti
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { evaluateBetQuality, BetQualityReport } from "./bet-quality";
 import { generateByStrategy, Strategy } from "./strategies";
+import { computeAntiPopularityPenalty } from "@/ai/knowledge/jackpotMasterStrategies";
 
 // ═══════════════════════════════════════════════════════
 // GERADOR INTELIGENTE DE APOSTAS v2.0
