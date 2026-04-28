@@ -1,7 +1,7 @@
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { NumberStats } from "./statistics";
 import { buildConditionalNetwork, scoreByBayesianNetwork, computeMutualInformation, type ConditionalNode, type BayesianNetworkScore } from "@/ai/engines/bayesianNetworkEngine";
-import { computeAntiPopularityPenalty, getAntiPopularityProfile } from "@/ai/knowledge/jackpotMasterStrategies";
+import { computeAntiPopularityPenalty } from "@/ai/knowledge/jackpotMasterStrategies";
 
 export interface AINumberRanking {
   number: number;
