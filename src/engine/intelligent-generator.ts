@@ -299,7 +299,8 @@ export function generateIntelligentBets(
         ? simulateAgainstHistory(numbers, draws, config)
         : { avgHits: 0, maxHits: 0, minHits: 0, prizeCount: 0, totalDraws: 0, consistency: 50 };
 
-      const score = computeCompositeScore(quality, sim, trendAlign.score, cycleAlign.score, distribution.score);
+      const baseScore = computeCompositeScore(quality, sim, trendAlign.score, cycleAlign.score, distribution.score);
+      const score = Math.round(baseScore * computeAntiPopularityPenalty(numbers, config.id));
 
       const insights = generateInsights(numbers, stats, draws, config, sim);
 
