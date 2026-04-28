@@ -18,7 +18,7 @@ import { multiScaleCycleAnalysis } from "../engines/cycleEngine";
 import { computeRegressionCandidates, getUpwardRegressionNumbers } from "../engines/regressionEngine";
 import { computeEntropyReport } from "../engines/entropyEngine";
 import { computeHistoricalNorms, checkGameOutlier } from "../engines/stabilityEngine";
-import { applyJackpotMasterBoost, scoreJackpotAlignment } from "../knowledge/jackpotMasterStrategies";
+import { applyJackpotMasterBoost, scoreJackpotAlignment, computeAntiPopularityPenalty } from "../knowledge/jackpotMasterStrategies";
 
 interface GeneratorConfig {
   lotteryId: string;
@@ -157,10 +157,13 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
   // Sort candidates by co-occurrence bonus first, then score
   candidates.sort((a, b) => b.coOccBonus - a.coOccBonus);
 
-  // Score all candidates
-  const scored = candidates.map(c =>
-    scoreGame(c.game, config.lotteryId, config.stats, config.draws, config.riskProfile)
-  );
+  // Score all candidates and aplicar penalidade anti-popularidade no ranking final
+  const scored = candidates.map(c => {
+    const sg = scoreGame(c.game, config.lotteryId, config.stats, config.draws, config.riskProfile);
+    const penalty = computeAntiPopularityPenalty(sg.numbers, config.lotteryId);
+    sg.totalScore = sg.totalScore * penalty;
+    return sg;
+  });
 
   // Sort by score
   scored.sort((a, b) => b.totalScore - a.totalScore);

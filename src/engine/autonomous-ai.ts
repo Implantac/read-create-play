@@ -1,6 +1,7 @@
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { NumberStats } from "./statistics";
 import { buildConditionalNetwork, scoreByBayesianNetwork, computeMutualInformation, type ConditionalNode, type BayesianNetworkScore } from "@/ai/engines/bayesianNetworkEngine";
+import { computeAntiPopularityPenalty } from "@/ai/knowledge/jackpotMasterStrategies";
 
 export interface AINumberRanking {
   number: number;
@@ -454,7 +455,7 @@ function computeRankings(
     const accel = momentumMap[s.number] || 0;
     const momentumBonus = (accel / maxAccel) * 15;
 
-    const compositeScore = Math.round(
+    const rawComposite = Math.round(
       frequencyScore * 0.15 +
       recencyScore * 0.12 +
       trendScore * 0.15 +
@@ -466,6 +467,10 @@ function computeRankings(
       momentumBonus * 0.05 +
       50 * 0.05
     );
+
+    // Aplica anti-popularidade individual (datas/múltiplos de 5 conforme nível)
+    const antiPopMult = computeAntiPopularityPenalty([s.number], config.id);
+    const compositeScore = Math.round(rawComposite * antiPopMult);
 
     const classification = compositeScore >= 65 ? "forte" : compositeScore >= 40 ? "moderado" : "fraco";
     const trend = s.momentum > 0.5 ? "subindo" : s.momentum < -0.5 ? "descendo" : "estável";

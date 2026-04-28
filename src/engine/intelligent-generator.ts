@@ -2,6 +2,7 @@ import { NumberStats, computeFrequencyStats, generateSmartBet } from "./statisti
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { evaluateBetQuality, BetQualityReport } from "./bet-quality";
 import { generateByStrategy, Strategy } from "./strategies";
+import { computeAntiPopularityPenalty } from "@/ai/knowledge/jackpotMasterStrategies";
 
 // ═══════════════════════════════════════════════════════
 // GERADOR INTELIGENTE DE APOSTAS v2.0
@@ -298,7 +299,8 @@ export function generateIntelligentBets(
         ? simulateAgainstHistory(numbers, draws, config)
         : { avgHits: 0, maxHits: 0, minHits: 0, prizeCount: 0, totalDraws: 0, consistency: 50 };
 
-      const score = computeCompositeScore(quality, sim, trendAlign.score, cycleAlign.score, distribution.score);
+      const baseScore = computeCompositeScore(quality, sim, trendAlign.score, cycleAlign.score, distribution.score);
+      const score = Math.round(baseScore * computeAntiPopularityPenalty(numbers, config.id));
 
       const insights = generateInsights(numbers, stats, draws, config, sim);
 

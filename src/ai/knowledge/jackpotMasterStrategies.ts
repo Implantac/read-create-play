@@ -454,6 +454,30 @@ export function applyJackpotMasterBoost(
 }
 
 /**
+ * Penalidade anti-popularidade aplicada a um JOGO completo.
+ * Retorna um multiplicador (0..1) para ser aplicado em scores/rankings de
+ * qualquer gerador, escalando com o nível selecionado pelo usuário
+ * (light / standard / aggressive) e com a quantidade de números "populares"
+ * (datas 1-31 em Mega/Quina e múltiplos de 5 em loterias de universo grande).
+ *
+ * Use como: finalScore *= computeAntiPopularityPenalty(game, lotteryId)
+ */
+export function computeAntiPopularityPenalty(game: number[], lotteryId: string): number {
+  const antiPop = getAntiPopularityProfile();
+  let mult = 1;
+  for (const n of game) {
+    if ((lotteryId === "megasena" || lotteryId === "quina") && n <= 31) {
+      mult *= antiPop.datesMultiplier;
+    }
+    if ((lotteryId === "megasena" || lotteryId === "quina" || lotteryId === "lotomania") && n % 5 === 0) {
+      mult *= antiPop.multiplesOfFiveMultiplier;
+    }
+  }
+  // Limita penalidade total para não zerar jogos legítimos
+  return Math.max(0.35, mult);
+}
+
+/**
  * Verifica se um jogo respeita o perfil vencedor da modalidade.
  * Retorna score 0-100 indicando aderência ao perfil.
  */

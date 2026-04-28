@@ -3,6 +3,7 @@ import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { evaluateBetQuality, BetQualityReport } from "./bet-quality";
 import { generateByStrategy, Strategy } from "./strategies";
 import { analyzeFrameCenter, analyzeRowDistribution } from "./generation-filters";
+import { computeAntiPopularityPenalty } from "@/ai/knowledge/jackpotMasterStrategies";
 
 // ═══════════════════════════════════════════════════════
 // GERADOR EXTREMO — Pipeline de 8 Etapas
@@ -387,7 +388,7 @@ function scoreBet(
     histScore = Math.min(15, (avgHits - expectedHits) * 5);
   }
 
-  return Math.max(0, Math.min(100,
+  const rawScore = Math.max(0, Math.min(100,
     avgFreq * 0.4 +
     avgTrend * 5 +
     avgCycle * 8 +
@@ -400,6 +401,8 @@ function scoreBet(
     histScore +
     25 // base
   ));
+  // Anti-popularidade dinâmica controlada pelo usuário
+  return rawScore * computeAntiPopularityPenalty(bet, config.id);
 }
 
 // ═══════════════════════════════════════════════════════
