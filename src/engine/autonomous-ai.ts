@@ -468,6 +468,10 @@ function computeRankings(
       50 * 0.05
     );
 
+    // Aplica anti-popularidade individual (datas/múltiplos de 5 conforme nível)
+    const antiPopMult = computeAntiPopularityPenalty([s.number], config.id);
+    const compositeScore = Math.round(rawComposite * antiPopMult);
+
     const classification = compositeScore >= 65 ? "forte" : compositeScore >= 40 ? "moderado" : "fraco";
     const trend = s.momentum > 0.5 ? "subindo" : s.momentum < -0.5 ? "descendo" : "estável";
 
