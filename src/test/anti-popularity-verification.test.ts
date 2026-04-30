@@ -29,6 +29,7 @@ import {
   setAntiPopularityLevel,
   getAntiPopularityLevel,
   computeAntiPopularityPenalty,
+  applyJackpotMasterBoost,
   AntiPopularityLevel,
   ANTI_POPULARITY_PROFILES,
 } from "@/ai/knowledge/jackpotMasterStrategies";
