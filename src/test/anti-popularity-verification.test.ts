@@ -1,22 +1,30 @@
 /**
  * Verificação automática: confirma que o nível de anti-popularidade
- * (leve / padrão / agressivo) afeta os scores finais e a ORDENAÇÃO
- * gerada pelos quatro motores: Universal, Profissional, Extremo e IA Autônoma.
+ * (leve / padrão / agressivo) afeta NÃO APENAS os scores finais e a
+ * ordenação dos jogos, mas também os PESOS e PENALIDADES INDIVIDUAIS
+ * por número, nos quatro motores: Universal, Profissional, Extremo e
+ * IA Autônoma.
  *
- * Cobertura: TODAS as 8 modalidades suportadas pelo motor master
- * (Mega-Sena, Lotofácil, Quina, Lotomania, Dupla Sena, Timemania,
- *  Dia de Sorte e Super Sete).
+ * Cobertura: TODAS as 8 modalidades suportadas pelo motor master.
  *
  * Para cada combinação modalidade × gerador × nível este teste:
  *   1. Roda a geração e captura scores finais ordenados.
  *   2. Captura a sequência de assinaturas dos jogos (ordenação).
  *   3. Mede a penalidade média anti-popularidade aplicada.
- *   4. Verifica que ao menos UM dos vetores (scores OU ordenação) muda
- *      entre níveis — comprovando que o seletor afeta o ranking final.
+ *   4. Captura PER-NUMBER:
+ *        • penaltyVector  — penalidade individual de cada número (1..N)
+ *        • boostedWeights — peso após applyJackpotMasterBoost partindo
+ *          de um mapa uniforme (isola o efeito do nível)
+ *        • generatorWeights — pesos/scores por número observados na
+ *          saída do gerador (frequência ponderada nos jogos retornados
+ *          ou compositeScore individual no caso da IA Autônoma).
+ *   5. Verifica que ao menos um vetor (scores OU ordenação OU pesos
+ *      por número OU penalidades por número) muda entre níveis nas
+ *      modalidades onde o perfil prevê alteração.
  *
  * NOTA: o gerador Universal é executado apenas em Mega-Sena e Lotofácil
  * porque o pipeline completo leva ~25s por modalidade; os outros 3
- * geradores (Profissional, Extremo, IA Autônoma) cobrem todas as 8.
+ * geradores cobrem todas as 8.
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
