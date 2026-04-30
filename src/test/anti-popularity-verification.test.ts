@@ -125,7 +125,7 @@ describe("Anti-Popularidade — Verificação Automática nos 4 Geradores", () =
           lotteryId: "megasena",
           count: 8,
           riskProfile: "balanced",
-          filters: {},
+          filters: { avoidSequences: false, balanceParity: false, balanceHighLow: false, prioritizeHot: false, prioritizeCold: false, frameCenter: false, limitRepetition: false },
           stats,
           draws,
         });
@@ -193,7 +193,7 @@ describe("Anti-Popularidade — Verificação Automática nos 4 Geradores", () =
           lotteryId: "lotofacil",
           count: 6,
           riskProfile: "balanced",
-          filters: {},
+          filters: { avoidSequences: false, balanceParity: false, balanceHighLow: false, prioritizeHot: false, prioritizeCold: false, frameCenter: false, limitRepetition: false },
           stats,
           draws,
         });
