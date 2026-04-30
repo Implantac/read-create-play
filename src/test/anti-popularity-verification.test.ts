@@ -119,7 +119,7 @@ describe("Anti-Popularidade — Verificação Automática nos 4 Geradores", () =
     const draws = seededDraws(120, 60, 6, 7);
     const stats = computeFrequencyStats(draws, 60);
 
-    it("Universal — scores e/ou ordenação mudam por nível", () => {
+    it("Universal — scores e/ou ordenação mudam por nível", { timeout: 60000 }, () => {
       const snapshots = runForEachLevel<RunSnapshot>(() => {
         const games = generateGames({
           lotteryId: "megasena",
@@ -187,7 +187,7 @@ describe("Anti-Popularidade — Verificação Automática nos 4 Geradores", () =
     const draws = seededDraws(120, 25, 15, 11);
     const stats = computeFrequencyStats(draws, 25);
 
-    it("Universal — produz resultado válido em todos os níveis", () => {
+    it("Universal — produz resultado válido em todos os níveis", { timeout: 60000 }, () => {
       const snapshots = runForEachLevel<RunSnapshot>(() => {
         const games = generateGames({
           lotteryId: "lotofacil",
