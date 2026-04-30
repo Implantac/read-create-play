@@ -218,7 +218,7 @@ describe("Anti-Popularidade — Verificação Automática nos 4 Geradores × 8 M
       const stats = computeFrequencyStats(draws, fx.config.numbers);
 
       if (fx.runUniversal) {
-        it("Universal — scores e/ou ordenação mudam por nível", { timeout: 90000 }, () => {
+        it("Universal — scores, ordenação, pesos e penalidades por número", { timeout: 90000 }, () => {
           const snapshots = runForEachLevel<RunSnapshot>(() => {
             const games = generateGames({
               lotteryId: fx.config.id,
@@ -235,49 +235,78 @@ describe("Anti-Popularidade — Verificação Automática nos 4 Geradores × 8 M
               scores: games.map(g => g.totalScore),
               ordering: nums.map(gameKey),
               avgPen: avgPenalty(nums, fx.config.id),
+              penaltyVector: perNumberPenaltyVector(fx.config.numbers, fx.config.id),
+              boostedWeights: perNumberBoostedWeights(fx.config.numbers, stats, draws, fx.config.id),
+              generatorWeights: generatorPerNumberWeights(
+                games.map(g => ({ numbers: g.numbers, score: g.totalScore })),
+                fx.config.numbers,
+              ),
             };
           });
           compareSnapshots(snapshots, `Universal/${fx.config.id}`);
         });
       }
 
-      it("Profissional — scores e/ou ordenação mudam por nível", { timeout: 30000 }, () => {
+      it("Profissional — scores, ordenação, pesos e penalidades por número", { timeout: 30000 }, () => {
         const snapshots = runForEachLevel<RunSnapshot>(() => {
           const bets = generateProfessionalBets(stats, fx.config, draws, 2);
           const nums = bets.map(b => b.numbers);
+          const scores = bets.map(b => (b as any).combinedScore ?? (b as any).score ?? 0);
           return {
-            scores: bets.map(b => (b as any).combinedScore ?? (b as any).score ?? 0),
+            scores,
             ordering: nums.map(gameKey),
             avgPen: avgPenalty(nums, fx.config.id),
+            penaltyVector: perNumberPenaltyVector(fx.config.numbers, fx.config.id),
+            boostedWeights: perNumberBoostedWeights(fx.config.numbers, stats, draws, fx.config.id),
+            generatorWeights: generatorPerNumberWeights(
+              bets.map((b, i) => ({ numbers: b.numbers, score: scores[i] || 1 })),
+              fx.config.numbers,
+            ),
           };
         });
         compareSnapshots(snapshots, `Profissional/${fx.config.id}`);
       });
 
-      it("Extremo — scores e/ou ordenação mudam por nível", { timeout: 30000 }, () => {
+      it("Extremo — scores, ordenação, pesos e penalidades por número", { timeout: 30000 }, () => {
         const snapshots = runForEachLevel<RunSnapshot>(() => {
           const ecfg = getDefaultExtremeConfig(fx.config, draws);
           ecfg.totalCandidates = Math.min(ecfg.totalCandidates, 2000);
           ecfg.topN = 10;
           const result = runExtremePipeline(stats, fx.config, draws, ecfg);
           const nums = result.bets.map(b => b.numbers);
+          const scores = result.bets.map(b => (b as any).score ?? (b as any).totalScore ?? 0);
           return {
-            scores: result.bets.map(b => (b as any).score ?? (b as any).totalScore ?? 0),
+            scores,
             ordering: nums.map(gameKey),
             avgPen: avgPenalty(nums, fx.config.id),
+            penaltyVector: perNumberPenaltyVector(fx.config.numbers, fx.config.id),
+            boostedWeights: perNumberBoostedWeights(fx.config.numbers, stats, draws, fx.config.id),
+            generatorWeights: generatorPerNumberWeights(
+              result.bets.map((b, i) => ({ numbers: b.numbers, score: scores[i] || 1 })),
+              fx.config.numbers,
+            ),
           };
         });
         compareSnapshots(snapshots, `Extremo/${fx.config.id}`);
       });
 
-      it("IA Autônoma — scores do ranking e/ou ordenação mudam por nível", { timeout: 30000 }, () => {
+      it("IA Autônoma — compositeScore por número, pesos e penalidades", { timeout: 30000 }, () => {
         const snapshots = runForEachLevel<RunSnapshot>(() => {
           const report = runAutonomousAnalysis(draws, stats, fx.config);
           const top = report.rankings.slice(0, Math.min(20, fx.config.numbers));
+          // Para a IA Autônoma os "generatorWeights" são o compositeScore
+          // alocado a cada número diretamente — vetor 1..N preenchido pelo ranking.
+          const genW = new Array<number>(fx.config.numbers).fill(0);
+          for (const r of report.rankings) {
+            if (r.number >= 1 && r.number <= fx.config.numbers) genW[r.number - 1] = r.compositeScore;
+          }
           return {
             scores: top.map(r => r.compositeScore),
             ordering: top.map(r => `${r.number}`),
             avgPen: avgPenalty([top.map(r => r.number)], fx.config.id),
+            penaltyVector: perNumberPenaltyVector(fx.config.numbers, fx.config.id),
+            boostedWeights: perNumberBoostedWeights(fx.config.numbers, stats, draws, fx.config.id),
+            generatorWeights: genW,
           };
         });
         compareSnapshots(snapshots, `IAAutonoma/${fx.config.id}`);
