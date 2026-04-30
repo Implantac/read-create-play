@@ -93,38 +93,95 @@ const gameKey = (g: number[]) => [...g].sort((a, b) => a - b).join("-");
 const avgPenalty = (games: number[][], lotteryId: string) =>
   games.length === 0 ? 1 : games.reduce((s, g) => s + computeAntiPopularityPenalty(g, lotteryId), 0) / games.length;
 
+/** Vetor de penalidade individual: penalidade aplicada ao número n sozinho. */
+function perNumberPenaltyVector(totalNumbers: number, lotteryId: string): number[] {
+  const out: number[] = [];
+  for (let n = 1; n <= totalNumbers; n++) out.push(computeAntiPopularityPenalty([n], lotteryId));
+  return out;
+}
+
+/** Vetor de pesos boosted partindo de mapa uniforme — isola o efeito do nível. */
+function perNumberBoostedWeights(
+  totalNumbers: number,
+  stats: NumberStats[],
+  draws: DrawResult[],
+  lotteryId: string,
+): number[] {
+  const uniform = new Map<number, number>();
+  for (let n = 1; n <= totalNumbers; n++) uniform.set(n, 1);
+  const boosted = applyJackpotMasterBoost(uniform, stats, draws, lotteryId);
+  const out: number[] = [];
+  for (let n = 1; n <= totalNumbers; n++) out.push(boosted.get(n) ?? 1);
+  return out;
+}
+
+/** Frequência ponderada (por score) com que cada número aparece nas apostas geradas. */
+function generatorPerNumberWeights(
+  bets: { numbers: number[]; score: number }[],
+  totalNumbers: number,
+): number[] {
+  const out = new Array<number>(totalNumbers).fill(0);
+  for (const b of bets) {
+    for (const n of b.numbers) {
+      if (n >= 1 && n <= totalNumbers) out[n - 1] += b.score;
+    }
+  }
+  return out;
+}
+
 interface RunSnapshot {
   scores: number[];
   ordering: string[];
   avgPen: number;
+  /** Penalidade individual por número (depende somente do nível e da modalidade). */
+  penaltyVector: number[];
+  /** Pesos por número após boost master partindo de uniforme. */
+  boostedWeights: number[];
+  /** Distribuição de pesos/scores por número observada nos resultados do gerador. */
+  generatorWeights: number[];
 }
+
+const vecKey = (v: number[]) => v.map(x => x.toFixed(4)).join("|");
 
 function compareSnapshots(snapshots: Record<AntiPopularityLevel, RunSnapshot>, label: string) {
   const profiles = LEVELS.map(l => ANTI_POPULARITY_PROFILES[l]);
   expect(profiles[0].datesMultiplier).toBeGreaterThan(profiles[2].datesMultiplier);
 
-  const sigScores = LEVELS.map(l => snapshots[l].scores.map(s => s.toFixed(4)).join("|"));
+  const sigScores = LEVELS.map(l => vecKey(snapshots[l].scores));
   const sigOrder = LEVELS.map(l => snapshots[l].ordering.join(","));
+  const sigPenalty = LEVELS.map(l => vecKey(snapshots[l].penaltyVector));
+  const sigBoosted = LEVELS.map(l => vecKey(snapshots[l].boostedWeights));
+  const sigGenWeights = LEVELS.map(l => vecKey(snapshots[l].generatorWeights));
+
   const allScoresEqual = sigScores[0] === sigScores[1] && sigScores[1] === sigScores[2];
   const allOrderEqual = sigOrder[0] === sigOrder[1] && sigOrder[1] === sigOrder[2];
+  const allPenaltyEqual = sigPenalty[0] === sigPenalty[1] && sigPenalty[1] === sigPenalty[2];
+  const allBoostedEqual = sigBoosted[0] === sigBoosted[1] && sigBoosted[1] === sigBoosted[2];
+  const allGenWeightsEqual =
+    sigGenWeights[0] === sigGenWeights[1] && sigGenWeights[1] === sigGenWeights[2];
 
-  // Modalidades onde o ranking INDIVIDUAL da IA Autônoma não recebe penalidade
-  // anti-popularidade (a função opera por jogo completo, e modalidades de
-  // universo pequeno/médio sem componente de "datas" relevante não disparam o
-  // multiplicador). Nessas, exigimos apenas que a geração rode em todos os níveis.
+  // Modalidades cujo perfil de penalidade NÃO depende do nível (sem datas/múltiplos
+  // de 5 sensíveis): Lotofácil, Dupla Sena, Timemania, Dia de Sorte, Super Sete.
+  // Nestas, penaltyVector e boostedWeights são naturalmente iguais entre níveis;
+  // exigimos apenas que a geração produza saída válida.
+  const lotteryId = label.split("/")[1];
+  const hasLevelSensitivePenalty =
+    lotteryId === "megasena" || lotteryId === "quina" || lotteryId === "lotomania";
+
   const pens = LEVELS.map(l => snapshots[l].avgPen);
-  const allPenaltyNeutral = pens.every(p => Math.abs(p - 1) < 1e-6);
-  const isWideCoverage =
-    label.includes("lotomania") ||
-    label.includes("supersete") ||
-    label.includes("lotofacil") ||
-    // IA Autônoma em modalidades sem sinal de penalidade no ranking individual
-    (label.startsWith("IAAutonoma/") && allPenaltyNeutral);
 
-  if (!isWideCoverage) {
+  if (hasLevelSensitivePenalty) {
     expect(
-      !allScoresEqual || !allOrderEqual,
-      `[${label}] Scores e ordenação idênticos em todos os níveis — anti-popularidade não está afetando o resultado.`
+      !allPenaltyEqual,
+      `[${label}] penaltyVector idêntico em todos os níveis — penalidade por número não responde ao seletor.`
+    ).toBe(true);
+    expect(
+      !allBoostedEqual,
+      `[${label}] boostedWeights idênticos em todos os níveis — boost master não propaga o nível para os pesos por número.`
+    ).toBe(true);
+    expect(
+      !allScoresEqual || !allOrderEqual || !allGenWeightsEqual,
+      `[${label}] Saída do gerador (scores/ordering/genWeights) idêntica em todos os níveis.`
     ).toBe(true);
   } else {
     LEVELS.forEach(l => expect(snapshots[l].ordering.length).toBeGreaterThan(0));
@@ -132,7 +189,8 @@ function compareSnapshots(snapshots: Record<AntiPopularityLevel, RunSnapshot>, l
 
   console.log(
     `[${label}] avgPen leve=${pens[0].toFixed(3)} pad=${pens[1].toFixed(3)} agg=${pens[2].toFixed(3)} | ` +
-    `scoresChanged=${!allScoresEqual} orderingChanged=${!allOrderEqual}`
+    `scoresΔ=${!allScoresEqual} orderΔ=${!allOrderEqual} penVecΔ=${!allPenaltyEqual} ` +
+    `boostedWΔ=${!allBoostedEqual} genWΔ=${!allGenWeightsEqual}`
   );
 }
 
@@ -145,6 +203,8 @@ function runForEachLevel<T>(fn: () => T): Record<AntiPopularityLevel, T> {
   }
   return out;
 }
+
+import type { NumberStats } from "@/engine/statistics";
 
 // ─────────────────────────────────────────────────────────────────
 // Suíte parametrizada
