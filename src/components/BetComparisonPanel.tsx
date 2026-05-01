@@ -59,25 +59,27 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
   const highlights = useMemo(() => {
     if (bets.length === 0) return null;
 
-    const getConsistency = (bet: BetPerformance) => {
-      if (bet.results.length === 0) return 0;
-      const mean = bet.avgHits;
-      const variance = bet.results.reduce((acc, r) => acc + Math.pow((r.bestHits ?? r.hits) - mean, 2), 0) / bet.results.length;
-      return 1 / (1 + Math.sqrt(variance)); // Quanto maior, mais consistente (menor desvio)
-    };
+    const metrics = bets.map(b => {
+      // Cálculo de consistência: Frequência de acertos acima de 40% do total de números
+      const threshold = pick * 0.4;
+      const consistency = b.results.length > 0 
+        ? b.results.filter(r => (r.bestHits ?? r.hits) >= threshold).length / b.results.length 
+        : 0;
 
-    const metrics = bets.map(b => ({
-      avgHits: b.avgHits,
-      bestHit: b.bestHit,
-      prizeHits: b.prizeHits,
-      totalPrize: b.totalPrizeValue,
-      consistency: getConsistency(b),
-      score: b.score
-    }));
+      return {
+        avgHits: b.avgHits,
+        bestHit: b.bestHit,
+        prizeHits: b.prizeHits,
+        totalPrize: b.totalPrizeValue,
+        consistency: consistency,
+        score: b.score
+      };
+    });
 
-    // Função para encontrar todos os índices que empatam no máximo
     const findMaxIndices = (field: keyof typeof metrics[0]) => {
-      const maxVal = Math.max(...metrics.map(m => m[field] as number));
+      const vals = metrics.map(m => m[field]);
+      const maxVal = Math.max(...vals);
+      if (maxVal === 0 && field === 'prizeHits') return []; // Não destacar se ninguém ganhou nada
       return metrics.reduce((acc, curr, idx) => (curr[field] === maxVal ? [...acc, idx] : acc), [] as number[]);
     };
 
@@ -88,8 +90,9 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
       totalPrize: findMaxIndices("totalPrize"),
       consistency: findMaxIndices("consistency"),
       score: findMaxIndices("score"),
+      metrics: metrics // Exportar métricas calculadas
     };
-  }, [bets]);
+  }, [bets, pick]);
 
   return (
     <motion.div 
