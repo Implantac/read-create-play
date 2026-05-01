@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
   Info, Zap, AlertTriangle, ShieldCheck, TrendingUp, 
-  BarChart, Activity, Save, FolderOpen, History, Trash2, Loader2, X 
+  BarChart, Activity, Save, FolderOpen, History, Trash2, Loader2, X,
+  ArrowLeftRight, Check, Square
 } from "lucide-react";
 import { 
   Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, 
@@ -51,8 +52,64 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
   const [scenarioName, setScenarioName] = useState("");
   const [loading, setLoading] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
 
-  // Load scenarios
+  // Simulate weights based on inputs
+  const simulatedWeights = useMemo(() => {
+    const baseWeights = selfCalibrateWeights(draws, lotteryId);
+    const syntheticContext: ContextSnapshot = {
+      recentSumTrend: "stable",
+      recentParityShift: 0,
+      recentGapAcceleration: 0,
+      volatilityIndex: volatility,
+      regimeStability: regimeStability,
+    };
+    const adjusted = applyContextAdjustments(baseWeights, syntheticContext, riskProfile);
+    return [
+      { name: "Soma", value: adjusted.sumWeight, color: "#3b82f6" },
+      { name: "Paridade", value: adjusted.parityWeight, color: "#8b5cf6" },
+      { name: "Dispersão", value: adjusted.dispersalWeight, color: "#ec4899" },
+      { name: "Frequência", value: adjusted.frequencyWeight, color: "#f59e0b" },
+      { name: "Atraso", value: adjusted.gapWeight, color: "#10b981" },
+      { name: "Tendência", value: adjusted.trendWeight, color: "#ef4444" },
+      { name: "Repetição", value: adjusted.repeatWeight, color: "#06b6d4" },
+      { name: "Cluster", value: adjusted.clusterWeight, color: "#6366f1" },
+    ];
+  }, [lotteryId, draws, riskProfile, volatility, regimeStability]);
+
+  // Add current state as a "virtual" scenario for comparison
+  const currentScenario: SimulationScenario = useMemo(() => ({
+    id: "current",
+    name: "Atual (Simulado)",
+    risk_profile: riskProfile,
+    volatility: volatility,
+    regime_stability: regimeStability,
+    weights: simulatedWeights,
+    created_at: new Date().toISOString()
+  }), [riskProfile, volatility, regimeStability, simulatedWeights]);
+
+  const toggleComparison = (id: string) => {
+    setSelectedForComparison(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const comparisonResult = useMemo(() => {
+    const list = [currentScenario, ...scenarios].filter(s => selectedForComparison.includes(s.id));
+    if (list.length < 2) return null;
+
+    const metrics = simulatedWeights.map(m => {
+      const data: any = { name: m.name };
+      list.forEach(s => {
+        const weightEntry = s.weights.find((w: any) => w.name === m.name);
+        data[s.name] = weightEntry ? weightEntry.value : 0;
+      });
+      return data;
+    });
+
+    return { scenarios: list, metrics };
+  }, [selectedForComparison, scenarios, currentScenario, simulatedWeights]);
+
   const fetchScenarios = async () => {
     if (!user) return;
     try {
@@ -135,36 +192,6 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
       date: format(new Date(s.created_at), "dd/MM", { locale: ptBR })
     }));
   }, [scenarios]);
-
-  // Simulate weights based on inputs
-  const simulatedWeights = useMemo(() => {
-    // 1. Get base adaptive weights (from real history or defaults)
-    const baseWeights = selfCalibrateWeights(draws, lotteryId);
-    
-    // 2. Create a synthetic context snapshot based on sliders
-    const syntheticContext: ContextSnapshot = {
-      recentSumTrend: "stable",
-      recentParityShift: 0,
-      recentGapAcceleration: 0,
-      volatilityIndex: volatility,
-      regimeStability: regimeStability,
-    };
-
-    // 3. Apply adjustments
-    const adjusted = applyContextAdjustments(baseWeights, syntheticContext, riskProfile);
-    
-    // Convert to chart data
-    return [
-      { name: "Soma", value: adjusted.sumWeight, color: "#3b82f6" },
-      { name: "Paridade", value: adjusted.parityWeight, color: "#8b5cf6" },
-      { name: "Dispersão", value: adjusted.dispersalWeight, color: "#ec4899" },
-      { name: "Frequência", value: adjusted.frequencyWeight, color: "#f59e0b" },
-      { name: "Atraso", value: adjusted.gapWeight, color: "#10b981" },
-      { name: "Tendência", value: adjusted.trendWeight, color: "#ef4444" },
-      { name: "Repetição", value: adjusted.repeatWeight, color: "#06b6d4" },
-      { name: "Cluster", value: adjusted.clusterWeight, color: "#6366f1" },
-    ];
-  }, [lotteryId, draws, riskProfile, volatility, regimeStability]);
 
   const riskLabels: Record<RiskProfile, string> = {
     conservative: "Conservador",
@@ -285,35 +312,133 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               </Button>
             </div>
-            <Button 
-              variant="outline" 
-              className="w-full h-8 text-[10px] gap-2 border-primary/20" 
-              onClick={() => setShowHistory(!showHistory)}
-            >
-              <History className="w-3.5 h-3.5" />
-              {showHistory ? "Fechar Histórico" : "Ver Cenários Salvos"}
-            </Button>
+            <div className="flex flex-col gap-2">
+              <Button 
+                size="sm" 
+                variant={selectedForComparison.includes("current") ? "default" : "outline"}
+                className="h-8 text-[10px] gap-2 border-primary/20"
+                onClick={() => toggleComparison("current")}
+              >
+                {selectedForComparison.includes("current") ? <Check className="w-3 h-3" /> : <Square className="w-3 h-3" />}
+                Comparar Atual
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full h-8 text-[10px] gap-2 border-primary/20" 
+                onClick={() => setShowHistory(!showHistory)}
+              >
+                <History className="w-3.5 h-3.5" />
+                {showHistory ? "Fechar Histórico" : "Ver Cenários Salvos"}
+              </Button>
+            </div>
           </div>
         </div>
 
-        {/* History/Comparison Section */}
+        {/* Comparison Dashboard */}
+        {comparisonResult && (
+          <div className="p-5 rounded-2xl bg-primary/5 border border-primary/20 space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ArrowLeftRight className="w-4 h-4 text-primary" />
+                <h4 className="text-sm font-black text-foreground">Dashboard Comparativo de Cenários</h4>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => setSelectedForComparison([])} className="h-7 text-[10px] text-muted-foreground">
+                <X className="w-3 h-3 mr-1" /> Limpar Comparação
+              </Button>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Diferença de Pesos por Métrica</p>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ReBarChart data={comparisonResult.metrics}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                      <XAxis dataKey="name" tick={{ fontSize: 9 }} />
+                      <YAxis tick={{ fontSize: 9 }} />
+                      <ReTooltip contentStyle={{ fontSize: 10, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
+                      <Legend iconSize={8} wrapperStyle={{ fontSize: 10, paddingTop: 10 }} />
+                      {comparisonResult.scenarios.map((s, i) => (
+                        <Bar 
+                          key={s.id} 
+                          dataKey={s.name} 
+                          fill={i === 0 ? "hsl(var(--primary))" : i === 1 ? "hsl(var(--accent))" : i === 2 ? "#ec4899" : "#8b5cf6"} 
+                          radius={[4, 4, 0, 0]} 
+                        />
+                      ))}
+                    </ReBarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Parâmetros de Entrada</p>
+                <div className="overflow-hidden rounded-xl border border-border bg-background">
+                  <table className="w-full text-[10px] text-left">
+                    <thead>
+                      <tr className="bg-muted/50 border-b border-border">
+                        <th className="p-2 font-bold">Cenário</th>
+                        <th className="p-2 font-bold">Perfil</th>
+                        <th className="p-2 font-bold">Volat.</th>
+                        <th className="p-2 font-bold">Estab.</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {comparisonResult.scenarios.map(s => (
+                        <tr key={s.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                          <td className="p-2 font-medium truncate max-w-[100px]">{s.name}</td>
+                          <td className="p-2">{riskLabels[s.risk_profile as RiskProfile]}</td>
+                          <td className="p-2 font-mono text-primary">{(s.volatility * 100).toFixed(0)}%</td>
+                          <td className="p-2 font-mono text-accent">{(s.regime_stability * 100).toFixed(0)}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="bg-primary/10 p-3 rounded-lg border border-primary/10">
+                  <p className="text-[10px] leading-relaxed text-primary italic">
+                    <Info className="w-3 h-3 inline mr-1 mb-0.5" />
+                    <strong>Dica de Análise:</strong> Observe como as métricas de Dispersão e Atraso (Gap) oscilam entre os cenários. Maiores divergências indicam instabilidade no comportamento estatístico da dezenas.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* History Section */}
         {showHistory && (
           <div className="grid md:grid-cols-2 gap-6 p-4 rounded-xl bg-muted/20 border border-border">
             <div className="space-y-3">
               <h4 className="text-xs font-bold flex items-center gap-2">
                 <FolderOpen className="w-3.5 h-3.5 text-primary" /> Cenários Salvos
               </h4>
-              <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 scrollbar-thin">
+              <div className="space-y-2 max-h-[250px] overflow-y-auto pr-2 scrollbar-thin">
                 {scenarios.length === 0 ? (
                   <p className="text-[10px] text-muted-foreground italic">Nenhum cenário salvo ainda.</p>
                 ) : (
                   scenarios.map(s => (
                     <div key={s.id} className="flex items-center justify-between p-2 rounded-lg bg-background border border-border group hover:border-primary/30 transition-colors">
-                      <div className="flex-1 cursor-pointer" onClick={() => loadScenario(s)}>
-                        <p className="text-[11px] font-bold text-foreground">{s.name}</p>
-                        <p className="text-[9px] text-muted-foreground">
-                          {riskLabels[s.risk_profile]} • Vol: {Math.round(s.volatility * 100)}% • Est: {Math.round(s.regime_stability * 100)}%
-                        </p>
+                      <div className="flex items-center gap-2 flex-1 cursor-pointer" onClick={() => loadScenario(s)}>
+                        <div 
+                          className="shrink-0" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleComparison(s.id);
+                          }}
+                        >
+                          {selectedForComparison.includes(s.id) ? (
+                            <Check className="w-4 h-4 text-primary" />
+                          ) : (
+                            <Square className="w-4 h-4 text-muted-foreground/30" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-bold text-foreground">{s.name}</p>
+                          <p className="text-[9px] text-muted-foreground">
+                            {riskLabels[s.risk_profile as RiskProfile]} • Vol: {Math.round(s.volatility * 100)}% • Est: {Math.round(s.regime_stability * 100)}%
+                          </p>
+                        </div>
                       </div>
                       <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => deleteScenario(s.id)}>
                         <Trash2 className="w-3.5 h-3.5 text-destructive" />
@@ -353,7 +478,6 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
 
         {/* Visualizations */}
         <div className="grid lg:grid-cols-2 gap-8 items-center">
-          {/* Radar Chart for Weights Balance */}
           <div className="relative group">
             <div className="absolute inset-0 bg-primary/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="h-64 relative">
@@ -389,7 +513,6 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
             </div>
           </div>
 
-          {/* Bar Chart for Metric Breakdown */}
           <div className="space-y-6">
             <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
@@ -424,7 +547,6 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
               </ResponsiveContainer>
             </div>
 
-            {/* Explanation Box */}
             <div className="bg-muted/30 border border-border/50 rounded-xl p-4">
               <div className="flex gap-3">
                 <div className={`p-2 rounded-lg bg-background border ${volatility > 0.6 ? 'border-orange-500/30' : 'border-primary/20'} shrink-0 h-fit`}>
