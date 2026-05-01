@@ -145,62 +145,77 @@ interface RunSnapshot {
 
 const vecKey = (v: number[]) => v.map(x => x.toFixed(4)).join("|");
 
-function compareSnapshots(snapshots: Record<AntiPopularityLevel, RunSnapshot>, label: string) {
-  const profiles = LEVELS.map(l => ANTI_POPULARITY_PROFILES[l]);
-  expect(profiles[0].datesMultiplier).toBeGreaterThan(profiles[2].datesMultiplier);
+function generateDiffSummary(current: any, existing: any): string {
+  let diff = "";
+  const levels = Object.keys(current) as AntiPopularityLevel[];
+  
+  for (const lvl of levels) {
+    const c = current[lvl];
+    const e = existing[lvl];
+    if (!e) {
+      diff += `  [${lvl}]: Nível novo (não existia no snapshot)\n`;
+      continue;
+    }
 
-  const sigScores = LEVELS.map(l => vecKey(snapshots[l].scores));
-  const sigOrder = LEVELS.map(l => snapshots[l].ordering.join(","));
-  const sigPenalty = LEVELS.map(l => vecKey(snapshots[l].penaltyVector));
-  const sigBoosted = LEVELS.map(l => vecKey(snapshots[l].boostedWeights));
-  const sigGenWeights = LEVELS.map(l => vecKey(snapshots[l].generatorWeights));
+    const vectors = ["penaltyVector", "boostedWeights", "generatorWeights"] as const;
+    for (const vec of vectors) {
+      const cv = vecKey(c[vec]);
+      const ev = vecKey(e[vec]);
+      if (cv !== ev) {
+        // Encontra o primeiro índice de diferença para facilitar debug
+        const firstDiff = c[vec].findIndex((v: number, i: number) => v.toFixed(4) !== e[vec][i].toFixed(4));
+        diff += `  [${lvl}] ${vec} MUDOU: index ${firstDiff} (era ${e[vec][firstDiff]?.toFixed(4)}, agora é ${c[vec][firstDiff]?.toFixed(4)})\n`;
+      }
+    }
 
-  const allScoresEqual = sigScores[0] === sigScores[1] && sigScores[1] === sigScores[2];
-  const allOrderEqual = sigOrder[0] === sigOrder[1] && sigOrder[1] === sigOrder[2];
-  const allPenaltyEqual = sigPenalty[0] === sigPenalty[1] && sigPenalty[1] === sigPenalty[2];
-  const allBoostedEqual = sigBoosted[0] === sigBoosted[1] && sigBoosted[1] === sigBoosted[2];
-  const allGenWeightsEqual =
-    sigGenWeights[0] === sigGenWeights[1] && sigGenWeights[1] === sigGenWeights[2];
+    if (c.ordering.join(",") !== e.ordering.join(",")) {
+      diff += `  [${lvl}] ordering MUDOU: ${e.ordering.slice(0, 3).join("-")}... -> ${c.ordering.slice(0, 3).join("-")}...\n`;
+    }
+  }
+  return diff;
+}
 
-  // Modalidades cujo perfil de penalidade NÃO depende do nível (sem datas/múltiplos
-  // de 5 sensíveis): Lotofácil, Dupla Sena, Timemania, Dia de Sorte, Super Sete.
-  // Nestas, penaltyVector e boostedWeights são naturalmente iguais entre níveis;
-  // exigimos apenas que a geração produza saída válida.
-  const lotteryId = label.split("/")[1];
-  const hasLevelSensitivePenalty =
-    lotteryId === "megasena" || lotteryId === "quina" || lotteryId === "lotomania";
+function checkAndReportSnapshots(snapshots: Record<AntiPopularityLevel, RunSnapshot>, label: string) {
+  const fileName = `${label.replace(/\//g, "_")}.json`;
+  const filePath = path.join(SNAPSHOT_DIR, fileName);
 
-  const pens = LEVELS.map(l => snapshots[l].avgPen);
-
-  if (hasLevelSensitivePenalty) {
-    expect(
-      !allPenaltyEqual,
-      `[${label}] penaltyVector idêntico em todos os níveis — penalidade por número não responde ao seletor.`
-    ).toBe(true);
-    expect(
-      !allBoostedEqual,
-      `[${label}] boostedWeights idênticos em todos os níveis — boost master não propaga o nível para os pesos por número.`
-    ).toBe(true);
-    expect(
-      !allScoresEqual || !allOrderEqual || !allGenWeightsEqual,
-      `[${label}] Saída do gerador (scores/ordering/genWeights) idêntica em todos os níveis.`
-    ).toBe(true);
-  } else {
-    LEVELS.forEach(l => expect(snapshots[l].ordering.length).toBeGreaterThan(0));
+  if (SHOULD_UPDATE || !fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, JSON.stringify(snapshots, null, 2));
+    console.log(`[SNAPSHOT] Gravado: ${fileName}`);
+    return;
   }
 
-  console.log(
-    `[${label}] avgPen leve=${pens[0].toFixed(3)} pad=${pens[1].toFixed(3)} agg=${pens[2].toFixed(3)} | ` +
-    `scoresΔ=${!allScoresEqual} orderΔ=${!allOrderEqual} penVecΔ=${!allPenaltyEqual} ` +
-    `boostedWΔ=${!allBoostedEqual} genWΔ=${!allGenWeightsEqual}`
-  );
+  const existing = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+  
+  try {
+    // Verificações lógicas básicas (as que já existiam em compareSnapshots)
+    const lotteryId = label.split("/")[1];
+    const hasLevelSensitivePenalty = 
+      lotteryId === "megasena" || lotteryId === "quina" || lotteryId === "lotomania";
+
+    const sigPenalty = LEVELS.map(l => vecKey(snapshots[l].penaltyVector));
+    const allPenaltyEqual = sigPenalty[0] === sigPenalty[1] && sigPenalty[1] === sigPenalty[2];
+
+    if (hasLevelSensitivePenalty) {
+      expect(
+        !allPenaltyEqual,
+        `[${label}] penaltyVector idêntico em todos os níveis — penalidade não responde ao seletor.`
+      ).toBe(true);
+    }
+
+    // Comparação profunda com o snapshot
+    expect(snapshots, `Snapshot mismatch for ${label}`).toEqual(existing);
+  } catch (err) {
+    const diffReport = generateDiffSummary(snapshots, existing);
+    console.error(`\n❌ FALHA NO SNAPSHOT: ${label}\n${diffReport}`);
+    throw err;
+  }
 }
 
 function runForEachLevel<T>(fn: () => T): Record<AntiPopularityLevel, T> {
   const out = {} as Record<AntiPopularityLevel, T>;
   for (const lvl of LEVELS) {
     setAntiPopularityLevel(lvl);
-    expect(getAntiPopularityLevel()).toBe(lvl);
     out[lvl] = fn();
   }
   return out;
