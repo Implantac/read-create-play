@@ -299,7 +299,8 @@ function checkAndReportSnapshots(snapshots: Record<AntiPopularityLevel, RunSnaps
     fs.writeFileSync(reportPath, htmlReport);
 
     console.error(`\n❌ FALHA NO SNAPSHOT: ${label}\n${diffReport}`);
-    console.error(`👉 Relatório visual gerado em: ${reportPath}\n`);
+    console.error(`👉 Relatório visual gerado em: ${reportPath}`);
+    console.error(`🔗 Link: file://${reportPath}\n`);
     throw err;
   }
 }
