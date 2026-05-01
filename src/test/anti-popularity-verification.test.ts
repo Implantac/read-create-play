@@ -227,7 +227,13 @@ import type { NumberStats } from "@/engine/statistics";
 // Suíte parametrizada
 // ─────────────────────────────────────────────────────────────────
 describe("Anti-Popularidade — Verificação Automática nos 4 Geradores × 8 Modalidades", () => {
-  beforeEach(() => setAntiPopularityLevel("standard"));
+  beforeEach(() => {
+    setAntiPopularityLevel("standard");
+  });
+
+  afterEach(() => {
+    restoreRandom();
+  });
 
   for (const fx of FIXTURES) {
     describe(`${fx.config.name} (${fx.config.id})`, () => {
@@ -236,6 +242,7 @@ describe("Anti-Popularidade — Verificação Automática nos 4 Geradores × 8 M
 
       if (fx.runUniversal) {
         it("Universal — scores, ordenação, pesos e penalidades por número", { timeout: 90000 }, () => {
+          setupDeterministicRandom(fx.seed);
           const snapshots = runForEachLevel<RunSnapshot>(() => {
             const games = generateGames({
               lotteryId: fx.config.id,
@@ -260,11 +267,12 @@ describe("Anti-Popularidade — Verificação Automática nos 4 Geradores × 8 M
               ),
             };
           });
-          compareSnapshots(snapshots, `Universal/${fx.config.id}`);
+          checkAndReportSnapshots(snapshots, `Universal/${fx.config.id}`);
         });
       }
 
       it("Profissional — scores, ordenação, pesos e penalidades por número", { timeout: 30000 }, () => {
+        setupDeterministicRandom(fx.seed);
         const snapshots = runForEachLevel<RunSnapshot>(() => {
           const bets = generateProfessionalBets(stats, fx.config, draws, 2);
           const nums = bets.map(b => b.numbers);
@@ -281,10 +289,11 @@ describe("Anti-Popularidade — Verificação Automática nos 4 Geradores × 8 M
             ),
           };
         });
-        compareSnapshots(snapshots, `Profissional/${fx.config.id}`);
+        checkAndReportSnapshots(snapshots, `Profissional/${fx.config.id}`);
       });
 
       it("Extremo — scores, ordenação, pesos e penalidades por número", { timeout: 30000 }, () => {
+        setupDeterministicRandom(fx.seed);
         const snapshots = runForEachLevel<RunSnapshot>(() => {
           const ecfg = getDefaultExtremeConfig(fx.config, draws);
           ecfg.totalCandidates = Math.min(ecfg.totalCandidates, 2000);
@@ -304,15 +313,14 @@ describe("Anti-Popularidade — Verificação Automática nos 4 Geradores × 8 M
             ),
           };
         });
-        compareSnapshots(snapshots, `Extremo/${fx.config.id}`);
+        checkAndReportSnapshots(snapshots, `Extremo/${fx.config.id}`);
       });
 
       it("IA Autônoma — compositeScore por número, pesos e penalidades", { timeout: 30000 }, () => {
+        setupDeterministicRandom(fx.seed);
         const snapshots = runForEachLevel<RunSnapshot>(() => {
           const report = runAutonomousAnalysis(draws, stats, fx.config);
           const top = report.rankings.slice(0, Math.min(20, fx.config.numbers));
-          // Para a IA Autônoma os "generatorWeights" são o compositeScore
-          // alocado a cada número diretamente — vetor 1..N preenchido pelo ranking.
           const genW = new Array<number>(fx.config.numbers).fill(0);
           for (const r of report.rankings) {
             if (r.number >= 1 && r.number <= fx.config.numbers) genW[r.number - 1] = r.compositeScore;
@@ -326,7 +334,7 @@ describe("Anti-Popularidade — Verificação Automática nos 4 Geradores × 8 M
             generatorWeights: genW,
           };
         });
-        compareSnapshots(snapshots, `IAAutonoma/${fx.config.id}`);
+        checkAndReportSnapshots(snapshots, `IAAutonoma/${fx.config.id}`);
       });
     });
   }
