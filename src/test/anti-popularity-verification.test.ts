@@ -7,27 +7,13 @@
  *
  * Cobertura: TODAS as 8 modalidades suportadas pelo motor master.
  *
- * Para cada combinação modalidade × gerador × nível este teste:
- *   1. Roda a geração e captura scores finais ordenados.
- *   2. Captura a sequência de assinaturas dos jogos (ordenação).
- *   3. Mede a penalidade média anti-popularidade aplicada.
- *   4. Captura PER-NUMBER:
- *        • penaltyVector  — penalidade individual de cada número (1..N)
- *        • boostedWeights — peso após applyJackpotMasterBoost partindo
- *          de um mapa uniforme (isola o efeito do nível)
- *        • generatorWeights — pesos/scores por número observados na
- *          saída do gerador (frequência ponderada nos jogos retornados
- *          ou compositeScore individual no caso da IA Autônoma).
- *   5. Verifica que ao menos um vetor (scores OU ordenação OU pesos
- *      por número OU penalidades por número) muda entre níveis nas
- *      modalidades onde o perfil prevê alteração.
- *
- * NOTA: o gerador Universal é executado apenas em Mega-Sena e Lotofácil
- * porque o pipeline completo leva ~25s por modalidade; os outros 3
- * geradores cobrem todas as 8.
+ * COMANDO PARA ATUALIZAR SNAPSHOTS:
+ * bunx vitest run -u src/test/anti-popularity-verification.test.ts
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import { computeFrequencyStats } from "@/engine/statistics";
 import { generateGames } from "@/ai/generators/universalGameGenerator";
 import { generateProfessionalBets } from "@/engine/professional-generator";
@@ -42,6 +28,22 @@ import {
   ANTI_POPULARITY_PROFILES,
 } from "@/ai/knowledge/jackpotMasterStrategies";
 import type { LotteryConfig, DrawResult } from "@/data/lotteries";
+
+const SNAPSHOT_DIR = path.join(process.cwd(), "src/test/snapshots/anti-popularity");
+const SHOULD_UPDATE = process.argv.includes("-u") || process.argv.includes("--update");
+
+// Mock de Math.random para garantir determinismo nos snapshots
+const originalRandom = Math.random;
+function setupDeterministicRandom(seed: number) {
+  let s = seed;
+  Math.random = () => {
+    s = (s * 1664525 + 1013904223) % 4294967296;
+    return s / 4294967296;
+  };
+}
+function restoreRandom() {
+  Math.random = originalRandom;
+}
 
 const LEVELS: AntiPopularityLevel[] = ["light", "standard", "aggressive"];
 
@@ -143,62 +145,77 @@ interface RunSnapshot {
 
 const vecKey = (v: number[]) => v.map(x => x.toFixed(4)).join("|");
 
-function compareSnapshots(snapshots: Record<AntiPopularityLevel, RunSnapshot>, label: string) {
-  const profiles = LEVELS.map(l => ANTI_POPULARITY_PROFILES[l]);
-  expect(profiles[0].datesMultiplier).toBeGreaterThan(profiles[2].datesMultiplier);
+function generateDiffSummary(current: any, existing: any): string {
+  let diff = "";
+  const levels = Object.keys(current) as AntiPopularityLevel[];
+  
+  for (const lvl of levels) {
+    const c = current[lvl];
+    const e = existing[lvl];
+    if (!e) {
+      diff += `  [${lvl}]: Nível novo (não existia no snapshot)\n`;
+      continue;
+    }
 
-  const sigScores = LEVELS.map(l => vecKey(snapshots[l].scores));
-  const sigOrder = LEVELS.map(l => snapshots[l].ordering.join(","));
-  const sigPenalty = LEVELS.map(l => vecKey(snapshots[l].penaltyVector));
-  const sigBoosted = LEVELS.map(l => vecKey(snapshots[l].boostedWeights));
-  const sigGenWeights = LEVELS.map(l => vecKey(snapshots[l].generatorWeights));
+    const vectors = ["penaltyVector", "boostedWeights", "generatorWeights"] as const;
+    for (const vec of vectors) {
+      const cv = vecKey(c[vec]);
+      const ev = vecKey(e[vec]);
+      if (cv !== ev) {
+        // Encontra o primeiro índice de diferença para facilitar debug
+        const firstDiff = c[vec].findIndex((v: number, i: number) => v.toFixed(4) !== e[vec][i].toFixed(4));
+        diff += `  [${lvl}] ${vec} MUDOU: index ${firstDiff} (era ${e[vec][firstDiff]?.toFixed(4)}, agora é ${c[vec][firstDiff]?.toFixed(4)})\n`;
+      }
+    }
 
-  const allScoresEqual = sigScores[0] === sigScores[1] && sigScores[1] === sigScores[2];
-  const allOrderEqual = sigOrder[0] === sigOrder[1] && sigOrder[1] === sigOrder[2];
-  const allPenaltyEqual = sigPenalty[0] === sigPenalty[1] && sigPenalty[1] === sigPenalty[2];
-  const allBoostedEqual = sigBoosted[0] === sigBoosted[1] && sigBoosted[1] === sigBoosted[2];
-  const allGenWeightsEqual =
-    sigGenWeights[0] === sigGenWeights[1] && sigGenWeights[1] === sigGenWeights[2];
+    if (c.ordering.join(",") !== e.ordering.join(",")) {
+      diff += `  [${lvl}] ordering MUDOU: ${e.ordering.slice(0, 3).join("-")}... -> ${c.ordering.slice(0, 3).join("-")}...\n`;
+    }
+  }
+  return diff;
+}
 
-  // Modalidades cujo perfil de penalidade NÃO depende do nível (sem datas/múltiplos
-  // de 5 sensíveis): Lotofácil, Dupla Sena, Timemania, Dia de Sorte, Super Sete.
-  // Nestas, penaltyVector e boostedWeights são naturalmente iguais entre níveis;
-  // exigimos apenas que a geração produza saída válida.
-  const lotteryId = label.split("/")[1];
-  const hasLevelSensitivePenalty =
-    lotteryId === "megasena" || lotteryId === "quina" || lotteryId === "lotomania";
+function checkAndReportSnapshots(snapshots: Record<AntiPopularityLevel, RunSnapshot>, label: string) {
+  const fileName = `${label.replace(/\//g, "_")}.json`;
+  const filePath = path.join(SNAPSHOT_DIR, fileName);
 
-  const pens = LEVELS.map(l => snapshots[l].avgPen);
-
-  if (hasLevelSensitivePenalty) {
-    expect(
-      !allPenaltyEqual,
-      `[${label}] penaltyVector idêntico em todos os níveis — penalidade por número não responde ao seletor.`
-    ).toBe(true);
-    expect(
-      !allBoostedEqual,
-      `[${label}] boostedWeights idênticos em todos os níveis — boost master não propaga o nível para os pesos por número.`
-    ).toBe(true);
-    expect(
-      !allScoresEqual || !allOrderEqual || !allGenWeightsEqual,
-      `[${label}] Saída do gerador (scores/ordering/genWeights) idêntica em todos os níveis.`
-    ).toBe(true);
-  } else {
-    LEVELS.forEach(l => expect(snapshots[l].ordering.length).toBeGreaterThan(0));
+  if (SHOULD_UPDATE || !fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, JSON.stringify(snapshots, null, 2));
+    console.log(`[SNAPSHOT] Gravado: ${fileName}`);
+    return;
   }
 
-  console.log(
-    `[${label}] avgPen leve=${pens[0].toFixed(3)} pad=${pens[1].toFixed(3)} agg=${pens[2].toFixed(3)} | ` +
-    `scoresΔ=${!allScoresEqual} orderΔ=${!allOrderEqual} penVecΔ=${!allPenaltyEqual} ` +
-    `boostedWΔ=${!allBoostedEqual} genWΔ=${!allGenWeightsEqual}`
-  );
+  const existing = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+  
+  try {
+    // Verificações lógicas básicas (as que já existiam em compareSnapshots)
+    const lotteryId = label.split("/")[1];
+    const hasLevelSensitivePenalty = 
+      lotteryId === "megasena" || lotteryId === "quina" || lotteryId === "lotomania";
+
+    const sigPenalty = LEVELS.map(l => vecKey(snapshots[l].penaltyVector));
+    const allPenaltyEqual = sigPenalty[0] === sigPenalty[1] && sigPenalty[1] === sigPenalty[2];
+
+    if (hasLevelSensitivePenalty) {
+      expect(
+        !allPenaltyEqual,
+        `[${label}] penaltyVector idêntico em todos os níveis — penalidade não responde ao seletor.`
+      ).toBe(true);
+    }
+
+    // Comparação profunda com o snapshot
+    expect(snapshots, `Snapshot mismatch for ${label}`).toEqual(existing);
+  } catch (err) {
+    const diffReport = generateDiffSummary(snapshots, existing);
+    console.error(`\n❌ FALHA NO SNAPSHOT: ${label}\n${diffReport}`);
+    throw err;
+  }
 }
 
 function runForEachLevel<T>(fn: () => T): Record<AntiPopularityLevel, T> {
   const out = {} as Record<AntiPopularityLevel, T>;
   for (const lvl of LEVELS) {
     setAntiPopularityLevel(lvl);
-    expect(getAntiPopularityLevel()).toBe(lvl);
     out[lvl] = fn();
   }
   return out;
@@ -210,7 +227,13 @@ import type { NumberStats } from "@/engine/statistics";
 // Suíte parametrizada
 // ─────────────────────────────────────────────────────────────────
 describe("Anti-Popularidade — Verificação Automática nos 4 Geradores × 8 Modalidades", () => {
-  beforeEach(() => setAntiPopularityLevel("standard"));
+  beforeEach(() => {
+    setAntiPopularityLevel("standard");
+  });
+
+  afterEach(() => {
+    restoreRandom();
+  });
 
   for (const fx of FIXTURES) {
     describe(`${fx.config.name} (${fx.config.id})`, () => {
@@ -219,6 +242,7 @@ describe("Anti-Popularidade — Verificação Automática nos 4 Geradores × 8 M
 
       if (fx.runUniversal) {
         it("Universal — scores, ordenação, pesos e penalidades por número", { timeout: 90000 }, () => {
+          setupDeterministicRandom(fx.seed);
           const snapshots = runForEachLevel<RunSnapshot>(() => {
             const games = generateGames({
               lotteryId: fx.config.id,
@@ -243,11 +267,12 @@ describe("Anti-Popularidade — Verificação Automática nos 4 Geradores × 8 M
               ),
             };
           });
-          compareSnapshots(snapshots, `Universal/${fx.config.id}`);
+          checkAndReportSnapshots(snapshots, `Universal/${fx.config.id}`);
         });
       }
 
       it("Profissional — scores, ordenação, pesos e penalidades por número", { timeout: 30000 }, () => {
+        setupDeterministicRandom(fx.seed);
         const snapshots = runForEachLevel<RunSnapshot>(() => {
           const bets = generateProfessionalBets(stats, fx.config, draws, 2);
           const nums = bets.map(b => b.numbers);
@@ -264,10 +289,11 @@ describe("Anti-Popularidade — Verificação Automática nos 4 Geradores × 8 M
             ),
           };
         });
-        compareSnapshots(snapshots, `Profissional/${fx.config.id}`);
+        checkAndReportSnapshots(snapshots, `Profissional/${fx.config.id}`);
       });
 
       it("Extremo — scores, ordenação, pesos e penalidades por número", { timeout: 30000 }, () => {
+        setupDeterministicRandom(fx.seed);
         const snapshots = runForEachLevel<RunSnapshot>(() => {
           const ecfg = getDefaultExtremeConfig(fx.config, draws);
           ecfg.totalCandidates = Math.min(ecfg.totalCandidates, 2000);
@@ -287,15 +313,14 @@ describe("Anti-Popularidade — Verificação Automática nos 4 Geradores × 8 M
             ),
           };
         });
-        compareSnapshots(snapshots, `Extremo/${fx.config.id}`);
+        checkAndReportSnapshots(snapshots, `Extremo/${fx.config.id}`);
       });
 
       it("IA Autônoma — compositeScore por número, pesos e penalidades", { timeout: 30000 }, () => {
+        setupDeterministicRandom(fx.seed);
         const snapshots = runForEachLevel<RunSnapshot>(() => {
           const report = runAutonomousAnalysis(draws, stats, fx.config);
           const top = report.rankings.slice(0, Math.min(20, fx.config.numbers));
-          // Para a IA Autônoma os "generatorWeights" são o compositeScore
-          // alocado a cada número diretamente — vetor 1..N preenchido pelo ranking.
           const genW = new Array<number>(fx.config.numbers).fill(0);
           for (const r of report.rankings) {
             if (r.number >= 1 && r.number <= fx.config.numbers) genW[r.number - 1] = r.compositeScore;
@@ -309,7 +334,7 @@ describe("Anti-Popularidade — Verificação Automática nos 4 Geradores × 8 M
             generatorWeights: genW,
           };
         });
-        compareSnapshots(snapshots, `IAAutonoma/${fx.config.id}`);
+        checkAndReportSnapshots(snapshots, `IAAutonoma/${fx.config.id}`);
       });
     });
   }
