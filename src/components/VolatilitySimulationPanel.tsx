@@ -192,35 +192,6 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
     }));
   }, [scenarios]);
 
-  // Simulate weights based on inputs
-  const simulatedWeights = useMemo(() => {
-    // 1. Get base adaptive weights (from real history or defaults)
-    const baseWeights = selfCalibrateWeights(draws, lotteryId);
-    
-    // 2. Create a synthetic context snapshot based on sliders
-    const syntheticContext: ContextSnapshot = {
-      recentSumTrend: "stable",
-      recentParityShift: 0,
-      recentGapAcceleration: 0,
-      volatilityIndex: volatility,
-      regimeStability: regimeStability,
-    };
-
-    // 3. Apply adjustments
-    const adjusted = applyContextAdjustments(baseWeights, syntheticContext, riskProfile);
-    
-    // Convert to chart data
-    return [
-      { name: "Soma", value: adjusted.sumWeight, color: "#3b82f6" },
-      { name: "Paridade", value: adjusted.parityWeight, color: "#8b5cf6" },
-      { name: "Dispersão", value: adjusted.dispersalWeight, color: "#ec4899" },
-      { name: "Frequência", value: adjusted.frequencyWeight, color: "#f59e0b" },
-      { name: "Atraso", value: adjusted.gapWeight, color: "#10b981" },
-      { name: "Tendência", value: adjusted.trendWeight, color: "#ef4444" },
-      { name: "Repetição", value: adjusted.repeatWeight, color: "#06b6d4" },
-      { name: "Cluster", value: adjusted.clusterWeight, color: "#6366f1" },
-    ];
-  }, [lotteryId, draws, riskProfile, volatility, regimeStability]);
 
   const riskLabels: Record<RiskProfile, string> = {
     conservative: "Conservador",
