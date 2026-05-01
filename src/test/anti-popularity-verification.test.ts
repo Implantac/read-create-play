@@ -59,7 +59,7 @@ interface LotteryFixture {
 }
 
 const FIXTURES: LotteryFixture[] = [
-  { config: { id: "megasena",   name: "Mega-Sena",   numbers: 60,  pick: 6,  color: "neon-green",  icon: "🍀" }, drawCount: 120, seed: 7,  runUniversal: true },
+  { config: { id: "megasena",   name: "Mega-Sena",   numbers: 60,  pick: 6,  color: "neon-green",  icon: "🍀" }, drawCount: 120, seed: 8,  runUniversal: true },
   { config: { id: "lotofacil",  name: "Lotofácil",   numbers: 25,  pick: 15, color: "neon-blue",   icon: "🎯" }, drawCount: 120, seed: 11, runUniversal: true },
   { config: { id: "quina",      name: "Quina",       numbers: 80,  pick: 5,  color: "neon-purple", icon: "🎰" }, drawCount: 120, seed: 17 },
   { config: { id: "lotomania",  name: "Lotomania",   numbers: 100, pick: 50, color: "neon-orange", icon: "💯" }, drawCount: 80,  seed: 23 },
