@@ -280,8 +280,12 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
         <option value="generatorWeights">generatorWeights</option>
       </select>
     </div>
-    <div style="font-size: 0.9em; color: #888;">
-      * Dica: Use o filtro para isolar o impacto em penalidades ou pesos específicos.
+    <label class="toggle-container">
+      <input type="checkbox" id="diffOnly" onchange="applyFilters()" checked>
+      <span>Modo Comparação (Apenas Mudanças)</span>
+    </label>
+    <div style="font-size: 0.9em; color: #888; margin-left: auto;">
+      * Dica: Compare valores lado a lado e veja o delta de cada alteração.
     </div>
   </div>
 
