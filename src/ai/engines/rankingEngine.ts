@@ -28,6 +28,7 @@ export function scoreGame(
   draws: DrawResult[],
   riskProfile: RiskProfile = "balanced"
 ): ScoredGame {
+  const breakdown: any[] = [];
   const rules = getLotteryRules(lotteryId);
   const sorted = [...numbers].sort((a, b) => a - b);
   const prevDraw = draws.length > 0 ? draws[0].numbers : undefined;
