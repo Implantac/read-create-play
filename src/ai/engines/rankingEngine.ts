@@ -329,6 +329,8 @@ export function scoreGame(
     probScore * w.probability
   );
 
+  breakdown.push({ metric: "Base (Estatístico/Estrutural)", value: rawScore, type: "base", description: "Pontuação inicial baseada em frequência e padrões" });
+
   // Apply all overlays with enhanced signals
   const totalScore = Math.max(0, Math.min(100,
     rawScore
