@@ -16,13 +16,15 @@ import {
   Brain, TrendingUp, TrendingDown, Zap, Target, RefreshCw, Sparkles,
   AlertTriangle, CheckCircle, ArrowUp, ArrowDown, Minus, Loader2,
   Activity, Trophy, GitBranch, Link2, Timer, Gauge, Dice1, TriangleAlert, FlaskConical,
-  Save, Network, Bookmark, Copy, Star
+  Save, Network, Bookmark, Copy, Star, Settings2
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   PieChart, Pie, Cell, Legend, ScatterChart, Scatter, ZAxis, LineChart, Line
 } from "recharts";
+
+import { VolatilitySimulationPanel } from "@/components/VolatilitySimulationPanel";
 
 interface Props {
   config: LotteryConfig;
@@ -403,8 +405,14 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
           <TabsTrigger value="patterns">Padrões</TabsTrigger>
           <TabsTrigger value="strategies">Estratégias</TabsTrigger>
           <TabsTrigger value="shifts">Mudanças</TabsTrigger>
+          <TabsTrigger value="simulation">Simulação</TabsTrigger>
           <TabsTrigger value="ai">Análise IA</TabsTrigger>
         </TabsList>
+
+        {/* Simulation Tab */}
+        <TabsContent value="simulation">
+          <VolatilitySimulationPanel lotteryId={config.id} draws={draws} />
+        </TabsContent>
 
         {/* Ranking Tab */}
         <TabsContent value="ranking" className="space-y-4">
