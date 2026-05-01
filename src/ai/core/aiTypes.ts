@@ -69,6 +69,14 @@ export interface ScoredGame {
   explanation: string[];
   roiTier?: "excellent" | "good" | "average" | "below_average";
   roiScore?: number;
+  scoreBreakdown?: ScoreAdjustment[];
+}
+
+export interface ScoreAdjustment {
+  metric: string;
+  value: number;
+  type: "base" | "bonus" | "penalty";
+  description: string;
 }
 
 export interface GameScores {
