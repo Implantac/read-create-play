@@ -406,9 +406,6 @@ export function scoreGame(
   const grade = totalScore >= 85 ? "S" : totalScore >= 70 ? "A" : totalScore >= 55 ? "B" :
     totalScore >= 40 ? "C" : totalScore >= 25 ? "D" : "F";
 
-  const alignment = scoreJackpotAlignment(sorted, draws, lotteryId);
-  const antiPopPenalty = computeAntiPopularityPenalty(sorted, lotteryId);
-
   const explanation = buildExplanation(sorted, lotteryId, pattern, { statistical: statScore, structural: structScore, coverage: coverageScore, diversity: diversityScore, strategyFit, probability: probScore }, totalScore, grade, clusterScore, humanPenalty, monteCarlo, roi, context, entropyReport, cycleScore, regressionScore, multiWindowBonus, forecastBonus, consecutiveEntropy, edgeBalance, markovResult, enhancedEntropy, bayesNetScore, { bayesianBonus, alignmentScore: alignment.score, antiPopPenalty });
 
   return {
@@ -419,6 +416,7 @@ export function scoreGame(
     explanation,
     roiTier: roi.roiTier,
     roiScore: Math.round(roi.riskAdjustedScore * 100),
+    scoreBreakdown: breakdown
   };
 }
 
