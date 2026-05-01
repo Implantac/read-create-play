@@ -177,7 +177,7 @@ const HistoricoPage = () => {
               </div>
 
               <AnimatePresence>
-                {isChecking && checkResult && (
+                {isReady && checkResult && (
                   <motion.div 
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
@@ -201,7 +201,7 @@ const HistoricoPage = () => {
                       </div>
                     </div>
 
-                    <div className="max-h-[200px] overflow-y-auto pr-2 scrollbar-thin space-y-2 border-t border-border/40 pt-4">
+                    <div className="max-h-[250px] overflow-y-auto pr-2 scrollbar-thin space-y-2 border-t border-border/40 pt-4">
                       {checkResult.length === 0 ? (
                         <p className="text-xs text-center py-4 text-muted-foreground">Nenhum acerto encontrado para este jogo no histórico.</p>
                       ) : (
