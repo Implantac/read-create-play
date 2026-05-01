@@ -53,7 +53,29 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
   const [loading, setLoading] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
-  const [showComparison, setShowComparison] = useState(false);
+
+  // Simulate weights based on inputs
+  const simulatedWeights = useMemo(() => {
+    const baseWeights = selfCalibrateWeights(draws, lotteryId);
+    const syntheticContext: ContextSnapshot = {
+      recentSumTrend: "stable",
+      recentParityShift: 0,
+      recentGapAcceleration: 0,
+      volatilityIndex: volatility,
+      regimeStability: regimeStability,
+    };
+    const adjusted = applyContextAdjustments(baseWeights, syntheticContext, riskProfile);
+    return [
+      { name: "Soma", value: adjusted.sumWeight, color: "#3b82f6" },
+      { name: "Paridade", value: adjusted.parityWeight, color: "#8b5cf6" },
+      { name: "Dispersão", value: adjusted.dispersalWeight, color: "#ec4899" },
+      { name: "Frequência", value: adjusted.frequencyWeight, color: "#f59e0b" },
+      { name: "Atraso", value: adjusted.gapWeight, color: "#10b981" },
+      { name: "Tendência", value: adjusted.trendWeight, color: "#ef4444" },
+      { name: "Repetição", value: adjusted.repeatWeight, color: "#06b6d4" },
+      { name: "Cluster", value: adjusted.clusterWeight, color: "#6366f1" },
+    ];
+  }, [lotteryId, draws, riskProfile, volatility, regimeStability]);
 
   // Add current state as a "virtual" scenario for comparison
   const currentScenario: SimulationScenario = useMemo(() => ({
@@ -76,7 +98,6 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
     const list = [currentScenario, ...scenarios].filter(s => selectedForComparison.includes(s.id));
     if (list.length < 2) return null;
 
-    // Create comparison metrics
     const metrics = simulatedWeights.map(m => {
       const data: any = { name: m.name };
       list.forEach(s => {
