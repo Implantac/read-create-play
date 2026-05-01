@@ -414,17 +414,32 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
               <h4 className="text-xs font-bold flex items-center gap-2">
                 <FolderOpen className="w-3.5 h-3.5 text-primary" /> Cenários Salvos
               </h4>
-              <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 scrollbar-thin">
+              <div className="space-y-2 max-h-[250px] overflow-y-auto pr-2 scrollbar-thin">
                 {scenarios.length === 0 ? (
                   <p className="text-[10px] text-muted-foreground italic">Nenhum cenário salvo ainda.</p>
                 ) : (
                   scenarios.map(s => (
                     <div key={s.id} className="flex items-center justify-between p-2 rounded-lg bg-background border border-border group hover:border-primary/30 transition-colors">
-                      <div className="flex-1 cursor-pointer" onClick={() => loadScenario(s)}>
-                        <p className="text-[11px] font-bold text-foreground">{s.name}</p>
-                        <p className="text-[9px] text-muted-foreground">
-                          {riskLabels[s.risk_profile]} • Vol: {Math.round(s.volatility * 100)}% • Est: {Math.round(s.regime_stability * 100)}%
-                        </p>
+                      <div className="flex items-center gap-2 flex-1 cursor-pointer" onClick={() => loadScenario(s)}>
+                        <div 
+                          className="shrink-0" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleComparison(s.id);
+                          }}
+                        >
+                          {selectedForComparison.includes(s.id) ? (
+                            <Check className="w-4 h-4 text-primary" />
+                          ) : (
+                            <Square className="w-4 h-4 text-muted-foreground/30" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-bold text-foreground">{s.name}</p>
+                          <p className="text-[9px] text-muted-foreground">
+                            {riskLabels[s.risk_profile as RiskProfile]} • Vol: {Math.round(s.volatility * 100)}% • Est: {Math.round(s.regime_stability * 100)}%
+                          </p>
+                        </div>
                       </div>
                       <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => deleteScenario(s.id)}>
                         <Trash2 className="w-3.5 h-3.5 text-destructive" />
