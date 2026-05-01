@@ -540,38 +540,6 @@ function buildExplanation(
   }
 
   lines.push(`--- FIM DA ANÁLISE ---`);
-  } else if (multiWindowBonus !== undefined && multiWindowBonus < -2) {
-    lines.push("⚠️ Sinais de regressão divergentes entre janelas temporais");
-  }
-
-  if (forecastBonus !== undefined && forecastBonus > 3) {
-    lines.push("📈 Previsão Holt-Winters favorável: tendência ascendente confirmada");
-  }
-
-  if (consecutiveEntropy) {
-    if (consecutiveEntropy.maxRun > 3) lines.push(`⚠️ Sequência longa de ${consecutiveEntropy.maxRun} consecutivos detectada`);
-    else if (consecutiveEntropy.consecutivePairs >= 1 && consecutiveEntropy.score > 0.7)
-      lines.push("✅ Padrão de consecutivos dentro do ideal histórico");
-  }
-
-  if (edgeBalance !== undefined) {
-    if (edgeBalance >= 0.7) lines.push("✅ Equilíbrio entre extremos e centro do volante");
-    else if (edgeBalance < 0.4) lines.push("⚠️ Desequilíbrio entre números extremos e centrais");
-  }
-
-  // BAYESIAN NETWORK insights
-  if (bayesNetScore) {
-    if (bayesNetScore.networkScore >= 65) {
-      lines.push(`✅ Rede Bayesiana favorável: ${bayesNetScore.networkScore}/100 — ${bayesNetScore.centralityCount} números de alta centralidade`);
-    } else if (bayesNetScore.networkScore >= 45) {
-      lines.push(`📊 Rede Bayesiana moderada: ${bayesNetScore.networkScore}/100`);
-    } else {
-      lines.push(`⚠️ Baixa coerência na rede condicional: ${bayesNetScore.networkScore}/100`);
-    }
-    if (bayesNetScore.internalConsistency >= 0.7) {
-      lines.push("✅ Alta consistência interna: números se reforçam mutuamente");
-    }
-  }
 
   return lines;
 }
