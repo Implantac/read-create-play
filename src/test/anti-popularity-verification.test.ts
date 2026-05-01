@@ -279,6 +279,11 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
     .delta { font-family: monospace; font-size: 0.85em; }
     .delta.pos { color: #4caf50; }
     .delta.neg { color: #ff5252; }
+    .breakdown-container { margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 20px; }
+    .breakdown-container table { max-width: 800px; }
+    .breakdown-container tr.base { background: rgba(187, 134, 252, 0.1); }
+    .breakdown-container tr.bonus { background: rgba(76, 175, 80, 0.05); }
+    .breakdown-container tr.penalty { background: rgba(244, 67, 54, 0.05); }
     .ordering-box { padding: 10px; background: #252525; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #4caf50; }
     .ordering-box.diff { border-left-color: #ff5252; }
     .old { color: #aaa; text-decoration: line-through; font-size: 0.9em; }
