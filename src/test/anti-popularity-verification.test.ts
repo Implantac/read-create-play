@@ -422,6 +422,7 @@ describe("Anti-Popularidade — Verificação Automática nos 4 Geradores × 8 M
                 games.map(g => ({ numbers: g.numbers, score: g.totalScore })),
                 fx.config.numbers,
               ),
+              scoreBreakdown: games[0]?.scoreBreakdown,
             };
           });
           checkAndReportSnapshots(snapshots, `Universal/${fx.config.id}`);
