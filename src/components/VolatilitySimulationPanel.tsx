@@ -312,16 +312,100 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               </Button>
             </div>
-            <Button 
-              variant="outline" 
-              className="w-full h-8 text-[10px] gap-2 border-primary/20" 
-              onClick={() => setShowHistory(!showHistory)}
-            >
-              <History className="w-3.5 h-3.5" />
-              {showHistory ? "Fechar Histórico" : "Ver Cenários Salvos"}
-            </Button>
+              <Button 
+                size="sm" 
+                variant={selectedForComparison.includes("current") ? "default" : "outline"}
+                className="h-8 text-[10px] gap-2 border-primary/20"
+                onClick={() => toggleComparison("current")}
+              >
+                {selectedForComparison.includes("current") ? <Check className="w-3 h-3" /> : <Square className="w-3 h-3" />}
+                Comparar Atual
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full h-8 text-[10px] gap-2 border-primary/20" 
+                onClick={() => setShowHistory(!showHistory)}
+              >
+                <History className="w-3.5 h-3.5" />
+                {showHistory ? "Fechar Histórico" : "Ver Cenários Salvos"}
+              </Button>
+            </div>
           </div>
         </div>
+
+        {/* Comparison Dashboard */}
+        {comparisonResult && (
+          <div className="p-5 rounded-2xl bg-primary/5 border border-primary/20 space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ArrowLeftRight className="w-4 h-4 text-primary" />
+                <h4 className="text-sm font-black text-foreground">Dashboard Comparativo de Cenários</h4>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => setSelectedForComparison([])} className="h-7 text-[10px] text-muted-foreground">
+                <X className="w-3 h-3 mr-1" /> Limpar Comparação
+              </Button>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Metric Comparison Bars */}
+              <div className="space-y-4">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Diferença de Pesos por Métrica</p>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ReBarChart data={comparisonResult.metrics}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                      <XAxis dataKey="name" tick={{ fontSize: 9 }} />
+                      <YAxis tick={{ fontSize: 9 }} />
+                      <ReTooltip contentStyle={{ fontSize: 10, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
+                      <Legend iconSize={8} wrapperStyle={{ fontSize: 10, paddingTop: 10 }} />
+                      {comparisonResult.scenarios.map((s, i) => (
+                        <Bar 
+                          key={s.id} 
+                          dataKey={s.name} 
+                          fill={i === 0 ? "hsl(var(--primary))" : i === 1 ? "hsl(var(--accent))" : i === 2 ? "#ec4899" : "#8b5cf6"} 
+                          radius={[4, 4, 0, 0]} 
+                        />
+                      ))}
+                    </ReBarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Settings Summary Table */}
+              <div className="space-y-4">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Parâmetros de Entrada</p>
+                <div className="overflow-hidden rounded-xl border border-border bg-background">
+                  <table className="w-full text-[10px] text-left">
+                    <thead>
+                      <tr className="bg-muted/50 border-b border-border">
+                        <th className="p-2 font-bold">Cenário</th>
+                        <th className="p-2 font-bold">Perfil</th>
+                        <th className="p-2 font-bold">Volat.</th>
+                        <th className="p-2 font-bold">Estab.</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {comparisonResult.scenarios.map(s => (
+                        <tr key={s.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                          <td className="p-2 font-medium truncate max-w-[100px]">{s.name}</td>
+                          <td className="p-2">{riskLabels[s.risk_profile as RiskProfile]}</td>
+                          <td className="p-2 font-mono text-primary">{(s.volatility * 100).toFixed(0)}%</td>
+                          <td className="p-2 font-mono text-accent">{(s.regime_stability * 100).toFixed(0)}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="bg-primary/10 p-3 rounded-lg border border-primary/10">
+                  <p className="text-[10px] leading-relaxed text-primary italic">
+                    <Info className="w-3 h-3 inline mr-1 mb-0.5" />
+                    <strong>Dica de Análise:</strong> Observe como as métricas de Dispersão e Atraso (Gap) oscilam entre os cenários. Maiores divergências indicam instabilidade no comportamento estatístico da dezenas.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* History/Comparison Section */}
         {showHistory && (
