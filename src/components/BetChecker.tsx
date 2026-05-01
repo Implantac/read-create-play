@@ -8,8 +8,11 @@ import {
   BarChart3, Target, ArrowUpRight, ChevronDown, ChevronUp,
   Award, DollarSign, Sparkles, CheckCircle2, AlertTriangle,
   Copy, Save, Grid3X3, ArrowDown, ArrowUp, Minus, ListChecks,
-  FileDown, RotateCcw, Hash, Eye, Dice1, Info, Eraser, Play
+  FileDown, RotateCcw, Hash, Eye, Dice1, Info, Eraser, Play,
+  GitCompare, CheckSquare
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { BetComparisonPanel } from "./BetComparisonPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -409,6 +412,8 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
   const [hasRunPerformance, setHasRunPerformance] = useState(false);
   const [showGrid, setShowGrid] = useState(true);
   const [quickCheckResult, setQuickCheckResult] = useState<{ bet: number[]; draw: DrawResult } | null>(null);
+  const [selectedForComparison, setSelectedForComparison] = useState<number[]>([]);
+  const [showComparison, setShowComparison] = useState(false);
 
   const { savedBets, saveBet } = useSavedBets(lotteryId);
   const selectedDraws = useMemo(() => draws.slice(0, drawRange), [draws, drawRange]);
@@ -440,7 +445,15 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
     setShowGrid(true);
     setQuickCheckResult(null);
     setActiveTab("quick");
+    setSelectedForComparison([]);
+    setShowComparison(false);
   }, [lotteryId]);
+
+  const toggleComparison = (index: number) => {
+    setSelectedForComparison(prev => 
+      prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]
+    );
+  };
 
   const performanceRef = useRef({ hasRunPerformance, runPerformanceCheck: () => {} });
 
@@ -1194,7 +1207,21 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                 </AnimatePresence>
 
                 {performances.length > 0 && (
-                  <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1 scrollbar-thin">
+                  <div className="space-y-2">
+                    <AnimatePresence>
+                      {selectedForComparison.length >= 2 && (
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                          <Button 
+                            className="w-full mb-2 gap-2 gradient-brand shadow-lg shadow-primary/20 h-10 font-bold"
+                            onClick={() => setShowComparison(true)}
+                          >
+                            <GitCompare className="w-4 h-4" />
+                            Comparar {selectedForComparison.length} Jogos Lado a Lado
+                          </Button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                    <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1 scrollbar-thin">
                     {performances.map((perf, i) => {
                       const isExpanded = expandedPerf === i;
                       return (
@@ -1202,9 +1229,17 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                           className="rounded-xl bg-card/50 border border-border/25 overflow-hidden hover:border-border/50 transition-all"
                         >
                           <button className="w-full flex items-center gap-2 sm:gap-3 p-3.5 text-left" onClick={() => setExpandedPerf(isExpanded ? null : i)}>
-                            <div className="shrink-0">
-                              {i < 3 ? <span className="text-lg">{["🥇", "🥈", "🥉"][i]}</span>
-                                : <span className="text-xs font-mono text-muted-foreground w-6 text-center">#{i + 1}</span>}
+                            <div className="flex items-center gap-2">
+                              <Checkbox 
+                                checked={selectedForComparison.includes(i)}
+                                onCheckedChange={() => toggleComparison(i)}
+                                onClick={(e) => e.stopPropagation()}
+                                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                              />
+                              <div className="shrink-0">
+                                {i < 3 ? <span className="text-lg">{["🥇", "🥈", "🥉"][i]}</span>
+                                  : <span className="text-xs font-mono text-muted-foreground w-6 text-center">#{i + 1}</span>}
+                              </div>
                             </div>
                             <ScoreRing score={perf.score} size={38} />
                             <div className="flex-1 min-w-0">
@@ -1318,6 +1353,7 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                         </motion.div>
                       );
                     })}
+                    </div>
                   </div>
                 )}
 
@@ -1438,6 +1474,17 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
           )}
         </AnimatePresence>
       </div>
+
+      <AnimatePresence>
+        {showComparison && (
+          <BetComparisonPanel 
+            bets={selectedForComparison.map(i => performances[i])} 
+            onClose={() => setShowComparison(false)} 
+            lotteryId={lotteryId}
+            pick={pick}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

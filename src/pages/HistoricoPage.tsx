@@ -27,8 +27,8 @@ const HistoricoPage = () => {
   // Checker state
   const [checkerInput, setCheckerInput] = useState("");
   const [checkerNumbers, setCheckerNumbers] = useState<number[]>([]);
-  const [checkResult, setCheckResult] = useState<{ concurso: number; hits: number; matched: number[] }[] | null>(null);
-  const [isChecking, setIsReady] = useState(false);
+  const [checkResult, setCheckResult] = useState<{ concurso: number; hits: number; matched: number[]; date: string }[] | null>(null);
+  const [isReady, setIsReady] = useState(false);
 
   const { saveBet } = useSavedBets(config.id);
 
@@ -61,7 +61,8 @@ const HistoricoPage = () => {
       return {
         concurso: draw.concurso,
         hits: matched.length,
-        matched
+        matched,
+        date: draw.date
       };
     }).filter(r => r.hits > 0).sort((a, b) => b.hits - a.hits || b.concurso - a.concurso);
     
