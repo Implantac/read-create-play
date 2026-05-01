@@ -36,6 +36,13 @@ interface BetPerformance {
   score: number;
 }
 
+interface Props {
+  bets: BetPerformance[];
+  onClose: () => void;
+  lotteryId: string;
+  pick: number;
+}
+
 export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
   const copyNumbers = (nums: number[]) => {
     navigator.clipboard.writeText(nums.join(", "));
