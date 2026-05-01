@@ -52,8 +52,42 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
   const [scenarioName, setScenarioName] = useState("");
   const [loading, setLoading] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [selectedForComparison, setSelectedForComparison] = useState<string[]>([]);
+  const [showComparison, setShowComparison] = useState(false);
 
-  // Load scenarios
+  // Add current state as a "virtual" scenario for comparison
+  const currentScenario: SimulationScenario = useMemo(() => ({
+    id: "current",
+    name: "Atual (Simulado)",
+    risk_profile: riskProfile,
+    volatility: volatility,
+    regime_stability: regimeStability,
+    weights: simulatedWeights,
+    created_at: new Date().toISOString()
+  }), [riskProfile, volatility, regimeStability, simulatedWeights]);
+
+  const toggleComparison = (id: string) => {
+    setSelectedForComparison(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const comparisonResult = useMemo(() => {
+    const list = [currentScenario, ...scenarios].filter(s => selectedForComparison.includes(s.id));
+    if (list.length < 2) return null;
+
+    // Create comparison metrics
+    const metrics = simulatedWeights.map(m => {
+      const data: any = { name: m.name };
+      list.forEach(s => {
+        const weightEntry = s.weights.find((w: any) => w.name === m.name);
+        data[s.name] = weightEntry ? weightEntry.value : 0;
+      });
+      return data;
+    });
+
+    return { scenarios: list, metrics };
+  }, [selectedForComparison, scenarios, currentScenario, simulatedWeights]);
   const fetchScenarios = async () => {
     if (!user) return;
     try {
