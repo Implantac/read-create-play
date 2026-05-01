@@ -1,15 +1,39 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Info, Zap, AlertTriangle, ShieldCheck, TrendingUp, BarChart, Activity } from "lucide-react";
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, BarChart as ReBarChart, Bar, XAxis, YAxis, Tooltip as ReTooltip, Cell } from "recharts";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { 
+  Info, Zap, AlertTriangle, ShieldCheck, TrendingUp, 
+  BarChart, Activity, Save, FolderOpen, History, Trash2, Loader2, X 
+} from "lucide-react";
+import { 
+  Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, 
+  BarChart as ReBarChart, Bar, XAxis, YAxis, Tooltip as ReTooltip, Cell,
+  LineChart, Line, CartesianGrid, Legend
+} from "recharts";
 import { RiskProfile } from "@/ai/core/aiTypes";
 import { selfCalibrateWeights, applyContextAdjustments, ContextSnapshot } from "@/ai/engines/adaptiveEngine";
 import { AI_CONFIG } from "@/ai/core/aiConfig";
 import { DrawResult } from "@/data/lotteries";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+interface SimulationScenario {
+  id: string;
+  name: string;
+  risk_profile: RiskProfile;
+  volatility: number;
+  regime_stability: number;
+  weights: any;
+  created_at: string;
+}
 
 interface Props {
   lotteryId: string;
@@ -17,9 +41,100 @@ interface Props {
 }
 
 export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
+  const { user } = useAuth();
   const [riskProfile, setRiskProfile] = useState<RiskProfile>("balanced");
   const [volatility, setVolatility] = useState(0.5);
   const [regimeStability, setRegimeStability] = useState(0.6);
+  
+  // Scenarios state
+  const [scenarios, setScenarios] = useState<SimulationScenario[]>([]);
+  const [scenarioName, setScenarioName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+
+  // Load scenarios
+  const fetchScenarios = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from("simulation_scenarios")
+        .select("*")
+        .eq("lottery_id", lotteryId)
+        .order("created_at", { ascending: false });
+      
+      if (error) throw error;
+      setScenarios(data || []);
+    } catch (err) {
+      console.error("Error fetching scenarios:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchScenarios();
+  }, [user, lotteryId]);
+
+  const saveScenario = async () => {
+    if (!user) {
+      toast.error("Faça login para salvar cenários");
+      return;
+    }
+    if (!scenarioName.trim()) {
+      toast.error("Digite um nome para o cenário");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.from("simulation_scenarios").insert({
+        user_id: user.id,
+        lottery_id: lotteryId,
+        name: scenarioName,
+        risk_profile: riskProfile,
+        volatility: volatility,
+        regime_stability: regimeStability,
+        weights: simulatedWeights,
+      });
+
+      if (error) throw error;
+      
+      toast.success("Cenário salvo com sucesso!");
+      setScenarioName("");
+      fetchScenarios();
+    } catch (err: any) {
+      toast.error("Erro ao salvar: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadScenario = (s: SimulationScenario) => {
+    setRiskProfile(s.risk_profile);
+    setVolatility(s.volatility);
+    setRegimeStability(s.regime_stability);
+    setShowHistory(false);
+    toast.success(`Cenário "${s.name}" carregado`);
+  };
+
+  const deleteScenario = async (id: string) => {
+    try {
+      const { error } = await supabase.from("simulation_scenarios").delete().eq("id", id);
+      if (error) throw error;
+      setScenarios(scenarios.filter(s => s.id !== id));
+      toast.success("Cenário excluído");
+    } catch (err: any) {
+      toast.error("Erro ao excluir: " + err.message);
+    }
+  };
+
+  // Compare history data
+  const comparisonData = useMemo(() => {
+    return scenarios.slice(0, 5).reverse().map(s => ({
+      name: s.name,
+      volatility: s.volatility,
+      stability: s.regime_stability,
+      date: format(new Date(s.created_at), "dd/MM", { locale: ptBR })
+    }));
+  }, [scenarios]);
 
   // Simulate weights based on inputs
   const simulatedWeights = useMemo(() => {
@@ -88,7 +203,7 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
       </CardHeader>
       <CardContent className="pt-4 space-y-8">
         {/* Controls */}
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-4 gap-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
@@ -154,7 +269,87 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
               className="py-4"
             />
           </div>
+
+          <div className="space-y-4">
+            <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+              <Save className="w-3.5 h-3.5 text-primary" /> Salvar Cenário
+            </label>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Nome do cenário..."
+                className="h-9 text-xs"
+                value={scenarioName}
+                onChange={(e) => setScenarioName(e.target.value)}
+              />
+              <Button size="icon" className="h-9 w-9 shrink-0" onClick={saveScenario} disabled={loading}>
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              </Button>
+            </div>
+            <Button 
+              variant="outline" 
+              className="w-full h-8 text-[10px] gap-2 border-primary/20" 
+              onClick={() => setShowHistory(!showHistory)}
+            >
+              <History className="w-3.5 h-3.5" />
+              {showHistory ? "Fechar Histórico" : "Ver Cenários Salvos"}
+            </Button>
+          </div>
         </div>
+
+        {/* History/Comparison Section */}
+        {showHistory && (
+          <div className="grid md:grid-cols-2 gap-6 p-4 rounded-xl bg-muted/20 border border-border">
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold flex items-center gap-2">
+                <FolderOpen className="w-3.5 h-3.5 text-primary" /> Cenários Salvos
+              </h4>
+              <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 scrollbar-thin">
+                {scenarios.length === 0 ? (
+                  <p className="text-[10px] text-muted-foreground italic">Nenhum cenário salvo ainda.</p>
+                ) : (
+                  scenarios.map(s => (
+                    <div key={s.id} className="flex items-center justify-between p-2 rounded-lg bg-background border border-border group hover:border-primary/30 transition-colors">
+                      <div className="flex-1 cursor-pointer" onClick={() => loadScenario(s)}>
+                        <p className="text-[11px] font-bold text-foreground">{s.name}</p>
+                        <p className="text-[9px] text-muted-foreground">
+                          {riskLabels[s.risk_profile]} • Vol: {Math.round(s.volatility * 100)}% • Est: {Math.round(s.regime_stability * 100)}%
+                        </p>
+                      </div>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => deleteScenario(s.id)}>
+                        <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                      </Button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold flex items-center gap-2">
+                <BarChart className="w-3.5 h-3.5 text-primary" /> Histórico Comparativo
+              </h4>
+              <div className="h-40">
+                {comparisonData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={comparisonData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                      <XAxis dataKey="date" tick={{ fontSize: 9 }} />
+                      <YAxis domain={[0, 1]} tick={{ fontSize: 9 }} />
+                      <ReTooltip contentStyle={{ fontSize: 10, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
+                      <Legend iconSize={8} wrapperStyle={{ fontSize: 9 }} />
+                      <Line type="monotone" dataKey="volatility" name="Volatilidade" stroke="#ef4444" strokeWidth={2} dot={{ r: 3 }} />
+                      <Line type="monotone" dataKey="stability" name="Estabilidade" stroke="#10b981" strokeWidth={2} dot={{ r: 3 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-[10px] text-muted-foreground italic">
+                    Dados insuficientes para gerar gráfico histórico.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Visualizations */}
         <div className="grid lg:grid-cols-2 gap-8 items-center">
