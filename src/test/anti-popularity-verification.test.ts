@@ -185,6 +185,29 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
     const e = existing[lvl];
     if (!e) continue;
 
+    let breakdownTable = "";
+    if (c.scoreBreakdown) {
+      let rows = "";
+      c.scoreBreakdown.forEach((adj: any) => {
+        rows += `
+          <tr class="${adj.type}">
+            <td>${adj.metric}</td>
+            <td class="delta ${adj.type === 'bonus' ? 'pos' : adj.type === 'penalty' ? 'neg' : ''}">
+              ${adj.value > 0 ? '+' : ''}${adj.value.toFixed(2)}
+            </td>
+            <td>${adj.description}</td>
+          </tr>`;
+      });
+      breakdownTable = `
+        <div class="breakdown-container">
+          <h3>Passo a Passo da Pontuação (IA Universal)</h3>
+          <table>
+            <thead><tr><th>Métrica</th><th>Ajuste</th><th>Razão</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }
+
     let vectorTables = "";
     const vectors = ["penaltyVector", "boostedWeights", "generatorWeights"] as const;
     
