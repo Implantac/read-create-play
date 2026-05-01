@@ -196,22 +196,22 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
         const valE = e[vec][i];
         const isDiff = valC?.toFixed(4) !== valE?.toFixed(4);
         if (isDiff) diffCount++;
+        const delta = (valC || 0) - (valE || 0);
 
-        if (isDiff || maxLen <= 20) {
-          rows += `
-            <tr class="${isDiff ? "diff" : ""}">
-              <td>${i + 1}</td>
-              <td>${valE?.toFixed(4) ?? "-"}</td>
-              <td>${valC?.toFixed(4) ?? "-"}</td>
-            </tr>`;
-        }
+        rows += `
+          <tr class="${isDiff ? "diff" : "same"}" data-diff="${isDiff}">
+            <td>${i + 1}</td>
+            <td>${valE?.toFixed(4) ?? "-"}</td>
+            <td>${valC?.toFixed(4) ?? "-"}</td>
+            <td class="delta ${delta > 0 ? 'pos' : delta < 0 ? 'neg' : ''}">${isDiff ? (delta > 0 ? '+' : '') + delta.toFixed(4) : '-'}</td>
+          </tr>`;
       }
 
       vectorTables += `
         <div class="vector-container" data-vector="${vec}">
           <h3>${vec} (${diffCount} alterações)</h3>
           <table>
-            <thead><tr><th>Núm</th><th>Anterior</th><th>Atual</th></tr></thead>
+            <thead><tr><th>Núm</th><th>Anterior</th><th>Atual</th><th>Delta</th></tr></thead>
             <tbody>${rows}</tbody>
           </table>
         </div>`;
