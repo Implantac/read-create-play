@@ -145,6 +145,34 @@ interface RunSnapshot {
 }
 
 const vecKey = (v: number[]) => v.map(x => x.toFixed(4)).join("|");
+function generateDiffSummary(current: any, existing: any): string {
+  let diff = "";
+  const levels = Object.keys(current) as AntiPopularityLevel[];
+  
+  for (const lvl of levels) {
+    const c = current[lvl];
+    const e = existing[lvl];
+    if (!e) {
+      diff += `  [${lvl}]: Nível novo (não existia no snapshot)\n`;
+      continue;
+    }
+
+    const vectors = ["penaltyVector", "boostedWeights", "generatorWeights"] as const;
+    for (const vec of vectors) {
+      const cv = vecKey(c[vec]);
+      const ev = vecKey(e[vec]);
+      if (cv !== ev) {
+        const firstDiff = c[vec].findIndex((v: number, i: number) => v.toFixed(4) !== e[vec][i].toFixed(4));
+        diff += `  [${lvl}] ${vec} MUDOU: index ${firstDiff} (era ${e[vec][firstDiff]?.toFixed(4)}, agora é ${c[vec][firstDiff]?.toFixed(4)})\n`;
+      }
+    }
+
+    if (c.ordering.join(",") !== e.ordering.join(",")) {
+      diff += `  [${lvl}] ordering MUDOU: ${e.ordering.slice(0, 3).join("-")}... -> ${c.ordering.slice(0, 3).join("-")}...\n`;
+    }
+  }
+  return diff;
+}
 
 function generateHTMLDiffReport(current: any, existing: any, label: string): string {
   const levels = Object.keys(current) as AntiPopularityLevel[];
