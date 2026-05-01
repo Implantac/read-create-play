@@ -1229,9 +1229,17 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                           className="rounded-xl bg-card/50 border border-border/25 overflow-hidden hover:border-border/50 transition-all"
                         >
                           <button className="w-full flex items-center gap-2 sm:gap-3 p-3.5 text-left" onClick={() => setExpandedPerf(isExpanded ? null : i)}>
-                            <div className="shrink-0">
-                              {i < 3 ? <span className="text-lg">{["🥇", "🥈", "🥉"][i]}</span>
-                                : <span className="text-xs font-mono text-muted-foreground w-6 text-center">#{i + 1}</span>}
+                            <div className="flex items-center gap-2">
+                              <Checkbox 
+                                checked={selectedForComparison.includes(i)}
+                                onCheckedChange={() => toggleComparison(i)}
+                                onClick={(e) => e.stopPropagation()}
+                                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                              />
+                              <div className="shrink-0">
+                                {i < 3 ? <span className="text-lg">{["🥇", "🥈", "🥉"][i]}</span>
+                                  : <span className="text-xs font-mono text-muted-foreground w-6 text-center">#{i + 1}</span>}
+                              </div>
                             </div>
                             <ScoreRing score={perf.score} size={38} />
                             <div className="flex-1 min-w-0">
