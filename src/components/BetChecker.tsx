@@ -412,6 +412,8 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
   const [hasRunPerformance, setHasRunPerformance] = useState(false);
   const [showGrid, setShowGrid] = useState(true);
   const [quickCheckResult, setQuickCheckResult] = useState<{ bet: number[]; draw: DrawResult } | null>(null);
+  const [selectedForComparison, setSelectedForComparison] = useState<number[]>([]);
+  const [showComparison, setShowComparison] = useState(false);
 
   const { savedBets, saveBet } = useSavedBets(lotteryId);
   const selectedDraws = useMemo(() => draws.slice(0, drawRange), [draws, drawRange]);
