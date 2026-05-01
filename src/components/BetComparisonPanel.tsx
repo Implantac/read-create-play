@@ -350,18 +350,31 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
                   <TrendingUp className="w-5 h-5 text-primary" />
                   <h4 className="text-sm font-bold">Veredito da Comparação</h4>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed mb-4">
-                  O jogo <strong className="text-foreground">{bets[0].label}</strong> apresenta a maior robustez estatística com score de <strong>{bets[0].score}</strong>. 
-                  {commonNumbers.length > 0 && ` Há uma convergência de ${commonNumbers.length} dezenas entre as seleções, o que sugere um núcleo forte de aposta.`}
-                </p>
+                <div className="text-xs text-muted-foreground leading-relaxed mb-4 space-y-2">
+                  <p>
+                    A análise identificou que o jogo <strong className="text-foreground">{bets[highlights?.score[0] || 0].label}</strong> 
+                    é a opção mais equilibrada com score de <strong>{bets[highlights?.score[0] || 0].score}</strong>.
+                  </p>
+                  {highlights?.consistency.length && highlights.consistency.length > 0 && (
+                    <p className="flex items-center gap-1.5">
+                      <ShieldCheck className="w-3 h-3 text-blue-400" /> 
+                      <span>Destaque em consistência: <strong>{bets[highlights.consistency[0]].label}</strong>.</span>
+                    </p>
+                  )}
+                  {commonNumbers.length > 0 && (
+                    <p>Há uma convergência de {commonNumbers.length} dezenas entre as seleções, o que sugere um núcleo forte de aposta.</p>
+                  )}
+                </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-[11px]">
                     <span className="text-muted-foreground">Potencial de Prêmio</span>
-                    <span className="font-bold text-green-400">Alto</span>
+                    <span className="font-bold text-green-400">
+                      {Math.max(...(highlights?.metrics.map(m => m.prizeHits) || [0])) > 0 ? "Muito Alto" : "Médio"}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between text-[11px]">
                     <span className="text-muted-foreground">Divergência de Jogos</span>
-                    <span className="font-bold">{Math.round((allNumbers.length - commonNumbers.length) / allNumbers.length * 100)}%</span>
+                    <span className="font-bold">{allNumbers.length > 0 ? Math.round((allNumbers.length - commonNumbers.length) / allNumbers.length * 100) : 0}%</span>
                   </div>
                 </div>
                 <Button className="mt-6 w-full gap-2 gradient-brand shadow-lg shadow-primary/20" size="sm">
