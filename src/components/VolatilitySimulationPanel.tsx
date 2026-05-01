@@ -312,6 +312,8 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               </Button>
             </div>
+            <div className="flex flex-col gap-2">
+
               <Button 
                 size="sm" 
                 variant={selectedForComparison.includes("current") ? "default" : "outline"}
