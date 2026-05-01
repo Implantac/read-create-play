@@ -292,18 +292,33 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
   ${sections}
 
   <script>
-    function filterVectors() {
-      const filter = document.getElementById('vectorFilter').value;
-      const containers = document.querySelectorAll('.vector-container');
+    function applyFilters() {
+      const vectorFilter = document.getElementById('vectorFilter').value;
+      const diffOnly = document.getElementById('diffOnly').checked;
       
-      containers.forEach(container => {
-        if (filter === 'all' || container.getAttribute('data-vector') === filter) {
+      // Filtra containers de vetores
+      document.querySelectorAll('.vector-container').forEach(container => {
+        const isVectorMatch = vectorFilter === 'all' || container.getAttribute('data-vector') === vectorFilter;
+        if (isVectorMatch) {
           container.classList.remove('hidden');
         } else {
           container.classList.add('hidden');
         }
       });
+
+      // Filtra linhas das tabelas (comparações)
+      document.querySelectorAll('tr[data-diff]').forEach(row => {
+        const isDiff = row.getAttribute('data-diff') === 'true';
+        if (diffOnly && !isDiff) {
+          row.classList.add('hidden');
+        } else {
+          row.classList.remove('hidden');
+        }
+      });
     }
+
+    // Inicializa com filtros aplicados
+    window.onload = applyFilters;
   </script>
 </body>
 </html>`;
