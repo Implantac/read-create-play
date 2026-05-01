@@ -196,22 +196,22 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
         const valE = e[vec][i];
         const isDiff = valC?.toFixed(4) !== valE?.toFixed(4);
         if (isDiff) diffCount++;
+        const delta = (valC || 0) - (valE || 0);
 
-        if (isDiff || maxLen <= 20) {
-          rows += `
-            <tr class="${isDiff ? "diff" : ""}">
-              <td>${i + 1}</td>
-              <td>${valE?.toFixed(4) ?? "-"}</td>
-              <td>${valC?.toFixed(4) ?? "-"}</td>
-            </tr>`;
-        }
+        rows += `
+          <tr class="${isDiff ? "diff" : "same"}" data-diff="${isDiff}">
+            <td>${i + 1}</td>
+            <td>${valE?.toFixed(4) ?? "-"}</td>
+            <td>${valC?.toFixed(4) ?? "-"}</td>
+            <td class="delta ${delta > 0 ? 'pos' : delta < 0 ? 'neg' : ''}">${isDiff ? (delta > 0 ? '+' : '') + delta.toFixed(4) : '-'}</td>
+          </tr>`;
       }
 
       vectorTables += `
         <div class="vector-container" data-vector="${vec}">
           <h3>${vec} (${diffCount} alterações)</h3>
           <table>
-            <thead><tr><th>Núm</th><th>Anterior</th><th>Atual</th></tr></thead>
+            <thead><tr><th>Núm</th><th>Anterior</th><th>Atual</th><th>Delta</th></tr></thead>
             <tbody>${rows}</tbody>
           </table>
         </div>`;
@@ -250,6 +250,9 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
     th { background: #333; }
     tr.diff { background: rgba(255, 82, 82, 0.15); }
     tr.diff td:nth-child(3) { color: #ff5252; font-weight: bold; }
+    .delta { font-family: monospace; font-size: 0.85em; }
+    .delta.pos { color: #4caf50; }
+    .delta.neg { color: #ff5252; }
     .ordering-box { padding: 10px; background: #252525; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #4caf50; }
     .ordering-box.diff { border-left-color: #ff5252; }
     .old { color: #aaa; text-decoration: line-through; font-size: 0.9em; }
@@ -257,6 +260,8 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
     h2 { margin-top: 0; color: #03dac6; }
     h3 { font-size: 16px; margin-bottom: 10px; color: #aaa; }
     .hidden { display: none !important; }
+    .toggle-container { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .toggle-container input { cursor: pointer; }
   </style>
 </head>
 <body>
@@ -268,33 +273,52 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
   <div class="controls">
     <div>
       <label>Filtrar Vetor: </label>
-      <select id="vectorFilter" onchange="filterVectors()">
+      <select id="vectorFilter" onchange="applyFilters()">
         <option value="all">Todos os Vetores</option>
         <option value="penaltyVector">penaltyVector</option>
         <option value="boostedWeights">boostedWeights</option>
         <option value="generatorWeights">generatorWeights</option>
       </select>
     </div>
-    <div style="font-size: 0.9em; color: #888;">
-      * Dica: Use o filtro para isolar o impacto em penalidades ou pesos específicos.
+    <label class="toggle-container">
+      <input type="checkbox" id="diffOnly" onchange="applyFilters()" checked>
+      <span>Modo Comparação (Apenas Mudanças)</span>
+    </label>
+    <div style="font-size: 0.9em; color: #888; margin-left: auto;">
+      * Dica: Compare valores lado a lado e veja o delta de cada alteração.
     </div>
   </div>
 
   ${sections}
 
   <script>
-    function filterVectors() {
-      const filter = document.getElementById('vectorFilter').value;
-      const containers = document.querySelectorAll('.vector-container');
+    function applyFilters() {
+      const vectorFilter = document.getElementById('vectorFilter').value;
+      const diffOnly = document.getElementById('diffOnly').checked;
       
-      containers.forEach(container => {
-        if (filter === 'all' || container.getAttribute('data-vector') === filter) {
+      // Filtra containers de vetores
+      document.querySelectorAll('.vector-container').forEach(container => {
+        const isVectorMatch = vectorFilter === 'all' || container.getAttribute('data-vector') === vectorFilter;
+        if (isVectorMatch) {
           container.classList.remove('hidden');
         } else {
           container.classList.add('hidden');
         }
       });
+
+      // Filtra linhas das tabelas (comparações)
+      document.querySelectorAll('tr[data-diff]').forEach(row => {
+        const isDiff = row.getAttribute('data-diff') === 'true';
+        if (diffOnly && !isDiff) {
+          row.classList.add('hidden');
+        } else {
+          row.classList.remove('hidden');
+        }
+      });
     }
+
+    // Inicializa com filtros aplicados
+    window.onload = applyFilters;
   </script>
 </body>
 </html>`;
