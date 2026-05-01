@@ -79,11 +79,12 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-8">
           {/* Stats Grid Side-by-Side */}
-          <div className={`grid gap-4`} style={{ gridTemplateColumns: `repeat(${bets.length}, minmax(280px, 1fr))` }}>
-            {bets.map((bet, i) => (
-              <div key={i} className={`p-5 rounded-2xl border-2 transition-all ${
-                i === 0 ? "border-primary/30 bg-primary/5 shadow-lg shadow-primary/5" : "border-border/50 bg-card"
-              }`}>
+          <div className="overflow-x-auto pb-4 scrollbar-thin">
+            <div className="flex gap-4 min-w-max pb-2">
+              {bets.map((bet, i) => (
+                <div key={i} className={`p-5 rounded-2xl border-2 transition-all w-[300px] shrink-0 ${
+                  i === 0 ? "border-primary/30 bg-primary/5 shadow-lg shadow-primary/5" : "border-border/50 bg-card"
+                }`}>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     {i === 0 && <Trophy className="w-4 h-4 text-primary" />}
