@@ -197,7 +197,7 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
         const isDiff = valC?.toFixed(4) !== valE?.toFixed(4);
         if (isDiff) diffCount++;
 
-        if (isDiff || maxLen <= 20) { // Mostra apenas diffs ou se o vetor for pequeno
+        if (isDiff || maxLen <= 20) {
           rows += `
             <tr class="${isDiff ? "diff" : ""}">
               <td>${i + 1}</td>
@@ -208,7 +208,7 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
       }
 
       vectorTables += `
-        <div class="vector-container">
+        <div class="vector-container" data-vector="${vec}">
           <h3>${vec} (${diffCount} alterações)</h3>
           <table>
             <thead><tr><th>Núm</th><th>Anterior</th><th>Atual</th></tr></thead>
@@ -238,7 +238,11 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
   <title>Diff Report - ${label}</title>
   <style>
     body { font-family: sans-serif; background: #121212; color: #e0e0e0; margin: 20px; }
-    h1 { color: #bb86fc; border-bottom: 2px solid #333; padding-bottom: 10px; }
+    .header-container { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+    h1 { color: #bb86fc; margin: 0; }
+    .controls { background: #1e1e1e; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; display: flex; gap: 20px; align-items: center; }
+    select, button { background: #333; color: white; border: 1px solid #444; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+    select:hover { border-color: #bb86fc; }
     .level-section { background: #1e1e1e; border-radius: 8px; padding: 20px; margin-bottom: 30px; border: 1px solid #333; }
     .vectors-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
     table { width: 100%; border-collapse: collapse; font-size: 14px; background: #252525; }
@@ -252,12 +256,46 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
     .new { color: #4caf50; font-weight: bold; }
     h2 { margin-top: 0; color: #03dac6; }
     h3 { font-size: 16px; margin-bottom: 10px; color: #aaa; }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
-  <h1>Relatório de Diferenças: ${label}</h1>
-  <p>Gerado em: ${new Date().toLocaleString()}</p>
+  <div class="header-container">
+    <h1>Relatório de Diferenças: ${label}</h1>
+    <span>Gerado em: ${new Date().toLocaleString()}</span>
+  </div>
+
+  <div class="controls">
+    <div>
+      <label>Filtrar Vetor: </label>
+      <select id="vectorFilter" onchange="filterVectors()">
+        <option value="all">Todos os Vetores</option>
+        <option value="penaltyVector">penaltyVector</option>
+        <option value="boostedWeights">boostedWeights</option>
+        <option value="generatorWeights">generatorWeights</option>
+      </select>
+    </div>
+    <div style="font-size: 0.9em; color: #888;">
+      * Dica: Use o filtro para isolar o impacto em penalidades ou pesos específicos.
+    </div>
+  </div>
+
   ${sections}
+
+  <script>
+    function filterVectors() {
+      const filter = document.getElementById('vectorFilter').value;
+      const containers = document.querySelectorAll('.vector-container');
+      
+      containers.forEach(container => {
+        if (filter === 'all' || container.getAttribute('data-vector') === filter) {
+          container.classList.remove('hidden');
+        } else {
+          container.classList.add('hidden');
+        }
+      });
+    }
+  </script>
 </body>
 </html>`;
 }
