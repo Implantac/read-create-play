@@ -272,6 +272,48 @@ export type Database = {
         }
         Relationships: []
       }
+      simulation_scenarios: {
+        Row: {
+          created_at: string
+          id: string
+          lottery_id: string
+          name: string
+          regime_stability: number
+          result_metrics: Json | null
+          risk_profile: string
+          updated_at: string
+          user_id: string
+          volatility: number
+          weights: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lottery_id: string
+          name: string
+          regime_stability: number
+          result_metrics?: Json | null
+          risk_profile: string
+          updated_at?: string
+          user_id: string
+          volatility: number
+          weights: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lottery_id?: string
+          name?: string
+          regime_stability?: number
+          result_metrics?: Json | null
+          risk_profile?: string
+          updated_at?: string
+          user_id?: string
+          volatility?: number
+          weights?: Json
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
