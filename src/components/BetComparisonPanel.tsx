@@ -1,12 +1,14 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Trophy, GitCompare, X, Award, DollarSign, Target, 
-  BarChart3, CheckCircle2, Copy, TrendingUp, ArrowRight
+  BarChart3, CheckCircle2, Copy, TrendingUp, ArrowRight,
+  Sparkles, Zap, ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BetHitsChart } from "./BetHitsChart";
 import { toast } from "sonner";
+import { useMemo } from "react";
 
 interface PerfResult {
   concurso: number;
