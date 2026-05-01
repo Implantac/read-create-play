@@ -251,6 +251,7 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
           <span class="old">Era: ${e.ordering.join(", ")}</span><br>
           <span class="new">Agora: ${c.ordering.join(", ")}</span>
         </div>
+        ${breakdownTable}
         <div class="vectors-grid">${vectorTables}</div>
       </section>`;
   }
