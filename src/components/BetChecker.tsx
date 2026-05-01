@@ -8,8 +8,11 @@ import {
   BarChart3, Target, ArrowUpRight, ChevronDown, ChevronUp,
   Award, DollarSign, Sparkles, CheckCircle2, AlertTriangle,
   Copy, Save, Grid3X3, ArrowDown, ArrowUp, Minus, ListChecks,
-  FileDown, RotateCcw, Hash, Eye, Dice1, Info, Eraser, Play
+  FileDown, RotateCcw, Hash, Eye, Dice1, Info, Eraser, Play,
+  GitCompare, CheckSquare
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { BetComparisonPanel } from "./BetComparisonPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
