@@ -35,12 +35,18 @@ export function scoreGame(
   const pattern = computePatternProfile(sorted, lotteryId, prevDraw);
   const riskConfig = AI_CONFIG.riskProfiles[riskProfile];
 
-  // ADAPTIVE: Self-calibrate weights from historical patterns
+  // ADAPTIVE: Automação profunda e calibração dinâmica
   const adaptiveW = selfCalibrateWeights(draws, lotteryId);
   const context = detectContext(draws, lotteryId);
   let contextW = applyContextAdjustments(adaptiveW, context, riskProfile);
+  
+  // Aumenta o peso de métricas críticas se o regime for instável
+  if (context.volatilityIndex > 0.7) {
+    (contextW as any).frequencyWeight *= 1.25;
+    (contextW as any).clusterWeight *= 1.15;
+  }
 
-  // STABILITY: Smooth weights with EMA to prevent erratic changes
+  // STABILITY: Filtro EMA para suavização de ruído estatístico
   contextW = smoothWeights(contextW, lotteryId, riskProfile);
 
   // SELF-LEARNING: Apply weight optimizations from performance history
