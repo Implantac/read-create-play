@@ -6,7 +6,7 @@
 
 import { DrawResult } from "@/data/lotteries";
 import { NumberStats } from "@/engine/statistics";
-import { getLotteryRules, PRIMES, FIBONACCI } from "../knowledge/lotteriesKnowledge";
+import { getLotteryRules, PRIMES, FIBONACCI, MERSENNE, PERFECT_SQUARES } from "../knowledge/lotteriesKnowledge";
 
 /** Co-occurrence matrix: how often pairs appear together */
 export interface CoOccurrenceResult {
@@ -173,25 +173,30 @@ export function multiWindowTrend(draws: DrawResult[], totalNumbers: number): Tre
   return results;
 }
 
-/** Prime and Fibonacci density scoring for a game */
+/** Prime, Fibonacci, Mersenne and Perfect Square density scoring */
 export function computeSpecialNumberScore(numbers: number[]): {
   primeCount: number;
   fibCount: number;
-  primeRatio: number;
-  fibRatio: number;
+  mersenneCount: number;
+  squareCount: number;
   specialScore: number;
 } {
   const primeCount = numbers.filter(n => PRIMES.has(n)).length;
   const fibCount = numbers.filter(n => FIBONACCI.has(n)).length;
-  const primeRatio = primeCount / numbers.length;
-  const fibRatio = fibCount / numbers.length;
+  const mersenneCount = numbers.filter(n => MERSENNE.has(n)).length;
+  const squareCount = numbers.filter(n => PERFECT_SQUARES.has(n)).length;
 
-  // Historical averages: ~40% primes, ~15% fibonacci is typical
-  const primeDev = Math.abs(primeRatio - 0.4);
-  const fibDev = Math.abs(fibRatio - 0.15);
-  const specialScore = Math.max(0, 100 - primeDev * 150 - fibDev * 200);
+  // Pontuação baseada em densidades ideais históricas
+  // Primos: ~33% | Fibonacci: ~15% | Quadrados: ~15% | Mersenne: bônus de raridade
+  const n = numbers.length;
+  const primeScore = Math.max(0, 100 - Math.abs((primeCount/n) - 0.33) * 300);
+  const fibScore = Math.max(0, 100 - Math.abs((fibCount/n) - 0.15) * 400);
+  const squareScore = Math.max(0, 100 - Math.abs((squareCount/n) - 0.15) * 400);
+  const mersenneBonus = mersenneCount > 0 ? 15 : 0;
 
-  return { primeCount, fibCount, primeRatio, fibRatio, specialScore };
+  const specialScore = Math.min(100, (primeScore * 0.4 + fibScore * 0.3 + squareScore * 0.3) + mersenneBonus);
+
+  return { primeCount, fibCount, mersenneCount, squareCount, specialScore };
 }
 
 /** Compute "coverage score" — how well a set of games covers the number space */
