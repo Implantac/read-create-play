@@ -18,6 +18,7 @@ import { computeRegressionCandidates, scoreByRegression, computeMultiWindowRegre
 import { computeRecencyWeightedFrequency, computeCovarianceNetwork, scoreByCorrelationNetwork, computeTemporalVolatility, scoreByVolatility } from "./probabilityEngine";
 import { buildTransitionMatrix, scoreByTransitionMatrix, buildPairTransitions, scoreByPairTransitions, computeStationaryDistribution, scoreByStationaryDist, buildRecencyWeightedMatrix, scoreByRecencyWeightedMatrix, computeVelocityProfiles, scoreByVelocity } from "./markovEngine";
 import { buildConditionalNetwork, scoreByBayesianNetwork, computeMutualInformation, scoreByMutualInformation } from "./bayesianNetworkEngine";
+import { scoreJackpotAlignment, computeAntiPopularityPenalty } from "../knowledge/jackpotMasterStrategies";
 import type { ScoredGame, GameScores, RiskProfile } from "../core/aiTypes";
 
 export function scoreGame(
