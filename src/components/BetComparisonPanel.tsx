@@ -152,80 +152,103 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
           {/* Stats Grid Side-by-Side */}
           <div className="overflow-x-auto pb-4 scrollbar-thin">
             <div className="flex gap-4 min-w-max pb-2">
-              {bets.map((bet, i) => (
-                <div key={i} className={`p-5 rounded-2xl border-2 transition-all w-[300px] shrink-0 ${
-                  i === 0 ? "border-primary/30 bg-primary/5 shadow-lg shadow-primary/5" : "border-border/50 bg-card"
-                }`}>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    {i === 0 && <Trophy className="w-4 h-4 text-primary" />}
-                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      {i === 0 ? "Melhor Rank" : `Opção #${i + 1}`}
-                    </span>
-                  </div>
-                  <Badge variant={i === 0 ? "default" : "secondary"} className="font-mono">
-                    Score: {bet.score}
-                  </Badge>
-                </div>
+              {bets.map((bet, i) => {
+                const isBestScore = highlights?.score.includes(i);
+                const isBestAvg = highlights?.avgHits.includes(i);
+                const isBestHit = highlights?.bestHit.includes(i);
+                const isBestPrize = highlights?.prizeHits.includes(i);
+                const isBestConsistency = highlights?.consistency.includes(i);
+                const consistencyVal = highlights?.metrics[i].consistency || 0;
 
-                <h3 className="font-bold text-sm mb-4 truncate" title={bet.label}>{bet.label}</h3>
-
-                <div className="grid grid-cols-2 gap-3 mb-6">
-                  <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
-                    <p className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1">
-                      <Target className="w-3 h-3" /> Média
-                    </p>
-                    <p className="text-sm font-bold font-mono">{bet.avgHits.toFixed(2)}</p>
-                  </div>
-                  <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
-                    <p className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1">
-                      <Award className="w-3 h-3" /> Recorde
-                    </p>
-                    <p className="text-sm font-bold font-mono text-accent">{bet.bestHit}</p>
-                  </div>
-                  <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
-                    <p className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3" /> Prêmios
-                    </p>
-                    <p className="text-sm font-bold font-mono text-green-400">{bet.prizeHits}x</p>
-                  </div>
-                  <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
-                    <p className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1">
-                      <DollarSign className="w-3 h-3" /> Total
-                    </p>
-                    <p className="text-sm font-bold font-mono text-primary">{bet.totalPrize}</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Composição</span>
-                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => copyNumbers(bet.numbers)}>
-                      <Copy className="w-3 h-3" />
-                    </Button>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {bet.numbers.map(n => (
-                      <span 
-                        key={n} 
-                        className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-mono font-bold border transition-colors ${
-                          commonNumbers.includes(n) 
-                            ? "bg-primary text-primary-foreground border-primary shadow-sm" 
-                            : "bg-muted/50 text-foreground border-border"
-                        }`}
-                        title={commonNumbers.includes(n) ? "Número presente em todos os jogos comparados" : ""}
-                      >
-                        {String(n).padStart(2, "0")}
+                return (
+                  <div key={i} className={`p-5 rounded-2xl border-2 transition-all w-[300px] shrink-0 ${
+                    isBestScore ? "border-primary bg-primary/5 shadow-lg shadow-primary/10" : "border-border/50 bg-card"
+                  }`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      {isBestScore && <Sparkles className="w-4 h-4 text-primary animate-pulse" />}
+                      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                        {isBestScore ? "Performance Top" : `Aposta #${i + 1}`}
                       </span>
-                    ))}
+                    </div>
+                    <Badge variant={isBestScore ? "default" : "secondary"} className={`font-mono ${isBestScore ? "gradient-brand" : ""}`}>
+                      Score: {bet.score}
+                    </Badge>
+                  </div>
+
+                  <h3 className="font-bold text-sm mb-4 truncate" title={bet.label}>{bet.label}</h3>
+
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    <MetricBox 
+                      label="Média" 
+                      value={bet.avgHits.toFixed(2)} 
+                      icon={Target} 
+                      isBest={isBestAvg} 
+                    />
+                    <MetricBox 
+                      label="Recorde" 
+                      value={bet.bestHit} 
+                      icon={Award} 
+                      isBest={isBestHit} 
+                      colorClass="text-accent"
+                    />
+                    <MetricBox 
+                      label="Prêmios" 
+                      value={bet.prizeHits} 
+                      icon={CheckCircle2} 
+                      isBest={isBestPrize} 
+                      colorClass="text-green-400"
+                      suffix="x"
+                    />
+                    <MetricBox 
+                      label="Consistência" 
+                      value={Math.round(consistencyVal * 100)} 
+                      icon={ShieldCheck} 
+                      isBest={isBestConsistency} 
+                      colorClass="text-blue-400"
+                      suffix="%"
+                    />
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-muted/30 border border-border/50 mb-6 flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] text-muted-foreground mb-0.5">Retorno Total Estimado</p>
+                      <p className="text-sm font-bold text-primary font-mono">{bet.totalPrize}</p>
+                    </div>
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <DollarSign className="w-4 h-4 text-primary" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Composição</span>
+                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => copyNumbers(bet.numbers)}>
+                        <Copy className="w-3 h-3" />
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {bet.numbers.map(n => (
+                        <span 
+                          key={n} 
+                          className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-mono font-bold border transition-colors ${
+                            commonNumbers.includes(n) 
+                              ? "bg-primary text-primary-foreground border-primary shadow-sm" 
+                              : "bg-muted/50 text-foreground border-border"
+                          }`}
+                          title={commonNumbers.includes(n) ? "Número presente em todos os jogos comparados" : ""}
+                        >
+                          {String(n).padStart(2, "0")}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-6 pt-6 border-t border-border/50">
+                    <BetHitsChart results={bet.results} avgHits={bet.avgHits} pick={pick} />
                   </div>
                 </div>
-
-                <div className="mt-6 pt-6 border-t border-border/50">
-                  <BetHitsChart results={bet.results} avgHits={bet.avgHits} pick={pick} />
-                </div>
-              </div>
-            ))}
+              )})}
           </div>
         </div>
 
