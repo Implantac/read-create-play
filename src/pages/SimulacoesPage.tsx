@@ -7,9 +7,10 @@ import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { ComplianceDisclaimer } from "@/components/ComplianceDisclaimer";
 import { ComparativeSimulatorPanel } from "@/components/ComparativeSimulatorPanel";
+import { VolatilitySimulationPanel } from "@/components/VolatilitySimulationPanel";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { FlaskConical, Loader2, TrendingUp, Cpu, BarChart3, Layers } from "lucide-react";
+import { FlaskConical, Loader2, TrendingUp, Cpu, BarChart3, Layers, Activity } from "lucide-react";
 
 const HistoricalSimulatorPanel = lazy(() => import("@/components/HistoricalSimulatorPanel").then(m => ({ default: m.HistoricalSimulatorPanel })));
 const MassiveSimulationDashboard = lazy(() => import("@/components/MassiveSimulationDashboard").then(m => ({ default: m.MassiveSimulationDashboard })));
@@ -82,7 +83,7 @@ const SimulacoesPage = () => {
               <Card className="bg-card/80 border-border">
                 <CardContent className="p-3 text-center">
                   <Cpu className="w-5 h-5 text-primary mx-auto mb-1" />
-                  <div className="text-lg font-black text-foreground font-mono">6</div>
+                  <div className="text-lg font-black text-foreground font-mono">7</div>
                   <div className="text-[10px] text-muted-foreground">Simuladores</div>
                 </CardContent>
               </Card>
@@ -95,6 +96,7 @@ const SimulacoesPage = () => {
               </Card>
             </div>
 
+            <VolatilitySimulationPanel lotteryId={config.id} draws={draws} />
             <ComparativeSimulatorPanel stats={stats} config={config} draws={draws} />
 
             <SafeSuspense fallback={<LazyFallback />}>
