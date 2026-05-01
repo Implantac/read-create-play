@@ -146,34 +146,92 @@ interface RunSnapshot {
 
 const vecKey = (v: number[]) => v.map(x => x.toFixed(4)).join("|");
 
-function generateDiffSummary(current: any, existing: any): string {
-  let diff = "";
+function generateHTMLDiffReport(current: any, existing: any, label: string): string {
   const levels = Object.keys(current) as AntiPopularityLevel[];
-  
+  let sections = "";
+
   for (const lvl of levels) {
     const c = current[lvl];
     const e = existing[lvl];
-    if (!e) {
-      diff += `  [${lvl}]: Nível novo (não existia no snapshot)\n`;
-      continue;
-    }
+    if (!e) continue;
 
+    let vectorTables = "";
     const vectors = ["penaltyVector", "boostedWeights", "generatorWeights"] as const;
+    
     for (const vec of vectors) {
-      const cv = vecKey(c[vec]);
-      const ev = vecKey(e[vec]);
-      if (cv !== ev) {
-        // Encontra o primeiro índice de diferença para facilitar debug
-        const firstDiff = c[vec].findIndex((v: number, i: number) => v.toFixed(4) !== e[vec][i].toFixed(4));
-        diff += `  [${lvl}] ${vec} MUDOU: index ${firstDiff} (era ${e[vec][firstDiff]?.toFixed(4)}, agora é ${c[vec][firstDiff]?.toFixed(4)})\n`;
+      let rows = "";
+      const maxLen = Math.max(c[vec].length, e[vec].length);
+      let diffCount = 0;
+
+      for (let i = 0; i < maxLen; i++) {
+        const valC = c[vec][i];
+        const valE = e[vec][i];
+        const isDiff = valC?.toFixed(4) !== valE?.toFixed(4);
+        if (isDiff) diffCount++;
+
+        if (isDiff || maxLen <= 20) { // Mostra apenas diffs ou se o vetor for pequeno
+          rows += `
+            <tr class="${isDiff ? "diff" : ""}">
+              <td>${i + 1}</td>
+              <td>${valE?.toFixed(4) ?? "-"}</td>
+              <td>${valC?.toFixed(4) ?? "-"}</td>
+            </tr>`;
+        }
       }
+
+      vectorTables += `
+        <div class="vector-container">
+          <h3>${vec} (${diffCount} alterações)</h3>
+          <table>
+            <thead><tr><th>Núm</th><th>Anterior</th><th>Atual</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
     }
 
-    if (c.ordering.join(",") !== e.ordering.join(",")) {
-      diff += `  [${lvl}] ordering MUDOU: ${e.ordering.slice(0, 3).join("-")}... -> ${c.ordering.slice(0, 3).join("-")}...\n`;
-    }
+    const orderDiff = c.ordering.join(",") !== e.ordering.join(",");
+    sections += `
+      <section class="level-section">
+        <h2>Nível: ${lvl.toUpperCase()}</h2>
+        <div class="ordering-box ${orderDiff ? "diff" : ""}">
+          <strong>Ordenação:</strong><br>
+          <span class="old">Era: ${e.ordering.join(", ")}</span><br>
+          <span class="new">Agora: ${c.ordering.join(", ")}</span>
+        </div>
+        <div class="vectors-grid">${vectorTables}</div>
+      </section>`;
   }
-  return diff;
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Diff Report - ${label}</title>
+  <style>
+    body { font-family: sans-serif; background: #121212; color: #e0e0e0; margin: 20px; }
+    h1 { color: #bb86fc; border-bottom: 2px solid #333; padding-bottom: 10px; }
+    .level-section { background: #1e1e1e; border-radius: 8px; padding: 20px; margin-bottom: 30px; border: 1px solid #333; }
+    .vectors-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; background: #252525; }
+    th, td { border: 1px solid #444; padding: 8px; text-align: center; }
+    th { background: #333; }
+    tr.diff { background: rgba(255, 82, 82, 0.15); }
+    tr.diff td:nth-child(3) { color: #ff5252; font-weight: bold; }
+    .ordering-box { padding: 10px; background: #252525; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #4caf50; }
+    .ordering-box.diff { border-left-color: #ff5252; }
+    .old { color: #aaa; text-decoration: line-through; font-size: 0.9em; }
+    .new { color: #4caf50; font-weight: bold; }
+    h2 { margin-top: 0; color: #03dac6; }
+    h3 { font-size: 16px; margin-bottom: 10px; color: #aaa; }
+  </style>
+</head>
+<body>
+  <h1>Relatório de Diferenças: ${label}</h1>
+  <p>Gerado em: ${new Date().toLocaleString()}</p>
+  ${sections}
+</body>
+</html>`;
 }
 
 function checkAndReportSnapshots(snapshots: Record<AntiPopularityLevel, RunSnapshot>, label: string) {
@@ -189,7 +247,6 @@ function checkAndReportSnapshots(snapshots: Record<AntiPopularityLevel, RunSnaps
   const existing = JSON.parse(fs.readFileSync(filePath, "utf-8"));
   
   try {
-    // Verificações lógicas básicas (as que já existiam em compareSnapshots)
     const lotteryId = label.split("/")[1];
     const hasLevelSensitivePenalty = 
       lotteryId === "megasena" || lotteryId === "quina" || lotteryId === "lotomania";
@@ -204,11 +261,17 @@ function checkAndReportSnapshots(snapshots: Record<AntiPopularityLevel, RunSnaps
       ).toBe(true);
     }
 
-    // Comparação profunda com o snapshot
     expect(snapshots, `Snapshot mismatch for ${label}`).toEqual(existing);
   } catch (err) {
     const diffReport = generateDiffSummary(snapshots, existing);
+    const htmlReport = generateHTMLDiffReport(snapshots, existing, label);
+    
+    if (!fs.existsSync(REPORT_DIR)) fs.mkdirSync(REPORT_DIR, { recursive: true });
+    const reportPath = path.join(REPORT_DIR, `diff-${label.replace(/\//g, "-")}.html`);
+    fs.writeFileSync(reportPath, htmlReport);
+
     console.error(`\n❌ FALHA NO SNAPSHOT: ${label}\n${diffReport}`);
+    console.error(`👉 Relatório visual gerado em: ${reportPath}\n`);
     throw err;
   }
 }
