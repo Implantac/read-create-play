@@ -410,27 +410,30 @@ export function applyJackpotMasterBoost(
     const n = stat.number;
     let multiplier = 1.0;
 
-    // Boost: número quente alinhado ao share recomendado
-    if (hotSet.has(n)) multiplier *= 1.0 + profile.hotShare[1] * 0.3;
+    // Boost: número quente (Hot) - Foco em momentum de curto prazo
+    if (hotSet.has(n)) multiplier *= 1.0 + (profile.hotShare[1] * 0.45);
 
-    // Boost: número atrasado dentro do share recomendado
-    if (overdueSet.has(n)) multiplier *= 1.0 + profile.overdueShare[1] * 0.4;
+    // Boost: número médio (Neutral) - Sustentação estatística
+    if (medianSet.has(n)) multiplier *= 1.15;
+
+    // Boost: número atrasado (Overdue) - Reversão à média (Jackpot Hunter)
+    if (overdueSet.has(n)) multiplier *= 1.0 + (profile.overdueShare[1] * 0.6);
 
     // Boost: repetição do anterior alinhada à média histórica da modalidade
     if (lastDraw.has(n)) {
       const repeatTarget = (profile.repeatPrev[0] + profile.repeatPrev[1]) / 2;
       const repeatStrength = repeatTarget / rules.pick;
-      multiplier *= 1.0 + repeatStrength * 0.5;
+      multiplier *= 1.0 + (repeatStrength * 0.65);
     }
 
     // Boost: primos dentro da faixa ideal
     if (PRIMES.has(n)) {
       const primeShare = (profile.primeRange[0] + profile.primeRange[1]) / 2 / rules.pick;
-      multiplier *= 1.0 + primeShare * 0.3;
+      multiplier *= 1.0 + (primeShare * 0.4);
     }
 
-    // Boost: Fibonacci suave (presença marginal estatística)
-    if (FIBONACCI.has(n)) multiplier *= 1.05;
+    // Boost: Fibonacci (Harmonia estrutural)
+    if (FIBONACCI.has(n)) multiplier *= 1.08;
 
     // Boost específico Lotofácil — frame/centro
     if (lotteryId === "lotofacil") {
