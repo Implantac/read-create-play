@@ -109,6 +109,7 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
 
     return { scenarios: list, metrics };
   }, [selectedForComparison, scenarios, currentScenario, simulatedWeights]);
+
   const fetchScenarios = async () => {
     if (!user) return;
     try {
@@ -191,7 +192,6 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
       date: format(new Date(s.created_at), "dd/MM", { locale: ptBR })
     }));
   }, [scenarios]);
-
 
   const riskLabels: Record<RiskProfile, string> = {
     conservative: "Conservador",
@@ -313,7 +313,6 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
               </Button>
             </div>
             <div className="flex flex-col gap-2">
-
               <Button 
                 size="sm" 
                 variant={selectedForComparison.includes("current") ? "default" : "outline"}
@@ -349,7 +348,6 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
             </div>
 
             <div className="grid md:grid-cols-2 gap-8">
-              {/* Metric Comparison Bars */}
               <div className="space-y-4">
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Diferença de Pesos por Métrica</p>
                 <div className="h-64">
@@ -373,7 +371,6 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
                 </div>
               </div>
 
-              {/* Settings Summary Table */}
               <div className="space-y-4">
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Parâmetros de Entrada</p>
                 <div className="overflow-hidden rounded-xl border border-border bg-background">
@@ -409,7 +406,7 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
           </div>
         )}
 
-        {/* History/Comparison Section */}
+        {/* History Section */}
         {showHistory && (
           <div className="grid md:grid-cols-2 gap-6 p-4 rounded-xl bg-muted/20 border border-border">
             <div className="space-y-3">
@@ -481,7 +478,6 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
 
         {/* Visualizations */}
         <div className="grid lg:grid-cols-2 gap-8 items-center">
-          {/* Radar Chart for Weights Balance */}
           <div className="relative group">
             <div className="absolute inset-0 bg-primary/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="h-64 relative">
@@ -517,7 +513,6 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
             </div>
           </div>
 
-          {/* Bar Chart for Metric Breakdown */}
           <div className="space-y-6">
             <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
@@ -552,7 +547,6 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
               </ResponsiveContainer>
             </div>
 
-            {/* Explanation Box */}
             <div className="bg-muted/30 border border-border/50 rounded-xl p-4">
               <div className="flex gap-3">
                 <div className={`p-2 rounded-lg bg-background border ${volatility > 0.6 ? 'border-orange-500/30' : 'border-primary/20'} shrink-0 h-fit`}>
