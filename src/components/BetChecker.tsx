@@ -1345,6 +1345,7 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                         </motion.div>
                       );
                     })}
+                    </div>
                   </div>
                 )}
 
