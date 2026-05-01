@@ -250,6 +250,9 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
     th { background: #333; }
     tr.diff { background: rgba(255, 82, 82, 0.15); }
     tr.diff td:nth-child(3) { color: #ff5252; font-weight: bold; }
+    .delta { font-family: monospace; font-size: 0.85em; }
+    .delta.pos { color: #4caf50; }
+    .delta.neg { color: #ff5252; }
     .ordering-box { padding: 10px; background: #252525; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #4caf50; }
     .ordering-box.diff { border-left-color: #ff5252; }
     .old { color: #aaa; text-decoration: line-through; font-size: 0.9em; }
@@ -257,6 +260,8 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
     h2 { margin-top: 0; color: #03dac6; }
     h3 { font-size: 16px; margin-bottom: 10px; color: #aaa; }
     .hidden { display: none !important; }
+    .toggle-container { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .toggle-container input { cursor: pointer; }
   </style>
 </head>
 <body>
