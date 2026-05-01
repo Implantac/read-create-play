@@ -156,6 +156,7 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
               </div>
             ))}
           </div>
+        </div>
 
           {/* Differences Section */}
           <div className="space-y-4">
