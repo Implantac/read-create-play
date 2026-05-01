@@ -36,6 +36,36 @@ interface BetPerformance {
   score: number;
 }
 
+function MetricBox({ label, value, icon: Icon, isBest, colorClass, suffix = "" }: { 
+  label: string; value: string | number; icon: any; isBest?: boolean; colorClass?: string; suffix?: string 
+}) {
+  return (
+    <div className={`p-3 rounded-xl border transition-all relative overflow-hidden h-full flex flex-col justify-center ${
+      isBest 
+        ? "bg-primary/10 border-primary/40 shadow-sm shadow-primary/10" 
+        : "bg-muted/50 border-border/50"
+    }`}>
+      {isBest && (
+        <motion.div 
+          initial={{ opacity: 0, scale: 0, rotate: -20 }}
+          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          className="absolute -top-1 -right-1"
+        >
+          <div className="bg-primary text-primary-foreground p-1 rounded-bl-lg shadow-sm">
+            <Sparkles className="w-2.5 h-2.5" />
+          </div>
+        </motion.div>
+      )}
+      <p className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1">
+        <Icon className={`w-3 h-3 ${isBest ? "text-primary" : ""}`} /> {label}
+      </p>
+      <p className={`text-sm font-bold font-mono ${isBest ? "text-primary scale-105" : colorClass || "text-foreground"} transition-all`}>
+        {value}{suffix}
+      </p>
+    </div>
+  );
+}
+
 interface Props {
   bets: BetPerformance[];
   onClose: () => void;
