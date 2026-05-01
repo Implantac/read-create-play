@@ -397,9 +397,12 @@ export function applyJackpotMasterBoost(
 
   // Estatísticas auxiliares
   const sortedByFreq = [...stats].sort((a, b) => b.frequency - a.frequency);
-  const hotSet = new Set(sortedByFreq.slice(0, Math.ceil(rules.totalNumbers * 0.30)).map(s => s.number));
+  const hotSet = new Set(sortedByFreq.slice(0, Math.ceil(rules.totalNumbers * 0.35)).map(s => s.number));
   const overdueSet = new Set(
-    stats.filter(s => s.avgGap > 0 && s.lastSeen >= s.avgGap * 1.3).map(s => s.number)
+    stats.filter(s => s.avgGap > 0 && s.lastSeen >= s.avgGap * 1.5).map(s => s.number)
+  );
+  const medianSet = new Set(
+    sortedByFreq.slice(Math.floor(rules.totalNumbers * 0.35), Math.floor(rules.totalNumbers * 0.70)).map(s => s.number)
   );
   const lastDraw = new Set(draws.length > 0 ? draws[0].numbers : []);
 
