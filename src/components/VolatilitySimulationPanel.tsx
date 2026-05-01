@@ -124,7 +124,7 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
               <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
                 <Zap className="w-3.5 h-3.5 text-primary" /> Volatilidade Simulada
               </label>
-              <Badge variant="ghost" className={`text-[10px] font-black uppercase ${volatilityColor}`}>
+              <Badge variant="outline" className={`text-[10px] font-black uppercase border-transparent ${volatilityColor}`}>
                 {volatilityStatus}
               </Badge>
             </div>
@@ -213,7 +213,7 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
                         return (
                           <div className="bg-card border border-border p-2 rounded-md shadow-xl text-[10px]">
                             <p className="font-bold text-foreground mb-1">{payload[0].payload.name}</p>
-                            <p className="text-primary">Peso Ajustado: {payload[0].value?.toFixed(2)}x</p>
+                            <p className="text-primary">Peso Ajustado: {Number(payload[0].value).toFixed(2)}x</p>
                           </div>
                         );
                       }
