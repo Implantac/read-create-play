@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
   Info, Zap, AlertTriangle, ShieldCheck, TrendingUp, 
-  BarChart, Activity, Save, FolderOpen, History, Trash2, Loader2, X 
+  BarChart, Activity, Save, FolderOpen, History, Trash2, Loader2, X,
+  ArrowLeftRight, Check, Square
 } from "lucide-react";
 import { 
   Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, 
