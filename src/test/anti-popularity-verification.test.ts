@@ -7,27 +7,13 @@
  *
  * Cobertura: TODAS as 8 modalidades suportadas pelo motor master.
  *
- * Para cada combinação modalidade × gerador × nível este teste:
- *   1. Roda a geração e captura scores finais ordenados.
- *   2. Captura a sequência de assinaturas dos jogos (ordenação).
- *   3. Mede a penalidade média anti-popularidade aplicada.
- *   4. Captura PER-NUMBER:
- *        • penaltyVector  — penalidade individual de cada número (1..N)
- *        • boostedWeights — peso após applyJackpotMasterBoost partindo
- *          de um mapa uniforme (isola o efeito do nível)
- *        • generatorWeights — pesos/scores por número observados na
- *          saída do gerador (frequência ponderada nos jogos retornados
- *          ou compositeScore individual no caso da IA Autônoma).
- *   5. Verifica que ao menos um vetor (scores OU ordenação OU pesos
- *      por número OU penalidades por número) muda entre níveis nas
- *      modalidades onde o perfil prevê alteração.
- *
- * NOTA: o gerador Universal é executado apenas em Mega-Sena e Lotofácil
- * porque o pipeline completo leva ~25s por modalidade; os outros 3
- * geradores cobrem todas as 8.
+ * COMANDO PARA ATUALIZAR SNAPSHOTS:
+ * bunx vitest run -u src/test/anti-popularity-verification.test.ts
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import { computeFrequencyStats } from "@/engine/statistics";
 import { generateGames } from "@/ai/generators/universalGameGenerator";
 import { generateProfessionalBets } from "@/engine/professional-generator";
@@ -42,6 +28,22 @@ import {
   ANTI_POPULARITY_PROFILES,
 } from "@/ai/knowledge/jackpotMasterStrategies";
 import type { LotteryConfig, DrawResult } from "@/data/lotteries";
+
+const SNAPSHOT_DIR = path.join(process.cwd(), "src/test/snapshots/anti-popularity");
+const SHOULD_UPDATE = process.argv.includes("-u") || process.argv.includes("--update");
+
+// Mock de Math.random para garantir determinismo nos snapshots
+const originalRandom = Math.random;
+function setupDeterministicRandom(seed: number) {
+  let s = seed;
+  Math.random = () => {
+    s = (s * 1664525 + 1013904223) % 4294967296;
+    return s / 4294967296;
+  };
+}
+function restoreRandom() {
+  Math.random = originalRandom;
+}
 
 const LEVELS: AntiPopularityLevel[] = ["light", "standard", "aggressive"];
 
