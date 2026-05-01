@@ -1,12 +1,14 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Trophy, GitCompare, X, Award, DollarSign, Target, 
-  BarChart3, CheckCircle2, Copy, TrendingUp, ArrowRight
+  BarChart3, CheckCircle2, Copy, TrendingUp, ArrowRight,
+  Sparkles, Zap, ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BetHitsChart } from "./BetHitsChart";
 import { toast } from "sonner";
+import { useMemo } from "react";
 
 interface PerfResult {
   concurso: number;
@@ -34,6 +36,36 @@ interface BetPerformance {
   score: number;
 }
 
+function MetricBox({ label, value, icon: Icon, isBest, colorClass, suffix = "" }: { 
+  label: string; value: string | number; icon: any; isBest?: boolean; colorClass?: string; suffix?: string 
+}) {
+  return (
+    <div className={`p-3 rounded-xl border transition-all relative overflow-hidden h-full flex flex-col justify-center ${
+      isBest 
+        ? "bg-primary/10 border-primary/40 shadow-sm shadow-primary/10" 
+        : "bg-muted/50 border-border/50"
+    }`}>
+      {isBest && (
+        <motion.div 
+          initial={{ opacity: 0, scale: 0, rotate: -20 }}
+          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          className="absolute -top-1 -right-1"
+        >
+          <div className="bg-primary text-primary-foreground p-1 rounded-bl-lg shadow-sm">
+            <Sparkles className="w-2.5 h-2.5" />
+          </div>
+        </motion.div>
+      )}
+      <p className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1">
+        <Icon className={`w-3 h-3 ${isBest ? "text-primary" : ""}`} /> {label}
+      </p>
+      <p className={`text-sm font-bold font-mono ${isBest ? "text-primary scale-105" : colorClass || "text-foreground"} transition-all`}>
+        {value}{suffix}
+      </p>
+    </div>
+  );
+}
+
 interface Props {
   bets: BetPerformance[];
   onClose: () => void;
@@ -52,6 +84,45 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
   
   // Encontrar números em comum
   const commonNumbers = allNumbers.filter(n => bets.every(b => b.numbers.includes(n)));
+
+  // Calcular métricas de destaque
+  const highlights = useMemo(() => {
+    if (bets.length === 0) return null;
+
+    const metrics = bets.map(b => {
+      // Cálculo de consistência: Frequência de acertos acima de 40% do total de números
+      const threshold = pick * 0.4;
+      const consistency = b.results.length > 0 
+        ? b.results.filter(r => (r.bestHits ?? r.hits) >= threshold).length / b.results.length 
+        : 0;
+
+      return {
+        avgHits: b.avgHits,
+        bestHit: b.bestHit,
+        prizeHits: b.prizeHits,
+        totalPrize: b.totalPrizeValue,
+        consistency: consistency,
+        score: b.score
+      };
+    });
+
+    const findMaxIndices = (field: keyof typeof metrics[0]) => {
+      const vals = metrics.map(m => m[field]);
+      const maxVal = Math.max(...vals);
+      if (maxVal === 0 && field === 'prizeHits') return []; // Não destacar se ninguém ganhou nada
+      return metrics.reduce((acc, curr, idx) => (curr[field] === maxVal ? [...acc, idx] : acc), [] as number[]);
+    };
+
+    return {
+      avgHits: findMaxIndices("avgHits"),
+      bestHit: findMaxIndices("bestHit"),
+      prizeHits: findMaxIndices("prizeHits"),
+      totalPrize: findMaxIndices("totalPrize"),
+      consistency: findMaxIndices("consistency"),
+      score: findMaxIndices("score"),
+      metrics: metrics // Exportar métricas calculadas
+    };
+  }, [bets, pick]);
 
   return (
     <motion.div 
@@ -81,80 +152,103 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
           {/* Stats Grid Side-by-Side */}
           <div className="overflow-x-auto pb-4 scrollbar-thin">
             <div className="flex gap-4 min-w-max pb-2">
-              {bets.map((bet, i) => (
-                <div key={i} className={`p-5 rounded-2xl border-2 transition-all w-[300px] shrink-0 ${
-                  i === 0 ? "border-primary/30 bg-primary/5 shadow-lg shadow-primary/5" : "border-border/50 bg-card"
-                }`}>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    {i === 0 && <Trophy className="w-4 h-4 text-primary" />}
-                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      {i === 0 ? "Melhor Rank" : `Opção #${i + 1}`}
-                    </span>
-                  </div>
-                  <Badge variant={i === 0 ? "default" : "secondary"} className="font-mono">
-                    Score: {bet.score}
-                  </Badge>
-                </div>
+              {bets.map((bet, i) => {
+                const isBestScore = highlights?.score.includes(i);
+                const isBestAvg = highlights?.avgHits.includes(i);
+                const isBestHit = highlights?.bestHit.includes(i);
+                const isBestPrize = highlights?.prizeHits.includes(i);
+                const isBestConsistency = highlights?.consistency.includes(i);
+                const consistencyVal = highlights?.metrics[i].consistency || 0;
 
-                <h3 className="font-bold text-sm mb-4 truncate" title={bet.label}>{bet.label}</h3>
-
-                <div className="grid grid-cols-2 gap-3 mb-6">
-                  <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
-                    <p className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1">
-                      <Target className="w-3 h-3" /> Média
-                    </p>
-                    <p className="text-sm font-bold font-mono">{bet.avgHits.toFixed(2)}</p>
-                  </div>
-                  <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
-                    <p className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1">
-                      <Award className="w-3 h-3" /> Recorde
-                    </p>
-                    <p className="text-sm font-bold font-mono text-accent">{bet.bestHit}</p>
-                  </div>
-                  <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
-                    <p className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3" /> Prêmios
-                    </p>
-                    <p className="text-sm font-bold font-mono text-green-400">{bet.prizeHits}x</p>
-                  </div>
-                  <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
-                    <p className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1">
-                      <DollarSign className="w-3 h-3" /> Total
-                    </p>
-                    <p className="text-sm font-bold font-mono text-primary">{bet.totalPrize}</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Composição</span>
-                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => copyNumbers(bet.numbers)}>
-                      <Copy className="w-3 h-3" />
-                    </Button>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {bet.numbers.map(n => (
-                      <span 
-                        key={n} 
-                        className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-mono font-bold border transition-colors ${
-                          commonNumbers.includes(n) 
-                            ? "bg-primary text-primary-foreground border-primary shadow-sm" 
-                            : "bg-muted/50 text-foreground border-border"
-                        }`}
-                        title={commonNumbers.includes(n) ? "Número presente em todos os jogos comparados" : ""}
-                      >
-                        {String(n).padStart(2, "0")}
+                return (
+                  <div key={i} className={`p-5 rounded-2xl border-2 transition-all w-[300px] shrink-0 ${
+                    isBestScore ? "border-primary bg-primary/5 shadow-lg shadow-primary/10" : "border-border/50 bg-card"
+                  }`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      {isBestScore && <Sparkles className="w-4 h-4 text-primary animate-pulse" />}
+                      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                        {isBestScore ? "Performance Top" : `Aposta #${i + 1}`}
                       </span>
-                    ))}
+                    </div>
+                    <Badge variant={isBestScore ? "default" : "secondary"} className={`font-mono ${isBestScore ? "gradient-brand" : ""}`}>
+                      Score: {bet.score}
+                    </Badge>
+                  </div>
+
+                  <h3 className="font-bold text-sm mb-4 truncate" title={bet.label}>{bet.label}</h3>
+
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    <MetricBox 
+                      label="Média" 
+                      value={bet.avgHits.toFixed(2)} 
+                      icon={Target} 
+                      isBest={isBestAvg} 
+                    />
+                    <MetricBox 
+                      label="Recorde" 
+                      value={bet.bestHit} 
+                      icon={Award} 
+                      isBest={isBestHit} 
+                      colorClass="text-accent"
+                    />
+                    <MetricBox 
+                      label="Prêmios" 
+                      value={bet.prizeHits} 
+                      icon={CheckCircle2} 
+                      isBest={isBestPrize} 
+                      colorClass="text-green-400"
+                      suffix="x"
+                    />
+                    <MetricBox 
+                      label="Consistência" 
+                      value={Math.round(consistencyVal * 100)} 
+                      icon={ShieldCheck} 
+                      isBest={isBestConsistency} 
+                      colorClass="text-blue-400"
+                      suffix="%"
+                    />
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-muted/30 border border-border/50 mb-6 flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] text-muted-foreground mb-0.5">Retorno Total Estimado</p>
+                      <p className="text-sm font-bold text-primary font-mono">{bet.totalPrize}</p>
+                    </div>
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <DollarSign className="w-4 h-4 text-primary" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Composição</span>
+                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => copyNumbers(bet.numbers)}>
+                        <Copy className="w-3 h-3" />
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {bet.numbers.map(n => (
+                        <span 
+                          key={n} 
+                          className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-mono font-bold border transition-colors ${
+                            commonNumbers.includes(n) 
+                              ? "bg-primary text-primary-foreground border-primary shadow-sm" 
+                              : "bg-muted/50 text-foreground border-border"
+                          }`}
+                          title={commonNumbers.includes(n) ? "Número presente em todos os jogos comparados" : ""}
+                        >
+                          {String(n).padStart(2, "0")}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-6 pt-6 border-t border-border/50">
+                    <BetHitsChart results={bet.results} avgHits={bet.avgHits} pick={pick} />
                   </div>
                 </div>
-
-                <div className="mt-6 pt-6 border-t border-border/50">
-                  <BetHitsChart results={bet.results} avgHits={bet.avgHits} pick={pick} />
-                </div>
-              </div>
-            ))}
+              )})}
           </div>
         </div>
 
@@ -256,18 +350,31 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
                   <TrendingUp className="w-5 h-5 text-primary" />
                   <h4 className="text-sm font-bold">Veredito da Comparação</h4>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed mb-4">
-                  O jogo <strong className="text-foreground">{bets[0].label}</strong> apresenta a maior robustez estatística com score de <strong>{bets[0].score}</strong>. 
-                  {commonNumbers.length > 0 && ` Há uma convergência de ${commonNumbers.length} dezenas entre as seleções, o que sugere um núcleo forte de aposta.`}
-                </p>
+                <div className="text-xs text-muted-foreground leading-relaxed mb-4 space-y-2">
+                  <p>
+                    A análise identificou que o jogo <strong className="text-foreground">{bets[highlights?.score[0] || 0].label}</strong> 
+                    é a opção mais equilibrada com score de <strong>{bets[highlights?.score[0] || 0].score}</strong>.
+                  </p>
+                  {highlights?.consistency.length && highlights.consistency.length > 0 && (
+                    <p className="flex items-center gap-1.5">
+                      <ShieldCheck className="w-3 h-3 text-blue-400" /> 
+                      <span>Destaque em consistência: <strong>{bets[highlights.consistency[0]].label}</strong>.</span>
+                    </p>
+                  )}
+                  {commonNumbers.length > 0 && (
+                    <p>Há uma convergência de {commonNumbers.length} dezenas entre as seleções, o que sugere um núcleo forte de aposta.</p>
+                  )}
+                </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-[11px]">
                     <span className="text-muted-foreground">Potencial de Prêmio</span>
-                    <span className="font-bold text-green-400">Alto</span>
+                    <span className="font-bold text-green-400">
+                      {Math.max(...(highlights?.metrics.map(m => m.prizeHits) || [0])) > 0 ? "Muito Alto" : "Médio"}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between text-[11px]">
                     <span className="text-muted-foreground">Divergência de Jogos</span>
-                    <span className="font-bold">{Math.round((allNumbers.length - commonNumbers.length) / allNumbers.length * 100)}%</span>
+                    <span className="font-bold">{allNumbers.length > 0 ? Math.round((allNumbers.length - commonNumbers.length) / allNumbers.length * 100) : 0}%</span>
                   </div>
                 </div>
                 <Button className="mt-6 w-full gap-2 gradient-brand shadow-lg shadow-primary/20" size="sm">
