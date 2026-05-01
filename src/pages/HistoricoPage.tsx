@@ -61,7 +61,8 @@ const HistoricoPage = () => {
       return {
         concurso: draw.concurso,
         hits: matched.length,
-        matched
+        matched,
+        date: draw.date
       };
     }).filter(r => r.hits > 0).sort((a, b) => b.hits - a.hits || b.concurso - a.concurso);
     
