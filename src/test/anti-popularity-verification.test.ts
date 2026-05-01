@@ -142,6 +142,8 @@ interface RunSnapshot {
   boostedWeights: number[];
   /** Distribuição de pesos/scores por número observada nos resultados do gerador. */
   generatorWeights: number[];
+  /** Breakdown de pontuação passo a passo para o primeiro jogo gerado. */
+  scoreBreakdown?: any[];
 }
 
 const vecKey = (v: number[]) => v.map(x => x.toFixed(4)).join("|");
@@ -182,6 +184,29 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
     const c = current[lvl];
     const e = existing[lvl];
     if (!e) continue;
+
+    let breakdownTable = "";
+    if (c.scoreBreakdown) {
+      let rows = "";
+      c.scoreBreakdown.forEach((adj: any) => {
+        rows += `
+          <tr class="${adj.type}">
+            <td>${adj.metric}</td>
+            <td class="delta ${adj.type === 'bonus' ? 'pos' : adj.type === 'penalty' ? 'neg' : ''}">
+              ${adj.value > 0 ? '+' : ''}${adj.value.toFixed(2)}
+            </td>
+            <td>${adj.description}</td>
+          </tr>`;
+      });
+      breakdownTable = `
+        <div class="breakdown-container">
+          <h3>Passo a Passo da Pontuação (IA Universal)</h3>
+          <table>
+            <thead><tr><th>Métrica</th><th>Ajuste</th><th>Razão</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }
 
     let vectorTables = "";
     const vectors = ["penaltyVector", "boostedWeights", "generatorWeights"] as const;
@@ -226,6 +251,7 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
           <span class="old">Era: ${e.ordering.join(", ")}</span><br>
           <span class="new">Agora: ${c.ordering.join(", ")}</span>
         </div>
+        ${breakdownTable}
         <div class="vectors-grid">${vectorTables}</div>
       </section>`;
   }
@@ -253,6 +279,11 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
     .delta { font-family: monospace; font-size: 0.85em; }
     .delta.pos { color: #4caf50; }
     .delta.neg { color: #ff5252; }
+    .breakdown-container { margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 20px; }
+    .breakdown-container table { max-width: 800px; }
+    .breakdown-container tr.base { background: rgba(187, 134, 252, 0.1); }
+    .breakdown-container tr.bonus { background: rgba(76, 175, 80, 0.05); }
+    .breakdown-container tr.penalty { background: rgba(244, 67, 54, 0.05); }
     .ordering-box { padding: 10px; background: #252525; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #4caf50; }
     .ordering-box.diff { border-left-color: #ff5252; }
     .old { color: #aaa; text-decoration: line-through; font-size: 0.9em; }
@@ -420,6 +451,7 @@ describe("Anti-Popularidade — Verificação Automática nos 4 Geradores × 8 M
                 games.map(g => ({ numbers: g.numbers, score: g.totalScore })),
                 fx.config.numbers,
               ),
+              scoreBreakdown: games[0]?.scoreBreakdown,
             };
           });
           checkAndReportSnapshots(snapshots, `Universal/${fx.config.id}`);

@@ -28,6 +28,7 @@ export function scoreGame(
   draws: DrawResult[],
   riskProfile: RiskProfile = "balanced"
 ): ScoredGame {
+  const breakdown: any[] = [];
   const rules = getLotteryRules(lotteryId);
   const sorted = [...numbers].sort((a, b) => a - b);
   const prevDraw = draws.length > 0 ? draws[0].numbers : undefined;
@@ -328,49 +329,82 @@ export function scoreGame(
     probScore * w.probability
   );
 
+  breakdown.push({ metric: "Base (Estatístico/Estrutural)", value: rawScore, type: "base", description: "Pontuação inicial baseada em frequência e padrões" });
+
   // Apply all overlays with enhanced signals
-  const totalScore = Math.max(0, Math.min(100,
-    rawScore
-    + monteCarloBonus * 0.10
-    + roiBonus * 0.08
-    + winPatternBonus * 0.08
-    + entropyBonus * 0.06
-    + cycleBonus * 0.06
-    + multiScaleCycleBonus * 0.05
-    + bayesianBonus * 0.04
-    + advPatternBonus * 0.04
-    + harmonicBonus * 0.04
-    + positionalBonus * 0.03
-    + regressionBonus * 0.06
-    + multiWindowBonus * 0.05
-    + recencyBonus * 0.05
-    + forecastBonus * 0.05
-    + consecutiveBonus * 0.03
-    + edgeBonus * 0.03
-    + coOccBonus * 0.05
-    + correlationBonus * 0.04
-    + volatilityBonus * 0.03
-    + markovBonus * 0.06
-    + pairTransBonus * 0.04
-    + stationaryBonus * 0.03
-    + uniformityBonus * 0.04
-    + jointEntropyBonus * 0.03
-    + bayesNetBonus * 0.05
-    + miBonus * 0.03
-    + rwMarkovBonus * 0.04
-    + velocityBonus * 0.03
-    - humanPenalty * 0.30
-    - antiPairPenalty * 0.08
-    - regimePenalty * 0.04
-    - outlierPenalty * 0.06
-    - klPenalty * 0.03
-  ));
+  let runningScore = rawScore;
+  
+  const applyAdjustment = (metric: string, bonus: number, weight: number, desc: string) => {
+    const adj = bonus * weight;
+    runningScore += adj;
+    if (adj !== 0) {
+      breakdown.push({ 
+        metric, 
+        value: Number(adj.toFixed(2)), 
+        type: adj > 0 ? "bonus" : "penalty", 
+        description: desc 
+      });
+    }
+  };
+
+  applyAdjustment("Monte Carlo", monteCarloBonus, 0.10, "Simulações de consistência");
+  applyAdjustment("ROI Estimado", roiBonus, 0.08, "Expectativa de retorno financeiro");
+  applyAdjustment("Padrões Ganhadores", winPatternBonus, 0.08, "Alinhamento com sorteios reais");
+  applyAdjustment("Entropia", entropyBonus, 0.06, "Qualidade da distribuição de informação");
+  applyAdjustment("Ciclos", cycleBonus, 0.06, "Momento do número no ciclo natural");
+  applyAdjustment("Ciclos Multi-Escala", multiScaleCycleBonus, 0.05, "Consenso de janelas temporais");
+  applyAdjustment("Bayes (Predição)", bayesianBonus, 0.04, "Probabilidade condicional posterior");
+  applyAdjustment("Padrões Avançados", advPatternBonus, 0.04, "Harmonia e geometria numérica");
+  applyAdjustment("Harmônicos", harmonicBonus, 0.04, "Equilíbrio modular e proporção áurea");
+  applyAdjustment("Posicional", positionalBonus, 0.03, "Simetria e clusters terminais");
+  applyAdjustment("Regressão", regressionBonus, 0.06, "Tendência de retorno à média");
+  applyAdjustment("Consenso Regressão", multiWindowBonus, 0.05, "Validação multi-janela");
+  applyAdjustment("Recência", recencyBonus, 0.05, "Momentum de sorteios recentes");
+  applyAdjustment("Previsão (Forecast)", forecastBonus, 0.05, "Tendência Holt-Winters");
+  applyAdjustment("Consecutivos", consecutiveBonus, 0.03, "Qualidade das sequências");
+  applyAdjustment("Borda/Interior", edgeBonus, 0.03, "Equilíbrio geográfico no volante");
+  applyAdjustment("Co-ocorrência", coOccBonus, 0.05, "Pares que costumam sair juntos");
+  applyAdjustment("Correlação", correlationBonus, 0.04, "Rede de dependência estatística");
+  applyAdjustment("Volatilidade", volatilityBonus, 0.03, "Estabilidade do comportamento numérico");
+  applyAdjustment("Markov", markovBonus, 0.06, "Probabilidades de transição");
+  applyAdjustment("Transição de Pares", pairTransBonus, 0.04, "Markov de segunda ordem");
+  applyAdjustment("Distribuição Estacionária", stationaryBonus, 0.03, "Equilíbrio de longo prazo");
+  applyAdjustment("Uniformidade", uniformityBonus, 0.04, "Rényi + KL Divergence");
+  applyAdjustment("Entropia Conjunta", jointEntropyBonus, 0.03, "Novidade relativa a sorteios recentes");
+  applyAdjustment("Rede Bayesiana", bayesNetBonus, 0.05, "Dependência condicional complexa");
+  applyAdjustment("Informação Mútua", miBonus, 0.03, "Auto-previsibilidade");
+  applyAdjustment("Markov Ponderado", rwMarkovBonus, 0.04, "Transições com decaimento temporal");
+  applyAdjustment("Velocidade", velocityScore, 0.03, "Aceleração de frequência");
+
+  // Alinhamento Mestre (novo)
+  const alignment = scoreJackpotAlignment(numbers, draws, lotteryId);
+  const alignmentAdj = (alignment.score - 50) * 0.15;
+  applyAdjustment("Alinhamento Mestre", alignmentAdj, 1, "Aderência ao perfil campeão");
+
+  // Penalties
+  applyAdjustment("Padrão Humano", humanPenalty, -0.30, "Evita datas e desenhos comuns");
+  applyAdjustment("Anti-Pares", antiPairPenalty, -0.08, "Evita combinações improváveis");
+  applyAdjustment("Mudança de Regime", regimePenalty, -0.04, "Instabilidade no padrão de sorteio");
+  applyAdjustment("Outliers", outlierPenalty, -0.06, "Desvios estatísticos extremos");
+  applyAdjustment("Divergência KL", klPenalty, -0.03, "Afastamento da distribuição uniforme");
+
+  // Anti-Popularidade (novo)
+  const antiPopPenalty = computeAntiPopularityPenalty(numbers, lotteryId);
+  if (antiPopPenalty < 1) {
+    const antiPopVal = runningScore * (antiPopPenalty - 1);
+    runningScore += antiPopVal;
+    breakdown.push({
+      metric: "Anti-Popularidade",
+      value: Number(antiPopVal.toFixed(2)),
+      type: "penalty",
+      description: "Proteção contra rateio baixo (apostas comuns)"
+    });
+  }
+
+  const totalScore = Math.max(0, Math.min(100, runningScore));
 
   const grade = totalScore >= 85 ? "S" : totalScore >= 70 ? "A" : totalScore >= 55 ? "B" :
     totalScore >= 40 ? "C" : totalScore >= 25 ? "D" : "F";
-
-  const alignment = scoreJackpotAlignment(sorted, draws, lotteryId);
-  const antiPopPenalty = computeAntiPopularityPenalty(sorted, lotteryId);
 
   const explanation = buildExplanation(sorted, lotteryId, pattern, { statistical: statScore, structural: structScore, coverage: coverageScore, diversity: diversityScore, strategyFit, probability: probScore }, totalScore, grade, clusterScore, humanPenalty, monteCarlo, roi, context, entropyReport, cycleScore, regressionScore, multiWindowBonus, forecastBonus, consecutiveEntropy, edgeBalance, markovResult, enhancedEntropy, bayesNetScore, { bayesianBonus, alignmentScore: alignment.score, antiPopPenalty });
 
@@ -382,6 +416,7 @@ export function scoreGame(
     explanation,
     roiTier: roi.roiTier,
     roiScore: Math.round(roi.riskAdjustedScore * 100),
+    scoreBreakdown: breakdown
   };
 }
 
