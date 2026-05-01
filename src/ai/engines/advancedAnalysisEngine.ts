@@ -6,7 +6,7 @@
 
 import { DrawResult } from "@/data/lotteries";
 import { NumberStats } from "@/engine/statistics";
-import { getLotteryRules, PRIMES, FIBONACCI } from "../knowledge/lotteriesKnowledge";
+import { getLotteryRules, PRIMES, FIBONACCI, MERSENNE, PERFECT_SQUARES } from "../knowledge/lotteriesKnowledge";
 
 /** Co-occurrence matrix: how often pairs appear together */
 export interface CoOccurrenceResult {
