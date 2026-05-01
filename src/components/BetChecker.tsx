@@ -1474,6 +1474,17 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
           )}
         </AnimatePresence>
       </div>
+
+      <AnimatePresence>
+        {showComparison && (
+          <BetComparisonPanel 
+            bets={selectedForComparison.map(i => performances[i])} 
+            onClose={() => setShowComparison(false)} 
+            lotteryId={lotteryId}
+            pick={pick}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
