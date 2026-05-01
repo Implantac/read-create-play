@@ -205,20 +205,40 @@ const HistoricoPage = () => {
                       {checkResult.length === 0 ? (
                         <p className="text-xs text-center py-4 text-muted-foreground">Nenhum acerto encontrado para este jogo no histórico.</p>
                       ) : (
-                        checkResult.slice(0, 30).map((res, idx) => (
-                          <div key={res.concurso} className="flex items-center justify-between p-2 rounded-lg bg-card/50 border border-border/30 hover:border-primary/30 transition-colors">
+                        checkResult.slice(0, 50).map((res, idx) => (
+                          <div key={res.concurso} className="flex items-center justify-between p-2.5 rounded-lg bg-card/50 border border-border/30 hover:border-primary/40 hover:bg-card/80 transition-all group">
                             <div className="flex items-center gap-3">
-                              <span className="text-[10px] font-bold text-primary w-12">#{res.concurso}</span>
-                              <Badge variant="secondary" className="text-[10px] gap-1 font-mono">
-                                <Trophy className="w-2.5 h-2.5" /> {res.hits} acertos
+                              <div className="flex flex-col">
+                                <span className="text-[11px] font-bold text-primary leading-tight">#{res.concurso}</span>
+                                <span className="text-[9px] text-muted-foreground leading-tight">{res.date}</span>
+                              </div>
+                              <Badge variant="secondary" className="text-[10px] h-6 gap-1.5 font-bold px-2 bg-primary/10 text-primary border-primary/20">
+                                <Trophy className="w-3 h-3" /> {res.hits} acertos
                               </Badge>
                             </div>
-                            <div className="flex flex-wrap gap-1">
-                              {res.matched.map(m => (
-                                <span key={m} className="w-5 h-5 rounded-full bg-primary/20 text-primary border border-primary/30 flex items-center justify-center text-[8px] font-bold">
-                                  {String(m).padStart(2, "0")}
-                                </span>
-                              ))}
+                            <div className="flex items-center gap-3">
+                              <div className="flex flex-wrap gap-1 justify-end max-w-[200px]">
+                                {res.matched.map(m => (
+                                  <span key={m} className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[10px] font-black shadow-sm group-hover:scale-110 transition-transform">
+                                    {String(m).padStart(2, "0")}
+                                  </span>
+                                ))}
+                              </div>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className="w-1.5 h-8 bg-primary/20 rounded-full overflow-hidden shrink-0">
+                                      <div 
+                                        className="bg-primary w-full transition-all duration-500" 
+                                        style={{ height: `${(res.hits / config.pick) * 100}%` }} 
+                                      />
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="text-[10px] font-bold">{(res.hits / config.pick * 100).toFixed(0)}% das dezenas</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                             </div>
                           </div>
                         ))
