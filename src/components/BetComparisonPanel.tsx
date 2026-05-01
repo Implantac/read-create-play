@@ -36,13 +36,6 @@ interface BetPerformance {
   score: number;
 }
 
-interface Props {
-  bets: BetPerformance[];
-  onClose: () => void;
-  lotteryId: string;
-  pick: number;
-}
-
 export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
   const copyNumbers = (nums: number[]) => {
     navigator.clipboard.writeText(nums.join(", "));
@@ -54,6 +47,42 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
   
   // Encontrar números em comum
   const commonNumbers = allNumbers.filter(n => bets.every(b => b.numbers.includes(n)));
+
+  // Calcular métricas de destaque
+  const highlights = useMemo(() => {
+    if (bets.length === 0) return null;
+
+    const getConsistency = (bet: BetPerformance) => {
+      if (bet.results.length === 0) return 0;
+      const mean = bet.avgHits;
+      const variance = bet.results.reduce((acc, r) => acc + Math.pow((r.bestHits ?? r.hits) - mean, 2), 0) / bet.results.length;
+      return 1 / (1 + Math.sqrt(variance)); // Quanto maior, mais consistente (menor desvio)
+    };
+
+    const metrics = bets.map(b => ({
+      avgHits: b.avgHits,
+      bestHit: b.bestHit,
+      prizeHits: b.prizeHits,
+      totalPrize: b.totalPrizeValue,
+      consistency: getConsistency(b),
+      score: b.score
+    }));
+
+    // Função para encontrar todos os índices que empatam no máximo
+    const findMaxIndices = (field: keyof typeof metrics[0]) => {
+      const maxVal = Math.max(...metrics.map(m => m[field] as number));
+      return metrics.reduce((acc, curr, idx) => (curr[field] === maxVal ? [...acc, idx] : acc), [] as number[]);
+    };
+
+    return {
+      avgHits: findMaxIndices("avgHits"),
+      bestHit: findMaxIndices("bestHit"),
+      prizeHits: findMaxIndices("prizeHits"),
+      totalPrize: findMaxIndices("totalPrize"),
+      consistency: findMaxIndices("consistency"),
+      score: findMaxIndices("score"),
+    };
+  }, [bets]);
 
   return (
     <motion.div 
