@@ -445,7 +445,15 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
     setShowGrid(true);
     setQuickCheckResult(null);
     setActiveTab("quick");
+    setSelectedForComparison([]);
+    setShowComparison(false);
   }, [lotteryId]);
+
+  const toggleComparison = (index: number) => {
+    setSelectedForComparison(prev => 
+      prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]
+    );
+  };
 
   const performanceRef = useRef({ hasRunPerformance, runPerformanceCheck: () => {} });
 
