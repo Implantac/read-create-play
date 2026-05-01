@@ -30,6 +30,7 @@ import {
 import type { LotteryConfig, DrawResult } from "@/data/lotteries";
 
 const SNAPSHOT_DIR = path.join(process.cwd(), "src/test/snapshots/anti-popularity");
+const REPORT_DIR = path.join(process.cwd(), "src/test/reports");
 const SHOULD_UPDATE = process.argv.includes("-u") || process.argv.includes("--update");
 
 // Mock de Math.random para garantir determinismo nos snapshots
