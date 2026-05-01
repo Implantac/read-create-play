@@ -142,6 +142,8 @@ interface RunSnapshot {
   boostedWeights: number[];
   /** Distribuição de pesos/scores por número observada nos resultados do gerador. */
   generatorWeights: number[];
+  /** Breakdown de pontuação passo a passo para o primeiro jogo gerado. */
+  scoreBreakdown?: any[];
 }
 
 const vecKey = (v: number[]) => v.map(x => x.toFixed(4)).join("|");
