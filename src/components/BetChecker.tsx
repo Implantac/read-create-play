@@ -1207,7 +1207,21 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                 </AnimatePresence>
 
                 {performances.length > 0 && (
-                  <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1 scrollbar-thin">
+                  <div className="space-y-2">
+                    <AnimatePresence>
+                      {selectedForComparison.length >= 2 && (
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                          <Button 
+                            className="w-full mb-2 gap-2 gradient-brand shadow-lg shadow-primary/20 h-10 font-bold"
+                            onClick={() => setShowComparison(true)}
+                          >
+                            <GitCompare className="w-4 h-4" />
+                            Comparar {selectedForComparison.length} Jogos Lado a Lado
+                          </Button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                    <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1 scrollbar-thin">
                     {performances.map((perf, i) => {
                       const isExpanded = expandedPerf === i;
                       return (
