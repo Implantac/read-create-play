@@ -273,7 +273,7 @@ function generateHTMLDiffReport(current: any, existing: any, label: string): str
   <div class="controls">
     <div>
       <label>Filtrar Vetor: </label>
-      <select id="vectorFilter" onchange="filterVectors()">
+      <select id="vectorFilter" onchange="applyFilters()">
         <option value="all">Todos os Vetores</option>
         <option value="penaltyVector">penaltyVector</option>
         <option value="boostedWeights">boostedWeights</option>
