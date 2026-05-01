@@ -63,7 +63,7 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
         .order("created_at", { ascending: false });
       
       if (error) throw error;
-      setScenarios(data || []);
+      setScenarios((data as any[]) || []);
     } catch (err) {
       console.error("Error fetching scenarios:", err);
     }
@@ -108,7 +108,7 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
   };
 
   const loadScenario = (s: SimulationScenario) => {
-    setRiskProfile(s.risk_profile);
+    setRiskProfile(s.risk_profile as RiskProfile);
     setVolatility(s.volatility);
     setRegimeStability(s.regime_stability);
     setShowHistory(false);
