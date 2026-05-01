@@ -368,7 +368,10 @@ export function scoreGame(
   const grade = totalScore >= 85 ? "S" : totalScore >= 70 ? "A" : totalScore >= 55 ? "B" :
     totalScore >= 40 ? "C" : totalScore >= 25 ? "D" : "F";
 
-  const explanation = buildExplanation(sorted, lotteryId, pattern, { statistical: statScore, structural: structScore, coverage: coverageScore, diversity: diversityScore, strategyFit, probability: probScore }, totalScore, grade, clusterScore, humanPenalty, monteCarlo, roi, context, entropyReport, cycleScore, regressionScore, multiWindowBonus, forecastBonus, consecutiveEntropy, edgeBalance, markovResult, enhancedEntropy, bayesNetScore);
+  const alignment = scoreJackpotAlignment(sorted, draws, lotteryId);
+  const antiPopPenalty = computeAntiPopularityPenalty(sorted, lotteryId);
+
+  const explanation = buildExplanation(sorted, lotteryId, pattern, { statistical: statScore, structural: structScore, coverage: coverageScore, diversity: diversityScore, strategyFit, probability: probScore }, totalScore, grade, clusterScore, humanPenalty, monteCarlo, roi, context, entropyReport, cycleScore, regressionScore, multiWindowBonus, forecastBonus, consecutiveEntropy, edgeBalance, markovResult, enhancedEntropy, bayesNetScore, { bayesianBonus, alignmentScore: alignment.score, antiPopPenalty });
 
   return {
     numbers: sorted,
@@ -402,10 +405,25 @@ function buildExplanation(
   edgeBalance?: number,
   markovResult?: { markovScore: number; highProbCount: number; strongSignals: { number: number; probability: number }[] },
   enhancedEntropy?: { uniformityScore: number; renyiEntropy: number; klDivergence: number },
-  bayesNetScore?: { networkScore: number; centralityCount: number; internalConsistency: number }
+  bayesNetScore?: { networkScore: number; centralityCount: number; internalConsistency: number },
+  extraInsights?: { bayesianBonus: number; alignmentScore: number; antiPopPenalty: number }
 ): string[] {
   const lines: string[] = [];
   lines.push(`Score geral: ${total}/100 (${grade})`);
+
+  // PRINCIPAIS RAZÕES DO RANKING
+  if (extraInsights) {
+    if (extraInsights.bayesianBonus > 0) {
+      lines.push(`🎯 Probabilidades Bayesianas: +${extraInsights.bayesianBonus} pontos de confiança condicional`);
+    }
+    if (extraInsights.alignmentScore >= 60) {
+      lines.push(`🏆 Alinhamento Mestre: ${extraInsights.alignmentScore}/100 — alta aderência ao perfil vencedor`);
+    }
+    if (extraInsights.antiPopPenalty < 1) {
+      const reduction = Math.round((1 - extraInsights.antiPopPenalty) * 100);
+      lines.push(`🛡️ Anti-Popularidade: penalidade de ${reduction}% aplicada para proteger o prêmio (evita apostas comuns)`);
+    }
+  }
 
   if (scores.statistical >= 70) lines.push("✅ Boa aderência ao perfil de frequência selecionado");
   else lines.push("⚠️ Frequência dos números diverge do perfil ideal");
