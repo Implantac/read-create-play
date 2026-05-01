@@ -301,10 +301,10 @@ export const MASTER_PRINCIPLES = [
     impact: "Lei dos Grandes Números atua a favor: cobertura cumulativa cresce linearmente.",
   },
   {
-    id: "no_pattern",
-    title: "Quebra de Padrão Visual",
-    rule: "Evite linhas/colunas cheias, diagonais, cantos isolados — comuns em apostas humanas casuais.",
-    impact: "Mantém o jogo dentro da entropia natural dos sorteios e fora do clube de apostas populares.",
+    id: "fractal_distribution",
+    title: "Distribuição Fractal de Dezenas",
+    rule: "As dezenas devem estar distribuídas em 'ninhos' que espelham a topologia do sorteio real, evitando vácuos numéricos superiores a 15% do volante.",
+    impact: "Elimina jogos com 'dead zones' (zonas mortas) que raramente ocorrem em sorteios de prêmio principal.",
   },
 ] as const;
 
