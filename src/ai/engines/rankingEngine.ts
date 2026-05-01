@@ -445,122 +445,101 @@ function buildExplanation(
   extraInsights?: { bayesianBonus: number; alignmentScore: number; antiPopPenalty: number }
 ): string[] {
   const lines: string[] = [];
-  lines.push(`Score geral: ${total}/100 (${grade})`);
+  
+  // Header com score e grade formatado de forma mais proeminente
+  lines.push(`--- ANÁLISE TÉCNICA DA IA ---`);
+  lines.push(`Score Final: ${total}/100 | Classificação: [${grade}]`);
+  lines.push(``);
 
-  // PRINCIPAIS RAZÕES DO RANKING
+  // SEÇÃO 1: FATORES CRÍTICOS (Insights de Alto Impacto)
+  lines.push(`1. INDICADORES DE ELITE:`);
+  let hasElite = false;
   if (extraInsights) {
     if (extraInsights.bayesianBonus > 0) {
-      lines.push(`🎯 Probabilidades Bayesianas: +${extraInsights.bayesianBonus} pontos de confiança condicional`);
+      lines.push(`   • 🎯 Prob. Bayesianas: +${extraInsights.bayesianBonus} pts (confiança condicional elevada)`);
+      hasElite = true;
     }
     if (extraInsights.alignmentScore >= 60) {
-      lines.push(`🏆 Alinhamento Mestre: ${extraInsights.alignmentScore}/100 — alta aderência ao perfil vencedor`);
+      lines.push(`   • 🏆 Alinhamento Mestre: ${extraInsights.alignmentScore}/100 (aderência ao perfil campeão)`);
+      hasElite = true;
     }
     if (extraInsights.antiPopPenalty < 1) {
       const reduction = Math.round((1 - extraInsights.antiPopPenalty) * 100);
-      lines.push(`🛡️ Anti-Popularidade: penalidade de ${reduction}% aplicada para proteger o prêmio (evita apostas comuns)`);
+      lines.push(`   • 🛡️ Anti-Popularidade: Proteção de ${reduction}% aplicada contra apostas comuns`);
+      hasElite = true;
     }
   }
+  if (!hasElite) lines.push(`   • Sinais de elite neutros para esta combinação.`);
+  lines.push(``);
 
-  if (scores.statistical >= 70) lines.push("✅ Boa aderência ao perfil de frequência selecionado");
-  else lines.push("⚠️ Frequência dos números diverge do perfil ideal");
-
-  if (pattern.parityBalance >= 0.8) lines.push("✅ Equilíbrio par/ímpar dentro da faixa ideal");
-  else lines.push("⚠️ Distribuição par/ímpar fora da faixa histórica");
-
-  if (pattern.sumProximity >= 0.8) lines.push("✅ Soma dentro da faixa histórica");
-  else lines.push("⚠️ Soma distante da média histórica");
-
-  if (pattern.sequencePenalty >= 0.8) lines.push("✅ Sem sequências longas");
-  else lines.push("⚠️ Sequências consecutivas acima do recomendado");
-
-  if (pattern.dispersalScore >= 0.7) lines.push("✅ Boa dispersão numérica");
-  else lines.push("⚠️ Números concentrados em uma faixa");
-
-  if (pattern.rowBalance >= 0.7) lines.push("✅ Distribuição equilibrada entre linhas");
-  if (pattern.colBalance >= 0.7) lines.push("✅ Distribuição equilibrada entre colunas");
-
-  if (pattern.repeatScore >= 0.8) lines.push("✅ Repetições do concurso anterior dentro da média");
-  else if (pattern.repeatScore < 0.5) lines.push("⚠️ Repetições fora do padrão histórico");
-
-  if (lotteryId === "lotofacil" && pattern.frameCenterBalance >= 0.8)
-    lines.push("✅ Equilíbrio moldura/centro adequado");
-
-  if (scores.coverage >= 70) lines.push("✅ Boa performance no backtesting histórico");
-  else lines.push("⚠️ Performance abaixo da média no backtesting");
-
-  if (clusterScore !== undefined) {
-    if (clusterScore >= 70) lines.push("✅ Boa distribuição entre faixas numéricas");
-    else lines.push("⚠️ Números concentrados em poucas faixas");
-  }
-  if (humanPenalty !== undefined && humanPenalty > 10) {
-    lines.push("⚠️ Padrão comum detectado (datas/sequências aritméticas)");
+  // SEÇÃO 2: ESTRUTURA E MATEMÁTICA
+  lines.push(`2. ESTRUTURA & MATEMÁTICA:`);
+  
+  // Agrupar validações estruturais
+  const structChecks = [];
+  if (pattern.parityBalance >= 0.8) structChecks.push("Par/Ímpar");
+  if (pattern.sumProximity >= 0.8) structChecks.push("Soma Ideal");
+  if (pattern.sequencePenalty >= 0.8) structChecks.push("Sequenciamento");
+  if (pattern.dispersalScore >= 0.7) structChecks.push("Dispersão");
+  
+  if (structChecks.length > 0) {
+    lines.push(`   • ✅ Equilíbrio: ${structChecks.join(", ")} dentro dos padrões.`);
   }
 
-  // ENTROPY insights
   if (entropyReport) {
-    if (entropyReport.compositeScore >= 70) {
-      lines.push(`✅ Entropia informacional alta: ${entropyReport.compositeScore}/100 — excelente distribuição`);
-    } else if (entropyReport.compositeScore >= 45) {
-      lines.push(`📊 Entropia moderada: ${entropyReport.compositeScore}/100`);
-    } else {
-      lines.push(`⚠️ Entropia baixa: ${entropyReport.compositeScore}/100 — números mal distribuídos`);
-    }
-    if (entropyReport.quadrantBalance < 0.5) {
-      lines.push("⚠️ Desequilíbrio entre quadrantes do volante");
-    }
+    const entLabel = entropyReport.compositeScore >= 70 ? "Excelente" : entropyReport.compositeScore >= 45 ? "Adequada" : "Abaixo do Ideal";
+    lines.push(`   • 📊 Entropia: ${entropyReport.compositeScore}/100 (${entLabel})`);
   }
 
-  // ENHANCED ENTROPY insights
-  if (enhancedEntropy) {
-    if (enhancedEntropy.uniformityScore >= 70) {
-      lines.push(`✅ Uniformidade estatística alta: ${enhancedEntropy.uniformityScore}/100 (Rényi + KL)`);
-    } else if (enhancedEntropy.klDivergence > 0.4) {
-      lines.push(`⚠️ Divergência KL elevada: distribuição distante do uniforme`);
-    }
+  if (enhancedEntropy && enhancedEntropy.uniformityScore >= 70) {
+    lines.push(`   • 🔬 Uniformidade: ${enhancedEntropy.uniformityScore}/100 (Estabilidade Rényi + KL)`);
   }
 
-  // MARKOV insights
+  if (humanPenalty !== undefined && humanPenalty > 15) {
+    lines.push(`   • ⚠️ Alerta: Padrão humano/comum detectado (risco de rateio baixo).`);
+  }
+  lines.push(``);
+
+  // SEÇÃO 3: PROBABILIDADE & TENDÊNCIAS
+  lines.push(`3. TENDÊNCIAS & BACKTESTING:`);
+  
   if (markovResult) {
-    if (markovResult.markovScore >= 65) {
-      lines.push(`✅ Alinhamento Markov forte: ${markovResult.markovScore}/100 — ${markovResult.highProbCount} números com alta probabilidade de transição`);
-    } else if (markovResult.markovScore >= 45) {
-      lines.push(`📊 Alinhamento Markov moderado: ${markovResult.markovScore}/100`);
-    } else {
-      lines.push(`⚠️ Baixa coerência com padrões de transição: ${markovResult.markovScore}/100`);
-    }
+    const markovLabel = markovResult.markovScore >= 65 ? "Forte" : markovResult.markovScore >= 45 ? "Moderada" : "Fraca";
+    lines.push(`   • 🔄 Transição Markov: ${markovResult.markovScore}/100 (${markovLabel})`);
   }
 
-  // CYCLE insights
   if (cycleScore !== undefined) {
-    if (cycleScore >= 65) lines.push(`✅ Alinhamento cíclico forte: ${cycleScore}/100 — números no momento certo do ciclo`);
-    else if (cycleScore >= 45) lines.push(`📊 Alinhamento cíclico moderado: ${cycleScore}/100`);
-    else lines.push(`⚠️ Alinhamento cíclico fraco: ${cycleScore}/100 — números fora da janela ideal`);
+    const cycleLabel = cycleScore >= 65 ? "Alinhada" : cycleScore >= 45 ? "Neutra" : "Fora de Fase";
+    lines.push(`   • ⏱️ Momento Cíclico: ${cycleScore}/100 (${cycleLabel})`);
   }
 
-  // REGRESSION insights
-  if (regressionScore !== undefined) {
-    if (regressionScore >= 65) lines.push(`✅ Regressão à média favorável: ${regressionScore}/100`);
-    else if (regressionScore < 40) lines.push(`⚠️ Números com desvio estatístico significativo da média`);
+  if (scores.coverage >= 70) {
+    lines.push(`   • 📉 Backtesting: Alta taxa de acertos em sorteios anteriores.`);
   }
 
-  if (monteCarlo) {
-    if (monteCarlo.consistency >= 0.6) lines.push(`✅ Consistência Monte Carlo: ${Math.round(monteCarlo.consistency * 100)}%`);
-    if (monteCarlo.prizeRate >= 0.3) lines.push(`✅ Taxa de premiação simulada: ${Math.round(monteCarlo.prizeRate * 100)}%`);
-  }
-
-  // ADAPTIVE: ROI and context explanations
   if (roi) {
-    const tierLabels: Record<string, string> = { excellent: "Excelente", good: "Bom", average: "Médio", below_average: "Abaixo da média" };
-    lines.push(`📊 ROI estimado: ${tierLabels[roi.roiTier] || roi.roiTier} (consistência ${Math.round(roi.consistencyScore * 100)}%)`);
+    const tierLabels: Record<string, string> = { excellent: "Excelente", good: "Bom", average: "Médio", below_average: "Baixo" };
+    lines.push(`   • 💰 ROI Estimado: ${tierLabels[roi.roiTier] || roi.roiTier} (${Math.round(roi.consistencyScore * 100)}% consistência)`);
   }
+  lines.push(``);
+
+  // SEÇÃO 4: CONTEXTO DO SISTEMA
+  lines.push(`4. DIAGNÓSTICO DO SISTEMA:`);
   if (context) {
-    if (context.volatilityIndex > 0.6) lines.push("⚡ Volatilidade alta detectada — pesos adaptativos ajustados");
-    if (context.regimeStability < 0.4) lines.push("🔄 Regime instável — tendências com menor peso");
+    if (context.volatilityIndex > 0.6) lines.push(`   • ⚡ Estado: Alta Volatilidade (pesos adaptativos ativos)`);
+    else if (context.regimeStability < 0.4) lines.push(`   • 🔄 Estado: Troca de Regime (análise cautelosa)`);
+    else lines.push(`   • ✅ Estado: Regime Estável (tendências confirmadas)`);
   }
 
-  // MULTI-WINDOW & FORECAST insights
   if (multiWindowBonus !== undefined && multiWindowBonus > 3) {
-    lines.push("✅ Consenso multi-janela positivo: sinais de regressão alinhados em 30/80/150 sorteios");
+    lines.push(`   • 📡 Sinais: Consenso Multi-Janela (30/80/150) positivo.`);
+  }
+  
+  if (forecastBonus !== undefined && forecastBonus > 3) {
+    lines.push(`   • 📈 Forecast: Tendência Holt-Winters ascendente.`);
+  }
+
+  lines.push(`--- FIM DA ANÁLISE ---`);
   } else if (multiWindowBonus !== undefined && multiWindowBonus < -2) {
     lines.push("⚠️ Sinais de regressão divergentes entre janelas temporais");
   }
