@@ -1,8 +1,9 @@
 import { NumberStats } from "@/engine/statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, ChevronDown, ChevronUp, Flame, Snowflake, RefreshCw, Hash, Target, Zap, Binary, Boxes } from "lucide-react";
+import { BarChart3, ChevronDown, ChevronUp, Flame, Snowflake, RefreshCw, Hash, Target, Zap, Binary, Boxes, Info } from "lucide-react";
 import { useState } from "react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Props {
   numbers: number[];
@@ -227,6 +228,43 @@ export function GameAnalysisBlock({ numbers, stats, config, draws, defaultOpen =
                 <p className="text-[10px] text-amber-500">
                   ⚠ {analysis.consecutives} par{analysis.consecutives > 1 ? "es" : ""} consecutivo{analysis.consecutives > 1 ? "s" : ""}
                 </p>
+              )}
+
+              {/* Detailed Breakdown for Advanced AI */}
+              {(strategyId === "markov" || strategyId === "poisson" || strategyId === "cluster") && (
+                <div className="pt-2 border-t border-border/30">
+                  <p className="text-[9px] uppercase font-bold text-muted-foreground mb-1.5 flex items-center gap-1">
+                    <Info className="w-2.5 h-2.5 text-primary" /> Breakdown por Dezena (IA)
+                  </p>
+                  <div className="flex flex-wrap gap-1">
+                    {numbers.sort((a, b) => a - b).map(n => {
+                      const s = stats.find(st => st.number === n);
+                      if (!s) return null;
+                      let scoreVal = 0;
+                      let label = "";
+                      if (strategyId === "markov") { scoreVal = s.trend > 0 ? 100 : 30; label = "Transição"; }
+                      else if (strategyId === "poisson") { scoreVal = Math.round(Math.min(100, (10 / (s.avgGap + 1)) * 50)); label = "Poisson"; }
+                      else if (strategyId === "cluster") { scoreVal = Math.round(Math.min(100, s.momentum * 30)); label = "Afinidade"; }
+                      return (
+                        <TooltipProvider key={n}>
+                          <Tooltip delayDuration={200}>
+                            <TooltipTrigger asChild>
+                              <div className="flex flex-col items-center p-1 rounded bg-background/40 border border-border/20 min-w-[32px] cursor-help hover:border-primary/40 transition-colors">
+                                <span className="text-[10px] font-bold font-mono">{String(n).padStart(2, "0")}</span>
+                                <div className="w-full h-1 mt-1 rounded-full bg-muted overflow-hidden">
+                                  <div className="h-full bg-primary" style={{ width: `${scoreVal}%` }} />
+                                </div>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="text-[10px] p-2 bg-card border-border shadow-xl">
+                              <p className="font-bold">Dezena {n} • Score {label}: {scoreVal}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      );
+                    })}
+                  </div>
+                </div>
               )}
             </div>
           </motion.div>
