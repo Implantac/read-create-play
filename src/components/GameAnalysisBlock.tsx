@@ -1,7 +1,7 @@
 import { NumberStats } from "@/engine/statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, ChevronDown, ChevronUp, Flame, Snowflake, RefreshCw, Hash, Target } from "lucide-react";
+import { BarChart3, ChevronDown, ChevronUp, Flame, Snowflake, RefreshCw, Hash, Target, Zap, Binary, Boxes } from "lucide-react";
 import { useState } from "react";
 
 interface Props {
@@ -10,9 +10,10 @@ interface Props {
   config: LotteryConfig;
   draws: DrawResult[];
   defaultOpen?: boolean;
+  strategyId?: string;
 }
 
-function computeGameAnalysis(numbers: number[], stats: NumberStats[], config: LotteryConfig, draws: DrawResult[]) {
+function computeGameAnalysis(numbers: number[], stats: NumberStats[], config: LotteryConfig, draws: DrawResult[], strategyId?: string) {
   const gameStats = numbers.map(n => stats.find(s => s.number === n)).filter(Boolean) as NumberStats[];
   
   // Frequency average
@@ -42,6 +43,22 @@ function computeGameAnalysis(numbers: number[], stats: NumberStats[], config: Lo
   const hot = gameStats.filter(s => s.status === "hot").length;
   const cold = gameStats.filter(s => s.status === "cold").length;
   const normal = gameStats.filter(s => s.status === "normal").length;
+
+  // Advanced AI Metric Calculation
+  let markovScore = 0;
+  let poissonScore = 0;
+  let clusterScore = 0;
+
+  if (strategyId === "markov") {
+    const transitionsCount = gameStats.reduce((acc, s) => acc + (s.trend > 0 ? 1 : 0), 0);
+    markovScore = Math.round((transitionsCount / numbers.length) * 100);
+  } else if (strategyId === "poisson") {
+    const avgGap = gameStats.reduce((acc, s) => acc + s.avgGap, 0) / (gameStats.length || 1);
+    poissonScore = Math.round(Math.min(100, (10 / (avgGap + 1)) * 50));
+  } else if (strategyId === "cluster") {
+    const momentumSum = gameStats.reduce((acc, s) => acc + s.momentum, 0);
+    clusterScore = Math.round(Math.min(100, momentumSum * 15));
+  }
 
   // Strategy classification
   let strategy: string;
@@ -73,13 +90,13 @@ function computeGameAnalysis(numbers: number[], stats: NumberStats[], config: Lo
     avgFreq, avgDelay, delayLabel, delayColor,
     even, odd, sum, repeated, hot, cold, normal,
     strategy, sumInRange, consecutives, ranges,
-    idealMin, idealMax
+    idealMin, idealMax, markovScore, poissonScore, clusterScore
   };
 }
 
-export function GameAnalysisBlock({ numbers, stats, config, draws, defaultOpen = false }: Props) {
+export function GameAnalysisBlock({ numbers, stats, config, draws, defaultOpen = false, strategyId }: Props) {
   const [open, setOpen] = useState(defaultOpen);
-  const analysis = computeGameAnalysis(numbers, stats, config, draws);
+  const analysis = computeGameAnalysis(numbers, stats, config, draws, strategyId);
 
   return (
     <div className="mt-1">
@@ -107,6 +124,35 @@ export function GameAnalysisBlock({ numbers, stats, config, draws, defaultOpen =
               </p>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {/* AI Scores for Advanced Strategies */}
+                {strategyId === "markov" && (
+                  <MetricCard
+                    label="Poder de Transição"
+                    value={`${analysis.markovScore}%`}
+                    icon={<Zap className="w-3 h-3" />}
+                    color="text-primary"
+                    subtitle="Peso: 2.0 (Cadeia de Markov)"
+                  />
+                )}
+                {strategyId === "poisson" && (
+                  <MetricCard
+                    label="Desvio Poisson"
+                    value={`${analysis.poissonScore}%`}
+                    icon={<Binary className="w-3 h-3" />}
+                    color="text-primary"
+                    subtitle="Peso: 1.8 (Probabilidade)"
+                  />
+                )}
+                {strategyId === "cluster" && (
+                  <MetricCard
+                    label="Afinidade Cluster"
+                    value={`${analysis.clusterScore}%`}
+                    icon={<Boxes className="w-3 h-3" />}
+                    color="text-primary"
+                    subtitle="Peso: 2.2 (Afinidade)"
+                  />
+                )}
+
                 {/* Frequency */}
                 <MetricCard
                   label="Frequência média"
