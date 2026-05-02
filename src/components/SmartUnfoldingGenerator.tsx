@@ -25,6 +25,7 @@ export function SmartUnfoldingGenerator({ matrixData, config, onSaveBet }: Props
   const [games, setGames] = useState<number[][]>([]);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<WheelTemplate | null>(null);
+  const [auditResult, setAuditResult] = useState<WheelGuaranteeAudit | null>(null);
 
   const suggestedNumbers = useMemo(
     () => matrixData.slice(0, baseCount).map(r => r.number).sort((a, b) => a - b),
