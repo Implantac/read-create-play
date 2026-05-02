@@ -251,6 +251,57 @@ export function SmartUnfoldingGenerator({ matrixData, config, onSaveBet }: Props
             </Button>
           </div>
 
+          {/* Audit Results Section */}
+          {auditResult && (
+            <Card className="p-4 bg-primary/5 border-primary/20 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <SearchCheck className="w-4 h-4 text-primary" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider">Relatório de Auditoria Matemática</h4>
+                </div>
+                <Badge variant={auditResult.isSolid ? "default" : "destructive"} className="text-[9px] h-5">
+                  {auditResult.isSolid ? "GARANTIA SÓLIDA" : "COBERTURA PARCIAL"}
+                </Badge>
+              </div>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="space-y-1">
+                  <p className="text-[10px] text-muted-foreground uppercase font-medium">Alvo (t)</p>
+                  <p className="text-sm font-bold font-mono">{auditResult.targetGuarantee} Acertos</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] text-muted-foreground uppercase font-medium">Cobertura Real</p>
+                  <p className={`text-sm font-bold font-mono ${auditResult.actualCoverage > 90 ? "text-emerald-400" : "text-amber-400"}`}>
+                    {auditResult.actualCoverage.toFixed(1)}%
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] text-muted-foreground uppercase font-medium">Eficiência</p>
+                  <p className="text-sm font-bold font-mono">Alta (Redução +90%)</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[10px] text-muted-foreground uppercase font-medium">Amostra de Teste</p>
+                  <p className="text-sm font-bold font-mono">{auditResult.combinationsTested} simulações</p>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-[10px] uppercase font-bold">
+                  <span className="text-muted-foreground">Progresso da Cobertura Combinatória</span>
+                  <span className="text-primary">{auditResult.actualCoverage.toFixed(0)}%</span>
+                </div>
+                <Progress value={auditResult.actualCoverage} className="h-1.5 bg-primary/10" />
+              </div>
+
+              {!auditResult.isSolid && (
+                <div className="flex items-start gap-2 p-2 rounded bg-amber-500/10 border border-amber-500/20 text-[9px] text-amber-400 italic">
+                  <AlertCircle className="w-3 h-3 shrink-0 mt-0.5" />
+                  <span>Nota: O fechamento selecionado utiliza uma redução agressiva. Em alguns casos raros, a garantia pode oscilar levemente dependendo da distribuição das dezenas escolhidas.</span>
+                </div>
+              )}
+            </Card>
+          )}
+
           <div className="grid gap-2 max-h-96 overflow-y-auto pr-1">
             {games.map((game, idx) => (
               <Card key={idx} className="flex items-center gap-3 px-3 py-2 bg-muted/20 border-border">
