@@ -236,8 +236,18 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
             </div>
             <div>
               <h2 className="text-lg font-bold">Comparativo Detalhado</h2>
-              <p className="text-xs text-muted-foreground">{bets.length} combinações selecionadas • {lotteryId.toUpperCase()}</p>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <p className="text-xs text-muted-foreground">{bets.length} combinações • {lotteryId.toUpperCase()}</p>
+                <div className="hidden lg:flex items-center gap-2 border-l border-border/50 pl-3 text-[9px] font-medium text-muted-foreground uppercase tracking-wider">
+                  <span>Atalhos:</span>
+                  <kbd className="px-1.5 py-0.5 rounded border border-border bg-background font-mono text-[8px]">Alt+F</kbd> Filtros
+                  <kbd className="px-1.5 py-0.5 rounded border border-border bg-background font-mono text-[8px]">Alt+C</kbd> Grid
+                  <kbd className="px-1.5 py-0.5 rounded border border-border bg-background font-mono text-[8px]">Alt+D</kbd> Divergir
+                  <kbd className="px-1.5 py-0.5 rounded border border-border bg-background font-mono text-[8px]">Alt+S</kbd> Stats
+                </div>
+              </div>
             </div>
+
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full">
             <X className="w-5 h-5" />
