@@ -309,9 +309,14 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
                           Aposta #{i + 1}
                         </span>
                       </div>
-                      <Badge variant={isBestScore ? "default" : "secondary"} className={`font-mono ${isBestScore ? "gradient-brand" : ""}`}>
+                      <Badge 
+                        variant={isBestScore ? "default" : "secondary"} 
+                        className={`font-mono ${isBestScore ? "gradient-brand" : ""}`}
+                        aria-label={`Pontuação total: ${bet.score} de 100`}
+                      >
                         Score: {bet.score}
                       </Badge>
+
                     </div>
 
                     <h3 className="font-bold text-sm mb-4 truncate pr-2" title={bet.label}>{bet.label}</h3>
