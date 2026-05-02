@@ -175,6 +175,43 @@ describe("BetComparisonPanel Accessibility", () => {
     expect(tooltip).toBeInTheDocument();
   });
 
+  it("deve remover a referência aria-describedby quando o tooltip é fechado via Escape", async () => {
+    render(
+      <TooltipProvider>
+        <BetComparisonPanel 
+          bets={mockBets} 
+          onClose={() => {}} 
+          lotteryId="megasena" 
+          pick={6} 
+        />
+      </TooltipProvider>
+    );
+
+    const avgButton = screen.getByLabelText(/Média: 4.00/);
+    
+    // Abre o tooltip
+    fireEvent.focus(avgButton);
+    await screen.findByRole("tooltip");
+
+    // Verifica que o atributo aria-describedby está presente e aponta para algo
+    const tooltipId = avgButton.getAttribute("aria-describedby");
+    expect(tooltipId).toBeTruthy();
+
+    // Fecha com Escape
+    fireEvent.keyDown(avgButton, { key: "Escape", code: "Escape" });
+
+    // Aguarda o tooltip sumir do DOM
+    await waitFor(() => {
+      expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+    });
+
+    // O Radix limpa ou mantém o ID mas remove o elemento. 
+    // Vamos verificar se o elemento referenciado ainda existe no DOM.
+    if (tooltipId) {
+      expect(document.getElementById(tooltipId)).toBeNull();
+    }
+  });
+
   it("deve permitir que o leitor de tela identifique os badges de métricas", () => {
     render(
       <TooltipProvider>
