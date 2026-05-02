@@ -439,6 +439,59 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick, stats, conf
                         ))}
                       </div>
                     </div>
+                    
+                    {/* Breakdown Side-by-Side */}
+                    {stats && config && (
+                      <div className="mt-6 pt-6 border-t border-border/50">
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight flex items-center gap-1.5">
+                            <Binary className="w-3 h-3 text-primary" /> 
+                            Breakdown de IA por Dezena
+                          </span>
+                          <Badge variant="outline" className="text-[8px] font-bold uppercase tracking-widest border-primary/20 text-primary">
+                            {bet.strategyId || "Análise Geral"}
+                          </Badge>
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-1.5">
+                          {bet.numbers.sort((a, b) => a - b).map(n => {
+                            const s = stats.find(st => st.number === n);
+                            if (!s) return null;
+                            
+                            let scoreVal = 0;
+                            let label = "Score";
+                            const strat = bet.strategyId || "markov"; // Default to markov if unknown
+
+                            if (strat === "markov") { scoreVal = s.trend > 0 ? 100 : 30; label = "Transição"; }
+                            else if (strat === "poisson") { scoreVal = Math.round(Math.min(100, (10 / (s.avgGap + 1)) * 50)); label = "Poisson"; }
+                            else if (strat === "cluster") { scoreVal = Math.round(Math.min(100, s.momentum * 30)); label = "Afinidade"; }
+                            else { scoreVal = Math.round((s.percentage / 20) * 100); label = "Frequência"; }
+
+                            return (
+                              <TooltipProvider key={n}>
+                                <Tooltip delayDuration={200}>
+                                  <TooltipTrigger asChild>
+                                    <div className="flex flex-col items-center p-1.5 rounded-lg bg-background/40 border border-border/20 min-w-[38px] cursor-help hover:border-primary/40 transition-colors">
+                                      <span className="text-[11px] font-bold font-mono">{String(n).padStart(2, "0")}</span>
+                                      <div className="w-full h-1.5 mt-1.5 rounded-full bg-muted overflow-hidden">
+                                        <div className="h-full bg-primary" style={{ width: `${scoreVal}%` }} />
+                                      </div>
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top" className="text-[10px] p-2 bg-card border-border shadow-xl">
+                                    <p className="font-bold">Dezena {n} • {label}: {scoreVal}</p>
+                                    <p className="text-muted-foreground mt-1">Status: {s.status}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            );
+                          })}
+                        </div>
+                        <p className="text-[8px] text-muted-foreground mt-3 italic">
+                          * Barras indicam a força individual de cada dezena segundo a estratégia "{bet.strategyId || 'Markov'}".
+                        </p>
+                      </div>
+                    )}
 
                     <div className="mt-6 pt-6 border-t border-border/50">
                       <BetHitsChart results={bet.results} avgHits={bet.avgHits} pick={pick} />
