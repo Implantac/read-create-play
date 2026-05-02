@@ -35,8 +35,7 @@ interface Props {
   maxNumbers: number;
   pick: number;
   stats?: NumberStats[];
-  config?: LotteryConfig } from "@/data/lotteries";
-import { NumberStats } from "@/engine/statistics";;
+  config?: LotteryConfig;
 }
 
 interface ExtendedMatchResult extends MatchResult {
