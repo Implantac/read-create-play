@@ -77,9 +77,9 @@ function computeGameAnalysis(numbers: number[], stats: NumberStats[], config: Lo
   };
 }
 
-export function GameAnalysisBlock({ numbers, stats, config, draws, defaultOpen = false }: Props) {
+export function GameAnalysisBlock({ numbers, stats, config, draws, defaultOpen = false, strategyId }: Props & { strategyId?: string }) {
   const [open, setOpen] = useState(defaultOpen);
-  const analysis = computeGameAnalysis(numbers, stats, config, draws);
+  const analysis = computeGameAnalysis(numbers, stats, config, draws, strategyId);
 
   return (
     <div className="mt-1">
