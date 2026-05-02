@@ -206,16 +206,78 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-8 scrollbar-thin">
+          {/* Contest Filters Section */}
+          <div className="bg-muted/20 border border-border/50 rounded-2xl p-4 space-y-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2 text-foreground font-bold text-sm">
+                <Filter className="w-4 h-4 text-primary" />
+                Filtros da Amostra Retroativa
+              </div>
+              <Button variant="ghost" size="sm" onClick={resetFilters} className="h-7 text-[10px] gap-1 hover:text-primary transition-colors">
+                <RefreshCcw className="w-3 h-3" /> Resetar Amostra
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-[10px] uppercase font-bold text-muted-foreground flex items-center gap-1">
+                  <Hash className="w-3 h-3" /> Concurso Inicial
+                </Label>
+                <Input 
+                  type="number" 
+                  value={minConcurso} 
+                  onChange={(e) => setMinConcurso(e.target.value === "" ? "" : Number(e.target.value))}
+                  className="h-9 text-xs bg-background/50"
+                  placeholder="Ex: 1"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] uppercase font-bold text-muted-foreground flex items-center gap-1">
+                  <Hash className="w-3 h-3" /> Concurso Final
+                </Label>
+                <Input 
+                  type="number" 
+                  value={maxConcurso} 
+                  onChange={(e) => setMaxConcurso(e.target.value === "" ? "" : Number(e.target.value))}
+                  className="h-9 text-xs bg-background/50"
+                  placeholder={`Ex: ${initialMax}`}
+                />
+              </div>
+              <div className="md:col-span-2 flex items-end pb-1.5">
+                <div className="flex items-center space-x-2 bg-background/30 p-2.5 rounded-lg border border-border/40 w-full hover:border-primary/30 transition-all cursor-pointer group" onClick={() => setOnlyPrizes(!onlyPrizes)}>
+                  <Checkbox 
+                    id="onlyPrizes" 
+                    checked={onlyPrizes} 
+                    onCheckedChange={(checked) => setOnlyPrizes(checked === true)}
+                    className="data-[state=checked]:bg-primary"
+                  />
+                  <Label htmlFor="onlyPrizes" className="text-xs cursor-pointer group-hover:text-foreground transition-colors">
+                    Exibir apenas concursos premiados na amostra
+                  </Label>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4 text-[10px] text-muted-foreground bg-primary/5 p-2 rounded-lg border border-primary/10">
+              <Info className="w-3.5 h-3.5 text-primary" />
+              <span>
+                Amostra atual: <strong>{filteredBets[0]?.results.length || 0} de {bets[0]?.results.length || 0} concursos</strong> 
+                {onlyPrizes && " (filtrado por prêmios)"}. Todos os cálculos e rankings foram atualizados.
+              </span>
+            </div>
+          </div>
+
           {/* Stats Grid Side-by-Side */}
           <div className="overflow-x-auto pb-4 scrollbar-thin">
             <div className="flex gap-4 min-w-max pb-2">
-              {bets.map((bet, i) => {
+              {filteredBets.map((bet, i) => {
                 const isBestScore = highlights?.score.includes(i);
                 const isBestAvg = highlights?.avgHits.includes(i);
                 const isBestHit = highlights?.bestHit.includes(i);
                 const isBestPrize = highlights?.prizeHits.includes(i);
                 const isBestConsistency = highlights?.consistency.includes(i);
                 const consistencyVal = highlights?.metrics[i].consistency || 0;
+                const currentScore = highlights?.metrics[i].score || 0;
 
                 return (
                   <div key={i} className={`p-5 rounded-2xl border-2 transition-all w-[300px] shrink-0 relative ${
