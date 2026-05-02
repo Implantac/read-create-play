@@ -3,12 +3,24 @@
  * Knowledge base for mathematical combinations and guarantees
  */
 
+// Simple seeded RNG for deterministic audits
+let auditSeed = 12345;
+function seededRandom() {
+  auditSeed = (auditSeed * 1664525 + 1013904223) % 4294967296;
+  return auditSeed / 4294967296;
+}
+
+function setAuditSeed(seed: number) {
+  auditSeed = seed;
+}
+
 export interface WheelGuaranteeAudit {
   targetGuarantee: number;     // t
   actualCoverage: number;     // % of combinations that hit at least t
   combinationsTested: number; // sample size for validation
   efficiency: number;        // ratio of reduction
   isSolid: boolean;          // if coverage is 100%
+  seedUsed: number;          // the seed used for this deterministic run
 }
 
 export interface WheelTemplate {
@@ -115,23 +127,28 @@ export const WHEEL_TEMPLATES: WheelTemplate[] = [
 /**
  * Audit function to validate a wheel's mathematical integrity
  */
-export function auditWheelTemplate(template: WheelTemplate, pool: number[]): WheelGuaranteeAudit {
+export function auditWheelTemplate(template: WheelTemplate, pool: number[], configSeed?: number): WheelGuaranteeAudit {
+  const currentSeed = configSeed ?? 12345;
+  setAuditSeed(currentSeed);
+
   const games = template.generate(pool);
   const v = template.v;
   const k = template.k;
   const t = template.t;
   const m = template.m;
 
-  // For a full audit, we would test all combinations of 'm' numbers from the 'v' pool.
-  // To keep it high performance, we use a large random sample if v! is too big.
   const sampleSize = 1000; 
   let successCount = 0;
 
   for (let i = 0; i < sampleSize; i++) {
-    // Generate a theoretical draw of size m from the pool
-    const theoreticalDraw = [...pool].sort(() => Math.random() - 0.5).slice(0, m);
+    // Deterministic shuffle for theoretical draw
+    const poolCopy = [...pool];
+    for (let j = poolCopy.length - 1; j > 0; j--) {
+      const k = Math.floor(seededRandom() * (j + 1));
+      [poolCopy[j], poolCopy[k]] = [poolCopy[k], poolCopy[j]];
+    }
+    const theoreticalDraw = poolCopy.slice(0, m);
     
-    // Check if any game in the wheel hits at least 't' numbers from this draw
     const hasGuarantee = games.some(game => {
       const hits = game.filter(n => theoreticalDraw.includes(n)).length;
       return hits >= t;
@@ -141,9 +158,6 @@ export function auditWheelTemplate(template: WheelTemplate, pool: number[]): Whe
   }
 
   const actualCoverage = (successCount / sampleSize) * 100;
-  
-  // Efficiency: (Total Combinations / Wheel Games)
-  // Simplified calculation for info purposes
   const efficiency = 100 - (template.gamesCount / 100); 
 
   return {
@@ -151,6 +165,7 @@ export function auditWheelTemplate(template: WheelTemplate, pool: number[]): Whe
     actualCoverage,
     combinationsTested: sampleSize,
     efficiency,
-    isSolid: actualCoverage >= 99.9
+    isSolid: actualCoverage >= 99.9,
+    seedUsed: currentSeed
   };
 }

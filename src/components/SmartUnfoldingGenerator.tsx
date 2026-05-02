@@ -4,7 +4,7 @@ import { LotteryConfig } from "@/data/lotteries";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Dices, Copy, Sparkles, Check, Info, ShieldCheck, Trophy, SearchCheck, AlertCircle } from "lucide-react";
+import { Dices, Copy, Sparkles, Check, Info, ShieldCheck, Trophy, SearchCheck, AlertCircle, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { WHEEL_TEMPLATES, WheelTemplate, auditWheelTemplate, WheelGuaranteeAudit } from "@/engine/lottery-wheels";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -26,6 +26,7 @@ export function SmartUnfoldingGenerator({ matrixData, config, onSaveBet }: Props
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<WheelTemplate | null>(null);
   const [auditResult, setAuditResult] = useState<WheelGuaranteeAudit | null>(null);
+  const [auditSeed, setAuditSeed] = useState(12345);
 
   const suggestedNumbers = useMemo(
     () => matrixData.slice(0, baseCount).map(r => r.number).sort((a, b) => a - b),
@@ -52,7 +53,7 @@ export function SmartUnfoldingGenerator({ matrixData, config, onSaveBet }: Props
       setGames(result);
       
       // Run audit
-      const audit = auditWheelTemplate(selectedTemplate, pool);
+      const audit = auditWheelTemplate(selectedTemplate, pool, auditSeed);
       setAuditResult(audit);
       
       toast.success(`${result.length} jogos gerados usando template matemático!`);
@@ -179,6 +180,31 @@ export function SmartUnfoldingGenerator({ matrixData, config, onSaveBet }: Props
               className="w-24"
             />
             <span className="font-mono font-bold text-primary">{baseCount}</span>
+          </div>
+        )}
+
+        {selectedTemplate && (
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-muted-foreground">Seed Auditor:</span>
+            <input
+              type="number"
+              value={auditSeed}
+              onChange={e => setAuditSeed(+e.target.value)}
+              className="w-16 h-7 bg-background border border-border rounded px-1 text-[10px] font-mono focus:ring-1 focus:ring-primary outline-none"
+            />
+            <Button 
+              size="icon" 
+              variant="ghost" 
+              className="h-7 w-7 hover:bg-primary/10 transition-colors" 
+              onClick={() => {
+                const newSeed = Math.floor(Math.random() * 99999);
+                setAuditSeed(newSeed);
+                toast.info(`Nova seed gerada: ${newSeed}`);
+              }}
+              title="Gera nova semente determinística"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+            </Button>
           </div>
         )}
 
