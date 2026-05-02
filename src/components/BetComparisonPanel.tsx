@@ -190,6 +190,35 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
     setOnlyPrizes(false);
     toast.info("Filtros resetados");
   };
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Atalhos apenas se o modal estiver aberto
+      if (e.altKey && e.key.toLowerCase() === 'f') {
+        e.preventDefault();
+        document.getElementById('filter-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        toast.info("Atalho: Filtros de Amostra", { duration: 1500 });
+      }
+      if (e.altKey && e.key.toLowerCase() === 'c') {
+        e.preventDefault();
+        document.getElementById('comparison-grid')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        toast.info("Atalho: Grid de Comparação", { duration: 1500 });
+      }
+      if (e.altKey && e.key.toLowerCase() === 'd') {
+        e.preventDefault();
+        document.getElementById('differences-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        toast.info("Atalho: Análise de Divergência", { duration: 1500 });
+      }
+      if (e.altKey && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        document.getElementById('consistency-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        toast.info("Atalho: Métrica de Consistência", { duration: 1500 });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
 
   return (
     <motion.div 
