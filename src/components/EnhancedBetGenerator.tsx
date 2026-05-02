@@ -67,7 +67,7 @@ export function EnhancedBetGenerator({ stats, config, onSaveBet }: Props) {
       let bet: number[] | null;
       if (hasActiveFilters) {
         bet = generateWithFilters(
-          () => generateByStrategy(strategy, stats, config),
+          () => generateByStrategy(strategy, stats, config, draws),
           filters,
           stats,
           config,
