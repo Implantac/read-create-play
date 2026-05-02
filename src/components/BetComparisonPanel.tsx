@@ -358,10 +358,11 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
                     </div>
 
                     <div className="p-3 rounded-xl bg-muted/30 border border-border/50 mb-6 flex items-center justify-between">
-                      <div>
-                        <p className="text-[10px] text-muted-foreground mb-0.5">Retorno Total Estimado</p>
-                        <p className="text-sm font-bold text-primary font-mono">{bet.totalPrize}</p>
+                      <div aria-label={`Retorno total estimado: ${bet.totalPrize}`}>
+                        <p className="text-[10px] text-muted-foreground mb-0.5" aria-hidden="true">Retorno Total Estimado</p>
+                        <p className="text-sm font-bold text-primary font-mono" aria-hidden="true">{bet.totalPrize}</p>
                       </div>
+
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                         <DollarSign className="w-4 h-4 text-primary" />
                       </div>
