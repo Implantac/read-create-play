@@ -338,28 +338,59 @@ export function generateByStrategy(
     }
 
     case "markov": {
-      const weighted = stats.map(s => ({
-        ...s,
-        weight: Math.max(0.1, s.recentFreq * 1.5 + (s.trend > 0 ? s.trend * 2 : 1) + Math.random() * 5),
-      }));
+      // Logic: compute transition probabilities between numbers
+      const transitions = new Map<number, Map<number, number>>();
+      draws.slice(0, 50).forEach(draw => {
+        for (let i = 0; i < draw.numbers.length; i++) {
+          for (let j = i + 1; j < draw.numbers.length; j++) {
+            const n1 = draw.numbers[i];
+            const n2 = draw.numbers[j];
+            if (!transitions.has(n1)) transitions.set(n1, new Map());
+            const targets = transitions.get(n1)!;
+            targets.set(n2, (targets.get(n2) || 0) + 1);
+          }
+        }
+      });
+
+      const weighted = stats.map(s => {
+        let transitionScore = 0;
+        const targets = transitions.get(s.number);
+        if (targets) {
+          transitionScore = Array.from(targets.values()).reduce((a, b) => a + b, 0) / 10;
+        }
+        return {
+          ...s,
+          weight: Math.max(0.1, s.recentFreq * 1.5 + transitionScore + (s.trend > 0 ? s.trend * 2 : 1) + Math.random() * 5),
+        };
+      });
       const shuffled = weightedShuffle(weighted);
       return shuffled.slice(0, pick).map(s => s.number).sort((a, b) => a - b);
     }
 
     case "poisson": {
-      const weighted = stats.map(s => ({
-        ...s,
-        weight: Math.max(0.1, (1 / (s.avgGap + 1)) * 10 + s.cycleScore * 2 + Math.random() * 4),
-      }));
+      // Logic: based on Lambda (expected frequency)
+      const lambda = pick / config.numbers;
+      const weighted = stats.map(s => {
+        // Probability of occurring based on recent gap vs average gap
+        const p = Math.exp(-lambda) * (lambda ** (s.avgGap / (s.lastSeen + 1)));
+        return {
+          ...s,
+          weight: Math.max(0.1, p * 20 + s.cycleScore * 2 + Math.random() * 4),
+        };
+      });
       const shuffled = weightedShuffle(weighted);
       return shuffled.slice(0, pick).map(s => s.number).sort((a, b) => a - b);
     }
 
     case "cluster": {
-      const weighted = stats.map(s => ({
-        ...s,
-        weight: Math.max(0.1, s.momentum * 2 + s.recentFreq * 1.5 + Math.random() * 6),
-      }));
+      // Logic: groups of numbers that appeared together recently
+      const weighted = stats.map(s => {
+        const clusterScore = s.momentum * 2 + s.recentFreq * 1.5;
+        return {
+          ...s,
+          weight: Math.max(0.1, clusterScore + (s.status === "hot" ? 3 : 0) + Math.random() * 6),
+        };
+      });
       const shuffled = weightedShuffle(weighted);
       return shuffled.slice(0, pick).map(s => s.number).sort((a, b) => a - b);
     }
