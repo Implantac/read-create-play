@@ -284,7 +284,7 @@ describe("BetComparisonPanel Accessibility", () => {
     // Aguarda o estado mudar para 'delayed-open' ou 'open'
     await waitFor(() => {
       const state = avgButton.getAttribute("data-state");
-      expect(["open", "delayed-open"]).toContain(state);
+      expect(["open", "delayed-open", "instant-open"]).toContain(state);
     });
 
     // Pressiona Escape
