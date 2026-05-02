@@ -38,14 +38,26 @@ export function SmartUnfoldingGenerator({ matrixData, config, onSaveBet }: Props
   }, []);
 
   const handleGenerate = useCallback(() => {
-    if (baseNumbers.length < config.pick) {
-      toast.error(`Selecione ao menos ${config.pick} dezenas`);
-      return;
+    if (selectedTemplate) {
+      if (baseNumbers.length < selectedTemplate.v) {
+        toast.error(`O template selecionado requer exatamente ${selectedTemplate.v} dezenas`);
+        return;
+      }
+      // Use exactly v numbers for the template
+      const pool = baseNumbers.slice(0, selectedTemplate.v);
+      const result = selectedTemplate.generate(pool);
+      setGames(result);
+      toast.success(`${result.length} jogos gerados usando template matemático!`);
+    } else {
+      if (baseNumbers.length < config.pick) {
+        toast.error(`Selecione ao menos ${config.pick} dezenas`);
+        return;
+      }
+      const result = generateUnfolding(baseNumbers, config.pick, maxGames);
+      setGames(result);
+      toast.success(`${result.length} jogos gerados!`);
     }
-    const result = generateUnfolding(baseNumbers, config.pick, maxGames);
-    setGames(result);
-    toast.success(`${result.length} jogos gerados!`);
-  }, [baseNumbers, config.pick, maxGames]);
+  }, [baseNumbers, config.pick, maxGames, selectedTemplate]);
 
   const coverage = useMemo(() => computeCoverage(games, baseNumbers), [games, baseNumbers]);
 
