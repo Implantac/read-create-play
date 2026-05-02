@@ -26,26 +26,31 @@ function MetricBox({ label, value, icon: Icon, isBest, colorClass, suffix = "", 
   label: string; value: string | number; icon: any; isBest?: boolean; colorClass?: string; suffix?: string; tooltip?: string
 }) {
   const content = (
-    <div className={`p-3 rounded-xl border transition-all relative overflow-hidden h-full flex flex-col justify-center ${
-      isBest 
-        ? "bg-primary/10 border-primary/40 shadow-sm shadow-primary/10" 
-        : "bg-muted/50 border-border/50"
-    }`}>
+    <div 
+      className={`p-3 rounded-xl border transition-all relative overflow-hidden h-full flex flex-col justify-center ${
+        isBest 
+          ? "bg-primary/10 border-primary/40 shadow-sm shadow-primary/10" 
+          : "bg-muted/50 border-border/50"
+      }`}
+      role="group"
+      aria-label={`${label}: ${value}${suffix}${isBest ? " (Melhor resultado)" : ""}`}
+    >
       {isBest && (
         <motion.div 
           initial={{ opacity: 0, scale: 0, rotate: -20 }}
           animate={{ opacity: 1, scale: 1, rotate: 0 }}
           className="absolute -top-1 -right-1"
+          aria-hidden="true"
         >
           <div className="bg-primary text-primary-foreground p-1 rounded-bl-lg shadow-sm">
             <Sparkles className="w-2.5 h-2.5" />
           </div>
         </motion.div>
       )}
-      <p className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1">
+      <p className="text-[10px] text-muted-foreground mb-1 flex items-center gap-1" aria-hidden="true">
         <Icon className={`w-3 h-3 ${isBest ? "text-primary" : ""}`} /> {label}
       </p>
-      <p className={`text-sm font-bold font-mono ${isBest ? "text-primary scale-105" : colorClass || "text-foreground"} transition-all`}>
+      <p className={`text-sm font-bold font-mono ${isBest ? "text-primary scale-105" : colorClass || "text-foreground"} transition-all`} aria-hidden="true">
         {value}{suffix}
       </p>
     </div>
@@ -56,7 +61,12 @@ function MetricBox({ label, value, icon: Icon, isBest, colorClass, suffix = "", 
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="cursor-help">{content}</div>
+            <button 
+              className="w-full text-left cursor-help focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xl"
+              aria-label={`${label}: ${value}${suffix}. ${tooltip}`}
+            >
+              {content}
+            </button>
           </TooltipTrigger>
           <TooltipContent className="max-w-[200px] text-center">
             <p className="text-xs">{tooltip}</p>
@@ -299,9 +309,14 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
                           Aposta #{i + 1}
                         </span>
                       </div>
-                      <Badge variant={isBestScore ? "default" : "secondary"} className={`font-mono ${isBestScore ? "gradient-brand" : ""}`}>
+                      <Badge 
+                        variant={isBestScore ? "default" : "secondary"} 
+                        className={`font-mono ${isBestScore ? "gradient-brand" : ""}`}
+                        aria-label={`Pontuação total: ${bet.score} de 100`}
+                      >
                         Score: {bet.score}
                       </Badge>
+
                     </div>
 
                     <h3 className="font-bold text-sm mb-4 truncate pr-2" title={bet.label}>{bet.label}</h3>
@@ -343,10 +358,11 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
                     </div>
 
                     <div className="p-3 rounded-xl bg-muted/30 border border-border/50 mb-6 flex items-center justify-between">
-                      <div>
-                        <p className="text-[10px] text-muted-foreground mb-0.5">Retorno Total Estimado</p>
-                        <p className="text-sm font-bold text-primary font-mono">{bet.totalPrize}</p>
+                      <div aria-label={`Retorno total estimado: ${bet.totalPrize}`}>
+                        <p className="text-[10px] text-muted-foreground mb-0.5" aria-hidden="true">Retorno Total Estimado</p>
+                        <p className="text-sm font-bold text-primary font-mono" aria-hidden="true">{bet.totalPrize}</p>
                       </div>
+
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                         <DollarSign className="w-4 h-4 text-primary" />
                       </div>
