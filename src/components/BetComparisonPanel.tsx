@@ -95,7 +95,7 @@ interface Props {
   config?: LotteryConfig;
 }
 
-export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
+export function BetComparisonPanel({ bets, onClose, lotteryId, pick, stats, config }: Props) {
   const copyNumbers = (nums: number[]) => {
     navigator.clipboard.writeText(nums.join(", "));
     toast.success("Números copiados!");
