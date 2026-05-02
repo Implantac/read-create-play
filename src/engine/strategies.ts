@@ -106,7 +106,8 @@ function ensureBalancedSelection(selected: number[], pick: number, maxNum: numbe
 export function generateByStrategy(
   strategy: Strategy,
   stats: NumberStats[],
-  config: LotteryConfig
+  config: LotteryConfig,
+  draws: DrawResult[] = []
 ): number[] {
   const pick = config.pick;
 
@@ -295,7 +296,6 @@ export function generateByStrategy(
     }
 
     case "cycle": {
-      // Numbers whose gaps are most regular (low stdDev relative to avgGap) and are overdue
       const weighted = stats.map(s => ({
         ...s,
         weight: Math.max(0.1,
@@ -317,7 +317,6 @@ export function generateByStrategy(
     }
 
     case "hybrid": {
-      // Combine ML consensus with trend and cycle analysis
       const models = runAllModels(stats, config);
       const consensus = getConsensusRanking(models);
       const consensusMap = new Map(consensus.map(c => [c.number, c.score]));
@@ -338,7 +337,35 @@ export function generateByStrategy(
       return ensureBalancedSelection(selected, pick, config.numbers);
     }
 
+    case "markov": {
+      const weighted = stats.map(s => ({
+        ...s,
+        weight: Math.max(0.1, s.recentFreq * 1.5 + (s.trend > 0 ? s.trend * 2 : 1) + Math.random() * 5),
+      }));
+      const shuffled = weightedShuffle(weighted);
+      return shuffled.slice(0, pick).map(s => s.number).sort((a, b) => a - b);
+    }
+
+    case "poisson": {
+      const weighted = stats.map(s => ({
+        ...s,
+        weight: Math.max(0.1, (1 / (s.avgGap + 1)) * 10 + s.cycleScore * 2 + Math.random() * 4),
+      }));
+      const shuffled = weightedShuffle(weighted);
+      return shuffled.slice(0, pick).map(s => s.number).sort((a, b) => a - b);
+    }
+
+    case "cluster": {
+      const weighted = stats.map(s => ({
+        ...s,
+        weight: Math.max(0.1, s.momentum * 2 + s.recentFreq * 1.5 + Math.random() * 6),
+      }));
+      const shuffled = weightedShuffle(weighted);
+      return shuffled.slice(0, pick).map(s => s.number).sort((a, b) => a - b);
+    }
+
     default:
       return generateSmartBet(stats, pick);
   }
 }
+
