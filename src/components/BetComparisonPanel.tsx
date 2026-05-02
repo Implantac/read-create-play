@@ -91,6 +91,8 @@ interface Props {
   onClose: () => void;
   lotteryId: string;
   pick: number;
+  stats?: NumberStats[];
+  config?: LotteryConfig;
 }
 
 export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
