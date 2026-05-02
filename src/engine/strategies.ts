@@ -1,5 +1,5 @@
 import { NumberStats, generateSmartBet } from "./statistics";
-import { LotteryConfig } from "@/data/lotteries";
+import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { getConsensusRanking, runAllModels } from "./ml-models";
 
 export type Strategy =
