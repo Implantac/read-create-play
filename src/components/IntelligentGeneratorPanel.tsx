@@ -75,7 +75,7 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
       const genConfig: GenerationConfig = {
         totalBets,
         topResults,
-        strategies: ["hot", "lowDelay", "trend", "cycle", "balanced", "smart", "hybrid", "ml", "sectors", "pattern"],
+        strategies: ["hot", "lowDelay", "trend", "cycle", "balanced", "smart", "hybrid", "ml", "sectors", "pattern", "markov", "poisson", "cluster"],
         simulateHistory,
         minScore: 30,
       };

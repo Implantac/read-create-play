@@ -259,6 +259,9 @@ const INTELLIGENT_STRATEGIES: { id: Strategy; label: string; weight: number }[] 
   { id: "ml", label: "IA Ensemble", weight: 1.5 },
   { id: "sectors", label: "Cobertura por Setores", weight: 1 },
   { id: "pattern", label: "Padrões Estruturais", weight: 1 },
+  { id: "markov", label: "Cadeia de Markov", weight: 1.2 },
+  { id: "poisson", label: "Distribuição Poisson", weight: 1.2 },
+  { id: "cluster", label: "Análise de Clusters", weight: 1.2 },
 ];
 
 // ═══════════════════════════════════════════════════════

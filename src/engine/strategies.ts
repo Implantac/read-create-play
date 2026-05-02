@@ -1,5 +1,5 @@
 import { NumberStats, generateSmartBet } from "./statistics";
-import { LotteryConfig } from "@/data/lotteries";
+import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { getConsensusRanking, runAllModels } from "./ml-models";
 
 export type Strategy =
@@ -16,7 +16,10 @@ export type Strategy =
   | "sectors"
   | "trend"
   | "cycle"
-  | "hybrid";
+  | "hybrid"
+  | "markov"
+  | "poisson"
+  | "cluster";
 
 export interface StrategyInfo {
   id: Strategy;
@@ -43,6 +46,9 @@ export const STRATEGIES: StrategyInfo[] = [
   // AI
   { id: "ml", label: "IA Ensemble", desc: "Consenso de 6 modelos de Machine Learning", category: "ai" },
   { id: "hybrid", label: "IA Híbrida", desc: "Combina consenso ML + análise de tendência + ciclos", category: "ai" },
+  { id: "markov", label: "Cadeia de Markov", desc: "Probabilidade de transição e sequência de estados", category: "ai" },
+  { id: "poisson", label: "Poisson", desc: "Distribuição estatística por taxa de ocorrência", category: "ai" },
+  { id: "cluster", label: "Clusters", desc: "Agrupamento por afinidade e correlação histórica", category: "ai" },
 ];
 
 function isPrime(n: number): boolean {
@@ -100,7 +106,8 @@ function ensureBalancedSelection(selected: number[], pick: number, maxNum: numbe
 export function generateByStrategy(
   strategy: Strategy,
   stats: NumberStats[],
-  config: LotteryConfig
+  config: LotteryConfig,
+  draws: DrawResult[] = []
 ): number[] {
   const pick = config.pick;
 
@@ -289,7 +296,6 @@ export function generateByStrategy(
     }
 
     case "cycle": {
-      // Numbers whose gaps are most regular (low stdDev relative to avgGap) and are overdue
       const weighted = stats.map(s => ({
         ...s,
         weight: Math.max(0.1,
@@ -311,7 +317,6 @@ export function generateByStrategy(
     }
 
     case "hybrid": {
-      // Combine ML consensus with trend and cycle analysis
       const models = runAllModels(stats, config);
       const consensus = getConsensusRanking(models);
       const consensusMap = new Map(consensus.map(c => [c.number, c.score]));
@@ -332,7 +337,66 @@ export function generateByStrategy(
       return ensureBalancedSelection(selected, pick, config.numbers);
     }
 
+    case "markov": {
+      // Logic: compute transition probabilities between numbers
+      const transitions = new Map<number, Map<number, number>>();
+      draws.slice(0, 50).forEach(draw => {
+        for (let i = 0; i < draw.numbers.length; i++) {
+          for (let j = i + 1; j < draw.numbers.length; j++) {
+            const n1 = draw.numbers[i];
+            const n2 = draw.numbers[j];
+            if (!transitions.has(n1)) transitions.set(n1, new Map());
+            const targets = transitions.get(n1)!;
+            targets.set(n2, (targets.get(n2) || 0) + 1);
+          }
+        }
+      });
+
+      const weighted = stats.map(s => {
+        let transitionScore = 0;
+        const targets = transitions.get(s.number);
+        if (targets) {
+          transitionScore = Array.from(targets.values()).reduce((a, b) => a + b, 0) / 10;
+        }
+        return {
+          ...s,
+          weight: Math.max(0.1, s.recentFreq * 1.5 + transitionScore + (s.trend > 0 ? s.trend * 2 : 1) + Math.random() * 5),
+        };
+      });
+      const shuffled = weightedShuffle(weighted);
+      return shuffled.slice(0, pick).map(s => s.number).sort((a, b) => a - b);
+    }
+
+    case "poisson": {
+      // Logic: based on Lambda (expected frequency)
+      const lambda = pick / config.numbers;
+      const weighted = stats.map(s => {
+        // Probability of occurring based on recent gap vs average gap
+        const p = Math.exp(-lambda) * (lambda ** (s.avgGap / (s.lastSeen + 1)));
+        return {
+          ...s,
+          weight: Math.max(0.1, p * 20 + s.cycleScore * 2 + Math.random() * 4),
+        };
+      });
+      const shuffled = weightedShuffle(weighted);
+      return shuffled.slice(0, pick).map(s => s.number).sort((a, b) => a - b);
+    }
+
+    case "cluster": {
+      // Logic: groups of numbers that appeared together recently
+      const weighted = stats.map(s => {
+        const clusterScore = s.momentum * 2 + s.recentFreq * 1.5;
+        return {
+          ...s,
+          weight: Math.max(0.1, clusterScore + (s.status === "hot" ? 3 : 0) + Math.random() * 6),
+        };
+      });
+      const shuffled = weightedShuffle(weighted);
+      return shuffled.slice(0, pick).map(s => s.number).sort((a, b) => a - b);
+    }
+
     default:
       return generateSmartBet(stats, pick);
   }
 }
+

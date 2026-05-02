@@ -2,9 +2,12 @@ import { useState, useMemo, useCallback } from "react";
 import { MatrixRow, generateUnfolding, computeCoverage } from "@/engine/matrix-analysis";
 import { LotteryConfig } from "@/data/lotteries";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Dices, Copy, Sparkles, Check, Info } from "lucide-react";
+import { Dices, Copy, Sparkles, Check, Info, ShieldCheck, Trophy } from "lucide-react";
 import { toast } from "sonner";
+import { WHEEL_TEMPLATES, WheelTemplate } from "@/engine/lottery-wheels";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Props {
   matrixData: MatrixRow[];
@@ -20,6 +23,7 @@ export function SmartUnfoldingGenerator({ matrixData, config, onSaveBet }: Props
   const [manualSelection, setManualSelection] = useState<number[]>([]);
   const [games, setGames] = useState<number[][]>([]);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<WheelTemplate | null>(null);
 
   const suggestedNumbers = useMemo(
     () => matrixData.slice(0, baseCount).map(r => r.number).sort((a, b) => a - b),
@@ -35,14 +39,26 @@ export function SmartUnfoldingGenerator({ matrixData, config, onSaveBet }: Props
   }, []);
 
   const handleGenerate = useCallback(() => {
-    if (baseNumbers.length < config.pick) {
-      toast.error(`Selecione ao menos ${config.pick} dezenas`);
-      return;
+    if (selectedTemplate) {
+      if (baseNumbers.length < selectedTemplate.v) {
+        toast.error(`O template selecionado requer exatamente ${selectedTemplate.v} dezenas`);
+        return;
+      }
+      // Use exactly v numbers for the template
+      const pool = baseNumbers.slice(0, selectedTemplate.v);
+      const result = selectedTemplate.generate(pool);
+      setGames(result);
+      toast.success(`${result.length} jogos gerados usando template matemático!`);
+    } else {
+      if (baseNumbers.length < config.pick) {
+        toast.error(`Selecione ao menos ${config.pick} dezenas`);
+        return;
+      }
+      const result = generateUnfolding(baseNumbers, config.pick, maxGames);
+      setGames(result);
+      toast.success(`${result.length} jogos gerados!`);
     }
-    const result = generateUnfolding(baseNumbers, config.pick, maxGames);
-    setGames(result);
-    toast.success(`${result.length} jogos gerados!`);
-  }, [baseNumbers, config.pick, maxGames]);
+  }, [baseNumbers, config.pick, maxGames, selectedTemplate]);
 
   const coverage = useMemo(() => computeCoverage(games, baseNumbers), [games, baseNumbers]);
 
@@ -75,8 +91,55 @@ export function SmartUnfoldingGenerator({ matrixData, config, onSaveBet }: Props
         </div>
       </div>
 
+      {/* Templates Selection */}
+      <div className="space-y-3">
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold flex items-center gap-2">
+          <ShieldCheck className="w-3 h-3 text-primary" /> Templates de Fechamento Matemático
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            size="sm"
+            variant={!selectedTemplate ? "default" : "outline"}
+            onClick={() => { setSelectedTemplate(null); setBaseCount(defaultBaseCount); }}
+            className="h-8 text-[10px]"
+          >
+            Livre / Customizado
+          </Button>
+          {WHEEL_TEMPLATES.map(t => (
+            <TooltipProvider key={t.id}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant={selectedTemplate?.id === t.id ? "default" : "outline"}
+                    onClick={() => {
+                      setSelectedTemplate(t);
+                      setBaseCount(t.v);
+                      toast.info(`Template ${t.name} selecionado. Selecione ${t.v} dezenas.`);
+                    }}
+                    className={`h-8 text-[10px] ${selectedTemplate?.id === t.id ? "gradient-brand border-none" : ""}`}
+                  >
+                    {t.name}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs p-3">
+                  <div className="space-y-1.5">
+                    <p className="text-xs font-bold">{t.name}</p>
+                    <p className="text-[10px] leading-relaxed">{t.description}</p>
+                    <div className="flex items-center gap-2 pt-1 border-t border-border mt-1">
+                      <Badge variant="outline" className="text-[8px]">{t.v} Dezenas</Badge>
+                      <Badge variant="outline" className="text-[8px]">{t.gamesCount} Jogos</Badge>
+                    </div>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ))}
+        </div>
+      </div>
+
       {/* Controls */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-border/50">
         <div className="flex items-center gap-2">
           <Button
             size="sm"
@@ -96,7 +159,7 @@ export function SmartUnfoldingGenerator({ matrixData, config, onSaveBet }: Props
           </Button>
         </div>
 
-        {useAutoSuggest && (
+        {useAutoSuggest && !selectedTemplate && (
           <div className="flex items-center gap-2 text-xs">
             <span className="text-muted-foreground">Dezenas base:</span>
             <input
@@ -111,21 +174,27 @@ export function SmartUnfoldingGenerator({ matrixData, config, onSaveBet }: Props
           </div>
         )}
 
-        <div className="flex items-center gap-2 text-xs">
-          <span className="text-muted-foreground">Jogos:</span>
-          <input
-            type="range"
-            min={1}
-            max={50}
-            value={maxGames}
-            onChange={e => setMaxGames(+e.target.value)}
-            className="w-24"
-          />
-          <span className="font-mono font-bold text-primary">{maxGames}</span>
-        </div>
+        {!selectedTemplate && (
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-muted-foreground">Jogos:</span>
+            <input
+              type="range"
+              min={1}
+              max={50}
+              value={maxGames}
+              onChange={e => setMaxGames(+e.target.value)}
+              className="w-24"
+            />
+            <span className="font-mono font-bold text-primary">{maxGames}</span>
+          </div>
+        )}
 
-        <Button onClick={handleGenerate} size="sm" className="h-8 text-xs ml-auto">
-          <Dices className="w-3 h-3 mr-1" /> Gerar Desdobramento
+        <Button 
+          onClick={handleGenerate} 
+          size="sm" 
+          className="h-9 px-4 gradient-brand border-none shadow-lg shadow-primary/20 ml-auto"
+        >
+          <Dices className="w-3.5 h-3.5 mr-2" /> Gerar {selectedTemplate ? "Template" : "Desdobramento"}
         </Button>
       </div>
 
