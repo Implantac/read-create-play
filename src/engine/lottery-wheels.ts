@@ -3,12 +3,24 @@
  * Knowledge base for mathematical combinations and guarantees
  */
 
+// Simple seeded RNG for deterministic audits
+let auditSeed = 12345;
+function seededRandom() {
+  auditSeed = (auditSeed * 1664525 + 1013904223) % 4294967296;
+  return auditSeed / 4294967296;
+}
+
+function setAuditSeed(seed: number) {
+  auditSeed = seed;
+}
+
 export interface WheelGuaranteeAudit {
   targetGuarantee: number;     // t
   actualCoverage: number;     // % of combinations that hit at least t
   combinationsTested: number; // sample size for validation
   efficiency: number;        // ratio of reduction
   isSolid: boolean;          // if coverage is 100%
+  seedUsed: number;          // the seed used for this deterministic run
 }
 
 export interface WheelTemplate {
