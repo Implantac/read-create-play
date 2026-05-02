@@ -15,6 +15,9 @@ import { toast } from "sonner";
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { PerfResult, BetPerformance } from "@/types/bet-analysis";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { NumberStats } from "@/engine/statistics";
+import { LotteryConfig } from "@/data/lotteries";
+import { Binary, Boxes } from "lucide-react";
 
 function formatCurrency(value: number): string {
   if (value >= 1000000) return `R$ ${(value / 1000000).toFixed(1)}M`;
