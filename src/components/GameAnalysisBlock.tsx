@@ -1,7 +1,7 @@
 import { NumberStats } from "@/engine/statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, ChevronDown, ChevronUp, Flame, Snowflake, RefreshCw, Hash, Target } from "lucide-react";
+import { BarChart3, ChevronDown, ChevronUp, Flame, Snowflake, RefreshCw, Hash, Target, Zap, Binary, Boxes } from "lucide-react";
 import { useState } from "react";
 
 interface Props {
