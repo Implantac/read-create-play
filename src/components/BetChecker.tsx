@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
+import { NumberStats } from "@/engine/statistics"; } from "@/data/lotteries";
 import { checkBetAgainstDraws, MatchResult, getPrizeTiers } from "@/services/lotteryApi";
 import { DrawResultWithPrizes, DrawPrizeData } from "@/hooks/useLotteryDraws";
 import { motion, AnimatePresence } from "framer-motion";
@@ -33,8 +34,9 @@ interface Props {
   lotteryId: string;
   maxNumbers: number;
   pick: number;
-  stats?: any[];
-  config?: LotteryConfig;
+  stats?: NumberStats[];
+  config?: LotteryConfig } from "@/data/lotteries";
+import { NumberStats } from "@/engine/statistics";;
 }
 
 interface ExtendedMatchResult extends MatchResult {
