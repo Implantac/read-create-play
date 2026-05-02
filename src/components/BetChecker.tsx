@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
-import { DrawResult } from "@/data/lotteries";
+import { DrawResult, LotteryConfig } from "@/data/lotteries";
+import { NumberStats } from "@/engine/statistics";
 import { checkBetAgainstDraws, MatchResult, getPrizeTiers } from "@/services/lotteryApi";
 import { DrawResultWithPrizes, DrawPrizeData } from "@/hooks/useLotteryDraws";
 import { motion, AnimatePresence } from "framer-motion";
@@ -33,6 +34,8 @@ interface Props {
   lotteryId: string;
   maxNumbers: number;
   pick: number;
+  stats?: NumberStats[];
+  config?: LotteryConfig;
 }
 
 interface ExtendedMatchResult extends MatchResult {
@@ -380,7 +383,7 @@ function QuickCheckResult({
 
 // ─── Main Component ───
 
-export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick }: Props) {
+export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick, stats, config }: Props) {
   const [inputValue, setInputValue] = useState("");
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
   const pasteJustHandled = useRef(false);
@@ -622,12 +625,26 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
         : 0;
 
       const trendData = computeTrend(betResults);
+      
+      // Attempt to infer strategyId for breakdown
+      let strategyId: string | undefined;
+      const labelLower = bet.label.toLowerCase();
+      if (labelLower.includes("markov")) strategyId = "markov";
+      else if (labelLower.includes("poisson")) strategyId = "poisson";
+      else if (labelLower.includes("cluster")) strategyId = "cluster";
+      else if (labelLower.includes("ml") || labelLower.includes("ensemble")) strategyId = "ml";
+      else if (labelLower.includes("fibonacci")) strategyId = "fibonacci";
+      else if (labelLower.includes("primes") || labelLower.includes("primo")) strategyId = "primes";
+      else if (labelLower.includes("hot") || labelLower.includes("quente")) strategyId = "hot";
+      else if (labelLower.includes("cold") || labelLower.includes("fria")) strategyId = "cold";
+
       return {
         numbers: bet.numbers, label: bet.label, results: betResults,
         avgHits: Math.round(avgHits * 100) / 100, bestHit, prizeHits,
         totalPrizeValue, totalPrize: formatCurrency(totalPrizeValue),
         score: Math.min(score, 100),
         trend: trendData.trend, recentAvg: trendData.recentAvg, previousAvg: trendData.previousAvg,
+        strategyId
       };
     });
 
@@ -1464,6 +1481,8 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
             onClose={() => setShowComparison(false)} 
             lotteryId={lotteryId}
             pick={pick}
+            stats={stats}
+            config={config}
           />
         )}
       </AnimatePresence>

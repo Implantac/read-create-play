@@ -126,7 +126,7 @@ const GeradorPage = () => {
 
             {/* Bet Checker stays FREE */}
             <SafeSuspense fallback={<LazyFallback />}>
-              <BetChecker draws={draws} drawsWithPrizes={drawsWithPrizes} lotteryId={selectedLottery} maxNumbers={config.numbers} pick={config.pick} />
+              <BetChecker draws={draws} drawsWithPrizes={drawsWithPrizes} lotteryId={selectedLottery} maxNumbers={config.numbers} pick={config.pick} stats={stats} config={config} />
             </SafeSuspense>
           </>
         )}
