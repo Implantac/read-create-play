@@ -148,10 +148,31 @@ describe("BetComparisonPanel Accessibility", () => {
     fireEvent.blur(avgButton);
     fireEvent.focus(otherButton);
 
-    // Aguarda o tooltip desaparecer
     await waitFor(() => {
       expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
     });
+  });
+
+  it("deve abrir o tooltip ao navegar com teclado (Tab)", async () => {
+    render(
+      <TooltipProvider>
+        <BetComparisonPanel 
+          bets={mockBets} 
+          onClose={() => {}} 
+          lotteryId="megasena" 
+          pick={6} 
+        />
+      </TooltipProvider>
+    );
+
+    const avgButton = screen.getByLabelText(/Média: 4.00/);
+    
+    // O Radix Tooltip abre no foco do teclado por padrão
+    fireEvent.focus(avgButton);
+    
+    // Aguarda o tooltip
+    const tooltip = await screen.findByRole("tooltip");
+    expect(tooltip).toBeInTheDocument();
   });
 
   it("deve permitir que o leitor de tela identifique os badges de métricas", () => {
