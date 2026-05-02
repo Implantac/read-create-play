@@ -607,6 +607,7 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
           concurso: draw.concurso, date: draw.date, hits, matched,
           prize: prizeInfo?.label || "", prizeValue: prizeInfo?.value || 0, realPrize,
           secondHits, secondMatched, secondPrize, secondPrizeValue,
+          secondPrizeValue, // duplicated in original code but keeping consistency
           bestHits: isDupla ? bestHitsForDraw : undefined,
         };
       });
@@ -622,12 +623,26 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
         : 0;
 
       const trendData = computeTrend(betResults);
+      
+      // Attempt to infer strategyId for breakdown
+      let strategyId: string | undefined;
+      const labelLower = bet.label.toLowerCase();
+      if (labelLower.includes("markov")) strategyId = "markov";
+      else if (labelLower.includes("poisson")) strategyId = "poisson";
+      else if (labelLower.includes("cluster")) strategyId = "cluster";
+      else if (labelLower.includes("ml") || labelLower.includes("ensemble")) strategyId = "ml";
+      else if (labelLower.includes("fibonacci")) strategyId = "fibonacci";
+      else if (labelLower.includes("primes") || labelLower.includes("primo")) strategyId = "primes";
+      else if (labelLower.includes("hot") || labelLower.includes("quente")) strategyId = "hot";
+      else if (labelLower.includes("cold") || labelLower.includes("fria")) strategyId = "cold";
+
       return {
         numbers: bet.numbers, label: bet.label, results: betResults,
         avgHits: Math.round(avgHits * 100) / 100, bestHit, prizeHits,
         totalPrizeValue, totalPrize: formatCurrency(totalPrizeValue),
         score: Math.min(score, 100),
         trend: trendData.trend, recentAvg: trendData.recentAvg, previousAvg: trendData.previousAvg,
+        strategyId
       };
     });
 
