@@ -183,6 +183,31 @@ export function SmartUnfoldingGenerator({ matrixData, config, onSaveBet }: Props
           </div>
         )}
 
+        {selectedTemplate && (
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-muted-foreground">Seed Auditor:</span>
+            <input
+              type="number"
+              value={auditSeed}
+              onChange={e => setAuditSeed(+e.target.value)}
+              className="w-16 h-7 bg-background border border-border rounded px-1 text-[10px] font-mono focus:ring-1 focus:ring-primary outline-none"
+            />
+            <Button 
+              size="icon" 
+              variant="ghost" 
+              className="h-7 w-7 hover:bg-primary/10 transition-colors" 
+              onClick={() => {
+                const newSeed = Math.floor(Math.random() * 99999);
+                setAuditSeed(newSeed);
+                toast.info(`Nova seed gerada: ${newSeed}`);
+              }}
+              title="Gera nova semente determinística"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        )}
+
         {!selectedTemplate && (
           <div className="flex items-center gap-2 text-xs">
             <span className="text-muted-foreground">Jogos:</span>
