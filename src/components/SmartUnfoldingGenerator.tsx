@@ -3,8 +3,10 @@ import { MatrixRow, generateUnfolding, computeCoverage } from "@/engine/matrix-a
 import { LotteryConfig } from "@/data/lotteries";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Dices, Copy, Sparkles, Check, Info } from "lucide-react";
+import { Dices, Copy, Sparkles, Check, Info, ShieldCheck, Trophy } from "lucide-react";
 import { toast } from "sonner";
+import { WHEEL_TEMPLATES, WheelTemplate } from "@/engine/lottery-wheels";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Props {
   matrixData: MatrixRow[];
