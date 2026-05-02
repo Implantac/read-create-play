@@ -307,7 +307,7 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
           </div>
 
           {/* Stats Grid Side-by-Side */}
-          <div className="overflow-x-auto pb-4 scrollbar-thin">
+          <div id="comparison-grid" tabIndex={-1} className="overflow-x-auto pb-4 scrollbar-thin focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-xl">
             <div className="flex gap-4 min-w-max pb-2">
               {filteredBets.map((bet, i) => {
                 const isBestScore = highlights?.score.includes(i);
