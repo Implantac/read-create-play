@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { BetHitsChart } from "./BetHitsChart";
 import { toast } from "sonner";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { PerfResult, BetPerformance } from "@/types/bet-analysis";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -190,6 +190,35 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
     setOnlyPrizes(false);
     toast.info("Filtros resetados");
   };
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Atalhos apenas se o modal estiver aberto
+      if (e.altKey && e.key.toLowerCase() === 'f') {
+        e.preventDefault();
+        document.getElementById('filter-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        toast.info("Atalho: Filtros de Amostra", { duration: 1500 });
+      }
+      if (e.altKey && e.key.toLowerCase() === 'c') {
+        e.preventDefault();
+        document.getElementById('comparison-grid')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        toast.info("Atalho: Grid de Comparação", { duration: 1500 });
+      }
+      if (e.altKey && e.key.toLowerCase() === 'd') {
+        e.preventDefault();
+        document.getElementById('differences-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        toast.info("Atalho: Análise de Divergência", { duration: 1500 });
+      }
+      if (e.altKey && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        document.getElementById('consistency-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        toast.info("Atalho: Métrica de Consistência", { duration: 1500 });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
 
   return (
     <motion.div 
@@ -207,8 +236,18 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
             </div>
             <div>
               <h2 className="text-lg font-bold">Comparativo Detalhado</h2>
-              <p className="text-xs text-muted-foreground">{bets.length} combinações selecionadas • {lotteryId.toUpperCase()}</p>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <p className="text-xs text-muted-foreground">{bets.length} combinações • {lotteryId.toUpperCase()}</p>
+                <div className="hidden lg:flex items-center gap-2 border-l border-border/50 pl-3 text-[9px] font-medium text-muted-foreground uppercase tracking-wider">
+                  <span>Atalhos:</span>
+                  <kbd className="px-1.5 py-0.5 rounded border border-border bg-background font-mono text-[8px]">Alt+F</kbd> Filtros
+                  <kbd className="px-1.5 py-0.5 rounded border border-border bg-background font-mono text-[8px]">Alt+C</kbd> Grid
+                  <kbd className="px-1.5 py-0.5 rounded border border-border bg-background font-mono text-[8px]">Alt+D</kbd> Divergir
+                  <kbd className="px-1.5 py-0.5 rounded border border-border bg-background font-mono text-[8px]">Alt+S</kbd> Stats
+                </div>
+              </div>
             </div>
+
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full">
             <X className="w-5 h-5" />
@@ -217,7 +256,7 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-8 scrollbar-thin">
           {/* Contest Filters Section */}
-          <div className="bg-muted/20 border border-border/50 rounded-2xl p-4 space-y-4">
+          <div id="filter-section" tabIndex={-1} className="bg-muted/20 border border-border/50 rounded-2xl p-4 space-y-4 focus:outline-none focus:ring-2 focus:ring-primary/20">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2 text-foreground font-bold text-sm">
                 <Filter className="w-4 h-4 text-primary" />
@@ -278,7 +317,7 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
           </div>
 
           {/* Stats Grid Side-by-Side */}
-          <div className="overflow-x-auto pb-4 scrollbar-thin">
+          <div id="comparison-grid" tabIndex={-1} className="overflow-x-auto pb-4 scrollbar-thin focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-xl">
             <div className="flex gap-4 min-w-max pb-2">
               {filteredBets.map((bet, i) => {
                 const isBestScore = highlights?.score.includes(i);
@@ -402,12 +441,12 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
           </div>
 
           {/* Differences Section */}
-          <div className="space-y-4">
+          <div id="differences-section" tabIndex={-1} className="space-y-4 focus:outline-none focus:ring-2 focus:ring-primary/10 p-2 rounded-xl">
             <h3 className="text-sm font-bold flex items-center gap-2">
               <GitCompare className="w-4 h-4 text-primary" />
               Análise de Divergência de Dezenas
             </h3>
-            
+
             <div className="overflow-x-auto rounded-xl border border-border bg-card/50">
               <table className="w-full text-left border-collapse">
                 <thead>
@@ -501,12 +540,12 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
           </div>
 
           {/* Ranking & Performance History */}
-          <div className="space-y-6">
+          <div id="consistency-section" tabIndex={-1} className="space-y-6 focus:outline-none focus:ring-2 focus:ring-primary/10 p-2 rounded-xl">
             <h3 className="text-sm font-bold flex items-center gap-2">
               <BarChart3 className="w-4 h-4 text-primary" />
               Ranking e Histórico de Consistência
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-6">
                 {bets.map((bet, i) => {
