@@ -1,0 +1,78 @@
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { BetComparisonPanel } from "../BetComparisonPanel";
+import { TooltipProvider } from "@/components/ui/tooltip";
+
+// Mock das dependências que não queremos testar aqui
+vi.mock("@/components/BetHitsChart", () => ({
+  BetHitsChart: () => <div data-testid="hits-chart" />
+}));
+
+const mockBets = [
+  {
+    numbers: [1, 2, 3, 4, 5, 6],
+    label: "Aposta Teste 1",
+    results: [
+      { concurso: 1, date: "01/01/2026", hits: 4, matched: [1, 2, 3, 4], prizeValue: 800, prize: "Quadra" }
+    ],
+    avgHits: 4,
+    bestHit: 4,
+    prizeHits: 1,
+    totalPrizeValue: 800,
+    totalPrize: "R$ 800",
+    score: 85,
+    trend: "stable" as const,
+    recentAvg: 4,
+    previousAvg: 4
+  }
+];
+
+describe("BetComparisonPanel Accessibility", () => {
+  it("deve anunciar corretamente o tooltip quando o botão de métrica recebe foco", async () => {
+    render(
+      <TooltipProvider>
+        <BetComparisonPanel 
+          bets={mockBets} 
+          onClose={() => {}} 
+          lotteryId="megasena" 
+          pick={6} 
+        />
+      </TooltipProvider>
+    );
+
+    // Encontrar o botão de média (que tem tooltip)
+    // O aria-label contém o valor e a descrição do tooltip
+    const avgButton = screen.getByLabelText(/Média: 4.00.*Média de acertos em todos os sorteios analisados/);
+    expect(avgButton).toBeInTheDocument();
+
+    // Simular foco para verificar se o tooltip aparece e está associado
+    avgButton.focus();
+    
+    // O tooltip deve ter o ID que o botão referencia no aria-describedby
+    const tooltipId = avgButton.getAttribute("aria-describedby");
+    expect(tooltipId).toBeDefined();
+
+    await waitFor(() => {
+      const tooltipContent = document.getElementById(tooltipId!);
+      expect(tooltipContent).toBeInTheDocument();
+      expect(tooltipContent).toHaveTextContent("Média de acertos em todos os sorteios analisados");
+    });
+  });
+
+  it("deve permitir que o leitor de tela identifique os badges de métricas", () => {
+    render(
+      <TooltipProvider>
+        <BetComparisonPanel 
+          bets={mockBets} 
+          onClose={() => {}} 
+          lotteryId="megasena" 
+          pick={6} 
+        />
+      </TooltipProvider>
+    );
+
+    // Verificar se o Badge de Score tem o aria-label correto
+    const scoreBadge = screen.getByLabelText(/Pontuação total: 85 de 100/);
+    expect(scoreBadge).toBeInTheDocument();
+  });
+});
