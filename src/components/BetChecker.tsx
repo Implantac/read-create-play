@@ -309,7 +309,7 @@ function DrawComparisonBlock({
 function QuickCheckResult({
   bet, draw, lotteryId, onClose, prizeTiers
 }: {
-  bet: number[]; draw: DrawResult, LotteryConfig; lotteryId: string; onClose: () => void;
+  bet: number[]; draw: DrawResult; lotteryId: string; onClose: () => void;
   prizeTiers?: DrawPrizeData | null;
 }) {
   const { hits, matched } = matchBetAgainstDraw(bet, draw.numbers, lotteryId);
