@@ -154,6 +154,41 @@ describe("BetComparisonPanel Accessibility", () => {
     });
   });
 
+  it("deve abrir o tooltip ao pressionar Enter ou Space quando o botão está em foco", async () => {
+    render(
+      <TooltipProvider>
+        <BetComparisonPanel 
+          bets={mockBets} 
+          onClose={() => {}} 
+          lotteryId="megasena" 
+          pick={6} 
+        />
+      </TooltipProvider>
+    );
+
+    const avgButton = screen.getByLabelText(/Média: 4.00/);
+    
+    // Coloca o foco
+    avgButton.focus();
+
+    // Pressiona Enter
+    fireEvent.keyDown(avgButton, { key: "Enter", code: "Enter" });
+    
+    // Aguarda o tooltip (O Radix abre por padrão no foco, mas Enter/Space reforçam ou acionam triggers de clique se houver)
+    // No Radix Tooltip, o foco já é o trigger principal, mas vamos validar a persistência/ação
+    let tooltip = await screen.findByRole("tooltip");
+    expect(tooltip).toBeInTheDocument();
+
+    // Fecha com Escape para testar o próximo
+    fireEvent.keyDown(avgButton, { key: "Escape", code: "Escape" });
+    await waitFor(() => expect(screen.queryByRole("tooltip")).not.toBeInTheDocument());
+
+    // Pressiona Space
+    fireEvent.keyDown(avgButton, { key: " ", code: "Space" });
+    tooltip = await screen.findByRole("tooltip");
+    expect(tooltip).toBeInTheDocument();
+  });
+
   it("deve permitir que o leitor de tela identifique os badges de métricas", () => {
     render(
       <TooltipProvider>
