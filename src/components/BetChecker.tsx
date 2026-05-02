@@ -607,7 +607,6 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
           concurso: draw.concurso, date: draw.date, hits, matched,
           prize: prizeInfo?.label || "", prizeValue: prizeInfo?.value || 0, realPrize,
           secondHits, secondMatched, secondPrize, secondPrizeValue,
-          secondPrizeValue, // duplicated in original code but keeping consistency
           bestHits: isDupla ? bestHitsForDraw : undefined,
         };
       });
