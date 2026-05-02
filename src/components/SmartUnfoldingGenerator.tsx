@@ -50,6 +50,11 @@ export function SmartUnfoldingGenerator({ matrixData, config, onSaveBet }: Props
       const pool = baseNumbers.slice(0, selectedTemplate.v);
       const result = selectedTemplate.generate(pool);
       setGames(result);
+      
+      // Run audit
+      const audit = auditWheelTemplate(selectedTemplate, pool);
+      setAuditResult(audit);
+      
       toast.success(`${result.length} jogos gerados usando template matemático!`);
     } else {
       if (baseNumbers.length < config.pick) {
@@ -58,6 +63,7 @@ export function SmartUnfoldingGenerator({ matrixData, config, onSaveBet }: Props
       }
       const result = generateUnfolding(baseNumbers, config.pick, maxGames);
       setGames(result);
+      setAuditResult(null);
       toast.success(`${result.length} jogos gerados!`);
     }
   }, [baseNumbers, config.pick, maxGames, selectedTemplate]);
