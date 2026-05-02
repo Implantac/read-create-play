@@ -3,15 +3,24 @@ import {
   Trophy, GitCompare, X, Award, DollarSign, Target, 
   BarChart3, CheckCircle2, Copy, TrendingUp, ArrowRight,
   Sparkles, Zap, ShieldCheck, ExternalLink, Calendar,
-  Medal, Info
+  Medal, Info, Filter, Hash, RefreshCcw, CheckSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { BetHitsChart } from "./BetHitsChart";
 import { toast } from "sonner";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { PerfResult, BetPerformance } from "@/types/bet-analysis";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
+function formatCurrency(value: number): string {
+  if (value >= 1000000) return `R$ ${(value / 1000000).toFixed(1)}M`;
+  if (value >= 1000) return `R$ ${(value / 1000).toFixed(1)}k`;
+  return `R$ ${value.toFixed(0)}`;
+}
 
 function MetricBox({ label, value, icon: Icon, isBest, colorClass, suffix = "", tooltip }: { 
   label: string; value: string | number; icon: any; isBest?: boolean; colorClass?: string; suffix?: string; tooltip?: string
