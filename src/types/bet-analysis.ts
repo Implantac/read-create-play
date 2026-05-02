@@ -26,4 +26,5 @@ export interface BetPerformance {
   trend?: "up" | "down" | "stable";
   recentAvg?: number;
   previousAvg?: number;
+  strategyId?: string;
 }
