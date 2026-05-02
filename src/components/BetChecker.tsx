@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
-import { DrawResult } from "@/data/lotteries";
+import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { checkBetAgainstDraws, MatchResult, getPrizeTiers } from "@/services/lotteryApi";
-import { DrawResultWithPrizes, DrawPrizeData } from "@/hooks/useLotteryDraws";
+import { DrawResult, LotteryConfigWithPrizes, DrawPrizeData } from "@/hooks/useLotteryDraws";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, Trophy, X, TrendingUp, Zap, Brain, Loader2,
@@ -28,8 +28,8 @@ import { PerfResult, BetPerformance } from "@/types/bet-analysis";
 // ─── Types ───
 
 interface Props {
-  draws: DrawResult[];
-  drawsWithPrizes?: DrawResultWithPrizes[];
+  draws: DrawResult, LotteryConfig[];
+  drawsWithPrizes?: DrawResult, LotteryConfigWithPrizes[];
   lotteryId: string;
   maxNumbers: number;
   pick: number;
@@ -307,7 +307,7 @@ function DrawComparisonBlock({
 function QuickCheckResult({
   bet, draw, lotteryId, onClose, prizeTiers
 }: {
-  bet: number[]; draw: DrawResult; lotteryId: string; onClose: () => void;
+  bet: number[]; draw: DrawResult, LotteryConfig; lotteryId: string; onClose: () => void;
   prizeTiers?: DrawPrizeData | null;
 }) {
   const { hits, matched } = matchBetAgainstDraw(bet, draw.numbers, lotteryId);
@@ -393,7 +393,7 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
   const [expandedPerf, setExpandedPerf] = useState<number | null>(null);
   const [hasRunPerformance, setHasRunPerformance] = useState(false);
   const [showGrid, setShowGrid] = useState(true);
-  const [quickCheckResult, setQuickCheckResult] = useState<{ bet: number[]; draw: DrawResult } | null>(null);
+  const [quickCheckResult, setQuickCheckResult] = useState<{ bet: number[]; draw: DrawResult, LotteryConfig } | null>(null);
   const [selectedForComparison, setSelectedForComparison] = useState<number[]>([]);
   const [showComparison, setShowComparison] = useState(false);
 
@@ -1266,8 +1266,8 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                                   <div className="flex items-center gap-2">
                                     <div className="flex flex-wrap gap-1">
                                       {perf.numbers.map((n, idx) => {
-                                        const lastDrawResult = perf.results[0];
-                                        const isHitLastDraw = lastDrawResult?.matched.includes(n) || false;
+                                        const lastDrawResult, LotteryConfig = perf.results[0];
+                                        const isHitLastDraw = lastDrawResult, LotteryConfig?.matched.includes(n) || false;
                                         return (
                                           <span key={`${n}-${idx}`} className={`text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-mono font-bold ${
                                             isHitLastDraw
