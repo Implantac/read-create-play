@@ -362,6 +362,35 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
               <div className="space-y-6">
                 {bets.map((bet, i) => {
                   const threshold = Math.ceil(pick * 0.4);
+                  
+                  // Calcular sequências consecutivas (streaks)
+                  const sortedForStreaks = [...bet.results].sort((a, b) => a.concurso - b.concurso);
+                  let currentStreak: number[] = [];
+                  let allStreaks: number[][] = [];
+                  
+                  for (const r of sortedForStreaks) {
+                    const hits = r.bestHits ?? r.hits;
+                    if (hits >= threshold) {
+                      if (currentStreak.length === 0 || r.concurso === currentStreak[currentStreak.length - 1] + 1) {
+                        currentStreak.push(r.concurso);
+                      } else {
+                        if (currentStreak.length > 0) allStreaks.push(currentStreak);
+                        currentStreak = [r.concurso];
+                      }
+                    } else {
+                      if (currentStreak.length > 0) allStreaks.push(currentStreak);
+                      currentStreak = [];
+                    }
+                  }
+                  if (currentStreak.length > 0) allStreaks.push(currentStreak);
+                  
+                  const maxStreakLen = allStreaks.length > 0 ? Math.max(...allStreaks.map(s => s.length)) : 0;
+                  const streakContests = new Set(
+                    allStreaks
+                      .filter(s => s.length === maxStreakLen && maxStreakLen > 1)
+                      .flat()
+                  );
+
                   const consistencyDraws = bet.results
                     .filter(r => (r.bestHits ?? r.hits) >= threshold)
                     .sort((a, b) => b.concurso - a.concurso);
@@ -373,9 +402,16 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
                           <span className="text-xs font-bold text-foreground">{bet.label}</span>
                           <span className="text-[10px] text-muted-foreground">Threshold: {threshold} acertos</span>
                         </div>
-                        <Badge variant="outline" className="text-[10px] border-blue-500/30 text-blue-400">
-                          {consistencyDraws.length} sorteios consistentes
-                        </Badge>
+                        <div className="flex flex-col items-end gap-1">
+                          <Badge variant="outline" className="text-[10px] border-blue-500/30 text-blue-400">
+                            {consistencyDraws.length} sorteios consistentes
+                          </Badge>
+                          {maxStreakLen > 1 && (
+                            <Badge variant="outline" className="text-[9px] bg-orange-500/10 text-orange-400 border-orange-500/20">
+                              🔥 Maior Sequência: {maxStreakLen}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
 
                       <div className="space-y-4">
@@ -413,21 +449,43 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
                             ) : (
                               consistencyDraws.map((r, ri) => {
                                 const googleLink = `https://www.google.com/search?q=resultado+loteria+${lotteryId}+concurso+${r.concurso}`;
+                                const isStreak = streakContests.has(r.concurso);
+                                
                                 return (
-                                  <div key={ri} className="flex items-center justify-between text-[10px] p-2 rounded-lg bg-blue-500/5 border border-blue-500/10 group hover:bg-blue-500/10 transition-colors">
+                                  <div 
+                                    key={ri} 
+                                    className={`flex items-center justify-between text-[10px] p-2 rounded-lg border transition-all group ${
+                                      isStreak 
+                                        ? "bg-orange-500/5 border-orange-500/20 shadow-sm" 
+                                        : "bg-blue-500/5 border-blue-500/10 hover:bg-blue-500/10"
+                                    }`}
+                                  >
                                     <div className="flex items-center gap-2">
-                                      <span className="font-mono font-bold text-blue-400">#{r.concurso}</span>
+                                      <span className={`font-mono font-bold ${isStreak ? "text-orange-400" : "text-blue-400"}`}>
+                                        #{r.concurso}
+                                      </span>
                                       <span className="opacity-50 flex items-center gap-1">
                                         <Calendar className="w-2.5 h-2.5" /> {r.date}
                                       </span>
+                                      {isStreak && (
+                                        <Badge variant="outline" className="text-[8px] bg-orange-500/10 text-orange-400 border-orange-500/20 h-4 px-1 leading-none">
+                                          🔥 SEQ
+                                        </Badge>
+                                      )}
                                     </div>
                                     <div className="flex items-center gap-3">
-                                      <span className="font-bold">{r.bestHits ?? r.hits} acertos</span>
+                                      <span className={`font-bold ${isStreak ? "text-orange-300" : ""}`}>
+                                        {r.bestHits ?? r.hits} acertos
+                                      </span>
                                       <a 
                                         href={googleLink} 
                                         target="_blank" 
                                         rel="noopener noreferrer"
-                                        className="p-1 rounded-md hover:bg-primary/20 text-muted-foreground hover:text-primary transition-colors"
+                                        className={`p-1 rounded-md transition-colors ${
+                                          isStreak 
+                                            ? "hover:bg-orange-500/20 text-orange-400" 
+                                            : "hover:bg-primary/20 text-muted-foreground hover:text-primary"
+                                        }`}
                                         title="Revisar resultado no Google"
                                       >
                                         <ExternalLink className="w-3 h-3" />
