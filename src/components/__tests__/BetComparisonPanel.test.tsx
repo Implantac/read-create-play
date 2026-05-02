@@ -59,6 +59,37 @@ describe("BetComparisonPanel Accessibility", () => {
     });
   });
 
+  it("deve remover o tooltip quando a tecla Escape é pressionada", async () => {
+    render(
+      <TooltipProvider>
+        <BetComparisonPanel 
+          bets={mockBets} 
+          onClose={() => {}} 
+          lotteryId="megasena" 
+          pick={6} 
+        />
+      </TooltipProvider>
+    );
+
+    const avgButton = screen.getByLabelText(/Média: 4.00/);
+    avgButton.focus();
+
+    const tooltipId = avgButton.getAttribute("aria-describedby");
+    
+    // Aguarda o tooltip aparecer
+    await waitFor(() => {
+      expect(document.getElementById(tooltipId!)).toBeInTheDocument();
+    });
+
+    // Pressiona Escape
+    fireEvent.keyDown(avgButton, { key: "Escape", code: "Escape" });
+
+    // Aguarda o tooltip desaparecer
+    await waitFor(() => {
+      expect(document.getElementById(tooltipId!)).not.toBeInTheDocument();
+    });
+  });
+
   it("deve permitir que o leitor de tela identifique os badges de métricas", () => {
     render(
       <TooltipProvider>
@@ -71,8 +102,8 @@ describe("BetComparisonPanel Accessibility", () => {
       </TooltipProvider>
     );
 
-    // Verificar se o Badge de Score tem o aria-label correto
     const scoreBadge = screen.getByLabelText(/Pontuação total: 85 de 100/);
     expect(scoreBadge).toBeInTheDocument();
   });
 });
+
