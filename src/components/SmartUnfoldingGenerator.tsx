@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from "react";
 import { MatrixRow, generateUnfolding, computeCoverage } from "@/engine/matrix-analysis";
 import { LotteryConfig } from "@/data/lotteries";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Dices, Copy, Sparkles, Check, Info, ShieldCheck, Trophy } from "lucide-react";
 import { toast } from "sonner";
