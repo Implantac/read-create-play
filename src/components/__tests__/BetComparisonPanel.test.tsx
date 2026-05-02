@@ -212,6 +212,39 @@ describe("BetComparisonPanel Accessibility", () => {
     }
   });
 
+  it("deve manter o foco no botão que abriu o tooltip após pressionar Escape", async () => {
+    render(
+      <TooltipProvider>
+        <BetComparisonPanel 
+          bets={mockBets} 
+          onClose={() => {}} 
+          lotteryId="megasena" 
+          pick={6} 
+        />
+      </TooltipProvider>
+    );
+
+    const avgButton = screen.getByLabelText(/Média: 4.00/);
+    
+    // Foca no botão para abrir o tooltip
+    avgButton.focus();
+    expect(document.activeElement).toBe(avgButton);
+
+    // Aguarda o tooltip aparecer
+    await screen.findByRole("tooltip");
+
+    // Pressiona Escape para fechar o tooltip
+    fireEvent.keyDown(avgButton, { key: "Escape", code: "Escape" });
+
+    // Aguarda o tooltip sumir
+    await waitFor(() => {
+      expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+    });
+
+    // Verifica se o foco permanece no botão original
+    expect(document.activeElement).toBe(avgButton);
+  });
+
   it("deve permitir que o leitor de tela identifique os badges de métricas", () => {
     render(
       <TooltipProvider>
