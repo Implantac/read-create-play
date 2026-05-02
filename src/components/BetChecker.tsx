@@ -18,10 +18,12 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { generateNativeImprovements } from "@/engine/native-analysis";
 import { computeFrequencyStats } from "@/engine/statistics";
-import { useSavedBets, SavedBet } from "@/hooks/useSavedBets";
+import { useSavedBets } from "@/hooks/useSavedBets";
 import { Progress } from "@/components/ui/progress";
 import { BetHitsChart } from "@/components/BetHitsChart";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { PerfResult, BetPerformance } from "@/types/bet-analysis";
 
 // ─── Types ───
 
@@ -40,33 +42,13 @@ interface ExtendedMatchResult extends MatchResult {
   bestMatchCount: number;
 }
 
-interface PerfResult {
-  concurso: number; date: string; hits: number; matched: number[]; prize: string; prizeValue: number; realPrize?: string;
-  secondHits?: number; secondMatched?: number[]; secondPrize?: string; secondPrizeValue?: number;
-  bestHits?: number;
-}
-
-interface BetPerformance {
-  numbers: number[];
-  label: string;
-  results: PerfResult[];
-  avgHits: number;
-  bestHit: number;
-  prizeHits: number;
-  totalPrizeValue: number;
-  totalPrize: string;
-  score: number;
-  trend?: "up" | "down" | "stable";
-  recentAvg?: number;
-  previousAvg?: number;
-}
-
 interface AIImprovement {
   original: number[];
   suggested: number[];
   reason: string;
   expectedGain: string;
 }
+
 
 // ─── Helpers ───
 
