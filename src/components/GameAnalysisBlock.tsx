@@ -12,7 +12,7 @@ interface Props {
   defaultOpen?: boolean;
 }
 
-function computeGameAnalysis(numbers: number[], stats: NumberStats[], config: LotteryConfig, draws: DrawResult[]) {
+function computeGameAnalysis(numbers: number[], stats: NumberStats[], config: LotteryConfig, draws: DrawResult[], strategyId?: string) {
   const gameStats = numbers.map(n => stats.find(s => s.number === n)).filter(Boolean) as NumberStats[];
   
   // Frequency average
