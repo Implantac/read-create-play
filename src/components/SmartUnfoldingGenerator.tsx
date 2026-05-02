@@ -4,10 +4,11 @@ import { LotteryConfig } from "@/data/lotteries";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Dices, Copy, Sparkles, Check, Info, ShieldCheck, Trophy } from "lucide-react";
+import { Dices, Copy, Sparkles, Check, Info, ShieldCheck, Trophy, SearchCheck, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { WHEEL_TEMPLATES, WheelTemplate } from "@/engine/lottery-wheels";
+import { WHEEL_TEMPLATES, WheelTemplate, auditWheelTemplate, WheelGuaranteeAudit } from "@/engine/lottery-wheels";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Progress } from "@/components/ui/progress";
 
 interface Props {
   matrixData: MatrixRow[];
