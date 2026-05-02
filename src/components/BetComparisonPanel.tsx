@@ -309,6 +309,48 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
             </div>
           </div>
 
+          {/* Métrica de Consistência - Explicação */}
+          <div className="p-5 rounded-2xl bg-blue-500/5 border border-blue-500/10 space-y-4">
+            <div className="flex items-center gap-2 text-blue-400">
+              <ShieldCheck className="w-5 h-5" />
+              <h3 className="text-sm font-bold">Entenda a Métrica de Consistência</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-[9px] font-bold border-blue-500/30 text-blue-400 uppercase">Fórmula</Badge>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Limiar de 40%</span>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Um jogo é considerado "consistente" em um sorteio quando atinge ao menos <strong className="text-foreground">40% das dezenas</strong> necessárias para o prêmio máximo. 
+                  Para a {lotteryId.toUpperCase()}, isso equivale a <strong className="text-foreground">{Math.ceil(pick * 0.4)} ou mais acertos</strong>.
+                </p>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-[9px] font-bold border-blue-500/30 text-blue-400 uppercase">Dados</Badge>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Amostra Utilizada</span>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  A porcentagem é extraída de uma base de <strong className="text-foreground">{bets[0]?.results.length || 0} sorteios</strong> reais. 
+                  Esta amostra garante que a métrica reflita o comportamento histórico real e não apenas eventos isolados.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-[9px] font-bold border-blue-500/30 text-blue-400 uppercase">Objetivo</Badge>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">O que isso indica?</span>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Quanto maior a porcentagem, mais <strong className="text-foreground">estável</strong> é o jogo. Jogos com alta consistência tendem a manter uma base de acertos frequente, 
+                  reduzindo a dependência de um único sorteio atípico.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Ranking & Performance History */}
           <div className="space-y-4">
             <h3 className="text-sm font-bold flex items-center gap-2">
