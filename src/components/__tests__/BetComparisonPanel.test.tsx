@@ -121,6 +121,39 @@ describe("BetComparisonPanel Accessibility", () => {
     });
   });
 
+  it("deve abrir o tooltip ao navegar com teclado (Tab) e fechar ao sair (Shift+Tab)", async () => {
+    render(
+      <TooltipProvider>
+        <button data-testid="other-button">Outro</button>
+        <BetComparisonPanel 
+          bets={mockBets} 
+          onClose={() => {}} 
+          lotteryId="megasena" 
+          pick={6} 
+        />
+      </TooltipProvider>
+    );
+
+    const avgButton = screen.getByLabelText(/Média: 4.00/);
+    const otherButton = screen.getByTestId("other-button");
+
+    // Simula navegação via Tab (focando no elemento)
+    fireEvent.focus(avgButton);
+
+    // Aguarda o tooltip aparecer
+    const tooltip = await screen.findByRole("tooltip");
+    expect(tooltip).toBeInTheDocument();
+
+    // Simula saída via Shift+Tab (focando em outro elemento)
+    fireEvent.blur(avgButton);
+    fireEvent.focus(otherButton);
+
+    // Aguarda o tooltip desaparecer
+    await waitFor(() => {
+      expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+    });
+  });
+
   it("deve permitir que o leitor de tela identifique os badges de métricas", () => {
     render(
       <TooltipProvider>
