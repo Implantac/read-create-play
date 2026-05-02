@@ -32,8 +32,6 @@ function MetricBox({ label, value, icon: Icon, isBest, colorClass, suffix = "", 
           ? "bg-primary/10 border-primary/40 shadow-sm shadow-primary/10" 
           : "bg-muted/50 border-border/50"
       }`}
-      role="group"
-      aria-label={`${label}: ${value}${suffix}${isBest ? " (Melhor resultado)" : ""}`}
     >
       {isBest && (
         <motion.div 
@@ -57,18 +55,20 @@ function MetricBox({ label, value, icon: Icon, isBest, colorClass, suffix = "", 
   );
 
   if (tooltip) {
+    const tooltipId = `tooltip-${label.toLowerCase().replace(/\s+/g, '-')}`;
     return (
       <TooltipProvider>
-        <Tooltip>
+        <Tooltip delayDuration={300}>
           <TooltipTrigger asChild>
             <button 
               className="w-full text-left cursor-help focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xl"
               aria-label={`${label}: ${value}${suffix}. ${tooltip}`}
+              aria-describedby={tooltipId}
             >
               {content}
             </button>
           </TooltipTrigger>
-          <TooltipContent className="max-w-[200px] text-center">
+          <TooltipContent id={tooltipId} className="max-w-[200px] text-center">
             <p className="text-xs">{tooltip}</p>
           </TooltipContent>
         </Tooltip>
@@ -76,7 +76,11 @@ function MetricBox({ label, value, icon: Icon, isBest, colorClass, suffix = "", 
     );
   }
 
-  return content;
+  return (
+    <div role="group" aria-label={`${label}: ${value}${suffix}${isBest ? " (Melhor resultado)" : ""}`}>
+      {content}
+    </div>
+  );
 }
 
 interface Props {
