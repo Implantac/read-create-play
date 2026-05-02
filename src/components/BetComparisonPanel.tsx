@@ -362,6 +362,35 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
               <div className="space-y-6">
                 {bets.map((bet, i) => {
                   const threshold = Math.ceil(pick * 0.4);
+                  
+                  // Calcular sequências consecutivas (streaks)
+                  const sortedForStreaks = [...bet.results].sort((a, b) => a.concurso - b.concurso);
+                  let currentStreak: number[] = [];
+                  let allStreaks: number[][] = [];
+                  
+                  for (const r of sortedForStreaks) {
+                    const hits = r.bestHits ?? r.hits;
+                    if (hits >= threshold) {
+                      if (currentStreak.length === 0 || r.concurso === currentStreak[currentStreak.length - 1] + 1) {
+                        currentStreak.push(r.concurso);
+                      } else {
+                        if (currentStreak.length > 0) allStreaks.push(currentStreak);
+                        currentStreak = [r.concurso];
+                      }
+                    } else {
+                      if (currentStreak.length > 0) allStreaks.push(currentStreak);
+                      currentStreak = [];
+                    }
+                  }
+                  if (currentStreak.length > 0) allStreaks.push(currentStreak);
+                  
+                  const maxStreakLen = allStreaks.length > 0 ? Math.max(...allStreaks.map(s => s.length)) : 0;
+                  const streakContests = new Set(
+                    allStreaks
+                      .filter(s => s.length === maxStreakLen && maxStreakLen > 1)
+                      .flat()
+                  );
+
                   const consistencyDraws = bet.results
                     .filter(r => (r.bestHits ?? r.hits) >= threshold)
                     .sort((a, b) => b.concurso - a.concurso);
@@ -373,9 +402,16 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
                           <span className="text-xs font-bold text-foreground">{bet.label}</span>
                           <span className="text-[10px] text-muted-foreground">Threshold: {threshold} acertos</span>
                         </div>
-                        <Badge variant="outline" className="text-[10px] border-blue-500/30 text-blue-400">
-                          {consistencyDraws.length} sorteios consistentes
-                        </Badge>
+                        <div className="flex flex-col items-end gap-1">
+                          <Badge variant="outline" className="text-[10px] border-blue-500/30 text-blue-400">
+                            {consistencyDraws.length} sorteios consistentes
+                          </Badge>
+                          {maxStreakLen > 1 && (
+                            <Badge variant="outline" className="text-[9px] bg-orange-500/10 text-orange-400 border-orange-500/20">
+                              🔥 Maior Sequência: {maxStreakLen}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
 
                       <div className="space-y-4">
