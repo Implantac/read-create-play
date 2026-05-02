@@ -33,6 +33,9 @@ const ICON_MAP: Record<Strategy, typeof Sparkles> = {
   cycle: Repeat,
   ml: Brain,
   hybrid: Layers,
+  markov: Zap,
+  poisson: Binary,
+  cluster: Boxes,
 };
 
 const CATEGORY_LABELS = { basic: "Básicas", math: "Matemáticas", ai: "Inteligência Artificial" };
