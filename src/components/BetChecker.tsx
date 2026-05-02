@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { checkBetAgainstDraws, MatchResult, getPrizeTiers } from "@/services/lotteryApi";
-import { DrawResult, LotteryConfigWithPrizes, DrawPrizeData } from "@/hooks/useLotteryDraws";
+import { DrawResultWithPrizes, DrawPrizeData } from "@/hooks/useLotteryDraws";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, Trophy, X, TrendingUp, Zap, Brain, Loader2,
