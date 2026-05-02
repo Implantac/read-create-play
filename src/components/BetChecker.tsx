@@ -28,11 +28,13 @@ import { PerfResult, BetPerformance } from "@/types/bet-analysis";
 // ─── Types ───
 
 interface Props {
-  draws: DrawResult, LotteryConfig[];
-  drawsWithPrizes?: DrawResult, LotteryConfigWithPrizes[];
+  draws: DrawResult[];
+  drawsWithPrizes?: DrawResultWithPrizes[];
   lotteryId: string;
   maxNumbers: number;
   pick: number;
+  stats?: any[];
+  config?: LotteryConfig;
 }
 
 interface ExtendedMatchResult extends MatchResult {
