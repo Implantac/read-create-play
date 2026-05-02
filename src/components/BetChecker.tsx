@@ -1478,6 +1478,8 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
             onClose={() => setShowComparison(false)} 
             lotteryId={lotteryId}
             pick={pick}
+            stats={stats}
+            config={config}
           />
         )}
       </AnimatePresence>
