@@ -264,7 +264,7 @@ export function EnhancedBetGenerator({ stats, config, onSaveBet }: Props) {
               {draws.length > 0 && (
                 <div className="px-3 pb-2">
                   <HistoricalValidationBadge bet={bet} draws={draws} config={config} />
-                  <GameAnalysisBlock numbers={bet} stats={stats} config={config} draws={draws} />
+                  <GameAnalysisBlock numbers={bet} stats={stats} config={config} draws={draws} strategyId={strategy} />
                 </div>
               )}
             </motion.div>
