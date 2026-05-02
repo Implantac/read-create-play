@@ -449,21 +449,43 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
                             ) : (
                               consistencyDraws.map((r, ri) => {
                                 const googleLink = `https://www.google.com/search?q=resultado+loteria+${lotteryId}+concurso+${r.concurso}`;
+                                const isStreak = streakContests.has(r.concurso);
+                                
                                 return (
-                                  <div key={ri} className="flex items-center justify-between text-[10px] p-2 rounded-lg bg-blue-500/5 border border-blue-500/10 group hover:bg-blue-500/10 transition-colors">
+                                  <div 
+                                    key={ri} 
+                                    className={`flex items-center justify-between text-[10px] p-2 rounded-lg border transition-all group ${
+                                      isStreak 
+                                        ? "bg-orange-500/5 border-orange-500/20 shadow-sm" 
+                                        : "bg-blue-500/5 border-blue-500/10 hover:bg-blue-500/10"
+                                    }`}
+                                  >
                                     <div className="flex items-center gap-2">
-                                      <span className="font-mono font-bold text-blue-400">#{r.concurso}</span>
+                                      <span className={`font-mono font-bold ${isStreak ? "text-orange-400" : "text-blue-400"}`}>
+                                        #{r.concurso}
+                                      </span>
                                       <span className="opacity-50 flex items-center gap-1">
                                         <Calendar className="w-2.5 h-2.5" /> {r.date}
                                       </span>
+                                      {isStreak && (
+                                        <Badge variant="outline" className="text-[8px] bg-orange-500/10 text-orange-400 border-orange-500/20 h-4 px-1 leading-none">
+                                          🔥 SEQ
+                                        </Badge>
+                                      )}
                                     </div>
                                     <div className="flex items-center gap-3">
-                                      <span className="font-bold">{r.bestHits ?? r.hits} acertos</span>
+                                      <span className={`font-bold ${isStreak ? "text-orange-300" : ""}`}>
+                                        {r.bestHits ?? r.hits} acertos
+                                      </span>
                                       <a 
                                         href={googleLink} 
                                         target="_blank" 
                                         rel="noopener noreferrer"
-                                        className="p-1 rounded-md hover:bg-primary/20 text-muted-foreground hover:text-primary transition-colors"
+                                        className={`p-1 rounded-md transition-colors ${
+                                          isStreak 
+                                            ? "hover:bg-orange-500/20 text-orange-400" 
+                                            : "hover:bg-primary/20 text-muted-foreground hover:text-primary"
+                                        }`}
                                         title="Revisar resultado no Google"
                                       >
                                         <ExternalLink className="w-3 h-3" />
