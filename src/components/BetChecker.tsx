@@ -395,7 +395,7 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
   const [expandedPerf, setExpandedPerf] = useState<number | null>(null);
   const [hasRunPerformance, setHasRunPerformance] = useState(false);
   const [showGrid, setShowGrid] = useState(true);
-  const [quickCheckResult, setQuickCheckResult] = useState<{ bet: number[]; draw: DrawResult, LotteryConfig } | null>(null);
+  const [quickCheckResult, setQuickCheckResult] = useState<{ bet: number[]; draw: DrawResult } | null>(null);
   const [selectedForComparison, setSelectedForComparison] = useState<number[]>([]);
   const [showComparison, setShowComparison] = useState(false);
 
