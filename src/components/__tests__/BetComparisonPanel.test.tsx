@@ -295,5 +295,36 @@ describe("BetComparisonPanel Accessibility", () => {
       expect(avgButton).toHaveAttribute("data-state", "closed");
     });
   });
+
+  it("deve manter a estabilidade do foco ao abrir e fechar tooltips rapidamente em sequência", async () => {
+    render(
+      <TooltipProvider>
+        <BetComparisonPanel 
+          bets={mockBets} 
+          onClose={() => {}} 
+          lotteryId="megasena" 
+          pick={6} 
+        />
+      </TooltipProvider>
+    );
+
+    const avgButton = screen.getByLabelText(/Média: 4.00/);
+    const recordButton = screen.getByLabelText(/Recorde: 4/);
+    
+    // Sequência rápida 1: Abre Média, fecha com Escape
+    avgButton.focus();
+    fireEvent.keyDown(avgButton, { key: "Escape", code: "Escape" });
+    expect(document.activeElement).toBe(avgButton);
+
+    // Sequência rápida 2: Move para Recorde, abre, fecha com Escape
+    recordButton.focus();
+    fireEvent.keyDown(recordButton, { key: "Escape", code: "Escape" });
+    expect(document.activeElement).toBe(recordButton);
+
+    // Sequência rápida 3: Volta para Média
+    avgButton.focus();
+    fireEvent.keyDown(avgButton, { key: "Escape", code: "Escape" });
+    expect(document.activeElement).toBe(avgButton);
+  });
 });
 
