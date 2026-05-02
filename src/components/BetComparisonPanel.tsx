@@ -530,12 +530,12 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
           </div>
 
           {/* Ranking & Performance History */}
-          <div className="space-y-6">
+          <div id="consistency-section" tabIndex={-1} className="space-y-6 focus:outline-none focus:ring-2 focus:ring-primary/10 p-2 rounded-xl">
             <h3 className="text-sm font-bold flex items-center gap-2">
               <BarChart3 className="w-4 h-4 text-primary" />
               Ranking e Histórico de Consistência
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-6">
                 {bets.map((bet, i) => {
