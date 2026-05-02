@@ -352,76 +352,140 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
           </div>
 
           {/* Ranking & Performance History */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             <h3 className="text-sm font-bold flex items-center gap-2">
               <BarChart3 className="w-4 h-4 text-primary" />
-              Ranking de Acertos Históricos
+              Ranking e Amostra de Consistência
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <p className="text-[10px] text-muted-foreground uppercase font-bold px-1">Top Concursos por Jogo</p>
-                {bets.map((bet, i) => (
-                  <div key={i} className="p-4 rounded-xl border border-border bg-card/50">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs font-bold text-foreground">{bet.label}</span>
-                      <Badge variant="outline" className="text-[10px]">{bet.prizeHits} prêmios</Badge>
-                    </div>
-                    <div className="space-y-1.5">
-                      {bet.results
-                        .filter(r => r.hits > 0)
-                        .sort((a, b) => (b.bestHits ?? b.hits) - (a.bestHits ?? a.hits))
-                        .slice(0, 3)
-                        .map((r, ri) => (
-                          <div key={ri} className="flex items-center justify-between text-[10px] p-2 rounded-lg bg-muted/30">
-                            <span className="font-mono opacity-60">#{r.concurso}</span>
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold">{r.hits} acertos</span>
-                              {r.prize && <span className="text-primary font-bold">🎉</span>}
-                            </div>
+              <div className="space-y-6">
+                {bets.map((bet, i) => {
+                  const threshold = Math.ceil(pick * 0.4);
+                  const consistencyDraws = bet.results
+                    .filter(r => (r.bestHits ?? r.hits) >= threshold)
+                    .sort((a, b) => b.concurso - a.concurso);
+
+                  return (
+                    <div key={i} className="p-5 rounded-2xl border border-border bg-card/50 flex flex-col">
+                      <div className="flex items-center justify-between mb-4 pb-4 border-b border-border/40">
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold text-foreground">{bet.label}</span>
+                          <span className="text-[10px] text-muted-foreground">Threshold: {threshold} acertos</span>
+                        </div>
+                        <Badge variant="outline" className="text-[10px] border-blue-500/30 text-blue-400">
+                          {consistencyDraws.length} sorteios consistentes
+                        </Badge>
+                      </div>
+
+                      <div className="space-y-4">
+                        {/* Top Hits */}
+                        <div>
+                          <p className="text-[10px] text-muted-foreground uppercase font-bold mb-2 flex items-center gap-1">
+                            <Trophy className="w-3 h-3 text-accent" /> Recordes Históricos
+                          </p>
+                          <div className="space-y-1.5">
+                            {bet.results
+                              .filter(r => r.hits > 0)
+                              .sort((a, b) => (b.bestHits ?? b.hits) - (a.bestHits ?? a.hits))
+                              .slice(0, 3)
+                              .map((r, ri) => (
+                                <div key={ri} className="flex items-center justify-between text-[10px] p-2 rounded-lg bg-muted/30">
+                                  <span className="font-mono opacity-60">#{r.concurso}</span>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-bold">{r.hits} acertos</span>
+                                    {r.prize && <span className="text-primary font-bold">🎉</span>}
+                                  </div>
+                                </div>
+                              ))
+                            }
                           </div>
-                        ))
-                      }
+                        </div>
+
+                        {/* Consistency Sample */}
+                        <div>
+                          <p className="text-[10px] text-muted-foreground uppercase font-bold mb-2 flex items-center gap-1">
+                            <ShieldCheck className="w-3 h-3 text-blue-400" /> Amostra de Consistência (40%+)
+                          </p>
+                          <div className="max-h-[180px] overflow-y-auto pr-2 scrollbar-thin space-y-1.5">
+                            {consistencyDraws.length === 0 ? (
+                              <p className="text-[10px] text-muted-foreground italic py-2 text-center">Nenhum concurso atingiu o limiar de 40%.</p>
+                            ) : (
+                              consistencyDraws.map((r, ri) => {
+                                const googleLink = `https://www.google.com/search?q=resultado+loteria+${lotteryId}+concurso+${r.concurso}`;
+                                return (
+                                  <div key={ri} className="flex items-center justify-between text-[10px] p-2 rounded-lg bg-blue-500/5 border border-blue-500/10 group hover:bg-blue-500/10 transition-colors">
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-mono font-bold text-blue-400">#{r.concurso}</span>
+                                      <span className="opacity-50 flex items-center gap-1">
+                                        <Calendar className="w-2.5 h-2.5" /> {r.date}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                      <span className="font-bold">{r.bestHits ?? r.hits} acertos</span>
+                                      <a 
+                                        href={googleLink} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="p-1 rounded-md hover:bg-primary/20 text-muted-foreground hover:text-primary transition-colors"
+                                        title="Revisar resultado no Google"
+                                      >
+                                        <ExternalLink className="w-3 h-3" />
+                                      </a>
+                                    </div>
+                                  </div>
+                                );
+                              })
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="flex flex-col gap-6">
+                <div className="p-5 rounded-2xl border border-primary/20 bg-primary/5 flex flex-col">
+                  <div className="flex items-center gap-3 mb-4">
+                    <TrendingUp className="w-5 h-5 text-primary" />
+                    <h4 className="text-sm font-bold">Veredito da Comparação</h4>
+                  </div>
+                  <div className="text-xs text-muted-foreground leading-relaxed mb-4 space-y-2">
+                    <p>
+                      A análise identificou que o jogo <strong className="text-foreground">{bets[highlights?.score[0] || 0].label}</strong> 
+                      é a opção mais equilibrada com score de <strong>{bets[highlights?.score[0] || 0].score}</strong>.
+                    </p>
+                    {highlights?.consistency.length && highlights.consistency.length > 0 && (
+                      <p className="flex items-center gap-1.5">
+                        <ShieldCheck className="w-3 h-3 text-blue-400" /> 
+                        <span>Destaque em consistência: <strong>{bets[highlights.consistency[0]].label}</strong>.</span>
+                      </p>
+                    )}
+                    {commonNumbers.length > 0 && (
+                      <p>Há uma convergência de {commonNumbers.length} dezenas entre as seleções, o que sugere um núcleo forte de aposta.</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-muted-foreground">Potencial de Prêmio</span>
+                      <span className="font-bold text-green-400">
+                        {Math.max(...(highlights?.metrics.map(m => m.prizeHits) || [0])) > 0 ? "Muito Alto" : "Médio"}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-muted-foreground">Divergência de Jogos</span>
+                      <span className="font-bold">{allNumbers.length > 0 ? Math.round((allNumbers.length - commonNumbers.length) / allNumbers.length * 100) : 0}%</span>
                     </div>
                   </div>
-                ))}
-              </div>
-              
-              <div className="p-5 rounded-2xl border border-primary/20 bg-primary/5 flex flex-col justify-center">
-                <div className="flex items-center gap-3 mb-4">
-                  <TrendingUp className="w-5 h-5 text-primary" />
-                  <h4 className="text-sm font-bold">Veredito da Comparação</h4>
+                  <Button className="mt-6 w-full gap-2 gradient-brand shadow-lg shadow-primary/20" size="sm">
+                    Utilizar Seleção Vencedora <ArrowRight className="w-3.5 h-3.5" />
+                  </Button>
                 </div>
-                <div className="text-xs text-muted-foreground leading-relaxed mb-4 space-y-2">
-                  <p>
-                    A análise identificou que o jogo <strong className="text-foreground">{bets[highlights?.score[0] || 0].label}</strong> 
-                    é a opção mais equilibrada com score de <strong>{bets[highlights?.score[0] || 0].score}</strong>.
-                  </p>
-                  {highlights?.consistency.length && highlights.consistency.length > 0 && (
-                    <p className="flex items-center gap-1.5">
-                      <ShieldCheck className="w-3 h-3 text-blue-400" /> 
-                      <span>Destaque em consistência: <strong>{bets[highlights.consistency[0]].label}</strong>.</span>
-                    </p>
-                  )}
-                  {commonNumbers.length > 0 && (
-                    <p>Há uma convergência de {commonNumbers.length} dezenas entre as seleções, o que sugere um núcleo forte de aposta.</p>
-                  )}
+
+                <div className="p-4 rounded-xl bg-muted/20 border border-border text-[10px] text-muted-foreground italic">
+                  * A amostra de consistência utiliza o critério de 40% de acertos sobre o total de dezenas do jogo (Ex: 6 acertos na Lotofácil). Os links externos permitem conferir a veracidade dos sorteios citados.
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-muted-foreground">Potencial de Prêmio</span>
-                    <span className="font-bold text-green-400">
-                      {Math.max(...(highlights?.metrics.map(m => m.prizeHits) || [0])) > 0 ? "Muito Alto" : "Médio"}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-muted-foreground">Divergência de Jogos</span>
-                    <span className="font-bold">{allNumbers.length > 0 ? Math.round((allNumbers.length - commonNumbers.length) / allNumbers.length * 100) : 0}%</span>
-                  </div>
-                </div>
-                <Button className="mt-6 w-full gap-2 gradient-brand shadow-lg shadow-primary/20" size="sm">
-                  Utilizar Seleção Vencedora <ArrowRight className="w-3.5 h-3.5" />
-                </Button>
               </div>
             </div>
           </div>
