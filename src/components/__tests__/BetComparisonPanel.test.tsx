@@ -260,5 +260,40 @@ describe("BetComparisonPanel Accessibility", () => {
     const scoreBadge = screen.getByLabelText(/Pontuação total: 85 de 100/);
     expect(scoreBadge).toBeInTheDocument();
   });
+
+  it("deve atualizar o estado (data-state) do trigger ao abrir e fechar o tooltip", async () => {
+    render(
+      <TooltipProvider>
+        <BetComparisonPanel 
+          bets={mockBets} 
+          onClose={() => {}} 
+          lotteryId="megasena" 
+          pick={6} 
+        />
+      </TooltipProvider>
+    );
+
+    const avgButton = screen.getByLabelText(/Média: 4.00/);
+    
+    // Estado inicial deve ser 'closed'
+    expect(avgButton).toHaveAttribute("data-state", "closed");
+
+    // Abre o tooltip via foco
+    avgButton.focus();
+
+    // Aguarda o estado mudar para 'delayed-open' ou 'open'
+    await waitFor(() => {
+      const state = avgButton.getAttribute("data-state");
+      expect(["open", "delayed-open"]).toContain(state);
+    });
+
+    // Pressiona Escape
+    fireEvent.keyDown(avgButton, { key: "Escape", code: "Escape" });
+
+    // Volta para 'closed'
+    await waitFor(() => {
+      expect(avgButton).toHaveAttribute("data-state", "closed");
+    });
+  });
 });
 
