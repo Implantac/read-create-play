@@ -3,15 +3,24 @@ import {
   Trophy, GitCompare, X, Award, DollarSign, Target, 
   BarChart3, CheckCircle2, Copy, TrendingUp, ArrowRight,
   Sparkles, Zap, ShieldCheck, ExternalLink, Calendar,
-  Medal, Info
+  Medal, Info, Filter, Hash, RefreshCcw, CheckSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { BetHitsChart } from "./BetHitsChart";
 import { toast } from "sonner";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { PerfResult, BetPerformance } from "@/types/bet-analysis";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
+function formatCurrency(value: number): string {
+  if (value >= 1000000) return `R$ ${(value / 1000000).toFixed(1)}M`;
+  if (value >= 1000) return `R$ ${(value / 1000).toFixed(1)}k`;
+  return `R$ ${value.toFixed(0)}`;
+}
 
 function MetricBox({ label, value, icon: Icon, isBest, colorClass, suffix = "", tooltip }: { 
   label: string; value: string | number; icon: any; isBest?: boolean; colorClass?: string; suffix?: string; tooltip?: string
@@ -72,39 +81,86 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
     navigator.clipboard.writeText(nums.join(", "));
     toast.success("Números copiados!");
   };
-
-  // Comparação de dezenas
-  const allNumbers = Array.from(new Set(bets.flatMap(b => b.numbers))).sort((a, b) => a - b);
   
-  // Encontrar números em comum
-  const commonNumbers = allNumbers.filter(n => bets.every(b => b.numbers.includes(n)));
+  // Filtros de Amostra
+  const initialMin = useMemo(() => bets.length > 0 ? Math.min(...bets[0].results.map(r => r.concurso)) : 0, [bets]);
+  const initialMax = useMemo(() => bets.length > 0 ? Math.max(...bets[0].results.map(r => r.concurso)) : 0, [bets]);
+  
+  const [minConcurso, setMinConcurso] = useState<number | "">(initialMin);
+  const [maxConcurso, setMaxConcurso] = useState<number | "">(initialMax);
+  const [onlyPrizes, setOnlyPrizes] = useState(false);
 
-  // Calcular métricas de destaque
-  const highlights = useMemo(() => {
-    if (bets.length === 0) return null;
+  // Derivar bets filtrados em tempo real
+  const filteredBets = useMemo(() => {
+    return bets.map(bet => {
+      const filteredResults = bet.results.filter(r => {
+        const matchesRange = (minConcurso === "" || r.concurso >= minConcurso) && 
+                             (maxConcurso === "" || r.concurso <= maxConcurso);
+        const matchesPrize = !onlyPrizes || (r.prizeValue > 0 || (r.secondPrizeValue && r.secondPrizeValue > 0));
+        return matchesRange && matchesPrize;
+      });
 
-    const metrics = bets.map(b => {
-      // Cálculo de consistência: Frequência de acertos acima de 40% do total de números
+      // Recalcular métricas para o subconjunto filtrado
+      const totalHits = filteredResults.reduce((s, r) => s + (r.bestHits ?? r.hits), 0);
+      const avgHits = filteredResults.length > 0 ? totalHits / filteredResults.length : 0;
+      const bestHit = filteredResults.length > 0 ? Math.max(...filteredResults.map(r => r.bestHits ?? r.hits)) : 0;
+      const prizeHits = filteredResults.filter(r => r.prizeValue > 0 || (r.secondPrizeValue && r.secondPrizeValue > 0)).length;
+      const totalPrizeValue = filteredResults.reduce((s, r) => s + (r.prizeValue + (r.secondPrizeValue || 0)), 0);
+
+      // Recalcular consistency
       const threshold = Math.ceil(pick * 0.4);
-      const consistency = b.results.length > 0 
-        ? b.results.filter(r => (r.bestHits ?? r.hits) >= threshold).length / b.results.length 
+      const consistency = filteredResults.length > 0 
+        ? filteredResults.filter(r => (r.bestHits ?? r.hits) >= threshold).length / filteredResults.length 
         : 0;
 
+      return {
+        ...bet,
+        results: filteredResults,
+        avgHits,
+        bestHit,
+        prizeHits,
+        totalPrizeValue,
+        totalPrize: formatCurrency(totalPrizeValue),
+        consistency // Adicionando consistency aqui para facilitar
+      };
+    });
+  }, [bets, minConcurso, maxConcurso, onlyPrizes, pick]);
+
+  // Comparação de dezenas (usando a aposta original, mas poderia ser a filtrada se mudasse dezenas)
+  const allNumbers = Array.from(new Set(bets.flatMap(b => b.numbers))).sort((a, b) => a - b);
+  const commonNumbers = allNumbers.filter(n => bets.every(b => b.numbers.includes(n)));
+
+  // Calcular métricas de destaque baseadas nos filtros
+  const highlights = useMemo(() => {
+    if (filteredBets.length === 0) return null;
+
+    const metrics = filteredBets.map(b => {
       return {
         avgHits: b.avgHits,
         bestHit: b.bestHit,
         prizeHits: b.prizeHits,
         totalPrize: b.totalPrizeValue,
-        consistency: consistency,
-        score: b.score
+        consistency: b.consistency || 0,
+        score: b.score // O score original é mantido ou poderia ser recalculado? 
+                       // Vamos recalcular o score para refletir os filtros
       };
     });
 
-    const findMaxIndices = (field: keyof typeof metrics[0]) => {
-      const vals = metrics.map(m => m[field]);
+    // Função para recalcular score simplificado baseado na amostra atual
+    const recalculatedMetrics = filteredBets.map((b, i) => {
+      const drawCount = b.results.length;
+      const effectiveMax = pick; // Simplificado
+      const score = effectiveMax > 0 && drawCount > 0
+        ? Math.round((b.avgHits / effectiveMax) * 40 + (b.bestHit / effectiveMax) * 30 + (b.prizeHits / drawCount) * 30)
+        : 0;
+      return { ...metrics[i], score: Math.min(score, 100) };
+    });
+
+    const findMaxIndices = (field: keyof typeof recalculatedMetrics[0]) => {
+      const vals = recalculatedMetrics.map(m => m[field]);
       const maxVal = Math.max(...vals);
       if (maxVal === 0 && (field === 'prizeHits' || field === 'totalPrize')) return []; 
-      return metrics.reduce((acc, curr, idx) => (curr[field] === maxVal ? [...acc, idx] : acc), [] as number[]);
+      return recalculatedMetrics.reduce((acc, curr, idx) => (curr[field] === maxVal ? [...acc, idx] : acc), [] as number[]);
     };
 
     return {
@@ -114,9 +170,16 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
       totalPrize: findMaxIndices("totalPrize"),
       consistency: findMaxIndices("consistency"),
       score: findMaxIndices("score"),
-      metrics: metrics
+      metrics: recalculatedMetrics
     };
-  }, [bets, pick]);
+  }, [filteredBets, pick]);
+
+  const resetFilters = () => {
+    setMinConcurso(initialMin);
+    setMaxConcurso(initialMax);
+    setOnlyPrizes(false);
+    toast.info("Filtros resetados");
+  };
 
   return (
     <motion.div 
@@ -143,16 +206,78 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-8 scrollbar-thin">
+          {/* Contest Filters Section */}
+          <div className="bg-muted/20 border border-border/50 rounded-2xl p-4 space-y-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2 text-foreground font-bold text-sm">
+                <Filter className="w-4 h-4 text-primary" />
+                Filtros da Amostra Retroativa
+              </div>
+              <Button variant="ghost" size="sm" onClick={resetFilters} className="h-7 text-[10px] gap-1 hover:text-primary transition-colors">
+                <RefreshCcw className="w-3 h-3" /> Resetar Amostra
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-[10px] uppercase font-bold text-muted-foreground flex items-center gap-1">
+                  <Hash className="w-3 h-3" /> Concurso Inicial
+                </Label>
+                <Input 
+                  type="number" 
+                  value={minConcurso} 
+                  onChange={(e) => setMinConcurso(e.target.value === "" ? "" : Number(e.target.value))}
+                  className="h-9 text-xs bg-background/50"
+                  placeholder="Ex: 1"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] uppercase font-bold text-muted-foreground flex items-center gap-1">
+                  <Hash className="w-3 h-3" /> Concurso Final
+                </Label>
+                <Input 
+                  type="number" 
+                  value={maxConcurso} 
+                  onChange={(e) => setMaxConcurso(e.target.value === "" ? "" : Number(e.target.value))}
+                  className="h-9 text-xs bg-background/50"
+                  placeholder={`Ex: ${initialMax}`}
+                />
+              </div>
+              <div className="md:col-span-2 flex items-end pb-1.5">
+                <div className="flex items-center space-x-2 bg-background/30 p-2.5 rounded-lg border border-border/40 w-full hover:border-primary/30 transition-all cursor-pointer group" onClick={() => setOnlyPrizes(!onlyPrizes)}>
+                  <Checkbox 
+                    id="onlyPrizes" 
+                    checked={onlyPrizes} 
+                    onCheckedChange={(checked) => setOnlyPrizes(checked === true)}
+                    className="data-[state=checked]:bg-primary"
+                  />
+                  <Label htmlFor="onlyPrizes" className="text-xs cursor-pointer group-hover:text-foreground transition-colors">
+                    Exibir apenas concursos premiados na amostra
+                  </Label>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4 text-[10px] text-muted-foreground bg-primary/5 p-2 rounded-lg border border-primary/10">
+              <Info className="w-3.5 h-3.5 text-primary" />
+              <span>
+                Amostra atual: <strong>{filteredBets[0]?.results.length || 0} de {bets[0]?.results.length || 0} concursos</strong> 
+                {onlyPrizes && " (filtrado por prêmios)"}. Todos os cálculos e rankings foram atualizados.
+              </span>
+            </div>
+          </div>
+
           {/* Stats Grid Side-by-Side */}
           <div className="overflow-x-auto pb-4 scrollbar-thin">
             <div className="flex gap-4 min-w-max pb-2">
-              {bets.map((bet, i) => {
+              {filteredBets.map((bet, i) => {
                 const isBestScore = highlights?.score.includes(i);
                 const isBestAvg = highlights?.avgHits.includes(i);
                 const isBestHit = highlights?.bestHit.includes(i);
                 const isBestPrize = highlights?.prizeHits.includes(i);
                 const isBestConsistency = highlights?.consistency.includes(i);
                 const consistencyVal = highlights?.metrics[i].consistency || 0;
+                const currentScore = highlights?.metrics[i].score || 0;
 
                 return (
                   <div key={i} className={`p-5 rounded-2xl border-2 transition-all w-[300px] shrink-0 relative ${
