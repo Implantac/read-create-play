@@ -3,6 +3,14 @@
  * Knowledge base for mathematical combinations and guarantees
  */
 
+export interface WheelGuaranteeAudit {
+  targetGuarantee: number;     // t
+  actualCoverage: number;     // % of combinations that hit at least t
+  combinationsTested: number; // sample size for validation
+  efficiency: number;        // ratio of reduction
+  isSolid: boolean;          // if coverage is 100%
+}
+
 export interface WheelTemplate {
   id: string;
   name: string;
