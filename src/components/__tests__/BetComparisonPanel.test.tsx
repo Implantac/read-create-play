@@ -90,6 +90,37 @@ describe("BetComparisonPanel Accessibility", () => {
     });
   });
 
+  it("deve remover o tooltip quando houver um clique fora do elemento", async () => {
+    render(
+      <TooltipProvider>
+        <div data-testid="outside-element">Fora</div>
+        <BetComparisonPanel 
+          bets={mockBets} 
+          onClose={() => {}} 
+          lotteryId="megasena" 
+          pick={6} 
+        />
+      </TooltipProvider>
+    );
+
+    const avgButton = screen.getByLabelText(/Média: 4.00/);
+    
+    // Abre o tooltip via foco
+    fireEvent.focus(avgButton);
+
+    // Aguarda o tooltip aparecer no DOM (usando o papel semântico do Radix)
+    const tooltip = await screen.findByRole("tooltip");
+    expect(tooltip).toBeInTheDocument();
+
+    // Perde o foco (simulando clique fora ou tab)
+    fireEvent.blur(avgButton);
+
+    // Aguarda o tooltip desaparecer
+    await waitFor(() => {
+      expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+    });
+  });
+
   it("deve permitir que o leitor de tela identifique os badges de métricas", () => {
     render(
       <TooltipProvider>
