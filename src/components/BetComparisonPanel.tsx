@@ -431,12 +431,12 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
           </div>
 
           {/* Differences Section */}
-          <div className="space-y-4">
+          <div id="differences-section" tabIndex={-1} className="space-y-4 focus:outline-none focus:ring-2 focus:ring-primary/10 p-2 rounded-xl">
             <h3 className="text-sm font-bold flex items-center gap-2">
               <GitCompare className="w-4 h-4 text-primary" />
               Análise de Divergência de Dezenas
             </h3>
-            
+
             <div className="overflow-x-auto rounded-xl border border-border bg-card/50">
               <table className="w-full text-left border-collapse">
                 <thead>
