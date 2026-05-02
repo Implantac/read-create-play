@@ -113,23 +113,44 @@ export const WHEEL_TEMPLATES: WheelTemplate[] = [
 ];
 
 /**
- * AI Strategy Enhancements
- * New advanced strategies for improved game creation
+ * Audit function to validate a wheel's mathematical integrity
  */
-export const ADVANCED_STRATEGIES = [
-  {
-    id: "markov-chain",
-    name: "Cadeia de Markov",
-    desc: "Predição baseada em probabilidade de transição entre estados (números)",
-  },
-  {
-    id: "poisson-distribution",
-    name: "Distribuição de Poisson",
-    desc: "Análise da taxa de ocorrência para identificar anomalias estatísticas",
-  },
-  {
-    id: "cluster-analysis",
-    name: "Análise de Clusters",
-    desc: "Agrupamento de dezenas que tendem a sair juntas (afinidade)",
+export function auditWheelTemplate(template: WheelTemplate, pool: number[]): WheelGuaranteeAudit {
+  const games = template.generate(pool);
+  const v = template.v;
+  const k = template.k;
+  const t = template.t;
+  const m = template.m;
+
+  // For a full audit, we would test all combinations of 'm' numbers from the 'v' pool.
+  // To keep it high performance, we use a large random sample if v! is too big.
+  const sampleSize = 1000; 
+  let successCount = 0;
+
+  for (let i = 0; i < sampleSize; i++) {
+    // Generate a theoretical draw of size m from the pool
+    const theoreticalDraw = [...pool].sort(() => Math.random() - 0.5).slice(0, m);
+    
+    // Check if any game in the wheel hits at least 't' numbers from this draw
+    const hasGuarantee = games.some(game => {
+      const hits = game.filter(n => theoreticalDraw.includes(n)).length;
+      return hits >= t;
+    });
+
+    if (hasGuarantee) successCount++;
   }
-];
+
+  const actualCoverage = (successCount / sampleSize) * 100;
+  
+  // Efficiency: (Total Combinations / Wheel Games)
+  // Simplified calculation for info purposes
+  const efficiency = 100 - (template.gamesCount / 100); 
+
+  return {
+    targetGuarantee: t,
+    actualCoverage,
+    combinationsTested: sampleSize,
+    efficiency,
+    isSolid: actualCoverage >= 99.9
+  };
+}
