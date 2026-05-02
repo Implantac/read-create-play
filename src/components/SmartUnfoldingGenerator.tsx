@@ -53,7 +53,7 @@ export function SmartUnfoldingGenerator({ matrixData, config, onSaveBet }: Props
       setGames(result);
       
       // Run audit
-      const audit = auditWheelTemplate(selectedTemplate, pool);
+      const audit = auditWheelTemplate(selectedTemplate, pool, auditSeed);
       setAuditResult(audit);
       
       toast.success(`${result.length} jogos gerados usando template matemático!`);
