@@ -16,7 +16,10 @@ export type Strategy =
   | "sectors"
   | "trend"
   | "cycle"
-  | "hybrid";
+  | "hybrid"
+  | "markov"
+  | "poisson"
+  | "cluster";
 
 export interface StrategyInfo {
   id: Strategy;
