@@ -81,39 +81,86 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
     navigator.clipboard.writeText(nums.join(", "));
     toast.success("Números copiados!");
   };
-
-  // Comparação de dezenas
-  const allNumbers = Array.from(new Set(bets.flatMap(b => b.numbers))).sort((a, b) => a - b);
   
-  // Encontrar números em comum
-  const commonNumbers = allNumbers.filter(n => bets.every(b => b.numbers.includes(n)));
+  // Filtros de Amostra
+  const initialMin = useMemo(() => bets.length > 0 ? Math.min(...bets[0].results.map(r => r.concurso)) : 0, [bets]);
+  const initialMax = useMemo(() => bets.length > 0 ? Math.max(...bets[0].results.map(r => r.concurso)) : 0, [bets]);
+  
+  const [minConcurso, setMinConcurso] = useState<number | "">(initialMin);
+  const [maxConcurso, setMaxConcurso] = useState<number | "">(initialMax);
+  const [onlyPrizes, setOnlyPrizes] = useState(false);
 
-  // Calcular métricas de destaque
-  const highlights = useMemo(() => {
-    if (bets.length === 0) return null;
+  // Derivar bets filtrados em tempo real
+  const filteredBets = useMemo(() => {
+    return bets.map(bet => {
+      const filteredResults = bet.results.filter(r => {
+        const matchesRange = (minConcurso === "" || r.concurso >= minConcurso) && 
+                             (maxConcurso === "" || r.concurso <= maxConcurso);
+        const matchesPrize = !onlyPrizes || (r.prizeValue > 0 || (r.secondPrizeValue && r.secondPrizeValue > 0));
+        return matchesRange && matchesPrize;
+      });
 
-    const metrics = bets.map(b => {
-      // Cálculo de consistência: Frequência de acertos acima de 40% do total de números
+      // Recalcular métricas para o subconjunto filtrado
+      const totalHits = filteredResults.reduce((s, r) => s + (r.bestHits ?? r.hits), 0);
+      const avgHits = filteredResults.length > 0 ? totalHits / filteredResults.length : 0;
+      const bestHit = filteredResults.length > 0 ? Math.max(...filteredResults.map(r => r.bestHits ?? r.hits)) : 0;
+      const prizeHits = filteredResults.filter(r => r.prizeValue > 0 || (r.secondPrizeValue && r.secondPrizeValue > 0)).length;
+      const totalPrizeValue = filteredResults.reduce((s, r) => s + (r.prizeValue + (r.secondPrizeValue || 0)), 0);
+
+      // Recalcular consistency
       const threshold = Math.ceil(pick * 0.4);
-      const consistency = b.results.length > 0 
-        ? b.results.filter(r => (r.bestHits ?? r.hits) >= threshold).length / b.results.length 
+      const consistency = filteredResults.length > 0 
+        ? filteredResults.filter(r => (r.bestHits ?? r.hits) >= threshold).length / filteredResults.length 
         : 0;
 
+      return {
+        ...bet,
+        results: filteredResults,
+        avgHits,
+        bestHit,
+        prizeHits,
+        totalPrizeValue,
+        totalPrize: formatCurrency(totalPrizeValue),
+        consistency // Adicionando consistency aqui para facilitar
+      };
+    });
+  }, [bets, minConcurso, maxConcurso, onlyPrizes, pick]);
+
+  // Comparação de dezenas (usando a aposta original, mas poderia ser a filtrada se mudasse dezenas)
+  const allNumbers = Array.from(new Set(bets.flatMap(b => b.numbers))).sort((a, b) => a - b);
+  const commonNumbers = allNumbers.filter(n => bets.every(b => b.numbers.includes(n)));
+
+  // Calcular métricas de destaque baseadas nos filtros
+  const highlights = useMemo(() => {
+    if (filteredBets.length === 0) return null;
+
+    const metrics = filteredBets.map(b => {
       return {
         avgHits: b.avgHits,
         bestHit: b.bestHit,
         prizeHits: b.prizeHits,
         totalPrize: b.totalPrizeValue,
-        consistency: consistency,
-        score: b.score
+        consistency: b.consistency || 0,
+        score: b.score // O score original é mantido ou poderia ser recalculado? 
+                       // Vamos recalcular o score para refletir os filtros
       };
     });
 
-    const findMaxIndices = (field: keyof typeof metrics[0]) => {
-      const vals = metrics.map(m => m[field]);
+    // Função para recalcular score simplificado baseado na amostra atual
+    const recalculatedMetrics = filteredBets.map((b, i) => {
+      const drawCount = b.results.length;
+      const effectiveMax = pick; // Simplificado
+      const score = effectiveMax > 0 && drawCount > 0
+        ? Math.round((b.avgHits / effectiveMax) * 40 + (b.bestHit / effectiveMax) * 30 + (b.prizeHits / drawCount) * 30)
+        : 0;
+      return { ...metrics[i], score: Math.min(score, 100) };
+    });
+
+    const findMaxIndices = (field: keyof typeof recalculatedMetrics[0]) => {
+      const vals = recalculatedMetrics.map(m => m[field]);
       const maxVal = Math.max(...vals);
       if (maxVal === 0 && (field === 'prizeHits' || field === 'totalPrize')) return []; 
-      return metrics.reduce((acc, curr, idx) => (curr[field] === maxVal ? [...acc, idx] : acc), [] as number[]);
+      return recalculatedMetrics.reduce((acc, curr, idx) => (curr[field] === maxVal ? [...acc, idx] : acc), [] as number[]);
     };
 
     return {
@@ -123,9 +170,16 @@ export function BetComparisonPanel({ bets, onClose, lotteryId, pick }: Props) {
       totalPrize: findMaxIndices("totalPrize"),
       consistency: findMaxIndices("consistency"),
       score: findMaxIndices("score"),
-      metrics: metrics
+      metrics: recalculatedMetrics
     };
-  }, [bets, pick]);
+  }, [filteredBets, pick]);
+
+  const resetFilters = () => {
+    setMinConcurso(initialMin);
+    setMaxConcurso(initialMax);
+    setOnlyPrizes(false);
+    toast.info("Filtros resetados");
+  };
 
   return (
     <motion.div 
