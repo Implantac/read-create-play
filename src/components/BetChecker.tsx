@@ -382,7 +382,7 @@ function QuickCheckResult({
 
 // ─── Main Component ───
 
-export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick }: Props) {
+export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick, stats, config }: Props) {
   const [inputValue, setInputValue] = useState("");
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
   const pasteJustHandled = useRef(false);
