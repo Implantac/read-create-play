@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Trophy, GitCompare, X, Award, DollarSign, Target, 
   BarChart3, CheckCircle2, Copy, TrendingUp, ArrowRight,
-  Sparkles, Zap, ShieldCheck
+  Sparkles, Zap, ShieldCheck, ExternalLink, Calendar
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
