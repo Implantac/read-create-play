@@ -105,21 +105,19 @@ describe("BetComparisonPanel Accessibility", () => {
 
     const avgButton = screen.getByLabelText(/Média: 4.00/);
     
-    // Abre o tooltip via foco/hover simulado
-    fireEvent.mouseEnter(avgButton);
+    // Abre o tooltip via foco
+    fireEvent.focus(avgButton);
 
-    const tooltipId = avgButton.getAttribute("aria-describedby");
-    
-    await waitFor(() => {
-      expect(document.getElementById(tooltipId!)).toBeInTheDocument();
-    });
+    // Aguarda o tooltip aparecer no DOM (usando o papel semântico do Radix)
+    const tooltip = await screen.findByRole("tooltip");
+    expect(tooltip).toBeInTheDocument();
 
     // Clica fora
     fireEvent.mouseDown(screen.getByTestId("outside-element"));
 
     // Aguarda o tooltip desaparecer
     await waitFor(() => {
-      expect(document.getElementById(tooltipId!)).not.toBeInTheDocument();
+      expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
     });
   });
 
