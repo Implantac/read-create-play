@@ -1268,8 +1268,8 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
                                   <div className="flex items-center gap-2">
                                     <div className="flex flex-wrap gap-1">
                                       {perf.numbers.map((n, idx) => {
-                                        const lastDrawResult, LotteryConfig = perf.results[0];
-                                        const isHitLastDraw = lastDrawResult, LotteryConfig?.matched.includes(n) || false;
+                                        const lastDrawResult = perf.results[0];
+                                        const isHitLastDraw = lastDrawResult?.matched.includes(n) || false;
                                         return (
                                           <span key={`${n}-${idx}`} className={`text-[10px] w-6 h-6 rounded-full flex items-center justify-center font-mono font-bold ${
                                             isHitLastDraw
