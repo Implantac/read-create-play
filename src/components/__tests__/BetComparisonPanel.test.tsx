@@ -112,8 +112,8 @@ describe("BetComparisonPanel Accessibility", () => {
     const tooltip = await screen.findByRole("tooltip");
     expect(tooltip).toBeInTheDocument();
 
-    // Clica fora
-    fireEvent.mouseDown(screen.getByTestId("outside-element"));
+    // Perde o foco (simulando clique fora ou tab)
+    fireEvent.blur(avgButton);
 
     // Aguarda o tooltip desaparecer
     await waitFor(() => {
