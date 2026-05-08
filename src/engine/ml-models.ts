@@ -515,13 +515,14 @@ export function getConsensusRanking(models: ModelResult[]): MLPrediction[] {
     });
   });
 
-  const consensus = Object.entries(numberScores).map(([num, data]) => {
+  const consensus: MLPrediction[] = Object.entries(numberScores).map(([num, data]) => {
     const total = Math.abs(data.breakdown.frequency) + Math.abs(data.breakdown.recency) + Math.abs(data.breakdown.trend) + Math.abs(data.breakdown.cycle) + Math.abs(data.breakdown.momentum) + Math.abs(data.breakdown.consistency) + Math.abs(data.breakdown.other) || 1;
     return {
       number: parseInt(num),
       score: Math.round((data.total / (data.count || 1)) * (1 + data.topCount * 0.15)),
       rank: 0,
       model: "Consenso",
+      agreement: data.topCount, // quantos modelos (0..N) listaram no top15
       breakdown: {
         frequency: Math.round((data.breakdown.frequency / total) * 100),
         recency: Math.round((data.breakdown.recency / total) * 100),
@@ -539,5 +540,39 @@ export function getConsensusRanking(models: ModelResult[]): MLPrediction[] {
   const max = consensus[0]?.score || 1;
   consensus.forEach(c => (c.score = Math.round((c.score / max) * 100)));
 
+  // Anexa razão em linguagem natural aos top 10
+  consensus.slice(0, 10).forEach(c => {
+    c.reason = buildReason(c, models.length);
+  });
+
   return consensus;
+}
+
+/**
+ * Gera explicação textual curta sobre por que um número foi recomendado pelo consenso.
+ */
+function buildReason(p: MLPrediction, totalModels: number): string {
+  const bd = p.breakdown;
+  if (!bd) return "Recomendação por convergência dos modelos.";
+  const factors: Array<{ label: string; value: number }> = [
+    { label: "frequência histórica forte", value: bd.frequency },
+    { label: "aparições recentes", value: bd.recency },
+    { label: "tendência de alta", value: bd.trend },
+    { label: "padrão cíclico ativo", value: bd.cycle },
+    { label: "momentum acelerando", value: bd.momentum },
+    { label: "regularidade de gaps", value: bd.consistency },
+  ].filter(f => f.value >= 8).sort((a, b) => b.value - a.value).slice(0, 3);
+
+  const agree = p.agreement ?? 0;
+  const agreementText = agree >= totalModels - 1
+    ? `Consenso quase unânime (${agree}/${totalModels} modelos)`
+    : agree >= Math.ceil(totalModels / 2)
+      ? `Maioria dos modelos concorda (${agree}/${totalModels})`
+      : `Sinal moderado (${agree}/${totalModels} modelos)`;
+
+  const factorText = factors.length > 0
+    ? factors.map(f => f.label).join(", ")
+    : "sinal estatístico distribuído";
+
+  return `${agreementText}. Drivers: ${factorText}.`;
 }
