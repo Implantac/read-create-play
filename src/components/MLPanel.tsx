@@ -3,10 +3,10 @@ import { NumberStats, computeFrequencyStats } from "@/engine/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { runAllModels, getConsensusRanking, ModelResult, MLPrediction, ScoreBreakdown } from "@/engine/ml-models";
 import { motion, AnimatePresence } from "framer-motion";
-import { Brain, Play, Trophy, Target, Percent, Info, BarChart2, Beaker } from "lucide-react";
+import { Brain, Play, Trophy, Target, Percent, Info, BarChart2, Beaker, Zap, Users, TrendingUp, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend } from "recharts";
 
 interface Props {
   stats: NumberStats[];
