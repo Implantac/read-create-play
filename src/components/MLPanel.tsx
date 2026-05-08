@@ -245,7 +245,7 @@ export function MLPanel({ stats, config, draws }: Props) {
             Modelos de Machine Learning
           </h3>
           <p className="text-xs text-muted-foreground mt-0.5">
-            6 modelos com backtesting real e breakdown de fatores
+            6 modelos · backtesting com lift sobre o acaso · radar comparativo · explicações em linguagem natural
           </p>
         </div>
         <Button
