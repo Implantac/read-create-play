@@ -39,12 +39,106 @@ function BacktestBadge({ model }: { model: ModelResult }) {
     return <span className="text-[10px] text-muted-foreground/60 italic">sem backtesting</span>;
   }
   const bt = model.backtestDetails;
+  const liftColor = bt.liftOverChance >= 1.3 ? "text-emerald-500" : bt.liftOverChance >= 1.1 ? "text-amber-500" : "text-muted-foreground";
   return (
-    <div className="flex items-center gap-1 mt-1">
-      <Beaker className="w-2.5 h-2.5 text-primary/60" />
-      <span className="text-[10px] text-muted-foreground">
-        {bt.totalDrawsTested} sorteios | avg {bt.avgHitsInTop15} hits/top15
+    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+      <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+        <Beaker className="w-2.5 h-2.5 text-primary/60" />
+        {bt.totalDrawsTested} testes
       </span>
+      <span className={`inline-flex items-center gap-1 text-[10px] font-mono ${liftColor}`}>
+        <Zap className="w-2.5 h-2.5" />
+        lift {bt.liftOverChance.toFixed(2)}x
+      </span>
+    </div>
+  );
+}
+
+function AgreementBadge({ agreement, total }: { agreement: number; total: number }) {
+  if (agreement <= 0) return null;
+  const pct = agreement / total;
+  const color = pct >= 0.83 ? "bg-emerald-500/15 text-emerald-500 border-emerald-500/30"
+    : pct >= 0.5 ? "bg-amber-500/15 text-amber-500 border-amber-500/30"
+    : "bg-muted text-muted-foreground border-border";
+  return (
+    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-mono border ${color}`}>
+      <Users className="w-2.5 h-2.5" />
+      {agreement}/{total}
+    </span>
+  );
+}
+
+function ModelLeaderboard({ models }: { models: ModelResult[] }) {
+  const sorted = [...models].sort((a, b) => {
+    const la = a.backtestDetails?.liftOverChance ?? 0;
+    const lb = b.backtestDetails?.liftOverChance ?? 0;
+    return lb - la;
+  });
+  return (
+    <div className="rounded-lg border border-border bg-secondary/30 p-3 mb-4">
+      <p className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1.5">
+        <Trophy className="w-3 h-3 text-amber-500" />
+        Leaderboard de Backtesting (ordenado por lift sobre o acaso)
+      </p>
+      <div className="space-y-1.5">
+        {sorted.map((m, i) => {
+          const bt = m.backtestDetails;
+          const lift = bt?.liftOverChance ?? 0;
+          const liftPct = Math.min(100, (lift / 2) * 100); // 2x lift = 100% bar
+          const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i + 1}`;
+          return (
+            <div key={m.name} className="flex items-center gap-2 text-[11px]">
+              <span className="w-6 shrink-0 text-center">{medal}</span>
+              <span className="w-32 truncate text-foreground font-medium">{m.name}</span>
+              <div className="flex-1 h-2 rounded-full bg-secondary overflow-hidden">
+                <div
+                  className={`h-full rounded-full ${lift >= 1.3 ? "bg-emerald-500" : lift >= 1.1 ? "bg-amber-500" : "bg-muted-foreground/40"}`}
+                  style={{ width: `${liftPct}%` }}
+                />
+              </div>
+              <span className="w-12 text-right font-mono text-foreground">{lift.toFixed(2)}x</span>
+              <span className="w-16 text-right font-mono text-muted-foreground">{m.accuracy}% acc</span>
+            </div>
+          );
+        })}
+      </div>
+      <p className="text-[10px] text-muted-foreground mt-2 italic">
+        Lift = avg hits no top15 ÷ esperado por chance. Acima de 1.0x indica edge real sobre o aleatório.
+      </p>
+    </div>
+  );
+}
+
+function ModelRadar({ models }: { models: ModelResult[] }) {
+  const data = [
+    { metric: "Acurácia", ...Object.fromEntries(models.map(m => [m.name, m.accuracy])) },
+    { metric: "Confiança", ...Object.fromEntries(models.map(m => [m.name, m.confidence])) },
+    { metric: "Hit Rate", ...Object.fromEntries(models.map(m => [m.name, m.backtestDetails?.top15HitRate ?? 0])) },
+    { metric: "Top5 Prec.", ...Object.fromEntries(models.map(m => [m.name, m.backtestDetails?.top5Precision ?? 0])) },
+    { metric: "Consistência", ...Object.fromEntries(models.map(m => [m.name, m.backtestDetails?.consistency ?? 0])) },
+    { metric: "Lift x50", ...Object.fromEntries(models.map(m => [m.name, (m.backtestDetails?.liftOverChance ?? 0) * 50])) },
+  ];
+  const colors = ["hsl(142,70%,50%)", "hsl(200,90%,55%)", "hsl(0,72%,55%)", "hsl(45,80%,55%)", "hsl(180,60%,55%)", "hsl(300,70%,60%)"];
+  return (
+    <div className="rounded-lg border border-border bg-secondary/30 p-3 mb-4">
+      <p className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1.5">
+        <TrendingUp className="w-3 h-3 text-primary" />
+        Comparativo Multidimensional (radar)
+      </p>
+      <div className="h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <RadarChart data={data}>
+            <PolarGrid stroke="hsl(var(--border))" />
+            <PolarAngleAxis dataKey="metric" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+            <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }} />
+            {models.map((m, i) => (
+              <Radar key={m.name} name={m.name} dataKey={m.name} stroke={colors[i % colors.length]} fill={colors[i % colors.length]} fillOpacity={0.12} strokeWidth={1.5} />
+            ))}
+            <Legend wrapperStyle={{ fontSize: 10 }} iconSize={8} />
+            <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 11 }} />
+          </RadarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }
