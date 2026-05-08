@@ -3,10 +3,10 @@ import { NumberStats, computeFrequencyStats } from "@/engine/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { runAllModels, getConsensusRanking, ModelResult, MLPrediction, ScoreBreakdown } from "@/engine/ml-models";
 import { motion, AnimatePresence } from "framer-motion";
-import { Brain, Play, Trophy, Target, Percent, Info, BarChart2, Beaker } from "lucide-react";
+import { Brain, Play, Trophy, Target, Percent, Info, BarChart2, Beaker, Zap, Users, TrendingUp, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend } from "recharts";
 
 interface Props {
   stats: NumberStats[];
@@ -39,12 +39,106 @@ function BacktestBadge({ model }: { model: ModelResult }) {
     return <span className="text-[10px] text-muted-foreground/60 italic">sem backtesting</span>;
   }
   const bt = model.backtestDetails;
+  const liftColor = bt.liftOverChance >= 1.3 ? "text-emerald-500" : bt.liftOverChance >= 1.1 ? "text-amber-500" : "text-muted-foreground";
   return (
-    <div className="flex items-center gap-1 mt-1">
-      <Beaker className="w-2.5 h-2.5 text-primary/60" />
-      <span className="text-[10px] text-muted-foreground">
-        {bt.totalDrawsTested} sorteios | avg {bt.avgHitsInTop15} hits/top15
+    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+      <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+        <Beaker className="w-2.5 h-2.5 text-primary/60" />
+        {bt.totalDrawsTested} testes
       </span>
+      <span className={`inline-flex items-center gap-1 text-[10px] font-mono ${liftColor}`}>
+        <Zap className="w-2.5 h-2.5" />
+        lift {bt.liftOverChance.toFixed(2)}x
+      </span>
+    </div>
+  );
+}
+
+function AgreementBadge({ agreement, total }: { agreement: number; total: number }) {
+  if (agreement <= 0) return null;
+  const pct = agreement / total;
+  const color = pct >= 0.83 ? "bg-emerald-500/15 text-emerald-500 border-emerald-500/30"
+    : pct >= 0.5 ? "bg-amber-500/15 text-amber-500 border-amber-500/30"
+    : "bg-muted text-muted-foreground border-border";
+  return (
+    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-mono border ${color}`}>
+      <Users className="w-2.5 h-2.5" />
+      {agreement}/{total}
+    </span>
+  );
+}
+
+function ModelLeaderboard({ models }: { models: ModelResult[] }) {
+  const sorted = [...models].sort((a, b) => {
+    const la = a.backtestDetails?.liftOverChance ?? 0;
+    const lb = b.backtestDetails?.liftOverChance ?? 0;
+    return lb - la;
+  });
+  return (
+    <div className="rounded-lg border border-border bg-secondary/30 p-3 mb-4">
+      <p className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1.5">
+        <Trophy className="w-3 h-3 text-amber-500" />
+        Leaderboard de Backtesting (ordenado por lift sobre o acaso)
+      </p>
+      <div className="space-y-1.5">
+        {sorted.map((m, i) => {
+          const bt = m.backtestDetails;
+          const lift = bt?.liftOverChance ?? 0;
+          const liftPct = Math.min(100, (lift / 2) * 100); // 2x lift = 100% bar
+          const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i + 1}`;
+          return (
+            <div key={m.name} className="flex items-center gap-2 text-[11px]">
+              <span className="w-6 shrink-0 text-center">{medal}</span>
+              <span className="w-32 truncate text-foreground font-medium">{m.name}</span>
+              <div className="flex-1 h-2 rounded-full bg-secondary overflow-hidden">
+                <div
+                  className={`h-full rounded-full ${lift >= 1.3 ? "bg-emerald-500" : lift >= 1.1 ? "bg-amber-500" : "bg-muted-foreground/40"}`}
+                  style={{ width: `${liftPct}%` }}
+                />
+              </div>
+              <span className="w-12 text-right font-mono text-foreground">{lift.toFixed(2)}x</span>
+              <span className="w-16 text-right font-mono text-muted-foreground">{m.accuracy}% acc</span>
+            </div>
+          );
+        })}
+      </div>
+      <p className="text-[10px] text-muted-foreground mt-2 italic">
+        Lift = avg hits no top15 ÷ esperado por chance. Acima de 1.0x indica edge real sobre o aleatório.
+      </p>
+    </div>
+  );
+}
+
+function ModelRadar({ models }: { models: ModelResult[] }) {
+  const data = [
+    { metric: "Acurácia", ...Object.fromEntries(models.map(m => [m.name, m.accuracy])) },
+    { metric: "Confiança", ...Object.fromEntries(models.map(m => [m.name, m.confidence])) },
+    { metric: "Hit Rate", ...Object.fromEntries(models.map(m => [m.name, m.backtestDetails?.top15HitRate ?? 0])) },
+    { metric: "Top5 Prec.", ...Object.fromEntries(models.map(m => [m.name, m.backtestDetails?.top5Precision ?? 0])) },
+    { metric: "Consistência", ...Object.fromEntries(models.map(m => [m.name, m.backtestDetails?.consistency ?? 0])) },
+    { metric: "Lift x50", ...Object.fromEntries(models.map(m => [m.name, (m.backtestDetails?.liftOverChance ?? 0) * 50])) },
+  ];
+  const colors = ["hsl(142,70%,50%)", "hsl(200,90%,55%)", "hsl(0,72%,55%)", "hsl(45,80%,55%)", "hsl(180,60%,55%)", "hsl(300,70%,60%)"];
+  return (
+    <div className="rounded-lg border border-border bg-secondary/30 p-3 mb-4">
+      <p className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1.5">
+        <TrendingUp className="w-3 h-3 text-primary" />
+        Comparativo Multidimensional (radar)
+      </p>
+      <div className="h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <RadarChart data={data}>
+            <PolarGrid stroke="hsl(var(--border))" />
+            <PolarAngleAxis dataKey="metric" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+            <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }} />
+            {models.map((m, i) => (
+              <Radar key={m.name} name={m.name} dataKey={m.name} stroke={colors[i % colors.length]} fill={colors[i % colors.length]} fillOpacity={0.12} strokeWidth={1.5} />
+            ))}
+            <Legend wrapperStyle={{ fontSize: 10 }} iconSize={8} />
+            <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 11 }} />
+          </RadarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }
@@ -118,6 +212,12 @@ export function MLPanel({ stats, config, draws }: Props) {
           </p>
           <button onClick={() => setSelectedNumber(null)} className="text-xs text-muted-foreground hover:text-foreground">✕</button>
         </div>
+        {selectedNumber.reason && (
+          <div className="mb-2 p-2 rounded bg-primary/5 border border-primary/20 text-[11px] text-foreground/90 flex gap-1.5">
+            <Sparkles className="w-3 h-3 shrink-0 text-primary mt-0.5" />
+            <span>{selectedNumber.reason}</span>
+          </div>
+        )}
         <div className="space-y-1.5">
           {factors.map(f => (
             <div key={f.label} className="flex items-center gap-2">
@@ -145,7 +245,7 @@ export function MLPanel({ stats, config, draws }: Props) {
             Modelos de Machine Learning
           </h3>
           <p className="text-xs text-muted-foreground mt-0.5">
-            6 modelos com backtesting real e breakdown de fatores
+            6 modelos · backtesting com lift sobre o acaso · radar comparativo · explicações em linguagem natural
           </p>
         </div>
         <Button
@@ -190,6 +290,10 @@ export function MLPanel({ stats, config, draws }: Props) {
             {/* Breakdown detail panel */}
             {renderBreakdownDetail()}
 
+            {/* NEW: Backtesting leaderboard + radar comparativo */}
+            <ModelLeaderboard models={models} />
+            <ModelRadar models={models} />
+
             <Tabs defaultValue="consensus" className="w-full">
               <TabsList className="w-full bg-secondary/50 border border-border flex-wrap h-auto gap-1 p-1">
                 <TabsTrigger value="consensus" className="text-xs">
@@ -204,17 +308,26 @@ export function MLPanel({ stats, config, draws }: Props) {
 
               <TabsContent value="consensus" className="mt-4">
                 <p className="text-xs text-muted-foreground mb-2">
-                  Top 20 — média ponderada pela acurácia dos 6 modelos (clique em uma barra para ver detalhes):
+                  Top 20 — média ponderada pela acurácia dos modelos. Badge mostra concordância entre modelos:
                 </p>
                 {consensus && (
                   <>
                     {renderChart(consensus, "270, 70%")}
-                    <div className="mt-3 space-y-1">
+                    <div className="mt-3 space-y-2">
                       {consensus.slice(0, 5).map(p => (
-                        <div key={p.number} className="flex items-center gap-2">
-                          <span className="text-xs font-mono text-foreground w-8">Nº{String(p.number).padStart(2, '0')}</span>
-                          <BreakdownBar breakdown={p.breakdown} />
-                          <span className="text-[10px] font-mono text-muted-foreground w-10 text-right">{p.score}%</span>
+                        <div key={p.number} className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-mono text-foreground w-8">Nº{String(p.number).padStart(2, '0')}</span>
+                            <BreakdownBar breakdown={p.breakdown} />
+                            <AgreementBadge agreement={p.agreement ?? 0} total={models.length} />
+                            <span className="text-[10px] font-mono text-muted-foreground w-10 text-right">{p.score}%</span>
+                          </div>
+                          {p.reason && (
+                            <p className="text-[10px] text-muted-foreground/90 pl-10 italic flex gap-1">
+                              <Sparkles className="w-2.5 h-2.5 shrink-0 text-primary mt-0.5" />
+                              {p.reason}
+                            </p>
+                          )}
                         </div>
                       ))}
                     </div>
