@@ -17,6 +17,10 @@ export interface MLPrediction {
   rank: number;
   model: string;
   breakdown?: ScoreBreakdown;
+  /** Quantos modelos (0..6) colocaram este número no top15 — só preenchido no consenso */
+  agreement?: number;
+  /** Razão em linguagem natural — só preenchido no consenso para os top */
+  reason?: string;
 }
 
 export interface ModelResult {
