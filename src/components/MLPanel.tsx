@@ -290,6 +290,10 @@ export function MLPanel({ stats, config, draws }: Props) {
             {/* Breakdown detail panel */}
             {renderBreakdownDetail()}
 
+            {/* NEW: Backtesting leaderboard + radar comparativo */}
+            <ModelLeaderboard models={models} />
+            <ModelRadar models={models} />
+
             <Tabs defaultValue="consensus" className="w-full">
               <TabsList className="w-full bg-secondary/50 border border-border flex-wrap h-auto gap-1 p-1">
                 <TabsTrigger value="consensus" className="text-xs">
@@ -304,17 +308,26 @@ export function MLPanel({ stats, config, draws }: Props) {
 
               <TabsContent value="consensus" className="mt-4">
                 <p className="text-xs text-muted-foreground mb-2">
-                  Top 20 — média ponderada pela acurácia dos 6 modelos (clique em uma barra para ver detalhes):
+                  Top 20 — média ponderada pela acurácia dos modelos. Badge mostra concordância entre modelos:
                 </p>
                 {consensus && (
                   <>
                     {renderChart(consensus, "270, 70%")}
-                    <div className="mt-3 space-y-1">
+                    <div className="mt-3 space-y-2">
                       {consensus.slice(0, 5).map(p => (
-                        <div key={p.number} className="flex items-center gap-2">
-                          <span className="text-xs font-mono text-foreground w-8">Nº{String(p.number).padStart(2, '0')}</span>
-                          <BreakdownBar breakdown={p.breakdown} />
-                          <span className="text-[10px] font-mono text-muted-foreground w-10 text-right">{p.score}%</span>
+                        <div key={p.number} className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-mono text-foreground w-8">Nº{String(p.number).padStart(2, '0')}</span>
+                            <BreakdownBar breakdown={p.breakdown} />
+                            <AgreementBadge agreement={p.agreement ?? 0} total={models.length} />
+                            <span className="text-[10px] font-mono text-muted-foreground w-10 text-right">{p.score}%</span>
+                          </div>
+                          {p.reason && (
+                            <p className="text-[10px] text-muted-foreground/90 pl-10 italic flex gap-1">
+                              <Sparkles className="w-2.5 h-2.5 shrink-0 text-primary mt-0.5" />
+                              {p.reason}
+                            </p>
+                          )}
                         </div>
                       ))}
                     </div>
