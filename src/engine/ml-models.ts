@@ -64,8 +64,9 @@ function backtestModel(
   testSize: number = 30
 ): BacktestMetrics {
   const maxTestable = Math.min(testSize, allDraws.length - windowSize);
+  const expectedByChance = (15 / config.numbers) * config.pick;
   if (maxTestable <= 0) {
-    return { totalDrawsTested: 0, avgHitsInTop15: 0, top15HitRate: 0, top5Precision: 0, consistency: 0 };
+    return { totalDrawsTested: 0, avgHitsInTop15: 0, top15HitRate: 0, top5Precision: 0, consistency: 0, liftOverChance: 0, expectedByChance };
   }
 
   const hitsPerDraw: number[] = [];
@@ -94,7 +95,7 @@ function backtestModel(
   }
 
   if (hitsPerDraw.length === 0) {
-    return { totalDrawsTested: 0, avgHitsInTop15: 0, top15HitRate: 0, top5Precision: 0, consistency: 0 };
+    return { totalDrawsTested: 0, avgHitsInTop15: 0, top15HitRate: 0, top5Precision: 0, consistency: 0, liftOverChance: 0, expectedByChance };
   }
 
   const avg = hitsPerDraw.reduce((a, b) => a + b, 0) / hitsPerDraw.length;
@@ -102,6 +103,7 @@ function backtestModel(
   const top5Precision = top5Hits.reduce((a, b) => a + b, 0) / (top5Hits.length * 5);
   const variance = hitsPerDraw.reduce((s, h) => s + (h - avg) ** 2, 0) / hitsPerDraw.length;
   const stdDev = Math.sqrt(variance);
+  const lift = expectedByChance > 0 ? avg / expectedByChance : 0;
 
   return {
     totalDrawsTested: hitsPerDraw.length,
@@ -109,6 +111,8 @@ function backtestModel(
     top15HitRate: Math.round(hitRate * 1000) / 10,
     top5Precision: Math.round(top5Precision * 1000) / 10,
     consistency: Math.round((1 - Math.min(stdDev / (avg || 1), 1)) * 100),
+    liftOverChance: Math.round(lift * 100) / 100,
+    expectedByChance: Math.round(expectedByChance * 100) / 100,
   };
 }
 
