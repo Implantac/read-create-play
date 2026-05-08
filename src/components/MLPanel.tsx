@@ -212,6 +212,12 @@ export function MLPanel({ stats, config, draws }: Props) {
           </p>
           <button onClick={() => setSelectedNumber(null)} className="text-xs text-muted-foreground hover:text-foreground">✕</button>
         </div>
+        {selectedNumber.reason && (
+          <div className="mb-2 p-2 rounded bg-primary/5 border border-primary/20 text-[11px] text-foreground/90 flex gap-1.5">
+            <Sparkles className="w-3 h-3 shrink-0 text-primary mt-0.5" />
+            <span>{selectedNumber.reason}</span>
+          </div>
+        )}
         <div className="space-y-1.5">
           {factors.map(f => (
             <div key={f.label} className="flex items-center gap-2">
