@@ -37,7 +37,11 @@ export interface BacktestMetrics {
   avgHitsInTop15: number;
   top15HitRate: number;     // % of draws where >=1 of top15 hit
   top5Precision: number;    // avg % of top5 that appeared in draw
-  consistency: number;      // stddev of hits (lower = better)
+  consistency: number;      // 0..100 (higher = more stable across folds)
+  /** Lift sobre o esperado por chance (1.0 = no edge, 1.5 = +50% vs random) */
+  liftOverChance: number;
+  /** Quantos hits seriam esperados puramente por chance no top15 */
+  expectedByChance: number;
 }
 
 function normalizeAndRank(scored: MLPrediction[]): void {
