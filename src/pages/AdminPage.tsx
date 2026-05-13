@@ -539,8 +539,8 @@ export default function AdminPage() {
                               </Badge>
                             </TableCell>
                             <TableCell>
-                              <Badge className={PLAN_COLORS[isOwnerRow ? "lifetime" : p.plan] || ""}>
-                                {isOwnerRow ? "♾ Vitalício" : (PLAN_LABELS[p.plan] || p.plan)}
+                              <Badge className={PLAN_COLORS[p.plan] || ""}>
+                                {PLAN_LABELS[p.plan] || p.plan}
                               </Badge>
                             </TableCell>
                             <TableCell>
