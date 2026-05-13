@@ -645,7 +645,7 @@ export default function AdminPage() {
                   { role: "super_admin", desc: "Acesso absoluto e irrestrito. Gerencia todos os usuários, papéis, planos e configurações. Nunca é limitado pelo plano comercial. O proprietário do sistema possui este nível permanentemente.", icon: "👑", count: roles.filter(r => r.role === "super_admin").length },
                   { role: "admin", desc: "Acesso administrativo amplo. Pode gerenciar usuários e visualizar métricas. Limitado por definições do Super Admin.", icon: "🛡️", count: roles.filter(r => r.role === "admin").length },
                   { role: "moderator", desc: "Acesso gerencial. Pode visualizar dados e moderar conteúdo. Sem acesso a configurações críticas.", icon: "⚙️", count: roles.filter(r => r.role === "moderator").length },
-                  { role: "user", desc: "Acesso padrão controlado pelo plano comercial (Gratuito, Premium, Profissional, Vitalício).", icon: "👤", count: profiles.length - roles.length },
+                  { role: "user", desc: "Acesso padrão controlado pelo plano comercial (Gratuito ou Vitalício).", icon: "👤", count: profiles.length - roles.length },
                 ].map(item => (
                   <Card key={item.role} className={`border-border/30 ${item.role === "super_admin" ? "bg-amber-500/5 border-amber-500/20" : "bg-card/40"}`}>
                     <CardContent className="p-4">
