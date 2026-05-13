@@ -11,7 +11,7 @@ interface PlanGateProps {
   fallbackMessage?: string;
 }
 
-const PLAN_LABELS = { free: "Gratuito", premium: "Premium", professional: "Profissional", lifetime: "Vitalício" };
+const PLAN_LABELS = { free: "Gratuito", lifetime: "Vitalício" };
 
 const FEATURE_BENEFITS: Record<string, { title: string; benefit: string; icon: React.ElementType }> = {
   gerador_profissional: {
