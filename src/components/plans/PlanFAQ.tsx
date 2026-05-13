@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 const faqs = [
   { q: "Como funciona o plano Gratuito?", a: "Você pode usar o plano Gratuito sem limite de tempo para acessar as funcionalidades básicas. O plano Vitalício desbloqueia todas as ferramentas avançadas." },
-  { q: "O plano Vitalício tem alguma taxa recorrente?", a: "Não. O plano Vitalício é um pagamento único de R$ 79,90. Você paga uma vez e tem acesso para sempre a todas as funcionalidades e atualizações, sem mensalidades." },
+  { q: "O plano Vitalício tem alguma taxa recorrente?", a: "Não. O plano Vitalício é um pagamento único de R$ 79,90. Você paga uma vez e tem acesso para sempre a todas as funcionalidades e atualizações, sem cobranças adicionais." },
   { q: "Como gerencio meu acesso?", a: "Você pode ver o status do seu plano em seu Perfil ou na página de Planos. Como é um acesso vitalício, ele nunca expira." },
   { q: "O plano Vitalício inclui atualizações futuras?", a: "Sim! O plano Vitalício garante acesso permanente a todas as funcionalidades atuais e futuras da plataforma, sem nenhum custo adicional." },
   { q: "Quais formas de pagamento são aceitas?", a: "Aceitamos cartões de crédito, débito e Pix, tudo processado de forma segura pelo Stripe." },
