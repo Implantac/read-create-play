@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node audit-plans.js && vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint . --cache",
     "typecheck": "tsc --noEmit",
