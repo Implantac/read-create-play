@@ -52,15 +52,15 @@ const OWNER_EMAIL = "etcsuporte889@gmail.com";
 
 const PLAN_COLORS: Record<string, string> = {
   free: "bg-muted text-muted-foreground",
-  premium: "bg-primary/20 text-primary",
-  professional: "bg-accent/20 text-accent",
   lifetime: "bg-yellow-500/20 text-yellow-400",
+  premium: "bg-yellow-500/20 text-yellow-400",
+  professional: "bg-yellow-500/20 text-yellow-400",
 };
 
 const PLAN_LABELS: Record<string, string> = {
   free: "Gratuito",
-  premium: "Premium",
-  professional: "Profissional",
+  premium: "Vitalício",
+  professional: "Vitalício",
   lifetime: "Vitalício",
 };
 
