@@ -1,4 +1,4 @@
-import { Crown, Zap, Sparkles, Infinity, Settings, Loader2 } from "lucide-react";
+import { Crown, Infinity, Settings, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
@@ -12,15 +12,12 @@ import { PlanTrustBar } from "@/components/plans/PlanTrustBar";
 import { PlanComparisonTable } from "@/components/plans/PlanComparisonTable";
 import { refineError } from "@/lib/error-handler";
 
-
 const basePlans = [
   {
     id: "lifetime",
     name: "Vitalício",
-    monthlyPrice: "R$ 79,90",
-    annualPrice: "R$ 79,90",
+    price: "R$ 79,90",
     period: " único",
-    annualPeriod: " único",
     icon: Infinity,
     description: "Pague uma vez, use para sempre. Acesso completo a todas as ferramentas.",
     savedBetsLimit: "Jogos salvos ilimitados",
@@ -44,14 +41,13 @@ export default function PlanosPage() {
   const { profile, session } = useAuth();
   const currentPlan = profile?.plan ?? "free";
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
-  const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
   const navigate = useNavigate();
 
   const plans: PlanData[] = basePlans.map((p) => ({
     id: p.id,
     name: p.name,
-    price: billingCycle === "annual" ? p.annualPrice : p.monthlyPrice,
-    period: billingCycle === "annual" ? p.annualPeriod : p.period,
+    price: p.price,
+    period: p.period,
     icon: p.icon,
     description: p.description,
     savedBetsLimit: p.savedBetsLimit,
@@ -59,7 +55,6 @@ export default function PlanosPage() {
     cta: p.cta,
     highlight: p.highlight,
     isLifetime: p.isLifetime,
-    annualTotal: billingCycle === "annual" ? (p as any).annualTotal : undefined,
   }));
 
   const handleCheckout = async (planId: string) => {
@@ -68,17 +63,10 @@ export default function PlanosPage() {
       return;
     }
 
-    // Map to annual variant if annual billing selected
-    let checkoutPlanId = planId;
-    if (billingCycle === "annual" && (planId === "premium" || planId === "professional")) {
-      const base = basePlans.find((p) => p.id === planId);
-      checkoutPlanId = (base as any)?.annualId || planId;
-    }
-
     setLoadingPlan(planId);
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { planId: checkoutPlanId },
+        body: { planId },
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       if (error) throw error;
@@ -87,7 +75,6 @@ export default function PlanosPage() {
       const refined = refineError(e);
       toast.error(`${refined.title}: ${refined.description} ${refined.recommendation}`);
     } finally {
-
       setLoadingPlan(null);
     }
   };
@@ -105,7 +92,6 @@ export default function PlanosPage() {
       const refined = refineError(e);
       toast.error(`${refined.title}: ${refined.description} ${refined.recommendation}`);
     } finally {
-
       setLoadingPlan(null);
     }
   };
@@ -121,19 +107,33 @@ export default function PlanosPage() {
       >
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-5">
           <Crown className="w-3.5 h-3.5" />
-          Escolha seu plano
+          Plano Vitalício
         </div>
         <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight mb-3">
           Pare de apostar no escuro.{" "}
           <span className="gradient-brand-text">Use inteligência.</span>
         </h1>
         <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto mb-3">
-          Motor estatístico, IA preditiva e algoritmos avançados — tudo para você tomar decisões melhores.
+          Acesso vitalício ao Titan Loterias. Pague uma vez e tenha todas as ferramentas de IA para sempre.
         </p>
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold">
           🔥 Oferta especial por tempo limitado
         </div>
       </motion.div>
+
+      {/* Manage subscription */}
+      {currentPlan !== "free" && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex justify-center mb-8"
+        >
+          <Button variant="outline" className="gap-2" onClick={handleManageSubscription} disabled={loadingPlan === "manage"}>
+            {loadingPlan === "manage" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Settings className="w-4 h-4" />}
+            Gerenciar acesso
+          </Button>
+        </motion.div>
+      )}
 
       {/* Grid container for centered single card */}
       <div className="flex justify-center mb-12">
@@ -154,39 +154,6 @@ export default function PlanosPage() {
             );
           })}
         </div>
-      </div>
-
-      {/* Manage subscription */}
-      {currentPlan !== "free" && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex justify-center mb-8"
-        >
-          <Button variant="outline" className="gap-2" onClick={handleManageSubscription} disabled={loadingPlan === "manage"}>
-            {loadingPlan === "manage" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Settings className="w-4 h-4" />}
-            Gerenciar assinatura
-          </Button>
-        </motion.div>
-      )}
-
-      {/* Plan Cards */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
-        {plans.map((plan, i) => {
-          const isCurrent = currentPlan === plan.id;
-          const isUpgrade = plan.id !== "free" && !isCurrent;
-          return (
-            <PlanCard
-              key={plan.id}
-              plan={plan}
-              index={i}
-              isCurrent={isCurrent}
-              isUpgrade={isUpgrade}
-              isLoading={loadingPlan === plan.id}
-              onCheckout={handleCheckout}
-            />
-          );
-        })}
       </div>
 
       {/* Trust Bar */}
