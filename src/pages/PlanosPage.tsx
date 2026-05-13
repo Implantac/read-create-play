@@ -130,44 +130,31 @@ export default function PlanosPage() {
         <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto mb-3">
           Motor estatístico, IA preditiva e algoritmos avançados — tudo para você tomar decisões melhores.
         </p>
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold animate-pulse">
-          🔥 7 dias grátis em todos os planos pagos — sem cartão
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold">
+          🔥 Oferta especial por tempo limitado
         </div>
       </motion.div>
 
-      {/* Billing Toggle */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15, duration: 0.4 }}
-        className="flex justify-center mb-8"
-      >
-        <div className="inline-flex items-center gap-1 p-1 rounded-full bg-muted/50 border border-border/30">
-          <button
-            onClick={() => setBillingCycle("monthly")}
-            className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-              billingCycle === "monthly"
-                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Mensal
-          </button>
-          <button
-            onClick={() => setBillingCycle("annual")}
-            className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 relative ${
-              billingCycle === "annual"
-                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Anual
-            <span className="absolute -top-2.5 -right-3 px-1.5 py-0.5 rounded-full bg-accent text-accent-foreground text-[10px] font-bold leading-none">
-              -20%
-            </span>
-          </button>
+      {/* Grid container for centered single card */}
+      <div className="flex justify-center mb-12">
+        <div className="w-full max-w-md">
+          {plans.map((plan, i) => {
+            const isCurrent = currentPlan === plan.id;
+            const isUpgrade = plan.id !== "free" && !isCurrent;
+            return (
+              <PlanCard
+                key={plan.id}
+                plan={plan}
+                index={i}
+                isCurrent={isCurrent}
+                isUpgrade={isUpgrade}
+                isLoading={loadingPlan === plan.id}
+                onCheckout={handleCheckout}
+              />
+            );
+          })}
         </div>
-      </motion.div>
+      </div>
 
       {/* Manage subscription */}
       {currentPlan !== "free" && (
