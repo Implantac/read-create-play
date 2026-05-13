@@ -69,8 +69,6 @@ const workflowGroups: { label: string; stepNumber: number; items: NavItem[] }[] 
 
 const PLAN_LABELS: Record<string, string> = {
   free: "Gratuito",
-  premium: "Premium",
-  professional: "Profissional",
   lifetime: "Vitalício",
 };
 
