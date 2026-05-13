@@ -15,9 +15,9 @@ const faqCategories = [
     title: "Conta e Acesso",
     icon: Users,
     faqs: [
-      { q: "Como criar minha conta?", a: "Acesse a página de cadastro, preencha seu nome, e-mail, telefone e senha. Após o cadastro, você terá 7 dias de acesso gratuito a todas as funcionalidades." },
+      { q: "Como adquirir o plano Vitalício?", a: "Acesse a página de planos e clique em \"Garantir acesso vitalício\". Após o pagamento de R$ 79,90, sua conta terá acesso permanente a todas as funcionalidades." },
       { q: "Esqueci minha senha, como recuperar?", a: "Na página de login, clique em \"Esqueci minha senha\". Enviaremos um link de recuperação para o e-mail cadastrado." },
-      { q: "Como funciona o período de teste gratuito?", a: "Ao criar sua conta, você recebe 7 dias de acesso completo sem nenhum custo. Após esse período, escolha um dos nossos planos para continuar usando." },
+      { q: "O acesso é imediato?", a: "Sim! Assim que o pagamento for confirmado, todas as ferramentas de IA e geradores profissionais estarão desbloqueados na sua conta." },
       { q: "Posso usar a mesma conta em vários dispositivos?", a: "Sim! Sua conta pode ser acessada de qualquer dispositivo com navegador. Seus dados ficam sincronizados automaticamente." },
     ],
   },
