@@ -466,9 +466,9 @@ export default function AdminPage() {
                     <SelectContent>
                       <SelectItem value="all">Todos planos</SelectItem>
                       <SelectItem value="free">Gratuito</SelectItem>
-                      <SelectItem value="premium">Premium</SelectItem>
-                      <SelectItem value="professional">Profissional</SelectItem>
                       <SelectItem value="lifetime">Vitalício</SelectItem>
+                      <SelectItem value="premium" className="hidden">Legacy Premium</SelectItem>
+                      <SelectItem value="professional" className="hidden">Legacy Profissional</SelectItem>
                     </SelectContent>
                   </Select>
                   <Select value={filterRole} onValueChange={setFilterRole}>
