@@ -52,15 +52,15 @@ const OWNER_EMAIL = "etcsuporte889@gmail.com";
 
 const PLAN_COLORS: Record<string, string> = {
   free: "bg-muted text-muted-foreground",
-  premium: "bg-primary/20 text-primary",
-  professional: "bg-accent/20 text-accent",
   lifetime: "bg-yellow-500/20 text-yellow-400",
+  premium: "bg-yellow-500/20 text-yellow-400",
+  professional: "bg-yellow-500/20 text-yellow-400",
 };
 
 const PLAN_LABELS: Record<string, string> = {
   free: "Gratuito",
-  premium: "Premium",
-  professional: "Profissional",
+  premium: "Vitalício",
+  professional: "Vitalício",
   lifetime: "Vitalício",
 };
 
@@ -466,9 +466,9 @@ export default function AdminPage() {
                     <SelectContent>
                       <SelectItem value="all">Todos planos</SelectItem>
                       <SelectItem value="free">Gratuito</SelectItem>
-                      <SelectItem value="premium">Premium</SelectItem>
-                      <SelectItem value="professional">Profissional</SelectItem>
                       <SelectItem value="lifetime">Vitalício</SelectItem>
+                      <SelectItem value="premium" className="hidden">Legacy Premium</SelectItem>
+                      <SelectItem value="professional" className="hidden">Legacy Profissional</SelectItem>
                     </SelectContent>
                   </Select>
                   <Select value={filterRole} onValueChange={setFilterRole}>
@@ -539,8 +539,8 @@ export default function AdminPage() {
                               </Badge>
                             </TableCell>
                             <TableCell>
-                              <Badge className={PLAN_COLORS[isOwnerRow ? "lifetime" : p.plan] || ""}>
-                                {isOwnerRow ? "♾ Vitalício" : (PLAN_LABELS[p.plan] || p.plan)}
+                              <Badge className={PLAN_COLORS[p.plan] || ""}>
+                                {PLAN_LABELS[p.plan] || p.plan}
                               </Badge>
                             </TableCell>
                             <TableCell>
@@ -586,9 +586,10 @@ export default function AdminPage() {
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="free">Gratuito</SelectItem>
-                                      <SelectItem value="premium">Premium</SelectItem>
-                                      <SelectItem value="professional">Profissional</SelectItem>
                                       <SelectItem value="lifetime">Vitalício</SelectItem>
+                                      {/* Legacy support for display if needed, but selecting one of these will update to Vitalício display anyway */}
+                                      <SelectItem value="premium" className="hidden">Premium</SelectItem>
+                                      <SelectItem value="professional" className="hidden">Profissional</SelectItem>
                                     </SelectContent>
                                   </Select>
                                   <Button
@@ -644,7 +645,7 @@ export default function AdminPage() {
                   { role: "super_admin", desc: "Acesso absoluto e irrestrito. Gerencia todos os usuários, papéis, planos e configurações. Nunca é limitado pelo plano comercial. O proprietário do sistema possui este nível permanentemente.", icon: "👑", count: roles.filter(r => r.role === "super_admin").length },
                   { role: "admin", desc: "Acesso administrativo amplo. Pode gerenciar usuários e visualizar métricas. Limitado por definições do Super Admin.", icon: "🛡️", count: roles.filter(r => r.role === "admin").length },
                   { role: "moderator", desc: "Acesso gerencial. Pode visualizar dados e moderar conteúdo. Sem acesso a configurações críticas.", icon: "⚙️", count: roles.filter(r => r.role === "moderator").length },
-                  { role: "user", desc: "Acesso padrão controlado pelo plano comercial (Gratuito, Premium, Profissional, Vitalício).", icon: "👤", count: profiles.length - roles.length },
+                  { role: "user", desc: "Acesso padrão controlado pelo plano comercial (Gratuito ou Vitalício).", icon: "👤", count: profiles.length - roles.length },
                 ].map(item => (
                   <Card key={item.role} className={`border-border/30 ${item.role === "super_admin" ? "bg-amber-500/5 border-amber-500/20" : "bg-card/40"}`}>
                     <CardContent className="p-4">

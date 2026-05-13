@@ -165,7 +165,7 @@ export function AppSidebar() {
                           <p className="font-semibold mb-0.5">{item.title}</p>
                           <p className="text-muted-foreground">{item.tooltip}</p>
                           {locked && (
-                            <p className="text-amber-400 mt-1 text-[10px]">🔒 Requer plano {PLAN_LABELS[minPlan!] || "Premium"}</p>
+                            <p className="text-amber-400 mt-1 text-[10px]">🔒 Requer plano {PLAN_LABELS[minPlan!] || "Vitalício"}</p>
                           )}
                         </TooltipContent>
                       </Tooltip>

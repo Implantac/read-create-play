@@ -146,7 +146,7 @@ export default function FechamentosPage() {
         title="Fechamentos Matemáticos"
         description="Matrizes otimizadas com garantia mínima de acertos"
         icon={Grid3X3}
-        badge="PRO"
+        badge="VITALÍCIO"
       />
       <LotteryContextBanner />
 

@@ -175,7 +175,7 @@ export function ExtremeCoveragePanel() {
             <div>
               <h3 className="font-bold text-foreground flex items-center gap-2">
                 Cobertura Extrema
-                <Badge variant="default" className="text-[10px]">PREMIUM</Badge>
+                <Badge variant="default" className="text-[10px]">VITALÍCIO</Badge>
               </h3>
               <p className="text-xs text-muted-foreground">
                 Algoritmo de 5 camadas: Geração → Greedy → Refinamento → Simulated Annealing → Pós-processamento

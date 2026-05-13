@@ -191,8 +191,8 @@ export default function PerfilPage() {
           </div>
           <div className="space-y-2">
             <Label>Plano atual</Label>
-            <div className="px-3 py-2 rounded-md bg-muted/50 border border-border/30 text-sm font-medium capitalize text-foreground">
-              {profile?.plan || "free"}
+            <div className="px-3 py-2 rounded-md bg-muted/50 border border-border/30 text-sm font-medium text-foreground">
+              {profile?.plan === "free" ? "Gratuito" : "Vitalício"}
             </div>
           </div>
           {isPaidPlan && (

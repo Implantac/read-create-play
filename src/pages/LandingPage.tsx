@@ -880,7 +880,7 @@ export default function LandingPage() {
                 { q: "Como funciona o acesso vitalício?", a: "Você paga uma única vez o valor de R$ 79,90 e tem acesso para sempre a todas as ferramentas, loterias e atualizações futuras da plataforma. Sem mensalidades, sem taxas escondidas." },
                 { q: "Quais loterias são suportadas?", a: "Todas as 8 principais: Mega-Sena, Lotofácil, Quina, Lotomania, Dupla Sena, Timemania, Dia de Sorte e Super Sete. Dados oficiais da Caixa, sincronizados automaticamente." },
                 { q: "Como funciona a IA?", a: "14+ algoritmos analisam frequência, atraso, paridade, soma e distribuição de milhares de sorteios. A partir disso, geram combinações otimizadas automaticamente. Você não precisa entender estatística — a IA cuida disso." },
-                { q: "Posso cancelar quando quiser?", a: "Sim, sem multa e sem burocracia. Um clique e pronto. Seus dados ficam salvos caso queira voltar." },
+                { q: "O que acontece se eu não gostar?", a: "Oferecemos garantia incondicional de 7 dias. Se por qualquer motivo você achar que o Titan não é para você, devolvemos 100% do seu dinheiro sem perguntas." },
                 { q: "Preciso instalar algum aplicativo?", a: "Não. O Titan roda 100% no navegador — computador, tablet ou celular. Também pode ser instalado como PWA para acesso rápido." },
               ].map((item, i) => (
                 <AccordionItem key={i} value={`faq-${i}`} className="glass-card border border-border/30 rounded-xl px-5 data-[state=open]:border-primary/20">
