@@ -664,7 +664,7 @@ export default function LandingPage() {
               <span className="gradient-brand-text">Garantido</span>
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto mb-6">
-              Pague uma vez e use para sempre. Tenha acesso a todas as ferramentas de IA e atualizações sem mensalidades.
+              Pague uma vez e use para sempre. Tenha acesso a todas as ferramentas de IA e atualizações futuras.
             </p>
           </motion.div>
 
