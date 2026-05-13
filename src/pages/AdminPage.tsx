@@ -586,9 +586,6 @@ export default function AdminPage() {
                                     <SelectContent>
                                       <SelectItem value="free">Gratuito</SelectItem>
                                       <SelectItem value="lifetime">Vitalício</SelectItem>
-                                      {/* Legacy support for display if needed, but selecting one of these will update to Vitalício display anyway */}
-                                      <SelectItem value="premium" className="hidden">Premium</SelectItem>
-                                      <SelectItem value="professional" className="hidden">Profissional</SelectItem>
                                     </SelectContent>
                                   </Select>
                                   <Button
