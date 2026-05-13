@@ -1,11 +1,3 @@
-import { readFileSync, readdirSync, statSync } from 'fs';
-import { join, extname } from 'path';
-
-const FORBIDDEN_WORDS = [/mensal/i, /premium/i, /\bpro\b/i];
-const IGNORE_DIRS = ['node_modules', '.git', 'dist', 'supabase', 'test', '__tests__'];
-const IGNORE_FILES = ['audit-plans.js', 'AuthContext.tsx', 'usePlanAccess.ts', 'AdminPage.tsx', 'ml-models.ts'];
-const VALID_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.json'];
-
 import { readFileSync, readdirSync, statSync, writeFileSync } from 'fs';
 import { join, extname } from 'path';
 
