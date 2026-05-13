@@ -189,7 +189,7 @@ Quando solicitado:
 - Retornar: média de acertos, melhor resultado, pior resultado, consistência
 
 ═══════════════════════════════════════════
-MODO DE EXPLICABILIDADE (DIFERENCIAL PREMIUM)
+MODO DE EXPLICABILIDADE (DIFERENCIAL VITALÍCIO)
 ═══════════════════════════════════════════
 
 Todo resultado deve explicar:
