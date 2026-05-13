@@ -62,7 +62,7 @@ const SimulacoesPage = () => {
       {draws.length === 0 ? (
         <EmptyState description="Importe os sorteios primeiro no Dashboard para rodar simulações." />
       ) : (
-        <PlanGate feature="simulacoes" fallbackMessage="Simulações avançadas — disponível nos planos Premium e superiores">
+        <PlanGate feature="simulacoes" fallbackMessage="Simulações avançadas — disponível no plano Vitalício">
           <>
             {/* Quick Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
