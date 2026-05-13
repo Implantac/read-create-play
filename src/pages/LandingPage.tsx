@@ -302,7 +302,7 @@ export default function LandingPage() {
             </Link>
             <Link to="/signup">
               <Button size="sm" className="gradient-brand text-primary-foreground shadow-lg shadow-primary/20 gap-1.5">
-                Testar Grátis <ArrowRight className="w-3.5 h-3.5" />
+                Obter Acesso <ArrowRight className="w-3.5 h-3.5" />
               </Button>
             </Link>
           </div>
