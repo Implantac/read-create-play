@@ -57,8 +57,6 @@ const PLAN_COLORS: Record<string, string> = {
 
 const PLAN_LABELS: Record<string, string> = {
   free: "Gratuito",
-  premium: "Vitalício",
-  professional: "Vitalício",
   lifetime: "Vitalício",
 };
 
