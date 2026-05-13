@@ -147,7 +147,7 @@ export default function LoginPage() {
               <p className="text-sm text-center text-muted-foreground pt-2">
                 Não tem conta?{" "}
                 <Link to="/signup" className="text-primary hover:underline font-semibold">
-                  Criar conta grátis
+                  Obter acesso vitalício
                 </Link>
               </p>
             </CardFooter>
