@@ -28,45 +28,45 @@ export const heroVariants = {
     headline: "Pare de jogar no escuro.",
     headlineHighlight: "Jogue com inteligência.",
     subheadline: "Analise 10.000+ sorteios reais, gere combinações otimizadas por IA e teste suas estratégias antes de apostar. Sem promessas mágicas — só dados, lógica e transparência.",
-    cta: "Começar Grátis por 7 Dias",
+    cta: "Garantir Acesso Vitalício",
     secondaryCta: "Ver como funciona",
   },
   B: {
     headline: "Seus números podem ser melhores.",
     headlineHighlight: "A IA prova isso.",
     subheadline: "Enquanto outros jogam no palpite, 5.000+ brasileiros já usam inteligência artificial para gerar apostas com mais chance de acerto. Sua vez.",
-    cta: "Começar com Dados Reais",
+    cta: "Acessar Plataforma Agora",
     secondaryCta: "Ver como funciona",
   },
   C: {
     headline: "14 algoritmos. 10.000 sorteios.",
     headlineHighlight: "Apostas baseadas em ciência.",
     subheadline: "Machine Learning analisa frequência, atraso, paridade e distribuição de cada loteria para gerar combinações com cobertura estatística máxima.",
-    cta: "Testar Gratuitamente",
+    cta: "Obter Acesso Vitalício",
     secondaryCta: "Ver como funciona",
   },
 };
 
 export const floatingCtaVariants = {
-  A: "Começar Grátis",
-  B: "Começar com Dados Reais",
-  C: "Testar Gratuitamente",
+  A: "Garantir Acesso",
+  B: "Acessar Agora",
+  C: "Acesso Vitalício",
 };
 
 export const midCtaVariants = {
-  A: "Criar Conta Grátis",
-  B: "Começar com Dados Reais",
-  C: "Testar Sem Compromisso",
+  A: "Garantir Acesso Vitalício",
+  B: "Acessar com Dados Reais",
+  C: "Obter Acesso Agora",
 };
 
 export const finalCtaVariants = {
-  A: "Começar Grátis Agora",
+  A: "Garantir Acesso Agora",
   B: "Quero Apostar com Inteligência",
-  C: "Acessar Plataforma Grátis",
+  C: "Acessar Plataforma Agora",
 };
 
 export const iaCtaVariants = {
-  A: "Ativar IA Grátis por 7 Dias",
+  A: "Ativar IA Vitalícia",
   B: "Experimentar a IA Agora",
-  C: "Testar IA Gratuitamente",
+  C: "Obter IA Agora",
 };

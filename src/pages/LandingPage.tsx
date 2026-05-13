@@ -61,7 +61,7 @@ const testimonials = [
   { name: "Roberto F.", initials: "RF", role: "Apostador profissional • há 6 meses", stars: 5, text: "O backtesting sozinho já vale o plano. Testo qualquer estratégia contra o histórico real antes de gastar. Não abro mão.", highlight: "ROI positivo em 6 meses" },
   { name: "Mariana L.", initials: "ML", role: "Quina • há 3 meses", stars: 4, text: "A simulação Monte Carlo me mostrou quais combinações realmente funcionam. Agora jogo com confiança, não com palpite.", highlight: null },
   { name: "Fernando G.", initials: "FG", role: "Multi-loteria • há 1 ano", stars: 5, text: "Testei 4 plataformas antes de chegar aqui. Nenhuma chega perto em dados, interface e velocidade. É de outro nível.", highlight: "melhor plataforma do mercado" },
-  { name: "Juliana R.", initials: "JR", role: "Lotofácil • há 2 meses", stars: 5, text: "Comecei no plano grátis e em 1 semana já vi valor. O dashboard é claro e a IA explica tudo. Super recomendo!", highlight: null },
+  { name: "Juliana R.", initials: "JR", role: "Lotofácil • há 2 meses", stars: 5, text: "Comecei a usar a plataforma e em 1 semana já vi valor. O dashboard é claro e a IA explica tudo. Super recomendo!", highlight: null },
 ];
 
 function TestimonialCard({ t, i }: { t: typeof testimonials[0]; i: number }) {
@@ -198,64 +198,22 @@ const stats = [
 
 const plans = [
   {
-    name: "Grátis",
-    price: "R$ 0",
-    annualPrice: "R$ 0",
-    period: "/mês",
-    annualPeriod: "/mês",
-    features: ["Dashboard com estatísticas", "Frequência e atraso de números", "1 loteria completa", "Gerador básico de jogos"],
-    cta: "Começar Grátis",
-    highlight: false,
-  },
-  {
-    name: "Pro",
-    price: "R$ 29",
-    annualPrice: "R$ 23",
-    annualTotal: "R$ 287,00/ano",
-    period: "/mês",
-    annualPeriod: "/mês",
-    features: [
-      "Todas as 8 loterias",
-      "IA + Machine Learning",
-      "Gerador profissional com filtros",
-      "Backtesting contra histórico real",
-      "Simulação Monte Carlo massiva",
-      "Suporte prioritário por chat",
-    ],
-    cta: "Testar grátis por 7 dias",
-    highlight: true,
-  },
-  {
-    name: "Titan",
-    price: "R$ 59",
-    annualPrice: "R$ 47",
-    annualTotal: "R$ 575,00/ano",
-    period: "/mês",
-    annualPeriod: "/mês",
-    features: [
-      "Tudo do Pro incluso",
-      "Motor HP de alta performance",
-      "Algoritmos genéticos avançados",
-      "Otimizador combinatorial",
-      "Suporte prioritário dedicado",
-    ],
-    cta: "Testar grátis por 7 dias",
-    highlight: false,
-  },
-  {
     name: "Vitalício",
-    price: "R$ 497",
-    annualPrice: "R$ 497",
+    price: "R$ 79,90",
+    annualPrice: "R$ 79,90",
     period: " único",
     annualPeriod: " único",
     features: [
       "Acesso completo para sempre",
+      "Todas as 8 loterias incluídas",
+      "IA + Machine Learning",
+      "Gerador profissional com filtros",
+      "Backtesting contra histórico real",
       "Todas as atualizações futuras",
-      "Prioridade máxima no suporte",
       "Zero mensalidades",
     ],
     cta: "Garantir acesso vitalício",
-    highlight: false,
+    highlight: true,
     isLifetime: true,
   },
 ];
@@ -344,7 +302,7 @@ export default function LandingPage() {
             </Link>
             <Link to="/signup">
               <Button size="sm" className="gradient-brand text-primary-foreground shadow-lg shadow-primary/20 gap-1.5">
-                Testar Grátis <ArrowRight className="w-3.5 h-3.5" />
+                Obter Acesso <ArrowRight className="w-3.5 h-3.5" />
               </Button>
             </Link>
           </div>
@@ -702,40 +660,15 @@ export default function LandingPage() {
             className="text-center mb-14"
           >
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              Invista centavos, economize{" "}
-              <span className="gradient-brand-text">reais</span>
+              Acesso Vitalício{" "}
+              <span className="gradient-brand-text">Garantido</span>
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto mb-6">
-              Teste grátis por 7 dias. Sem cartão de crédito. Cancele quando quiser — sem multas.
+              Pague uma vez e use para sempre. Tenha acesso a todas as ferramentas de IA e atualizações sem mensalidades.
             </p>
-            <div className="inline-flex items-center gap-3 bg-muted/50 rounded-full p-1 border border-border/50">
-              <button
-                onClick={() => setBillingCycle("monthly")}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-                  billingCycle === "monthly"
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Mensal
-              </button>
-              <button
-                onClick={() => setBillingCycle("annual")}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 ${
-                  billingCycle === "annual"
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Anual
-                <span className="px-1.5 py-0.5 rounded-full bg-neon-green/20 text-neon-green text-[10px] font-bold">
-                  -20%
-                </span>
-              </button>
-            </div>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+          <div className="flex justify-center max-w-md mx-auto">
             {plans.map((plan, i) => {
               const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -862,8 +795,8 @@ export default function LandingPage() {
           >
             <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground">
               <span className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5 text-primary/60" /> Pagamento seguro</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 text-primary/60" /> Cancele quando quiser</span>
-              <span className="flex items-center gap-1.5"><Trophy className="w-3.5 h-3.5 text-primary/60" /> 7 dias grátis</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 text-primary/60" /> Acesso imediato</span>
+              <span className="flex items-center gap-1.5"><Trophy className="w-3.5 h-3.5 text-primary/60" /> Vitalício</span>
             </div>
             {/* Guarantee badge */}
             <div className="inline-flex items-center gap-3 px-5 py-3 rounded-xl bg-primary/5 border border-primary/15">
@@ -871,8 +804,8 @@ export default function LandingPage() {
                 <Shield className="w-5 h-5 text-primary" />
               </div>
               <div className="text-left">
-                <p className="text-xs font-semibold text-foreground">Garantia de 7 dias</p>
-                <p className="text-[11px] text-muted-foreground">Teste completo sem compromisso. Não gostou? Cancele com um clique.</p>
+                <p className="text-xs font-semibold text-foreground">Garantia de Satisfação</p>
+                <p className="text-[11px] text-muted-foreground">Pague uma vez e use para sempre. Suporte prioritário incluso.</p>
               </div>
             </div>
             {/* Live counter */}
@@ -944,7 +877,7 @@ export default function LandingPage() {
             <Accordion type="single" collapsible className="space-y-3">
               {[
                 { q: "O Titan garante que vou ganhar na loteria?", a: "Não — e desconfie de quem promete isso. Loterias são jogos de azar. O que o Titan faz é usar IA para analisar padrões reais em 10.000+ sorteios e gerar combinações estatisticamente mais inteligentes. Você troca palpite por dados." },
-                { q: "Posso testar antes de pagar?", a: "Sim! São 7 dias grátis com acesso completo a todos os recursos. Sem cartão de crédito. Se não gostar, é só não continuar." },
+                { q: "Como funciona o acesso vitalício?", a: "Você paga uma única vez o valor de R$ 79,90 e tem acesso para sempre a todas as ferramentas, loterias e atualizações futuras da plataforma. Sem mensalidades, sem taxas escondidas." },
                 { q: "Quais loterias são suportadas?", a: "Todas as 8 principais: Mega-Sena, Lotofácil, Quina, Lotomania, Dupla Sena, Timemania, Dia de Sorte e Super Sete. Dados oficiais da Caixa, sincronizados automaticamente." },
                 { q: "Como funciona a IA?", a: "14+ algoritmos analisam frequência, atraso, paridade, soma e distribuição de milhares de sorteios. A partir disso, geram combinações otimizadas automaticamente. Você não precisa entender estatística — a IA cuida disso." },
                 { q: "Posso cancelar quando quiser?", a: "Sim, sem multa e sem burocracia. Um clique e pronto. Seus dados ficam salvos caso queira voltar." },
@@ -979,7 +912,7 @@ export default function LandingPage() {
               <span className="gradient-brand-text">dinheiro no escuro</span>
             </h2>
             <p className="text-muted-foreground">
-              5.000+ jogadores já estão apostando com inteligência. Comece agora — teste grátis por 7 dias, sem cartão.
+              5.000+ jogadores já estão apostando com inteligência. Garanta seu acesso vitalício agora por apenas R$ 79,90.
             </p>
             <motion.div
               whileHover={{ scale: 1.06, boxShadow: "0 0 30px hsl(var(--primary) / 0.5)" }}
@@ -991,7 +924,7 @@ export default function LandingPage() {
                 {finalCtaVariants[abVariant]} <ArrowRight className="w-5 h-5" />
               </Button>
             </motion.div>
-            <p className="text-xs text-muted-foreground/60">Sem cartão de crédito • Cancele quando quiser</p>
+            <p className="text-xs text-muted-foreground/60">Pagamento único • Acesso imediato</p>
           </div>
         </motion.div>
       </section>

@@ -99,12 +99,12 @@ export function PlanGate({ feature, children, fallbackMessage }: PlanGateProps) 
           <Link to="/planos">
             <Button className="gap-2 gradient-brand text-primary-foreground shadow-md shadow-primary/20 mt-1">
               <Crown className="w-4 h-4" />
-              Desbloquear com {PLAN_LABELS[required]}
+              Ativar Acesso Vitalício
               <ArrowRight className="w-3 h-3" />
             </Button>
           </Link>
           <p className="text-xs text-muted-foreground/60">
-            7 dias grátis • Cancele quando quiser
+            Pagamento único • R$ 79,90
           </p>
         </CardContent>
       </Card>

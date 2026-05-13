@@ -116,7 +116,7 @@ export default function SignupPage() {
                 Criar <span className="gradient-brand-text">Conta</span>
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                7 dias grátis • Comece agora
+                Acesso Vitalício • Comece agora
               </p>
             </div>
           </CardHeader>
@@ -195,7 +195,7 @@ export default function SignupPage() {
             <CardFooter className="flex flex-col gap-3 pt-2">
               <Button type="submit" className="w-full h-11 gradient-brand text-primary-foreground font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-shadow" disabled={loading}>
                 {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                Criar conta grátis
+                Garantir acesso agora
                 {!loading && <ArrowRight className="w-4 h-4 ml-2" />}
               </Button>
               <p className="text-sm text-center text-muted-foreground pt-2">
