@@ -924,7 +924,7 @@ export default function LandingPage() {
                 {finalCtaVariants[abVariant]} <ArrowRight className="w-5 h-5" />
               </Button>
             </motion.div>
-            <p className="text-xs text-muted-foreground/60">Sem cartão de crédito • Cancele quando quiser</p>
+            <p className="text-xs text-muted-foreground/60">Pagamento único • Acesso imediato</p>
           </div>
         </motion.div>
       </section>
