@@ -170,7 +170,7 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
       <Tabs defaultValue="generator" className="w-full mt-4">
         <TabsList className="grid w-full grid-cols-2 mb-4">
           <TabsTrigger value="generator" className="text-xs gap-1">
-            <Sparkles className="w-3 h-3" /> Gerador Pro
+            <Sparkles className="w-3 h-3" /> Gerador Profissional
           </TabsTrigger>
           <TabsTrigger value="closure" className="text-xs gap-1">
             <Shield className="w-3 h-3" /> Fechamentos
