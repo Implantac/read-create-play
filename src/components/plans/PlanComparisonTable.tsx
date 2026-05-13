@@ -52,7 +52,7 @@ export function PlanComparisonTable() {
               <tr className="border-b border-border/30 bg-muted/30">
                 <th className="text-left px-5 py-3.5 font-semibold text-foreground">Funcionalidade</th>
                 <th className="text-center px-4 py-3.5 font-semibold text-foreground w-28">Gratuito</th>
-                <th className="text-center px-4 py-3.5 font-semibold text-primary w-28">Vitalício</th>
+                <th className="text-center px-4 py-3.5 font-semibold text-primary w-28">Vitalício (R$ 79,90)</th>
               </tr>
             </thead>
             <tbody>
