@@ -912,7 +912,7 @@ export default function LandingPage() {
               <span className="gradient-brand-text">dinheiro no escuro</span>
             </h2>
             <p className="text-muted-foreground">
-              5.000+ jogadores já estão apostando com inteligência. Comece agora — teste grátis por 7 dias, sem cartão.
+              5.000+ jogadores já estão apostando com inteligência. Garanta seu acesso vitalício agora por apenas R$ 79,90.
             </p>
             <motion.div
               whileHover={{ scale: 1.06, boxShadow: "0 0 30px hsl(var(--primary) / 0.5)" }}
