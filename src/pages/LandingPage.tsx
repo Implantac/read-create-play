@@ -210,7 +210,7 @@ const plans = [
       "Gerador profissional com filtros",
       "Backtesting contra histórico real",
       "Todas as atualizações futuras",
-      "Zero mensalidades",
+      "Taxa única",
     ],
     cta: "Garantir acesso vitalício",
     highlight: true,
