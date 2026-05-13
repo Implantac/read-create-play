@@ -430,16 +430,19 @@ export default function AdminPage() {
                 })}
               </div>
               <div className="flex gap-4 mt-2">
-                {["free", "premium", "professional", "lifetime"].map(plan => (
-                  <div key={plan} className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                    <div className={`w-2 h-2 rounded-full ${
-                      plan === "free" ? "bg-muted-foreground/50" :
-                      plan === "premium" ? "bg-primary" :
-                      plan === "lifetime" ? "bg-amber-500" : "bg-accent"
-                    }`} />
-                    {PLAN_LABELS[plan]}: {planCounts[plan] || 0}
-                  </div>
-                ))}
+                {["free", "lifetime"].map(plan => {
+                  const count = (plan === "lifetime") 
+                    ? (planCounts["lifetime"] || 0) + (planCounts["premium"] || 0) + (planCounts["professional"] || 0)
+                    : planCounts[plan] || 0;
+                  return (
+                    <div key={plan} className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                      <div className={`w-2 h-2 rounded-full ${
+                        plan === "free" ? "bg-muted-foreground/50" : "bg-amber-500"
+                      }`} />
+                      {PLAN_LABELS[plan]}: {count}
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
