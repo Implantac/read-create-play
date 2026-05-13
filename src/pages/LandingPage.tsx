@@ -795,8 +795,8 @@ export default function LandingPage() {
           >
             <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground">
               <span className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5 text-primary/60" /> Pagamento seguro</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 text-primary/60" /> Cancele quando quiser</span>
-              <span className="flex items-center gap-1.5"><Trophy className="w-3.5 h-3.5 text-primary/60" /> 7 dias grátis</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 text-primary/60" /> Acesso imediato</span>
+              <span className="flex items-center gap-1.5"><Trophy className="w-3.5 h-3.5 text-primary/60" /> Vitalício</span>
             </div>
             {/* Guarantee badge */}
             <div className="inline-flex items-center gap-3 px-5 py-3 rounded-xl bg-primary/5 border border-primary/15">
@@ -804,8 +804,8 @@ export default function LandingPage() {
                 <Shield className="w-5 h-5 text-primary" />
               </div>
               <div className="text-left">
-                <p className="text-xs font-semibold text-foreground">Garantia de 7 dias</p>
-                <p className="text-[11px] text-muted-foreground">Teste completo sem compromisso. Não gostou? Cancele com um clique.</p>
+                <p className="text-xs font-semibold text-foreground">Garantia de Satisfação</p>
+                <p className="text-[11px] text-muted-foreground">Pague uma vez e use para sempre. Suporte prioritário incluso.</p>
               </div>
             </div>
             {/* Live counter */}
