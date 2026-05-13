@@ -660,40 +660,15 @@ export default function LandingPage() {
             className="text-center mb-14"
           >
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              Invista centavos, economize{" "}
-              <span className="gradient-brand-text">reais</span>
+              Acesso Vitalício{" "}
+              <span className="gradient-brand-text">Garantido</span>
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto mb-6">
-              Teste grátis por 7 dias. Sem cartão de crédito. Cancele quando quiser — sem multas.
+              Pague uma vez e use para sempre. Tenha acesso a todas as ferramentas de IA e atualizações sem mensalidades.
             </p>
-            <div className="inline-flex items-center gap-3 bg-muted/50 rounded-full p-1 border border-border/50">
-              <button
-                onClick={() => setBillingCycle("monthly")}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-                  billingCycle === "monthly"
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Mensal
-              </button>
-              <button
-                onClick={() => setBillingCycle("annual")}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 ${
-                  billingCycle === "annual"
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Anual
-                <span className="px-1.5 py-0.5 rounded-full bg-neon-green/20 text-neon-green text-[10px] font-bold">
-                  -20%
-                </span>
-              </button>
-            </div>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+          <div className="flex justify-center max-w-md mx-auto">
             {plans.map((plan, i) => {
               const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
                 const rect = e.currentTarget.getBoundingClientRect();
