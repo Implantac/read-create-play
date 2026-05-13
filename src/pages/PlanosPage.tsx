@@ -28,7 +28,7 @@ const basePlans = [
       "Backtesting contra histórico real",
       "Acesso vitalício garantido",
       "Todas as atualizações futuras incluídas",
-      "Sem mensalidades nunca mais",
+      "Sem mensalidades",
       "Suporte prioritário",
     ],
     cta: "Garantir acesso vitalício",

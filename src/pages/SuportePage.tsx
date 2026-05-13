@@ -26,7 +26,7 @@ const faqCategories = [
     icon: CreditCard,
     faqs: [
       { q: "Quais formas de pagamento são aceitas?", a: "Aceitamos cartões de crédito, débito e Pix, processados de forma segura pelo Stripe." },
-      { q: "O pagamento é único ou mensal?", a: "O plano Vitalício é um pagamento único de R$ 79,90. Você não terá nenhuma cobrança mensal ou anual futura." },
+      { q: "O pagamento tem taxas recorrentes?", a: "Não. O plano Vitalício é um pagamento único de R$ 79,90. Você não terá nenhuma cobrança mensal ou anual futura." },
       { q: "Como gerencio meu acesso?", a: "Acesse \"Perfil\" ou a página de planos para ver o status da sua conta. Como o plano é vitalício, seu acesso nunca expira." },
       { q: "Posso solicitar reembolso?", a: "Sim, oferecemos reembolso integral em até 7 dias após a compra caso você não esteja satisfeito. Basta entrar em contato pelo WhatsApp ou e-mail." },
       { q: "O plano Vitalício inclui atualizações futuras?", a: "Sim! O plano Vitalício garante acesso permanente a todas as funcionalidades atuais e futuras, sem custo adicional." },

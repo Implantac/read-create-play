@@ -50,8 +50,8 @@ const FEATURE_MIN_PLAN: Record<Feature, PlanType> = {
 
 export const PLAN_LIMITS = {
   free: { savedBetsPerLottery: 3 },
-  premium: { savedBetsPerLottery: Infinity },
-  professional: { savedBetsPerLottery: Infinity },
+  premium: { savedBetsPerLottery: Infinity }, // Legacy
+  professional: { savedBetsPerLottery: Infinity }, // Legacy
   lifetime: { savedBetsPerLottery: Infinity },
 } as const;
 
