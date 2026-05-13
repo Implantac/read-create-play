@@ -408,8 +408,10 @@ export default function AdminPage() {
             </CardHeader>
             <CardContent>
               <div className="flex gap-0.5 h-7 rounded-full overflow-hidden bg-muted">
-                {["free", "premium", "professional", "lifetime"].map(plan => {
-                  const count = planCounts[plan] || 0;
+                {["free", "lifetime"].map(plan => {
+                  const count = (plan === "lifetime") 
+                    ? (planCounts["lifetime"] || 0) + (planCounts["premium"] || 0) + (planCounts["professional"] || 0)
+                    : planCounts[plan] || 0;
                   const pct = profiles.length > 0 ? (count / profiles.length) * 100 : 0;
                   if (pct === 0) return null;
                   return (
@@ -417,9 +419,7 @@ export default function AdminPage() {
                       key={plan}
                       className={`h-full flex items-center justify-center text-[10px] font-bold transition-all ${
                         plan === "free" ? "bg-muted-foreground/30 text-foreground" :
-                        plan === "premium" ? "bg-primary text-primary-foreground" :
-                        plan === "lifetime" ? "bg-amber-500 text-amber-950" :
-                        "bg-accent text-accent-foreground"
+                        "bg-amber-500 text-amber-950"
                       }`}
                       style={{ width: `${pct}%` }}
                       title={`${PLAN_LABELS[plan]}: ${count} (${Math.round(pct)}%)`}
