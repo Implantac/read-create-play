@@ -61,7 +61,7 @@ const testimonials = [
   { name: "Roberto F.", initials: "RF", role: "Apostador profissional • há 6 meses", stars: 5, text: "O backtesting sozinho já vale o plano. Testo qualquer estratégia contra o histórico real antes de gastar. Não abro mão.", highlight: "ROI positivo em 6 meses" },
   { name: "Mariana L.", initials: "ML", role: "Quina • há 3 meses", stars: 4, text: "A simulação Monte Carlo me mostrou quais combinações realmente funcionam. Agora jogo com confiança, não com palpite.", highlight: null },
   { name: "Fernando G.", initials: "FG", role: "Multi-loteria • há 1 ano", stars: 5, text: "Testei 4 plataformas antes de chegar aqui. Nenhuma chega perto em dados, interface e velocidade. É de outro nível.", highlight: "melhor plataforma do mercado" },
-  { name: "Juliana R.", initials: "JR", role: "Lotofácil • há 2 meses", stars: 5, text: "Comecei no plano grátis e em 1 semana já vi valor. O dashboard é claro e a IA explica tudo. Super recomendo!", highlight: null },
+  { name: "Juliana R.", initials: "JR", role: "Lotofácil • há 2 meses", stars: 5, text: "Comecei a usar a plataforma e em 1 semana já vi valor. O dashboard é claro e a IA explica tudo. Super recomendo!", highlight: null },
 ];
 
 function TestimonialCard({ t, i }: { t: typeof testimonials[0]; i: number }) {
