@@ -877,7 +877,7 @@ export default function LandingPage() {
             <Accordion type="single" collapsible className="space-y-3">
               {[
                 { q: "O Titan garante que vou ganhar na loteria?", a: "Não — e desconfie de quem promete isso. Loterias são jogos de azar. O que o Titan faz é usar IA para analisar padrões reais em 10.000+ sorteios e gerar combinações estatisticamente mais inteligentes. Você troca palpite por dados." },
-                { q: "Como funciona o acesso vitalício?", a: "Você paga uma única vez o valor de R$ 79,90 e tem acesso para sempre a todas as ferramentas, loterias e atualizações futuras da plataforma. Sem mensalidades, sem taxas escondidas." },
+                { q: "Como funciona o acesso vitalício?", a: "Você paga uma única vez o valor de R$ 79,90 e tem acesso para sempre a todas as ferramentas, loterias e atualizações futuras da plataforma. Sem taxas escondidas." },
                 { q: "Quais loterias são suportadas?", a: "Todas as 8 principais: Mega-Sena, Lotofácil, Quina, Lotomania, Dupla Sena, Timemania, Dia de Sorte e Super Sete. Dados oficiais da Caixa, sincronizados automaticamente." },
                 { q: "Como funciona a IA?", a: "14+ algoritmos analisam frequência, atraso, paridade, soma e distribuição de milhares de sorteios. A partir disso, geram combinações otimizadas automaticamente. Você não precisa entender estatística — a IA cuida disso." },
                 { q: "O que acontece se eu não gostar?", a: "Oferecemos garantia incondicional de 7 dias. Se por qualquer motivo você achar que o Titan não é para você, devolvemos 100% do seu dinheiro sem perguntas." },
