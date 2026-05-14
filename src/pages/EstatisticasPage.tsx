@@ -155,6 +155,9 @@ const EstatisticasPage = () => {
         <StatsCard title="Soma Média" value={avgSum} icon={Sigma} color="amber" subtitle="Soma das dezenas" />
       </div>
 
+      {/* Data Science Engine */}
+      <AdvancedAnalyticsPanel stats={stats} draws={filteredDraws} config={config} />
+
       {/* Charts */}
       <div className="grid lg:grid-cols-2 gap-6">
         <SafeSuspense fallback={<ChartFallback />}><FrequencyChart stats={stats} /></SafeSuspense>
