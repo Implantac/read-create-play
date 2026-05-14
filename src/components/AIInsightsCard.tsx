@@ -75,28 +75,33 @@ export function AIInsightsCard({ stats, draws, lotteryName, compact }: Props) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-card rounded-xl border border-border/50 p-5"
+      className={compact ? "" : "glass-card rounded-xl border border-border/50 p-5"}
     >
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-          <Brain className="w-4 h-4 text-primary" />
+      {!compact && (
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center relative overflow-hidden group">
+            <div className="absolute inset-0 bg-primary/20 animate-pulse" />
+            <Brain className="w-4 h-4 text-primary relative z-10" />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-foreground">Insights da IA</h3>
+            <p className="text-[10px] text-muted-foreground">Análise automática — {lotteryName}</p>
+          </div>
         </div>
-        <div>
-          <h3 className="text-sm font-bold text-foreground">Insights da IA</h3>
-          <p className="text-[10px] text-muted-foreground">Análise automática — {lotteryName}</p>
-        </div>
-      </div>
-      <div className="space-y-3">
+      )}
+      <div className="space-y-4">
         {insights.map((insight, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="flex items-start gap-2.5 text-xs"
+            className="flex items-start gap-3 text-xs group"
           >
-            <insight.icon className={`w-3.5 h-3.5 mt-0.5 shrink-0 ${typeColors[insight.type]}`} />
-            <p className="text-muted-foreground leading-relaxed">{insight.text}</p>
+            <div className={`p-1.5 rounded-md bg-muted/30 ${typeColors[insight.type].replace('text-', 'bg-').replace('-blue', '/10').replace('-red', '/10').replace('primary', 'primary/10').replace('accent', 'accent/10')} group-hover:scale-110 transition-transform`}>
+              <insight.icon className={`w-3.5 h-3.5 shrink-0 ${typeColors[insight.type]}`} />
+            </div>
+            <p className="text-muted-foreground/90 leading-relaxed font-medium mt-0.5">{insight.text}</p>
           </motion.div>
         ))}
       </div>
