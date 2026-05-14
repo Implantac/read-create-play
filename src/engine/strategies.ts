@@ -19,7 +19,8 @@ export type Strategy =
   | "hybrid"
   | "markov"
   | "poisson"
-  | "cluster";
+  | "cluster"
+  | "expert";
 
 export interface StrategyInfo {
   id: Strategy;
@@ -49,6 +50,7 @@ export const STRATEGIES: StrategyInfo[] = [
   { id: "markov", label: "Cadeia de Markov", desc: "Probabilidade de transição e sequência de estados", category: "ai" },
   { id: "poisson", label: "Poisson", desc: "Distribuição estatística por taxa de ocorrência", category: "ai" },
   { id: "cluster", label: "Clusters", desc: "Agrupamento por afinidade e correlação histórica", category: "ai" },
+  { id: "expert", label: "Loto-Mestre", desc: "Estratégia profissional com dezenas fixas e desdobramento", category: "ai" },
 ];
 
 function isPrime(n: number): boolean {
@@ -395,8 +397,25 @@ export function generateByStrategy(
       return shuffled.slice(0, pick).map(s => s.number).sort((a, b) => a - b);
     }
 
+    case "expert": {
+      // Expert strategy: use top 3 consensus as "fixed" numbers, then fill with high-cycle-score variants
+      const models = runAllModels(stats, config);
+      const consensus = getConsensusRanking(models);
+      const fixedCount = Math.min(3, Math.floor(pick * 0.4));
+      const fixed = consensus.slice(0, fixedCount).map(c => c.number);
+      
+      const remainingStats = stats.filter(s => !fixed.includes(s.number));
+      const weighted = remainingStats.map(s => ({
+        ...s,
+        weight: Math.max(0.1, s.cycleScore * 6 + s.trend * 4 + s.recentFreq * 2 + Math.random() * 5),
+      }));
+      
+      const shuffled = weightedShuffle(weighted);
+      const selected = [...fixed, ...shuffled.slice(0, pick - fixed.length).map(s => s.number)];
+      return selected.sort((a, b) => a - b);
+    }
+
     default:
       return generateSmartBet(stats, pick);
   }
 }
-
