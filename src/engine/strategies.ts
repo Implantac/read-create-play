@@ -415,6 +415,48 @@ export function generateByStrategy(
       return selected.sort((a, b) => a - b);
     }
 
+    case \"quantum\": {
+      const result = runQuantumAnalysis(stats, config);
+      const topPool = result.predictions.slice(0, Math.min(pick * 2, result.predictions.length));
+      const shuffled = [...topPool].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, pick).map(p => p.number).sort((a, b) => a - b);
+    }
+
+    case \"randomForest\": {
+      const result = runRandomForest(stats, config);
+      const topPool = result.predictions.slice(0, Math.min(pick * 2, result.predictions.length));
+      const shuffled = [...topPool].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, pick).map(p => p.number).sort((a, b) => a - b);
+    }
+
+    case \"xgboost\": {
+      const result = runXGBoost(stats, config);
+      const topPool = result.predictions.slice(0, Math.min(pick * 2, result.predictions.length));
+      const shuffled = [...topPool].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, pick).map(p => p.number).sort((a, b) => a - b);
+    }
+
+    case \"lstm\": {
+      const result = runNeuralNetwork(stats, config);
+      const topPool = result.predictions.slice(0, Math.min(pick * 2, result.predictions.length));
+      const shuffled = [...topPool].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, pick).map(p => p.number).sort((a, b) => a - b);
+    }
+
+    case \"bayesian\": {
+      const result = runBayesianInference(stats, config);
+      const topPool = result.predictions.slice(0, Math.min(pick * 2, result.predictions.length));
+      const shuffled = [...topPool].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, pick).map(p => p.number).sort((a, b) => a - b);
+    }
+
+    case \"markov_model\": {
+      const result = runMarkovChain(stats, config);
+      const topPool = result.predictions.slice(0, Math.min(pick * 2, result.predictions.length));
+      const shuffled = [...topPool].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, pick).map(p => p.number).sort((a, b) => a - b);
+    }
+
     default:
       return generateSmartBet(stats, pick);
   }
