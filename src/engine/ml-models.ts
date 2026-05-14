@@ -553,14 +553,14 @@ export function getConsensusRanking(models: ModelResult[]): MLPrediction[] {
  */
 function buildReason(p: MLPrediction, totalModels: number): string {
   const bd = p.breakdown;
-  if (!bd) return \"Recomendação baseada em convergência algorítmica de alta precisão.\";
+  if (!bd) return "Recomendação baseada em convergência algorítmica de alta precisão.";
   const factors: Array<{ label: string; value: number }> = [
-    { label: \"frequência histórica sólida\", value: bd.frequency },
-    { label: \"momentum de curto prazo positivo\", value: bd.recency },
-    { label: \"tendência de alta confirmada\", value: bd.trend },
-    { label: \"maturidade de ciclo detectada\", value: bd.cycle },
-    { label: \"aceleração de momentum estatístico\", value: bd.momentum },
-    { label: \"estabilidade de desvio padrão (gaps)\", value: bd.consistency },
+    { label: "frequência histórica sólida", value: bd.frequency },
+    { label: "momentum de curto prazo positivo", value: bd.recency },
+    { label: "tendência de alta confirmada", value: bd.trend },
+    { label: "maturidade de ciclo detectada", value: bd.cycle },
+    { label: "aceleração de momentum estatístico", value: bd.momentum },
+    { label: "estabilidade de desvio padrão (gaps)", value: bd.consistency },
   ].filter(f => f.value >= 8).sort((a, b) => b.value - a.value).slice(0, 3);
 
   const agree = p.agreement ?? 0;
@@ -571,8 +571,8 @@ function buildReason(p: MLPrediction, totalModels: number): string {
       : `Sinal Algorítmico (${agree}/${totalModels} modelos)`;
 
   const factorText = factors.length > 0
-    ? factors.map(f => f.label).join(\", \")
-    : \"distribuição de probabilidade equilibrada\";
+    ? factors.map(f => f.label).join(", ")
+    : "distribuição de probabilidade equilibrada";
 
   return `${agreementText}. Indicadores: ${factorText}.`;
 }
