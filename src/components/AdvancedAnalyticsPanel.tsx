@@ -118,14 +118,15 @@ export function AdvancedAnalyticsPanel({ stats, draws, config }: Props) {
             </div>
 
             <Tabs defaultValue="integrated" className="w-full">
-              <TabsList className="w-full bg-secondary/50 border border-border flex-wrap h-auto gap-1 p-1">
-                <TabsTrigger value="integrated" className="text-xs">
-                  <Brain className="w-3 h-3 mr-1" /> Score Integrado
+              <TabsList className="w-full bg-muted/30 border border-border/40 flex-wrap h-auto gap-1 p-1 rounded-xl mb-6">
+                <TabsTrigger value="integrated" className="text-xs font-bold rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  <Sparkles className="w-3 h-3 mr-1.5" /> Score Integrado
                 </TabsTrigger>
-                <TabsTrigger value="logistic" className="text-xs">Regressão</TabsTrigger>
-                <TabsTrigger value="timeseries" className="text-xs">Séries Temp.</TabsTrigger>
-                <TabsTrigger value="correlation" className="text-xs">Correlação</TabsTrigger>
-                <TabsTrigger value="clusters" className="text-xs">Clusters</TabsTrigger>
+                <TabsTrigger value="volatility" className="text-xs font-bold rounded-lg">Volatilidade</TabsTrigger>
+                <TabsTrigger value="logistic" className="text-xs font-bold rounded-lg">Regressão</TabsTrigger>
+                <TabsTrigger value="timeseries" className="text-xs font-bold rounded-lg">Séries Temp.</TabsTrigger>
+                <TabsTrigger value="correlation" className="text-xs font-bold rounded-lg">Correlação</TabsTrigger>
+                <TabsTrigger value="clusters" className="text-xs font-bold rounded-lg">Clusters</TabsTrigger>
               </TabsList>
 
               {/* Integrated Score */}
