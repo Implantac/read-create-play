@@ -206,11 +206,16 @@ export function runMassiveSimulation(
     roi: Math.round(p.expectedValue * 100) / 100,
   }));
 
+  const robustnessScore = Math.round(
+    (performances.reduce((acc, p) => acc + p.consistency, 0) / Math.max(1, performances.length)) * 100
+  );
+
   return {
     totalIterations: simConfig.iterations,
     elapsedMs: Math.round(performance.now() - start),
     performances,
     convergenceData,
     yearlyProjection,
+    robustnessScore,
   };
 }
