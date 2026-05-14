@@ -90,19 +90,27 @@ function exportCSV(entry: BacktestHistoryEntry) {
 
 function exportPDF(entry: BacktestHistoryEntry) {
   const date = new Date(entry.timestamp).toLocaleString("pt-BR");
-  const rowsHtml = entry.results.map((r, i) => `
-    <tr style="border-bottom: 1px solid #eee;">
-      <td style="padding: 8px; text-align: center;">${i + 1}</td>
-      <td style="padding: 8px; font-weight: bold;">${r.label}</td>
-      <td style="padding: 8px; text-align: center;">${r.avgHits}</td>
-      <td style="padding: 8px; text-align: center;">${r.bestHit}</td>
-      <td style="padding: 8px; text-align: center;">${r.winRate}%</td>
-      <td style="padding: 8px; text-align: center;">${r.profit}x</td>
-      <td style="padding: 8px; text-align: center;">${Math.round(r.consistency * 100)}%</td>
-    </tr>
-  `).join("");
+  const fileName = `relatorio-backtest-${entry.lotteryId}-${entry.id}.pdf`;
+  const rowsHtml = entry.results.map((r, i) => {
+    const strategyInfo = STRATEGIES.find(s => s.id === r.strategy);
+    const modelLabel = strategyInfo?.category === "ai" ? "Machine Learning" : "Estatística";
+    
+    return `
+      <tr style="border-bottom: 1px solid #eee;">
+        <td style="padding: 8px; text-align: center;">${i + 1}</td>
+        <td style="padding: 8px;">${modelLabel}</td>
+        <td style="padding: 8px; font-weight: bold;">${r.label}</td>
+        <td style="padding: 8px; text-align: center;">${r.avgHits}</td>
+        <td style="padding: 8px; text-align: center;">${r.bestHit}</td>
+        <td style="padding: 8px; text-align: center;">${r.winRate}%</td>
+        <td style="padding: 8px; text-align: center;">${r.profit}x</td>
+        <td style="padding: 8px; text-align: center;">${Math.round(r.consistency * 100)}%</td>
+      </tr>
+    `;
+  }).join("");
+  
   const html = `
-    <html><head><title>Backtest - ${entry.lotteryName}</title>
+    <html><head><title>${fileName}</title>
     <style>
       body { font-family: sans-serif; color: #333; padding: 20px; }
       h1 { color: #22c55e; margin-bottom: 5px; }
@@ -111,12 +119,14 @@ function exportPDF(entry: BacktestHistoryEntry) {
       th { background: #f8f9fa; padding: 10px 8px; text-align: left; font-size: 12px; border-bottom: 2px solid #ddd; }
       td { font-size: 11px; padding: 8px; }
       .meta { font-size: 12px; color: #666; margin-bottom: 20px; }
+      .filename { font-family: monospace; font-size: 10px; color: #999; margin-top: 40px; border-top: 1px solid #eee; padding-top: 10px; }
     </style></head><body>
       <div class="header">
         <h1>Titan Loterias - Relatório de Backtest</h1>
         <p>Gerado em ${date}</p>
       </div>
       <div class="meta">
+        <strong>Arquivo:</strong> ${fileName}<br>
         <strong>Loteria:</strong> ${entry.lotteryName}<br>
         <strong>Janela:</strong> ${entry.testWindow} sorteios<br>
         <strong>Apostas por sorteio:</strong> ${entry.betsPerDraw}<br>
@@ -124,10 +134,11 @@ function exportPDF(entry: BacktestHistoryEntry) {
       </div>
       <table>
         <thead><tr>
-          <th>#</th><th>Estratégia</th><th>Média</th><th>Melhor</th><th>Win Rate</th><th>ROI</th><th>Consistência</th>
+          <th>#</th><th>Modelo</th><th>Estratégia</th><th>Média</th><th>Melhor</th><th>Win Rate</th><th>ROI</th><th>Consistência</th>
         </tr></thead>
         <tbody>${rowsHtml}</tbody>
       </table>
+      <div class="filename">ID do Documento: ${entry.id} | Nome do Arquivo Sugerido: ${fileName}</div>
     </body></html>
   `;
   const win = window.open("", "_blank");
