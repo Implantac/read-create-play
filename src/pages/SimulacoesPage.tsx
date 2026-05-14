@@ -10,7 +10,8 @@ import { ComparativeSimulatorPanel } from "@/components/ComparativeSimulatorPane
 import { VolatilitySimulationPanel } from "@/components/VolatilitySimulationPanel";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { FlaskConical, Loader2, TrendingUp, Cpu, BarChart3, Layers, Activity } from "lucide-react";
+import { FlaskConical, Loader2, TrendingUp, Cpu, BarChart3, Layers, Activity, Brain } from "lucide-react";
+import { AdvancedAnalyticsPanel } from "@/components/AdvancedAnalyticsPanel";
 
 const HistoricalSimulatorPanel = lazy(() => import("@/components/HistoricalSimulatorPanel").then(m => ({ default: m.HistoricalSimulatorPanel })));
 const MassiveSimulationDashboard = lazy(() => import("@/components/MassiveSimulationDashboard").then(m => ({ default: m.MassiveSimulationDashboard })));
@@ -96,6 +97,7 @@ const SimulacoesPage = () => {
               </Card>
             </div>
 
+            <AdvancedAnalyticsPanel stats={stats} draws={draws} config={config} />
             <VolatilitySimulationPanel lotteryId={config.id} draws={draws} />
             <ComparativeSimulatorPanel stats={stats} config={config} draws={draws} />
 

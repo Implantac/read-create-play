@@ -30,16 +30,20 @@ export function AppLayout() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background gradient-mesh">
+      <div className="min-h-screen flex w-full bg-background selection:bg-primary/20">
+        <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
+        <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-accent/5 via-transparent to-transparent pointer-events-none" />
+        
         <AppSidebar />
-        <div className="flex-1 flex flex-col min-w-0">
+        
+        <div className="flex-1 flex flex-col min-w-0 relative">
           {/* Header */}
-          <header className="border-b border-border/50 glass-panel sticky top-0 z-50">
+          <header className="border-b border-border/40 bg-background/80 backdrop-blur-xl sticky top-0 z-50">
             {/* Top row - brand + actions */}
-            <div className="h-14 flex items-center gap-3 px-4">
-              <SidebarTrigger className="shrink-0 text-muted-foreground hover:text-foreground" />
+            <div className="h-16 flex items-center gap-3 px-4 sm:px-6">
+              <SidebarTrigger className="shrink-0 text-muted-foreground hover:text-primary transition-colors hover:bg-primary/10 rounded-lg p-2" />
               
-              <div className="w-px h-6 bg-border/50 hidden sm:block" />
+              <div className="w-px h-6 bg-border/40 hidden sm:block" />
 
               {/* Lottery selector - scrollable on mobile */}
               <div className="flex-1 overflow-x-auto scrollbar-hide">
@@ -88,13 +92,18 @@ export function AppLayout() {
                 {/* User menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="gap-2 hover:bg-muted/50 px-1.5">
-                      <div className="w-8 h-8 rounded-full gradient-brand flex items-center justify-center shadow-md shadow-primary/10">
+                    <Button variant="ghost" size="sm" className="gap-2.5 hover:bg-muted/50 px-2 rounded-xl transition-all border border-transparent hover:border-border/30">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20 border border-white/10">
                         <User className="w-4 h-4 text-primary-foreground" />
                       </div>
-                      <span className="hidden md:inline text-xs text-muted-foreground max-w-[100px] truncate">
-                        {profile?.full_name || user?.email?.split("@")[0] || "Usuário"}
-                      </span>
+                      <div className="hidden md:flex flex-col items-start leading-none">
+                        <span className="text-[11px] font-bold text-foreground">
+                          {profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "Usuário"}
+                        </span>
+                        <span className="text-[9px] text-muted-foreground uppercase tracking-wider font-semibold">
+                          {profile?.plan || "Free"}
+                        </span>
+                      </div>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-60 glass-card">

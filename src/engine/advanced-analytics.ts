@@ -460,3 +460,63 @@ export function computeIntegratedScores(
     };
   }).sort((a, b) => b.finalScore - a.finalScore);
 }
+
+// ═══════════════════════════════════════════════════════
+// 6. VOLATILIDADE E SENTIMENTO — Métricas de Risco e Comportamento
+// ═══════════════════════════════════════════════════════
+
+export interface VolatilityStats {
+  number: number;
+  volatility: number; // 0-1 (higher means more unstable frequency)
+  stability: number; // 1 - volatility
+  sentiment: "Bullish" | "Bearish" | "Neutral"; // Trend direction
+  riskScore: number; // Combined risk index
+}
+
+export function computeVolatilityAndSentiment(
+  draws: DrawResult[],
+  config: LotteryConfig,
+  windowSize: number = 30
+): VolatilityStats[] {
+  const numWindows = Math.floor(draws.length / 10);
+  if (numWindows < 3) return [];
+
+  return Array.from({ length: config.numbers }, (_, i) => {
+    const n = i + 1;
+    const windowFrequencies: number[] = [];
+    
+    // Calculate frequency across sliding windows
+    for (let w = 0; w < numWindows; w++) {
+      const window = draws.slice(w * 10, (w + 1) * 10);
+      const freq = window.filter(d => d.numbers.includes(n)).length;
+      windowFrequencies.push(freq);
+    }
+
+    const mean = windowFrequencies.reduce((a, b) => a + b, 0) / windowFrequencies.length;
+    const variance = windowFrequencies.reduce((s, f) => s + (f - mean) ** 2, 0) / windowFrequencies.length;
+    const stdDev = Math.sqrt(variance);
+    
+    // Normalized volatility (0 to 1)
+    const volatility = Math.min(1, stdDev / (mean || 1));
+    
+    // Sentiment based on last 2 windows trend
+    const recent = windowFrequencies.slice(0, 2);
+    const prev = windowFrequencies.slice(2, 4);
+    const recentAvg = recent.length > 0 ? recent.reduce((a, b) => a + b, 0) / recent.length : 0;
+    const prevAvg = prev.length > 0 ? prev.reduce((a, b) => a + b, 0) / prev.length : 0;
+    
+    let sentiment: "Bullish" | "Bearish" | "Neutral" = "Neutral";
+    if (recentAvg > prevAvg * 1.2) sentiment = "Bullish";
+    else if (recentAvg < prevAvg * 0.8) sentiment = "Bearish";
+
+    const riskScore = (volatility * 50) + (mean < 0.1 ? 30 : 0) + (sentiment === "Bearish" ? 20 : 0);
+
+    return {
+      number: n,
+      volatility,
+      stability: 1 - volatility,
+      sentiment,
+      riskScore: Math.min(100, riskScore),
+    };
+  }).sort((a, b) => b.volatility - a.volatility);
+}

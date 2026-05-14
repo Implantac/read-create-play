@@ -8,6 +8,7 @@ import { StatsCard } from "@/components/StatsCard";
 import { computeFrequencyStats, computeSumDistribution } from "@/engine/statistics";
 import { PieChart, Flame, Snowflake, TrendingUp, BarChart3, Clock, Target, Sigma, Filter, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AdvancedAnalyticsPanel } from "@/components/AdvancedAnalyticsPanel";
 
 const FrequencyChart = lazy(() => import("@/components/FrequencyChart").then(m => ({ default: m.FrequencyChart })));
 const HeatmapGrid = lazy(() => import("@/components/HeatmapGrid").then(m => ({ default: m.HeatmapGrid })));
@@ -153,6 +154,9 @@ const EstatisticasPage = () => {
         <StatsCard title="Menos Sorteado" value={leastFrequent ? `${String(leastFrequent.number).padStart(2,'0')} (${leastFrequent.frequency}x)` : '-'} icon={Snowflake} color="blue" subtitle="Número mais raro" />
         <StatsCard title="Soma Média" value={avgSum} icon={Sigma} color="amber" subtitle="Soma das dezenas" />
       </div>
+
+      {/* Data Science Engine */}
+      <AdvancedAnalyticsPanel stats={stats} draws={filteredDraws} config={config} />
 
       {/* Charts */}
       <div className="grid lg:grid-cols-2 gap-6">
