@@ -466,64 +466,6 @@ export default function StrategyLabPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="space-y-2.5">
-                    <label className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
-                      <Hash className="w-3 h-3" />
-                      Jogos por Estratégia
-                    </label>
-                    <Slider
-                      value={[gamesPerStrategy]}
-                      onValueChange={([v]) => { setGamesPerStrategy(v); setResult(null); }}
-                      min={3}
-                      max={30}
-                      step={1}
-                    />
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-muted-foreground">3</span>
-                      <span className="text-sm font-mono font-black text-primary">{gamesPerStrategy}</span>
-                      <span className="text-[10px] text-muted-foreground">30</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2.5">
-                    <label className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
-                      <Target className="w-3 h-3" />
-                      Perfil de Análise
-                    </label>
-                    <Select value={profile} onValueChange={(v) => { setProfile(v as EvolutionProfile); setResult(null); }}>
-                      <SelectTrigger className="h-10 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(PROFILE_INFO).map(([k, v]) => (
-                          <SelectItem key={k} value={k} className="text-xs">
-                            <div className="flex items-center gap-2">
-                              <v.icon className={`w-3.5 h-3.5 ${v.color}`} />
-                              <span className="font-medium">{v.label}</span>
-                              <span className="text-muted-foreground">— {v.desc}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2.5">
-                    <label className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
-                      <BarChart3 className="w-3 h-3" />
-                      Base de Dados
-                    </label>
-                    <div className="p-3 rounded-xl bg-muted/15 border border-border">
-                      <div className="text-sm font-mono font-bold text-foreground">
-                        {draws?.length.toLocaleString() || 0} sorteios
-                      </div>
-                      <div className="text-[10px] text-muted-foreground mt-0.5">
-                        Concurso #{drawRange[0]} → #{drawRange[1]}
-                      </div>
-                    </div>
-                  </div>
-                </div>
 
                 {/* Run button */}
                 <div className="space-y-3">
