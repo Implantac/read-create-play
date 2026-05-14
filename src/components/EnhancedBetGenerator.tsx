@@ -36,6 +36,7 @@ const ICON_MAP: Record<Strategy, typeof Sparkles> = {
   markov: Zap,
   poisson: Binary,
   cluster: Boxes,
+  expert: Star,
 };
 
 const CATEGORY_LABELS = { basic: "Básicas", math: "Matemáticas", ai: "Inteligência Artificial" };
