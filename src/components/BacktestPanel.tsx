@@ -8,7 +8,7 @@ import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { STRATEGIES, Strategy } from "@/engine/strategies";
 import { runBacktest, BacktestResult } from "@/engine/backtesting";
 import { motion, AnimatePresence } from "framer-motion";
-import { FlaskConical, Play, Trophy, TrendingUp, Zap } from "lucide-react";
+import { FlaskConical, Play, Trophy, TrendingUp, Zap, FileDown } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, Cell,
 } from "recharts";
@@ -140,6 +140,53 @@ export function BacktestPanel({ stats, config, draws }: Props) {
           {running ? <Zap className="w-4 h-4 animate-pulse" /> : <Play className="w-4 h-4" />}
           {running ? "Executando backtesting..." : `Testar ${selectedStrategies.length} estratégias × ${testWindow} sorteios`}
         </Button>
+
+        {results && (
+          <div className="flex gap-2 mb-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex-1 text-[10px] h-8 gap-1.5"
+              onClick={() => {
+                const headers = ["Estratégia", "Loteria", "Janela", "Média Acertos", "Melhor Acerto", "Win Rate (%)", "ROI", "Consistência (%)"];
+                const rows = results.map(r => [
+                  r.label,
+                  config.name,
+                  `${testWindow} sorteios`,
+                  r.avgHits,
+                  r.bestHit,
+                  r.winRate,
+                  r.profit,
+                  Math.round(r.consistency * 100)
+                ]);
+                const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.setAttribute("download", `backtest-${config.id}-${Date.now()}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                toast.success("CSV exportado com sucesso!");
+              }}
+            >
+              <FileDown className="w-3 h-3" />
+              Exportar CSV
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex-1 text-[10px] h-8 gap-1.5"
+              onClick={() => {
+                window.print();
+                toast.success("Preparando PDF para impressão...");
+              }}
+            >
+              <FileDown className="w-3 h-3" />
+              Exportar PDF
+            </Button>
+          </div>
+        )}
 
         <AnimatePresence>
           {results && (
