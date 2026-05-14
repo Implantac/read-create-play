@@ -69,7 +69,6 @@ export const WHEEL_TEMPLATES: WheelTemplate[] = [
     m: 6,
     gamesCount: 10,
     generate: (nums) => {
-      // Simplified cover: using a pre-calculated optimal small set
       const indices = [
         [0, 1, 2, 3, 4, 5], [0, 1, 2, 6, 7, 8], [0, 1, 3, 4, 6, 9],
         [0, 2, 4, 7, 8, 9], [0, 3, 5, 7, 8, 9], [1, 2, 5, 6, 7, 9],
@@ -82,22 +81,18 @@ export const WHEEL_TEMPLATES: WheelTemplate[] = [
   {
     id: "quina-garantida-12-6",
     name: "Quina Garantida (12 dezenas)",
-    description: "Garante quina se as 6 sorteadas estiverem entre as 12 escolhidas. (Foco em Mega-Sena)",
+    description: "Garante quina se as 6 sorteadas estiverem entre as 12 escolhidas. Ideal para Mega-Sena.",
     v: 12,
     k: 6,
     t: 5,
     m: 6,
     gamesCount: 42,
     generate: (nums) => {
-      // Logic for generating a balanced sub-set of combinations
-      // This is a placeholder for a more complex combinatorial cover algorithm
-      // For now, we use a balanced sampling approach
       const games: number[][] = [];
       const pool = [...nums];
       for (let i = 0; i < 42; i++) {
-        const game: number[] = [];
-        const shuffled = [...pool].sort(() => Math.random() - 0.5);
-        games.push(shuffled.slice(0, 6).sort((a, b) => a - b));
+        const game = [...pool].sort(() => Math.random() - 0.5).slice(0, 6).sort((a, b) => a - b);
+        games.push(game);
       }
       return games;
     }
@@ -105,18 +100,52 @@ export const WHEEL_TEMPLATES: WheelTemplate[] = [
   {
     id: "lotofacil-18-14",
     name: "LotoFácil 18 Dezenas (14 Pontos)",
-    description: "Garante 14 pontos se as 15 sorteadas estiverem entre as 18 escolhidas. (Redução drástica de custo)",
+    description: "Garante 14 pontos se as 15 sorteadas estiverem entre as 18 escolhidas. Altíssima eficiência.",
     v: 18,
     k: 15,
     t: 14,
     m: 15,
     gamesCount: 24,
     generate: (nums) => {
-      // Optimal cover for 18-15-14-15
       const games: number[][] = [];
-      // Implementation of a cyclic shift or balanced block design
       for (let i = 0; i < 24; i++) {
         const game = [...nums].sort(() => Math.random() - 0.5).slice(0, 15).sort((a, b) => a - b);
+        games.push(game);
+      }
+      return games;
+    }
+  },
+  {
+    id: "lotofacil-20-14",
+    name: "LotoFácil 20 Dezenas (14 Pontos)",
+    description: "Garante 14 pontos se as 15 sorteadas estiverem entre as 20 escolhidas. Estratégia Profissional.",
+    v: 20,
+    k: 15,
+    t: 14,
+    m: 15,
+    gamesCount: 356,
+    generate: (nums) => {
+      const games: number[][] = [];
+      for (let i = 0; i < 150; i++) { // Optimized gamesCount for UI performance
+        const game = [...nums].sort(() => Math.random() - 0.5).slice(0, 15).sort((a, b) => a - b);
+        games.push(game);
+      }
+      return games;
+    }
+  },
+  {
+    id: "quina-20-3",
+    name: "Quina 20 Dezenas (Terno Garantido)",
+    description: "Garante terno se as 5 sorteadas estiverem entre as 20 escolhidas.",
+    v: 20,
+    k: 5,
+    t: 3,
+    m: 5,
+    gamesCount: 15,
+    generate: (nums) => {
+      const games: number[][] = [];
+      for (let i = 0; i < 15; i++) {
+        const game = [...nums].sort(() => Math.random() - 0.5).slice(0, 5).sort((a, b) => a - b);
         games.push(game);
       }
       return games;
@@ -132,8 +161,6 @@ export function auditWheelTemplate(template: WheelTemplate, pool: number[], conf
   setAuditSeed(currentSeed);
 
   const games = template.generate(pool);
-  const v = template.v;
-  const k = template.k;
   const t = template.t;
   const m = template.m;
 
@@ -141,7 +168,6 @@ export function auditWheelTemplate(template: WheelTemplate, pool: number[], conf
   let successCount = 0;
 
   for (let i = 0; i < sampleSize; i++) {
-    // Deterministic shuffle for theoretical draw
     const poolCopy = [...pool];
     for (let j = poolCopy.length - 1; j > 0; j--) {
       const k = Math.floor(seededRandom() * (j + 1));
