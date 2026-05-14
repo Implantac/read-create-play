@@ -92,13 +92,18 @@ export function AppLayout() {
                 {/* User menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="gap-2 hover:bg-muted/50 px-1.5">
-                      <div className="w-8 h-8 rounded-full gradient-brand flex items-center justify-center shadow-md shadow-primary/10">
+                    <Button variant="ghost" size="sm" className="gap-2.5 hover:bg-muted/50 px-2 rounded-xl transition-all border border-transparent hover:border-border/30">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20 border border-white/10">
                         <User className="w-4 h-4 text-primary-foreground" />
                       </div>
-                      <span className="hidden md:inline text-xs text-muted-foreground max-w-[100px] truncate">
-                        {profile?.full_name || user?.email?.split("@")[0] || "Usuário"}
-                      </span>
+                      <div className="hidden md:flex flex-col items-start leading-none">
+                        <span className="text-[11px] font-bold text-foreground">
+                          {profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "Usuário"}
+                        </span>
+                        <span className="text-[9px] text-muted-foreground uppercase tracking-wider font-semibold">
+                          {profile?.plan || "Free"}
+                        </span>
+                      </div>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-60 glass-card">
