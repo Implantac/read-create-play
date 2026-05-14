@@ -449,7 +449,7 @@ export default function StrategyLabPage() {
                       <div className="space-y-2">
                         <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block mb-1">Perfil Evolutivo</span>
                         <div className="grid grid-cols-3 gap-1">
-                          {(["conservador", "equilibrado", "agressivo"] as const).map(p => (
+                          {(["economico", "equilibrado", "agressivo"] as const).map(p => (
                             <Button
                               key={p}
                               variant={profile === p ? "default" : "outline"}
