@@ -144,16 +144,17 @@ export function BacktestPanel({ stats, config, draws }: Props) {
 
         {results && (
           <div className="flex gap-2 mb-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               className="flex-1 text-[10px] h-8 gap-1.5"
               onClick={() => {
-                const headers = ["Estratégia", "Loteria", "Janela", "Média Acertos", "Melhor Acerto", "Win Rate (%)", "ROI", "Consistência (%)"];
+                const headers = ["Estratégia", "Loteria", "Janela", "Apostas/Sorteio", "Média Acertos", "Melhor Acerto", "Win Rate (%)", "ROI", "Consistência (%)"];
                 const rows = results.map(r => [
-                  r.label,
-                  config.name,
-                  `${testWindow} sorteios`,
+                  `"${r.label}"`,
+                  `"${config.name}"`,
+                  `"${testWindow} sorteios"`,
+                  `"${betsPerDraw}"`,
                   r.avgHits,
                   r.bestHit,
                   r.winRate,
@@ -161,7 +162,7 @@ export function BacktestPanel({ stats, config, draws }: Props) {
                   Math.round(r.consistency * 100)
                 ]);
                 const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement("a");
                 link.href = URL.createObjectURL(blob);
                 link.setAttribute("download", `backtest-${config.id}-${Date.now()}.csv`);
@@ -174,12 +175,69 @@ export function BacktestPanel({ stats, config, draws }: Props) {
               <FileDown className="w-3 h-3" />
               Exportar CSV
             </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               className="flex-1 text-[10px] h-8 gap-1.5"
               onClick={() => {
-                window.print();
+                const date = new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+                const rowsHtml = results.map((r, i) => `
+                  <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 8px; text-align: center;">${i + 1}</td>
+                    <td style="padding: 8px; font-weight: bold;">${r.label}</td>
+                    <td style="padding: 8px; text-align: center;">${r.avgHits}</td>
+                    <td style="padding: 8px; text-align: center;">${r.bestHit}</td>
+                    <td style="padding: 8px; text-align: center;">${r.winRate}%</td>
+                    <td style="padding: 8px; text-align: center;">${r.profit}x</td>
+                    <td style="padding: 8px; text-align: center;">${Math.round(r.consistency * 100)}%</td>
+                  </tr>
+                `).join("");
+
+                const html = `
+                  <html>
+                    <head>
+                      <title>Backtest - ${config.name}</title>
+                      <style>
+                        body { font-family: sans-serif; color: #333; padding: 20px; }
+                        h1 { color: #22c55e; margin-bottom: 5px; }
+                        .header { border-bottom: 2px solid #22c55e; padding-bottom: 10px; margin-bottom: 20px; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th { background: #f8f9fa; padding: 10px 8px; text-align: left; font-size: 12px; border-bottom: 2px solid #ddd; }
+                        td { font-size: 11px; padding: 8px; }
+                        .meta { font-size: 12px; color: #666; margin-bottom: 20px; }
+                      </style>
+                    </head>
+                    <body>
+                      <div class="header">
+                        <h1>Titan Loterias - Relatório de Backtest</h1>
+                        <p>Gerado em ${date}</p>
+                      </div>
+                      <div class="meta">
+                        <strong>Loteria:</strong> ${config.name}<br>
+                        <strong>Janela:</strong> ${testWindow} sorteios<br>
+                        <strong>Apostas por sorteio:</strong> ${betsPerDraw}
+                      </div>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>Estratégia</th>
+                            <th>Média</th>
+                            <th>Melhor</th>
+                            <th>Win Rate</th>
+                            <th>ROI</th>
+                            <th>Consistência</th>
+                          </tr>
+                        </thead>
+                        <tbody>${rowsHtml}</tbody>
+                      </table>
+                    </body>
+                  </html>
+                `;
+                const win = window.open("", "_blank");
+                win?.document.write(html);
+                win?.document.close();
+                setTimeout(() => win?.print(), 500);
                 toast.success("Preparando PDF para impressão...");
               }}
             >
