@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { NumberStats } from "@/engine/statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { STRATEGIES, Strategy } from "@/engine/strategies";
-import type { MassiveSimResult } from "@/engine/massive-simulator";
+import type { MonteCarloResult } from "@/engine/massive-simulator";
 import MonteCarloWorker from "@/workers/monte-carlo.worker?worker";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -46,7 +46,7 @@ export function MassiveSimulatorPanel({ stats, config, draws }: Props) {
   const [selectedStrategies, setSelectedStrategies] = useState<Strategy[]>(["smart", "hot", "cycle", "hybrid"]);
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [result, setResult] = useState<MassiveSimResult | null>(null);
+  const [result, setResult] = useState<MonteCarloResult | null>(null);
   const workerRef = useRef<Worker | null>(null);
 
   // Reset state when lottery changes
@@ -86,7 +86,7 @@ export function MassiveSimulatorPanel({ stats, config, draws }: Props) {
       if (type === "progress") {
         setProgress(Math.round((data.completed / data.total) * 100));
       } else if (type === "result") {
-        setResult(data as MassiveSimResult);
+        setResult(data as MonteCarloResult);
         setProgress(100);
         setRunning(false);
         worker.terminate();
