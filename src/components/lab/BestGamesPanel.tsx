@@ -291,7 +291,7 @@ export function BestGamesPanel({ rankedGames, lotteryId, lotteryName, pick, maxN
         <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500/30 border border-emerald-500/30" />Q2</span>
         <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-amber-500/30 border border-amber-500/30" />Q3</span>
         <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-rose-500/30 border border-rose-500/30" />Q4</span>
-        <span className="text-muted-foreground/60">— faixas numéricas</span>
+        <span className="text-muted-foreground">— faixas numéricas</span>
       </div>
 
       {/* Remaining Games List (after top 3) */}

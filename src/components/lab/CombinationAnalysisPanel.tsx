@@ -84,7 +84,7 @@ export function CombinationAnalysisPanel({ analysis, maxNum }: { analysis: Combi
             {heatmapData.map(d => {
               const intensity = d.pct;
               const bg = intensity === 0
-                ? "bg-muted/20 text-muted-foreground/40"
+                ? "bg-muted/20 text-muted-foreground"
                 : intensity >= 80
                   ? "bg-primary/80 text-primary-foreground"
                   : intensity >= 60
