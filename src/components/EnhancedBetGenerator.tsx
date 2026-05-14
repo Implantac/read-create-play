@@ -37,6 +37,12 @@ const ICON_MAP: Record<Strategy, typeof Sparkles> = {
   poisson: Binary,
   cluster: Boxes,
   expert: Star,
+  quantum: Zap,
+  randomForest: Binary,
+  xgboost: TrendingUp,
+  lstm: Activity,
+  bayesian: Target,
+  markov_model: RefreshCw,
 };
 
 const CATEGORY_LABELS = { basic: "Básicas", math: "Matemáticas", ai: "Inteligência Artificial" };
