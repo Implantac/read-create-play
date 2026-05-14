@@ -335,6 +335,38 @@ export function runMarkovChain(stats: NumberStats[], config: LotteryConfig): Mod
 
 // ═══════════════════════════════════════════════════════
 // ENSEMBLE — weights calibrated by backtesting performance
+// Quantum Analysis — Multi-dimensional pattern detection
+export function runQuantumAnalysis(stats: NumberStats[], config: LotteryConfig): ModelResult {
+  const scored: MLPrediction[] = stats.map(s => {
+    const frequencyEnergy = Math.log10(s.frequency + 1) * 20;
+    const timeDecay = Math.exp(-s.lastSeen * 0.05) * 15;
+    const cycleResonance = s.cycleScore > 1.2 ? Math.pow(s.cycleScore, 1.5) * 8 : 0;
+    const momentumSpin = Math.tanh(s.momentum * 0.1) * 10;
+    const gapEntanglement = s.stdDev < s.avgGap * 0.4 ? 12 : 0;
+    const positionWave = Math.sin((s.number / config.numbers) * Math.PI * 4) * 5;
+    const hotColdInteraction = s.status === "hot" ? 10 : s.status === "cold" ? 5 : 0;
+
+    const raw = Math.max(0, frequencyEnergy + timeDecay + cycleResonance + momentumSpin + gapEntanglement + positionWave + hotColdInteraction);
+
+    return {
+      number: s.number,
+      score: raw,
+      rank: 0,
+      model: "Quantum",
+      breakdown: buildBreakdown(frequencyEnergy, timeDecay, momentumSpin, cycleResonance, momentumSpin, gapEntanglement, positionWave + hotColdInteraction),
+    };
+  });
+
+  normalizeAndRank(scored);
+  return {
+    name: "Análise Quantum",
+    description: "Detecção de padrões multi-dimensionais usando ressonância de ciclos e estados estatísticos",
+    predictions: scored,
+    accuracy: 0,
+    confidence: 0,
+  };
+}
+
 // ═══════════════════════════════════════════════════════
 
 export function runEnsembleVoting(stats: NumberStats[], config: LotteryConfig, modelWeights?: Record<string, number>): ModelResult {
