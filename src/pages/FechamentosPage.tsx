@@ -318,7 +318,7 @@ export default function FechamentosPage() {
                           isSelected
                             ? "bg-primary text-primary-foreground border-primary shadow-sm"
                             : isFull
-                            ? "bg-muted/20 text-muted-foreground/30 border-transparent cursor-not-allowed"
+                            ? "bg-muted/20 text-muted-foreground border-transparent cursor-not-allowed"
                             : "bg-muted/10 text-foreground border-border hover:border-primary/50 hover:bg-primary/5"
                         }`}
                       >

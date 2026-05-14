@@ -136,7 +136,7 @@ export function AppLayout() {
 
           {/* Footer */}
           <footer className="border-t border-border/30 py-3">
-            <div className="container mx-auto px-4 flex items-center justify-center gap-2 text-[10px] text-muted-foreground/60">
+            <div className="container mx-auto px-4 flex items-center justify-center gap-2 text-[10px] text-muted-foreground">
               <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-pulse" />
               <span className="font-mono tracking-wider uppercase">Titan Loterias — Motor v4.0 • ML • Database</span>
             </div>

@@ -208,7 +208,7 @@ export default function SignupPage() {
           </form>
         </Card>
 
-        <p className="text-center text-[10px] text-muted-foreground/40 mt-4 font-mono uppercase tracking-widest">
+        <p className="text-center text-[10px] text-muted-foreground mt-4 font-mono uppercase tracking-widest">
           Motor estatístico v4.0 • ML • Database
         </p>
       </motion.div>

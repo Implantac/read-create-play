@@ -36,7 +36,7 @@ function BreakdownBar({ breakdown }: { breakdown?: ScoreBreakdown }) {
 
 function BacktestBadge({ model }: { model: ModelResult }) {
   if (!model.backtestDetails || model.backtestDetails.totalDrawsTested === 0) {
-    return <span className="text-[10px] text-muted-foreground/60 italic">sem backtesting</span>;
+    return <span className="text-[10px] text-muted-foreground italic">sem backtesting</span>;
   }
   const bt = model.backtestDetails;
   const liftColor = bt.liftOverChance >= 1.3 ? "text-emerald-500" : bt.liftOverChance >= 1.1 ? "text-amber-500" : "text-muted-foreground";

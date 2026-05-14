@@ -130,7 +130,7 @@ export default function LoginPage() {
                   <span className="w-full border-t border-border/30" />
                 </div>
                 <div className="relative flex justify-center text-[10px] uppercase tracking-widest">
-                  <span className="bg-card px-3 text-muted-foreground/50">ou</span>
+                  <span className="bg-card px-3 text-muted-foreground">ou</span>
                 </div>
               </div>
 
@@ -154,7 +154,7 @@ export default function LoginPage() {
           </form>
         </Card>
 
-        <p className="text-center text-[10px] text-muted-foreground/40 mt-4 font-mono uppercase tracking-widest">
+        <p className="text-center text-[10px] text-muted-foreground mt-4 font-mono uppercase tracking-widest">
           Motor estatístico v4.0 • ML • Database
         </p>
       </motion.div>

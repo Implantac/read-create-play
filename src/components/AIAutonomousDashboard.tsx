@@ -1273,7 +1273,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <Brain className="mx-auto h-12 w-12 text-muted-foreground/30 mb-4" />
+                  <Brain className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                   <p className="text-muted-foreground mb-4">
                     Clique abaixo para a IA analisar todos os dados e gerar 10 jogos otimizados para o prêmio principal.
                   </p>

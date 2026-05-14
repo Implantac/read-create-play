@@ -1,4 +1,5 @@
 import { lazy, Suspense } from "react";
+import { Helmet } from "react-helmet-async";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PlanGate } from "@/components/PlanGate";
 import { EmptyState } from "@/components/EmptyState";
@@ -28,6 +29,14 @@ const EstrategiasPage = () => {
 
   return (
     <div className="space-y-6">
+      <Helmet>
+        <title>Estratégias de IA — Titan Loterias</title>
+        <meta name="description" content="Módulos avançados de Machine Learning, Redes Bayesianas e Otimização Genética para aumentar suas probabilidades matemáticas." />
+        <link rel="canonical" href="https://titanloterias.lovable.app/estrategias" />
+        <meta property="og:title" content="Estratégias de IA — Titan Loterias" />
+        <meta property="og:description" content="Machine Learning e Redes Bayesianas para loterias." />
+        <meta property="og:url" content="https://titanloterias.lovable.app/estrategias" />
+      </Helmet>
       {/* Enhanced Header */}
       <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/8 via-background to-accent/5 p-6 md:p-8">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />

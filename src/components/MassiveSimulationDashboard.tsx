@@ -458,7 +458,7 @@ function GameCard({ game, rank, config, drawCount }: {
   const prizeRate = (game.prizeCount / drawCount * 100).toFixed(1);
   const medalColors: Record<number, string> = {
     1: "text-yellow-400",
-    2: "text-gray-300",
+    2: "text-gray-500",
     3: "text-amber-600",
   };
 

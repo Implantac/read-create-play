@@ -515,7 +515,7 @@ function MetricCard({ label, value, sub, accent }: { label: string; value: strin
     <div className="p-3 rounded-xl bg-muted/10 border border-border text-center">
       <div className={`text-lg font-black font-mono ${accent ? "text-accent" : "text-foreground"}`}>{value}</div>
       <div className="text-[10px] text-muted-foreground font-medium">{label}</div>
-      <div className="text-[9px] text-muted-foreground/60">{sub}</div>
+      <div className="text-[9px] text-muted-foreground">{sub}</div>
     </div>
   );
 }

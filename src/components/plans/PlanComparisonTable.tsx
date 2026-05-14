@@ -29,7 +29,7 @@ function CellIcon({ available }: { available: boolean }) {
       <Check className="w-3 h-3 text-primary" />
     </div>
   ) : (
-    <X className="w-4 h-4 text-muted-foreground/30 mx-auto" />
+    <X className="w-4 h-4 text-muted-foreground mx-auto" />
   );
 }
 

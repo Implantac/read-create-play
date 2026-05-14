@@ -430,7 +430,7 @@ export function VolatilitySimulationPanel({ lotteryId, draws }: Props) {
                           {selectedForComparison.includes(s.id) ? (
                             <Check className="w-4 h-4 text-primary" />
                           ) : (
-                            <Square className="w-4 h-4 text-muted-foreground/30" />
+                            <Square className="w-4 h-4 text-muted-foreground" />
                           )}
                         </div>
                         <div>

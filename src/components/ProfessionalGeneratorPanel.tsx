@@ -249,7 +249,7 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
                         {bet.rank <= 3 ? (
                           <Award className={`w-4 h-4 ${
                             bet.rank === 1 ? "text-yellow-400" :
-                            bet.rank === 2 ? "text-gray-400" :
+                            bet.rank === 2 ? "text-gray-500" :
                             "text-amber-600"
                           }`} />
                         ) : (

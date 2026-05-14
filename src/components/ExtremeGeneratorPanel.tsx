@@ -510,7 +510,7 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
                     {bet.rank <= 3 ? (
                       <Award className={`w-4 h-4 ${
                         bet.rank === 1 ? "text-yellow-400" :
-                        bet.rank === 2 ? "text-gray-400" : "text-amber-600"
+                        bet.rank === 2 ? "text-gray-500" : "text-amber-600"
                       }`} />
                     ) : (
                       <span className="text-xs text-muted-foreground font-mono">#{bet.rank}</span>
@@ -551,7 +551,7 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
                                  {combined}
                                </div>
                                <div className="text-[9px] text-muted-foreground">combinada</div>
-                               <div className="text-[9px] text-muted-foreground/60">{bet.score} + bt</div>
+                               <div className="text-[9px] text-muted-foreground">{bet.score} + bt</div>
                              </div>
                            );
                          })()}

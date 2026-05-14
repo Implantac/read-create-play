@@ -1,4 +1,5 @@
 import { createRoot } from "react-dom/client";
+import { HelmetProvider } from "react-helmet-async";
 import App from "./App.tsx";
 import "./index.css";
 
@@ -116,7 +117,11 @@ if ("serviceWorker" in navigator) {
 // ── Mount app ────────────────────────────────────────────
 const rootEl = document.getElementById("root");
 if (rootEl) {
-  createRoot(rootEl).render(<App />);
+  createRoot(rootEl).render(
+    <HelmetProvider>
+      <App />
+    </HelmetProvider>
+  );
 } else {
   console.warn("[Titan] Root element not found");
 }

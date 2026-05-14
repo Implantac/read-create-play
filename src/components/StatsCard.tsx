@@ -49,7 +49,7 @@ export function StatsCard({ title, value, subtitle, icon: Icon, color = "green" 
       {subtitle && (
         <div className="flex items-center gap-1.5 mt-2 relative z-10">
           <div className={`w-1 h-1 rounded-full ${iconBgMap[color].split(' ')[0]}`} />
-          <p className="text-[11px] font-bold text-muted-foreground/60 tracking-tight">{subtitle}</p>
+          <p className="text-[11px] font-bold text-muted-foreground tracking-tight">{subtitle}</p>
         </div>
       )}
     </div>

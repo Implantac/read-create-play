@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { StatsCard } from "@/components/StatsCard";
 import { FrequencyChart } from "@/components/FrequencyChart";
@@ -84,6 +85,14 @@ const DashboardPage = () => {
 
   return (
     <div className="space-y-6">
+      <Helmet>
+        <title>Dashboard — Titan Loterias</title>
+        <meta name="description" content="Acesse análises estatísticas em tempo real, mapas de calor, tendências e gere jogos inteligentes no seu dashboard personalizado." />
+        <link rel="canonical" href="https://titanloterias.lovable.app/" />
+        <meta property="og:title" content="Dashboard — Titan Loterias" />
+        <meta property="og:description" content="Análises estatísticas e IA para suas apostas." />
+        <meta property="og:url" content="https://titanloterias.lovable.app/" />
+      </Helmet>
       <OnboardingGuide />
       <PageHeader
         title="Dashboard"

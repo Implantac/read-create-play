@@ -63,7 +63,7 @@ export function WorkflowSteps() {
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${step.bg} border border-white/5 shadow-inner`}>
                 <step.icon className={`w-5 h-5 ${step.color}`} />
               </div>
-              <span className="text-[10px] font-black font-mono text-muted-foreground/40 tracking-widest">
+              <span className="text-[10px] font-black font-mono text-muted-foreground tracking-widest">
                 STEP 0{step.number}
               </span>
             </div>

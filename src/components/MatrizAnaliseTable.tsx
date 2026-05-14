@@ -45,7 +45,7 @@ const ScoreBar = ({ score }: { score: number }) => {
 };
 
 const SortIcon = ({ active, asc }: { active: boolean; asc: boolean }) => {
-  if (!active) return <ArrowUpDown className="w-3 h-3 text-muted-foreground/50" />;
+  if (!active) return <ArrowUpDown className="w-3 h-3 text-muted-foreground" />;
   return asc ? <ArrowUp className="w-3 h-3 text-primary" /> : <ArrowDown className="w-3 h-3 text-primary" />;
 };
 
