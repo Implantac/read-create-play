@@ -10,15 +10,8 @@ import { computeAntiPopularityPenalty } from "@/ai/knowledge/jackpotMasterStrate
 // Múltiplas estratégias com scoring, ranking e fechamentos
 // ═══════════════════════════════════════════════════════
 
-export interface ProfessionalBet {
-  numbers: number[];
-  strategy: string;
-  strategyLabel: string;
-  quality: BetQualityReport;
-  statisticalScore: number;
-  probabilityEstimate: number;
-  rank: number;
-}
+import { ProfessionalBet } from "@/types/engine";
+export type { ProfessionalBet };
 
 export interface ClosureConfig {
   baseNumbers: number;   // quantas dezenas o jogador escolhe

@@ -60,14 +60,14 @@ interface LotteryFixture {
 }
 
 const FIXTURES: LotteryFixture[] = [
-  { config: { id: "megasena",   name: "Mega-Sena",   numbers: 60,  pick: 6,  color: "neon-green",  icon: "🍀" }, drawCount: 120, seed: 7,  runUniversal: true },
-  { config: { id: "lotofacil",  name: "Lotofácil",   numbers: 25,  pick: 15, color: "neon-blue",   icon: "🎯" }, drawCount: 120, seed: 11, runUniversal: true },
-  { config: { id: "quina",      name: "Quina",       numbers: 80,  pick: 5,  color: "neon-purple", icon: "🎰" }, drawCount: 120, seed: 17 },
-  { config: { id: "lotomania",  name: "Lotomania",   numbers: 100, pick: 50, color: "neon-orange", icon: "💯" }, drawCount: 80,  seed: 23 },
-  { config: { id: "duplasena",  name: "Dupla Sena",  numbers: 50,  pick: 6,  color: "neon-pink",   icon: "🎲" }, drawCount: 120, seed: 29 },
-  { config: { id: "timemania",  name: "Timemania",   numbers: 80,  pick: 10, color: "neon-cyan",   icon: "⚽" }, drawCount: 100, seed: 31 },
-  { config: { id: "diadesorte", name: "Dia de Sorte",numbers: 31,  pick: 7,  color: "neon-yellow", icon: "🍀" }, drawCount: 100, seed: 37 },
-  { config: { id: "supersete",  name: "Super Sete",  numbers: 10,  pick: 7,  color: "neon-red",    icon: "7️⃣" }, drawCount: 100, seed: 41 },
+  { config: { id: "megasena",   name: "Mega-Sena",   numbers: 60,  pick: 6,  color: "neon-green",  icon: "🍀", betPrice: 5.0, prizeTiers: [] }, drawCount: 120, seed: 7,  runUniversal: true },
+  { config: { id: "lotofacil",  name: "Lotofácil",   numbers: 25,  pick: 15, color: "neon-blue",   icon: "🎯", betPrice: 3.0, prizeTiers: [] }, drawCount: 120, seed: 11, runUniversal: true },
+  { config: { id: "quina",      name: "Quina",       numbers: 80,  pick: 5,  color: "neon-purple", icon: "🎰", betPrice: 2.5, prizeTiers: [] }, drawCount: 120, seed: 17 },
+  { config: { id: "lotomania",  name: "Lotomania",   numbers: 100, pick: 50, color: "neon-orange", icon: "💯", betPrice: 3.0, prizeTiers: [] }, drawCount: 80,  seed: 23 },
+  { config: { id: "duplasena",  name: "Dupla Sena",  numbers: 50,  pick: 6,  color: "neon-pink",   icon: "🎲", betPrice: 2.5, prizeTiers: [] }, drawCount: 120, seed: 29 },
+  { config: { id: "timemania",  name: "Timemania",   numbers: 80,  pick: 10, color: "neon-cyan",   icon: "⚽", betPrice: 3.5, prizeTiers: [] }, drawCount: 100, seed: 31 },
+  { config: { id: "diadesorte", name: "Dia de Sorte",numbers: 31,  pick: 7,  color: "neon-yellow", icon: "🍀", betPrice: 2.5, prizeTiers: [] }, drawCount: 100, seed: 37 },
+  { config: { id: "supersete",  name: "Super Sete",  numbers: 10,  pick: 7,  color: "neon-red",    icon: "7️⃣", betPrice: 2.5, prizeTiers: [] }, drawCount: 100, seed: 41 },
 ];
 
 // ─────────────────────────────────────────────────────────────────

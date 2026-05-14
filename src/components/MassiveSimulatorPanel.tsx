@@ -6,17 +6,20 @@ import { Progress } from "@/components/ui/progress";
 import { NumberStats } from "@/engine/statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { STRATEGIES, Strategy } from "@/engine/strategies";
-import type { MassiveSimResult } from "@/engine/massive-simulator";
+import type { MonteCarloResult } from "@/engine/massive-simulator";
 import MonteCarloWorker from "@/workers/monte-carlo.worker?worker";
 import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
 import {
   Rocket, Play, Trophy, TrendingUp, BarChart3,
-  Calendar, Zap, CheckCircle2
+  Calendar, Zap, CheckCircle2, Brain, Loader2
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
   LineChart, Line, CartesianGrid, Legend,
 } from "recharts";
+
+import { toast } from "sonner";
 
 interface Props {
   stats: NumberStats[];
@@ -46,7 +49,9 @@ export function MassiveSimulatorPanel({ stats, config, draws }: Props) {
   const [selectedStrategies, setSelectedStrategies] = useState<Strategy[]>(["smart", "hot", "cycle", "hybrid"]);
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [result, setResult] = useState<MassiveSimResult | null>(null);
+  const [result, setResult] = useState<MonteCarloResult | null>(null);
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
   const workerRef = useRef<Worker | null>(null);
 
   // Reset state when lottery changes
@@ -54,8 +59,9 @@ export function MassiveSimulatorPanel({ stats, config, draws }: Props) {
   useEffect(() => {
     if (prevLotteryId.current !== config.id) {
       prevLotteryId.current = config.id;
-      setResult(null);
-      setProgress(0);
+    setResult(null);
+    setAiAnalysis(null);
+    setProgress(0);
     }
   }, [config.id]);
 
@@ -86,7 +92,7 @@ export function MassiveSimulatorPanel({ stats, config, draws }: Props) {
       if (type === "progress") {
         setProgress(Math.round((data.completed / data.total) * 100));
       } else if (type === "result") {
-        setResult(data as MassiveSimResult);
+        setResult(data as MonteCarloResult);
         setProgress(100);
         setRunning(false);
         worker.terminate();
@@ -119,6 +125,21 @@ export function MassiveSimulatorPanel({ stats, config, draws }: Props) {
         },
       },
     });
+  };
+
+  const requestAIAnalysis = async () => {
+    if (!result) return;
+    setAiLoading(true);
+    try {
+      await new Promise(r => setTimeout(r, 400));
+      const { generateMonteCarloAnalysis } = await import("@/engine/native-analysis");
+      const analysis = generateMonteCarloAnalysis(result, config);
+      setAiAnalysis(analysis);
+    } catch (e) {
+      toast.error("Erro na análise técnica");
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   // Build chart data for hit distribution comparison
@@ -234,7 +255,39 @@ export function MassiveSimulatorPanel({ stats, config, draws }: Props) {
                 <span>{result.totalIterations.toLocaleString()} simulações em {result.elapsedMs}ms</span>
                 <span>•</span>
                 <span>{result.performances.length} estratégias comparadas</span>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="ml-auto h-7 text-[10px] gap-1 text-primary hover:text-primary hover:bg-primary/10"
+                  onClick={requestAIAnalysis}
+                  disabled={aiLoading}
+                >
+                  {aiLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Brain className="w-3 h-3" />}
+                  Análise de Viabilidade
+                </Button>
               </div>
+
+              {/* AI Analysis Result */}
+              {aiAnalysis && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="p-4 rounded-xl bg-primary/5 border border-primary/20 text-xs leading-relaxed overflow-hidden"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-1.5 rounded-lg bg-primary/20 text-primary">
+                      <Brain className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-foreground">Relatório de Viabilidade Técnica</h4>
+                      <p className="text-[10px] text-muted-foreground">Motor Monte Carlo v3.0 — AI Insight</p>
+                    </div>
+                  </div>
+                  <div className="prose prose-sm prose-invert max-w-none text-xs">
+                    <ReactMarkdown>{aiAnalysis}</ReactMarkdown>
+                  </div>
+                </motion.div>
+              )}
 
               {/* Strategy ranking */}
               <div>

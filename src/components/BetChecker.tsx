@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
-import { DrawResult, LotteryConfig } from "@/data/lotteries";
+import { DrawResult, LotteryConfig, LOTTERIES } from "@/data/lotteries";
 import { NumberStats } from "@/engine/statistics";
 import { checkBetAgainstDraws, MatchResult, getPrizeTiers } from "@/services/lotteryApi";
 import { DrawResultWithPrizes, DrawPrizeData } from "@/hooks/useLotteryDraws";
@@ -683,7 +683,7 @@ export function BetChecker({ draws, drawsWithPrizes, lotteryId, maxNumbers, pick
     setActiveTab("improve");
     try {
       const stats = computeFrequencyStats(draws, maxNumbers);
-      const config = { id: lotteryId, name: lotteryId, numbers: maxNumbers, pick, color: "", icon: "" };
+      const config = LOTTERIES.find(l => l.id === lotteryId) || { id: lotteryId, name: lotteryId, numbers: maxNumbers, pick, color: "", icon: "", betPrice: 0, prizeTiers: [] };
       const improvements = generateNativeImprovements(
         betsToImprove.map(b => ({ numbers: b.numbers, label: b.label, avgHits: b.avgHits, bestHit: b.bestHit, prizeHits: b.prizeHits })),
         stats, config, draws
