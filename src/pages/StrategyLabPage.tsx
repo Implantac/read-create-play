@@ -354,52 +354,119 @@ export default function StrategyLabPage() {
             </CollapsibleTrigger>
             <CollapsibleContent>
               <CardContent className="space-y-5 pt-0">
-                {/* Strategy selection */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-muted-foreground font-medium">
-                      Estratégias ({selectedStrategies.length}/{available.length})
-                    </span>
-                    <div className="flex gap-1">
-                      <Button variant="ghost" size="sm" onClick={selectAll} className="text-xs h-7">Todas</Button>
-                      <Button variant="ghost" size="sm" onClick={clearAll} className="text-xs h-7 text-muted-foreground">Limpar</Button>
+                {/* Configuration: Strategies + Window Selection */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Column 1: Strategy Selection */}
+                  <div className="lg:col-span-2 space-y-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">
+                        Estratégias para Testar ({selectedStrategies.length})
+                      </span>
+                      <div className="flex gap-2">
+                        <Button variant="ghost" size="sm" onClick={selectAll} className="text-[10px] h-6 px-2">Selecionar Todas</Button>
+                        <Button variant="ghost" size="sm" onClick={clearAll} className="text-[10px] h-6 px-2 text-muted-foreground">Limpar</Button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[320px] overflow-y-auto pr-1 scrollbar-thin">
+                      {available.map(s => {
+                        const isSelected = selectedStrategies.includes(s.id);
+                        return (
+                          <label
+                            key={s.id}
+                            className={`flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer text-xs transition-all duration-200 ${
+                              isSelected
+                                ? "border-primary/40 bg-primary/5 shadow-sm shadow-primary/5"
+                                : "border-border hover:bg-muted/20 hover:border-muted-foreground/20"
+                            }`}
+                          >
+                            <Checkbox checked={isSelected} onCheckedChange={() => toggleStrategy(s.id)} />
+                            <div className="flex-1 min-w-0">
+                              <div className="font-semibold text-foreground truncate">{s.name}</div>
+                              <div className="text-[10px] text-muted-foreground truncate mt-0.5">{s.description}</div>
+                            </div>
+                            <Badge variant="outline" className={`text-[9px] shrink-0 ${
+                              s.category === "ai" ? "border-primary/30 text-primary bg-primary/5" :
+                              s.category === "math" ? "border-blue-500/30 text-blue-500 bg-blue-500/5" :
+                              "border-muted-foreground/20"
+                            }`}>
+                              {s.category === "ai" ? "🤖 IA" :
+                               s.category === "math" ? "📐 Math" :
+                               s.category}
+                            </Badge>
+                          </label>
+                        );
+                      })}
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5 max-h-[250px] overflow-y-auto pr-1 scrollbar-thin">
-                    {available.map(s => {
-                      const isSelected = selectedStrategies.includes(s.id);
-                      return (
-                        <label
-                          key={s.id}
-                          className={`flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer text-xs transition-all duration-200 ${
-                            isSelected
-                              ? "border-primary/40 bg-primary/5 shadow-sm shadow-primary/5"
-                              : "border-border hover:bg-muted/20 hover:border-muted-foreground/20"
-                          }`}
-                        >
-                          <Checkbox checked={isSelected} onCheckedChange={() => toggleStrategy(s.id)} />
-                          <div className="flex-1 min-w-0">
-                            <div className="font-semibold text-foreground truncate">{s.name}</div>
-                            <div className="text-[10px] text-muted-foreground truncate mt-0.5">{s.description}</div>
-                          </div>
-                          <Badge variant="outline" className={`text-[9px] shrink-0 ${
-                            s.category === "ai" ? "border-primary/30 text-primary bg-primary/5" :
-                            s.category === "math" ? "border-blue-500/30 text-blue-500 bg-blue-500/5" :
-                            s.category === "hybrid" ? "border-amber-500/30 text-amber-500 bg-amber-500/5" :
-                            "border-muted-foreground/20"
-                          }`}>
-                            {s.category === "ai" ? "🤖 IA" :
-                             s.category === "math" ? "📐 Math" :
-                             s.category === "hybrid" ? "⚡ Hybrid" :
-                             s.category}
-                          </Badge>
-                        </label>
-                      );
-                    })}
+
+                  {/* Column 2: Parameters & Time Window */}
+                  <div className="space-y-6">
+                    {/* Time Window Section */}
+                    <div className="space-y-3">
+                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold block">
+                        Janela Temporal (Backtest)
+                      </span>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {[10, 30, 50, 100, 200, 500].map(window => {
+                          if (!draws || draws.length < 10) return null;
+                          const sorted = [...draws].sort((a, b) => b.concurso - a.concurso);
+                          const currentEnd = sorted[0].concurso;
+                          const currentStart = sorted[Math.min(window - 1, sorted.length - 1)].concurso;
+                          const isActive = customDrawRange && customDrawRange[0] === currentStart && customDrawRange[1] === currentEnd;
+                          
+                          return (
+                            <Button
+                              key={window}
+                              variant={isActive ? "default" : "outline"}
+                              size="sm"
+                              disabled={draws.length < window && window !== 500}
+                              className={`text-[10px] h-8 ${isActive ? "bg-primary" : ""}`}
+                              onClick={() => setCustomDrawRange([currentStart, currentEnd])}
+                            >
+                              Últimos {window}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                      <p className="text-[10px] text-muted-foreground italic">
+                        Testando do concurso {drawRange[0]} ao {drawRange[1]} ({drawRange[1] - drawRange[0] + 1} sorteios)
+                      </p>
+                    </div>
+
+                    {/* Simulation Parameters */}
+                    <div className="space-y-4 pt-4 border-t border-border/50">
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-[10px] text-muted-foreground font-bold uppercase tracking-wider">
+                          <span>Jogos por Estratégia</span>
+                          <span className="text-foreground">{gamesPerStrategy}</span>
+                        </div>
+                        <Slider
+                          value={[gamesPerStrategy]}
+                          onValueChange={([v]) => setGamesPerStrategy(v)}
+                          max={50} min={1} step={1}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block mb-1">Perfil Evolutivo</span>
+                        <div className="grid grid-cols-3 gap-1">
+                          {(["conservador", "equilibrado", "agressivo"] as const).map(p => (
+                            <Button
+                              key={p}
+                              variant={profile === p ? "default" : "outline"}
+                              size="sm"
+                              className="text-[10px] h-7 px-1 capitalize"
+                              onClick={() => setProfile(p)}
+                            >
+                              {p}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <Separator />
+                <div className="hidden">
 
                 {/* Parameters */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
