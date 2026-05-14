@@ -466,9 +466,6 @@ export default function StrategyLabPage() {
                   </div>
                 </div>
 
-                <div className="hidden">
-
-                {/* Parameters */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="space-y-2.5">
                     <label className="text-xs text-muted-foreground font-medium flex items-center gap-1.5">
