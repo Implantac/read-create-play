@@ -9,6 +9,7 @@ import { STRATEGIES, Strategy } from "@/engine/strategies";
 import { runBacktest, BacktestResult } from "@/engine/backtesting";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlaskConical, Play, Trophy, TrendingUp, Zap, FileDown } from "lucide-react";
+import { toast } from "sonner";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, Cell,
 } from "recharts";
