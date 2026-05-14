@@ -35,6 +35,7 @@ export function AdvancedAnalyticsPanel({ stats, draws, config }: Props) {
   const [correlations, setCorrelations] = useState<CorrelationPair[] | null>(null);
   const [clusters, setClusters] = useState<ClusterInfo[] | null>(null);
   const [integrated, setIntegrated] = useState<IntegratedScore[] | null>(null);
+  const [volatility, setVolatility] = useState<VolatilityStats[] | null>(null);
 
   const run = () => {
     setRunning(true);
@@ -44,6 +45,7 @@ export function AdvancedAnalyticsPanel({ stats, draws, config }: Props) {
       setCorrelations(computeCorrelationMatrix(draws, config, 25));
       setClusters(runKMeansClustering(draws, config, 5));
       setIntegrated(computeIntegratedScores(stats, draws, config));
+      setVolatility(computeVolatilityAndSentiment(draws, config));
       setRunning(false);
     }, 2200);
   };
