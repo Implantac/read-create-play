@@ -50,35 +50,39 @@ export function AdvancedAnalyticsPanel({ stats, draws, config }: Props) {
     }, 2200);
   };
 
-  const hasResults = logistic && timeSeries && correlations && clusters && integrated;
+  const hasResults = logistic && timeSeries && correlations && clusters && integrated && volatility;
 
   return (
-    <div className="rounded-xl bg-card border border-border p-5">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-            <Microscope className="w-4 h-4 text-primary" />
-            Análises Avançadas de Ciência de Dados
-          </h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Regressão Logística, Séries Temporais, Correlação e Clusterização
-          </p>
-        </div>
+    <DashboardWidget 
+      title="Motor de Ciência de Dados" 
+      subtitle="Modelagem Preditiva e Analítica Avançada" 
+      icon={Brain}
+      headerAction={
         <Button
           size="sm"
           onClick={run}
           disabled={running}
-          className="bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-95"
         >
-          <Play className="w-3 h-3 mr-1" />
-          {running ? "Analisando..." : "Executar Análises"}
+          {running ? (
+            <><Activity className="w-3 h-3 mr-1.5 animate-pulse" /> CALCULANDO...</>
+          ) : (
+            <><Play className="w-3 h-3 mr-1.5" /> EXECUTAR ENGINE</>
+          )}
         </Button>
-      </div>
-
+      }
+    >
       {running && (
-        <div className="flex flex-col items-center py-12 gap-3">
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-muted-foreground">Processando 4 modelos avançados...</p>
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-primary/20 rounded-full" />
+            <div className="absolute inset-0 w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+            <Brain className="absolute inset-0 m-auto w-6 h-6 text-primary animate-pulse" />
+          </div>
+          <div className="text-center">
+            <p className="text-sm font-black text-foreground uppercase tracking-widest">Processando Modelos</p>
+            <p className="text-xs text-muted-foreground font-medium">Sincronizando redes neurais e estatísticas...</p>
+          </div>
         </div>
       )}
 
