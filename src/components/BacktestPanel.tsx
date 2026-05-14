@@ -58,27 +58,34 @@ function saveHistory(entries: BacktestHistoryEntry[]) {
 }
 
 function exportCSV(entry: BacktestHistoryEntry) {
-  const headers = ["Estratégia", "Loteria", "Janela", "Apostas/Sorteio", "Média Acertos", "Melhor Acerto", "Win Rate (%)", "ROI", "Consistência (%)"];
-  const rows = entry.results.map(r => [
-    `"${r.label}"`,
-    `"${entry.lotteryName}"`,
-    `"${entry.testWindow} sorteios"`,
-    `"${entry.betsPerDraw}"`,
-    r.avgHits,
-    r.bestHit,
-    r.winRate,
-    r.profit,
-    Math.round(r.consistency * 100),
-  ]);
+  const headers = ["Modelo/AI", "Estratégia", "Loteria", "Janela", "Apostas/Sorteio", "Média Acertos", "Melhor Acerto", "Win Rate (%)", "ROI", "Consistência (%)"];
+  const rows = entry.results.map(r => {
+    const strategyInfo = STRATEGIES.find(s => s.id === r.strategy);
+    const modelLabel = strategyInfo?.category === "ai" ? "Machine Learning" : "Estatística";
+    
+    return [
+      `"${modelLabel}"`,
+      `"${r.label}"`,
+      `"${entry.lotteryName}"`,
+      `"${entry.testWindow} sorteios"`,
+      `"${entry.betsPerDraw}"`,
+      r.avgHits,
+      r.bestHit,
+      r.winRate,
+      r.profit,
+      Math.round(r.consistency * 100),
+    ];
+  });
   const csv = [headers, ...rows].map(e => e.join(",")).join("\n");
   const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.setAttribute("download", `backtest-${entry.lotteryId}-${entry.id}.csv`);
+  const fileName = `relatorio-backtest-${entry.lotteryId}-${entry.id}.csv`;
+  link.setAttribute("download", fileName);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  toast.success("CSV exportado!");
+  toast.success(`CSV "${fileName}" exportado!`);
 }
 
 function exportPDF(entry: BacktestHistoryEntry) {
