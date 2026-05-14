@@ -293,7 +293,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 group">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/40 group-hover:scale-110 transition-all duration-300 overflow-hidden">
-              <img src="/logo.png" alt="Titan Loterias" width="40" height="40" className="w-10 h-10 object-contain" fetchpriority="high" />
+              <img src="/logo.png" alt="Titan Loterias" width="40" height="40" className="w-10 h-10 object-contain" fetchPriority="high" />
             </div>
             <span className="text-lg font-bold tracking-tight">
               Titan <span className="text-primary text-glow-green">Loterias</span>
