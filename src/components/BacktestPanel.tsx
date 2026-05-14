@@ -8,10 +8,10 @@ import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { STRATEGIES, Strategy } from "@/engine/strategies";
 import { runBacktest, BacktestResult } from "@/engine/backtesting";
 import { motion, AnimatePresence } from "framer-motion";
-import { FlaskConical, Play, Trophy, TrendingUp, Zap, FileDown } from "lucide-react";
+import { FlaskConical, Play, Trophy, Zap, FileDown, History, Eye, Trash2, FileText } from "lucide-react";
 import { toast } from "sonner";
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, Cell,
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
 
 interface Props {
@@ -20,10 +20,115 @@ interface Props {
   draws: DrawResult[];
 }
 
+interface BacktestHistoryEntry {
+  id: string;
+  timestamp: number;
+  lotteryId: string;
+  lotteryName: string;
+  testWindow: number;
+  betsPerDraw: number;
+  strategies: Strategy[];
+  results: BacktestResult[];
+}
+
+const HISTORY_KEY = "titan_backtest_history_v1";
+const MAX_HISTORY = 30;
+
 const COLORS = [
   "hsl(142, 70%, 45%)", "hsl(200, 90%, 50%)", "hsl(280, 70%, 55%)",
   "hsl(45, 95%, 55%)", "hsl(0, 80%, 55%)", "hsl(170, 70%, 45%)",
 ];
+
+function loadHistory(): BacktestHistoryEntry[] {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+function saveHistory(entries: BacktestHistoryEntry[]) {
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(entries.slice(0, MAX_HISTORY)));
+  } catch (e) {
+    console.error("Failed to save backtest history", e);
+  }
+}
+
+function exportCSV(entry: BacktestHistoryEntry) {
+  const headers = ["Estratégia", "Loteria", "Janela", "Apostas/Sorteio", "Média Acertos", "Melhor Acerto", "Win Rate (%)", "ROI", "Consistência (%)"];
+  const rows = entry.results.map(r => [
+    `"${r.label}"`,
+    `"${entry.lotteryName}"`,
+    `"${entry.testWindow} sorteios"`,
+    `"${entry.betsPerDraw}"`,
+    r.avgHits,
+    r.bestHit,
+    r.winRate,
+    r.profit,
+    Math.round(r.consistency * 100),
+  ]);
+  const csv = [headers, ...rows].map(e => e.join(",")).join("\n");
+  const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.setAttribute("download", `backtest-${entry.lotteryId}-${entry.id}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  toast.success("CSV exportado!");
+}
+
+function exportPDF(entry: BacktestHistoryEntry) {
+  const date = new Date(entry.timestamp).toLocaleString("pt-BR");
+  const rowsHtml = entry.results.map((r, i) => `
+    <tr style="border-bottom: 1px solid #eee;">
+      <td style="padding: 8px; text-align: center;">${i + 1}</td>
+      <td style="padding: 8px; font-weight: bold;">${r.label}</td>
+      <td style="padding: 8px; text-align: center;">${r.avgHits}</td>
+      <td style="padding: 8px; text-align: center;">${r.bestHit}</td>
+      <td style="padding: 8px; text-align: center;">${r.winRate}%</td>
+      <td style="padding: 8px; text-align: center;">${r.profit}x</td>
+      <td style="padding: 8px; text-align: center;">${Math.round(r.consistency * 100)}%</td>
+    </tr>
+  `).join("");
+  const html = `
+    <html><head><title>Backtest - ${entry.lotteryName}</title>
+    <style>
+      body { font-family: sans-serif; color: #333; padding: 20px; }
+      h1 { color: #22c55e; margin-bottom: 5px; }
+      .header { border-bottom: 2px solid #22c55e; padding-bottom: 10px; margin-bottom: 20px; }
+      table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+      th { background: #f8f9fa; padding: 10px 8px; text-align: left; font-size: 12px; border-bottom: 2px solid #ddd; }
+      td { font-size: 11px; padding: 8px; }
+      .meta { font-size: 12px; color: #666; margin-bottom: 20px; }
+    </style></head><body>
+      <div class="header">
+        <h1>Titan Loterias - Relatório de Backtest</h1>
+        <p>Gerado em ${date}</p>
+      </div>
+      <div class="meta">
+        <strong>Loteria:</strong> ${entry.lotteryName}<br>
+        <strong>Janela:</strong> ${entry.testWindow} sorteios<br>
+        <strong>Apostas por sorteio:</strong> ${entry.betsPerDraw}<br>
+        <strong>Estratégias testadas:</strong> ${entry.strategies.length}
+      </div>
+      <table>
+        <thead><tr>
+          <th>#</th><th>Estratégia</th><th>Média</th><th>Melhor</th><th>Win Rate</th><th>ROI</th><th>Consistência</th>
+        </tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    </body></html>
+  `;
+  const win = window.open("", "_blank");
+  win?.document.write(html);
+  win?.document.close();
+  setTimeout(() => win?.print(), 500);
+  toast.success("Preparando PDF...");
+}
 
 export function BacktestPanel({ stats, config, draws }: Props) {
   const [selectedStrategies, setSelectedStrategies] = useState<Strategy[]>(
@@ -32,14 +137,15 @@ export function BacktestPanel({ stats, config, draws }: Props) {
   const [testWindow, setTestWindow] = useState(50);
   const [betsPerDraw, setBetsPerDraw] = useState(3);
   const [running, setRunning] = useState(false);
-  const [results, setResults] = useState<BacktestResult[] | null>(null);
+  const [currentEntry, setCurrentEntry] = useState<BacktestHistoryEntry | null>(null);
+  const [history, setHistory] = useState<BacktestHistoryEntry[]>(() => loadHistory());
+  const [showHistory, setShowHistory] = useState(false);
 
-  // Reset state when lottery changes
   const prevLotteryId = useRef(config.id);
   useEffect(() => {
     if (prevLotteryId.current !== config.id) {
       prevLotteryId.current = config.id;
-      setResults(null);
+      setCurrentEntry(null);
     }
   }, [config.id]);
 
@@ -51,7 +157,7 @@ export function BacktestPanel({ stats, config, draws }: Props) {
 
   const run = () => {
     setRunning(true);
-    setResults(null);
+    setCurrentEntry(null);
     setTimeout(() => {
       const minPrizeMap: Record<string, number> = {
         megasena: 4, lotofacil: 11, quina: 2, lotomania: 15,
@@ -64,11 +170,45 @@ export function BacktestPanel({ stats, config, draws }: Props) {
         betsPerDraw,
         minPrizeHits: minPrize,
       });
-      setResults(res);
+      const entry: BacktestHistoryEntry = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        timestamp: Date.now(),
+        lotteryId: config.id,
+        lotteryName: config.name,
+        testWindow,
+        betsPerDraw,
+        strategies: selectedStrategies,
+        results: res,
+      };
+      setCurrentEntry(entry);
+      const newHistory = [entry, ...history].slice(0, MAX_HISTORY);
+      setHistory(newHistory);
+      saveHistory(newHistory);
       setRunning(false);
     }, 50);
   };
 
+  const reopenEntry = (entry: BacktestHistoryEntry) => {
+    setCurrentEntry(entry);
+    setShowHistory(false);
+    toast.success(`Relatório de ${new Date(entry.timestamp).toLocaleString("pt-BR")} carregado`);
+  };
+
+  const deleteEntry = (id: string) => {
+    const newHistory = history.filter(e => e.id !== id);
+    setHistory(newHistory);
+    saveHistory(newHistory);
+    if (currentEntry?.id === id) setCurrentEntry(null);
+    toast.info("Entrada removida do histórico");
+  };
+
+  const clearHistory = () => {
+    setHistory([]);
+    saveHistory([]);
+    toast.info("Histórico limpo");
+  };
+
+  const results = currentEntry?.results ?? null;
   const chartData = results?.map(r => ({
     name: r.label,
     "Taxa Acerto (%)": r.winRate,
@@ -79,15 +219,107 @@ export function BacktestPanel({ stats, config, draws }: Props) {
   return (
     <Card className="bg-card/80 backdrop-blur border-border">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-foreground">
-          <FlaskConical className="w-5 h-5 text-primary" />
-          Backtesting Automático
-        </CardTitle>
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="flex items-center gap-2 text-foreground">
+            <FlaskConical className="w-5 h-5 text-primary" />
+            Backtesting Automático
+          </CardTitle>
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-xs h-7 gap-1.5"
+            onClick={() => setShowHistory(v => !v)}
+          >
+            <History className="w-3 h-3" />
+            Histórico ({history.length})
+          </Button>
+        </div>
         <p className="text-xs text-muted-foreground">
           Teste cada estratégia contra {draws.length} resultados históricos reais e compare desempenho
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* History Panel */}
+        <AnimatePresence>
+          {showHistory && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="rounded-lg border border-border bg-muted/10 p-3 space-y-2">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                    <History className="w-3.5 h-3.5 text-primary" />
+                    Histórico de Backtests
+                  </span>
+                  {history.length > 0 && (
+                    <Button size="sm" variant="ghost" className="text-[10px] h-6 text-destructive" onClick={clearHistory}>
+                      Limpar tudo
+                    </Button>
+                  )}
+                </div>
+                {history.length === 0 ? (
+                  <p className="text-xs text-muted-foreground text-center py-4">
+                    Nenhum backtest executado ainda. Os relatórios aparecerão aqui.
+                  </p>
+                ) : (
+                  <div className="space-y-1.5 max-h-64 overflow-y-auto">
+                    {history.map(entry => {
+                      const date = new Date(entry.timestamp);
+                      const top = entry.results[0];
+                      const isActive = currentEntry?.id === entry.id;
+                      return (
+                        <div
+                          key={entry.id}
+                          className={`flex items-center gap-2 p-2.5 rounded-md border text-xs transition-all ${
+                            isActive ? "border-primary bg-primary/5" : "border-border bg-card hover:bg-muted/20"
+                          }`}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-semibold text-foreground">{entry.lotteryName}</span>
+                              <Badge variant="outline" className="text-[9px] h-4 px-1.5">
+                                {entry.testWindow} sorteios
+                              </Badge>
+                              <Badge variant="outline" className="text-[9px] h-4 px-1.5">
+                                {entry.strategies.length} estrat.
+                              </Badge>
+                              {top && (
+                                <Badge variant="outline" className="text-[9px] h-4 px-1.5 text-primary border-primary/30">
+                                  🏆 {top.label} {top.winRate}%
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">
+                              {date.toLocaleDateString("pt-BR")} às {date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <Button size="sm" variant="ghost" className="h-7 w-7 p-0" title="Abrir relatório" onClick={() => reopenEntry(entry)}>
+                              <Eye className="w-3.5 h-3.5 text-primary" />
+                            </Button>
+                            <Button size="sm" variant="ghost" className="h-7 w-7 p-0" title="Baixar CSV" onClick={() => exportCSV(entry)}>
+                              <FileDown className="w-3.5 h-3.5" />
+                            </Button>
+                            <Button size="sm" variant="ghost" className="h-7 w-7 p-0" title="Baixar PDF" onClick={() => exportPDF(entry)}>
+                              <FileText className="w-3.5 h-3.5" />
+                            </Button>
+                            <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-destructive" title="Excluir" onClick={() => deleteEntry(entry.id)}>
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Strategy selector */}
         <div className="flex flex-wrap gap-1.5">
           {STRATEGIES.map(s => (
@@ -142,106 +374,14 @@ export function BacktestPanel({ stats, config, draws }: Props) {
           {running ? "Executando backtesting..." : `Testar ${selectedStrategies.length} estratégias × ${testWindow} sorteios`}
         </Button>
 
-        {results && (
-          <div className="flex gap-2 mb-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 text-[10px] h-8 gap-1.5"
-              onClick={() => {
-                const headers = ["Estratégia", "Loteria", "Janela", "Apostas/Sorteio", "Média Acertos", "Melhor Acerto", "Win Rate (%)", "ROI", "Consistência (%)"];
-                const rows = results.map(r => [
-                  `"${r.label}"`,
-                  `"${config.name}"`,
-                  `"${testWindow} sorteios"`,
-                  `"${betsPerDraw}"`,
-                  r.avgHits,
-                  r.bestHit,
-                  r.winRate,
-                  r.profit,
-                  Math.round(r.consistency * 100)
-                ]);
-                const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
-                const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                link.setAttribute("download", `backtest-${config.id}-${Date.now()}.csv`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                toast.success("CSV exportado com sucesso!");
-              }}
-            >
+        {currentEntry && (
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="flex-1 text-[10px] h-8 gap-1.5" onClick={() => exportCSV(currentEntry)}>
               <FileDown className="w-3 h-3" />
               Exportar CSV
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 text-[10px] h-8 gap-1.5"
-              onClick={() => {
-                const date = new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
-                const rowsHtml = results.map((r, i) => `
-                  <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 8px; text-align: center;">${i + 1}</td>
-                    <td style="padding: 8px; font-weight: bold;">${r.label}</td>
-                    <td style="padding: 8px; text-align: center;">${r.avgHits}</td>
-                    <td style="padding: 8px; text-align: center;">${r.bestHit}</td>
-                    <td style="padding: 8px; text-align: center;">${r.winRate}%</td>
-                    <td style="padding: 8px; text-align: center;">${r.profit}x</td>
-                    <td style="padding: 8px; text-align: center;">${Math.round(r.consistency * 100)}%</td>
-                  </tr>
-                `).join("");
-
-                const html = `
-                  <html>
-                    <head>
-                      <title>Backtest - ${config.name}</title>
-                      <style>
-                        body { font-family: sans-serif; color: #333; padding: 20px; }
-                        h1 { color: #22c55e; margin-bottom: 5px; }
-                        .header { border-bottom: 2px solid #22c55e; padding-bottom: 10px; margin-bottom: 20px; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                        th { background: #f8f9fa; padding: 10px 8px; text-align: left; font-size: 12px; border-bottom: 2px solid #ddd; }
-                        td { font-size: 11px; padding: 8px; }
-                        .meta { font-size: 12px; color: #666; margin-bottom: 20px; }
-                      </style>
-                    </head>
-                    <body>
-                      <div class="header">
-                        <h1>Titan Loterias - Relatório de Backtest</h1>
-                        <p>Gerado em ${date}</p>
-                      </div>
-                      <div class="meta">
-                        <strong>Loteria:</strong> ${config.name}<br>
-                        <strong>Janela:</strong> ${testWindow} sorteios<br>
-                        <strong>Apostas por sorteio:</strong> ${betsPerDraw}
-                      </div>
-                      <table>
-                        <thead>
-                          <tr>
-                            <th>#</th>
-                            <th>Estratégia</th>
-                            <th>Média</th>
-                            <th>Melhor</th>
-                            <th>Win Rate</th>
-                            <th>ROI</th>
-                            <th>Consistência</th>
-                          </tr>
-                        </thead>
-                        <tbody>${rowsHtml}</tbody>
-                      </table>
-                    </body>
-                  </html>
-                `;
-                const win = window.open("", "_blank");
-                win?.document.write(html);
-                win?.document.close();
-                setTimeout(() => win?.print(), 500);
-                toast.success("Preparando PDF para impressão...");
-              }}
-            >
-              <FileDown className="w-3 h-3" />
+            <Button variant="outline" size="sm" className="flex-1 text-[10px] h-8 gap-1.5" onClick={() => exportPDF(currentEntry)}>
+              <FileText className="w-3 h-3" />
               Exportar PDF
             </Button>
           </div>
@@ -255,6 +395,12 @@ export function BacktestPanel({ stats, config, draws }: Props) {
               exit={{ opacity: 0 }}
               className="space-y-4"
             >
+              {currentEntry && currentEntry.id !== history[0]?.id && (
+                <div className="text-[10px] text-muted-foreground italic px-1">
+                  📂 Visualizando relatório de {new Date(currentEntry.timestamp).toLocaleString("pt-BR")}
+                </div>
+              )}
+
               {/* Ranking */}
               <div className="space-y-2">
                 {results.map((r, idx) => (
