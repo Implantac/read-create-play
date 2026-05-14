@@ -8,7 +8,7 @@ import { NumberStats } from "./statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { seedRNG, fastGenerateDraw, fastWeightedDraw, fastCountHits } from "./hp-math-engine";
 
-import { 
+export type { 
   GenerationMode, MassiveSimJob, SimulatedGame, 
   MassiveSimProgress, MassiveSimResult, PatternInsight, 
   DistributionSummary 
