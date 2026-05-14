@@ -8,11 +8,17 @@ import { NumberStats } from "./statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { seedRNG, fastGenerateDraw, fastWeightedDraw, fastCountHits } from "./hp-math-engine";
 
-export type { 
+import { 
   GenerationMode, MassiveSimJob, SimulatedGame, 
   MassiveSimProgress, MassiveSimResult, PatternInsight, 
   DistributionSummary 
 } from "@/types/engine";
+
+export type { 
+  GenerationMode, MassiveSimJob, SimulatedGame, 
+  MassiveSimProgress, MassiveSimResult, PatternInsight, 
+  DistributionSummary 
+};
 
 // ─── Bitset Utilities ────────────────────────────────────────────
 
