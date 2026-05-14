@@ -1,4 +1,5 @@
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { Helmet } from "react-helmet-async";
 import Autoplay from "embla-carousel-autoplay";
 import { useState, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -81,7 +82,7 @@ function TestimonialCard({ t, i }: { t: typeof testimonials[0]; i: number }) {
             <Star key={s} className="w-3.5 h-3.5 fill-neon-amber text-neon-amber" />
           ))}
           {Array.from({ length: 5 - t.stars }).map((_, s) => (
-            <Star key={s} className="w-3.5 h-3.5 text-muted-foreground/30" />
+            <Star key={s} className="w-3.5 h-3.5 text-muted-foreground/60" />
           ))}
         </div>
         <span className="flex items-center gap-1 text-[10px] text-primary/70 font-medium">
@@ -277,13 +278,22 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+      <Helmet>
+        <title>Titan Loterias — IA e Dados para Loterias Brasileiras</title>
+        <meta name="description" content="Analise 10.000+ sorteios, gere apostas otimizadas por IA e teste estratégias antes de apostar. 8 loterias. Grátis por 7 dias." />
+        <link rel="canonical" href="https://titanloterias.lovable.app/landing" />
+        <meta property="og:title" content="Titan Loterias — IA e Dados para Loterias Brasileiras" />
+        <meta property="og:description" content="Analise 10.000+ sorteios, gere apostas otimizadas por IA e teste estratégias. 8 loterias. Grátis por 7 dias." />
+        <meta property="og:url" content="https://titanloterias.lovable.app/landing" />
+        <meta property="og:type" content="website" />
+      </Helmet>
       <FloatingCTA />
       {/* Nav */}
       <nav className="fixed top-0 inset-x-0 z-50 glass-panel border-b border-border/30">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 group">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/40 group-hover:scale-110 transition-all duration-300 overflow-hidden">
-              <img src="/logo.png" alt="Titan Loterias" className="w-10 h-10 object-contain" />
+              <img src="/logo.png" alt="Titan Loterias" width="40" height="40" className="w-10 h-10 object-contain" fetchpriority="high" />
             </div>
             <span className="text-lg font-bold tracking-tight">
               Titan <span className="text-primary text-glow-green">Loterias</span>
@@ -369,7 +379,7 @@ export default function LandingPage() {
             </motion.div>
 
             {/* Trust micro-copy */}
-            <motion.p custom={3.5} variants={fadeUp} className="text-xs text-muted-foreground/60 -mt-1">
+            <motion.p custom={3.5} variants={fadeUp} className="text-xs text-muted-foreground -mt-1">
               Sem cartão de crédito • Setup em 30 segundos
             </motion.p>
 
@@ -640,7 +650,7 @@ export default function LandingPage() {
                   </div>
                 ))}
                 <div className="pt-2 text-center">
-                  <span className="text-xs text-muted-foreground/60">Atualizado em tempo real</span>
+                  <span className="text-xs text-muted-foreground">Atualizado em tempo real</span>
                 </div>
               </div>
               {/* Glow behind card */}
@@ -924,7 +934,7 @@ export default function LandingPage() {
                 {finalCtaVariants[abVariant]} <ArrowRight className="w-5 h-5" />
               </Button>
             </motion.div>
-            <p className="text-xs text-muted-foreground/60">Pagamento único • Acesso imediato</p>
+            <p className="text-xs text-muted-foreground">Pagamento único • Acesso imediato</p>
           </div>
         </motion.div>
       </section>
@@ -951,7 +961,7 @@ export default function LandingPage() {
               <Link to="/login" className="hover:text-foreground transition-colors">Entrar</Link>
               <Link to="/signup" className="hover:text-foreground transition-colors">Criar Conta</Link>
             </div>
-            <div className="flex items-center gap-2 text-[10px] text-muted-foreground/60 font-mono tracking-wider">
+            <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-mono tracking-wider">
               <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-pulse-glow" />
               © {new Date().getFullYear()} Titan Loterias
             </div>
