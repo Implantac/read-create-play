@@ -28,6 +28,8 @@ import { OnboardingGuide } from "@/components/OnboardingGuide";
 import { UpgradeBanner } from "@/components/UpgradeBanner";
 import { DashboardSkeleton } from "@/components/DashboardSkeleton";
 import { PersonalPerformanceCard } from "@/components/PersonalPerformanceCard";
+import { DashboardWidget } from "@/components/DashboardWidget";
+import { Zap, Activity, Target } from "lucide-react";
 
 const container = {
   hidden: { opacity: 0 },
