@@ -1,5 +1,6 @@
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { NumberStats } from "@/engine/statistics";
+import { Strategy } from "@/engine/strategies";
 
 export type GenerationMode = "random" | "statistical" | "ai_weighted" | "hybrid";
 
@@ -26,8 +27,8 @@ export interface SimulatedGame {
   bestHit: number;
   prizeCount: number;
   hitDistribution: Record<number, number>;
-  stability: number; // lower = more consistent
-  score: number; // composite rank score
+  stability: number; 
+  score: number; 
   evenCount: number;
   oddCount: number;
   sum: number;
@@ -69,8 +70,46 @@ export interface ProfessionalBet {
   numbers: number[];
   strategy: string;
   strategyLabel: string;
-  quality: any; // Using any for now to avoid circular deps with bet-quality
+  quality: any;
   statisticalScore: number;
   probabilityEstimate: number;
   rank: number;
+}
+
+export interface MassiveSimConfig {
+  iterations: number;
+  strategies: Strategy[];
+  config: LotteryConfig;
+  compareWithRandom: boolean;
+}
+
+export interface StrategyPerformance {
+  strategy: Strategy;
+  label: string;
+  totalGames: number;
+  hitDistribution: Record<number, number>;
+  avgHits: number;
+  bestHit: number;
+  hitRate4Plus: number;
+  hitRate5Plus: number;
+  hitRateFull: number;
+  expectedValue: number;
+  consistency: number;
+}
+
+export interface MonteCarloResult {
+  totalIterations: number;
+  elapsedMs: number;
+  performances: StrategyPerformance[];
+  convergenceData: { iteration: number; avgHits: number; strategy: string }[];
+  yearlyProjection: YearlyProjection[];
+}
+
+export interface YearlyProjection {
+  strategy: string;
+  gamesPerYear: number;
+  expectedHits4Plus: number;
+  expectedHits5Plus: number;
+  expectedFullHits: number;
+  roi: number;
 }
