@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,15 @@ export default function SuportePage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Suporte e FAQ — Titan Loterias</title>
+        <meta name="description" content="Tire dúvidas sobre planos, pagamento, IA e geradores do Titan Loterias. FAQ completo e atendimento por WhatsApp." />
+        <link rel="canonical" href="https://titanloterias.lovable.app/suporte" />
+        <meta property="og:title" content="Suporte e FAQ — Titan Loterias" />
+        <meta property="og:description" content="Dúvidas sobre planos, IA e geradores. FAQ + atendimento WhatsApp." />
+        <meta property="og:url" content="https://titanloterias.lovable.app/suporte" />
+        <meta property="og:type" content="website" />
+      </Helmet>
       {/* Header */}
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-xl sticky top-0 z-40">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
