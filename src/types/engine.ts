@@ -103,6 +103,7 @@ export interface MonteCarloResult {
   performances: StrategyPerformance[];
   convergenceData: { iteration: number; avgHits: number; strategy: string }[];
   yearlyProjection: YearlyProjection[];
+  robustnessScore: number;
 }
 
 export interface YearlyProjection {
