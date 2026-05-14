@@ -371,11 +371,12 @@ export function runQuantumAnalysis(stats: NumberStats[], config: LotteryConfig):
 
 export function runEnsembleVoting(stats: NumberStats[], config: LotteryConfig, modelWeights?: Record<string, number>): ModelResult {
   const defaultWeights: Record<string, number> = {
-    "Random Forest": 0.22,
-    "XGBoost": 0.28,
-    "Rede Neural (LSTM)": 0.22,
-    "Inferência Bayesiana": 0.15,
-    "Cadeia de Markov": 0.13,
+    "Random Forest": 0.18,
+    "XGBoost": 0.22,
+    "Rede Neural (LSTM)": 0.18,
+    "Inferência Bayesiana": 0.12,
+    "Cadeia de Markov": 0.10,
+    "Análise Quantum": 0.20,
   };
 
   const weights = modelWeights || defaultWeights;
@@ -386,6 +387,7 @@ export function runEnsembleVoting(stats: NumberStats[], config: LotteryConfig, m
     { result: runNeuralNetwork(stats, config), name: "Rede Neural (LSTM)" },
     { result: runBayesianInference(stats, config), name: "Inferência Bayesiana" },
     { result: runMarkovChain(stats, config), name: "Cadeia de Markov" },
+    { result: runQuantumAnalysis(stats, config), name: "Análise Quantum" },
   ];
 
   const numberScores: Record<number, { total: number; agreement: number; breakdownAccum: ScoreBreakdown }> = {};
