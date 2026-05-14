@@ -1,4 +1,5 @@
 import { useState, useMemo, memo, lazy } from "react";
+import { Helmet } from "react-helmet-async";
 import { SafeSuspense } from "@/components/SafeSuspense";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PageHeader } from "@/components/PageHeader";
@@ -112,6 +113,14 @@ const EstatisticasPage = () => {
 
   return (
     <div className="space-y-6">
+      <Helmet>
+        <title>Estatísticas Avançadas — Titan Loterias</title>
+        <meta name="description" content="Análise profunda de tendências, números quentes e frios, atrasos e distribuições estatísticas. Use a ciência de dados a seu favor." />
+        <link rel="canonical" href="https://titanloterias.lovable.app/estatisticas" />
+        <meta property="og:title" content="Estatísticas Avançadas — Titan Loterias" />
+        <meta property="og:description" content="Análise profunda de tendências e estatísticas para loterias." />
+        <meta property="og:url" content="https://titanloterias.lovable.app/estatisticas" />
+      </Helmet>
       <PageHeader
         title="Estatísticas Avançadas"
         description={`Visão consolidada de todas as métricas — ${config.name}`}

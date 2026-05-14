@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Helmet } from "react-helmet-async";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { History, Search, ChevronDown, ChevronUp, CheckCircle2, Trophy, ArrowRight, Save, Copy } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -116,6 +117,14 @@ const HistoricoPage = () => {
 
   return (
     <div className="space-y-6">
+      <Helmet>
+        <title>Histórico de Resultados — Titan Loterias</title>
+        <meta name="description" content="Confira o histórico completo de sorteios da Mega-Sena, Lotofácil e outras. Use o conferidor retroativo para testar seus jogos contra resultados reais." />
+        <link rel="canonical" href="https://titanloterias.lovable.app/historico" />
+        <meta property="og:title" content="Histórico de Resultados — Titan Loterias" />
+        <meta property="og:description" content="Histórico completo e conferidor retroativo para loterias." />
+        <meta property="og:url" content="https://titanloterias.lovable.app/historico" />
+      </Helmet>
       <PageHeader
         title="Histórico de Concursos"
         description={`Navegue por todos os resultados — ${config.name}`}
