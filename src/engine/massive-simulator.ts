@@ -7,43 +7,11 @@ import { generateByStrategy, Strategy, STRATEGIES } from "./strategies";
 // Otimizado com bitsets, PRNG inline e variância O(1)
 // ═══════════════════════════════════════════════════════
 
-export interface MassiveSimConfig {
-  iterations: number;
-  strategies: Strategy[];
-  config: LotteryConfig;
-  compareWithRandom: boolean;
-}
+import { 
+  MassiveSimConfig, StrategyPerformance, MonteCarloResult, YearlyProjection 
+} from "@/types/engine";
 
-export interface StrategyPerformance {
-  strategy: Strategy;
-  label: string;
-  totalGames: number;
-  hitDistribution: Record<number, number>;
-  avgHits: number;
-  bestHit: number;
-  hitRate4Plus: number;
-  hitRate5Plus: number;
-  hitRateFull: number;
-  expectedValue: number;
-  consistency: number;
-}
-
-export interface MassiveSimResult {
-  totalIterations: number;
-  elapsedMs: number;
-  performances: StrategyPerformance[];
-  convergenceData: { iteration: number; avgHits: number; strategy: string }[];
-  yearlyProjection: YearlyProjection[];
-}
-
-export interface YearlyProjection {
-  strategy: string;
-  gamesPerYear: number;
-  expectedHits4Plus: number;
-  expectedHits5Plus: number;
-  expectedFullHits: number;
-  roi: number;
-}
+export type { MassiveSimConfig, StrategyPerformance, MonteCarloResult, YearlyProjection };
 
 // ─── Bitset utilities (inline for zero-overhead) ─────
 
@@ -68,21 +36,39 @@ function bitsetHits(a: Uint32Array, b: Uint32Array): number {
 
 // ─── Prize multipliers ──────────────────────────────────
 
-function getPrizeMultipliers(lotteryId: string, pick: number): Record<number, number> {
-  const base: Record<number, number> = {};
-  for (let i = 0; i <= pick; i++) base[i] = 0;
-  switch (lotteryId) {
-    case "megasena": base[4] = 50; base[5] = 5000; base[6] = 500000; break;
-    case "lotofacil": base[11] = 5; base[12] = 10; base[13] = 25; base[14] = 1500; base[15] = 100000; break;
-    case "quina": base[2] = 1; base[3] = 5; base[4] = 200; base[5] = 50000; break;
-    case "lotomania": base[0] = 5; base[15] = 10; base[16] = 25; base[17] = 100; base[18] = 1000; base[19] = 20000; base[20] = 500000; break;
-    case "duplasena": base[3] = 3; base[4] = 50; base[5] = 5000; base[6] = 300000; break;
-    case "timemania": base[3] = 2; base[4] = 10; base[5] = 50; base[6] = 500; base[7] = 50000; break;
-    case "diadesorte": base[4] = 10; base[5] = 50; base[6] = 2000; base[7] = 200000; break;
-    case "supersete": base[3] = 5; base[4] = 20; base[5] = 200; base[6] = 10000; base[7] = 500000; break;
-    default: base[pick - 2] = 10; base[pick - 1] = 1000; base[pick] = 100000;
+function getPrizeMultipliers(config: LotteryConfig): Record<number, number> {
+  const multipliers: Record<number, number> = {};
+  for (let i = 0; i <= config.pick; i++) multipliers[i] = 0;
+
+  if (config.prizeTiers && config.prizeTiers.length > 0) {
+    // For a professional app, we use fixed multipliers based on label/tier
+    // This is a simplification, as real prizes are variable, but for simulation it works
+    config.prizeTiers.forEach(tier => {
+      let multiplier = 0;
+      if (tier.hits === config.pick) multiplier = 100000;
+      else if (tier.hits === config.pick - 1) multiplier = 1500;
+      else if (tier.hits === config.pick - 2) multiplier = 50;
+      else if (tier.hits === 2 && config.id === "quina") multiplier = 1;
+      else if (tier.hits === 11 && config.id === "lotofacil") multiplier = 5;
+      else if (tier.hits === 12 && config.id === "lotofacil") multiplier = 10;
+      else if (tier.hits === 13 && config.id === "lotofacil") multiplier = 25;
+      else multiplier = Math.pow(10, tier.hits - (config.pick / 2));
+      
+      multipliers[tier.hits] = Math.max(multipliers[tier.hits] || 0, multiplier);
+    });
+    return multipliers;
   }
-  return base;
+
+  // Fallback to legacy
+  const { id, pick } = config;
+  switch (id) {
+    case "megasena": multipliers[4] = 50; multipliers[5] = 5000; multipliers[6] = 500000; break;
+    case "lotofacil": multipliers[11] = 5; multipliers[12] = 10; multipliers[13] = 25; multipliers[14] = 1500; multipliers[15] = 100000; break;
+    case "quina": multipliers[2] = 1; multipliers[3] = 5; multipliers[4] = 200; multipliers[5] = 50000; break;
+    case "lotomania": multipliers[0] = 5; multipliers[15] = 10; multipliers[16] = 25; multipliers[17] = 100; multipliers[18] = 1000; multipliers[19] = 20000; multipliers[20] = 500000; break;
+    default: multipliers[pick - 2] = 10; multipliers[pick - 1] = 1000; multipliers[pick] = 100000;
+  }
+  return multipliers;
 }
 
 /**
@@ -137,9 +123,9 @@ export function runMassiveSimulation(
   config: LotteryConfig,
   draws: DrawResult[],
   simConfig: MassiveSimConfig
-): MassiveSimResult {
+): MonteCarloResult {
   const start = performance.now();
-  const prizeMultipliers = getPrizeMultipliers(config.id, config.pick);
+  const prizeMultipliers = getPrizeMultipliers(config);
 
   const performances: StrategyPerformance[] = [];
   const convergenceData: { iteration: number; avgHits: number; strategy: string }[] = [];
