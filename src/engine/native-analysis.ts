@@ -361,6 +361,63 @@ export function generateMassiveSimAnalysis(
   return md;
 }
 
+/**
+ * Monte Carlo Strategy Comparison Analysis — v3.0
+ */
+export function generateMonteCarloAnalysis(
+  result: any, // MonteCarloResult
+  config: LotteryConfig
+): string {
+  const { performances, robustnessScore, yearlyProjection } = result;
+  if (!performances || performances.length === 0) return "Sem dados de simulação.";
+
+  const top = performances[0];
+  const avgROI = performances.reduce((s: number, p: any) => s + p.expectedValue, 0) / performances.length;
+  
+  let md = `## 🧬 Relatório de Viabilidade Monte Carlo — ${config.name}\n\n`;
+  md += `Análise de **robustez estratégica** baseada em ${result.totalIterations.toLocaleString()} simulações.\n\n`;
+
+  md += `### 🏅 Estratégia Dominante: **${top.label}**\n`;
+  md += `- Expectativa de Valor (ROI): **${top.expectedValue.toFixed(2)}x**\n`;
+  md += `- Consistência do Algoritmo: **${(top.consistency * 100).toFixed(1)}%**\n`;
+  md += `- Melhor acerto simulado: **${top.bestHit}** de ${config.pick}\n\n`;
+
+  md += `### 🛡️ Robustez do Sistema: **${robustnessScore}/100**\n`;
+  if (robustnessScore >= 80) {
+    md += `O sistema apresenta **alta estabilidade**. As médias de acerto são resilientes a variações estatísticas.\n\n`;
+  } else if (robustnessScore >= 50) {
+    md += `O sistema apresenta **estabilidade moderada**. Alguma volatilidade é esperada em curto prazo.\n\n`;
+  } else {
+    md += `O sistema apresenta **baixa estabilidade**. Resultados podem variar significativamente entre ciclos.\n\n`;
+  }
+
+  md += `### 📅 Projeção de Longo Prazo\n`;
+  const bestYear = yearlyProjection.find((p: any) => p.strategy === top.label);
+  if (bestYear) {
+    md += `Seguindo a estratégia **${top.label}** (156 jogos/ano):\n`;
+    md += `- Expectativa de Quadras/Ternos (4+): **~${bestYear.expectedHits4Plus.toFixed(1)}** por ano\n`;
+    md += `- Retorno Financeiro Estimado: **${bestYear.roi.toFixed(2)}x** o capital investido\n\n`;
+  }
+
+  md += `### ⚖️ Comparativo de Performance\n`;
+  performances.slice(0, 5).forEach((p: any) => {
+    const diff = p.expectedValue - avgROI;
+    const diffLabel = diff > 0 ? `(+${diff.toFixed(2)})` : `(${diff.toFixed(2)})`;
+    md += `- **${p.label}**: ${p.expectedValue.toFixed(2)}x ${diffLabel}\n`;
+  });
+  md += `\n`;
+
+  md += `### 💡 Conclusão Técnica\n`;
+  if (top.expectedValue > 1.2) {
+    md += `🚀 **Sinal de Compra**: A estratégia ${top.label} demonstra uma vantagem estatística clara sobre o aleatório.\n`;
+  } else {
+    md += `⚖️ **Sinal Neutro**: As estratégias estão próximas da paridade matemática. Recomendado usar fechamentos para aumentar as chances.\n`;
+  }
+  md += `\n---\n*Relatório gerado pelo Motor Monte Carlo v3.0.*`;
+
+  return md;
+}
+
 // ═══════════════════════════════════════════
 // AUTONOMOUS AI ANALYSIS (text report + 10 games)
 // ═══════════════════════════════════════════
