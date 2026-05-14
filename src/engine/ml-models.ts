@@ -465,6 +465,7 @@ export function runAllModels(
     { fn: runNeuralNetwork, name: "Rede Neural (LSTM)" },
     { fn: runBayesianInference, name: "Inferência Bayesiana" },
     { fn: runMarkovChain, name: "Cadeia de Markov" },
+    { fn: runQuantumAnalysis, name: "Análise Quantum" },
   ];
 
   const results: ModelResult[] = [];
