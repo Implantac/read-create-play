@@ -1,4 +1,5 @@
 import { lazy } from "react";
+import { Helmet } from "react-helmet-async";
 import { SafeSuspense } from "@/components/SafeSuspense";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { SelectedBetsProvider } from "@/contexts/SelectedBetsContext";
@@ -42,6 +43,14 @@ const GeradorPage = () => {
 
   return (
     <SelectedBetsProvider>
+      <Helmet>
+        <title>Gerador de Apostas Inteligentes — Titan Loterias</title>
+        <meta name="description" content="Gere combinações otimizadas para Mega-Sena, Lotofácil e mais. Use 14+ algoritmos de IA e filtros profissionais para aumentar suas chances." />
+        <link rel="canonical" href="https://titanloterias.lovable.app/gerador" />
+        <meta property="og:title" content="Gerador de Apostas Inteligentes — Titan Loterias" />
+        <meta property="og:description" content="Gere combinações otimizadas com IA para loterias." />
+        <meta property="og:url" content="https://titanloterias.lovable.app/gerador" />
+      </Helmet>
       <div className="space-y-6">
         <PageHeader
           title="Gerador de Apostas"
