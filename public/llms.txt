@@ -1,0 +1,18 @@
+# Titan Loterias
+
+> Plataforma premium de análise estatística e inteligência artificial para as loterias brasileiras (Mega-Sena, Lotofácil, Quina, Lotomania, Timemania, Dupla Sena, Dia de Sorte, Super Sete). Analisa 10.000+ sorteios, gera apostas otimizadas por IA e permite simular e validar estratégias antes de apostar.
+
+A Titan Loterias combina algoritmos de Machine Learning, simulação Monte Carlo, redes Bayesianas e análise estatística avançada para entregar apostas com maior probabilidade de acerto, transparência total e backtesting com histórico real.
+
+## Pages
+
+- [Landing](/landing): Apresentação da plataforma, recursos, planos e prova social.
+- [Planos](/planos): Comparativo dos planos Free, Pro, Premium e Elite com preços em BRL.
+- [Suporte](/suporte): Central de ajuda, FAQ e contato com a equipe.
+- [Instalar PWA](/install): Guia de instalação do app como Progressive Web App em iOS e Android.
+- [Cadastro](/signup): Criação de conta com 7 dias grátis de teste completo.
+- [Login](/login): Acesso à área autenticada do usuário.
+
+## Optional
+
+- [Recuperar senha](/forgot-password): Fluxo de redefinição de senha por e-mail.
