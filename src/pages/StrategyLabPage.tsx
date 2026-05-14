@@ -63,6 +63,7 @@ export default function StrategyLabPage() {
   const [showDetails, setShowDetails] = useState<string | null>(null);
   const [labHistory, setLabHistory] = useState<{ timestamp: number; winner: string; score: number }[]>([]);
   const [configOpen, setConfigOpen] = useState(true);
+  const [customDrawRange, setCustomDrawRange] = useState<[number, number] | null>(null);
 
   const available = useMemo(() => getStrategiesForLottery(config.id), [config.id]);
 
@@ -94,10 +95,11 @@ export default function StrategyLabPage() {
   }, [available]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const drawRange = useMemo((): [number, number] => {
+    if (customDrawRange) return customDrawRange;
     if (!draws || draws.length === 0) return [1, 1];
     const sorted = [...draws].sort((a, b) => a.concurso - b.concurso);
     return [sorted[0].concurso, sorted[sorted.length - 1].concurso];
-  }, [draws]);
+  }, [draws, customDrawRange]);
 
   const toggleStrategy = useCallback((id: string) => {
     setSelectedStrategies(prev =>
