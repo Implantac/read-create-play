@@ -103,7 +103,7 @@ export function PlanGate({ feature, children, fallbackMessage }: PlanGateProps) 
               <ArrowRight className="w-3 h-3" />
             </Button>
           </Link>
-          <p className="text-xs text-muted-foreground/60">
+          <p className="text-xs text-muted-foreground">
             Pagamento único • R$ 79,90
           </p>
         </CardContent>

@@ -82,7 +82,7 @@ function TestimonialCard({ t, i }: { t: typeof testimonials[0]; i: number }) {
             <Star key={s} className="w-3.5 h-3.5 fill-neon-amber text-neon-amber" />
           ))}
           {Array.from({ length: 5 - t.stars }).map((_, s) => (
-            <Star key={s} className="w-3.5 h-3.5 text-muted-foreground/60" />
+            <Star key={s} className="w-3.5 h-3.5 text-muted-foreground" />
           ))}
         </div>
         <span className="flex items-center gap-1 text-[10px] text-primary/70 font-medium">

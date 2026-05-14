@@ -314,7 +314,7 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
       )}
 
       {/* Compliance */}
-      <p className="text-[9px] text-muted-foreground/60 text-center leading-relaxed">
+      <p className="text-[9px] text-muted-foreground text-center leading-relaxed">
         Análise estatística para fins educacionais. Não garante premiação.
       </p>
     </div>

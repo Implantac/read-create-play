@@ -302,7 +302,7 @@ export function ScreensShowcase() {
                       <div className="w-2.5 h-2.5 rounded-full bg-neon-amber/50" />
                       <div className="w-2.5 h-2.5 rounded-full bg-primary/50" />
                     </div>
-                    <span className="text-[10px] font-mono text-muted-foreground/50 ml-2">
+                    <span className="text-[10px] font-mono text-muted-foreground ml-2">
                       titan-loterias.com/{slide.id}
                     </span>
                   </div>

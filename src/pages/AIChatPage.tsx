@@ -260,7 +260,7 @@ const AIChatPage = () => {
                   Seu assistente especialista em loterias brasileiras. Pergunte sobre análises,
                   estratégias ou peça jogos personalizados.
                 </p>
-                <p className="text-xs text-muted-foreground/60 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Loteria atual: <span className="font-medium text-primary">{config.name}</span>
                 </p>
               </div>
@@ -335,12 +335,12 @@ const AIChatPage = () => {
                   <div className="flex items-center gap-1 mt-1 ml-1">
                     <button
                       onClick={() => copyMessage(msg.content, i)}
-                      className="text-muted-foreground/50 hover:text-muted-foreground transition-colors p-1 rounded"
+                      className="text-muted-foreground hover:text-muted-foreground transition-colors p-1 rounded"
                       title="Copiar resposta"
                     >
                       {copiedIdx === i ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
                     </button>
-                    <span className="text-[10px] text-muted-foreground/40">
+                    <span className="text-[10px] text-muted-foreground">
                       {msg.timestamp.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                     </span>
                   </div>
@@ -414,7 +414,7 @@ const AIChatPage = () => {
               </Button>
             )}
           </div>
-          <p className="text-[10px] text-muted-foreground/50 text-center mt-2">
+          <p className="text-[10px] text-muted-foreground text-center mt-2">
             Titan IA pode cometer erros. Loterias são jogos de azar — jogue com responsabilidade.
           </p>
         </div>

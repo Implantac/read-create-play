@@ -128,7 +128,7 @@ export function AppSidebar() {
 
         {workflowGroups.map((group) => (
           <SidebarGroup key={group.label}>
-            <SidebarGroupLabel className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground/60 mb-1 flex items-center gap-1.5">
+            <SidebarGroupLabel className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-1 flex items-center gap-1.5">
               <span className="w-4 h-4 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[9px] font-bold text-primary">
                 {group.stepNumber}
               </span>
@@ -148,14 +148,14 @@ export function AppSidebar() {
                             <NavLink
                               to={item.url}
                               end={item.url === "/"}
-                              className={`rounded-lg px-3 py-2.5 text-sm transition-all duration-200 hover:bg-sidebar-accent/60 ${locked ? "text-muted-foreground/50" : "text-sidebar-foreground"}`}
+                              className={`rounded-lg px-3 py-2.5 text-sm transition-all duration-200 hover:bg-sidebar-accent/60 ${locked ? "text-muted-foreground" : "text-sidebar-foreground"}`}
                               activeClassName="bg-primary/10 text-primary font-semibold glow-green"
                             >
                               <item.icon className="mr-3 h-4 w-4 shrink-0" />
                               {!collapsed && (
                                 <>
                                   <span className="flex-1">{item.title}</span>
-                                  {locked && <Lock className="h-3 w-3 text-muted-foreground/40 shrink-0 ml-1" />}
+                                  {locked && <Lock className="h-3 w-3 text-muted-foreground shrink-0 ml-1" />}
                                 </>
                               )}
                             </NavLink>
@@ -199,7 +199,7 @@ export function AppSidebar() {
 
         {isAdmin && (
           <SidebarGroup>
-            <SidebarGroupLabel className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground/60 mb-1">
+            <SidebarGroupLabel className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-1">
               Sistema
             </SidebarGroupLabel>
             <SidebarGroupContent>
