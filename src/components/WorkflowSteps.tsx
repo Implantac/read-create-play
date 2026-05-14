@@ -18,8 +18,8 @@ const steps = [
     description: "Teste estratégias contra sorteios reais",
     icon: FlaskConical,
     url: "/simulacoes",
-    color: "text-neon-purple",
-    bgColor: "bg-neon-purple/10 border-neon-purple/20",
+    color: "text-primary",
+    bgColor: "bg-primary/10 border-primary/20",
   },
   {
     number: 3,
