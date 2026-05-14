@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -89,6 +90,15 @@ const InstallPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Instalar o App — Titan Loterias PWA</title>
+        <meta name="description" content="Instale o Titan Loterias como aplicativo no Android, iPhone ou desktop. Guia passo a passo para PWA." />
+        <link rel="canonical" href="https://titanloterias.lovable.app/install" />
+        <meta property="og:title" content="Instalar o App — Titan Loterias" />
+        <meta property="og:description" content="Guia para instalar o Titan Loterias como app PWA no celular ou desktop." />
+        <meta property="og:url" content="https://titanloterias.lovable.app/install" />
+        <meta property="og:type" content="website" />
+      </Helmet>
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-8">
         {/* Header */}
         <div className="flex items-center gap-3">

@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, Link } from "react-router-dom";
@@ -40,6 +41,15 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 relative overflow-hidden">
+      <Helmet>
+        <title>Entrar — Titan Loterias</title>
+        <meta name="description" content="Acesse sua conta Titan Loterias e analise sorteios, gere apostas com IA e teste estratégias." />
+        <link rel="canonical" href="https://titanloterias.lovable.app/login" />
+        <meta property="og:title" content="Entrar — Titan Loterias" />
+        <meta property="og:description" content="Acesse sua conta e use IA para análise inteligente de loterias brasileiras." />
+        <meta property="og:url" content="https://titanloterias.lovable.app/login" />
+        <meta property="og:type" content="website" />
+      </Helmet>
       {/* Background effects */}
       <div className="absolute inset-0 gradient-mesh" />
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
