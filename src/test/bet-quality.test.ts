@@ -10,6 +10,8 @@ const lotofacil: LotteryConfig = {
   pick: 15,
   color: "neon-blue",
   icon: "🎯",
+  betPrice: 3.0,
+  prizeTiers: [{ hits: 11, label: "11 Acertos" }, { hits: 12, label: "12 Acertos" }, { hits: 13, label: "13 Acertos" }, { hits: 14, label: "14 Acertos" }, { hits: 15, label: "15 Acertos" }],
 };
 
 const megasena: LotteryConfig = {
@@ -19,6 +21,8 @@ const megasena: LotteryConfig = {
   pick: 6,
   color: "neon-green",
   icon: "🍀",
+  betPrice: 5.0,
+  prizeTiers: [{ hits: 4, label: "Quadra" }, { hits: 5, label: "Quina" }, { hits: 6, label: "Sena" }],
 };
 
 const makeDraw = (n: number[]): DrawResult => ({ concurso: 1, date: "2026-01-01", numbers: n });

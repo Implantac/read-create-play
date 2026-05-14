@@ -12,10 +12,12 @@ import { LotteryConfig, DrawResult } from "@/data/lotteries";
 // Mock data
 const LOTOFACIL_CONFIG: LotteryConfig = {
   id: "lotofacil", name: "Lotofácil", numbers: 25, pick: 15, color: "neon-blue", icon: "🎯",
+  betPrice: 3.0, prizeTiers: [],
 };
 
 const MEGASENA_CONFIG: LotteryConfig = {
   id: "megasena", name: "Mega-Sena", numbers: 60, pick: 6, color: "neon-green", icon: "🍀",
+  betPrice: 5.0, prizeTiers: [],
 };
 
 function generateMockDraws(count: number, maxNum: number, pick: number): DrawResult[] {

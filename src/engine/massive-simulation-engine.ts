@@ -172,12 +172,18 @@ function analyzePattern(numbers: number[], maxNumber: number): {
 
 // ─── Prize Thresholds ────────────────────────────────────────────
 
-function getPrizeThreshold(lotteryId: string, pick: number): number {
+function getPrizeThreshold(config: LotteryConfig): number {
+  if (config.prizeTiers && config.prizeTiers.length > 0) {
+    // Return the minimum hits required for any prize
+    return Math.min(...config.prizeTiers.map(t => t.hits).filter(h => h > 0));
+  }
+  
+  // Fallback to legacy logic
   const thresholds: Record<string, number> = {
     megasena: 4, lotofacil: 11, quina: 2, lotomania: 15,
     duplasena: 3, timemania: 3, diadesorte: 4, supersete: 3,
   };
-  return thresholds[lotteryId] ?? Math.max(2, pick - 3);
+  return thresholds[config.id] ?? Math.max(2, config.pick - 3);
 }
 
 // ─── Core Simulation Engine ──────────────────────────────────────
@@ -202,7 +208,7 @@ export function runMassiveSimBatch(job: MassiveSimJob): MassiveSimResult {
   // Pre-compute bitsets for all historical draws
   const drawBitsets = draws.map(d => toBitset(d.numbers));
   const drawCount = draws.length;
-  const prizeThreshold = getPrizeThreshold(config.id, config.pick);
+  const prizeThreshold = getPrizeThreshold(config);
 
   // Build weights
   const weights = buildWeights(stats, config, mode);
