@@ -85,6 +85,36 @@ export const STRATEGY_REGISTRY: StrategyDefinition[] = [
     category: "math", baseStrategy: "primes", supportedLotteries: [],
     params: { ...DEFAULT_PARAMS, trendWeight: 0.5, cycleWeight: 0.6 },
   },
+  {
+    id: "quantum_analysis", name: "Análise Quantum", description: "Padrões multi-dimensionais e ressonância de ciclos",
+    category: "ai", baseStrategy: "quantum", supportedLotteries: [],
+    params: { ...DEFAULT_PARAMS },
+  },
+  {
+    id: "rf_model", name: "Random Forest", description: "Ensemble de árvores para detecção de features complexas",
+    category: "ai", baseStrategy: "randomForest", supportedLotteries: [],
+    params: { ...DEFAULT_PARAMS },
+  },
+  {
+    id: "xgboost_model", name: "XGBoost", description: "Gradient Boosting de alto desempenho e precisão",
+    category: "ai", baseStrategy: "xgboost", supportedLotteries: [],
+    params: { ...DEFAULT_PARAMS },
+  },
+  {
+    id: "lstm_nn", name: "Rede Neural (LSTM)", description: "Memória de longo prazo para sequências numéricas",
+    category: "ai", baseStrategy: "lstm", supportedLotteries: [],
+    params: { ...DEFAULT_PARAMS },
+  },
+  {
+    id: "bayesian_inf", name: "Inferência Bayesiana", description: "Cálculo probabilístico com atualização contínua",
+    category: "ai", baseStrategy: "bayesian", supportedLotteries: [],
+    params: { ...DEFAULT_PARAMS },
+  },
+  {
+    id: "markov_chain", name: "Cadeia de Markov", description: "Matriz de transição baseada no último sorteio",
+    category: "ai", baseStrategy: "markov_model", supportedLotteries: [],
+    params: { ...DEFAULT_PARAMS },
+  },
 ];
 
 export function getStrategy(id: string): StrategyDefinition | undefined {

@@ -7,7 +7,7 @@ import { GeneratorFiltersPanel } from "@/components/GeneratorFiltersPanel";
 import { HistoricalValidationBadge } from "@/components/HistoricalValidationBadge";
 import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, RefreshCw, Copy, Check, Brain, Flame, Snowflake, Shuffle, Hash, Sigma, Ratio, Grid3X3, Clock, BarChart3, TrendingUp, Repeat, Layers, Star, AlertTriangle, Binary, Boxes, Zap } from "lucide-react";
+import { Sparkles, RefreshCw, Copy, Check, Brain, Flame, Snowflake, Shuffle, Hash, Sigma, Ratio, Grid3X3, Clock, BarChart3, TrendingUp, Repeat, Layers, Star, AlertTriangle, Binary, Boxes, Zap, Activity, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useLotteryContext } from "@/contexts/LotteryContext";
@@ -37,6 +37,12 @@ const ICON_MAP: Record<Strategy, typeof Sparkles> = {
   poisson: Binary,
   cluster: Boxes,
   expert: Star,
+  quantum: Zap,
+  randomForest: Binary,
+  xgboost: TrendingUp,
+  lstm: Activity,
+  bayesian: Target,
+  markov_model: RefreshCw,
 };
 
 const CATEGORY_LABELS = { basic: "Básicas", math: "Matemáticas", ai: "Inteligência Artificial" };

@@ -1,6 +1,6 @@
 import { NumberStats, generateSmartBet } from "./statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { getConsensusRanking, runAllModels } from "./ml-models";
+import { getConsensusRanking, runAllModels, runQuantumAnalysis, runRandomForest, runXGBoost, runNeuralNetwork, runBayesianInference, runMarkovChain } from "./ml-models";
 
 export type Strategy =
   | "smart"
@@ -20,7 +20,13 @@ export type Strategy =
   | "markov"
   | "poisson"
   | "cluster"
-  | "expert";
+  | "expert"
+  | "quantum"
+  | "randomForest"
+  | "xgboost"
+  | "lstm"
+  | "bayesian"
+  | "markov_model";
 
 export interface StrategyInfo {
   id: Strategy;
@@ -51,6 +57,12 @@ export const STRATEGIES: StrategyInfo[] = [
   { id: "poisson", label: "Poisson", desc: "Distribuição estatística por taxa de ocorrência", category: "ai" },
   { id: "cluster", label: "Clusters", desc: "Agrupamento por afinidade e correlação histórica", category: "ai" },
   { id: "expert", label: "Loto-Mestre", desc: "Estratégia profissional com dezenas fixas e desdobramento", category: "ai" },
+  { id: "quantum", label: "Análise Quantum", desc: "Padrões multi-dimensionais e ressonância estatística", category: "ai" },
+  { id: "randomForest", label: "Random Forest", desc: "Ensemble de árvores de decisão e features clássicas", category: "ai" },
+  { id: "xgboost", label: "XGBoost", desc: "Gradient Boosting de alta performance", category: "ai" },
+  { id: "lstm", label: "Rede Neural (LSTM)", desc: "Reconhecimento de padrões profundos em séries temporais", category: "ai" },
+  { id: "bayesian", label: "Bayesiana", desc: "Inferência probabilística com atualização de priors", category: "ai" },
+  { id: "markov_model", label: "Cadeia de Markov", desc: "Probabilidades de transição de estados numéricos", category: "ai" },
 ];
 
 function isPrime(n: number): boolean {
@@ -413,6 +425,48 @@ export function generateByStrategy(
       const shuffled = weightedShuffle(weighted);
       const selected = [...fixed, ...shuffled.slice(0, pick - fixed.length).map(s => s.number)];
       return selected.sort((a, b) => a - b);
+    }
+
+    case "quantum": {
+      const result = runQuantumAnalysis(stats, config);
+      const topPool = result.predictions.slice(0, Math.min(pick * 2, result.predictions.length));
+      const shuffled = [...topPool].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, pick).map(p => p.number).sort((a, b) => a - b);
+    }
+
+    case "randomForest": {
+      const result = runRandomForest(stats, config);
+      const topPool = result.predictions.slice(0, Math.min(pick * 2, result.predictions.length));
+      const shuffled = [...topPool].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, pick).map(p => p.number).sort((a, b) => a - b);
+    }
+
+    case "xgboost": {
+      const result = runXGBoost(stats, config);
+      const topPool = result.predictions.slice(0, Math.min(pick * 2, result.predictions.length));
+      const shuffled = [...topPool].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, pick).map(p => p.number).sort((a, b) => a - b);
+    }
+
+    case "lstm": {
+      const result = runNeuralNetwork(stats, config);
+      const topPool = result.predictions.slice(0, Math.min(pick * 2, result.predictions.length));
+      const shuffled = [...topPool].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, pick).map(p => p.number).sort((a, b) => a - b);
+    }
+
+    case "bayesian": {
+      const result = runBayesianInference(stats, config);
+      const topPool = result.predictions.slice(0, Math.min(pick * 2, result.predictions.length));
+      const shuffled = [...topPool].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, pick).map(p => p.number).sort((a, b) => a - b);
+    }
+
+    case "markov_model": {
+      const result = runMarkovChain(stats, config);
+      const topPool = result.predictions.slice(0, Math.min(pick * 2, result.predictions.length));
+      const shuffled = [...topPool].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, pick).map(p => p.number).sort((a, b) => a - b);
     }
 
     default:

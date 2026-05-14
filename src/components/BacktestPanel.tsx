@@ -26,7 +26,7 @@ const COLORS = [
 
 export function BacktestPanel({ stats, config, draws }: Props) {
   const [selectedStrategies, setSelectedStrategies] = useState<Strategy[]>(
-    ["smart", "hot", "cold", "trend", "cycle", "hybrid"]
+    ["smart", "hot", "cold", "trend", "cycle", "hybrid", "quantum", "ml"]
   );
   const [testWindow, setTestWindow] = useState(50);
   const [betsPerDraw, setBetsPerDraw] = useState(3);
