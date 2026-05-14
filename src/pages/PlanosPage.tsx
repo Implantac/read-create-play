@@ -2,6 +2,7 @@ import { Crown, Infinity, Settings, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
+import { Helmet } from "react-helmet-async";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -98,6 +99,14 @@ export default function PlanosPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 md:px-6 pb-16">
+      <Helmet>
+        <title>Planos e Preços — Titan Loterias</title>
+        <meta name="description" content="Acesso vitalício à plataforma Titan Loterias. Pague uma vez e tenha IA, estatísticas e geradores profissionais para sempre. Confira nossos planos." />
+        <link rel="canonical" href="https://titanloterias.lovable.app/planos" />
+        <meta property="og:title" content="Planos e Preços — Titan Loterias" />
+        <meta property="og:description" content="Acesso vitalício à plataforma Titan Loterias. IA e estatísticas para sempre." />
+        <meta property="og:url" content="https://titanloterias.lovable.app/planos" />
+      </Helmet>
       {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0, y: -15 }}
