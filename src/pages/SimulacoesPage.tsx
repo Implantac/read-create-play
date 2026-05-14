@@ -97,6 +97,7 @@ const SimulacoesPage = () => {
               </Card>
             </div>
 
+            <AdvancedAnalyticsPanel stats={stats} draws={draws} config={config} />
             <VolatilitySimulationPanel lotteryId={config.id} draws={draws} />
             <ComparativeSimulatorPanel stats={stats} config={config} draws={draws} />
 
