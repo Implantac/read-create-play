@@ -7,17 +7,20 @@ import {
   computeCorrelationMatrix,
   runKMeansClustering,
   computeIntegratedScores,
+  computeVolatilityAndSentiment,
   LogisticResult,
   TimeSeriesForecast,
   CorrelationPair,
   ClusterInfo,
   IntegratedScore,
+  VolatilityStats,
 } from "@/engine/advanced-analytics";
 import { motion, AnimatePresence } from "framer-motion";
-import { Brain, Play, TrendingUp, GitBranch, Layers, BarChart3, Microscope } from "lucide-react";
+import { Brain, Play, TrendingUp, GitBranch, Layers, BarChart3, Microscope, ShieldAlert, Activity, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ScatterChart, Scatter, ZAxis } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ScatterChart, Scatter, ZAxis, LineChart, Line } from "recharts";
+import { DashboardWidget } from "./DashboardWidget";
 
 interface Props {
   stats: NumberStats[];
