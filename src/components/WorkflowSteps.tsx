@@ -9,8 +9,8 @@ const steps = [
     description: "Dados históricos, padrões e frequências",
     icon: Search,
     url: "/estatisticas",
-    color: "text-neon-blue",
-    bgColor: "bg-neon-blue/10 border-neon-blue/20",
+    color: "text-blue-500",
+    bgColor: "bg-blue-500/10 border-blue-500/20",
   },
   {
     number: 2,
