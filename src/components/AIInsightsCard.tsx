@@ -6,9 +6,10 @@ interface Props {
   stats: Array<{ number: number; frequency: number; lastSeen: number; status: string }>;
   draws: Array<{ numbers: number[] }>;
   lotteryName: string;
+  compact?: boolean;
 }
 
-export function AIInsightsCard({ stats, draws, lotteryName }: Props) {
+export function AIInsightsCard({ stats, draws, lotteryName, compact }: Props) {
   const insights = useMemo(() => {
     if (stats.length === 0 || draws.length === 0) return [];
 
