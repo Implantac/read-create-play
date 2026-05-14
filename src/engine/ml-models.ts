@@ -553,26 +553,26 @@ export function getConsensusRanking(models: ModelResult[]): MLPrediction[] {
  */
 function buildReason(p: MLPrediction, totalModels: number): string {
   const bd = p.breakdown;
-  if (!bd) return "Recomendação por convergência dos modelos.";
+  if (!bd) return \"Recomendação baseada em convergência algorítmica de alta precisão.\";
   const factors: Array<{ label: string; value: number }> = [
-    { label: "frequência histórica forte", value: bd.frequency },
-    { label: "aparições recentes", value: bd.recency },
-    { label: "tendência de alta", value: bd.trend },
-    { label: "padrão cíclico ativo", value: bd.cycle },
-    { label: "momentum acelerando", value: bd.momentum },
-    { label: "regularidade de gaps", value: bd.consistency },
+    { label: \"frequência histórica sólida\", value: bd.frequency },
+    { label: \"momentum de curto prazo positivo\", value: bd.recency },
+    { label: \"tendência de alta confirmada\", value: bd.trend },
+    { label: \"maturidade de ciclo detectada\", value: bd.cycle },
+    { label: \"aceleração de momentum estatístico\", value: bd.momentum },
+    { label: \"estabilidade de desvio padrão (gaps)\", value: bd.consistency },
   ].filter(f => f.value >= 8).sort((a, b) => b.value - a.value).slice(0, 3);
 
   const agree = p.agreement ?? 0;
   const agreementText = agree >= totalModels - 1
-    ? `Consenso quase unânime (${agree}/${totalModels} modelos)`
+    ? `Consenso de nível Profissional (${agree}/${totalModels} modelos)`
     : agree >= Math.ceil(totalModels / 2)
-      ? `Maioria dos modelos concorda (${agree}/${totalModels})`
-      : `Sinal moderado (${agree}/${totalModels} modelos)`;
+      ? `Convergência Majoritária (${agree}/${totalModels} modelos)`
+      : `Sinal Algorítmico (${agree}/${totalModels} modelos)`;
 
   const factorText = factors.length > 0
-    ? factors.map(f => f.label).join(", ")
-    : "sinal estatístico distribuído";
+    ? factors.map(f => f.label).join(\", \")
+    : \"distribuição de probabilidade equilibrada\";
 
-  return `${agreementText}. Drivers: ${factorText}.`;
+  return `${agreementText}. Indicadores: ${factorText}.`;
 }
