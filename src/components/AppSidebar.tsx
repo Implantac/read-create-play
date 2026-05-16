@@ -257,15 +257,15 @@ export function AppSidebar() {
               )}
               <Link
                 to="/planos"
-                className="flex items-center gap-2 rounded-lg bg-primary/5 border border-primary/10 px-3 py-2.5 hover:bg-primary/10 transition-colors group"
+                className="flex items-center gap-3 rounded-xl bg-primary text-primary-foreground px-4 py-3.5 hover:scale-[1.02] transition-all group shadow-lg shadow-primary/20"
               >
-                <Crown className="w-4 h-4 text-accent shrink-0" />
+                <Crown className="w-5 h-5 text-white shrink-0 drop-shadow-md" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-sidebar-accent-foreground">
-                    {currentPlan === "free" ? "Upgrade" : "Vitalício"}
+                  <p className="text-[11px] font-black uppercase tracking-widest leading-none">
+                    UPGRADE TO PRO
                   </p>
-                  <p className="text-[10px] text-muted-foreground truncate">
-                    {currentPlan === "free" ? "Desbloquear recursos" : "Plano ativo"}
+                  <p className="text-[9px] text-primary-foreground/70 font-bold mt-1 uppercase">
+                    Neural v4.0 Active
                   </p>
                 </div>
               </Link>
