@@ -515,6 +515,7 @@ const DashboardPage = () => {
                 <RecentDraws key={`recent-${selectedLottery}`} draws={drawsWithPrizes} />
               </DashboardWidget>
             </div>
+              </div>
           </PlanGate>
 
           {/* Limits section */}
