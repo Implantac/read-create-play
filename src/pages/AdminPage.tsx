@@ -645,6 +645,195 @@ export default function AdminPage() {
           </Card>
         </TabsContent>
 
+        {/* TICKETS TAB */}
+        <TabsContent value="tickets">
+          <Card className="bg-card/60 border-border/50">
+            <CardHeader className="pb-3">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                <div>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <MessageSquare className="w-5 h-5 text-primary" />
+                    Chamados de Suporte
+                  </CardTitle>
+                  <CardDescription>Gerencie as solicitações de atendimento dos usuários</CardDescription>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="relative w-52">
+                    <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
+                    <Input 
+                      placeholder="Protocolo ou assunto..." 
+                      value={ticketSearch} 
+                      onChange={(e) => setTicketSearch(e.target.value)} 
+                      className="pl-10 h-9" 
+                    />
+                  </div>
+                  <Select value={filterTicketStatus} onValueChange={setFilterTicketStatus}>
+                    <SelectTrigger className="w-[140px] h-9 text-xs">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos os Status</SelectItem>
+                      <SelectItem value="open">Abertos</SelectItem>
+                      <SelectItem value="in_progress">Em Atendimento</SelectItem>
+                      <SelectItem value="closed">Finalizados</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Protocolo</TableHead>
+                        <TableHead>Usuário</TableHead>
+                        <TableHead>Assunto</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Data</TableHead>
+                        <TableHead>Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {tickets
+                        .filter(t => {
+                          const matchesSearch = t.protocol.toLowerCase().includes(ticketSearch.toLowerCase()) || 
+                                               t.subject.toLowerCase().includes(ticketSearch.toLowerCase()) ||
+                                               t.email.toLowerCase().includes(ticketSearch.toLowerCase());
+                          const matchesStatus = filterTicketStatus === "all" || t.status === filterTicketStatus;
+                          return matchesSearch && matchesStatus;
+                        })
+                        .map(ticket => (
+                          <TableRow key={ticket.id}>
+                            <TableCell className="font-mono text-xs font-bold text-primary">
+                              #{ticket.protocol}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex flex-col">
+                                <span className="text-sm font-medium">{ticket.name}</span>
+                                <span className="text-[10px] text-muted-foreground">{ticket.email}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-sm max-w-[200px] truncate">
+                              {ticket.subject}
+                            </TableCell>
+                            <TableCell>
+                              {ticket.status === 'open' && (
+                                <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/20 gap-1">
+                                  <Clock className="w-3 h-3" /> Aberto
+                                </Badge>
+                              )}
+                              {ticket.status === 'in_progress' && (
+                                <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 gap-1">
+                                  <Activity className="w-3 h-3" /> Em Curso
+                                </Badge>
+                              )}
+                              {ticket.status === 'closed' && (
+                                <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20 gap-1">
+                                  <CheckCircle className="w-3 h-3" /> Finalizado
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-xs text-muted-foreground">
+                              {new Date(ticket.created_at).toLocaleDateString("pt-BR")}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Select 
+                                  value={ticket.status} 
+                                  onValueChange={async (val: any) => {
+                                    const { error } = await supabase
+                                      .from('support_tickets')
+                                      .update({ status: val, updated_at: new Date().toISOString() })
+                                      .eq('id', ticket.id);
+                                    
+                                    if (error) {
+                                      toast({ title: "Erro", description: "Não foi possível atualizar o status.", variant: "destructive" });
+                                    } else {
+                                      setTickets(prev => prev.map(t => t.id === ticket.id ? { ...t, status: val } : t));
+                                      toast({ title: "Sucesso", description: `Ticket #${ticket.protocol} atualizado para ${val}.` });
+                                      await logAction("ticket_status_changed", null, { protocol: ticket.protocol, new_status: val });
+                                    }
+                                  }}
+                                >
+                                  <SelectTrigger className="w-[110px] h-8 text-[10px]">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="open">Aberto</SelectItem>
+                                    <SelectItem value="in_progress">Em Atendimento</SelectItem>
+                                    <SelectItem value="closed">Finalizado</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                      <Eye className="w-4 h-4" />
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="max-w-2xl">
+                                    <DialogHeader>
+                                      <DialogTitle className="flex items-center gap-2">
+                                        <MessageSquare className="w-5 h-5" />
+                                        Detalhes do Chamado #{ticket.protocol}
+                                      </DialogTitle>
+                                    </DialogHeader>
+                                    <div className="space-y-4 py-4">
+                                      <div className="grid grid-cols-2 gap-4 text-sm">
+                                        <div className="space-y-1">
+                                          <p className="text-xs text-muted-foreground uppercase font-bold">Cliente</p>
+                                          <p className="font-medium">{ticket.name}</p>
+                                          <p className="text-muted-foreground">{ticket.email}</p>
+                                        </div>
+                                        <div className="space-y-1 text-right">
+                                          <p className="text-xs text-muted-foreground uppercase font-bold">Data de Abertura</p>
+                                          <p className="font-medium">{new Date(ticket.created_at).toLocaleString("pt-BR")}</p>
+                                          <p className="text-[10px] text-muted-foreground">ID: {ticket.id}</p>
+                                        </div>
+                                      </div>
+                                      <div className="bg-muted/30 p-4 rounded-lg border border-border/50 space-y-2">
+                                        <p className="text-xs text-muted-foreground uppercase font-bold">Assunto</p>
+                                        <p className="font-bold text-foreground">{ticket.subject}</p>
+                                        <div className="h-px bg-border/50 my-2" />
+                                        <p className="text-xs text-muted-foreground uppercase font-bold mb-1">Mensagem</p>
+                                        <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                                          {ticket.message}
+                                        </p>
+                                      </div>
+                                      <div className="flex justify-end gap-2">
+                                        <Button asChild variant="outline" size="sm" className="gap-2">
+                                          <a href={`mailto:${ticket.email}?subject=Re: Suporte Titan Loterias - ${ticket.protocol}`}>
+                                            <MailIcon className="w-4 h-4" /> Responder por E-mail
+                                          </a>
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </DialogContent>
+                                </Dialog>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      {tickets.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                            Nenhum chamado de suporte encontrado.
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         {/* ROLES TAB */}
         <TabsContent value="roles">
           <Card className="bg-card/60 border-border/50">
