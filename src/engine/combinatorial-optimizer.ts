@@ -128,8 +128,8 @@ export function runCombinatorialOptimization(
 
     // Crossover random pairs from top
     for (let i = 0; i < populationSize / 4; i++) {
-      const a = population[Math.floor(Math.random() * Math.min(5, population.length))];
-      const b = population[Math.floor(Math.random() * Math.min(10, population.length))];
+      const a = population[Math.floor(fastRandom() * Math.min(5, population.length))];
+      const b = population[Math.floor(fastRandom() * Math.min(10, population.length))];
       const child = crossover(a.bet, b.bet);
       const quality = evaluateBetQuality(child, stats, config, draws);
       newCandidates.push({ bet: child, score: quality.overall, quality });
