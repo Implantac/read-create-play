@@ -32,30 +32,12 @@ const SimulacoesPage = () => {
 
   return (
     <div className="space-y-6">
-      {/* Enhanced Header */}
-      <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/8 via-background to-accent/5 p-6 md:p-8">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-        <div className="relative flex flex-col md:flex-row md:items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-primary/15 flex items-center justify-center shrink-0 ring-2 ring-primary/20">
-            <FlaskConical className="w-7 h-7 text-primary" />
-          </div>
-          <div className="flex-1">
-            <h1 className="text-xl md:text-2xl font-black text-foreground tracking-tight">
-              Simulações
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Teste estratégias com simulações Monte Carlo, backtesting e simulação massiva para{" "}
-              <span className="text-primary font-semibold">{config.name}</span>
-            </p>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant="secondary" className="text-xs gap-1.5 py-1.5 px-3">
-              <BarChart3 className="w-3 h-3" />
-              {draws.length.toLocaleString()} sorteios
-            </Badge>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title="Simulation Lab"
+        description={`Ambiente de alta performance para backtesting e simulações estocásticas — ${config.name}`}
+        icon={FlaskConical}
+        badge="Quantum Engine v4.2"
+      />
 
       <LotteryContextBanner />
       <ComplianceDisclaimer />
