@@ -1,0 +1,16 @@
+[BLOQUEIO] src/components/AppLayout.tsx:105 -> {profile?.plan === 'free' ? 'Standard Access' : 'PRO TERMINAL'}
+[BLOQUEIO] src/components/AppSidebar.tsx:266 -> UPGRADE TO PRO
+[BLOQUEIO] src/components/plans/PlanComparisonTable.tsx:11 -> { name: "Gerador Profissional Premium", free: false, lifetime: true, elite: true },
+[BLOQUEIO] src/components/plans/PlanComparisonTable.tsx:18 -> { name: "Dashboard Social Premium", free: false, lifetime: false, elite: true },
+[BLOQUEIO] src/components/plans/PlanComparisonTable.tsx:52 -> <th className="text-center px-4 py-3.5 font-semibold text-primary w-28">Enterprise Pro</th>
+[BLOQUEIO] src/features/statistics/scoring.ts:14 -> classification: "Conservador" | "Moderado" | "Agressivo" | "Profissional" | "Premium" | "Elite";
+[BLOQUEIO] src/features/statistics/scoring.ts:72 -> else if (total > 88) classification = "Premium";
+[BLOQUEIO] src/lib/design-system.ts:40 -> premiumGradient: "bg-gradient-to-br from-primary/20 via-primary/5 to-transparent",
+[BLOQUEIO] src/pages/DashboardPage.tsx:228 -> {(profile?.plan === "free" || profile?.plan === "premium" || profile?.plan === "professional") && !isTrialExpired && !isAdmin && !isSuperAdmin && (
+[BLOQUEIO] src/pages/LandingPage.tsx:220 -> name: "Enterprise Pro",
+[BLOQUEIO] src/pages/LandingPage.tsx:245 -> "Tudo do plano Enterprise Pro",
+[BLOQUEIO] src/pages/LandingPage.tsx:248 -> "Dashboard Social Premium",
+[BLOQUEIO] src/pages/PlanosPage.tsx:19 -> name: "Enterprise Pro",
+[BLOQUEIO] src/pages/PlanosPage.tsx:29 -> "Gerador Profissional Premium",
+[BLOQUEIO] src/pages/PlanosPage.tsx:48 -> "Tudo do Enterprise Pro",
+[BLOQUEIO] src/pages/PlanosPage.tsx:51 -> "Dashboard Social Premium",
