@@ -99,7 +99,7 @@ export function runMassiveBatch(
     const bet = generateByStrategy(strategy, stats, config);
     
     // Pick random historical draw and compare via bitset
-    const drawIdx = Math.floor(Math.random() * drawCount);
+    const drawIdx = Math.floor(fastRandom() * drawCount);
     const betBs = toBitset(bet);
     const hits = drawCount > 0 ? bitsetHits(betBs, drawBitsets[drawIdx]) : 0;
 
