@@ -66,8 +66,8 @@ export default function SuportePage() {
   const [ticketSent, setTicketSent] = useState(false);
   const [protocol, setProtocol] = useState("");
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
+    name: user?.user_metadata?.full_name || "",
+    email: user?.email || "",
     subject: "",
     message: ""
   });
