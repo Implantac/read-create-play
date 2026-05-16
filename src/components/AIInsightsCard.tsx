@@ -30,7 +30,7 @@ export function AIInsightsCard({ stats, draws, lotteryName, compact }: Props) {
     if (cold.length > 0) {
       result.push({
         icon: TrendingDown,
-        text: `Dezenas atrasadas: ${cold.join(", ")} — estão sem aparecer há mais tempo que o esperado.`,
+        text: `Ciclo de Atraso: ${cold.join(", ")} ultrapassaram o limite de entropia esperado e entram na zona de alta probabilidade técnica.`,
         type: "warning",
       });
     }
