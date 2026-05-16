@@ -11,7 +11,7 @@ interface PlanGateProps {
   fallbackMessage?: string;
 }
 
-const PLAN_LABELS = { free: "Gratuito", lifetime: "Vitalício" };
+const PLAN_LABELS = { free: "Gratuito", lifetime: "Vitalício", elite: "Elite Cloud" };
 
 const FEATURE_BENEFITS: Record<string, { title: string; benefit: string; icon: React.ElementType }> = {
   gerador_profissional: {
@@ -99,12 +99,12 @@ export function PlanGate({ feature, children, fallbackMessage }: PlanGateProps) 
           <Link to="/planos">
             <Button className="gap-2 gradient-brand text-primary-foreground shadow-md shadow-primary/20 mt-1">
               <Crown className="w-4 h-4" />
-              Ativar Acesso Vitalício
+              Ver Planos de Acesso
               <ArrowRight className="w-3 h-3" />
             </Button>
           </Link>
-          <p className="text-xs text-muted-foreground">
-            Pagamento único • R$ 79,90
+          <p className="text-xs text-muted-foreground uppercase font-black tracking-tighter">
+            Evolução Neural v5.2 Ativa
           </p>
         </CardContent>
       </Card>

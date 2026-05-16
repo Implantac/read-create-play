@@ -5,6 +5,7 @@ const PLAN_HIERARCHY: Record<PlanType, number> = {
   premium: 1, // Legacy support
   professional: 2, // Legacy support
   lifetime: 3,
+  elite: 4,
 };
 
 export type Feature =
@@ -40,10 +41,10 @@ const FEATURE_MIN_PLAN: Record<Feature, PlanType> = {
   export_pdf: "lifetime",
   estrategias_basicas: "lifetime",
   roi_dashboard: "lifetime",
-  ia_autonoma: "lifetime",
-  ai_analyst: "lifetime",
-  estrategias_ml: "lifetime",
-  estrategias_hp: "lifetime",
+  ia_autonoma: "elite",
+  ai_analyst: "elite",
+  estrategias_ml: "elite",
+  estrategias_hp: "elite",
   estrategias_analytics: "lifetime",
   otimizacao: "lifetime",
 };
@@ -53,6 +54,7 @@ export const PLAN_LIMITS = {
   premium: { savedBetsPerLottery: Infinity }, // Legacy
   professional: { savedBetsPerLottery: Infinity }, // Legacy
   lifetime: { savedBetsPerLottery: Infinity },
+  elite: { savedBetsPerLottery: Infinity },
 } as const;
 
 export function usePlanAccess() {

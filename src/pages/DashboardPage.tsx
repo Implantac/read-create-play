@@ -33,6 +33,7 @@ import { QuickIntelligence } from "@/features/ai/components/QuickIntelligence";
 import { StatsWidget } from "@/components/ui/StatsWidget";
 import { DESIGN_TOKENS } from "@/lib/design-system";
 import { RecentDraws } from "@/components/RecentDraws";
+import { PlanGate } from "@/components/PlanGate";
 import { PersonalPerformanceCard } from "@/components/PersonalPerformanceCard";
 import { ParityChart } from "@/components/ParityChart";
 import { ConsecutiveChart } from "@/components/ConsecutiveChart";
@@ -224,7 +225,7 @@ const DashboardPage = () => {
       <ComplianceDisclaimer compact />
 
       {/* Trial countdown banner */}
-      {profile?.plan === "free" && !isTrialExpired && !isAdmin && !isSuperAdmin && (
+      {(profile?.plan === "free" || profile?.plan === "premium" || profile?.plan === "professional") && !isTrialExpired && !isAdmin && !isSuperAdmin && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -482,11 +483,12 @@ const DashboardPage = () => {
           </DndContext>
 
           {/* Advanced Analytics Section */}
-          <div className="space-y-6 mt-12">
-            <div className="flex items-center gap-3">
-              <div className="w-1.5 h-6 rounded-full bg-primary" />
-              <h2 className="text-xl font-black tracking-tight text-foreground uppercase">Análise de Comportamento</h2>
-            </div>
+          <PlanGate feature="estrategias_analytics">
+            <div className="space-y-6 mt-12">
+              <div className="flex items-center gap-3">
+                <div className="w-1.5 h-6 rounded-full bg-primary" />
+                <h2 className="text-xl font-black tracking-tight text-foreground uppercase">Análise de Comportamento</h2>
+              </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <DashboardWidget title="Paridade & Equilíbrio" subtitle="Pares vs Ímpares" icon={Target}>
@@ -514,7 +516,8 @@ const DashboardPage = () => {
                 <RecentDraws key={`recent-${selectedLottery}`} draws={drawsWithPrizes} />
               </DashboardWidget>
             </div>
-          </div>
+              </div>
+          </PlanGate>
 
           {/* Limits section */}
           {limit !== Infinity && (

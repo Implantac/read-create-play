@@ -188,7 +188,7 @@ const colorMap = {
   cyan: "from-neon-cyan/20 to-neon-cyan/5 border-neon-cyan/20 text-neon-cyan",
 };
 
-const lotteries = ["Mega-Sena", "Lotofácil", "Quina", "Lotomania", "Dupla Sena", "Timemania", "Dia de Sorte", "Super Sete", "Powerball (Breve)", "EuroMillions (Breve)"];
+const lotteries = ["Mega-Sena", "Lotofácil", "Quina", "Lotomania", "Dupla Sena", "Timemania", "Dia de Sorte", "Super Sete", "+Milionária", "Powerball (Breve)", "EuroMillions (Breve)"];
 
 const stats = [
   { value: "12.500+", label: "Sorteios analisados" },
@@ -199,22 +199,58 @@ const stats = [
 
 const plans = [
   {
-    name: "Vitalício",
+    name: "Standard",
+    price: "R$ 49,90",
+    annualPrice: "R$ 49,90",
+    period: " único",
+    annualPeriod: " único",
+    features: [
+      "Acesso a 3 Loterias Base",
+      "Estatísticas de Frequência",
+      "Gerador Básico por IA",
+      "Histórico de Sorteios",
+      "Suporte via E-mail",
+      "Atualizações de Dados",
+    ],
+    cta: "Começar agora",
+    highlight: false,
+    isLifetime: true,
+  },
+  {
+    name: "Enterprise Pro",
     price: "R$ 79,90",
     annualPrice: "R$ 79,90",
     period: " único",
     annualPeriod: " único",
     features: [
-      "Acesso completo para sempre",
-      "Todas as 8 loterias incluídas",
-      "IA + Machine Learning",
-      "Gerador profissional com filtros",
-      "Backtesting contra histórico real",
-      "Todas as atualizações futuras",
-      "Taxa única",
+      "Acesso Vitalício Completo",
+      "Todas as 8+ Loterias",
+      "Alpha Engine Quantum v5.2",
+      "Simulações Massivas ilimitadas",
+      "Layout Terminal Customizável",
+      "Exportação de Relatórios",
+      "Suporte Prioritário VIP",
     ],
     cta: "Garantir acesso vitalício",
     highlight: true,
+    isLifetime: true,
+  },
+  {
+    name: "Elite Cloud",
+    price: "R$ 149,90",
+    annualPrice: "R$ 149,90",
+    period: " único",
+    annualPeriod: " único",
+    features: [
+      "Tudo do plano Enterprise Pro",
+      "IA Autônoma Dedicada",
+      "Acesso Antecipado Global",
+      "Dashboard Social Premium",
+      "Marketplace de Estratégias",
+      "Configurações sem Limites",
+    ],
+    cta: "Seja um Membro Elite",
+    highlight: false,
     isLifetime: true,
   },
 ];
@@ -717,7 +753,7 @@ export default function LandingPage() {
             </p>
           </motion.div>
 
-          <div className="flex justify-center max-w-md mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {plans.map((plan, i) => {
               const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -744,8 +780,8 @@ export default function LandingPage() {
               return (
               <motion.div
                 key={plan.name}
-                initial={{ opacity: 0, x: i % 2 === 0 ? -60 : 60, rotateY: i % 2 === 0 ? 12 : -12, scale: 0.9 }}
-                whileInView={{ opacity: 1, x: 0, rotateY: 0, scale: 1 }}
+                initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ delay: i * 0.15, duration: 0.6, type: "spring", stiffness: 80, damping: 15 }}
                 onMouseMove={handleMouseMove}

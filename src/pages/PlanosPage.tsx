@@ -16,25 +16,45 @@ import { refineError } from "@/lib/error-handler";
 const basePlans = [
   {
     id: "lifetime",
-    name: "Vitalício",
+    name: "Enterprise Pro",
     price: "R$ 79,90",
     period: " único",
     icon: Infinity,
-    description: "Pague uma vez, use para sempre. Acesso completo a todas as ferramentas.",
+    description: "Acesso vitalício completo a todas as ferramentas e suporte prioritário VIP.",
     savedBetsLimit: "Jogos salvos ilimitados",
     features: [
-      "Todas as 8 loterias",
-      "IA + Machine Learning",
-      "Gerador Profissional com 14+ filtros",
-      "Backtesting contra histórico real",
+      "Todas as 8+ loterias",
+      "Alpha Engine Quantum v5.2",
+      "Simulações Massivas ilimitadas",
+      "Gerador Profissional Premium",
       "Acesso vitalício garantido",
-      "Todas as atualizações futuras incluídas",
+      "Todas as atualizações futuras",
       "Sem taxas recorrentes",
-      "Suporte prioritário",
+      "Suporte Prioritário VIP",
     ],
     cta: "Garantir acesso vitalício",
     isLifetime: true,
     highlight: true,
+  },
+  {
+    id: "elite",
+    name: "Elite Cloud",
+    price: "R$ 149,90",
+    period: " único",
+    icon: Crown,
+    description: "Para quem busca a fronteira da tecnologia lotérica com IA Autônoma dedicada.",
+    savedBetsLimit: "Servidores dedicados",
+    features: [
+      "Tudo do Enterprise Pro",
+      "IA Autônoma Dedicada",
+      "Acesso Antecipado Global",
+      "Dashboard Social Premium",
+      "Marketplace de Estratégias",
+      "Configurações sem Limites",
+    ],
+    cta: "Seja um Membro Elite",
+    isLifetime: true,
+    highlight: false,
   },
 ];
 
@@ -144,9 +164,9 @@ export default function PlanosPage() {
         </motion.div>
       )}
 
-      {/* Grid container for centered single card */}
+      {/* Grid container for centered cards */}
       <div className="flex justify-center mb-12">
-        <div className="w-full max-w-md">
+        <div className="grid md:grid-cols-2 gap-6 w-full max-w-4xl">
           {plans.map((plan, i) => {
             const isCurrent = currentPlan === plan.id;
             const isUpgrade = plan.id !== "free" && !isCurrent;
