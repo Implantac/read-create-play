@@ -1,9 +1,10 @@
 import { NumberStats } from "@/features/statistics/engine";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { generateByStrategy, Strategy, STRATEGIES } from "@/features/statistics/strategies";
+import { fastRandom } from "./hp-math-engine";
 
 // ═══════════════════════════════════════════════════════
-// Simulador Massivo de Monte Carlo v3.0
+// Simulador Massivo de Monte Carlo v3.1 — QUANTUM EDITION
 // Otimizado com bitsets, PRNG inline e variância O(1)
 // ═══════════════════════════════════════════════════════
 
