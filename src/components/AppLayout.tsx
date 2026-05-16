@@ -98,11 +98,11 @@ export function AppLayout() {
                         <User className="w-5 h-5 text-primary relative z-10" />
                       </div>
                       <div className="hidden md:flex flex-col items-start leading-none">
-                        <span className="text-[11px] font-bold text-foreground">
-                          {profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "Usuário"}
+                        <span className="text-[11px] font-black text-white uppercase tracking-wider">
+                          {profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "Trader"}
                         </span>
-                        <span className="text-[9px] text-muted-foreground uppercase tracking-wider font-semibold">
-                          {profile?.plan || "Free"}
+                        <span className="text-[9px] text-primary font-black uppercase tracking-[0.1em]">
+                          {profile?.plan === 'free' ? 'Standard Access' : 'PRO TERMINAL'}
                         </span>
                       </div>
                     </Button>
