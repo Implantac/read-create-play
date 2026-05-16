@@ -243,7 +243,7 @@ export default function SuportePage() {
                     </div>
                     <div>
                       <h4 className="font-bold text-lg">Chamado Aberto!</h4>
-                      <p className="text-sm text-muted-foreground">Anote seu protocolo: #TT-{Math.floor(100000 + Math.random() * 900000)}</p>
+                      <p className="text-sm text-muted-foreground">Anote seu protocolo: #<strong>{protocol}</strong></p>
                     </div>
                     <Button variant="outline" size="sm" onClick={() => setTicketSent(false)}>
                       Enviar nova mensagem
@@ -254,20 +254,45 @@ export default function SuportePage() {
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div className="space-y-1.5">
                         <label className="text-xs font-bold text-muted-foreground uppercase ml-1">Nome Completo</label>
-                        <Input required placeholder="Seu nome" className="bg-background/50 border-border/40 focus:border-primary/50" />
+                        <Input 
+                          required 
+                          placeholder="Seu nome" 
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          className="bg-background/50 border-border/40 focus:border-primary/50" 
+                        />
                       </div>
                       <div className="space-y-1.5">
                         <label className="text-xs font-bold text-muted-foreground uppercase ml-1">E-mail de Cadastro</label>
-                        <Input required type="email" placeholder="seu@email.com" className="bg-background/50 border-border/40 focus:border-primary/50" />
+                        <Input 
+                          required 
+                          type="email" 
+                          placeholder="seu@email.com" 
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          className="bg-background/50 border-border/40 focus:border-primary/50" 
+                        />
                       </div>
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold text-muted-foreground uppercase ml-1">Assunto</label>
-                      <Input required placeholder="Ex: Dúvida sobre IA, Pagamento, etc." className="bg-background/50 border-border/40 focus:border-primary/50" />
+                      <Input 
+                        required 
+                        placeholder="Ex: Dúvida sobre IA, Pagamento, etc." 
+                        value={formData.subject}
+                        onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                        className="bg-background/50 border-border/40 focus:border-primary/50" 
+                      />
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold text-muted-foreground uppercase ml-1">Mensagem</label>
-                      <Textarea required placeholder="Descreva sua dúvida ou problema com detalhes..." className="min-h-[120px] bg-background/50 border-border/40 focus:border-primary/50" />
+                      <Textarea 
+                        required 
+                        placeholder="Descreva sua dúvida ou problema com detalhes..." 
+                        value={formData.message}
+                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                        className="min-h-[120px] bg-background/50 border-border/40 focus:border-primary/50" 
+                      />
                     </div>
                     <Button disabled={isSubmitting} type="submit" className="w-full gradient-brand text-primary-foreground gap-2 font-bold uppercase tracking-wider h-12 shadow-lg shadow-primary/20">
                       {isSubmitting ? (
