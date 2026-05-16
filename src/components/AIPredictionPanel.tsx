@@ -150,7 +150,7 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-4 p-3 rounded-lg bg-muted/30 border border-border/30"
+            className="mb-6 p-4 rounded-xl bg-white/[0.02] border border-white/5"
           >
             <p className="text-xs text-muted-foreground leading-relaxed">
               <Brain className="w-3 h-3 inline mr-1 text-primary" />
