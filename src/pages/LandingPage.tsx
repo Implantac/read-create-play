@@ -753,7 +753,7 @@ export default function LandingPage() {
             </p>
           </motion.div>
 
-          <div className="flex justify-center max-w-md mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {plans.map((plan, i) => {
               const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
                 const rect = e.currentTarget.getBoundingClientRect();
