@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { DESIGN_TOKENS, cn } from "@/lib/design-system";
 import { motion } from "framer-motion";
 import { LucideIcon } from "lucide-react";
