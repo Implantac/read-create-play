@@ -205,7 +205,11 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
                           ? "lottery-ball-cold"
                           : "";
                       return (
-                        <span key={n} className={`lottery-ball text-[10px] sm:text-xs w-7 h-7 sm:w-8 sm:h-8 ${ballClass}`}>
+                        <span key={n} className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-black shadow-[0_4px_10px_rgba(0,0,0,0.3)] border-2 border-white/10 ${
+                          stat?.status === "hot" ? "bg-destructive text-white border-destructive/50" : 
+                          stat?.status === "cold" ? "bg-blue-600 text-white border-blue-500/50" : 
+                          "bg-[#111] text-primary border-primary/20"
+                        }`}>
                           {String(n).padStart(2, "0")}
                         </span>
                       );
