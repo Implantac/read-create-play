@@ -11,7 +11,10 @@ import { ComplianceDisclaimer } from "@/components/ComplianceDisclaimer";
 import { WorkflowSteps } from "@/components/WorkflowSteps";
 import { AIInsightsCard } from "@/components/AIInsightsCard";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, Zap, Activity, Target, ShieldCheck, Gauge, Crown } from "lucide-react";
+import { 
+  BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, Zap, Activity, Target, 
+  ShieldCheck, Gauge, Crown, X, Clover, Save, TrendingDown 
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +32,12 @@ import { QuickIntelligence } from "@/features/ai/components/QuickIntelligence";
 import { StatsWidget } from "@/components/ui/StatsWidget";
 import { DESIGN_TOKENS } from "@/lib/design-system";
 import { RecentDraws } from "@/components/RecentDraws";
+import { PersonalPerformanceCard } from "@/components/PersonalPerformanceCard";
+import { ParityChart } from "@/components/ParityChart";
+import { ConsecutiveChart } from "@/components/ConsecutiveChart";
+import { RangeDistribution } from "@/components/RangeDistribution";
+import { DelayChart } from "@/components/DelayChart";
+import { SumChart } from "@/components/SumChart";
 
 const container = {
   hidden: { opacity: 0 },
