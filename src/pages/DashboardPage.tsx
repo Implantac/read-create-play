@@ -101,9 +101,9 @@ const DashboardPage = () => {
       </Helmet>
       <OnboardingGuide />
       <PageHeader
-        title="Command Center"
-        description={`Terminal de inteligência estatística e fluxos neurais de alta performance — ${config.name}`}
-        icon={BarChart3}
+        title="Intelligence Terminal"
+        description={`Ecossistema de análise probabilística e fluxos neurais de alta performance — ${config.name}`}
+        icon={Gauge}
         badge="System Active"
       />
       <LotteryContextBanner />
