@@ -254,6 +254,8 @@ const DashboardPage = () => {
 
             {/* Right Column: AI & Smart Tools */}
             <div className="md:col-span-4 space-y-6">
+              <QuickIntelligence stats={stats} draws={draws} lotteryName={config.name} />
+
               {/* AI Insight Section */}
               <DashboardWidget title="Inteligência Artificial" subtitle="Insights em tempo real" icon={Sparkles} className="border-primary/30 shadow-lg shadow-primary/5">
                 <AIInsightsCard stats={stats} draws={draws} lotteryName={config.name} compact />
