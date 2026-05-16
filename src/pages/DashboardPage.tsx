@@ -21,6 +21,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, X, Save, Crown, Clover } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { useSavedBets } from "@/hooks/useSavedBets";
