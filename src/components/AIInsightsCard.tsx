@@ -55,7 +55,7 @@ export function AIInsightsCard({ stats, draws, lotteryName, compact }: Props) {
     if (highDelay.length > 0) {
       result.push({
         icon: AlertTriangle,
-        text: `${highDelay.length} dezena${highDelay.length > 1 ? "s" : ""} com atraso anômalo (>2x média) — candidatas a correção estatística.`,
+        text: `Anomalia de Distribuição: ${highDelay.length} dezenas apresentam atraso >2x a média histórica (Correção de Reversão à Média iminente).`,
         type: "warning",
       });
     }
