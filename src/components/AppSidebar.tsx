@@ -70,6 +70,7 @@ const workflowGroups: { label: string; stepNumber: number; items: NavItem[] }[] 
 const PLAN_LABELS: Record<string, string> = {
   free: "Gratuito",
   lifetime: "Vitalício",
+  elite: "Elite Cloud",
 };
 
 export function AppSidebar() {
