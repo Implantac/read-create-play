@@ -417,7 +417,6 @@ const DashboardPage = () => {
               </div>
             </div>
           </DndContext>
-          </div>
 
           {/* Advanced Analytics Section */}
           <div className="space-y-6 mt-12">
