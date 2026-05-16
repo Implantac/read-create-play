@@ -13,7 +13,8 @@ import { AIInsightsCard } from "@/components/AIInsightsCard";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, Zap, Activity, Target, 
-  ShieldCheck, Gauge, Crown, X, Clover, Save, TrendingDown, Settings2, Layout
+  ShieldCheck, Gauge, Crown, X, Clover, Save, TrendingDown, Settings2, Layout,
+  Download, Upload, Share2, RefreshCw
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,15 @@ import { DelayChart } from "@/components/DelayChart";
 import { SumChart } from "@/components/SumChart";
 import { useDashboardLayout } from "@/hooks/useDashboardLayout";
 import { SortableWidget } from "@/components/SortableWidget";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 import {
   DndContext,
   closestCenter,
@@ -72,7 +82,8 @@ const DashboardPage = () => {
   const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
   const { currentPlan } = usePlanAccess();
   const { profile, trialDaysLeft, isTrialExpired, isAdmin, isSuperAdmin } = useAuth();
-  const { layout, toggleWidget, updateOrder } = useDashboardLayout(selectedLottery);
+  const { layout, toggleWidget, updateOrder, exportLayout, importLayout } = useDashboardLayout(selectedLottery);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -94,6 +105,28 @@ const DashboardPage = () => {
       updateOrder(arrayMove(items, oldIndex, newIndex));
     }
   };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      if (importLayout(content)) {
+        toast.success("Layout restaurado com sucesso!");
+      } else {
+        toast.error("Erro ao importar layout. Verifique o arquivo.");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = ""; // Reset
+  };
+
   const [luckyGame, setLuckyGame] = useState<{ numbers: number[]; score: GameScore; strategy: string } | null>(null);
   const [generatingLucky, setGeneratingLucky] = useState(false);
 
@@ -151,10 +184,40 @@ const DashboardPage = () => {
         icon={Gauge}
         badge="System Active"
         headerAction={
-          <Button variant="outline" size="sm" className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10">
-            <Layout className="w-4 h-4 text-primary" />
-            <span className="hidden sm:inline">Personalizar Layout</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept=".json"
+              onChange={handleFileChange}
+            />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10">
+                  <Layout className="w-4 h-4 text-primary" />
+                  <span className="hidden sm:inline">Configurar Terminal</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 glass-card border-white/10">
+                <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Terminal UI</DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-white/5" />
+                <DropdownMenuItem onClick={exportLayout} className="gap-2 cursor-pointer focus:bg-primary/10">
+                  <Download className="w-4 h-4 text-primary" />
+                  <span>Exportar Layout (.json)</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleImportClick} className="gap-2 cursor-pointer focus:bg-primary/10">
+                  <Upload className="w-4 h-4 text-primary" />
+                  <span>Importar Layout</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-white/5" />
+                <DropdownMenuItem onClick={() => window.location.reload()} className="gap-2 cursor-pointer focus:bg-primary/10">
+                  <RefreshCw className="w-4 h-4 text-muted-foreground" />
+                  <span>Resetar Visualização</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         }
       />
       <LotteryContextBanner />

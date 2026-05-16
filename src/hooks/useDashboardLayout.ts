@@ -60,5 +60,38 @@ export function useDashboardLayout(lotteryId: string) {
     saveLayout(newLayout);
   };
 
-  return { layout, toggleWidget, updateOrder, isLoading };
+  const exportLayout = () => {
+    const data = JSON.stringify({
+      lotteryId,
+      layout,
+      exportedAt: new Date().toISOString(),
+      version: "2.0"
+    }, null, 2);
+    
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `titan_layout_${lotteryId}_${new Date().getTime()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const importLayout = (jsonData: string) => {
+    try {
+      const data = JSON.parse(jsonData);
+      if (data.layout && Array.isArray(data.layout)) {
+        saveLayout(data.layout);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error("Failed to import layout:", e);
+      return false;
+    }
+  };
+
+  return { layout, toggleWidget, updateOrder, exportLayout, importLayout, isLoading };
 }
