@@ -42,6 +42,7 @@ const SuportePage = lazy(() => import("./pages/SuportePage"));
 const InstallPage = lazy(() => import("./pages/InstallPage"));
 const StrategyLabPage = lazy(() => import("./pages/StrategyLabPage"));
 const MatrizAnalisePage = lazy(() => import("./pages/MatrizAnalisePage"));
+const GSCStatusPage = lazy(() => import("./pages/GSCStatusPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -77,6 +78,7 @@ function App() {
                   <Route path="/suporte" element={<SuportePage />} />
                   <Route path="/payment-success" element={<PaymentSuccessPage />} />
                   <Route path="/install" element={<InstallPage />} />
+                  <Route path="/seo-status" element={<GSCStatusPage />} />
 
                   {/* Protected */}
                   <Route element={<ProtectedRoute><LotteryProvider><AppLayout /></LotteryProvider></ProtectedRoute>}>
