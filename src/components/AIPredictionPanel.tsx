@@ -115,10 +115,10 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
               <button
                 key={n}
                 onClick={() => setCount(n)}
-                className={`text-[11px] sm:text-xs px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-md border transition-all ${
+                className={`text-[11px] px-3 py-1.5 rounded-lg border font-bold transition-all duration-300 ${
                   count === n
-                    ? "border-primary text-primary bg-primary/10"
-                    : "border-border text-muted-foreground hover:text-foreground"
+                    ? "border-primary text-primary bg-primary/20"
+                    : "border-white/5 text-muted-foreground hover:text-white hover:border-white/20 hover:bg-white/[0.03]"
                 }`}
               >
                 {n}
