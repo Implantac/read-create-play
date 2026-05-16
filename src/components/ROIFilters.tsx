@@ -59,7 +59,7 @@ export function ROIFilters({ filters, onChange, strategies, maxHits }: ROIFilter
       </div>
 
       <div className="space-y-1">
-        <Label className="text-[10px] text-muted-foreground">Min. Acertos</Label>
+        <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">THRESHOLD</Label>
         <Input
           type="number"
           min={0}
