@@ -149,8 +149,8 @@ export function AppSidebar() {
                             <NavLink
                               to={item.url}
                               end={item.url === "/"}
-                              className={`rounded-xl px-3 py-3 text-[13px] font-semibold transition-all duration-300 hover:bg-white/[0.04] ${locked ? "text-muted-foreground/50" : "text-sidebar-foreground"}`}
-                              activeClassName="bg-primary/10 text-primary font-semibold glow-green"
+                              className={`rounded-xl px-4 py-3 text-[13px] font-bold transition-all duration-500 hover:bg-white/[0.04] border border-transparent hover:border-white/5 ${locked ? "text-muted-foreground/40" : "text-sidebar-foreground"}`}
+                              activeClassName="bg-primary/10 text-primary border-primary/20"
                             >
                               <item.icon className="mr-3 h-4 w-4 shrink-0" />
                               {!collapsed && (
