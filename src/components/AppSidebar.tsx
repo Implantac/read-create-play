@@ -112,7 +112,7 @@ export function AppSidebar() {
 
       <SidebarContent className="px-2 py-3">
         {/* Active lottery indicator */}
-        <div className={`mx-1 mb-3 rounded-lg bg-primary/5 border border-primary/15 transition-all ${collapsed ? "p-2 flex justify-center" : "px-3 py-2"}`}>
+        <div className={`mx-1 mb-4 rounded-xl bg-white/[0.03] border border-white/5 transition-all ${collapsed ? "p-2 flex justify-center" : "px-3 py-3"}`}>
           {collapsed ? (
             <span className="text-lg" title={config.name}>{config.icon}</span>
           ) : (
