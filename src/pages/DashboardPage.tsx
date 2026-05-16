@@ -70,19 +70,22 @@ const DashboardPage = () => {
     if (stats.length === 0 || draws.length === 0) return;
     setGeneratingLucky(true);
     setTimeout(() => {
-      const strategies = ["frequency", "balance", "coverage", "dispersion"];
+      const strategies = ["smart", "hybrid", "ml", "balanced"];
       const randomStrategy = strategies[Math.floor(Math.random() * strategies.length)];
       const result = runIntelligentPipeline(stats, draws, selectedLottery, randomStrategy, 1);
+      
       if (result.games.length > 0) {
+        const game = result.games[0];
+        const score = calculateGameScore(game, stats, config);
         setLuckyGame({
-          numbers: result.games[0],
-          score: result.scores[0] || 0,
+          numbers: game,
+          score,
           strategy: result.strategy.name,
         });
       }
       setGeneratingLucky(false);
     }, 800);
-  }, [stats, draws, selectedLottery]);
+  }, [stats, draws, selectedLottery, config]);
 
   return (
     <div className="space-y-6">
