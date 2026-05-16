@@ -349,9 +349,9 @@ export default function LandingPage() {
               Usado por 5.000+ jogadores no Brasil
             </motion.div>
 
-            <motion.h1 custom={1} variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
+            <motion.h1 custom={1} variants={fadeUp} className="text-5xl md:text-8xl font-black tracking-[-0.06em] leading-[0.95] uppercase">
               {hero.headline}{" "}
-              <span className="gradient-brand-text">{hero.headlineHighlight}</span>
+              <span className="text-primary">{hero.headlineHighlight}</span>
             </motion.h1>
 
             <motion.p custom={2} variants={fadeUp} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
