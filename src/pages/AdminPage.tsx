@@ -100,11 +100,14 @@ export default function AdminPage() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [ticketSearch, setTicketSearch] = useState("");
   const [filterPlan, setFilterPlan] = useState("all");
   const [filterRole, setFilterRole] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [filterTicketStatus, setFilterTicketStatus] = useState("all");
   const [updating, setUpdating] = useState<string | null>(null);
   const [drawCount, setDrawCount] = useState(0);
   const [confirmDialog, setConfirmDialog] = useState<{
