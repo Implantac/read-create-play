@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FlaskConical, Play, Trophy, Zap, FileDown, History, Eye, Trash2, FileText } from "lucide-react";
 import { toast } from "sonner";
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend,
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area,
 } from "recharts";
 
 interface Props {
