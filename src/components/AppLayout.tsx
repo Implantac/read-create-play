@@ -30,9 +30,9 @@ export function AppLayout() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background selection:bg-primary/20">
-        <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
-        <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-accent/5 via-transparent to-transparent pointer-events-none" />
+      <div className="min-h-screen flex w-full bg-[#050505] selection:bg-primary/20">
+        <div className="fixed inset-0 bg-[radial-gradient(circle_at_1px_1px,_#ffffff11_1px,_transparent_0)] bg-[size:32px_32px] pointer-events-none opacity-20" />
+        <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent pointer-events-none" />
         
         <AppSidebar />
         
