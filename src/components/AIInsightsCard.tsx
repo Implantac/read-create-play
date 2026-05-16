@@ -78,30 +78,30 @@ export function AIInsightsCard({ stats, draws, lotteryName, compact }: Props) {
       className={compact ? "" : "glass-card rounded-xl border border-border/50 p-5"}
     >
       {!compact && (
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center relative overflow-hidden group">
-            <div className="absolute inset-0 bg-primary/20 animate-pulse" />
-            <Brain className="w-4 h-4 text-primary relative z-10" />
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center relative overflow-hidden group">
+            <div className="absolute inset-0 bg-primary/10 animate-pulse" />
+            <Brain className="w-5 h-5 text-primary relative z-10" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-foreground">Insights da IA</h3>
-            <p className="text-[10px] text-muted-foreground">Análise automática — {lotteryName}</p>
+            <h3 className="text-base font-black text-foreground tracking-tight uppercase">Titan Insights</h3>
+            <p className="text-[10px] text-muted-foreground font-bold tracking-widest uppercase opacity-60">Neural Engine v4.0</p>
           </div>
         </div>
       )}
-      <div className="space-y-4">
+      <div className="space-y-5">
         {insights.map((insight, i) => (
           <motion.div
             key={i}
-            initial={{ opacity: 0, x: -8 }}
+            initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="flex items-start gap-3 text-xs group"
+            className="flex items-start gap-4 text-xs group p-3 rounded-xl border border-white/[0.03] bg-white/[0.02] hover:bg-white/[0.04] transition-all"
           >
-            <div className={`p-1.5 rounded-md bg-muted/30 ${typeColors[insight.type].replace('text-', 'bg-').replace('-blue', '/10').replace('-red', '/10').replace('primary', 'primary/10').replace('accent', 'accent/10')} group-hover:scale-110 transition-transform`}>
-              <insight.icon className={`w-3.5 h-3.5 shrink-0 ${typeColors[insight.type]}`} />
+            <div className={`p-2 rounded-lg ${insight.type === 'positive' ? 'bg-primary/10' : insight.type === 'warning' ? 'bg-accent/10' : 'bg-blue-500/10'} group-hover:scale-110 transition-transform`}>
+              <insight.icon className={`w-4 h-4 shrink-0 ${typeColors[insight.type]}`} />
             </div>
-            <p className="text-muted-foreground/90 leading-relaxed font-medium mt-0.5">{insight.text}</p>
+            <p className="text-muted-foreground leading-relaxed font-semibold">{insight.text}</p>
           </motion.div>
         ))}
       </div>
