@@ -49,7 +49,7 @@ export function RecentDraws({ draws }: Props) {
                 </div>
                 <div className="flex flex-wrap gap-1.5 flex-1">
                   {draw.numbers.map(n => (
-                    <span key={n} className="lottery-ball text-xs w-7 h-7">
+                    <span key={n} className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black shadow-[0_2px_8px_rgba(0,0,0,0.4)] border border-white/10 bg-[#111] text-primary">
                       {String(n).padStart(2, "0")}
                     </span>
                   ))}
