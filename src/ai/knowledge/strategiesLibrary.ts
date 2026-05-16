@@ -3,7 +3,7 @@
  * Módulo completo com 6 estratégias avançadas para geração de apostas
  */
 
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/features/statistics/engine";
 import { DrawResult } from "@/data/lotteries";
 import { getLotteryRules, PRIMES, FIBONACCI } from "./lotteriesKnowledge";
 

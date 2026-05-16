@@ -1,5 +1,5 @@
 import { memo, useMemo } from "react";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/features/statistics/engine";
 import { Grid3X3 } from "lucide-react";
 
 interface Props {

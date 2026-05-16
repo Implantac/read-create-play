@@ -4,7 +4,7 @@ import {
   computeSumDistribution,
   generateSmartBet,
   NumberStats,
-} from "@/engine/statistics";
+} from "@/features/statistics/engine";
 import { DrawResult } from "@/data/lotteries";
 
 const makeDraw = (concurso: number, numbers: number[]): DrawResult => ({

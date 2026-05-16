@@ -12,7 +12,7 @@ import {
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/features/statistics/engine";
 import { detectPatterns, PatternReport } from "@/engine/pattern-detector";
 import { generatePatternAnalysis } from "@/engine/native-analysis";
 import {

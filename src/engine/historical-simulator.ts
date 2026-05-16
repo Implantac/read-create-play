@@ -1,5 +1,5 @@
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/features/statistics/engine";
 import { getPrizeTiers } from "@/services/lotteryApi";
 
 export interface GameEntry {

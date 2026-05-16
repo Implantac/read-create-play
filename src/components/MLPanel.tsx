@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { NumberStats, computeFrequencyStats } from "@/engine/statistics";
+import { NumberStats, computeFrequencyStats } from "@/features/statistics/engine";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { runAllModels, getConsensusRanking, ModelResult, MLPrediction, ScoreBreakdown } from "@/engine/ml-models";
 import { motion, AnimatePresence } from "framer-motion";

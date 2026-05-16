@@ -18,7 +18,7 @@
  * gerado do "perfil ideal" historicamente vencedor de cada modalidade.
  */
 
-import type { NumberStats } from "@/engine/statistics";
+import type { NumberStats } from "@/features/statistics/engine";
 import type { DrawResult } from "@/data/lotteries";
 import { getLotteryRules, PRIMES, FIBONACCI, LOTOFACIL_FRAME } from "./lotteriesKnowledge";
 

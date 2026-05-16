@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/features/statistics/engine";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import {
   runLogisticRegression,

@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { NumberStats, generateSmartBet } from "@/engine/statistics";
+import { NumberStats, generateSmartBet } from "@/features/statistics/engine";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { evaluateBetQuality, BetQualityReport } from "@/engine/bet-quality";
 import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";

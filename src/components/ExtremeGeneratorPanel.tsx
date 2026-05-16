@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { AntiPopularitySelector } from "@/components/AntiPopularitySelector";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/features/statistics/engine";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import {
   runExtremePipeline,

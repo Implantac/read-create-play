@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { evaluateBetQuality } from "@/engine/bet-quality";
-import { computeFrequencyStats } from "@/engine/statistics";
+import { computeFrequencyStats } from "@/features/statistics/engine";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 
 const lotofacil: LotteryConfig = {
