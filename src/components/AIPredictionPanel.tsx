@@ -129,7 +129,7 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
             onClick={generate}
             disabled={loading}
             size="sm"
-            className="text-[11px] sm:text-xs gap-1.5 bg-primary hover:bg-primary/90 h-8"
+            className="text-[11px] sm:text-xs gap-2 bg-primary text-primary-foreground h-9 px-6 rounded-xl font-black shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
           >
             {loading ? (
               <>
