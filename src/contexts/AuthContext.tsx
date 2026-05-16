@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-export type PlanType = "free" | "premium" | "professional" | "lifetime";
+export type PlanType = "free" | "premium" | "professional" | "lifetime" | "elite";
 
 interface Profile {
   id: string;
