@@ -1,12 +1,12 @@
 // ═══════════════════════════════════════════════════════════════════
-// MOTOR DE SIMULAÇÃO MASSIVA v2.0
+// MOTOR DE SIMULAÇÃO MASSIVA v3.0 — ENTERPRISE QUANTUM EDITION
 // Bitset comparisons, multi-strategy generation, intelligent filtering
 // Suporta milhões de combinações contra histórico completo
 // ═══════════════════════════════════════════════════════════════════
 
 import { NumberStats } from "@/features/statistics/engine";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { seedRNG, fastGenerateDraw, fastWeightedDraw, fastCountHits } from "./hp-math-engine";
+import { seedRNG, fastGenerateDraw, fastWeightedDraw, fastCountHits, fastRandom } from "./hp-math-engine";
 
 import { 
   GenerationMode, MassiveSimJob, SimulatedGame, 
