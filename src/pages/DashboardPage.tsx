@@ -184,10 +184,40 @@ const DashboardPage = () => {
         icon={Gauge}
         badge="System Active"
         headerAction={
-          <Button variant="outline" size="sm" className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10">
-            <Layout className="w-4 h-4 text-primary" />
-            <span className="hidden sm:inline">Personalizar Layout</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept=".json"
+              onChange={handleFileChange}
+            />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10">
+                  <Layout className="w-4 h-4 text-primary" />
+                  <span className="hidden sm:inline">Configurar Terminal</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 glass-card border-white/10">
+                <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Terminal UI</DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-white/5" />
+                <DropdownMenuItem onClick={exportLayout} className="gap-2 cursor-pointer focus:bg-primary/10">
+                  <Download className="w-4 h-4 text-primary" />
+                  <span>Exportar Layout (.json)</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleImportClick} className="gap-2 cursor-pointer focus:bg-primary/10">
+                  <Upload className="w-4 h-4 text-primary" />
+                  <span>Importar Layout</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-white/5" />
+                <DropdownMenuItem onClick={() => window.location.reload()} className="gap-2 cursor-pointer focus:bg-primary/10">
+                  <RefreshCw className="w-4 h-4 text-muted-foreground" />
+                  <span>Resetar Visualização</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         }
       />
       <LotteryContextBanner />
