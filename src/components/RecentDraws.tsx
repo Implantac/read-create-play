@@ -37,7 +37,7 @@ export function RecentDraws({ draws }: Props) {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.03 }}
-              className="rounded-lg bg-secondary/30 border border-border/30 hover:border-border/60 transition-colors overflow-hidden"
+              className="rounded-xl bg-white/[0.02] border border-white/5 hover:border-primary/40 transition-all duration-500 overflow-hidden group"
             >
               <div
                 className={`flex items-center gap-3 p-2.5 ${hasPrizes ? "cursor-pointer" : ""}`}
