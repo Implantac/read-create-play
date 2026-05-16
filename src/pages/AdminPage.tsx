@@ -49,6 +49,19 @@ interface AuditLog {
   created_at: string;
 }
 
+interface SupportTicket {
+  id: string;
+  user_id: string | null;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  protocol: string;
+  status: 'open' | 'in_progress' | 'closed';
+  created_at: string;
+  updated_at: string;
+}
+
 const OWNER_EMAIL = "etcsuporte889@gmail.com";
 
 const PLAN_COLORS: Record<string, string> = {
