@@ -20,7 +20,7 @@ export function AIInsightsCard({ stats, draws, lotteryName, compact }: Props) {
     if (hot.length > 0) {
       result.push({
         icon: TrendingUp,
-        text: `Dezenas em alta: ${hot.join(", ")} — aparecem com frequência acima da média nos últimos sorteios.`,
+        text: `Matrix Momentum: As dezenas ${hot.join(", ")} apresentam um desvio positivo significativo no volume de sorteios recentes.`,
         type: "positive",
       });
     }
