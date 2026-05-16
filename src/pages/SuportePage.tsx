@@ -60,6 +60,7 @@ const faqCategories = [
 ];
 
 export default function SuportePage() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [ticketSent, setTicketSent] = useState(false);
