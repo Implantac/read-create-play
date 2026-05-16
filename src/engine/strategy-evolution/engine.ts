@@ -4,8 +4,8 @@
  */
 
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { NumberStats, computeFrequencyStats } from "../statistics";
-import { generateByStrategy, Strategy } from "../strategies";
+import { NumberStats, computeFrequencyStats } from "@/features/statistics/engine";
+import { generateByStrategy, Strategy } from "@/features/statistics/strategies";
 import {
   StrategyDefinition,
   StrategyMetrics,

@@ -11,7 +11,7 @@ import { Brain, Play, Plus, Trash2, Trophy, BarChart3, Sparkles, Loader2, Target
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { toast } from "sonner";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/features/statistics/engine";
 import {
   SimulationBet, SimulationOutput, BetSimulationResult,
   runSimulation, parseBetsFromText, generateRandomBets, getMinPrizeHits,

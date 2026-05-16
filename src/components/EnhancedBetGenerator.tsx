@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/features/statistics/engine";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { STRATEGIES, Strategy, generateByStrategy } from "@/engine/strategies";
+import { STRATEGIES, Strategy, generateByStrategy } from "@/features/statistics/strategies";
 import { GenerationFilters, DEFAULT_FILTERS, generateWithFilters, betMatchesFilters } from "@/engine/generation-filters";
 import { GeneratorFiltersPanel } from "@/components/GeneratorFiltersPanel";
 import { HistoricalValidationBadge } from "@/components/HistoricalValidationBadge";

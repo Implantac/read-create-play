@@ -1,5 +1,5 @@
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { NumberStats } from "./statistics";
+import { NumberStats } from "@/features/statistics/engine";
 import { buildConditionalNetwork, scoreByBayesianNetwork, computeMutualInformation, type ConditionalNode, type BayesianNetworkScore } from "@/ai/engines/bayesianNetworkEngine";
 import { computeAntiPopularityPenalty } from "@/ai/knowledge/jackpotMasterStrategies";
 

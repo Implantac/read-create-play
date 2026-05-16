@@ -1,6 +1,6 @@
-import { NumberStats } from "./statistics";
+import { NumberStats } from "@/features/statistics/engine";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { generateByStrategy, Strategy, STRATEGIES } from "./strategies";
+import { generateByStrategy, Strategy, STRATEGIES } from "@/features/statistics/strategies";
 
 // ═══════════════════════════════════════════════════════
 // Simulador Massivo de Monte Carlo v3.0

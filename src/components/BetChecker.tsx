@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { DrawResult, LotteryConfig, LOTTERIES } from "@/data/lotteries";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/features/statistics/engine";
 import { checkBetAgainstDraws, MatchResult, getPrizeTiers } from "@/services/lotteryApi";
 import { DrawResultWithPrizes, DrawPrizeData } from "@/hooks/useLotteryDraws";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { generateNativeImprovements } from "@/engine/native-analysis";
-import { computeFrequencyStats } from "@/engine/statistics";
+import { computeFrequencyStats } from "@/features/statistics/engine";
 import { useSavedBets, SavedBet } from "@/hooks/useSavedBets";
 import { Progress } from "@/components/ui/progress";
 import { BetHitsChart } from "@/components/BetHitsChart";

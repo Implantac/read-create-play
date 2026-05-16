@@ -4,7 +4,7 @@
 // Suporta milhões de combinações contra histórico completo
 // ═══════════════════════════════════════════════════════════════════
 
-import { NumberStats } from "./statistics";
+import { NumberStats } from "@/features/statistics/engine";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { seedRNG, fastGenerateDraw, fastWeightedDraw, fastCountHits } from "./hp-math-engine";
 

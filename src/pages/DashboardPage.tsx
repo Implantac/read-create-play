@@ -21,6 +21,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, X, Save, Crown, Clover } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { useSavedBets } from "@/hooks/useSavedBets";
@@ -30,7 +32,9 @@ import { UpgradeBanner } from "@/components/UpgradeBanner";
 import { DashboardSkeleton } from "@/components/DashboardSkeleton";
 import { PersonalPerformanceCard } from "@/components/PersonalPerformanceCard";
 import { DashboardWidget } from "@/components/DashboardWidget";
-import { Zap, Activity, Target } from "lucide-react";
+import { calculateGameScore, GameScore } from "@/features/statistics/scoring";
+import { Zap, Activity, Target, ShieldCheck, Gauge, TrendingDown } from "lucide-react";
+import { QuickIntelligence } from "@/features/ai/components/QuickIntelligence";
 
 const container = {
   hidden: { opacity: 0 },
@@ -46,7 +50,7 @@ const DashboardPage = () => {
   const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
   const { currentPlan } = usePlanAccess();
   const { profile, trialDaysLeft, isTrialExpired, isAdmin, isSuperAdmin } = useAuth();
-  const [luckyGame, setLuckyGame] = useState<{ numbers: number[]; score: number; strategy: string } | null>(null);
+  const [luckyGame, setLuckyGame] = useState<{ numbers: number[]; score: GameScore; strategy: string } | null>(null);
   const [generatingLucky, setGeneratingLucky] = useState(false);
 
   // Reset lucky game when lottery changes
@@ -69,19 +73,22 @@ const DashboardPage = () => {
     if (stats.length === 0 || draws.length === 0) return;
     setGeneratingLucky(true);
     setTimeout(() => {
-      const strategies = ["frequency", "balance", "coverage", "dispersion"];
+      const strategies = ["smart", "hybrid", "ml", "balanced"];
       const randomStrategy = strategies[Math.floor(Math.random() * strategies.length)];
       const result = runIntelligentPipeline(stats, draws, selectedLottery, randomStrategy, 1);
+      
       if (result.games.length > 0) {
+        const game = result.games[0];
+        const score = calculateGameScore(game, stats, config);
         setLuckyGame({
-          numbers: result.games[0],
-          score: result.scores[0] || 0,
+          numbers: game,
+          score,
           strategy: result.strategy.name,
         });
       }
       setGeneratingLucky(false);
     }, 800);
-  }, [stats, draws, selectedLottery]);
+  }, [stats, draws, selectedLottery, config]);
 
   return (
     <div className="space-y-6">
@@ -95,9 +102,9 @@ const DashboardPage = () => {
       </Helmet>
       <OnboardingGuide />
       <PageHeader
-        title="Command Center"
-        description={`Terminal de inteligência estatística e fluxos neurais de alta performance — ${config.name}`}
-        icon={BarChart3}
+        title="Intelligence Terminal"
+        description={`Ecossistema de análise probabilística e fluxos neurais de alta performance — ${config.name}`}
+        icon={Gauge}
         badge="System Active"
       />
       <LotteryContextBanner />
@@ -166,24 +173,66 @@ const DashboardPage = () => {
         <div key={selectedLottery} className="space-y-8 pb-10">
           <AutoUpdater key={`auto-${selectedLottery}`} lotteryId={selectedLottery} onNewDraw={handleNewDraw} latestConcurso={draws[0]?.concurso || 0} onSyncTriggered={refetchDraws} />
 
-          {/* Core Analytics Grid */}
+          {/* Intelligence Market Grid */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             
-            {/* Left Column: Quick Stats & AI */}
+            {/* Left Column: Analytics Terminal */}
             <div className="md:col-span-8 space-y-6">
-              {/* Stats Grid */}
-              <motion.div
-                key={`stats-${selectedLottery}`}
-                variants={container}
-                initial="hidden"
-                animate="show"
-                className="grid grid-cols-2 lg:grid-cols-4 gap-4"
-              >
-                <motion.div variants={item}><StatsCard title="Concursos" value={draws.length} icon={BarChart3} color="green" subtitle="Histórico total" /></motion.div>
-                <motion.div variants={item}><StatsCard title="Quentes" value={hotNumbers} icon={Flame} color="red" subtitle="Top frequência" /></motion.div>
-                <motion.div variants={item}><StatsCard title="Frios" value={coldNumbers} icon={Snowflake} color="blue" subtitle="Menor frequência" /></motion.div>
-                <motion.div variants={item}><StatsCard title="Delay" value={`${avgDelay}c`} icon={TrendingUp} color="amber" subtitle="Atraso médio" /></motion.div>
-              </motion.div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-card/40 border border-border/50 rounded-2xl p-4 space-y-3 relative overflow-hidden group">
+                  <div className="flex items-center justify-between">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <BarChart3 className="w-4 h-4 text-primary" />
+                    </div>
+                    <Badge variant="outline" className="text-[8px] opacity-60">VOLUME</Badge>
+                  </div>
+                  <div>
+                    <h4 className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Amostragem Histórica</h4>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-black text-foreground">{draws.length}</span>
+                      <span className="text-[10px] text-green-500 font-bold flex items-center gap-0.5">
+                        <TrendingUp className="w-3 h-3" />
+                        +100%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/50 to-transparent" />
+                </div>
+
+                <div className="bg-card/40 border border-border/50 rounded-2xl p-4 space-y-3 relative overflow-hidden group">
+                  <div className="flex items-center justify-between">
+                    <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
+                      <Flame className="w-4 h-4 text-red-500" />
+                    </div>
+                    <Badge variant="outline" className="text-[8px] opacity-60">HEAT</Badge>
+                  </div>
+                  <div>
+                    <h4 className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Momentum (Quentes)</h4>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-black text-foreground">{hotNumbers}</span>
+                      <span className="text-[10px] text-red-500 font-bold">ALTA</span>
+                    </div>
+                  </div>
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500/50 to-transparent" />
+                </div>
+
+                <div className="bg-card/40 border border-border/50 rounded-2xl p-4 space-y-3 relative overflow-hidden group">
+                  <div className="flex items-center justify-between">
+                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                      <Snowflake className="w-4 h-4 text-blue-500" />
+                    </div>
+                    <Badge variant="outline" className="text-[8px] opacity-60">CYCLE</Badge>
+                  </div>
+                  <div>
+                    <h4 className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Atraso Estrutural</h4>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-black text-foreground">{avgDelay}</span>
+                      <span className="text-[10px] text-muted-foreground">CONCURSOS</span>
+                    </div>
+                  </div>
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500/50 to-transparent" />
+                </div>
+              </div>
 
               {/* Workflow & Progress */}
               <DashboardWidget title="Fluxo de Trabalho" subtitle="Etapas sugeridas para sua aposta" icon={Activity} noPadding>
@@ -205,56 +254,112 @@ const DashboardPage = () => {
 
             {/* Right Column: AI & Smart Tools */}
             <div className="md:col-span-4 space-y-6">
+              <QuickIntelligence stats={stats} draws={draws} lotteryName={config.name} />
+
               {/* AI Insight Section */}
               <DashboardWidget title="Inteligência Artificial" subtitle="Insights em tempo real" icon={Sparkles} className="border-primary/30 shadow-lg shadow-primary/5">
                 <AIInsightsCard stats={stats} draws={draws} lotteryName={config.name} compact />
               </DashboardWidget>
 
-              {/* Lucky Game Widget */}
-              <DashboardWidget title="Jogo da Sorte" subtitle="Geração inteligente v4.0" icon={Clover} className="bg-gradient-to-br from-background to-primary/5">
+              {/* Alpha Intelligence Widget */}
+              <DashboardWidget 
+                title="Alpha Engine v5.0" 
+                subtitle="Sistemas Neurais & Probabilidade" 
+                icon={Sparkles} 
+                className="bg-gradient-to-br from-background to-primary/5 border-primary/20 shadow-2xl shadow-primary/5"
+              >
                 <div className="space-y-4">
-                  <p className="text-xs text-muted-foreground">
-                    IA analisa as melhores tendências para gerar seu jogo.
-                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Market Status: <span className="text-primary">Optimized</span></span>
+                    </div>
+                    <Badge variant="outline" className="text-[9px] border-primary/30 text-primary bg-primary/5">
+                      REAL-TIME
+                    </Badge>
+                  </div>
+
                   <Button
                     onClick={generateLuckyGame}
                     disabled={generatingLucky || stats.length === 0}
-                    className="w-full h-12 bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                    className="w-full h-12 bg-gradient-to-r from-primary to-accent text-primary-foreground font-black rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all group overflow-hidden"
                   >
+                    <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-[-20deg]" />
                     {generatingLucky ? (
-                      <><Loader2 className="w-4 h-4 animate-spin mr-2" /> PROCESSANDO...</>
+                      <><Loader2 className="w-4 h-4 animate-spin mr-2" /> ANALISANDO FLUXOS...</>
                     ) : (
-                      <><Zap className="w-4 h-4 mr-2" /> GERAR AGORA</>
+                      <><Zap className="w-4 h-4 mr-2" /> EXECUTAR ALPHA-STRAT</>
                     )}
                   </Button>
 
                   <AnimatePresence>
                     {luckyGame && (
                       <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="rounded-xl border border-primary/20 bg-primary/5 p-4 relative overflow-hidden group"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="rounded-xl border border-primary/20 bg-primary/5 p-4 relative overflow-hidden space-y-4"
                       >
-                        <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent pointer-events-none" />
-                        <div className="flex items-center justify-between mb-3 relative z-10">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-primary px-2 py-0.5 rounded-full bg-primary/10">
-                            {luckyGame.strategy}
-                          </span>
-                          <button onClick={() => setLuckyGame(null)} className="text-muted-foreground hover:text-foreground transition-colors">
-                            <X className="w-4 h-4" />
-                          </button>
+                        <div className="flex items-center justify-between">
+                          <div className="flex flex-col">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-primary/60">Estratégia</span>
+                            <span className="text-xs font-bold text-foreground">{luckyGame.strategy}</span>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-primary/60">Classificação</span>
+                            <div className="flex items-center gap-1.5 justify-end">
+                              <ShieldCheck className="w-3 h-3 text-primary" />
+                              <span className="text-xs font-bold text-primary">{luckyGame.score.classification}</span>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex flex-wrap gap-2 relative z-10">
+
+                        <div className="flex flex-wrap gap-2 justify-center py-2">
                           {luckyGame.numbers.map(n => (
-                            <span key={n} className="w-9 h-9 rounded-full bg-background border-2 border-primary/20 flex items-center justify-center text-sm font-black text-primary shadow-sm">
+                            <span key={n} className="w-10 h-10 rounded-xl bg-background border-2 border-primary/20 flex items-center justify-center text-sm font-black text-primary shadow-sm hover:border-primary transition-colors cursor-default">
                               {String(n).padStart(2, "0")}
                             </span>
                           ))}
                         </div>
-                        <div className="mt-3 flex justify-between items-center relative z-10">
-                          <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Probabilidade estimada</span>
-                          <span className="text-xs font-black text-accent">{luckyGame.score.toFixed(1)}%</span>
+
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-end">
+                            <span className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Alpha Score</span>
+                            <span className="text-xl font-black text-primary font-mono">{luckyGame.score.total}%</span>
+                          </div>
+                          <Progress value={luckyGame.score.total} className="h-1.5 bg-primary/10" />
                         </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          {Object.entries(luckyGame.score.factors).map(([key, val]) => (
+                            <div key={key} className="bg-background/40 rounded-lg p-2 border border-border/50">
+                              <p className="text-[8px] uppercase text-muted-foreground font-bold truncate">{key}</p>
+                              <div className="flex items-center justify-between mt-1">
+                                <span className="text-[10px] font-bold text-foreground">{val}%</span>
+                                <div className="w-8 h-1 bg-muted rounded-full overflow-hidden">
+                                  <div className="h-full bg-primary" style={{ width: `${val}%` }} />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="pt-2 border-t border-primary/10">
+                          {luckyGame.score.insights.slice(0, 2).map((insight, idx) => (
+                            <div key={idx} className="flex items-center gap-2 mb-1">
+                              <div className="w-1 h-1 rounded-full bg-primary" />
+                              <p className="text-[9px] text-muted-foreground font-medium italic">{insight}</p>
+                            </div>
+                          ))}
+                        </div>
+
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="w-full text-[10px] h-7 gap-1.5 text-muted-foreground hover:text-primary"
+                          onClick={() => setLuckyGame(null)}
+                        >
+                          <X className="w-3 h-3" /> DESCARTAR ANÁLISE
+                        </Button>
                       </motion.div>
                     )}
                   </AnimatePresence>

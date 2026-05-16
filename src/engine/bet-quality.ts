@@ -1,4 +1,4 @@
-import { NumberStats } from "./statistics";
+import { NumberStats } from "@/features/statistics/engine";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 
 // ═══════════════════════════════════════════════════════

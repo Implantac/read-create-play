@@ -14,7 +14,7 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { computeFrequencyStats } from "@/engine/statistics";
+import { computeFrequencyStats } from "@/features/statistics/engine";
 import { generateGames } from "@/ai/generators/universalGameGenerator";
 import { generateProfessionalBets } from "@/engine/professional-generator";
 import { runExtremePipeline, getDefaultExtremeConfig } from "@/engine/extreme-generator";
@@ -407,7 +407,7 @@ function runForEachLevel<T>(fn: () => T): Record<AntiPopularityLevel, T> {
   return out;
 }
 
-import type { NumberStats } from "@/engine/statistics";
+import type { NumberStats } from "@/features/statistics/engine";
 
 // ─────────────────────────────────────────────────────────────────
 // Suíte parametrizada

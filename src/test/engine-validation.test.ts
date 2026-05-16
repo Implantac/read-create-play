@@ -2,8 +2,8 @@
  * Integration tests: Coverage Engine + Strategy Evolution + Statistics
  */
 import { describe, it, expect } from "vitest";
-import { computeFrequencyStats, NumberStats } from "@/engine/statistics";
-import { generateByStrategy, Strategy, STRATEGIES } from "@/engine/strategies";
+import { computeFrequencyStats, NumberStats } from "@/features/statistics/engine";
+import { generateByStrategy, Strategy, STRATEGIES } from "@/features/statistics/strategies";
 import { runExtremeCoverage } from "@/engine/extreme-coverage";
 import { CoverageConfig } from "@/engine/extreme-coverage";
 import { runStrategyLab, getStrategiesForLottery, STRATEGY_REGISTRY } from "@/engine/strategy-evolution";

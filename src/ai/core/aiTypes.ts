@@ -4,7 +4,7 @@
  */
 
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/features/statistics/engine";
 
 // ═══════════════════════════════════════════════════════
 // INTENT TYPES

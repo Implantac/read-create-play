@@ -1,4 +1,4 @@
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/features/statistics/engine";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { motion, AnimatePresence } from "framer-motion";
 import { BarChart3, ChevronDown, ChevronUp, Flame, Snowflake, RefreshCw, Hash, Target, Zap, Binary, Boxes, Info } from "lucide-react";

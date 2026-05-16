@@ -3,7 +3,7 @@
  * Motor Autoevolutivo de Estratégias, Ranking e Recomendação
  */
 
-import { Strategy } from "../strategies";
+import { Strategy } from "@/features/statistics/strategies";
 
 export type EvolutionProfile = "economico" | "equilibrado" | "agressivo" | "profissional" | "cobertura_extrema";
 

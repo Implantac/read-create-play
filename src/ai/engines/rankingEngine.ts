@@ -3,7 +3,7 @@
  * Multi-dimensional scoring for lottery games
  */
 
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/features/statistics/engine";
 import { DrawResult } from "@/data/lotteries";
 import { computePatternProfile } from "./patternEngine";
 import { getLotteryRules } from "../knowledge/lotteriesKnowledge";

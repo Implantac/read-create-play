@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Filter, ChevronDown, ChevronUp, X, Flame, Snowflake, RotateCcw } from "lucide-react";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/features/statistics/engine";
 import {
   GenerationFilters,
   DEFAULT_FILTERS,

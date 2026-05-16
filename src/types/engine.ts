@@ -1,6 +1,6 @@
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { NumberStats } from "@/engine/statistics";
-import { Strategy } from "@/engine/strategies";
+import { NumberStats } from "@/features/statistics/engine";
+import { Strategy } from "@/features/statistics/strategies";
 
 export type GenerationMode = "random" | "statistical" | "ai_weighted" | "hybrid";
 

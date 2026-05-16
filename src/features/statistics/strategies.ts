@@ -1,6 +1,6 @@
-import { NumberStats, generateSmartBet } from "./statistics";
+import { NumberStats, generateSmartBet } from "./engine";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { getConsensusRanking, runAllModels, runQuantumAnalysis, runRandomForest, runXGBoost, runNeuralNetwork, runBayesianInference, runMarkovChain } from "./ml-models";
+import { getConsensusRanking, runAllModels, runQuantumAnalysis, runRandomForest, runXGBoost, runNeuralNetwork, runBayesianInference, runMarkovChain } from "@/engine/ml-models";
 
 export type Strategy =
   | "smart"
@@ -338,7 +338,7 @@ export function generateByStrategy(
       const weighted = stats.map(s => ({
         ...s,
         weight: Math.max(0.1,
-          (consensusMap.get(s.number) || 0) * 0.4 +
+          (Number(consensusMap.get(s.number) || 0) * 0.4) +
           (s.trend > 0 ? s.trend * 3 : 0) +
           s.cycleScore * 5 +
           (s.momentum > 0 ? s.momentum * 1.5 : 0) +
