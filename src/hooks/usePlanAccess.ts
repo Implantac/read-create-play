@@ -54,6 +54,7 @@ export const PLAN_LIMITS = {
   premium: { savedBetsPerLottery: Infinity }, // Legacy
   professional: { savedBetsPerLottery: Infinity }, // Legacy
   lifetime: { savedBetsPerLottery: Infinity },
+  elite: { savedBetsPerLottery: Infinity },
 } as const;
 
 export function usePlanAccess() {
