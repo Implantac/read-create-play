@@ -221,10 +221,10 @@ const plans = [
 
 /* ── Credibility badges ── */
 const credibilityItems = [
-  { icon: Cpu, label: "Machine Learning", desc: "Modelos treinados com 10.000+ sorteios reais" },
-  { icon: Dices, label: "Monte Carlo", desc: "Simule milhões de cenários em segundos" },
-  { icon: Brain, label: "14+ Algoritmos", desc: "Frequência, atraso, paridade e mais" },
-  { icon: Shield, label: "Dados da Caixa", desc: "Atualizados automaticamente a cada sorteio" },
+  { icon: Cpu, label: "Machine Learning v4", desc: "Modelos treinados com 12.000+ sorteios reais e padrões neurais" },
+  { icon: Dices, label: "Monte Carlo Engine", desc: "Simule 1 milhão de cenários em menos de 3 segundos" },
+  { icon: Brain, label: "24+ Algoritmos", desc: "Frequência, atraso, entropia, paridade e distribuição avançada" },
+  { icon: Shield, label: "Enterprise Security", desc: "Infraestrutura bancária para proteção total dos seus dados" },
 ];
 
 export default function LandingPage() {
@@ -997,8 +997,10 @@ export default function LandingPage() {
             <div className="flex items-center gap-6 text-xs text-muted-foreground">
               <Link to="/planos" className="hover:text-foreground transition-colors">Planos</Link>
               <Link to="/install" className="hover:text-foreground transition-colors">Instalar App</Link>
+              <Link to="/suporte" className="hover:text-foreground transition-colors">Suporte</Link>
+              <Link to="/termos" className="hover:text-foreground transition-colors opacity-50">Termos</Link>
+              <Link to="/privacidade" className="hover:text-foreground transition-colors opacity-50">Privacidade</Link>
               <Link to="/login" className="hover:text-foreground transition-colors">Entrar</Link>
-              <Link to="/signup" className="hover:text-foreground transition-colors">Criar Conta</Link>
             </div>
             <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-mono tracking-wider">
               <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-pulse-glow" />
