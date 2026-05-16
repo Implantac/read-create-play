@@ -217,9 +217,6 @@ const DashboardPage = () => {
             
             {/* Left Column: Analytics Terminal */}
             <div className="md:col-span-8 space-y-6">
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500/50 to-transparent" />
-                </div>
-              </div>
 
               {/* Workflow & Progress */}
               <DashboardWidget title="Fluxo de Trabalho" subtitle="Etapas sugeridas para sua aposta" icon={Activity} noPadding>
