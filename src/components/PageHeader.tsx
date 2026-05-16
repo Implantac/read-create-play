@@ -43,6 +43,11 @@ export function PageHeader({ title, description, icon: Icon, badge, headerAction
           {description}
         </p>
       </div>
+      {headerAction && (
+        <div className="relative z-10 hidden md:block">
+          {headerAction}
+        </div>
+      )}
     </motion.div>
   );
 }
