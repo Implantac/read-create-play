@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { NumberStats } from "@/features/statistics/engine";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { STRATEGIES, Strategy } from "@/features/statistics/strategies";
-import { runBacktest, BacktestResult } from "@/engine/backtesting";
+import { runBacktest, BacktestResult } from "@/features/statistics/backtesting";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlaskConical, Play, Trophy, Zap, FileDown, History, Eye, Trash2, FileText } from "lucide-react";
 import { toast } from "sonner";

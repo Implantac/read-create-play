@@ -1,6 +1,6 @@
-import { NumberStats } from "./statistics";
+import { NumberStats } from "@/features/statistics/engine";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { generateByStrategy, Strategy, STRATEGIES } from "./strategies";
+import { generateByStrategy, Strategy, STRATEGIES } from "@/features/statistics/strategies";
 
 // ═══════════════════════════════════════════════════════
 // Motor de Backtesting Automático
