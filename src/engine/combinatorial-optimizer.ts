@@ -53,7 +53,7 @@ export function runCombinatorialOptimization(
     const selected: number[] = [];
     while (selected.length < config.pick && pool.length > 0) {
       const totalWeight = pool.reduce((s, p) => s + p.weight, 0);
-      let r = Math.random() * totalWeight;
+      let r = fastRandom() * totalWeight;
       for (let i = 0; i < pool.length; i++) {
         r -= pool[i].weight;
         if (r <= 0) {
@@ -68,19 +68,19 @@ export function runCombinatorialOptimization(
 
   function mutate(bet: number[]): number[] {
     const mutated = [...bet];
-    const mutations = Math.random() < 0.3 ? 2 : 1;
+    const mutations = fastRandom() < 0.3 ? 2 : 1;
     for (let m = 0; m < mutations; m++) {
-      const idx = Math.floor(Math.random() * mutated.length);
+      const idx = Math.floor(fastRandom() * mutated.length);
       let newNum: number;
       do {
         // Prefer nearby numbers or weighted random
-        if (Math.random() < 0.5) {
-          newNum = mutated[idx] + (Math.random() < 0.5 ? 1 : -1) * (Math.floor(Math.random() * 5) + 1);
+        if (fastRandom() < 0.5) {
+          newNum = mutated[idx] + (fastRandom() < 0.5 ? 1 : -1) * (Math.floor(fastRandom() * 5) + 1);
           newNum = Math.max(1, Math.min(config.numbers, newNum));
         } else {
           const pool = [...weightedPool];
           const totalWeight = pool.reduce((s, p) => s + p.weight, 0);
-          let r = Math.random() * totalWeight;
+          let r = fastRandom() * totalWeight;
           newNum = pool[0].number;
           for (const p of pool) {
             r -= p.weight;
@@ -98,7 +98,7 @@ export function runCombinatorialOptimization(
     const arr = [...combined];
     // Shuffle and pick
     for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = Math.floor(fastRandom() * (i + 1));
       [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     return arr.slice(0, config.pick).sort((a, b) => a - b);
