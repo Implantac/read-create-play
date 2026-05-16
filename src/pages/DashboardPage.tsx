@@ -225,7 +225,7 @@ const DashboardPage = () => {
       <ComplianceDisclaimer compact />
 
       {/* Trial countdown banner */}
-      {profile?.plan === "free" && !isTrialExpired && !isAdmin && !isSuperAdmin && (
+      {(profile?.plan === "free" || profile?.plan === "premium" || profile?.plan === "professional") && !isTrialExpired && !isAdmin && !isSuperAdmin && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
