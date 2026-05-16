@@ -89,8 +89,8 @@ export function AppSidebar() {
           {!collapsed && (
             <div>
               <div className="flex items-center gap-1.5">
-                <h1 className="text-base font-bold tracking-tight text-sidebar-accent-foreground">
-                  Titan<span className="gradient-brand-text ml-1">Loterias</span>
+                <h1 className="text-lg font-black tracking-[-0.05em] text-white">
+                  TITAN<span className="text-primary ml-0.5">TERMINAL</span>
                 </h1>
                 {isAdmin && (
                   <span className={`px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded border animate-pulse ${
