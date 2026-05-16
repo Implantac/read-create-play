@@ -123,16 +123,18 @@ export default function AdminPage() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const [profilesRes, drawsRes, rolesRes, logsRes] = await Promise.all([
+    const [profilesRes, drawsRes, rolesRes, logsRes, ticketsRes] = await Promise.all([
       supabase.from("profiles").select("*").order("created_at", { ascending: false }),
       supabase.from("lottery_draws").select("id", { count: "exact", head: true }),
       supabase.from("user_roles").select("*"),
       supabase.from("admin_audit_logs").select("*").order("created_at", { ascending: false }).limit(100),
+      supabase.from("support_tickets").select("*").order("created_at", { ascending: false }),
     ]);
     if (profilesRes.data) setProfiles(profilesRes.data as Profile[]);
     if (drawsRes.count !== null) setDrawCount(drawsRes.count);
     if (rolesRes.data) setRoles(rolesRes.data as UserRole[]);
     if (logsRes.data) setAuditLogs(logsRes.data as AuditLog[]);
+    if (ticketsRes.data) setTickets(ticketsRes.data as SupportTicket[]);
     setLoading(false);
   }, []);
 
