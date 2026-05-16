@@ -44,7 +44,7 @@ export function ROIFilters({ filters, onChange, strategies, maxHits }: ROIFilter
       </div>
 
       <div className="space-y-1">
-        <Label className="text-[10px] text-muted-foreground">Estratégia</Label>
+        <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">ALGORITHM</Label>
         <Select value={filters.strategy} onValueChange={v => update("strategy", v)}>
           <SelectTrigger className="h-8 w-[140px] text-xs">
             <SelectValue />
