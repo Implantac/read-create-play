@@ -1,12 +1,12 @@
 // ═══════════════════════════════════════════════════════════════════
-// MOTOR DE SIMULAÇÃO MASSIVA v2.0
+// MOTOR DE SIMULAÇÃO MASSIVA v3.0 — ENTERPRISE QUANTUM EDITION
 // Bitset comparisons, multi-strategy generation, intelligent filtering
 // Suporta milhões de combinações contra histórico completo
 // ═══════════════════════════════════════════════════════════════════
 
 import { NumberStats } from "@/features/statistics/engine";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { seedRNG, fastGenerateDraw, fastWeightedDraw, fastCountHits } from "./hp-math-engine";
+import { seedRNG, fastGenerateDraw, fastWeightedDraw, fastCountHits, fastRandom } from "./hp-math-engine";
 
 import { 
   GenerationMode, MassiveSimJob, SimulatedGame, 
@@ -183,11 +183,25 @@ export function runMassiveSimBatch(job: MassiveSimJob): MassiveSimResult {
   }
 
   for (let g = 0; g < totalGames; g++) {
-    // Generate game based on mode
+    // Quantum Multi-Strategy Engine
     let gameNumbers: number[];
+    const rand = fastRandom();
+    
     if (mode === "random") {
       const raw = fastGenerateDraw(config.numbers, config.pick, pool);
       gameNumbers = Array.from(raw);
+    } else if (mode === "hybrid") {
+      // Intelligent diversification
+      if (rand < 0.4) {
+        // AI Weighted
+        gameNumbers = Array.from(fastWeightedDraw(buildWeights(stats, config, "ai_weighted"), config.pick));
+      } else if (rand < 0.7) {
+        // Statistical
+        gameNumbers = Array.from(fastWeightedDraw(buildWeights(stats, config, "statistical"), config.pick));
+      } else {
+        // Pure Random (Discovery mode)
+        gameNumbers = Array.from(fastGenerateDraw(config.numbers, config.pick, pool));
+      }
     } else {
       const raw = fastWeightedDraw(weights, config.pick);
       gameNumbers = Array.from(raw);
@@ -222,13 +236,14 @@ export function runMassiveSimBatch(job: MassiveSimJob): MassiveSimResult {
     // Pattern analysis
     const pattern = analyzePattern(gameNumbers, config.numbers);
 
-    // Composite score
+    // Enterprise Scoring Algorithm v3.0
+    // Balances average return, peak performance, and pattern robustness
     const score =
-      avgHits * 30 +
-      bestHit * 20 +
-      (prizeCount / drawCount) * 100 * 25 +
-      (1 / (1 + stability)) * 15 +
-      (pattern.rangeSpread / config.numbers) * 10;
+      (avgHits / config.pick) * 1000 + // Yield
+      (bestHit / config.pick) * 500 +  // Potential
+      (prizeCount / drawCount) * 2000 + // Frequency
+      (1 / (1 + stability)) * 300 +     // Stability
+      (pattern.rangeSpread / config.numbers) * 200; // Coverage
 
     // Keep only top N games via binary insert
     if (topGames.length < topN || score > minTopScore) {

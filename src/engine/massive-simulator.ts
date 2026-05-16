@@ -1,9 +1,10 @@
 import { NumberStats } from "@/features/statistics/engine";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { generateByStrategy, Strategy, STRATEGIES } from "@/features/statistics/strategies";
+import { fastRandom } from "./hp-math-engine";
 
 // ═══════════════════════════════════════════════════════
-// Simulador Massivo de Monte Carlo v3.0
+// Simulador Massivo de Monte Carlo v3.1 — QUANTUM EDITION
 // Otimizado com bitsets, PRNG inline e variância O(1)
 // ═══════════════════════════════════════════════════════
 
@@ -98,7 +99,7 @@ export function runMassiveBatch(
     const bet = generateByStrategy(strategy, stats, config);
     
     // Pick random historical draw and compare via bitset
-    const drawIdx = Math.floor(Math.random() * drawCount);
+    const drawIdx = Math.floor(fastRandom() * drawCount);
     const betBs = toBitset(bet);
     const hits = drawCount > 0 ? bitsetHits(betBs, drawBitsets[drawIdx]) : 0;
 
