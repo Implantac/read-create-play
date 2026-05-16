@@ -8,7 +8,8 @@ const lotteries = [
   { name: "Dupla Sena", numbers: "6/50", color: "hsl(var(--neon-red))" },
   { name: "Timemania", numbers: "7/80", color: "hsl(var(--neon-cyan))" },
   { name: "Dia de Sorte", numbers: "7/31", color: "hsl(var(--neon-green))" },
-  { name: "+Milionária", numbers: "6/50+2", color: "hsl(var(--neon-purple))" },
+  { name: "Powerball", numbers: "5/69+1", color: "hsl(var(--neon-blue))", badge: "BREVE" },
+  { name: "EuroMillions", numbers: "5/50+2", color: "hsl(var(--neon-purple))", badge: "BREVE" },
 ];
 
 // Duplicate for seamless infinite scroll
@@ -52,8 +53,15 @@ export function LotteryLogosCarousel() {
                 {lottery.name.charAt(0)}
               </div>
               <div>
-                <div className="text-sm font-semibold text-foreground whitespace-nowrap">
-                  {lottery.name}
+                <div className="flex items-center gap-2">
+                  <div className="text-sm font-semibold text-foreground whitespace-nowrap">
+                    {lottery.name}
+                  </div>
+                  {(lottery as any).badge && (
+                    <span className="text-[8px] font-bold bg-white/10 px-1 rounded text-muted-foreground">
+                      {(lottery as any).badge}
+                    </span>
+                  )}
                 </div>
                 <div className="text-[10px] text-muted-foreground font-mono">
                   {lottery.numbers}
