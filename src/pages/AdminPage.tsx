@@ -412,8 +412,9 @@ export default function AdminPage() {
       </div>
 
       <Tabs defaultValue="users" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3 max-w-md">
+        <TabsList className="grid w-full grid-cols-4 max-w-xl">
           <TabsTrigger value="users" className="gap-1.5"><Users className="w-4 h-4" /> Usuários</TabsTrigger>
+          <TabsTrigger value="tickets" className="gap-1.5"><MessageSquare className="w-4 h-4" /> Suporte</TabsTrigger>
           <TabsTrigger value="roles" className="gap-1.5"><ShieldCheck className="w-4 h-4" /> Papéis</TabsTrigger>
           <TabsTrigger value="audit" className="gap-1.5"><History className="w-4 h-4" /> Auditoria</TabsTrigger>
         </TabsList>
