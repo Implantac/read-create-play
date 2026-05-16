@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FlaskConical, Play, Trophy, Zap, FileDown, History, Eye, Trash2, FileText } from "lucide-react";
 import { toast } from "sonner";
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend,
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area,
 } from "recharts";
 
 interface Props {
@@ -419,59 +419,122 @@ export function BacktestPanel({ stats, config, draws }: Props) {
                 </div>
               )}
 
-              {/* Ranking */}
-              <div className="space-y-2">
-                {results.map((r, idx) => (
-                  <div key={r.strategy} className="flex items-center gap-3 p-3 rounded-lg bg-muted/20 border border-border">
-                    <span className="text-lg font-bold font-mono text-primary w-7 text-right">#{idx + 1}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-foreground">{r.label}</span>
-                        {idx === 0 && <Badge variant="default" className="text-[10px]"><Trophy className="w-2.5 h-2.5 mr-0.5" />Melhor</Badge>}
-                      </div>
-                      <div className="flex gap-3 mt-1 text-[11px] text-muted-foreground flex-wrap">
-                        <span>Média: <strong className="text-foreground">{r.avgHits}</strong></span>
-                        <span>Melhor: <strong className="text-foreground">{r.bestHit}</strong></span>
-                        <span>Win: <strong className="text-primary">{r.winRate}%</strong></span>
-                        <span>ROI: <strong className="text-foreground">{r.profit}x</strong></span>
-                        <span className="hidden sm:inline">Série+: <strong>{r.streaks.bestWin}</strong></span>
-                        <span className="hidden sm:inline">Série-: <strong>{r.streaks.worstLoss}</strong></span>
-                      </div>
-                    </div>
-                    <div className="text-right hidden sm:block">
-                      <p className="text-[10px] text-muted-foreground">Consistência</p>
-                      <div className="flex items-center gap-1">
-                        <Progress value={r.consistency * 100} className="w-16 h-1.5" />
-                        <span className="text-xs font-mono text-foreground">{Math.round(r.consistency * 100)}%</span>
-                      </div>
+              {/* Equity Curve Visualizer */}
+              <div className="space-y-4">
+                <div className="bg-muted/10 rounded-lg p-4 border border-border">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-semibold flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-primary" />
+                      Curva de Patrimônio vs Risco
+                    </h3>
+                    <div className="flex gap-4">
+                      {results[0] && (
+                        <>
+                          <div className="text-right">
+                            <p className="text-[10px] text-muted-foreground uppercase">Drawdown Máx</p>
+                            <p className="text-xs font-mono text-destructive">R$ {results[0].maxDrawdown}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-[10px] text-muted-foreground uppercase">Sharpe Ratio</p>
+                            <p className="text-xs font-mono text-primary">{results[0].sharpeRatio}</p>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
-                ))}
+                  
+                  <div className="h-64 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={results[0]?.equityCurve || []}>
+                        <defs>
+                          <linearGradient id="colorEquity" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <XAxis 
+                          dataKey="x" 
+                          hide 
+                        />
+                        <YAxis 
+                          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
+                          axisLine={false}
+                          tickLine={false}
+                          tickFormatter={(v) => `R$ ${v}`}
+                        />
+                        <Tooltip
+                          content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                              return (
+                                <div className="bg-card border border-border p-2 rounded-md shadow-xl text-[11px]">
+                                  <p className="text-muted-foreground">Sorteio: {payload[0].payload.x}</p>
+                                  <p className="font-bold text-primary">Saldo: R$ {payload[0].value}</p>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                        <Area 
+                          type="monotone" 
+                          dataKey="y" 
+                          stroke="hsl(var(--primary))" 
+                          fillOpacity={1} 
+                          fill="url(#colorEquity)" 
+                          strokeWidth={2}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Ranking */}
+                <div className="space-y-2">
+                  {results.map((r, idx) => (
+                    <div key={r.strategy} className="group relative overflow-hidden flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl bg-muted/20 border border-border hover:border-primary/50 transition-all">
+                      <div className="flex items-center gap-3">
+                        <span className="text-xl font-bold font-mono text-primary/40 group-hover:text-primary transition-colors w-7 text-right">#{idx + 1}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-foreground">{r.label}</span>
+                            {idx === 0 && <Badge variant="default" className="text-[9px] h-4 uppercase tracking-tighter bg-primary text-primary-foreground">Top Alpha</Badge>}
+                            <Badge variant="outline" className="text-[10px] font-mono border-primary/20 text-primary bg-primary/5">
+                              {r.globalScore} pts
+                            </Badge>
+                          </div>
+                          <div className="grid grid-cols-2 sm:flex sm:gap-4 mt-2 text-[11px] text-muted-foreground">
+                            <div className="flex flex-col">
+                              <span className="text-[9px] uppercase opacity-60">Win Rate</span>
+                              <span className="text-foreground font-semibold">{r.winRate}%</span>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-[9px] uppercase opacity-60">Fator Recuperação</span>
+                              <span className="text-foreground font-semibold">{r.recoveryFactor}</span>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-[9px] uppercase opacity-60">Max Drawdown</span>
+                              <span className="text-destructive font-semibold">R$ {r.maxDrawdown}</span>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-[9px] uppercase opacity-60">ROI Estimado</span>
+                              <span className={`font-semibold ${r.profit > 1 ? 'text-green-500' : 'text-foreground'}`}>{r.profit}x</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center border-t sm:border-t-0 border-border/50 pt-2 sm:pt-0 mt-2 sm:mt-0">
+                        <p className="text-[10px] text-muted-foreground sm:mb-1 uppercase tracking-wider">Consistência</p>
+                        <div className="flex items-center gap-2">
+                          <Progress value={r.consistency * 100} className="w-20 h-1.5 bg-primary/10" />
+                          <span className="text-xs font-mono font-bold text-foreground">{Math.round(r.consistency * 100)}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              {/* Chart */}
-              {chartData.length > 0 && (
-                <div className="h-56">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={chartData}>
-                      <XAxis dataKey="name" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 9 }} angle={-20} textAnchor="end" height={50} />
-                      <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} />
-                      <Tooltip
-                        contentStyle={{
-                          background: "hsl(var(--card))",
-                          border: "1px solid hsl(var(--border))",
-                          borderRadius: 8,
-                          color: "hsl(var(--foreground))",
-                          fontSize: 12,
-                        }}
-                      />
-                      <Legend />
-                      <Bar dataKey="Taxa Acerto (%)" fill={COLORS[0]} radius={[2, 2, 0, 0]} />
-                      <Bar dataKey="Consistência (%)" fill={COLORS[1]} radius={[2, 2, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
             </motion.div>
           )}
         </AnimatePresence>
