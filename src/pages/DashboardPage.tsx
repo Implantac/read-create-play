@@ -30,7 +30,8 @@ import { UpgradeBanner } from "@/components/UpgradeBanner";
 import { DashboardSkeleton } from "@/components/DashboardSkeleton";
 import { PersonalPerformanceCard } from "@/components/PersonalPerformanceCard";
 import { DashboardWidget } from "@/components/DashboardWidget";
-import { Zap, Activity, Target } from "lucide-react";
+import { calculateGameScore, GameScore } from "@/features/statistics/scoring";
+import { Zap, Activity, Target, ShieldCheck, Gauge, TrendingDown } from "lucide-react";
 
 const container = {
   hidden: { opacity: 0 },
