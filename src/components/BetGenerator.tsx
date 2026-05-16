@@ -143,16 +143,18 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
   };
 
   return (
-    <div className="rounded-xl glass-card p-3 sm:p-5 space-y-4 sm:space-y-5">
+    <div className="rounded-xl glass-card p-4 sm:p-6 space-y-6 border border-white/5 relative overflow-hidden group">
+      <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 blur-[100px] pointer-events-none rounded-full group-hover:bg-primary/20 transition-all duration-700" />
+      
       {/* Header */}
-      <div className="flex items-center gap-2 sm:gap-3">
-        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+      <div className="flex items-center gap-4 relative z-10">
+        <div className="w-12 h-12 rounded-xl bg-[#0a0a0a] border border-white/10 flex items-center justify-center shrink-0 shadow-lg">
+          <Sparkles className="w-6 h-6 text-primary drop-shadow-[0_0_8px_rgba(var(--primary),0.4)]" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-bold text-foreground">Gerador de Apostas Inteligentes</h3>
-          <p className="text-[10px] sm:text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
-            Gere apostas com melhor distribuição estatística
+          <h3 className="text-lg font-black text-white tracking-tight uppercase leading-none">Smart Engineering Generator</h3>
+          <p className="text-[10px] text-muted-foreground mt-1 font-bold tracking-widest uppercase opacity-60">
+            Probability Matrix Optimization v4.2
           </p>
         </div>
       </div>
