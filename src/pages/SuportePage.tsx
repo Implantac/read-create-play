@@ -60,22 +60,50 @@ const faqCategories = [
 ];
 
 export default function SuportePage() {
-  const navigate = useNavigate();
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [ticketSent, setTicketSent] = useState(false);
+  const [protocol, setProtocol] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: ""
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulando envio de formulário
-    setTimeout(() => {
-      setIsSubmitting(false);
+    const newProtocol = `TT-${Math.floor(100000 + Math.random() * 900000)}`;
+    setProtocol(newProtocol);
+
+    try {
+      const { error } = await supabase.from('support_tickets').insert({
+        user_id: user?.id || null,
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+        protocol: newProtocol,
+        status: 'open'
+      });
+
+      if (error) throw error;
+
       setTicketSent(true);
       toast.success("Mensagem enviada com sucesso!", {
-        description: "Nossa equipe responderá em breve via e-mail.",
+        description: `Protocolo: ${newProtocol}. Nossa equipe responderá em breve.`,
       });
-    }, 1500);
+      setFormData({ name: "", email: "", subject: "", message: "" });
+    } catch (error: any) {
+      console.error("Erro ao enviar ticket:", error);
+      toast.error("Erro ao enviar mensagem", {
+        description: "Tente novamente em instantes ou use o WhatsApp.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
