@@ -482,11 +482,12 @@ const DashboardPage = () => {
           </DndContext>
 
           {/* Advanced Analytics Section */}
-          <div className="space-y-6 mt-12">
-            <div className="flex items-center gap-3">
-              <div className="w-1.5 h-6 rounded-full bg-primary" />
-              <h2 className="text-xl font-black tracking-tight text-foreground uppercase">Análise de Comportamento</h2>
-            </div>
+          <PlanGate feature="estrategias_analytics">
+            <div className="space-y-6 mt-12">
+              <div className="flex items-center gap-3">
+                <div className="w-1.5 h-6 rounded-full bg-primary" />
+                <h2 className="text-xl font-black tracking-tight text-foreground uppercase">Análise de Comportamento</h2>
+              </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <DashboardWidget title="Paridade & Equilíbrio" subtitle="Pares vs Ímpares" icon={Target}>
