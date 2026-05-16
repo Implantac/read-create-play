@@ -162,9 +162,10 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
         {/* Loading state */}
         {loading && (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
-            <div className="relative">
-              <div className="w-12 h-12 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
-              <Brain className="w-5 h-5 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+            <div className="relative group">
+              <div className="absolute inset-0 bg-primary/20 blur-xl animate-pulse" />
+              <div className="w-16 h-16 rounded-2xl border-2 border-white/10 border-t-primary animate-spin relative z-10" />
+              <Brain className="w-6 h-6 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20" />
             </div>
             <p className="text-xs text-muted-foreground animate-pulse">
               A IA está analisando padrões de 100 sorteios...
