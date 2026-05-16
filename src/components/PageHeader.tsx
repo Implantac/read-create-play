@@ -11,33 +11,36 @@ interface Props {
 export function PageHeader({ title, description, icon: Icon, badge }: Props) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: -10 }}
+      initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative flex items-center gap-4 sm:gap-6 mb-8 py-2"
+      transition={{ duration: 0.6, ease: "circOut" }}
+      className="relative flex items-center gap-6 mb-12 py-4 border-b border-white/[0.03]"
     >
-      <div className="absolute -left-12 top-1/2 -translate-y-1/2 w-24 h-24 bg-primary/10 blur-[60px] pointer-events-none rounded-full" />
+      <div className="absolute -left-20 top-1/2 -translate-y-1/2 w-40 h-40 bg-primary/5 blur-[100px] pointer-events-none rounded-full" />
       
       <div className="relative group">
-        <div className="absolute inset-0 bg-primary/20 blur-xl rounded-2xl group-hover:bg-primary/30 transition-all duration-500" />
-        <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shrink-0 shadow-2xl shadow-primary/20 border border-white/10 overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-primary-foreground relative z-10" />
+        <div className="absolute inset-0 bg-primary/30 blur-2xl rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-700" />
+        <div className="relative w-16 h-16 rounded-2xl bg-[#0a0a0a] flex items-center justify-center shrink-0 shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden group-hover:border-primary/40 transition-colors duration-500">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-50" />
+          <Icon className="w-8 h-8 text-primary relative z-10 drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]" />
         </div>
       </div>
 
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-3 flex-wrap">
-          <h1 className="text-xl sm:text-3xl font-black text-foreground tracking-tighter uppercase">{title}</h1>
+        <div className="flex items-center gap-4 flex-wrap">
+          <h1 className="text-3xl sm:text-4xl font-black text-white tracking-[-0.05em] uppercase leading-none">{title}</h1>
           {badge && (
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/5 text-primary border border-primary/20 shadow-sm">
-              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-widest">
+            <div className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-white/[0.03] text-primary border border-white/10 shadow-sm backdrop-blur-md">
+              <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_rgba(var(--primary),0.5)] animate-pulse" />
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em]">
                 {badge}
               </span>
             </div>
           )}
         </div>
-        <p className="text-sm sm:text-base text-muted-foreground font-medium mt-1 tracking-tight max-w-2xl">{description}</p>
+        <p className="text-sm sm:text-base text-muted-foreground/70 font-semibold mt-2 tracking-tight max-w-3xl border-l-2 border-primary/20 pl-4">
+          {description}
+        </p>
       </div>
     </motion.div>
   );

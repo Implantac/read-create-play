@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,7 +7,7 @@
 @layer base {
   :root,
   .dark {
-    --background: 225 25% 5%;
+    --background: 220 30% 2%;
     --foreground: 210 20% 92%;
 
     --card: 225 22% 9%;
@@ -16,7 +16,7 @@
     --popover: 225 22% 9%;
     --popover-foreground: 210 20% 92%;
 
-    --primary: 145 72% 42%;
+    --primary: 155 100% 50%;
     --primary-foreground: 225 25% 5%;
 
     --secondary: 225 18% 15%;
@@ -122,12 +122,13 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
-    letter-spacing: -0.02em;
+    font-family: 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.04em;
+    font-weight: 800;
   }
 
   code, .font-mono {

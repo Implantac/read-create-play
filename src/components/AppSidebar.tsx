@@ -80,17 +80,18 @@ export function AppSidebar() {
   const { config } = useLotteryContext();
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader className="p-4 border-b border-sidebar-border">
+    <Sidebar collapsible="icon" className="border-r border-white/5 bg-[#050505]/40 backdrop-blur-3xl">
+      <SidebarHeader className="p-4 border-b border-white/5">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-primary/20 group-hover:shadow-primary/40 group-hover:scale-110 transition-all duration-300 overflow-hidden">
-            <img src="/logo.png" alt="Titan Loterias" width="40" height="40" className="w-10 h-10 object-contain" />
+          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20 group-hover:border-primary/50 transition-all duration-500 overflow-hidden relative">
+            <div className="absolute inset-0 bg-primary/20 blur-xl animate-pulse" />
+            <img src="/logo.png" alt="Titan" width="48" height="48" className="w-10 h-10 object-contain relative z-10" />
           </div>
           {!collapsed && (
             <div>
               <div className="flex items-center gap-1.5">
-                <h1 className="text-base font-bold tracking-tight text-sidebar-accent-foreground">
-                  Titan<span className="gradient-brand-text ml-1">Loterias</span>
+                <h1 className="text-lg font-black tracking-[-0.05em] text-white">
+                  TITAN<span className="text-primary ml-0.5">TERMINAL</span>
                 </h1>
                 {isAdmin && (
                   <span className={`px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded border animate-pulse ${
@@ -102,8 +103,8 @@ export function AppSidebar() {
                   </span>
                 )}
               </div>
-              <p className="text-[10px] text-muted-foreground font-mono tracking-wider uppercase">
-                Inteligência para Loterias
+              <p className="text-[9px] text-primary/60 font-black tracking-[0.2em] uppercase">
+                Neural Data Engine
               </p>
             </div>
           )}
@@ -112,15 +113,15 @@ export function AppSidebar() {
 
       <SidebarContent className="px-2 py-3">
         {/* Active lottery indicator */}
-        <div className={`mx-1 mb-3 rounded-lg bg-primary/5 border border-primary/15 transition-all ${collapsed ? "p-2 flex justify-center" : "px-3 py-2"}`}>
+        <div className={`mx-1 mb-4 rounded-xl bg-white/[0.03] border border-white/5 transition-all ${collapsed ? "p-2 flex justify-center" : "px-3 py-3"}`}>
           {collapsed ? (
             <span className="text-lg" title={config.name}>{config.icon}</span>
           ) : (
             <div className="flex items-center gap-2">
               <span className="text-base">{config.icon}</span>
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-semibold text-primary truncate">{config.name}</p>
-                <p className="text-[9px] text-muted-foreground font-mono">{config.pick}/{config.numbers}</p>
+                <p className="text-[10px] font-black text-white uppercase tracking-widest truncate">{config.name}</p>
+                <p className="text-[9px] text-primary font-black opacity-60">ACTIVE STREAM</p>
               </div>
             </div>
           )}
@@ -128,8 +129,8 @@ export function AppSidebar() {
 
         {workflowGroups.map((group) => (
           <SidebarGroup key={group.label}>
-            <SidebarGroupLabel className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-1 flex items-center gap-1.5">
-              <span className="w-4 h-4 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[9px] font-bold text-primary">
+            <SidebarGroupLabel className="text-[9px] uppercase tracking-[0.2em] font-black text-muted-foreground/50 mb-2 flex items-center gap-2">
+              <span className="w-5 h-5 rounded bg-primary/20 border border-primary/40 flex items-center justify-center text-[10px] font-black text-primary">
                 {group.stepNumber}
               </span>
               {!collapsed && group.label}
@@ -148,8 +149,8 @@ export function AppSidebar() {
                             <NavLink
                               to={item.url}
                               end={item.url === "/"}
-                              className={`rounded-lg px-3 py-2.5 text-sm transition-all duration-200 hover:bg-sidebar-accent/60 ${locked ? "text-muted-foreground" : "text-sidebar-foreground"}`}
-                              activeClassName="bg-primary/10 text-primary font-semibold glow-green"
+                              className={`rounded-xl px-4 py-3 text-[13px] font-bold transition-all duration-500 hover:bg-white/[0.04] border border-transparent hover:border-white/5 ${locked ? "text-muted-foreground/40" : "text-sidebar-foreground"}`}
+                              activeClassName="bg-primary/10 text-primary border-primary/20"
                             >
                               <item.icon className="mr-3 h-4 w-4 shrink-0" />
                               {!collapsed && (
@@ -256,15 +257,15 @@ export function AppSidebar() {
               )}
               <Link
                 to="/planos"
-                className="flex items-center gap-2 rounded-lg bg-primary/5 border border-primary/10 px-3 py-2.5 hover:bg-primary/10 transition-colors group"
+                className="flex items-center gap-3 rounded-xl bg-primary text-primary-foreground px-4 py-3.5 hover:scale-[1.02] transition-all group shadow-lg shadow-primary/20"
               >
-                <Crown className="w-4 h-4 text-accent shrink-0" />
+                <Crown className="w-5 h-5 text-white shrink-0 drop-shadow-md" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-sidebar-accent-foreground">
-                    {currentPlan === "free" ? "Upgrade" : "Vitalício"}
+                  <p className="text-[11px] font-black uppercase tracking-widest leading-none">
+                    UPGRADE TO PRO
                   </p>
-                  <p className="text-[10px] text-muted-foreground truncate">
-                    {currentPlan === "free" ? "Desbloquear recursos" : "Plano ativo"}
+                  <p className="text-[9px] text-primary-foreground/70 font-bold mt-1 uppercase">
+                    Neural v4.0 Active
                   </p>
                 </div>
               </Link>

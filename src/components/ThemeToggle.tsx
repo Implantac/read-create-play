@@ -37,10 +37,10 @@ export function ThemeToggle() {
           size="icon"
           variant="ghost"
           onClick={handleToggle}
-          className="h-8 w-8 text-muted-foreground hover:text-foreground transition-colors"
+          className="h-9 w-9 text-muted-foreground hover:text-primary transition-all duration-300 bg-white/[0.03] border border-white/5 rounded-xl"
         >
-          <Sun className="h-4 w-4 rotate-0 scale-100 transition-transform dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
+          <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]" />
+          <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.4)]" />
           <span className="sr-only">Alternar tema</span>
         </Button>
       </TooltipTrigger>

@@ -16,7 +16,8 @@ const duplicated = [...lotteries, ...lotteries];
 
 export function LotteryLogosCarousel() {
   return (
-    <section className="py-12 border-b border-border/20 bg-card/20 backdrop-blur-sm overflow-hidden">
+    <section className="py-12 border-b border-white/5 bg-[#050505]/40 backdrop-blur-3xl overflow-hidden relative">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#ffffff05_1px,_transparent_0)] bg-[size:24px_24px] pointer-events-none" />
       <div className="container mx-auto px-4 mb-6">
         <p className="text-center text-xs uppercase tracking-[0.2em] text-muted-foreground font-mono">
           Loterias Suportadas

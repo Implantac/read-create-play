@@ -4,7 +4,7 @@ import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { evaluateBetQuality, BetQualityReport } from "@/engine/bet-quality";
 import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, RefreshCw, Copy, Check, ChevronRight, TrendingUp, Shield, Zap, BarChart3, CheckSquare } from "lucide-react";
+import { Sparkles, RefreshCw, Copy, Check, ChevronRight, TrendingUp, Shield, Zap, BarChart3, CheckSquare, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -143,16 +143,18 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
   };
 
   return (
-    <div className="rounded-xl glass-card p-3 sm:p-5 space-y-4 sm:space-y-5">
+    <div className="rounded-xl glass-card p-4 sm:p-6 space-y-6 border border-white/5 relative overflow-hidden group">
+      <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 blur-[100px] pointer-events-none rounded-full group-hover:bg-primary/20 transition-all duration-700" />
+      
       {/* Header */}
-      <div className="flex items-center gap-2 sm:gap-3">
-        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+      <div className="flex items-center gap-4 relative z-10">
+        <div className="w-12 h-12 rounded-xl bg-[#0a0a0a] border border-white/10 flex items-center justify-center shrink-0 shadow-lg">
+          <Sparkles className="w-6 h-6 text-primary drop-shadow-[0_0_8px_rgba(var(--primary),0.4)]" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-bold text-foreground">Gerador de Apostas Inteligentes</h3>
-          <p className="text-[10px] sm:text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
-            Gere apostas com melhor distribuição estatística
+          <h3 className="text-lg font-black text-white tracking-tight uppercase leading-none">Smart Engineering Generator</h3>
+          <p className="text-[10px] text-muted-foreground mt-1 font-bold tracking-widest uppercase opacity-60">
+            Probability Matrix Optimization v4.2
           </p>
         </div>
       </div>
@@ -171,18 +173,22 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
       </div>
 
       {/* Generate Buttons */}
-      <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 sm:gap-2">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 relative z-10">
         {[1, 3, 5, 10].map(n => (
           <Button
             key={n}
             variant="outline"
-            size="sm"
+            size="lg"
             onClick={() => generate(n)}
             disabled={generating}
-            className="text-[11px] sm:text-xs border-border/50 hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all h-8 sm:h-9 px-2 sm:px-3"
+            className="text-[11px] font-black uppercase tracking-widest border-white/5 hover:border-primary/40 bg-white/[0.02] hover:bg-white/[0.05] transition-all h-11 px-4 rounded-xl group/btn"
           >
-            <RefreshCw className={`w-3 h-3 mr-1 sm:mr-1.5 ${generating ? "animate-spin" : ""}`} />
-            {n} jogo{n > 1 ? "s" : ""}
+            {generating ? (
+              <Loader2 className="w-4 h-4 animate-spin text-primary" />
+            ) : (
+              <Zap className="w-4 h-4 mr-2 text-primary group-hover/btn:scale-110 transition-transform" />
+            )}
+            {n} {n > 1 ? "Games" : "Game"}
           </Button>
         ))}
       </div>
@@ -214,11 +220,12 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
           {bets.map((bet, i) => (
             <motion.div
               key={`${i}-${bet.numbers.join(",")}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.06 }}
-              className="p-4 rounded-xl bg-card border border-border/50 hover:border-border transition-colors space-y-3"
+              className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-primary/30 transition-all duration-500 group/card relative overflow-hidden"
             >
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
               {/* Card Header: Checkbox + Rank + Score + Grade */}
               <div className="flex items-center justify-between gap-1">
                 <div className="flex items-center gap-1.5 sm:gap-2">
@@ -244,12 +251,19 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
               <Progress value={bet.report.overall} className="h-1.5" />
 
               {/* Numbers */}
-              <div className="flex flex-wrap gap-1 sm:gap-1.5">
-                {bet.numbers.map(n => (
-                  <span key={n} className="lottery-ball text-[10px] sm:text-xs w-7 h-7 sm:w-8 sm:h-8">
-                    {String(n).padStart(2, "0")}
-                  </span>
-                ))}
+              <div className="flex flex-wrap gap-2 py-4">
+                {bet.numbers.map(n => {
+                  const stat = stats.find(s => s.number === n);
+                  return (
+                    <span key={n} className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-black shadow-[0_4px_15px_rgba(0,0,0,0.5)] border-2 border-white/10 transition-transform group-hover/card:scale-110 duration-500 ${
+                      stat?.status === "hot" ? "bg-destructive text-white border-destructive/50" : 
+                      stat?.status === "cold" ? "bg-blue-600 text-white border-blue-500/50" : 
+                      "bg-[#111] text-primary border-primary/20"
+                    }`}>
+                      {String(n).padStart(2, "0")}
+                    </span>
+                  );
+                })}
               </div>
 
               {/* Insights */}

@@ -84,21 +84,21 @@ export function GeneratorFiltersPanel({ config, draws, stats, filters, onFilters
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <CollapsibleTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2 text-xs w-full justify-between">
+        <Button variant="outline" size="sm" className="gap-3 text-[11px] font-bold uppercase tracking-wider w-full justify-between h-10 border-white/10 hover:border-primary/40 bg-white/[0.02] hover:bg-white/[0.04] transition-all duration-300">
           <div className="flex items-center gap-2">
-            <Filter className="w-3.5 h-3.5" />
-            Filtros Avançados
+            <Filter className="w-3.5 h-3.5 text-primary" />
+            Configurações Avançadas de Engenharia
             {activeFiltersCount > 0 && (
-              <Badge variant="default" className="text-[10px] px-1.5 py-0">
-                {activeFiltersCount}
+              <Badge variant="default" className="text-[10px] px-2 py-0.5 rounded bg-primary text-primary-foreground font-black">
+                {activeFiltersCount} ATIVOS
               </Badge>
             )}
           </div>
-          {isOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </Button>
       </CollapsibleTrigger>
 
-      <CollapsibleContent className="mt-3 space-y-4 p-4 rounded-lg border border-border/50 bg-muted/20">
+      <CollapsibleContent className="mt-4 space-y-6 p-6 rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-3xl">
         {/* Reset */}
         <div className="flex justify-end">
           <Button variant="ghost" size="sm" onClick={resetFilters} className="text-xs gap-1 text-muted-foreground">

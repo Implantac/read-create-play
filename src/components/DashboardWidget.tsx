@@ -30,7 +30,7 @@ export function DashboardWidget({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay }}
       className={cn(
-        "glass-card rounded-2xl border border-border/50 flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:border-primary/20",
+        "glass-card rounded-xl border border-white/5 flex flex-col h-full overflow-hidden transition-all duration-500 hover:border-primary/40 hover:bg-white/[0.02]",
         className
       )}
     >

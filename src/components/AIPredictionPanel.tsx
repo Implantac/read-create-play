@@ -66,9 +66,10 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
   };
 
   return (
-    <div className="rounded-xl glass-card p-3 sm:p-5 border border-primary/20 relative overflow-hidden">
-      {/* Glow effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+    <div className="rounded-xl glass-card p-3 sm:p-5 border border-white/5 relative overflow-hidden group">
+      {/* Dynamic Glow */}
+      <div className="absolute -top-24 -left-24 w-48 h-48 bg-primary/10 blur-[100px] pointer-events-none rounded-full group-hover:bg-primary/20 transition-all duration-700" />
+      <div className="absolute inset-0 bg-white/[0.01] pointer-events-none" />
       
       <div className="relative z-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
@@ -78,9 +79,9 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
             </div>
             <div className="min-w-0">
               <h3 className="text-xs sm:text-sm font-semibold text-foreground flex items-center gap-1.5 flex-wrap">
-                IA Nativa v2.0
-                <span className="text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
-                  Motor Estatístico
+                Titan Predictive Engine
+                <span className="text-[9px] px-2 py-0.5 rounded-lg bg-primary/20 text-primary font-black uppercase tracking-widest border border-primary/20">
+                  Neural v4.0
                 </span>
               </h3>
               <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-0.5 line-clamp-1">
@@ -114,10 +115,10 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
               <button
                 key={n}
                 onClick={() => setCount(n)}
-                className={`text-[11px] sm:text-xs px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-md border transition-all ${
+                className={`text-[11px] px-3 py-1.5 rounded-lg border font-bold transition-all duration-300 ${
                   count === n
-                    ? "border-primary text-primary bg-primary/10"
-                    : "border-border text-muted-foreground hover:text-foreground"
+                    ? "border-primary text-primary bg-primary/20"
+                    : "border-white/5 text-muted-foreground hover:text-white hover:border-white/20 hover:bg-white/[0.03]"
                 }`}
               >
                 {n}
@@ -128,7 +129,7 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
             onClick={generate}
             disabled={loading}
             size="sm"
-            className="text-[11px] sm:text-xs gap-1.5 bg-primary hover:bg-primary/90 h-8"
+            className="text-[11px] sm:text-xs gap-2 bg-primary text-primary-foreground h-9 px-6 rounded-xl font-black shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
           >
             {loading ? (
               <>
@@ -149,7 +150,7 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-4 p-3 rounded-lg bg-muted/30 border border-border/30"
+            className="mb-6 p-4 rounded-xl bg-white/[0.02] border border-white/5"
           >
             <p className="text-xs text-muted-foreground leading-relaxed">
               <Brain className="w-3 h-3 inline mr-1 text-primary" />
@@ -161,9 +162,10 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
         {/* Loading state */}
         {loading && (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
-            <div className="relative">
-              <div className="w-12 h-12 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
-              <Brain className="w-5 h-5 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+            <div className="relative group">
+              <div className="absolute inset-0 bg-primary/20 blur-xl animate-pulse" />
+              <div className="w-16 h-16 rounded-2xl border-2 border-white/10 border-t-primary animate-spin relative z-10" />
+              <Brain className="w-6 h-6 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20" />
             </div>
             <p className="text-xs text-muted-foreground animate-pulse">
               A IA está analisando padrões de 100 sorteios...
@@ -180,7 +182,7 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.08 }}
-                className="flex flex-col gap-1.5 p-3 rounded-lg bg-secondary/30 border border-primary/10 hover:border-primary/30 transition-colors group"
+                className="flex flex-col gap-3 p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-primary/40 hover:bg-white/[0.04] transition-all duration-500 group"
               >
                 <div className="flex items-start sm:items-center gap-1.5 sm:gap-2 flex-col sm:flex-row">
                   <div className="flex items-center gap-1.5">
@@ -204,7 +206,11 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
                           ? "lottery-ball-cold"
                           : "";
                       return (
-                        <span key={n} className={`lottery-ball text-[10px] sm:text-xs w-7 h-7 sm:w-8 sm:h-8 ${ballClass}`}>
+                        <span key={n} className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-black shadow-[0_4px_10px_rgba(0,0,0,0.3)] border-2 border-white/10 ${
+                          stat?.status === "hot" ? "bg-destructive text-white border-destructive/50" : 
+                          stat?.status === "cold" ? "bg-blue-600 text-white border-blue-500/50" : 
+                          "bg-[#111] text-primary border-primary/20"
+                        }`}>
                           {String(n).padStart(2, "0")}
                         </span>
                       );

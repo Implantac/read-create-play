@@ -95,10 +95,10 @@ const DashboardPage = () => {
       </Helmet>
       <OnboardingGuide />
       <PageHeader
-        title="Dashboard"
-        description={`Plataforma de análise estatística e inteligência para loterias — ${config.name}`}
+        title="Command Center"
+        description={`Terminal de inteligência estatística e fluxos neurais de alta performance — ${config.name}`}
         icon={BarChart3}
-        badge={draws.length > 0 ? `${draws.length} sorteios` : undefined}
+        badge="System Active"
       />
       <LotteryContextBanner />
       <ComplianceDisclaimer compact />
