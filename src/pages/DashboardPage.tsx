@@ -13,7 +13,7 @@ import { AIInsightsCard } from "@/components/AIInsightsCard";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, Zap, Activity, Target, 
-  ShieldCheck, Gauge, Crown, X, Clover, Save, TrendingDown 
+  ShieldCheck, Gauge, Crown, X, Clover, Save, TrendingDown, Settings2, Layout
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -38,6 +38,25 @@ import { ConsecutiveChart } from "@/components/ConsecutiveChart";
 import { RangeDistribution } from "@/components/RangeDistribution";
 import { DelayChart } from "@/components/DelayChart";
 import { SumChart } from "@/components/SumChart";
+import { useDashboardLayout } from "@/hooks/useDashboardLayout";
+import { SortableWidget } from "@/components/SortableWidget";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  rectSortingStrategy
+} from "@dnd-kit/sortable";
+import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 
 const container = {
   hidden: { opacity: 0 },
