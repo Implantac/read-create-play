@@ -4,7 +4,7 @@
  */
 
 import { LotteryConfig } from "@/data/lotteries";
-import { NumberStats } from "../statistics";
+import { NumberStats } from "@/features/statistics/engine";
 
 export interface GameQuality {
   game: number[];

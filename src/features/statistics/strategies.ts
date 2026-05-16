@@ -1,6 +1,6 @@
 import { NumberStats, generateSmartBet } from "./engine";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { getConsensusRanking, runAllModels, runQuantumAnalysis, runRandomForest, runXGBoost, runNeuralNetwork, runBayesianInference, runMarkovChain } from "./ml-models";
+import { getConsensusRanking, runAllModels, runQuantumAnalysis, runRandomForest, runXGBoost, runNeuralNetwork, runBayesianInference, runMarkovChain } from "@/engine/ml-models";
 
 export type Strategy =
   | "smart"

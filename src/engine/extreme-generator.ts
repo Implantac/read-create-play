@@ -1,7 +1,7 @@
-import { NumberStats } from "./statistics";
+import { NumberStats } from "@/features/statistics/engine";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { evaluateBetQuality, BetQualityReport } from "./bet-quality";
-import { generateByStrategy, Strategy } from "./strategies";
+import { generateByStrategy, Strategy } from "@/features/statistics/strategies";
 import { analyzeFrameCenter, analyzeRowDistribution } from "./generation-filters";
 import { computeAntiPopularityPenalty } from "@/ai/knowledge/jackpotMasterStrategies";
 
