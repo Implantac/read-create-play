@@ -66,9 +66,10 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
   };
 
   return (
-    <div className="rounded-xl glass-card p-3 sm:p-5 border border-primary/20 relative overflow-hidden">
-      {/* Glow effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+    <div className="rounded-xl glass-card p-3 sm:p-5 border border-white/5 relative overflow-hidden group">
+      {/* Dynamic Glow */}
+      <div className="absolute -top-24 -left-24 w-48 h-48 bg-primary/10 blur-[100px] pointer-events-none rounded-full group-hover:bg-primary/20 transition-all duration-700" />
+      <div className="absolute inset-0 bg-white/[0.01] pointer-events-none" />
       
       <div className="relative z-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
