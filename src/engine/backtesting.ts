@@ -22,6 +22,7 @@ export interface BacktestResult {
   maxDrawdown: number;
   recoveryFactor: number;
   sharpeRatio: number;
+  globalScore: number;
 }
 
 export interface BacktestConfig {
@@ -138,6 +139,15 @@ export function runBacktest(
     const stdDevReturn = Math.sqrt(dailyReturns.reduce((s, v) => s + (v - avgReturn) ** 2, 0) / dailyReturns.length);
     const sharpeRatio = stdDevReturn > 0 ? (avgReturn / stdDevReturn) : 0;
 
+    // Composite Score
+    const globalScore = Math.round(
+      (winRate * 2.5) + 
+      (consistency * 30) + 
+      (sharpeRatio * 15) + 
+      (Math.min(10, recoveryFactor) * 2) +
+      (avgHits * 10)
+    );
+
     results.push({
       strategy,
       label: stratInfo?.label || strategy,
@@ -153,8 +163,9 @@ export function runBacktest(
       maxDrawdown: Math.round(maxDrawdown * 100) / 100,
       recoveryFactor: Math.round(recoveryFactor * 100) / 100,
       sharpeRatio: Math.round(sharpeRatio * 100) / 100,
+      globalScore,
     });
   }
 
-  return results.sort((a, b) => b.globalScore || (b.winRate - a.winRate));
+  return results.sort((a, b) => b.globalScore - a.globalScore);
 }
