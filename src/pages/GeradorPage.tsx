@@ -53,9 +53,10 @@ const GeradorPage = () => {
       </Helmet>
       <div className="space-y-6">
         <PageHeader
-          title="Gerador de Apostas"
-          description="Gere combinações inteligentes com algoritmos estatísticos e IA"
+          title="Strategy Engine"
+          description={`Geração de combinações otimizadas via Matrix Neural e filtros de engenharia — ${config.name}`}
           icon={Sparkles}
+          badge="Neural Generator v4.2"
         />
         <LotteryContextBanner />
         <ComplianceDisclaimer />
