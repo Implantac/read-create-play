@@ -78,6 +78,7 @@ function App() {
                   <Route path="/suporte" element={<SuportePage />} />
                   <Route path="/payment-success" element={<PaymentSuccessPage />} />
                   <Route path="/install" element={<InstallPage />} />
+                  <Route path="/seo-status" element={<GSCStatusPage />} />
 
                   {/* Protected */}
                   <Route element={<ProtectedRoute><LotteryProvider><AppLayout /></LotteryProvider></ProtectedRoute>}>
