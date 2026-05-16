@@ -92,9 +92,10 @@ export function AppLayout() {
                 {/* User menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="gap-2.5 hover:bg-muted/50 px-2 rounded-xl transition-all border border-transparent hover:border-border/30">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20 border border-white/10">
-                        <User className="w-4 h-4 text-primary-foreground" />
+                    <Button variant="ghost" size="sm" className="gap-3 hover:bg-white/[0.04] px-2.5 rounded-xl transition-all border border-transparent hover:border-white/5 h-11">
+                      <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shadow-lg border border-primary/20 relative group overflow-hidden">
+                        <div className="absolute inset-0 bg-primary/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <User className="w-5 h-5 text-primary relative z-10" />
                       </div>
                       <div className="hidden md:flex flex-col items-start leading-none">
                         <span className="text-[11px] font-bold text-foreground">
