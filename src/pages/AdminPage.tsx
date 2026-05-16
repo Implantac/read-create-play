@@ -19,6 +19,7 @@ import {
 import {
   Users, Crown, TrendingUp, Search, Shield, Loader2, RefreshCw, Ban, CheckCircle2,
   ShieldCheck, AlertTriangle, History, UserCog, Eye, Zap, Database, Activity, Star,
+  MessageSquare, Clock, AlertCircle, CheckCircle, Mail as MailIcon
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
