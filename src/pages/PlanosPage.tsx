@@ -164,9 +164,9 @@ export default function PlanosPage() {
         </motion.div>
       )}
 
-      {/* Grid container for centered single card */}
+      {/* Grid container for centered cards */}
       <div className="flex justify-center mb-12">
-        <div className="w-full max-w-md">
+        <div className="grid md:grid-cols-2 gap-6 w-full max-w-4xl">
           {plans.map((plan, i) => {
             const isCurrent = currentPlan === plan.id;
             const isUpgrade = plan.id !== "free" && !isCurrent;
