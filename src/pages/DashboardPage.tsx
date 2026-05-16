@@ -150,6 +150,12 @@ const DashboardPage = () => {
         description={`Ecossistema de análise probabilística e fluxos neurais de alta performance — ${config.name}`}
         icon={Gauge}
         badge="System Active"
+        headerAction={
+          <Button variant="outline" size="sm" className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10">
+            <Layout className="w-4 h-4 text-primary" />
+            <span className="hidden sm:inline">Personalizar Layout</span>
+          </Button>
+        }
       />
       <LotteryContextBanner />
       <ComplianceDisclaimer compact />
