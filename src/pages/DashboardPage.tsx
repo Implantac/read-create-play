@@ -33,6 +33,7 @@ import { QuickIntelligence } from "@/features/ai/components/QuickIntelligence";
 import { StatsWidget } from "@/components/ui/StatsWidget";
 import { DESIGN_TOKENS } from "@/lib/design-system";
 import { RecentDraws } from "@/components/RecentDraws";
+import { PlanGate } from "@/components/PlanGate";
 import { PersonalPerformanceCard } from "@/components/PersonalPerformanceCard";
 import { ParityChart } from "@/components/ParityChart";
 import { ConsecutiveChart } from "@/components/ConsecutiveChart";
