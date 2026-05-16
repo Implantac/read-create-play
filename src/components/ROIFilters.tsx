@@ -29,7 +29,7 @@ export function ROIFilters({ filters, onChange, strategies, maxHits }: ROIFilter
       </div>
 
       <div className="space-y-1">
-        <Label className="text-[10px] text-muted-foreground">Período</Label>
+        <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">TIME WINDOW</Label>
         <Select value={filters.period} onValueChange={v => update("period", v)}>
           <SelectTrigger className="h-8 w-[120px] text-xs">
             <SelectValue />
