@@ -181,7 +181,7 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.08 }}
-                className="flex flex-col gap-1.5 p-3 rounded-lg bg-secondary/30 border border-primary/10 hover:border-primary/30 transition-colors group"
+                className="flex flex-col gap-3 p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-primary/40 hover:bg-white/[0.04] transition-all duration-500 group"
               >
                 <div className="flex items-start sm:items-center gap-1.5 sm:gap-2 flex-col sm:flex-row">
                   <div className="flex items-center gap-1.5">
