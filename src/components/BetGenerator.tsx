@@ -220,11 +220,12 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
           {bets.map((bet, i) => (
             <motion.div
               key={`${i}-${bet.numbers.join(",")}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.06 }}
-              className="p-4 rounded-xl bg-card border border-border/50 hover:border-border transition-colors space-y-3"
+              className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-primary/30 transition-all duration-500 group/card relative overflow-hidden"
             >
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
               {/* Card Header: Checkbox + Rank + Score + Grade */}
               <div className="flex items-center justify-between gap-1">
                 <div className="flex items-center gap-1.5 sm:gap-2">
