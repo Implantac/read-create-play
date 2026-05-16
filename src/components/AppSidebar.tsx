@@ -80,8 +80,8 @@ export function AppSidebar() {
   const { config } = useLotteryContext();
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader className="p-4 border-b border-sidebar-border">
+    <Sidebar collapsible="icon" className="border-r border-white/5 bg-[#050505]/40 backdrop-blur-3xl">
+      <SidebarHeader className="p-4 border-b border-white/5">
         <Link to="/" className="flex items-center gap-3 group">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-primary/20 group-hover:shadow-primary/40 group-hover:scale-110 transition-all duration-300 overflow-hidden">
             <img src="/logo.png" alt="Titan Loterias" width="40" height="40" className="w-10 h-10 object-contain" />
