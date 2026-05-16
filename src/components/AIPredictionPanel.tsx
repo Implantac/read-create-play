@@ -79,9 +79,9 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
             </div>
             <div className="min-w-0">
               <h3 className="text-xs sm:text-sm font-semibold text-foreground flex items-center gap-1.5 flex-wrap">
-                IA Nativa v2.0
-                <span className="text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
-                  Motor Estatístico
+                Titan Predictive Engine
+                <span className="text-[9px] px-2 py-0.5 rounded-lg bg-primary/20 text-primary font-black uppercase tracking-widest border border-primary/20">
+                  Neural v4.0
                 </span>
               </h3>
               <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-0.5 line-clamp-1">
