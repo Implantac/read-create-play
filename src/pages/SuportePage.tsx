@@ -2,10 +2,14 @@ import { Helmet } from "react-helmet-async";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Mail, HelpCircle, Clock, Shield, CreditCard, Zap, Users, ArrowLeft } from "lucide-react";
+import { MessageCircle, Mail, HelpCircle, Clock, Shield, CreditCard, Zap, Users, ArrowLeft, Send, CheckCircle2, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { useNavigate } from "react-router-dom";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { useState } from "react";
 
 const WHATSAPP_NUMBER = "5543998581400";
 const WHATSAPP_MESSAGE = encodeURIComponent("Olá! Preciso de ajuda com o Titan Loterias.");
@@ -55,6 +59,22 @@ const faqCategories = [
 
 export default function SuportePage() {
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [ticketSent, setTicketSent] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Simulando envio de formulário
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setTicketSent(true);
+      toast.success("Mensagem enviada com sucesso!", {
+        description: "Nossa equipe responderá em breve via e-mail.",
+      });
+    }, 1500);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -127,6 +147,111 @@ export default function SuportePage() {
                 </div>
               </div>
             </a>
+          </Card>
+        </motion.div>
+
+        {/* Status e Atendimento Status */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="grid md:grid-cols-3 gap-4">
+          <Card className="p-4 border-border/30 bg-card/50 backdrop-blur-sm flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
+              <CheckCircle2 className="w-5 h-5 text-green-500" />
+            </div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Status do Sistema</p>
+              <p className="text-sm font-semibold text-foreground">Operacional</p>
+            </div>
+          </Card>
+          <Card className="p-4 border-border/30 bg-card/50 backdrop-blur-sm flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <Clock className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Tempo de Resposta</p>
+              <p className="text-sm font-semibold text-foreground">~ 15 minutos</p>
+            </div>
+          </Card>
+          <Card className="p-4 border-border/30 bg-card/50 backdrop-blur-sm flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center shrink-0">
+              <Users className="w-5 h-5 text-amber-500" />
+            </div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Atendimento</p>
+              <p className="text-sm font-semibold text-foreground">Fila Normal</p>
+            </div>
+          </Card>
+        </motion.div>
+
+        {/* Contact Form */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <Card className="p-8 border-border/30 bg-card/50 backdrop-blur-md relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl -z-10" />
+            
+            <div className="flex flex-col md:flex-row gap-10">
+              <div className="md:w-1/3 space-y-4">
+                <h3 className="text-xl font-bold text-foreground uppercase tracking-tight">Formulário de Contato</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Não encontrou sua resposta no FAQ? Envie uma mensagem detalhada e nosso suporte técnico entrará em contato.
+                </p>
+                <div className="space-y-3 pt-4">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Shield className="w-4 h-4 text-primary/60" />
+                    Privacidade Garantida
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <AlertCircle className="w-4 h-4 text-primary/60" />
+                    Suporte Prioritário Vitalício
+                  </div>
+                </div>
+              </div>
+
+              <div className="md:w-2/3">
+                {ticketSent ? (
+                  <div className="h-full flex flex-col items-center justify-center text-center space-y-4 py-8 animate-in fade-in zoom-in duration-500">
+                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                      <CheckCircle2 className="w-8 h-8 text-primary" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-lg">Chamado Aberto!</h4>
+                      <p className="text-sm text-muted-foreground">Anote seu protocolo: #TT-{Math.floor(100000 + Math.random() * 900000)}</p>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => setTicketSent(false)}>
+                      Enviar nova mensagem
+                    </Button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-muted-foreground uppercase ml-1">Nome Completo</label>
+                        <Input required placeholder="Seu nome" className="bg-background/50 border-border/40 focus:border-primary/50" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-muted-foreground uppercase ml-1">E-mail de Cadastro</label>
+                        <Input required type="email" placeholder="seu@email.com" className="bg-background/50 border-border/40 focus:border-primary/50" />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-muted-foreground uppercase ml-1">Assunto</label>
+                      <Input required placeholder="Ex: Dúvida sobre IA, Pagamento, etc." className="bg-background/50 border-border/40 focus:border-primary/50" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-muted-foreground uppercase ml-1">Mensagem</label>
+                      <Textarea required placeholder="Descreva sua dúvida ou problema com detalhes..." className="min-h-[120px] bg-background/50 border-border/40 focus:border-primary/50" />
+                    </div>
+                    <Button disabled={isSubmitting} type="submit" className="w-full gradient-brand text-primary-foreground gap-2 font-bold uppercase tracking-wider h-12 shadow-lg shadow-primary/20">
+                      {isSubmitting ? (
+                        <>Processando...</>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4" />
+                          Enviar Chamado Prioritário
+                        </>
+                      )}
+                    </Button>
+                  </form>
+                )}
+              </div>
+            </div>
           </Card>
         </motion.div>
 
