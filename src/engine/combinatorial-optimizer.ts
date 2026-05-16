@@ -1,6 +1,7 @@
 import { NumberStats } from "@/features/statistics/engine";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { evaluateBetQuality, BetQualityReport } from "./bet-quality";
+import { fastRandom } from "./hp-math-engine";
 
 // ═══════════════════════════════════════════════════════
 // Otimizador Combinatório
