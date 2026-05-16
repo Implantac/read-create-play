@@ -251,12 +251,19 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
               <Progress value={bet.report.overall} className="h-1.5" />
 
               {/* Numbers */}
-              <div className="flex flex-wrap gap-1 sm:gap-1.5">
-                {bet.numbers.map(n => (
-                  <span key={n} className="lottery-ball text-[10px] sm:text-xs w-7 h-7 sm:w-8 sm:h-8">
-                    {String(n).padStart(2, "0")}
-                  </span>
-                ))}
+              <div className="flex flex-wrap gap-2 py-4">
+                {bet.numbers.map(n => {
+                  const stat = stats.find(s => s.number === n);
+                  return (
+                    <span key={n} className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-black shadow-[0_4px_15px_rgba(0,0,0,0.5)] border-2 border-white/10 transition-transform group-hover/card:scale-110 duration-500 ${
+                      stat?.status === "hot" ? "bg-destructive text-white border-destructive/50" : 
+                      stat?.status === "cold" ? "bg-blue-600 text-white border-blue-500/50" : 
+                      "bg-[#111] text-primary border-primary/20"
+                    }`}>
+                      {String(n).padStart(2, "0")}
+                    </span>
+                  );
+                })}
               </div>
 
               {/* Insights */}
