@@ -34,6 +34,7 @@ import { PersonalPerformanceCard } from "@/components/PersonalPerformanceCard";
 import { DashboardWidget } from "@/components/DashboardWidget";
 import { calculateGameScore, GameScore } from "@/features/statistics/scoring";
 import { Zap, Activity, Target, ShieldCheck, Gauge, TrendingDown } from "lucide-react";
+import { QuickIntelligence } from "@/features/ai/components/QuickIntelligence";
 
 const container = {
   hidden: { opacity: 0 },
