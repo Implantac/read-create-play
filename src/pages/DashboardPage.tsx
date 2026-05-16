@@ -82,7 +82,8 @@ const DashboardPage = () => {
   const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
   const { currentPlan } = usePlanAccess();
   const { profile, trialDaysLeft, isTrialExpired, isAdmin, isSuperAdmin } = useAuth();
-  const { layout, toggleWidget, updateOrder } = useDashboardLayout(selectedLottery);
+  const { layout, toggleWidget, updateOrder, exportLayout, importLayout } = useDashboardLayout(selectedLottery);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -104,6 +105,28 @@ const DashboardPage = () => {
       updateOrder(arrayMove(items, oldIndex, newIndex));
     }
   };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      if (importLayout(content)) {
+        toast.success("Layout restaurado com sucesso!");
+      } else {
+        toast.error("Erro ao importar layout. Verifique o arquivo.");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = ""; // Reset
+  };
+
   const [luckyGame, setLuckyGame] = useState<{ numbers: number[]; score: GameScore; strategy: string } | null>(null);
   const [generatingLucky, setGeneratingLucky] = useState(false);
 
