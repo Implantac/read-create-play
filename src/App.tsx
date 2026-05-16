@@ -42,6 +42,7 @@ const SuportePage = lazy(() => import("./pages/SuportePage"));
 const InstallPage = lazy(() => import("./pages/InstallPage"));
 const StrategyLabPage = lazy(() => import("./pages/StrategyLabPage"));
 const MatrizAnalisePage = lazy(() => import("./pages/MatrizAnalisePage"));
+const GSCStatusPage = lazy(() => import("./pages/GSCStatusPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
