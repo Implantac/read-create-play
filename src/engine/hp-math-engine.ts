@@ -14,7 +14,7 @@ export function seedRNG(s: number): void {
   _seed = s | 0;
 }
 
-function fastRandom(): number {
+export function fastRandom(): number {
   _seed = (_seed * 1664525 + 1013904223) | 0;
   return (_seed >>> 0) / 4294967296;
 }
