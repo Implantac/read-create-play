@@ -136,10 +136,16 @@ export function AppLayout() {
           </main>
 
           {/* Footer */}
-          <footer className="border-t border-border/30 py-3">
-            <div className="container mx-auto px-4 flex items-center justify-center gap-2 text-[10px] text-muted-foreground">
-              <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-pulse" />
-              <span className="font-mono tracking-wider uppercase">Titan Loterias — Motor v4.0 • ML • Database</span>
+          <footer className="border-t border-white/5 py-4 bg-[#050505]/60 backdrop-blur-md">
+            <div className="container mx-auto px-6 flex items-center justify-between gap-4 text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.2em]">
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(var(--primary),0.8)]" />
+                <span>TITAN QUANTUM ENGINE V4.2 — REAL-TIME STREAM</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <span>LATENCY: 12MS</span>
+                <span>SYSTEM STATUS: OPERATIONAL</span>
+              </div>
             </div>
           </footer>
         </div>
