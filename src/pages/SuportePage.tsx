@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 
 const WHATSAPP_NUMBER = "5543998581400";
 const WHATSAPP_MESSAGE = encodeURIComponent("Olá! Preciso de ajuda com o Titan Loterias.");
