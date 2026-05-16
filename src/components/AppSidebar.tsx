@@ -130,7 +130,7 @@ export function AppSidebar() {
         {workflowGroups.map((group) => (
           <SidebarGroup key={group.label}>
             <SidebarGroupLabel className="text-[9px] uppercase tracking-[0.2em] font-black text-muted-foreground/50 mb-2 flex items-center gap-2">
-              <span className="w-4 h-4 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[9px] font-bold text-primary">
+              <span className="w-5 h-5 rounded bg-primary/20 border border-primary/40 flex items-center justify-center text-[10px] font-black text-primary">
                 {group.stepNumber}
               </span>
               {!collapsed && group.label}
