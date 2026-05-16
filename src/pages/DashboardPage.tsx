@@ -1,15 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useLotteryContext } from "@/contexts/LotteryContext";
-import { StatsCard } from "@/components/StatsCard";
 import { FrequencyChart } from "@/components/FrequencyChart";
 import { HeatmapGrid } from "@/components/HeatmapGrid";
-import { RecentDraws } from "@/components/RecentDraws";
-import { SumChart } from "@/components/SumChart";
-import { ParityChart } from "@/components/ParityChart";
-import { ConsecutiveChart } from "@/components/ConsecutiveChart";
-import { RangeDistribution } from "@/components/RangeDistribution";
-import { DelayChart } from "@/components/DelayChart";
 import { AutoUpdater } from "@/components/AutoUpdater";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
@@ -18,7 +11,7 @@ import { ComplianceDisclaimer } from "@/components/ComplianceDisclaimer";
 import { WorkflowSteps } from "@/components/WorkflowSteps";
 import { AIInsightsCard } from "@/components/AIInsightsCard";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, X, Save, Crown, Clover } from "lucide-react";
+import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, Zap, Activity, Target, ShieldCheck, Gauge, Crown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,11 +23,12 @@ import { usePlanAccess } from "@/hooks/usePlanAccess";
 import { OnboardingGuide } from "@/components/OnboardingGuide";
 import { UpgradeBanner } from "@/components/UpgradeBanner";
 import { DashboardSkeleton } from "@/components/DashboardSkeleton";
-import { PersonalPerformanceCard } from "@/components/PersonalPerformanceCard";
 import { DashboardWidget } from "@/components/DashboardWidget";
 import { calculateGameScore, GameScore } from "@/features/statistics/scoring";
-import { Zap, Activity, Target, ShieldCheck, Gauge, TrendingDown } from "lucide-react";
 import { QuickIntelligence } from "@/features/ai/components/QuickIntelligence";
+import { StatsWidget } from "@/components/ui/StatsWidget";
+import { DESIGN_TOKENS } from "@/lib/design-system";
+import { RecentDraws } from "@/components/RecentDraws";
 
 const container = {
   hidden: { opacity: 0 },
