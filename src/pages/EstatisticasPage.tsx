@@ -122,10 +122,10 @@ const EstatisticasPage = () => {
         <meta property="og:url" content="https://titanloterias.lovable.app/estatisticas" />
       </Helmet>
       <PageHeader
-        title="Estatísticas Avançadas"
-        description={`Visão consolidada de todas as métricas — ${config.name}`}
+        title="Market Statistics"
+        description={`Análise técnica de alta densidade e comportamento de clusters — ${config.name}`}
         icon={PieChart}
-        badge={`${filteredDraws.length} sorteios${period > 0 ? ` (últimos ${period})` : ''}`}
+        badge="Enterprise Analytics"
       />
       <LotteryContextBanner />
 
