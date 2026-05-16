@@ -43,7 +43,7 @@ export function AIInsightsCard({ stats, draws, lotteryName, compact }: Props) {
       if (repeated.length > 0) {
         result.push({
           icon: Zap,
-          text: `${repeated.length} dezena${repeated.length > 1 ? "s" : ""} se repetiram entre os 2 últimos concursos — padrão de continuidade detectado.`,
+          text: `Padrão de Continuidade: Detectamos a repetição de ${repeated.length} dezenas. O motor neural sugere persistência de cluster.`,
           type: "info",
         });
       }
