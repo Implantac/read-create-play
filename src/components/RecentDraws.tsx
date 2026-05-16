@@ -16,14 +16,14 @@ export function RecentDraws({ draws }: Props) {
   const [expandedDraw, setExpandedDraw] = useState<number | null>(firstWithPrizes?.concurso ?? null);
 
   return (
-    <div className="rounded-xl glass-card p-5 space-y-4">
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-lg bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center">
-          <History className="w-4 h-4 text-neon-purple" />
+    <div className="rounded-xl glass-card p-6 space-y-6 border border-white/5 relative overflow-hidden">
+      <div className="flex items-center gap-4 relative z-10">
+        <div className="w-12 h-12 rounded-xl bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center shrink-0">
+          <History className="w-6 h-6 text-neon-purple drop-shadow-[0_0_8px_rgba(var(--neon-purple),0.4)]" />
         </div>
         <div>
-          <h3 className="text-sm font-semibold text-foreground">Últimos Concursos</h3>
-          <p className="text-[10px] text-muted-foreground mt-0.5">Resultados e premiações</p>
+          <h3 className="text-lg font-black text-white tracking-tight uppercase leading-none">Historical Results</h3>
+          <p className="text-[10px] text-muted-foreground mt-1 font-bold tracking-widest uppercase opacity-60">Verified Settlement Ledger</p>
         </div>
       </div>
       <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
