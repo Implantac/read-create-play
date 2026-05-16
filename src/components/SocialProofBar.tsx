@@ -4,8 +4,8 @@ import { Shield, Lock, Users, Award } from "lucide-react";
 const badges = [
   { icon: Shield, label: "Dados Oficiais da Caixa" },
   { icon: Lock, label: "Criptografia SSL 256-bit" },
-  { icon: Users, label: "5.000+ Jogadores Ativos" },
-  { icon: Award, label: "Plataforma #1 em Loterias" },
+   { icon: Users, label: "7.000+ Jogadores Ativos" },
+   { icon: Award, label: "Padrão de Segurança Enterprise" },
 ];
 
 export function SocialProofBar() {
