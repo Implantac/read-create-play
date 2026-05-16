@@ -83,8 +83,9 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r border-white/5 bg-[#050505]/40 backdrop-blur-3xl">
       <SidebarHeader className="p-4 border-b border-white/5">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-primary/20 group-hover:shadow-primary/40 group-hover:scale-110 transition-all duration-300 overflow-hidden">
-            <img src="/logo.png" alt="Titan Loterias" width="40" height="40" className="w-10 h-10 object-contain" />
+          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20 group-hover:border-primary/50 transition-all duration-500 overflow-hidden relative">
+            <div className="absolute inset-0 bg-primary/20 blur-xl animate-pulse" />
+            <img src="/logo.png" alt="Titan" width="48" height="48" className="w-10 h-10 object-contain relative z-10" />
           </div>
           {!collapsed && (
             <div>
