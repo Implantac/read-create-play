@@ -102,8 +102,8 @@ export function AppSidebar() {
                   </span>
                 )}
               </div>
-              <p className="text-[10px] text-muted-foreground font-mono tracking-wider uppercase">
-                Inteligência para Loterias
+              <p className="text-[9px] text-primary/60 font-black tracking-[0.2em] uppercase">
+                Neural Data Engine
               </p>
             </div>
           )}
