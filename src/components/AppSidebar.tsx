@@ -120,8 +120,8 @@ export function AppSidebar() {
             <div className="flex items-center gap-2">
               <span className="text-base">{config.icon}</span>
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-semibold text-primary truncate">{config.name}</p>
-                <p className="text-[9px] text-muted-foreground font-mono">{config.pick}/{config.numbers}</p>
+                <p className="text-[10px] font-black text-white uppercase tracking-widest truncate">{config.name}</p>
+                <p className="text-[9px] text-primary font-black opacity-60">ACTIVE STREAM</p>
               </div>
             </div>
           )}
