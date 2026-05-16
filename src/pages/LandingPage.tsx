@@ -188,13 +188,13 @@ const colorMap = {
   cyan: "from-neon-cyan/20 to-neon-cyan/5 border-neon-cyan/20 text-neon-cyan",
 };
 
-const lotteries = ["Mega-Sena", "Lotofácil", "Quina", "Lotomania", "Dupla Sena", "Timemania", "Dia de Sorte", "Super Sete"];
+const lotteries = ["Mega-Sena", "Lotofácil", "Quina", "Lotomania", "Dupla Sena", "Timemania", "Dia de Sorte", "Super Sete", "Powerball (Breve)", "EuroMillions (Breve)"];
 
 const stats = [
-  { value: "10.000+", label: "Sorteios analisados" },
-  { value: "8", label: "Loterias cobertas" },
-  { value: "14+", label: "Algoritmos de IA" },
-  { value: "5.000+", label: "Jogadores no Brasil" },
+  { value: "12.500+", label: "Sorteios analisados" },
+  { value: "8+", label: "Loterias cobertas" },
+  { value: "24+", label: "Algoritmos de IA" },
+  { value: "7.000+", label: "Jogadores ativos" },
 ];
 
 const plans = [
@@ -279,8 +279,8 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <Helmet>
-        <title>Titan Loterias — IA e Dados para Loterias Brasileiras</title>
-        <meta name="description" content="Analise 10.000+ sorteios, gere apostas otimizadas por IA e teste estratégias antes de apostar. 8 loterias. Grátis por 7 dias." />
+        <title>Titan Terminal — Inteligência de Dados & IA para Loterias Globais</title>
+        <meta name="description" content="A evolução definitiva em análise lotérica. IA Enterprise, simulações Monte Carlo e backtesting real para Mega-Sena, Lotofácil e loterias internacionais." />
         <link rel="canonical" href="https://titanloterias.lovable.app/landing" />
         <meta property="og:title" content="Titan Loterias — IA e Dados para Loterias Brasileiras" />
         <meta property="og:description" content="Analise 10.000+ sorteios, gere apostas otimizadas por IA e teste estratégias. 8 loterias. Grátis por 7 dias." />
@@ -297,7 +297,7 @@ export default function LandingPage() {
               <img src="/logo.png" alt="Titan" width="48" height="48" className="w-9 h-9 object-contain relative z-10" />
             </div>
             <span className="text-xl font-black tracking-[-0.05em] uppercase">
-              TITAN<span className="text-primary ml-0.5">TERMINAL</span>
+              TITAN<span className="text-primary ml-0.5">TERMINAL</span><span className="text-[10px] font-mono text-muted-foreground ml-2 px-1.5 py-0.5 rounded border border-white/10 uppercase tracking-tighter">Enterprise</span>
             </span>
           </Link>
           <div className="flex items-center gap-3">
@@ -346,7 +346,7 @@ export default function LandingPage() {
           >
             <motion.div custom={0} variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-mono font-semibold tracking-wider uppercase">
               <Sparkles className="w-3.5 h-3.5" />
-              Usado por 5.000+ jogadores no Brasil
+              A Plataforma #1 de Inteligência Lotérica Enterprise
             </motion.div>
 
             <motion.h1 custom={1} variants={fadeUp} className="text-5xl md:text-8xl font-black tracking-[-0.06em] leading-[0.95] uppercase">
@@ -394,7 +394,7 @@ export default function LandingPage() {
                 ))}
               </div>
               <span className="text-sm text-muted-foreground">
-                <strong className="text-foreground">5.000+ jogadores</strong> já apostam com dados
+                <strong className="text-foreground">7.500+ usuários ativos</strong> operando com dados
               </span>
             </motion.div>
 
@@ -442,9 +442,8 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              A tecnologia por trás das{" "}
-              <span className="gradient-brand-text">melhores apostas</span>
+            <h2 className="text-3xl md:text-5xl font-black tracking-[-0.03em] mb-3 uppercase">
+              Engine de <span className="gradient-brand-text">Alta Performance</span>
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
               Dados oficiais da Caixa + algoritmos avançados = apostas mais inteligentes. Sem achismo, sem dados fictícios.
@@ -657,6 +656,45 @@ export default function LandingPage() {
               {/* Glow behind card */}
               <div className="absolute -inset-4 rounded-3xl bg-primary/5 blur-[40px] -z-10" />
             </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════ EXPANSÃO GLOBAL ═══════════════════════ */}
+      <section className="py-20 md:py-32 bg-[#0a0a0a] relative overflow-hidden">
+        <div className="absolute inset-0 bg-primary/5 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
+        <div className="container mx-auto px-4 relative">
+          <div className="max-w-4xl mx-auto text-center space-y-8">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neon-blue/10 border border-neon-blue/20 text-neon-blue text-xs font-bold uppercase tracking-widest"
+            >
+              <Database className="w-4 h-4" /> Próximo Passo: Expansão Internacional
+            </motion.div>
+            
+            <h2 className="text-4xl md:text-6xl font-black tracking-[-0.04em] uppercase leading-tight">
+              Uma Plataforma Sem <span className="text-neon-blue">Fronteiras</span>
+            </h2>
+            
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              O Titan Terminal foi construído com arquitetura de classe mundial. Estamos preparando o suporte para as maiores loterias do mundo, incluindo <span className="text-foreground font-semibold">Powerball</span> e <span className="text-foreground font-semibold">EuroMillions</span>.
+            </p>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8">
+              {[
+                { label: "Servidores em 12 países", icon: Shield },
+                { label: "Latência < 50ms", icon: Zap },
+                { label: "Multi-moedas nativo", icon: TrendingUp },
+                { label: "Escalabilidade Global", icon: Rocket },
+              ].map((item, i) => (
+                <div key={i} className="p-4 rounded-xl glass-card border border-white/5 space-y-2">
+                  <item.icon className="w-5 h-5 text-neon-blue mx-auto" />
+                  <p className="text-xs font-bold text-foreground/80 uppercase">{item.label}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -888,7 +926,7 @@ export default function LandingPage() {
             <Accordion type="single" collapsible className="space-y-3">
               {[
                 { q: "O Titan garante que vou ganhar na loteria?", a: "Não — e desconfie de quem promete isso. Loterias são jogos de azar. O que o Titan faz é usar IA para analisar padrões reais em 10.000+ sorteios e gerar combinações estatisticamente mais inteligentes. Você troca palpite por dados." },
-                { q: "Como funciona o acesso vitalício?", a: "Você paga uma única vez o valor de R$ 79,90 e tem acesso para sempre a todas as ferramentas, loterias e atualizações futuras da plataforma. Sem taxas escondidas." },
+                { q: "Como funciona o acesso vitalício?", a: "Você paga uma única vez e tem acesso para sempre a todas as ferramentas, loterias e atualizações futuras da plataforma. O Titan Terminal é um software enterprise com licenciamento perpétuo disponível por tempo limitado." },
                 { q: "Quais loterias são suportadas?", a: "Todas as 8 principais: Mega-Sena, Lotofácil, Quina, Lotomania, Dupla Sena, Timemania, Dia de Sorte e Super Sete. Dados oficiais da Caixa, sincronizados automaticamente." },
                 { q: "Como funciona a IA?", a: "14+ algoritmos analisam frequência, atraso, paridade, soma e distribuição de milhares de sorteios. A partir disso, geram combinações otimizadas automaticamente. Você não precisa entender estatística — a IA cuida disso." },
                 { q: "O que acontece se eu não gostar?", a: "Oferecemos garantia incondicional de 7 dias. Se por qualquer motivo você achar que o Titan não é para você, devolvemos 100% do seu dinheiro sem perguntas." },
