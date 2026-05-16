@@ -6,9 +6,10 @@ interface Props {
   description: string;
   icon: LucideIcon;
   badge?: string;
+  headerAction?: React.ReactNode;
 }
 
-export function PageHeader({ title, description, icon: Icon, badge }: Props) {
+export function PageHeader({ title, description, icon: Icon, badge, headerAction }: Props) {
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -42,6 +43,11 @@ export function PageHeader({ title, description, icon: Icon, badge }: Props) {
           {description}
         </p>
       </div>
+      {headerAction && (
+        <div className="relative z-10 hidden md:block">
+          {headerAction}
+        </div>
+      )}
     </motion.div>
   );
 }
