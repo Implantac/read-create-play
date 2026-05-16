@@ -173,18 +173,22 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
       </div>
 
       {/* Generate Buttons */}
-      <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-1.5 sm:gap-2">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 relative z-10">
         {[1, 3, 5, 10].map(n => (
           <Button
             key={n}
             variant="outline"
-            size="sm"
+            size="lg"
             onClick={() => generate(n)}
             disabled={generating}
-            className="text-[11px] sm:text-xs border-border/50 hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all h-8 sm:h-9 px-2 sm:px-3"
+            className="text-[11px] font-black uppercase tracking-widest border-white/5 hover:border-primary/40 bg-white/[0.02] hover:bg-white/[0.05] transition-all h-11 px-4 rounded-xl group/btn"
           >
-            <RefreshCw className={`w-3 h-3 mr-1 sm:mr-1.5 ${generating ? "animate-spin" : ""}`} />
-            {n} jogo{n > 1 ? "s" : ""}
+            {generating ? (
+              <Loader2 className="w-4 h-4 animate-spin text-primary" />
+            ) : (
+              <Zap className="w-4 h-4 mr-2 text-primary group-hover/btn:scale-110 transition-transform" />
+            )}
+            {n} {n > 1 ? "Games" : "Game"}
           </Button>
         ))}
       </div>
