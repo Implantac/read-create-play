@@ -47,7 +47,7 @@ const DashboardPage = () => {
   const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
   const { currentPlan } = usePlanAccess();
   const { profile, trialDaysLeft, isTrialExpired, isAdmin, isSuperAdmin } = useAuth();
-  const [luckyGame, setLuckyGame] = useState<{ numbers: number[]; score: number; strategy: string } | null>(null);
+  const [luckyGame, setLuckyGame] = useState<{ numbers: number[]; score: GameScore; strategy: string } | null>(null);
   const [generatingLucky, setGeneratingLucky] = useState(false);
 
   // Reset lucky game when lottery changes
