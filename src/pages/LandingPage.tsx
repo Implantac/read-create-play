@@ -713,6 +713,10 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-14"
           >
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-neon-amber/10 border border-neon-amber/20 text-neon-amber text-[11px] font-mono font-semibold uppercase tracking-wider mb-4">
+              <Clock className="w-3 h-3" />
+              Oferta por tempo limitado — preço fixo enquanto durar o estoque
+            </div>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
               Acesso Vitalício{" "}
               <span className="gradient-brand-text">Garantido</span>
