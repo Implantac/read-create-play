@@ -194,7 +194,7 @@ const stats = [
   { value: "12.500+", label: "Sorteios analisados" },
   { value: "8+", label: "Loterias cobertas" },
   { value: "24+", label: "Algoritmos de IA" },
-  { value: "7.000+", label: "Jogadores ativos" },
+  { value: "7.500+", label: "Jogadores ativos" },
 ];
 
 const plans = [
@@ -390,7 +390,7 @@ export default function LandingPage() {
 
             <motion.h1 custom={1} variants={fadeUp} className="text-5xl md:text-8xl font-black tracking-[-0.06em] leading-[0.95] uppercase">
               {hero.headline}{" "}
-              <span className="text-primary">{hero.headlineHighlight}</span>
+              <span className="text-primary drop-shadow-[0_0_30px_hsl(var(--primary)/0.4)]">{hero.headlineHighlight}</span>
             </motion.h1>
 
             <motion.p custom={2} variants={fadeUp} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
@@ -713,6 +713,10 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-14"
           >
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-neon-amber/10 border border-neon-amber/20 text-neon-amber text-[11px] font-mono font-semibold uppercase tracking-wider mb-4">
+              <Clock className="w-3 h-3" />
+              Oferta por tempo limitado — preço fixo enquanto durar o estoque
+            </div>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
               Acesso Vitalício{" "}
               <span className="gradient-brand-text">Garantido</span>
@@ -723,39 +727,14 @@ export default function LandingPage() {
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {plans.map((plan, i) => {
-              const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                const rotateX = ((y - centerY) / centerY) * -10;
-                const rotateY = ((x - centerX) / centerX) * 10;
-                e.currentTarget.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03,1.03,1.03)`;
-                const glowEl = e.currentTarget.querySelector('[data-glow]') as HTMLElement;
-                if (glowEl) {
-                  glowEl.style.opacity = '1';
-                  glowEl.style.background = `radial-gradient(250px circle at ${x}px ${y}px, hsl(var(--primary) / 0.15), transparent 70%)`;
-                }
-              };
-              const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-                e.currentTarget.style.transform = `perspective(600px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)`;
-                const glowEl = e.currentTarget.querySelector('[data-glow]') as HTMLElement;
-                if (glowEl) {
-                  glowEl.style.opacity = '0';
-                }
-              };
-              return (
+            {plans.map((plan, i) => (
               <motion.div
                 key={plan.name}
                 initial={{ opacity: 0, y: 40, scale: 0.95 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ delay: i * 0.15, duration: 0.6, type: "spring", stiffness: 80, damping: 15 }}
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
-                style={{ transition: "transform 0.15s ease-out", transformStyle: "preserve-3d" }}
+                whileHover={{ y: -6, scale: 1.02, transition: { duration: 0.25 } }}
                 className={`rounded-xl p-6 border relative overflow-hidden group/card ${
                   plan.highlight
                     ? "glass-card border-primary/30 glow-green"
@@ -764,20 +743,12 @@ export default function LandingPage() {
                     : "glass-card border-border/30"
                 }`}
               >
-                {/* Animated border glow */}
-                <div className="pointer-events-none absolute -inset-[1px] rounded-xl opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 z-0"
-                  style={{
-                    background: 'conic-gradient(from var(--border-angle, 0deg), hsl(var(--primary) / 0.6), hsl(var(--neon-blue) / 0.6), hsl(var(--neon-purple) / 0.4), hsl(var(--primary) / 0.6))',
-                    animation: 'border-rotate 3s linear infinite',
-                  }}
-                />
-                <div className="pointer-events-none absolute inset-[1px] rounded-[11px] bg-card z-[1] opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
-                <div data-glow className="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 z-[2]" />
-                <div className="relative z-[3]">
-                {(plan as any).isLifetime && (
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10">
+                {(plan as any).isLifetime && !plan.highlight && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <span className="px-3 py-1 rounded-full bg-neon-amber text-background text-[10px] font-mono font-bold uppercase tracking-wider whitespace-nowrap">
-                      💎 Pagamento Único
+                      Pagamento Único
                     </span>
                   </div>
                 )}
@@ -836,8 +807,7 @@ export default function LandingPage() {
                   </Button>
                 </div>
               </motion.div>
-              );
-            })}
+            ))}
           </div>
 
           {/* Trust line below pricing */}
@@ -957,7 +927,10 @@ export default function LandingPage() {
       {/* ═══════════════════════ CTA FINAL ═══════════════════════ */}
       <section ref={ctaRef} className="py-20 md:py-28 gradient-mesh overflow-hidden">
         <motion.div className="container mx-auto px-4" style={{ scale: ctaScale, opacity: ctaOpacity }}>
-          <div className="max-w-2xl mx-auto text-center space-y-6 rounded-2xl glass-card p-10 md:p-14 border border-primary/10 glow-green">
+          <div className="max-w-2xl mx-auto text-center space-y-6 rounded-2xl glass-card p-10 md:p-14 border border-primary/10 glow-green relative overflow-hidden">
+            {/* Ambient glow */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-primary/20 blur-[80px] -z-10" />
+            
             <div className="w-14 h-14 rounded-2xl gradient-brand flex items-center justify-center mx-auto shadow-lg shadow-primary/20">
               <Zap className="w-7 h-7 text-primary-foreground" />
             </div>
@@ -978,7 +951,7 @@ export default function LandingPage() {
                 {finalCtaVariants[abVariant]} <ArrowRight className="w-5 h-5" />
               </Button>
             </motion.div>
-            <p className="text-xs text-muted-foreground">Pagamento único • Acesso imediato</p>
+            <p className="text-xs text-muted-foreground">Pagamento único • Acesso imediato • Garantia 7 dias</p>
           </div>
         </motion.div>
       </section>
