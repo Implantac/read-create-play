@@ -927,7 +927,10 @@ export default function LandingPage() {
       {/* ═══════════════════════ CTA FINAL ═══════════════════════ */}
       <section ref={ctaRef} className="py-20 md:py-28 gradient-mesh overflow-hidden">
         <motion.div className="container mx-auto px-4" style={{ scale: ctaScale, opacity: ctaOpacity }}>
-          <div className="max-w-2xl mx-auto text-center space-y-6 rounded-2xl glass-card p-10 md:p-14 border border-primary/10 glow-green">
+          <div className="max-w-2xl mx-auto text-center space-y-6 rounded-2xl glass-card p-10 md:p-14 border border-primary/10 glow-green relative overflow-hidden">
+            {/* Ambient glow */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-primary/20 blur-[80px] -z-10" />
+            
             <div className="w-14 h-14 rounded-2xl gradient-brand flex items-center justify-center mx-auto shadow-lg shadow-primary/20">
               <Zap className="w-7 h-7 text-primary-foreground" />
             </div>
@@ -948,7 +951,7 @@ export default function LandingPage() {
                 {finalCtaVariants[abVariant]} <ArrowRight className="w-5 h-5" />
               </Button>
             </motion.div>
-            <p className="text-xs text-muted-foreground">Pagamento único • Acesso imediato</p>
+            <p className="text-xs text-muted-foreground">Pagamento único • Acesso imediato • Garantia 7 dias</p>
           </div>
         </motion.div>
       </section>
