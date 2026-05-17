@@ -390,7 +390,7 @@ export default function LandingPage() {
 
             <motion.h1 custom={1} variants={fadeUp} className="text-5xl md:text-8xl font-black tracking-[-0.06em] leading-[0.95] uppercase">
               {hero.headline}{" "}
-              <span className="text-primary">{hero.headlineHighlight}</span>
+              <span className="text-primary drop-shadow-[0_0_30px_hsl(var(--primary)/0.4)]">{hero.headlineHighlight}</span>
             </motion.h1>
 
             <motion.p custom={2} variants={fadeUp} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
