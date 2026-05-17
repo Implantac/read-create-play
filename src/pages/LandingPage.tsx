@@ -380,9 +380,12 @@ export default function LandingPage() {
             animate="visible"
             className="max-w-3xl mx-auto text-center space-y-6"
           >
-            <motion.div custom={0} variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-mono font-semibold tracking-wider uppercase">
-              <Sparkles className="w-3.5 h-3.5" />
-              A Plataforma #1 de Inteligência Lotérica Enterprise
+            <motion.div custom={0} variants={fadeUp} className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[11px] font-mono font-semibold tracking-wider uppercase">
+              <span className="relative flex w-2 h-2">
+                <span className="absolute inline-flex w-full h-full rounded-full bg-primary opacity-75 animate-ping" />
+                <span className="relative inline-flex w-2 h-2 rounded-full bg-primary" />
+              </span>
+              Inteligência Lotérica Enterprise • Ao vivo
             </motion.div>
 
             <motion.h1 custom={1} variants={fadeUp} className="text-5xl md:text-8xl font-black tracking-[-0.06em] leading-[0.95] uppercase">
