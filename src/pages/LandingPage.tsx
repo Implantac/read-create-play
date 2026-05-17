@@ -380,9 +380,12 @@ export default function LandingPage() {
             animate="visible"
             className="max-w-3xl mx-auto text-center space-y-6"
           >
-            <motion.div custom={0} variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-mono font-semibold tracking-wider uppercase">
-              <Sparkles className="w-3.5 h-3.5" />
-              A Plataforma #1 de Inteligência Lotérica Enterprise
+            <motion.div custom={0} variants={fadeUp} className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[11px] font-mono font-semibold tracking-wider uppercase">
+              <span className="relative flex w-2 h-2">
+                <span className="absolute inline-flex w-full h-full rounded-full bg-primary opacity-75 animate-ping" />
+                <span className="relative inline-flex w-2 h-2 rounded-full bg-primary" />
+              </span>
+              Inteligência Lotérica Enterprise • Ao vivo
             </motion.div>
 
             <motion.h1 custom={1} variants={fadeUp} className="text-5xl md:text-8xl font-black tracking-[-0.06em] leading-[0.95] uppercase">
@@ -416,31 +419,34 @@ export default function LandingPage() {
             </motion.div>
 
             {/* Trust micro-copy */}
-            <motion.p custom={3.5} variants={fadeUp} className="text-xs text-muted-foreground -mt-1">
-              Sem cartão de crédito • Setup em 30 segundos
+            <motion.p custom={3.5} variants={fadeUp} className="text-xs text-muted-foreground -mt-1 flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+              <span className="flex items-center gap-1.5"><Shield className="w-3 h-3 text-primary/70" /> Pagamento único</span>
+              <span className="opacity-30">•</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-3 h-3 text-primary/70" /> Acesso imediato</span>
+              <span className="opacity-30">•</span>
+              <span className="flex items-center gap-1.5"><Trophy className="w-3 h-3 text-primary/70" /> Garantia 7 dias</span>
             </motion.p>
 
-            {/* Micro social proof */}
-            <motion.div custom={4} variants={fadeUp} className="pt-6 flex items-center justify-center gap-3">
-              <div className="flex -space-x-2">
-                {["CM", "AS", "RF", "ML"].map((initials) => (
-                  <Avatar key={initials} className="w-8 h-8 border-2 border-background">
-                    <AvatarFallback className="bg-primary/15 text-primary text-[10px] font-bold">{initials}</AvatarFallback>
-                  </Avatar>
-                ))}
+            {/* Micro social proof + live KPIs */}
+            <motion.div custom={4} variants={fadeUp} className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <div className="flex items-center gap-3">
+                <div className="flex -space-x-2">
+                  {["CM", "AS", "RF", "ML"].map((initials) => (
+                    <Avatar key={initials} className="w-8 h-8 border-2 border-background">
+                      <AvatarFallback className="bg-primary/15 text-primary text-[10px] font-bold">{initials}</AvatarFallback>
+                    </Avatar>
+                  ))}
+                </div>
+                <div className="text-left">
+                  <div className="flex items-center gap-1">
+                    {[1,2,3,4,5].map((s) => (<Star key={s} className="w-3 h-3 fill-neon-amber text-neon-amber" />))}
+                    <span className="text-xs font-bold text-foreground ml-1">4.9</span>
+                  </div>
+                  <span className="text-[11px] text-muted-foreground">
+                    <strong className="text-foreground">7.500+ jogadores</strong> ativos
+                  </span>
+                </div>
               </div>
-              <span className="text-sm text-muted-foreground">
-                <strong className="text-foreground">7.500+ usuários ativos</strong> operando com dados
-              </span>
-            </motion.div>
-
-            {/* Supported lotteries */}
-            <motion.div custom={5} variants={fadeUp} className="pt-4 flex flex-wrap items-center justify-center gap-2">
-              {lotteries.map((name) => (
-                <span key={name} className="px-3 py-1 rounded-full bg-muted/50 border border-border/30 text-xs font-medium text-muted-foreground">
-                  {name}
-                </span>
-              ))}
             </motion.div>
           </motion.div>
         </motion.div>
@@ -696,44 +702,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ═══════════════════════ EXPANSÃO GLOBAL ═══════════════════════ */}
-      <section className="py-20 md:py-32 bg-[#0a0a0a] relative overflow-hidden">
-        <div className="absolute inset-0 bg-primary/5 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
-        <div className="container mx-auto px-4 relative">
-          <div className="max-w-4xl mx-auto text-center space-y-8">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neon-blue/10 border border-neon-blue/20 text-neon-blue text-xs font-bold uppercase tracking-widest"
-            >
-              <Database className="w-4 h-4" /> Próximo Passo: Expansão Internacional
-            </motion.div>
-            
-            <h2 className="text-4xl md:text-6xl font-black tracking-[-0.04em] uppercase leading-tight">
-              Uma Plataforma Sem <span className="text-neon-blue">Fronteiras</span>
-            </h2>
-            
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              O Titan Terminal foi construído com arquitetura de classe mundial. Estamos preparando o suporte para as maiores loterias do mundo, incluindo <span className="text-foreground font-semibold">Powerball</span> e <span className="text-foreground font-semibold">EuroMillions</span>.
-            </p>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8">
-              {[
-                { label: "Servidores em 12 países", icon: Shield },
-                { label: "Latência < 50ms", icon: Zap },
-                { label: "Multi-moedas nativo", icon: TrendingUp },
-                { label: "Escalabilidade Global", icon: Rocket },
-              ].map((item, i) => (
-                <div key={i} className="p-4 rounded-xl glass-card border border-white/5 space-y-2">
-                  <item.icon className="w-5 h-5 text-neon-blue mx-auto" />
-                  <p className="text-xs font-bold text-foreground/80 uppercase">{item.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* (Expansão Global removida — reduzia momentum entre IA Autônoma e Pricing) */}
 
       {/* ═══════════════════════ PRICING ═══════════════════════ */}
       <section className="py-20 md:py-28">
@@ -997,7 +966,7 @@ export default function LandingPage() {
               <span className="gradient-brand-text">dinheiro no escuro</span>
             </h2>
             <p className="text-muted-foreground">
-              5.000+ jogadores já estão apostando com inteligência. Garanta seu acesso vitalício agora por apenas R$ 79,90.
+              <strong className="text-foreground">7.500+ jogadores</strong> já estão apostando com inteligência. Garanta seu acesso vitalício por <strong className="text-foreground">R$ 79,90</strong> — pagamento único.
             </p>
             <motion.div
               whileHover={{ scale: 1.06, boxShadow: "0 0 30px hsl(var(--primary) / 0.5)" }}
