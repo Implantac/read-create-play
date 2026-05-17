@@ -194,7 +194,7 @@ const stats = [
   { value: "12.500+", label: "Sorteios analisados" },
   { value: "8+", label: "Loterias cobertas" },
   { value: "24+", label: "Algoritmos de IA" },
-  { value: "7.000+", label: "Jogadores ativos" },
+  { value: "7.500+", label: "Jogadores ativos" },
 ];
 
 const plans = [
