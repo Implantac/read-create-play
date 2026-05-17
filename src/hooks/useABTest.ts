@@ -34,7 +34,7 @@ export const heroVariants = {
   B: {
     headline: "Seus números podem ser melhores.",
     headlineHighlight: "A IA prova isso.",
-    subheadline: "Enquanto outros jogam no palpite, 5.000+ brasileiros já usam inteligência artificial para gerar apostas com mais chance de acerto. Sua vez.",
+    subheadline: "Enquanto outros jogam no palpite, 7.500+ brasileiros já usam inteligência artificial para gerar apostas com mais chance de acerto. Sua vez.",
     cta: "Acessar Plataforma Agora",
     secondaryCta: "Ver como funciona",
   },
