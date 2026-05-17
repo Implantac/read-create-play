@@ -966,7 +966,7 @@ export default function LandingPage() {
               <span className="gradient-brand-text">dinheiro no escuro</span>
             </h2>
             <p className="text-muted-foreground">
-              5.000+ jogadores já estão apostando com inteligência. Garanta seu acesso vitalício agora por apenas R$ 79,90.
+              <strong className="text-foreground">7.500+ jogadores</strong> já estão apostando com inteligência. Garanta seu acesso vitalício por <strong className="text-foreground">R$ 79,90</strong> — pagamento único.
             </p>
             <motion.div
               whileHover={{ scale: 1.06, boxShadow: "0 0 30px hsl(var(--primary) / 0.5)" }}
