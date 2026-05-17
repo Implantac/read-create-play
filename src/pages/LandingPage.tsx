@@ -419,31 +419,34 @@ export default function LandingPage() {
             </motion.div>
 
             {/* Trust micro-copy */}
-            <motion.p custom={3.5} variants={fadeUp} className="text-xs text-muted-foreground -mt-1">
-              Sem cartão de crédito • Setup em 30 segundos
+            <motion.p custom={3.5} variants={fadeUp} className="text-xs text-muted-foreground -mt-1 flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+              <span className="flex items-center gap-1.5"><Shield className="w-3 h-3 text-primary/70" /> Pagamento único</span>
+              <span className="opacity-30">•</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-3 h-3 text-primary/70" /> Acesso imediato</span>
+              <span className="opacity-30">•</span>
+              <span className="flex items-center gap-1.5"><Trophy className="w-3 h-3 text-primary/70" /> Garantia 7 dias</span>
             </motion.p>
 
-            {/* Micro social proof */}
-            <motion.div custom={4} variants={fadeUp} className="pt-6 flex items-center justify-center gap-3">
-              <div className="flex -space-x-2">
-                {["CM", "AS", "RF", "ML"].map((initials) => (
-                  <Avatar key={initials} className="w-8 h-8 border-2 border-background">
-                    <AvatarFallback className="bg-primary/15 text-primary text-[10px] font-bold">{initials}</AvatarFallback>
-                  </Avatar>
-                ))}
+            {/* Micro social proof + live KPIs */}
+            <motion.div custom={4} variants={fadeUp} className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <div className="flex items-center gap-3">
+                <div className="flex -space-x-2">
+                  {["CM", "AS", "RF", "ML"].map((initials) => (
+                    <Avatar key={initials} className="w-8 h-8 border-2 border-background">
+                      <AvatarFallback className="bg-primary/15 text-primary text-[10px] font-bold">{initials}</AvatarFallback>
+                    </Avatar>
+                  ))}
+                </div>
+                <div className="text-left">
+                  <div className="flex items-center gap-1">
+                    {[1,2,3,4,5].map((s) => (<Star key={s} className="w-3 h-3 fill-neon-amber text-neon-amber" />))}
+                    <span className="text-xs font-bold text-foreground ml-1">4.9</span>
+                  </div>
+                  <span className="text-[11px] text-muted-foreground">
+                    <strong className="text-foreground">7.500+ jogadores</strong> ativos
+                  </span>
+                </div>
               </div>
-              <span className="text-sm text-muted-foreground">
-                <strong className="text-foreground">7.500+ usuários ativos</strong> operando com dados
-              </span>
-            </motion.div>
-
-            {/* Supported lotteries */}
-            <motion.div custom={5} variants={fadeUp} className="pt-4 flex flex-wrap items-center justify-center gap-2">
-              {lotteries.map((name) => (
-                <span key={name} className="px-3 py-1 rounded-full bg-muted/50 border border-border/30 text-xs font-medium text-muted-foreground">
-                  {name}
-                </span>
-              ))}
             </motion.div>
           </motion.div>
         </motion.div>
