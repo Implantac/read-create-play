@@ -702,44 +702,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ═══════════════════════ EXPANSÃO GLOBAL ═══════════════════════ */}
-      <section className="py-20 md:py-32 bg-[#0a0a0a] relative overflow-hidden">
-        <div className="absolute inset-0 bg-primary/5 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
-        <div className="container mx-auto px-4 relative">
-          <div className="max-w-4xl mx-auto text-center space-y-8">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neon-blue/10 border border-neon-blue/20 text-neon-blue text-xs font-bold uppercase tracking-widest"
-            >
-              <Database className="w-4 h-4" /> Próximo Passo: Expansão Internacional
-            </motion.div>
-            
-            <h2 className="text-4xl md:text-6xl font-black tracking-[-0.04em] uppercase leading-tight">
-              Uma Plataforma Sem <span className="text-neon-blue">Fronteiras</span>
-            </h2>
-            
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              O Titan Terminal foi construído com arquitetura de classe mundial. Estamos preparando o suporte para as maiores loterias do mundo, incluindo <span className="text-foreground font-semibold">Powerball</span> e <span className="text-foreground font-semibold">EuroMillions</span>.
-            </p>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8">
-              {[
-                { label: "Servidores em 12 países", icon: Shield },
-                { label: "Latência < 50ms", icon: Zap },
-                { label: "Multi-moedas nativo", icon: TrendingUp },
-                { label: "Escalabilidade Global", icon: Rocket },
-              ].map((item, i) => (
-                <div key={i} className="p-4 rounded-xl glass-card border border-white/5 space-y-2">
-                  <item.icon className="w-5 h-5 text-neon-blue mx-auto" />
-                  <p className="text-xs font-bold text-foreground/80 uppercase">{item.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* (Expansão Global removida — reduzia momentum entre IA Autônoma e Pricing) */}
 
       {/* ═══════════════════════ PRICING ═══════════════════════ */}
       <section className="py-20 md:py-28">
