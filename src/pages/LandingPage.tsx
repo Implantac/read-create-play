@@ -92,7 +92,7 @@ const colorMap = {
 const lotteries = ["Mega-Sena", "Lotofácil", "Quina", "Lotomania", "Dupla Sena", "Timemania", "Dia de Sorte", "Super Sete"];
 
 const stats = [
-  { value: "10.000+", label: "Sorteios analisados" },
+  { value: "7.500+", label: "Usuários ativos" },
   { value: "8", label: "Loterias suportadas" },
   { value: "14+", label: "Algoritmos de IA" },
   { value: "99.9%", label: "Uptime" },
