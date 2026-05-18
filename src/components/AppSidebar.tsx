@@ -267,7 +267,7 @@ export function AppSidebar() {
                 <Crown className="w-4 h-4 text-accent shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold text-sidebar-accent-foreground">
-                    {currentPlan === "free" ? "Upgrade" : currentPlan === "premium" ? "Premium" : "Pro"}
+                    {currentPlan === "free" ? "Upgrade" : currentPlan === "premium" ? "Premium" : "Titan"}
                   </p>
                   <p className="text-[10px] text-muted-foreground truncate">
                     {currentPlan === "free" ? "Desbloquear recursos" : "Plano ativo"}

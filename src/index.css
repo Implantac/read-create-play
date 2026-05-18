@@ -55,7 +55,6 @@
     --neon-cyan: 180 85% 48%;
     --surface-elevated: 225 18% 11%;
     --surface-glass: 225 20% 8%;
-    --glow-green: 0 0% 0% / 0;
     
     /* Brand gradient stops */
     --brand-start: 145 72% 42%;
@@ -108,7 +107,7 @@
     --neon-cyan: 180 75% 40%;
     --surface-elevated: 0 0% 100%;
     --surface-glass: 220 14% 97%;
-    --glow-green: 0 0% 0% / 0;
+    
 
     --brand-start: 145 72% 36%;
     --brand-end: 195 85% 42%;
