@@ -1,14 +1,14 @@
-import { memo, useMemo } from "react";
 import { DrawResult } from "@/data/lotteries";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { CHART_TOOLTIP_STYLE, CHART_AXIS_TICK } from "@/lib/chart-theme";
+import { useMemo } from "react";
 import { Link2 } from "lucide-react";
 
 interface Props {
   draws: DrawResult[];
 }
 
-export const ConsecutiveChart = memo(function ConsecutiveChart({ draws }: Props) {
+export function ConsecutiveChart({ draws }: Props) {
   const data = useMemo(() => {
     const countMap: Record<number, number> = {};
     draws.forEach(d => {
@@ -61,4 +61,4 @@ export const ConsecutiveChart = memo(function ConsecutiveChart({ draws }: Props)
       </div>
     </div>
   );
-});
+}

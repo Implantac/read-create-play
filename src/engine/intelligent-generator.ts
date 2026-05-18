@@ -1,8 +1,7 @@
-import { NumberStats, computeFrequencyStats, generateSmartBet } from "@/features/statistics/engine";
+import { NumberStats, computeFrequencyStats, generateSmartBet } from "./statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { evaluateBetQuality, BetQualityReport } from "./bet-quality";
-import { generateByStrategy, Strategy } from "@/features/statistics/strategies";
-import { computeAntiPopularityPenalty } from "@/ai/knowledge/jackpotMasterStrategies";
+import { generateByStrategy, Strategy } from "./strategies";
 
 // ═══════════════════════════════════════════════════════
 // GERADOR INTELIGENTE DE APOSTAS v2.0
@@ -259,9 +258,6 @@ const INTELLIGENT_STRATEGIES: { id: Strategy; label: string; weight: number }[] 
   { id: "ml", label: "IA Ensemble", weight: 1.5 },
   { id: "sectors", label: "Cobertura por Setores", weight: 1 },
   { id: "pattern", label: "Padrões Estruturais", weight: 1 },
-  { id: "markov", label: "Cadeia de Markov", weight: 1.2 },
-  { id: "poisson", label: "Distribuição Poisson", weight: 1.2 },
-  { id: "cluster", label: "Análise de Clusters", weight: 1.2 },
 ];
 
 // ═══════════════════════════════════════════════════════
@@ -302,8 +298,7 @@ export function generateIntelligentBets(
         ? simulateAgainstHistory(numbers, draws, config)
         : { avgHits: 0, maxHits: 0, minHits: 0, prizeCount: 0, totalDraws: 0, consistency: 50 };
 
-      const baseScore = computeCompositeScore(quality, sim, trendAlign.score, cycleAlign.score, distribution.score);
-      const score = Math.round(baseScore * computeAntiPopularityPenalty(numbers, config.id));
+      const score = computeCompositeScore(quality, sim, trendAlign.score, cycleAlign.score, distribution.score);
 
       const insights = generateInsights(numbers, stats, draws, config, sim);
 

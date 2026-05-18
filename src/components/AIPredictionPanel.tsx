@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { NumberStats } from "@/features/statistics/engine";
+import { NumberStats } from "@/engine/statistics";
 import { motion, AnimatePresence } from "framer-motion";
 import { Brain, Loader2, Copy, Check, Star, Sparkles, RefreshCw, AlertTriangle } from "lucide-react";
 import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
@@ -66,32 +66,31 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
   };
 
   return (
-    <div className="rounded-xl glass-card p-3 sm:p-5 border border-white/5 relative overflow-hidden group">
-      {/* Dynamic Glow */}
-      <div className="absolute -top-24 -left-24 w-48 h-48 bg-primary/10 blur-[100px] pointer-events-none rounded-full group-hover:bg-primary/20 transition-all duration-700" />
-      <div className="absolute inset-0 bg-white/[0.01] pointer-events-none" />
+    <div className="rounded-xl glass-card p-5 border border-primary/20 relative overflow-hidden">
+      {/* Glow effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
       
       <div className="relative z-10">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
               <Brain className="w-4 h-4 text-primary" />
             </div>
-            <div className="min-w-0">
-              <h3 className="text-xs sm:text-sm font-semibold text-foreground flex items-center gap-1.5 flex-wrap">
-                Titan Predictive Engine
-                <span className="text-[9px] px-2 py-0.5 rounded-lg bg-primary/20 text-primary font-black uppercase tracking-widest border border-primary/20">
-                  Neural v4.0
+            <div>
+              <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+                IA Nativa v2.0
+                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                  Motor Estatístico
                 </span>
               </h3>
-              <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-0.5 line-clamp-1">
-                Frequência + Markov + Ciclos + Entropia
+              <p className="text-[10px] text-muted-foreground mt-0.5">
+                Frequência + Markov + Ciclos + Co-ocorrência + Entropia — sem custo de créditos
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 sm:gap-2 ml-10 sm:ml-0">
-            {quality && (
-              <span className={`text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md ${
+          {quality && (
+            <div className="flex items-center gap-2">
+              <span className={`text-xs font-bold px-2 py-1 rounded-md ${
                 quality.grade === "S" ? "bg-yellow-500/20 text-yellow-400" :
                 quality.grade === "A" ? "bg-green-500/20 text-green-400" :
                 quality.grade === "B" ? "bg-blue-500/20 text-blue-400" :
@@ -99,26 +98,26 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
               }`}>
                 {quality.grade} ({quality.avgScore}pts)
               </span>
-            )}
-            {bets.length > 0 && (
-              <Button size="sm" variant="outline" onClick={copyAll} className="text-[10px] sm:text-xs h-7 sm:h-8 border-border/50">
-                <Copy className="w-3 h-3 mr-1" /> Copiar
-              </Button>
-            )}
-          </div>
+            </div>
+          )}
+          {bets.length > 0 && (
+            <Button size="sm" variant="outline" onClick={copyAll} className="text-xs border-border/50">
+              <Copy className="w-3 h-3 mr-1" /> Copiar todas
+            </Button>
+          )}
         </div>
 
         {/* Count selector + Generate */}
-        <div className="flex items-center gap-1.5 sm:gap-2 mb-4 flex-wrap">
+        <div className="flex items-center gap-2 mb-4">
           <div className="flex items-center gap-1">
             {[1, 3, 5, 10].map(n => (
               <button
                 key={n}
                 onClick={() => setCount(n)}
-                className={`text-[11px] px-3 py-1.5 rounded-lg border font-bold transition-all duration-300 ${
+                className={`text-xs px-3 py-1.5 rounded-md border transition-all ${
                   count === n
-                    ? "border-primary text-primary bg-primary/20"
-                    : "border-white/5 text-muted-foreground hover:text-white hover:border-white/20 hover:bg-white/[0.03]"
+                    ? "border-primary text-primary bg-primary/10"
+                    : "border-border text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {n}
@@ -129,7 +128,7 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
             onClick={generate}
             disabled={loading}
             size="sm"
-            className="text-[11px] sm:text-xs gap-2 bg-primary text-primary-foreground h-9 px-6 rounded-xl font-black shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            className="text-xs gap-1.5 bg-primary hover:bg-primary/90"
           >
             {loading ? (
               <>
@@ -150,7 +149,7 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-4 rounded-xl bg-white/[0.02] border border-white/5"
+            className="mb-4 p-3 rounded-lg bg-muted/30 border border-border/30"
           >
             <p className="text-xs text-muted-foreground leading-relaxed">
               <Brain className="w-3 h-3 inline mr-1 text-primary" />
@@ -162,10 +161,9 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
         {/* Loading state */}
         {loading && (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
-            <div className="relative group">
-              <div className="absolute inset-0 bg-primary/20 blur-xl animate-pulse" />
-              <div className="w-16 h-16 rounded-2xl border-2 border-white/10 border-t-primary animate-spin relative z-10" />
-              <Brain className="w-6 h-6 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20" />
+            <div className="relative">
+              <div className="w-12 h-12 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+              <Brain className="w-5 h-5 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
             </div>
             <p className="text-xs text-muted-foreground animate-pulse">
               A IA está analisando padrões de 100 sorteios...
@@ -182,21 +180,19 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.08 }}
-                className="flex flex-col gap-3 p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-primary/40 hover:bg-white/[0.04] transition-all duration-500 group"
+                className="flex flex-col gap-1.5 p-3 rounded-lg bg-secondary/30 border border-primary/10 hover:border-primary/30 transition-colors group"
               >
-                <div className="flex items-start sm:items-center gap-1.5 sm:gap-2 flex-col sm:flex-row">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] sm:text-xs text-primary font-mono font-semibold">#{i + 1}</span>
-                    {quality?.scores?.[i] !== undefined && (
-                      <span className={`text-[9px] sm:text-[10px] font-mono px-1.5 py-0.5 rounded ${
-                        quality.scores[i] >= 90 ? "bg-yellow-500/20 text-yellow-400" :
-                        quality.scores[i] >= 80 ? "bg-green-500/20 text-green-400" :
-                        quality.scores[i] >= 70 ? "bg-blue-500/20 text-blue-400" :
-                        "bg-muted text-muted-foreground"
-                      }`}>{quality.scores[i]}pts</span>
-                    )}
-                  </div>
-                  <div className="flex flex-wrap gap-1 sm:gap-1.5 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-primary font-mono w-6 font-semibold">#{i + 1}</span>
+                  {quality?.scores?.[i] !== undefined && (
+                    <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
+                      quality.scores[i] >= 90 ? "bg-yellow-500/20 text-yellow-400" :
+                      quality.scores[i] >= 80 ? "bg-green-500/20 text-green-400" :
+                      quality.scores[i] >= 70 ? "bg-blue-500/20 text-blue-400" :
+                      "bg-muted text-muted-foreground"
+                    }`}>{quality.scores[i]}pts</span>
+                  )}
+                  <div className="flex flex-wrap gap-1.5 flex-1">
                     {bet.map(n => {
                       const stat = stats.find(s => s.number === n);
                       const ballClass =
@@ -206,17 +202,13 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
                           ? "lottery-ball-cold"
                           : "";
                       return (
-                        <span key={n} className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-black shadow-[0_4px_10px_rgba(0,0,0,0.3)] border-2 border-white/10 ${
-                          stat?.status === "hot" ? "bg-destructive text-white border-destructive/50" : 
-                          stat?.status === "cold" ? "bg-blue-600 text-white border-blue-500/50" : 
-                          "bg-[#111] text-primary border-primary/20"
-                        }`}>
+                        <span key={n} className={`lottery-ball text-xs w-8 h-8 ${ballClass}`}>
                           {String(n).padStart(2, "0")}
                         </span>
                       );
                     })}
                   </div>
-                  <div className="flex items-center gap-1 self-end sm:self-auto">
+                  <div className="flex items-center gap-1">
                     {onSaveBet && (
                       <button
                         onClick={() => handleSave(bet, i)}

@@ -3,9 +3,9 @@ import { motion } from "framer-motion";
 
 const trustItems = [
   { icon: Shield, label: "Pagamento 100% seguro" },
-  { icon: RefreshCcw, label: "Garantia de satisfação" },
+  { icon: RefreshCcw, label: "Garantia de 7 dias" },
   { icon: CreditCard, label: "Cartão, Pix e mais" },
-  { icon: Clock, label: "Acesso Vitalício" },
+  { icon: Clock, label: "Cancele quando quiser" },
 ];
 
 export function PlanTrustBar() {

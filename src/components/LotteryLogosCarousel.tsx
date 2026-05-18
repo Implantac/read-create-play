@@ -8,8 +8,7 @@ const lotteries = [
   { name: "Dupla Sena", numbers: "6/50", color: "hsl(var(--neon-red))" },
   { name: "Timemania", numbers: "7/80", color: "hsl(var(--neon-cyan))" },
   { name: "Dia de Sorte", numbers: "7/31", color: "hsl(var(--neon-green))" },
-  { name: "Powerball", numbers: "5/69+1", color: "hsl(var(--neon-blue))", badge: "BREVE" },
-  { name: "EuroMillions", numbers: "5/50+2", color: "hsl(var(--neon-purple))", badge: "BREVE" },
+  { name: "+Milionária", numbers: "6/50+2", color: "hsl(var(--neon-purple))" },
 ];
 
 // Duplicate for seamless infinite scroll
@@ -17,8 +16,7 @@ const duplicated = [...lotteries, ...lotteries];
 
 export function LotteryLogosCarousel() {
   return (
-    <section className="py-12 border-b border-white/5 bg-[#050505]/40 backdrop-blur-3xl overflow-hidden relative">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#ffffff05_1px,_transparent_0)] bg-[size:24px_24px] pointer-events-none" />
+    <section className="py-12 border-b border-border/20 bg-card/20 backdrop-blur-sm overflow-hidden">
       <div className="container mx-auto px-4 mb-6">
         <p className="text-center text-xs uppercase tracking-[0.2em] text-muted-foreground font-mono">
           Loterias Suportadas
@@ -53,15 +51,8 @@ export function LotteryLogosCarousel() {
                 {lottery.name.charAt(0)}
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <div className="text-sm font-semibold text-foreground whitespace-nowrap">
-                    {lottery.name}
-                  </div>
-                  {(lottery as any).badge && (
-                    <span className="text-[8px] font-bold bg-white/10 px-1 rounded text-muted-foreground">
-                      {(lottery as any).badge}
-                    </span>
-                  )}
+                <div className="text-sm font-semibold text-foreground whitespace-nowrap">
+                  {lottery.name}
                 </div>
                 <div className="text-[10px] text-muted-foreground font-mono">
                   {lottery.numbers}

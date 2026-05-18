@@ -77,7 +77,7 @@ export function useSavedBets(lotteryId: string) {
     toast.success("Aposta salva!");
     fetchBets();
     return true;
-  }, [lotteryId, fetchBets, savedBets.length, limit]);
+  }, [lotteryId, fetchBets]);
 
   const updateBet = useCallback(async (id: string, updates: { label?: string; strategy?: string }) => {
     const { error } = await supabase.from("saved_bets").update(updates).eq("id", id);

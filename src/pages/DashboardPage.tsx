@@ -1,73 +1,26 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Helmet } from "react-helmet-async";
+import { useCallback, useMemo, useState } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
+import { StatsCard } from "@/components/StatsCard";
 import { FrequencyChart } from "@/components/FrequencyChart";
 import { HeatmapGrid } from "@/components/HeatmapGrid";
-import { AutoUpdater } from "@/components/AutoUpdater";
-import { PageHeader } from "@/components/PageHeader";
-import { EmptyState } from "@/components/EmptyState";
-import { LotteryContextBanner } from "@/components/LotteryContextBanner";
-import { ComplianceDisclaimer } from "@/components/ComplianceDisclaimer";
-import { WorkflowSteps } from "@/components/WorkflowSteps";
-import { AIInsightsCard } from "@/components/AIInsightsCard";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-  BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, Zap, Activity, Target, 
-  ShieldCheck, Gauge, Crown, X, Clover, Save, TrendingDown, Settings2, Layout,
-  Download, Upload, Share2, RefreshCw
-} from "lucide-react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { useAuth } from "@/contexts/AuthContext";
-import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
-import { useSavedBets } from "@/hooks/useSavedBets";
-import { usePlanAccess } from "@/hooks/usePlanAccess";
-import { OnboardingGuide } from "@/components/OnboardingGuide";
-import { UpgradeBanner } from "@/components/UpgradeBanner";
-import { DashboardSkeleton } from "@/components/DashboardSkeleton";
-import { DashboardWidget } from "@/components/DashboardWidget";
-import { calculateGameScore, GameScore } from "@/features/statistics/scoring";
-import { QuickIntelligence } from "@/features/ai/components/QuickIntelligence";
-import { StatsWidget } from "@/components/ui/StatsWidget";
-import { DESIGN_TOKENS } from "@/lib/design-system";
 import { RecentDraws } from "@/components/RecentDraws";
-import { PlanGate } from "@/components/PlanGate";
-import { PersonalPerformanceCard } from "@/components/PersonalPerformanceCard";
+import { SumChart } from "@/components/SumChart";
 import { ParityChart } from "@/components/ParityChart";
 import { ConsecutiveChart } from "@/components/ConsecutiveChart";
 import { RangeDistribution } from "@/components/RangeDistribution";
 import { DelayChart } from "@/components/DelayChart";
-import { SumChart } from "@/components/SumChart";
-import { useDashboardLayout } from "@/hooks/useDashboardLayout";
-import { SortableWidget } from "@/components/SortableWidget";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { toast } from "sonner";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent
-} from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-  rectSortingStrategy
-} from "@dnd-kit/sortable";
-import { restrictToWindowEdges } from "@dnd-kit/modifiers";
+import { AutoUpdater } from "@/components/AutoUpdater";
+import { PageHeader } from "@/components/PageHeader";
+import { EmptyState } from "@/components/EmptyState";
+import { LotteryContextBanner } from "@/components/LotteryContextBanner";
+import { motion, AnimatePresence } from "framer-motion";
+import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
+import { useSavedBets } from "@/hooks/useSavedBets";
+import { usePlanAccess } from "@/hooks/usePlanAccess";
 
 const container = {
   hidden: { opacity: 0 },
@@ -78,68 +31,20 @@ const item = {
   show: { opacity: 1, y: 0 },
 };
 
+const quickLinks = [
+  { title: "Gerador", description: "Gerar jogos inteligentes", icon: Sparkles, url: "/gerador", color: "text-primary" },
+  { title: "Simulações", description: "Testar contra o histórico", icon: FlaskConical, url: "/simulacoes", color: "text-neon-blue" },
+  { title: "Estatísticas", description: "Análise consolidada", icon: PieChart, url: "/estatisticas", color: "text-accent" },
+  { title: "Estratégias IA", description: "Machine Learning e IA", icon: Brain, url: "/estrategias", color: "text-neon-purple" },
+];
+
 const DashboardPage = () => {
-  const { config, draws, drawsWithPrizes, loading, syncing, stats, sumData, syncDraws, syncAllLotteries, addDraw, refetchDraws, selectedLottery } = useLotteryContext();
+  const { config, draws, drawsWithPrizes, loading, syncing, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery } = useLotteryContext();
   const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
   const { currentPlan } = usePlanAccess();
   const { profile, trialDaysLeft, isTrialExpired, isAdmin, isSuperAdmin } = useAuth();
-  const { layout, toggleWidget, updateOrder, exportLayout, importLayout } = useDashboardLayout(selectedLottery);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (over && active.id !== over.id) {
-      const items = layout.map(w => w.id);
-      const oldIndex = items.indexOf(active.id as string);
-      const newIndex = items.indexOf(over.id as string);
-      updateOrder(arrayMove(items, oldIndex, newIndex));
-    }
-  };
-
-  const handleImportClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result as string;
-      if (importLayout(content)) {
-        toast.success("Layout restaurado com sucesso!");
-      } else {
-        toast.error("Erro ao importar layout. Verifique o arquivo.");
-      }
-    };
-    reader.readAsText(file);
-    e.target.value = ""; // Reset
-  };
-
-  const [luckyGame, setLuckyGame] = useState<{ numbers: number[]; score: GameScore; strategy: string } | null>(null);
+  const [luckyGame, setLuckyGame] = useState<{ numbers: number[]; score: number; strategy: string } | null>(null);
   const [generatingLucky, setGeneratingLucky] = useState(false);
-
-  // Reset lucky game when lottery changes
-  const prevLotteryRef = useRef(selectedLottery);
-  useEffect(() => {
-    if (prevLotteryRef.current !== selectedLottery) {
-      setLuckyGame(null);
-      setGeneratingLucky(false);
-      prevLotteryRef.current = selectedLottery;
-    }
-  }, [selectedLottery]);
 
   const hotNumbers = useMemo(() => stats.filter(s => s.status === "hot").length, [stats]);
   const coldNumbers = useMemo(() => stats.filter(s => s.status === "cold").length, [stats]);
@@ -151,81 +56,31 @@ const DashboardPage = () => {
     if (stats.length === 0 || draws.length === 0) return;
     setGeneratingLucky(true);
     setTimeout(() => {
-      const strategies = ["smart", "hybrid", "ml", "balanced"];
+      const strategies = ["frequency", "balance", "coverage", "dispersion"];
       const randomStrategy = strategies[Math.floor(Math.random() * strategies.length)];
       const result = runIntelligentPipeline(stats, draws, selectedLottery, randomStrategy, 1);
-      
       if (result.games.length > 0) {
-        const game = result.games[0];
-        const score = calculateGameScore(game, stats, config);
         setLuckyGame({
-          numbers: game,
-          score,
+          numbers: result.games[0],
+          score: result.scores[0] || 0,
           strategy: result.strategy.name,
         });
       }
       setGeneratingLucky(false);
     }, 800);
-  }, [stats, draws, selectedLottery, config]);
-
+  }, [stats, draws, selectedLottery]);
   return (
     <div className="space-y-6">
-      <Helmet>
-        <title>Dashboard — Titan Loterias</title>
-        <meta name="description" content="Acesse análises estatísticas em tempo real, mapas de calor, tendências e gere jogos inteligentes no seu dashboard personalizado." />
-        <link rel="canonical" href="https://titanloterias.lovable.app/" />
-        <meta property="og:title" content="Dashboard — Titan Loterias" />
-        <meta property="og:description" content="Análises estatísticas e IA para suas apostas." />
-        <meta property="og:url" content="https://titanloterias.lovable.app/" />
-      </Helmet>
-      <OnboardingGuide />
       <PageHeader
-        title="Intelligence Terminal"
-        description={`Ecossistema de análise probabilística e fluxos neurais de alta performance — ${config.name}`}
-        icon={Gauge}
-        badge="System Active"
-        headerAction={
-          <div className="flex items-center gap-2">
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              accept=".json"
-              onChange={handleFileChange}
-            />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10">
-                  <Layout className="w-4 h-4 text-primary" />
-                  <span className="hidden sm:inline">Configurar Terminal</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 glass-card border-white/10">
-                <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Terminal UI</DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-white/5" />
-                <DropdownMenuItem onClick={exportLayout} className="gap-2 cursor-pointer focus:bg-primary/10">
-                  <Download className="w-4 h-4 text-primary" />
-                  <span>Exportar Layout (.json)</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleImportClick} className="gap-2 cursor-pointer focus:bg-primary/10">
-                  <Upload className="w-4 h-4 text-primary" />
-                  <span>Importar Layout</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-white/5" />
-                <DropdownMenuItem onClick={() => window.location.reload()} className="gap-2 cursor-pointer focus:bg-primary/10">
-                  <RefreshCw className="w-4 h-4 text-muted-foreground" />
-                  <span>Resetar Visualização</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        }
+        title="Dashboard"
+        description={`Análise estatística completa — ${config.name}`}
+        icon={BarChart3}
+        badge={draws.length > 0 ? `${draws.length} sorteios` : undefined}
       />
       <LotteryContextBanner />
-      <ComplianceDisclaimer compact />
 
       {/* Trial countdown banner */}
-      {(profile?.plan === "free" || profile?.plan === "premium" || profile?.plan === "professional") && !isTrialExpired && !isAdmin && !isSuperAdmin && (
+      {profile?.plan === "free" && !isTrialExpired && !isAdmin && !isSuperAdmin && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -254,6 +109,7 @@ const DashboardPage = () => {
               </Button>
             </Link>
           </div>
+          {/* Progress bar */}
           <div className="mt-3 h-1.5 rounded-full bg-muted/50 overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
@@ -265,13 +121,11 @@ const DashboardPage = () => {
         </motion.div>
       )}
 
-      {/* Upgrade banner for free users */}
-      {currentPlan === "free" && !isAdmin && !isSuperAdmin && isTrialExpired && (
-        <UpgradeBanner />
-      )}
-
-      {loading && draws.length === 0 && (
-        <DashboardSkeleton />
+      {loading && (
+        <div className="flex items-center justify-center py-16 gap-3 text-muted-foreground">
+          <Loader2 className="w-5 h-5 animate-spin text-primary" />
+          <span className="text-sm">Carregando resultados...</span>
+        </div>
       )}
 
       {!loading && draws.length === 0 && (
@@ -284,289 +138,162 @@ const DashboardPage = () => {
       )}
 
       {draws.length > 0 && (
-        <div key={selectedLottery} className="space-y-8 pb-10">
-          <AutoUpdater key={`auto-${selectedLottery}`} lotteryId={selectedLottery} onNewDraw={handleNewDraw} latestConcurso={draws[0]?.concurso || 0} onSyncTriggered={refetchDraws} />
+        <>
+          <AutoUpdater lotteryId={selectedLottery} onNewDraw={handleNewDraw} latestConcurso={draws[0]?.concurso || 0} />
 
-          {/* High-Performance Analytics Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <StatsWidget 
-              label="Volume Histórico" 
-              value={draws.length} 
-              subValue="concursos"
-              icon={BarChart3} 
-              trend="up"
-              color="indigo"
-            />
-            <StatsWidget 
-              label="Momentum (Quentes)" 
-              value={hotNumbers} 
-              subValue="dezenas"
-              icon={Flame} 
-              trend="up"
-              color="rose"
-            />
-            <StatsWidget 
-              label="Atraso Estrutural" 
-              value={avgDelay} 
-              subValue="ciclos"
-              icon={Snowflake} 
-              trend="neutral"
-              color="amber"
-            />
-            <StatsWidget 
-              label="Probabilidade" 
-              value="84.2%" 
-              subValue="confiança"
-              icon={Target} 
-              trend="up"
-              color="emerald"
-            />
-          </div>
+          {/* 🍀 GERAR JOGO DA SORTE */}
+          <motion.div variants={item} className="relative">
+            <div className="glass-card rounded-xl border border-primary/20 p-5 flex flex-col sm:flex-row items-center gap-4">
+              <div className="flex-1 text-center sm:text-left">
+                <h3 className="text-lg font-bold text-foreground flex items-center gap-2 justify-center sm:justify-start">
+                  <Clover className="w-5 h-5 text-primary" />
+                  Jogo da Sorte
+                </h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  IA gera 1 jogo otimizado com estratégia aleatória para {config.name}
+                </p>
+              </div>
+              <Button
+                onClick={generateLuckyGame}
+                disabled={generatingLucky || stats.length === 0}
+                className="bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all"
+                size="lg"
+              >
+                {generatingLucky ? (
+                  <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Gerando...</>
+                ) : (
+                  <><Sparkles className="w-4 h-4 mr-2" /> GERAR JOGO DA SORTE</>
+                )}
+              </Button>
+            </div>
 
-          {/* Customizable Intelligence Market Grid */}
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-            modifiers={[restrictToWindowEdges]}
+            <AnimatePresence>
+              {luckyGame && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="mt-3 glass-card rounded-xl border border-accent/30 p-4"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <span className="text-xs text-muted-foreground">Estratégia: </span>
+                      <span className="text-xs font-semibold text-primary">{luckyGame.strategy}</span>
+                      <span className="ml-3 text-xs text-muted-foreground">Score: </span>
+                      <span className="text-xs font-bold text-accent">{luckyGame.score.toFixed(1)}/100</span>
+                    </div>
+                    <button onClick={() => setLuckyGame(null)} className="text-muted-foreground hover:text-foreground">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {luckyGame.numbers.map(n => (
+                      <span key={n} className="w-9 h-9 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-sm font-bold text-primary">
+                        {String(n).padStart(2, "0")}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+
+          <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {quickLinks.map(link => (
+              <motion.div key={link.url} variants={item}>
+                <Link
+                  to={link.url}
+                  className="flex items-center gap-3 rounded-xl glass-card p-4 border border-border hover:border-primary/30 transition-all duration-300 hover:translate-y-[-2px] group"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-primary/5 border border-primary/10 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                    <link.icon className={`w-5 h-5 ${link.color}`} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground">{link.title}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">{link.description}</p>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          <motion.div
+            key={selectedLottery}
+            variants={container}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-2 lg:grid-cols-4 gap-4"
           >
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-              {/* Left Column: Analytics Terminal */}
-              <div className="md:col-span-8 space-y-6">
-                <SortableContext 
-                  items={layout.filter(w => ["workflow", "frequency", "heatmap"].includes(w.id)).map(w => w.id)} 
-                  strategy={verticalListSortingStrategy}
-                >
-                  {layout.map((w) => {
-                    if (w.id === "workflow") {
-                      return (
-                        <SortableWidget 
-                          key="workflow" 
-                          id="workflow" 
-                          title="Fluxo de Trabalho" 
-                          subtitle="Etapas sugeridas para sua aposta" 
-                          icon={Activity} 
-                          noPadding 
-                          enabled={w.enabled}
-                          onToggle={() => toggleWidget("workflow")}
-                        >
-                          <div className="p-1">
-                            <WorkflowSteps />
-                          </div>
-                        </SortableWidget>
-                      );
-                    }
-                    if (w.id === "charts" || w.id === "frequency" || w.id === "heatmap") {
-                      // We handle frequency and heatmap as individual sortable units now
-                      if (w.id === "frequency") {
-                        return (
-                          <SortableWidget 
-                            key="frequency" 
-                            id="frequency" 
-                            title="Frequência Global" 
-                            subtitle="Distribuição de dezenas" 
-                            icon={BarChart3}
-                            enabled={w.enabled}
-                            onToggle={() => toggleWidget("frequency")}
-                          >
-                            <FrequencyChart stats={stats} />
-                          </SortableWidget>
-                        );
-                      }
-                      if (w.id === "heatmap") {
-                        return (
-                          <SortableWidget 
-                            key="heatmap" 
-                            id="heatmap" 
-                            title="Mapa de Calor" 
-                            subtitle="Intensidade de sorteios" 
-                            icon={Flame}
-                            enabled={w.enabled}
-                            onToggle={() => toggleWidget("heatmap")}
-                          >
-                            <HeatmapGrid stats={stats} totalNumbers={config.numbers} />
-                          </SortableWidget>
-                        );
-                      }
-                    }
-                    return null;
-                  })}
-                </SortableContext>
-              </div>
+            <motion.div variants={item}><StatsCard title="Total Concursos" value={draws.length} icon={BarChart3} color="green" subtitle="Resultados históricos" /></motion.div>
+            <motion.div variants={item}><StatsCard title="Números Quentes" value={hotNumbers} icon={Flame} color="red" subtitle="Acima da média" /></motion.div>
+            <motion.div variants={item}><StatsCard title="Números Frios" value={coldNumbers} icon={Snowflake} color="blue" subtitle="Abaixo da média" /></motion.div>
+            <motion.div variants={item}><StatsCard title="Atraso Médio" value={`${avgDelay}d`} icon={TrendingUp} color="amber" subtitle="Concursos sem aparecer" /></motion.div>
+          </motion.div>
 
-              {/* Right Column: AI & Smart Tools */}
-              <div className="md:col-span-4 space-y-6">
-                <SortableContext 
-                  items={layout.filter(w => ["quick-intel", "ai-insights", "alpha-engine", "personal-performance"].includes(w.id)).map(w => w.id)} 
-                  strategy={verticalListSortingStrategy}
-                >
-                  {layout.map((w) => {
-                    if (w.id === "quick-intel") {
-                      return (
-                        <SortableWidget 
-                          key="quick-intel" 
-                          id="quick-intel" 
-                          enabled={w.enabled}
-                          onToggle={() => toggleWidget("quick-intel")}
-                        >
-                          <QuickIntelligence stats={stats} draws={draws} lotteryName={config.name} />
-                        </SortableWidget>
-                      );
-                    }
-                    if (w.id === "ai-insights") {
-                      return (
-                        <SortableWidget 
-                          key="ai-insights" 
-                          id="ai-insights" 
-                          title="Inteligência Artificial" 
-                          subtitle="Insights em tempo real" 
-                          icon={Sparkles} 
-                          className="border-primary/30 shadow-lg shadow-primary/5"
-                          enabled={w.enabled}
-                          onToggle={() => toggleWidget("ai-insights")}
-                        >
-                          <AIInsightsCard stats={stats} draws={draws} lotteryName={config.name} compact />
-                        </SortableWidget>
-                      );
-                    }
-                    if (w.id === "alpha-engine") {
-                      return (
-                        <SortableWidget 
-                          key="alpha-engine" 
-                          id="alpha-engine" 
-                          title="Alpha Engine v5.0" 
-                          subtitle="Sistemas Neurais & Probabilidade" 
-                          icon={Sparkles} 
-                          className="bg-gradient-to-br from-background to-primary/5 border-primary/20 shadow-2xl shadow-primary/5"
-                          enabled={w.enabled}
-                          onToggle={() => toggleWidget("alpha-engine")}
-                        >
-                          <div className="space-y-4">
-                            {/* ... Content remains same but simplified for the sortable wrapper ... */}
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Market Status: <span className="text-primary">Optimized</span></span>
-                              </div>
-                              <Badge variant="outline" className="text-[9px] border-primary/30 text-primary bg-primary/5">REAL-TIME</Badge>
-                            </div>
-                            <Button
-                              onClick={generateLuckyGame}
-                              disabled={generatingLucky || stats.length === 0}
-                              className="w-full h-12 bg-gradient-to-r from-primary to-accent text-primary-foreground font-black rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all group overflow-hidden"
-                            >
-                              <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-[-20deg]" />
-                              {generatingLucky ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> ANALISANDO...</> : <><Zap className="w-4 h-4 mr-2" /> EXECUTAR ALPHA-STRAT</>}
-                            </Button>
-                            {/* ... (rest of lucky game content) ... */}
-                          </div>
-                        </SortableWidget>
-                      );
-                    }
-                    if (w.id === "personal-performance") {
-                      return (
-                        <SortableWidget 
-                          key="personal-performance" 
-                          id="personal-performance"
-                          enabled={w.enabled}
-                          onToggle={() => toggleWidget("personal-performance")}
-                        >
-                          <PersonalPerformanceCard />
-                        </SortableWidget>
-                      );
-                    }
-                    return null;
-                  })}
-                </SortableContext>
-              </div>
-            </div>
-          </DndContext>
-
-          {/* Advanced Analytics Section */}
-          <PlanGate feature="estrategias_analytics">
-            <div className="space-y-6 mt-12">
-              <div className="flex items-center gap-3">
-                <div className="w-1.5 h-6 rounded-full bg-primary" />
-                <h2 className="text-xl font-black tracking-tight text-foreground uppercase">Análise de Comportamento</h2>
-              </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <DashboardWidget title="Paridade & Equilíbrio" subtitle="Pares vs Ímpares" icon={Target}>
-                <ParityChart draws={draws} />
-              </DashboardWidget>
-              <DashboardWidget title="Sequências Consecutivas" subtitle="Detecção de padrões seguidos" icon={Activity}>
-                <ConsecutiveChart draws={draws} />
-              </DashboardWidget>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <DashboardWidget title="Distribuição por Faixa" subtitle="Amplitude das dezenas" icon={BarChart3}>
-                <RangeDistribution draws={draws} config={config} />
-              </DashboardWidget>
-              <DashboardWidget title="Atraso por Dezena" subtitle="Concursos desde a última saída" icon={TrendingUp}>
-                <DelayChart stats={stats} />
-              </DashboardWidget>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <DashboardWidget title="Tendência de Soma" subtitle="Volume total por concurso" icon={TrendingUp}>
-                <SumChart data={sumData} />
-              </DashboardWidget>
-              <DashboardWidget title="Últimos Resultados" subtitle="Conferência de prêmios" icon={Clover} noPadding>
-                <RecentDraws key={`recent-${selectedLottery}`} draws={drawsWithPrizes} />
-              </DashboardWidget>
-            </div>
-              </div>
-          </PlanGate>
-
-          {/* Limits section */}
+          {/* Saved bets limit card */}
           {limit !== Infinity && (
-            <motion.div variants={item} className="glass-card rounded-2xl border border-border/50 p-6 mt-12 bg-gradient-to-r from-background to-muted/30">
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center shadow-inner">
-                    <Save className="w-6 h-6 text-accent" />
+            <motion.div variants={item} className="glass-card rounded-xl border border-border/50 p-5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center">
+                    <Save className="w-5 h-5 text-accent" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-foreground">Gestão de Jogos Salvos</h3>
-                    <p className="text-xs text-muted-foreground font-medium">
-                      Plano <span className="text-accent uppercase font-black">{currentPlan === "free" ? "Gratuito" : currentPlan}</span> • {config.name}
+                    <h3 className="text-sm font-semibold text-foreground">Apostas Salvas — {config.name}</h3>
+                    <p className="text-xs text-muted-foreground">
+                      Plano {currentPlan === "free" ? "Gratuito" : currentPlan} • Limite de {limit} jogos por loteria
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-6 w-full md:w-auto">
+                <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <div className="flex items-baseline gap-1">
-                      <span className={`text-3xl font-black font-mono ${isAtLimit ? "text-destructive" : "text-primary"}`}>
-                        {savedBets.length}
-                      </span>
-                      <span className="text-muted-foreground font-bold text-sm">/ {limit}</span>
-                    </div>
-                    <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">
-                      {isAtLimit ? "CAPACIDADE ESGOTADA" : "JOGOS EM MEMÓRIA"}
+                    <span className={`text-2xl font-bold font-mono ${isAtLimit ? "text-destructive" : "text-primary"}`}>
+                      {savedBets.length}/{limit}
+                    </span>
+                    <p className="text-[10px] text-muted-foreground">
+                      {isAtLimit ? "Limite atingido" : `${remaining} restante${remaining !== 1 ? "s" : ""}`}
                     </p>
                   </div>
                   {isAtLimit && (
-                    <Link to="/planos" className="flex-1 md:flex-none">
-                      <Button size="lg" className="w-full md:w-auto gap-2 bg-accent text-accent-foreground hover:bg-accent/90 shadow-lg shadow-accent/20 rounded-xl font-bold">
-                        <Crown className="w-4 h-4" />
-                        UPGRADE
+                    <Link to="/planos">
+                      <Button size="sm" variant="outline" className="gap-1.5 border-accent/20 text-accent hover:bg-accent/5">
+                        <Crown className="w-3.5 h-3.5" />
+                        Upgrade
                       </Button>
                     </Link>
                   )}
                 </div>
               </div>
-              <div className="mt-6 h-2 rounded-full bg-muted overflow-hidden shadow-inner">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${Math.min((savedBets.length / limit) * 100, 100)}%` }}
-                  transition={{ duration: 1, ease: "circOut" }}
-                  className={`h-full rounded-full ${isAtLimit ? "bg-destructive" : "bg-gradient-to-r from-primary to-accent"}`}
+              {/* Progress bar */}
+              <div className="mt-3 h-1.5 rounded-full bg-muted/50 overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${isAtLimit ? "bg-destructive" : "bg-primary"}`}
+                  style={{ width: `${Math.min((savedBets.length / limit) * 100, 100)}%` }}
                 />
               </div>
             </motion.div>
           )}
-        </div>
+
+          <motion.div variants={container} initial="hidden" animate="show" className="grid lg:grid-cols-2 gap-6">
+            <motion.div variants={item}><FrequencyChart stats={stats} /></motion.div>
+            <motion.div variants={item}><HeatmapGrid stats={stats} totalNumbers={config.numbers} /></motion.div>
+          </motion.div>
+
+          <div className="grid lg:grid-cols-2 gap-6">
+            <ParityChart draws={draws} />
+            <ConsecutiveChart draws={draws} />
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-6">
+            <RangeDistribution draws={draws} config={config} />
+            <DelayChart stats={stats} />
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-6">
+            <SumChart data={sumData} />
+            <RecentDraws draws={drawsWithPrizes} />
+          </div>
+        </>
       )}
     </div>
   );

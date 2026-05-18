@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
-import { AntiPopularitySelector } from "@/components/AntiPopularitySelector";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { NumberStats } from "@/features/statistics/engine";
+import { NumberStats } from "@/engine/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import {
   runExtremePipeline,
@@ -343,11 +342,6 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
         )}
       </AnimatePresence>
 
-      {/* Anti-Popularidade */}
-      <div className="mb-4">
-        <AntiPopularitySelector />
-      </div>
-
       {/* Generate button */}
       <div className="flex items-center gap-3 flex-wrap mb-4">
         <Button
@@ -510,7 +504,7 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
                     {bet.rank <= 3 ? (
                       <Award className={`w-4 h-4 ${
                         bet.rank === 1 ? "text-yellow-400" :
-                        bet.rank === 2 ? "text-gray-500" : "text-amber-600"
+                        bet.rank === 2 ? "text-gray-400" : "text-amber-600"
                       }`} />
                     ) : (
                       <span className="text-xs text-muted-foreground font-mono">#{bet.rank}</span>
@@ -551,7 +545,7 @@ export function ExtremeGeneratorPanel({ stats, config, draws, onSaveBet }: Props
                                  {combined}
                                </div>
                                <div className="text-[9px] text-muted-foreground">combinada</div>
-                               <div className="text-[9px] text-muted-foreground">{bet.score} + bt</div>
+                               <div className="text-[9px] text-muted-foreground/60">{bet.score} + bt</div>
                              </div>
                            );
                          })()}

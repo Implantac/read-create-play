@@ -22,14 +22,14 @@ export function ROIFilters({ filters, onChange, strategies, maxHits }: ROIFilter
   };
 
   return (
-    <div className="flex flex-wrap items-end gap-6 p-4 rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-md">
-      <div className="flex items-center gap-2 text-primary mr-2 mb-2">
+    <div className="flex flex-wrap items-end gap-3 p-3 rounded-lg border border-border/40 bg-muted/30">
+      <div className="flex items-center gap-2 text-muted-foreground mr-1">
         <Filter className="h-4 w-4" />
-        <span className="text-[10px] font-black uppercase tracking-widest">DATA FILTERS</span>
+        <span className="text-xs font-semibold">Filtros</span>
       </div>
 
       <div className="space-y-1">
-        <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">TIME WINDOW</Label>
+        <Label className="text-[10px] text-muted-foreground">Período</Label>
         <Select value={filters.period} onValueChange={v => update("period", v)}>
           <SelectTrigger className="h-8 w-[120px] text-xs">
             <SelectValue />
@@ -44,7 +44,7 @@ export function ROIFilters({ filters, onChange, strategies, maxHits }: ROIFilter
       </div>
 
       <div className="space-y-1">
-        <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">ALGORITHM</Label>
+        <Label className="text-[10px] text-muted-foreground">Estratégia</Label>
         <Select value={filters.strategy} onValueChange={v => update("strategy", v)}>
           <SelectTrigger className="h-8 w-[140px] text-xs">
             <SelectValue />
@@ -59,7 +59,7 @@ export function ROIFilters({ filters, onChange, strategies, maxHits }: ROIFilter
       </div>
 
       <div className="space-y-1">
-        <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">THRESHOLD</Label>
+        <Label className="text-[10px] text-muted-foreground">Min. Acertos</Label>
         <Input
           type="number"
           min={0}

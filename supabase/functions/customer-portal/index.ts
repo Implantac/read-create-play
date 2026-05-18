@@ -33,12 +33,7 @@ serve(async (req) => {
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    if (customers.data.length === 0) {
-      return new Response(JSON.stringify({ error: "no_customer", message: "Nenhuma assinatura encontrada. Assine um plano primeiro." }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      });
-    }
+    if (customers.data.length === 0) throw new Error("No Stripe customer found");
 
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: customers.data[0].id,

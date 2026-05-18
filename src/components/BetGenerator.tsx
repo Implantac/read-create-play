@@ -1,16 +1,14 @@
 import { useState, useMemo } from "react";
-import { NumberStats, generateSmartBet } from "@/features/statistics/engine";
+import { NumberStats, generateSmartBet } from "@/engine/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { evaluateBetQuality, BetQualityReport } from "@/engine/bet-quality";
 import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, RefreshCw, Copy, Check, ChevronRight, TrendingUp, Shield, Zap, BarChart3, CheckSquare, Loader2 } from "lucide-react";
+import { Sparkles, RefreshCw, Copy, Check, ChevronRight, TrendingUp, Shield, Zap, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useSelectedBets } from "@/contexts/SelectedBetsContext";
 
 interface Props {
   stats: NumberStats[];
@@ -102,7 +100,6 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
   const [copied, setCopied] = useState<number | null>(null);
   const [step, setStep] = useState<1 | 2>(1);
   const [generating, setGenerating] = useState(false);
-  const { toggleBet, isBetMarked } = useSelectedBets();
 
   const avgScore = useMemo(() => {
     if (bets.length === 0) return 0;
@@ -143,18 +140,16 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
   };
 
   return (
-    <div className="rounded-xl glass-card p-4 sm:p-6 space-y-6 border border-white/5 relative overflow-hidden group">
-      <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 blur-[100px] pointer-events-none rounded-full group-hover:bg-primary/20 transition-all duration-700" />
-      
+    <div className="rounded-xl glass-card p-5 space-y-5">
       {/* Header */}
-      <div className="flex items-center gap-4 relative z-10">
-        <div className="w-12 h-12 rounded-xl bg-[#0a0a0a] border border-white/10 flex items-center justify-center shrink-0 shadow-lg">
-          <Sparkles className="w-6 h-6 text-primary drop-shadow-[0_0_8px_rgba(var(--primary),0.4)]" />
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
+          <Sparkles className="w-5 h-5 text-primary" />
         </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-black text-white tracking-tight uppercase leading-none">Smart Engineering Generator</h3>
-          <p className="text-[10px] text-muted-foreground mt-1 font-bold tracking-widest uppercase opacity-60">
-            Probability Matrix Optimization v4.2
+        <div className="flex-1">
+          <h3 className="text-sm font-bold text-foreground">Gerador de Apostas Inteligentes</h3>
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            Gere apostas com melhor distribuição estatística — evite padrões comuns de jogadores
           </p>
         </div>
       </div>
@@ -173,22 +168,18 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
       </div>
 
       {/* Generate Buttons */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 relative z-10">
+      <div className="flex flex-wrap gap-2">
         {[1, 3, 5, 10].map(n => (
           <Button
             key={n}
             variant="outline"
-            size="lg"
+            size="sm"
             onClick={() => generate(n)}
             disabled={generating}
-            className="text-[11px] font-black uppercase tracking-widest border-white/5 hover:border-primary/40 bg-white/[0.02] hover:bg-white/[0.05] transition-all h-11 px-4 rounded-xl group/btn"
+            className="text-xs border-border/50 hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all"
           >
-            {generating ? (
-              <Loader2 className="w-4 h-4 animate-spin text-primary" />
-            ) : (
-              <Zap className="w-4 h-4 mr-2 text-primary group-hover/btn:scale-110 transition-transform" />
-            )}
-            {n} {n > 1 ? "Games" : "Game"}
+            <RefreshCw className={`w-3 h-3 mr-1.5 ${generating ? "animate-spin" : ""}`} />
+            {n} jogo{n > 1 ? "s" : ""} inteligente{n > 1 ? "s" : ""}
           </Button>
         ))}
       </div>
@@ -220,30 +211,26 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
           {bets.map((bet, i) => (
             <motion.div
               key={`${i}-${bet.numbers.join(",")}`}
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.06 }}
-              className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-primary/30 transition-all duration-500 group/card relative overflow-hidden"
+              className="p-4 rounded-xl bg-card border border-border/50 hover:border-border transition-colors space-y-3"
             >
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
-              {/* Card Header: Checkbox + Rank + Score + Grade */}
-              <div className="flex items-center justify-between gap-1">
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  <Checkbox
-                    checked={isBetMarked(bet.numbers)}
-                    onCheckedChange={() => toggleBet({ numbers: bet.numbers, label: `Gerador #${i + 1} (${bet.report.grade})` })}
-                    className="h-4 w-4"
-                  />
-                  <span className="text-[10px] sm:text-xs text-muted-foreground font-mono">#{i + 1}</span>
-                  <div className={`px-1.5 sm:px-2 py-0.5 rounded-md text-[9px] sm:text-[10px] font-bold ${getGradeBg(bet.report.grade)}`}>
+              {/* Card Header: Rank + Score + Grade */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground font-mono">#{i + 1}</span>
+                  <div className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${getGradeBg(bet.report.grade)}`}>
                     {bet.report.grade}
                   </div>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <span className={`text-base sm:text-lg font-bold tabular-nums ${getScoreColor(bet.report.overall)}`}>
-                    {bet.report.overall}
-                  </span>
-                  <span className="text-[9px] sm:text-[10px] text-muted-foreground">/100</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className={`text-lg font-bold tabular-nums ${getScoreColor(bet.report.overall)}`}>
+                      {bet.report.overall}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">/100</span>
+                  </div>
                 </div>
               </div>
 
@@ -251,19 +238,12 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
               <Progress value={bet.report.overall} className="h-1.5" />
 
               {/* Numbers */}
-              <div className="flex flex-wrap gap-2 py-4">
-                {bet.numbers.map(n => {
-                  const stat = stats.find(s => s.number === n);
-                  return (
-                    <span key={n} className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-black shadow-[0_4px_15px_rgba(0,0,0,0.5)] border-2 border-white/10 transition-transform group-hover/card:scale-110 duration-500 ${
-                      stat?.status === "hot" ? "bg-destructive text-white border-destructive/50" : 
-                      stat?.status === "cold" ? "bg-blue-600 text-white border-blue-500/50" : 
-                      "bg-[#111] text-primary border-primary/20"
-                    }`}>
-                      {String(n).padStart(2, "0")}
-                    </span>
-                  );
-                })}
+              <div className="flex flex-wrap gap-1.5">
+                {bet.numbers.map(n => (
+                  <span key={n} className="lottery-ball text-xs w-8 h-8">
+                    {String(n).padStart(2, "0")}
+                  </span>
+                ))}
               </div>
 
               {/* Insights */}
@@ -279,21 +259,21 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
               <GameAnalysisBlock numbers={bet.numbers} stats={stats} config={config} draws={draws} />
 
               {/* Actions */}
-              <div className="flex items-center gap-1 sm:gap-2 pt-1 flex-wrap">
+              <div className="flex items-center gap-2 pt-1">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => regenerateSingle(i)}
-                  className="h-7 text-[9px] sm:text-[10px] text-muted-foreground hover:text-primary px-1.5 sm:px-2"
+                  className="h-7 text-[10px] text-muted-foreground hover:text-primary px-2"
                 >
                   <RefreshCw className="w-3 h-3 mr-1" />
-                  <span className="hidden xs:inline">Gerar </span>novamente
+                  Gerar novamente
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => copyBet(bet.numbers, i)}
-                  className="h-7 text-[9px] sm:text-[10px] text-muted-foreground hover:text-primary px-1.5 sm:px-2"
+                  className="h-7 text-[10px] text-muted-foreground hover:text-primary px-2"
                 >
                   {copied === i ? <Check className="w-3 h-3 mr-1 text-primary" /> : <Copy className="w-3 h-3 mr-1" />}
                   Copiar
@@ -306,7 +286,7 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
                       onSaveBet(bet.numbers, "Gerador Inteligente", bet.report.overall, bet.report.grade);
                       toast.success("Aposta salva!");
                     }}
-                    className="h-7 text-[9px] sm:text-[10px] text-muted-foreground hover:text-primary px-1.5 sm:px-2"
+                    className="h-7 text-[10px] text-muted-foreground hover:text-primary px-2"
                   >
                     <Shield className="w-3 h-3 mr-1" />
                     Salvar
@@ -328,7 +308,7 @@ export function BetGenerator({ stats, config, draws = [], onSaveBet }: Props) {
       )}
 
       {/* Compliance */}
-      <p className="text-[9px] text-muted-foreground text-center leading-relaxed">
+      <p className="text-[9px] text-muted-foreground/60 text-center leading-relaxed">
         Análise estatística para fins educacionais. Não garante premiação.
       </p>
     </div>

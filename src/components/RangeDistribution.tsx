@@ -1,7 +1,7 @@
-import { memo, useMemo } from "react";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { CHART_TOOLTIP_STYLE, CHART_AXIS_TICK, CHART_COLORS } from "@/lib/chart-theme";
+import { useMemo } from "react";
 import { Layers } from "lucide-react";
 
 interface Props {
@@ -9,9 +9,7 @@ interface Props {
   config: LotteryConfig;
 }
 
-const colors = [CHART_COLORS.green, CHART_COLORS.blue, CHART_COLORS.amber, CHART_COLORS.purple, CHART_COLORS.red];
-
-export const RangeDistribution = memo(function RangeDistribution({ draws, config }: Props) {
+export function RangeDistribution({ draws, config }: Props) {
   const data = useMemo(() => {
     const rangeSize = Math.ceil(config.numbers / 5);
     const ranges = Array.from({ length: 5 }, (_, i) => ({
@@ -26,13 +24,15 @@ export const RangeDistribution = memo(function RangeDistribution({ draws, config
         if (range) range.count++;
       });
     });
-    const total = draws.length * (draws[0]?.numbers.length || 1);
+    const total = draws.length * draws[0]?.numbers.length || 1;
     return ranges.map(r => ({
       faixa: r.label,
       frequência: r.count,
       percentual: Math.round((r.count / total) * 100),
     }));
   }, [draws, config]);
+
+  const colors = [CHART_COLORS.green, CHART_COLORS.blue, CHART_COLORS.amber, CHART_COLORS.purple, CHART_COLORS.red];
 
   return (
     <div className="rounded-xl glass-card p-5 space-y-4">
@@ -67,4 +67,4 @@ export const RangeDistribution = memo(function RangeDistribution({ draws, config
       </div>
     </div>
   );
-});
+}

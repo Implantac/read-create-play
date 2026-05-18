@@ -162,12 +162,10 @@ export function getLotteryRules(lotteryId: string): LotteryRules {
   return LOTTERY_RULES[lotteryId] || LOTTERY_RULES.lotofacil;
 }
 
-/** Constantes Matemáticas para Filtros de Elite */
+/** Primes up to 100 for pattern analysis */
 export const PRIMES = new Set([2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97]);
 export const FIBONACCI = new Set([1,2,3,5,8,13,21,34,55,89]);
-export const MERSENNE = new Set([3, 7, 31, 127]); 
-export const PERFECT_SQUARES = new Set([1, 4, 9, 16, 25, 36, 49, 64, 81, 100]);
 
-/** Lotofácil: Mapeamento de Topologia do Volante */
+/** Lotofácil frame (border) numbers */
 export const LOTOFACIL_FRAME = new Set([1,2,3,4,5,6,10,11,15,16,20,21,22,23,24,25]);
 export const LOTOFACIL_CENTER = new Set([7,8,9,12,13,14,17,18,19]);

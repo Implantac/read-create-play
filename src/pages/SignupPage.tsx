@@ -1,4 +1,3 @@
-import { Helmet } from "react-helmet-async";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -86,15 +85,6 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 relative overflow-hidden">
-      <Helmet>
-        <title>Criar Conta — Titan Loterias</title>
-        <meta name="description" content="Crie sua conta Titan Loterias e teste 7 dias grátis. IA, geradores e backtesting para 8 loterias brasileiras." />
-        <link rel="canonical" href="https://titanloterias.lovable.app/signup" />
-        <meta property="og:title" content="Criar Conta — Titan Loterias" />
-        <meta property="og:description" content="Cadastre-se grátis e ganhe 7 dias de IA aplicada a loterias brasileiras." />
-        <meta property="og:url" content="https://titanloterias.lovable.app/signup" />
-        <meta property="og:type" content="website" />
-      </Helmet>
       {/* Background effects */}
       <div className="absolute inset-0 gradient-mesh" />
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
@@ -126,7 +116,7 @@ export default function SignupPage() {
                 Criar <span className="gradient-brand-text">Conta</span>
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Acesso Vitalício • Comece agora
+                7 dias grátis • Comece agora
               </p>
             </div>
           </CardHeader>
@@ -205,7 +195,7 @@ export default function SignupPage() {
             <CardFooter className="flex flex-col gap-3 pt-2">
               <Button type="submit" className="w-full h-11 gradient-brand text-primary-foreground font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-shadow" disabled={loading}>
                 {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                Garantir acesso agora
+                Criar conta grátis
                 {!loading && <ArrowRight className="w-4 h-4 ml-2" />}
               </Button>
               <p className="text-sm text-center text-muted-foreground pt-2">
@@ -218,7 +208,7 @@ export default function SignupPage() {
           </form>
         </Card>
 
-        <p className="text-center text-[10px] text-muted-foreground mt-4 font-mono uppercase tracking-widest">
+        <p className="text-center text-[10px] text-muted-foreground/40 mt-4 font-mono uppercase tracking-widest">
           Motor estatístico v4.0 • ML • Database
         </p>
       </motion.div>

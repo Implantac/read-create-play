@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { NumberStats } from "@/features/statistics/engine";
+import { NumberStats } from "@/engine/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { STRATEGIES, Strategy, generateByStrategy } from "@/features/statistics/strategies";
+import { STRATEGIES, Strategy, generateByStrategy } from "@/engine/strategies";
 import { GenerationFilters, DEFAULT_FILTERS, generateWithFilters, betMatchesFilters } from "@/engine/generation-filters";
 import { GeneratorFiltersPanel } from "@/components/GeneratorFiltersPanel";
 import { HistoricalValidationBadge } from "@/components/HistoricalValidationBadge";
 import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, RefreshCw, Copy, Check, Brain, Flame, Snowflake, Shuffle, Hash, Sigma, Ratio, Grid3X3, Clock, BarChart3, TrendingUp, Repeat, Layers, Star, AlertTriangle, Binary, Boxes, Zap, Activity, Target } from "lucide-react";
+import { Sparkles, RefreshCw, Copy, Check, Brain, Flame, Snowflake, Shuffle, Hash, Sigma, Ratio, Grid3X3, Clock, BarChart3, TrendingUp, Repeat, Layers, Star, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useLotteryContext } from "@/contexts/LotteryContext";
@@ -33,16 +33,6 @@ const ICON_MAP: Record<Strategy, typeof Sparkles> = {
   cycle: Repeat,
   ml: Brain,
   hybrid: Layers,
-  markov: Zap,
-  poisson: Binary,
-  cluster: Boxes,
-  expert: Star,
-  quantum: Zap,
-  randomForest: Binary,
-  xgboost: TrendingUp,
-  lstm: Activity,
-  bayesian: Target,
-  markov_model: RefreshCw,
 };
 
 const CATEGORY_LABELS = { basic: "Básicas", math: "Matemáticas", ai: "Inteligência Artificial" };
@@ -74,7 +64,7 @@ export function EnhancedBetGenerator({ stats, config, onSaveBet }: Props) {
       let bet: number[] | null;
       if (hasActiveFilters) {
         bet = generateWithFilters(
-          () => generateByStrategy(strategy, stats, config, draws),
+          () => generateByStrategy(strategy, stats, config),
           filters,
           stats,
           config,
@@ -271,7 +261,7 @@ export function EnhancedBetGenerator({ stats, config, onSaveBet }: Props) {
               {draws.length > 0 && (
                 <div className="px-3 pb-2">
                   <HistoricalValidationBadge bet={bet} draws={draws} config={config} />
-                  <GameAnalysisBlock numbers={bet} stats={stats} config={config} draws={draws} strategyId={strategy} />
+                  <GameAnalysisBlock numbers={bet} stats={stats} config={config} draws={draws} />
                 </div>
               )}
             </motion.div>

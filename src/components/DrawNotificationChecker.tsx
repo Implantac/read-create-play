@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { playMatchAlert, getTier } from "@/lib/alert-sounds";
+import { playMatchAlert } from "@/lib/alert-sounds";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { useNotificationPermission } from "@/hooks/useNotificationPermission";
@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Bell, BellRing, BellOff, Trophy, X, ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { JackpotParticles } from "@/components/JackpotParticles";
 
 interface MatchResult {
   betId: string;
@@ -32,69 +31,55 @@ export function DrawNotificationChecker() {
   const notifiedConcursos = useRef<Set<string>>(new Set());
 
   const checkMatches = useCallback(() => {
-    try {
-      if (!draws.length || !savedBets.length) return;
+    if (!draws.length || !savedBets.length) return;
 
-      const latestDraw = draws[0];
-      if (!latestDraw || !Number.isInteger(latestDraw.concurso) || !Array.isArray(latestDraw.numbers)) return;
-      if (latestDraw.concurso === lastCheckedConcurso) return;
+    const latestDraw = draws[0];
+    if (latestDraw.concurso === lastCheckedConcurso) return;
 
-      const validNumbers = latestDraw.numbers.filter((n) => Number.isInteger(n));
-      if (validNumbers.length === 0) return;
+    const results: MatchResult[] = [];
+    const drawSet = new Set(latestDraw.numbers);
 
-      const results: MatchResult[] = [];
-      const drawSet = new Set(validNumbers);
-
-      for (const bet of savedBets) {
-        const matched = bet.numbers.filter(n => drawSet.has(n));
-        if (matched.length >= Math.max(2, Math.floor(config.pick * 0.3))) {
-          results.push({
-            betId: bet.id,
-            betNumbers: bet.numbers,
-            matchedNumbers: matched,
-            matchCount: matched.length,
-            concurso: latestDraw.concurso,
-            strategy: bet.strategy,
-          });
-        }
+    for (const bet of savedBets) {
+      const matched = bet.numbers.filter(n => drawSet.has(n));
+      if (matched.length >= Math.max(2, Math.floor(config.pick * 0.3))) {
+        results.push({
+          betId: bet.id,
+          betNumbers: bet.numbers,
+          matchedNumbers: matched,
+          matchCount: matched.length,
+          concurso: latestDraw.concurso,
+          strategy: bet.strategy,
+        });
       }
+    }
 
-      results.sort((a, b) => b.matchCount - a.matchCount);
-      setMatches(results);
-      setLastCheckedConcurso(latestDraw.concurso);
-      setDismissed(false);
+    results.sort((a, b) => b.matchCount - a.matchCount);
+    setMatches(results);
+    setLastCheckedConcurso(latestDraw.concurso);
+    setDismissed(false);
 
-      const notifKey = `${selectedLottery}-${latestDraw.concurso}`;
-      if (results.length > 0 && !notifiedConcursos.current.has(notifKey)) {
-        notifiedConcursos.current.add(notifKey);
-        const best = results[0];
-        const isWinner = best.matchCount >= config.pick;
-        const lotteryName = LOTTERIES.find(l => l.id === selectedLottery)?.name || selectedLottery;
+    // Send browser push notification
+    const notifKey = `${selectedLottery}-${latestDraw.concurso}`;
+    if (results.length > 0 && !notifiedConcursos.current.has(notifKey)) {
+      notifiedConcursos.current.add(notifKey);
+      const best = results[0];
+      const isWinner = best.matchCount >= config.pick;
+      const lotteryName = LOTTERIES.find(l => l.id === selectedLottery)?.name || selectedLottery;
 
-        try {
-          playMatchAlert(best.matchCount, config.pick);
-        } catch (error) {
-          console.warn("Failed to play match alert", error);
+      // Play tier-based alert sound (different melody per match level)
+      playMatchAlert(best.matchCount, config.pick);
+
+      sendNotification(
+        isWinner
+          ? `🎉 Parabéns! Jogo premiado na ${lotteryName}!`
+          : `🔔 ${lotteryName} — ${results.length} aposta(s) com acertos!`,
+        {
+          body: isWinner
+            ? `Você acertou ${best.matchCount}/${config.pick} no concurso #${latestDraw.concurso}!`
+            : `Melhor resultado: ${best.matchCount}/${config.pick} acertos no concurso #${latestDraw.concurso}`,
+          tag: notifKey,
         }
-
-        try {
-          sendNotification(
-            isWinner
-              ? `🎉 Parabéns! Jogo premiado na ${lotteryName}!`
-              : `🔔 ${lotteryName} — ${results.length} aposta(s) com acertos!`,
-            {
-              body: isWinner
-                ? `Você acertou ${best.matchCount}/${config.pick} no concurso #${latestDraw.concurso}!`
-                : `Melhor resultado: ${best.matchCount}/${config.pick} acertos no concurso #${latestDraw.concurso}`,
-              tag: notifKey,
-            }
-          );
-        } catch (error) {
-          console.warn("Failed to send notification", error);
-        }
-      }
-    } catch (error) {
-      console.error("DrawNotificationChecker error:", error);
+      );
     }
   }, [draws, savedBets, config.pick, lastCheckedConcurso, selectedLottery, sendNotification]);
 
@@ -143,33 +128,15 @@ export function DrawNotificationChecker() {
 
   const bestMatch = matches[0];
   const isWinner = bestMatch.matchCount >= config.pick;
-  const tier = getTier(bestMatch.matchCount, config.pick);
-  const isHighTier = tier === "high" || tier === "jackpot";
 
   return (
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
-        animate={
-          isHighTier
-            ? {
-                opacity: 1,
-                y: 0,
-                scale: [1, 1.02, 0.98, 1.01, 1],
-                x: [0, -3, 3, -2, 2, 0],
-              }
-            : { opacity: 1, y: 0 }
-        }
-        transition={
-          isHighTier
-            ? { duration: 0.6, ease: "easeOut", scale: { repeat: 2, duration: 0.5 } }
-            : { duration: 0.3 }
-        }
+        animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
-        className={isHighTier ? "animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_3]" : ""}
       >
-        <Card className={`relative border ${isWinner ? "border-yellow-400/60 bg-yellow-500/10 shadow-[0_0_20px_rgba(234,179,8,0.4),0_0_40px_rgba(234,179,8,0.2)] animate-[jackpot-glow_2s_ease-in-out_infinite]" : isHighTier ? "border-amber-400/50 bg-amber-500/5 shadow-[0_0_15px_rgba(245,158,11,0.3)]" : "border-primary/30 bg-primary/5"} backdrop-blur`}>
-          {isWinner && <JackpotParticles />}
+        <Card className={`border ${isWinner ? "border-accent/50 bg-accent/5" : "border-primary/30 bg-primary/5"} backdrop-blur`}>
           <CardHeader className="py-3 px-4">
             <CardTitle className="flex items-center gap-2 text-sm">
               {isWinner ? (

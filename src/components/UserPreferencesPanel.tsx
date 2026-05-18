@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Globe, Clock, Banknote, Loader2, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { refineError } from "@/lib/error-handler";
-
 
 const LANGUAGES = [
   { value: "pt-BR", label: "Português (Brasil)" },
@@ -61,14 +59,8 @@ export default function UserPreferencesPanel() {
       if (error) throw error;
       toast({ title: "Preferências salvas com sucesso!" });
     } catch (err: any) {
-      const refined = refineError(err);
-      toast({ 
-        title: refined.title, 
-        description: `${refined.description} ${refined.recommendation}`, 
-        variant: "destructive" 
-      });
+      toast({ title: "Erro ao salvar preferências", description: err.message, variant: "destructive" });
     } finally {
-
       setSaving(false);
     }
   };

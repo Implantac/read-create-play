@@ -1,10 +1,10 @@
 import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { NumberStats } from "@/features/statistics/engine";
+import { NumberStats } from "@/engine/statistics";
 import { LotteryConfig } from "@/data/lotteries";
 import { Grid3X3, RotateCcw, Sparkles, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { generateSmartBet } from "@/features/statistics/engine";
+import { generateSmartBet } from "@/engine/statistics";
 import { toast } from "sonner";
 
 interface Props {
@@ -55,13 +55,11 @@ export function NumberPickerGrid({ config, stats, onSaveBet }: Props) {
     toast.success("Números copiados!");
   };
 
-  // Calculate grid columns — Lotofácil uses a 5x5 grid on mobile for perfect layout
-  const isLotofacil = config.numbers === 25;
-  const cols = isLotofacil ? 5 : config.numbers <= 31 ? 8 : config.numbers <= 50 ? 10 : 10;
-  const mobileCols = isLotofacil ? 5 : config.numbers <= 31 ? 6 : config.numbers <= 50 ? 8 : 8;
+  // Calculate grid columns based on total numbers
+  const cols = config.numbers <= 31 ? 8 : config.numbers <= 50 ? 10 : config.numbers <= 80 ? 10 : 10;
 
   return (
-    <div className="rounded-xl glass-card p-3 sm:p-5 space-y-3 sm:space-y-4">
+    <div className="rounded-xl glass-card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-neon-cyan/10 border border-neon-cyan/20 flex items-center justify-center">
@@ -95,14 +93,9 @@ export function NumberPickerGrid({ config, stats, onSaveBet }: Props) {
 
       {/* Grid */}
       <div
-        className="number-picker-responsive grid gap-1 sm:gap-1.5"
-        style={{ gridTemplateColumns: `repeat(${mobileCols}, minmax(0, 1fr))` }}
+        className="grid gap-1.5"
+        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
       >
-        <style>{`
-          @media (min-width: 641px) {
-            .number-picker-responsive { grid-template-columns: repeat(${cols}, minmax(0, 1fr)) !important; }
-          }
-        `}</style>
         {Array.from({ length: config.numbers }, (_, i) => i + 1).map(n => {
           const stat = stats.find(s => s.number === n);
           const isSelected = selected.has(n);
@@ -115,9 +108,9 @@ export function NumberPickerGrid({ config, stats, onSaveBet }: Props) {
               whileTap={{ scale: 0.9 }}
               onClick={() => toggle(n)}
               className={`
-                relative aspect-square rounded-lg text-[11px] sm:text-xs font-mono font-bold
+                relative aspect-square rounded-lg text-xs font-mono font-bold
                 flex items-center justify-center transition-all duration-150
-                border min-w-0
+                border
                 ${isSelected
                   ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/30 scale-105"
                   : isHot

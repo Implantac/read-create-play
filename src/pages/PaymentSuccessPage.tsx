@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 
 const PLAN_LABELS: Record<string, string> = {
+  premium: "Premium",
+  professional: "Profissional",
   lifetime: "Vitalício",
 };
 

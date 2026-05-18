@@ -2,11 +2,10 @@
 // Different melodies per match tier: low matches → simple beep, high matches → celebratory fanfare
 
 import { getSoundSettings } from "@/hooks/useSoundSettings";
-import { burstConfettiCenter } from "@/lib/confetti";
 
 type Tier = "low" | "mid" | "high" | "jackpot";
 
-export function getTier(matchCount: number, pick: number): Tier {
+function getTier(matchCount: number, pick: number): Tier {
   const ratio = matchCount / pick;
   if (ratio >= 1) return "jackpot";
   if (ratio >= 0.7) return "high";
@@ -27,27 +26,22 @@ function playTone(ctx: AudioContext, freq: number, start: number, duration: numb
 }
 
 const MELODIES: Record<Tier, { notes: [number, number][]; type: OscillatorType }> = {
-  // Coin-drop style — two quick metallic plinks
   low: {
-    notes: [[1200, 0.08], [900, 0.15]],
-    type: "triangle",
+    notes: [[523, 0.15], [659, 0.2]],
+    type: "sine",
   },
-  // Slot-machine partial win — ascending chime triplet
   mid: {
-    notes: [[880, 0.1], [1047, 0.1], [1319, 0.22]],
+    notes: [[523, 0.15], [659, 0.15], [784, 0.25]],
     type: "triangle",
   },
-  // Big win fanfare — dramatic ascending run with sustain
   high: {
-    notes: [[659, 0.1], [784, 0.1], [988, 0.1], [1175, 0.12], [1319, 0.3]],
+    notes: [[523, 0.12], [659, 0.12], [784, 0.12], [1047, 0.3]],
     type: "triangle",
   },
-  // Jackpot celebration — slot-machine payout cascade + triumphant resolve
   jackpot: {
     notes: [
-      [784, 0.08], [988, 0.08], [1175, 0.08],
-      [1319, 0.1], [1568, 0.1], [1319, 0.08],
-      [1568, 0.1], [1760, 0.15], [2093, 0.4],
+      [523, 0.1], [659, 0.1], [784, 0.1],
+      [1047, 0.15], [1047, 0.1], [1175, 0.1], [1319, 0.4],
     ],
     type: "square",
   },
@@ -85,13 +79,6 @@ export function playMatchAlert(matchCount: number, pick: number) {
   for (const [freq, dur] of melody.notes) {
     playTone(ctx, freq, t, dur, baseGain, melody.type);
     t += dur * 0.85;
-  }
-
-  // Visual confetti for high and jackpot-tier matches
-  if (tier === "jackpot") {
-    burstConfettiCenter(80);
-  } else if (tier === "high") {
-    burstConfettiCenter(30);
   }
 }
 

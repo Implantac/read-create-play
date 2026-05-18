@@ -1,30 +1,9 @@
 // ═══════════════════════════════════════════════════════
-// Web Worker: Simulador Monte Carlo por Estratégias v3.0
-// Bitset comparisons + O(1) variance + inline PRNG
+// Web Worker: Simulador Monte Carlo por Estratégias
+// Runs strategy-based Monte Carlo off the main thread
 // ═══════════════════════════════════════════════════════
 
-// ─── Bitset ops (inline) ─────────────────────────────
-
-function toBitset(numbers: number[]): Uint32Array {
-  const bs = new Uint32Array(4);
-  for (const n of numbers) {
-    bs[(n - 1) >> 5] |= 1 << ((n - 1) & 31);
-  }
-  return bs;
-}
-
-function popcount32(x: number): number {
-  x = x - ((x >>> 1) & 0x55555555);
-  x = (x & 0x33333333) + ((x >>> 2) & 0x33333333);
-  return (((x + (x >>> 4)) & 0x0f0f0f0f) * 0x01010101) >>> 24;
-}
-
-function bitsetHits(a: Uint32Array, b: Uint32Array): number {
-  return popcount32(a[0] & b[0]) + popcount32(a[1] & b[1]) +
-         popcount32(a[2] & b[2]) + popcount32(a[3] & b[3]);
-}
-
-// ─── Inline strategy generation ──────────────────────
+// ─── Inline strategy generation (no module imports in workers) ───
 
 interface StatInput {
   number: number; frequency: number; percentage: number; lastSeen: number;
@@ -33,17 +12,7 @@ interface StatInput {
 }
 
 interface ConfigInput { id: string; name: string; numbers: number; pick: number; color: string; icon: string; }
-
-function pickFromPool(pool: StatInput[], pick: number): number[] {
-  const selected: number[] = [];
-  const copy = [...pool];
-  while (selected.length < pick && copy.length > 0) {
-    const idx = Math.floor(Math.random() * copy.length);
-    selected.push(copy[idx].number);
-    copy.splice(idx, 1);
-  }
-  return selected.sort((a, b) => a - b);
-}
+interface DrawInput { concurso: number; date: string; numbers: number[]; }
 
 function generateSmartDraw(stats: StatInput[], config: ConfigInput): number[] {
   const sorted = [...stats].sort((a, b) => {
@@ -51,19 +20,40 @@ function generateSmartDraw(stats: StatInput[], config: ConfigInput): number[] {
     const scoreB = b.percentage * 0.3 + b.recentFreq * 0.3 + b.trend * 0.2 + b.cycleScore * 0.2;
     return scoreB - scoreA;
   });
-  return pickFromPool(sorted.slice(0, Math.ceil(config.pick * 2.5)), config.pick);
+  const pool = sorted.slice(0, Math.min(config.numbers, Math.ceil(config.pick * 2.5)));
+  const selected: number[] = [];
+  while (selected.length < config.pick && pool.length > 0) {
+    const idx = Math.floor(Math.random() * pool.length);
+    selected.push(pool[idx].number);
+    pool.splice(idx, 1);
+  }
+  return selected.sort((a, b) => a - b);
 }
 
 function generateHotDraw(stats: StatInput[], config: ConfigInput): number[] {
   const hot = [...stats].filter(s => s.status === "hot").sort((a, b) => b.frequency - a.frequency);
   const pool = hot.length >= config.pick ? hot : [...stats].sort((a, b) => b.frequency - a.frequency);
-  return pickFromPool(pool.slice(0, Math.ceil(config.pick * 2)), config.pick);
+  const selected: number[] = [];
+  const candidates = pool.slice(0, Math.ceil(config.pick * 2));
+  while (selected.length < config.pick && candidates.length > 0) {
+    const idx = Math.floor(Math.random() * candidates.length);
+    selected.push(candidates[idx].number);
+    candidates.splice(idx, 1);
+  }
+  return selected.sort((a, b) => a - b);
 }
 
 function generateColdDraw(stats: StatInput[], config: ConfigInput): number[] {
   const cold = [...stats].filter(s => s.status === "cold").sort((a, b) => a.frequency - b.frequency);
   const pool = cold.length >= config.pick ? cold : [...stats].sort((a, b) => a.frequency - b.frequency);
-  return pickFromPool(pool.slice(0, Math.ceil(config.pick * 2)), config.pick);
+  const candidates = pool.slice(0, Math.ceil(config.pick * 2));
+  const selected: number[] = [];
+  while (selected.length < config.pick && candidates.length > 0) {
+    const idx = Math.floor(Math.random() * candidates.length);
+    selected.push(candidates[idx].number);
+    candidates.splice(idx, 1);
+  }
+  return selected.sort((a, b) => a - b);
 }
 
 function generateBalancedDraw(stats: StatInput[], config: ConfigInput): number[] {
@@ -73,7 +63,10 @@ function generateBalancedDraw(stats: StatInput[], config: ConfigInput): number[]
   const hotPick = Math.ceil(config.pick * 0.4);
   const coldPick = Math.ceil(config.pick * 0.3);
   const neutralPick = config.pick - hotPick - coldPick;
-  const pick = (arr: StatInput[], n: number) => [...arr].sort(() => Math.random() - 0.5).slice(0, n).map(s => s.number);
+  const pick = (arr: StatInput[], n: number) => {
+    const shuffled = [...arr].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, n).map(s => s.number);
+  };
   const result = [...pick(hot, hotPick), ...pick(cold, coldPick), ...pick(neutral, neutralPick)];
   while (result.length < config.pick) {
     const n = Math.floor(Math.random() * config.numbers) + 1;
@@ -83,23 +76,36 @@ function generateBalancedDraw(stats: StatInput[], config: ConfigInput): number[]
 }
 
 function generateRandomDraw(config: ConfigInput): number[] {
-  const pool = new Uint8Array(config.numbers);
-  for (let i = 0; i < config.numbers; i++) pool[i] = i + 1;
-  for (let i = 0; i < config.pick; i++) {
-    const j = i + Math.floor(Math.random() * (config.numbers - i));
-    const tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+  const nums: number[] = [];
+  while (nums.length < config.pick) {
+    const n = Math.floor(Math.random() * config.numbers) + 1;
+    if (!nums.includes(n)) nums.push(n);
   }
-  const result: number[] = [];
-  for (let i = 0; i < config.pick; i++) result.push(pool[i]);
-  return result.sort((a, b) => a - b);
+  return nums.sort((a, b) => a - b);
 }
 
 function generateTrendDraw(stats: StatInput[], config: ConfigInput): number[] {
-  return pickFromPool([...stats].sort((a, b) => b.trend - a.trend).slice(0, Math.ceil(config.pick * 2)), config.pick);
+  const sorted = [...stats].sort((a, b) => b.trend - a.trend);
+  const pool = sorted.slice(0, Math.ceil(config.pick * 2));
+  const selected: number[] = [];
+  while (selected.length < config.pick && pool.length > 0) {
+    const idx = Math.floor(Math.random() * pool.length);
+    selected.push(pool[idx].number);
+    pool.splice(idx, 1);
+  }
+  return selected.sort((a, b) => a - b);
 }
 
 function generateCycleDraw(stats: StatInput[], config: ConfigInput): number[] {
-  return pickFromPool([...stats].sort((a, b) => b.cycleScore - a.cycleScore).slice(0, Math.ceil(config.pick * 2)), config.pick);
+  const sorted = [...stats].sort((a, b) => b.cycleScore - a.cycleScore);
+  const pool = sorted.slice(0, Math.ceil(config.pick * 2));
+  const selected: number[] = [];
+  while (selected.length < config.pick && pool.length > 0) {
+    const idx = Math.floor(Math.random() * pool.length);
+    selected.push(pool[idx].number);
+    pool.splice(idx, 1);
+  }
+  return selected.sort((a, b) => a - b);
 }
 
 function generateHybridDraw(stats: StatInput[], config: ConfigInput): number[] {
@@ -108,7 +114,14 @@ function generateHybridDraw(stats: StatInput[], config: ConfigInput): number[] {
     const sb = b.percentage * 0.2 + b.recentFreq * 0.2 + b.trend * 0.2 + b.cycleScore * 0.2 + b.momentum * 0.2;
     return sb - sa;
   });
-  return pickFromPool(sorted.slice(0, Math.ceil(config.pick * 2.5)), config.pick);
+  const pool = sorted.slice(0, Math.ceil(config.pick * 2.5));
+  const selected: number[] = [];
+  while (selected.length < config.pick && pool.length > 0) {
+    const idx = Math.floor(Math.random() * pool.length);
+    selected.push(pool[idx].number);
+    pool.splice(idx, 1);
+  }
+  return selected.sort((a, b) => a - b);
 }
 
 function generateByStrategy(strategy: string, stats: StatInput[], config: ConfigInput): number[] {
@@ -124,7 +137,14 @@ function generateByStrategy(strategy: string, stats: StatInput[], config: Config
   }
 }
 
-// ─── Prize multipliers ──────────────────────────────
+// ─── Simulation logic ───
+
+function countHits(bet: number[], draw: number[]): number {
+  let hits = 0;
+  const drawSet = new Set(draw);
+  for (const n of bet) { if (drawSet.has(n)) hits++; }
+  return hits;
+}
 
 function getPrizeMultipliers(lotteryId: string, pick: number): Record<number, number> {
   const base: Record<number, number> = {};
@@ -150,8 +170,6 @@ const STRATEGY_LABELS: Record<string, string> = {
   pattern: "Padrão", lowDelay: "Baixo Atraso", sectors: "Setores",
 };
 
-// ─── Worker handler ──────────────────────────────────
-
 self.onmessage = (e: MessageEvent) => {
   const { type, job } = e.data;
 
@@ -161,10 +179,6 @@ self.onmessage = (e: MessageEvent) => {
     const prizeMultipliers = getPrizeMultipliers(config.id, config.pick);
     const performances: any[] = [];
     const convergenceData: any[] = [];
-
-    // Pre-compute draw bitsets ONCE for all strategies
-    const drawBitsets = draws.map((d: any) => toBitset(d.numbers));
-    const drawCount = drawBitsets.length;
 
     const strategiesToRun = simConfig.compareWithRandom
       ? [...new Set([...simConfig.strategies, "smart"])]
@@ -177,23 +191,16 @@ self.onmessage = (e: MessageEvent) => {
 
       const hitDist: Record<number, number> = {};
       for (let i = 0; i <= config.pick; i++) hitDist[i] = 0;
-      let totalHits = 0, bestHit = 0, hitSquaredSum = 0;
+      let totalHits = 0, bestHit = 0;
       const convergence: number[] = [];
       const sampleInterval = Math.max(1, Math.floor(iterPerStrategy / 50));
 
       for (let i = 0; i < iterPerStrategy; i++) {
         const bet = generateByStrategy(strategy, stats, config);
-        const drawIdx = drawCount > 0 ? Math.floor(Math.random() * drawCount) : -1;
-
-        let hits = 0;
-        if (drawIdx >= 0) {
-          const betBs = toBitset(bet);
-          hits = bitsetHits(betBs, drawBitsets[drawIdx]);
-        }
-
+        const draw = draws.length > 0 ? draws[Math.floor(Math.random() * draws.length)].numbers : generateRandomDraw(config);
+        const hits = countHits(bet, draw);
         hitDist[hits] = (hitDist[hits] || 0) + 1;
         totalHits += hits;
-        hitSquaredSum += hits * hits;
         if (hits > bestHit) bestHit = hits;
         if ((i + 1) % sampleInterval === 0) convergence.push(totalHits / (i + 1));
       }
@@ -202,30 +209,19 @@ self.onmessage = (e: MessageEvent) => {
         convergenceData.push({ iteration: (idx + 1) * sampleInterval, avgHits: Math.round(avg * 1000) / 1000, strategy: label });
       });
 
-      const avgHits = iterPerStrategy > 0 ? totalHits / iterPerStrategy : 0;
-
-      // Hit rates via hitDist scan (no array expansion)
-      let count4Plus = 0, count5Plus = 0;
-      for (const [h, c] of Object.entries(hitDist)) {
-        const hNum = Number(h);
-        if (hNum >= 4) count4Plus += c;
-        if (hNum >= 5) count5Plus += c;
-      }
-      const hitRate4Plus = iterPerStrategy > 0 ? count4Plus / iterPerStrategy : 0;
-      const hitRate5Plus = iterPerStrategy > 0 ? count5Plus / iterPerStrategy : 0;
-      const hitRateFull = iterPerStrategy > 0 ? (hitDist[config.pick] || 0) / iterPerStrategy : 0;
+      const avgHits = totalHits / iterPerStrategy;
+      const hitRate4Plus = Object.entries(hitDist).filter(([h]) => Number(h) >= 4).reduce((s, [, c]) => s + c, 0) / iterPerStrategy;
+      const hitRate5Plus = Object.entries(hitDist).filter(([h]) => Number(h) >= 5).reduce((s, [, c]) => s + c, 0) / iterPerStrategy;
+      const hitRateFull = (hitDist[config.pick] || 0) / iterPerStrategy;
 
       let ev = 0;
-      for (const [hits, count] of Object.entries(hitDist)) {
-        ev += (prizeMultipliers[Number(hits)] || 0) * count;
-      }
-      ev = iterPerStrategy > 0 ? ev / iterPerStrategy : 0;
+      for (const [hits, count] of Object.entries(hitDist)) { ev += (prizeMultipliers[Number(hits)] || 0) * count; }
+      ev /= iterPerStrategy;
 
-      // O(1) variance: Var = E[X²] - E[X]²
-      const variance = iterPerStrategy > 0
-        ? Math.max(0, hitSquaredSum / iterPerStrategy - avgHits * avgHits)
-        : 0;
-      const consistency = avgHits > 0 ? Math.max(0, 1 - Math.sqrt(variance) / avgHits) : 0;
+      const hitValues = Object.entries(hitDist).flatMap(([h, c]) => Array(c).fill(Number(h)));
+      const mean = avgHits;
+      const variance = hitValues.reduce((s, v) => s + (v - mean) ** 2, 0) / hitValues.length;
+      const consistency = mean > 0 ? Math.max(0, 1 - Math.sqrt(variance) / mean) : 0;
 
       performances.push({
         strategy, label, totalGames: iterPerStrategy, hitDistribution: hitDist,
@@ -237,6 +233,7 @@ self.onmessage = (e: MessageEvent) => {
         consistency: Math.round(consistency * 1000) / 1000,
       });
 
+      // Progress per strategy
       self.postMessage({ type: "progress", data: { completed: si + 1, total: strategiesToRun.length, strategy: label } });
     }
 

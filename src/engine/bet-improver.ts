@@ -1,4 +1,4 @@
-import { NumberStats } from "@/features/statistics/engine";
+import { NumberStats } from "./statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { evaluateBetQuality, BetQualityReport } from "./bet-quality";
 

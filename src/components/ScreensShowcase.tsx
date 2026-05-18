@@ -233,10 +233,10 @@ export function ScreensShowcase() {
         >
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-mono font-semibold tracking-wider uppercase mb-4">
             <Sparkles className="w-3.5 h-3.5" />
-            Veja na Prática
+            Tour pela Plataforma
           </span>
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight mt-3">
-            Tudo o que você precisa em <span className="gradient-brand-text">uma plataforma</span>
+            Conheça as <span className="gradient-brand-text">principais telas</span>
           </h2>
           <p className="text-muted-foreground mt-3 max-w-xl mx-auto">
             Uma plataforma completa para análise, geração e simulação de apostas com inteligência artificial
@@ -302,7 +302,7 @@ export function ScreensShowcase() {
                       <div className="w-2.5 h-2.5 rounded-full bg-neon-amber/50" />
                       <div className="w-2.5 h-2.5 rounded-full bg-primary/50" />
                     </div>
-                    <span className="text-[10px] font-mono text-muted-foreground ml-2">
+                    <span className="text-[10px] font-mono text-muted-foreground/50 ml-2">
                       titan-loterias.com/{slide.id}
                     </span>
                   </div>

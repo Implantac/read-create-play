@@ -1,5 +1,4 @@
-import { lazy } from "react";
-import { SafeSuspense } from "@/components/SafeSuspense";
+import { lazy, Suspense } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
@@ -7,11 +6,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { ComplianceDisclaimer } from "@/components/ComplianceDisclaimer";
 import { ComparativeSimulatorPanel } from "@/components/ComparativeSimulatorPanel";
-import { VolatilitySimulationPanel } from "@/components/VolatilitySimulationPanel";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { FlaskConical, Loader2, TrendingUp, Cpu, BarChart3, Layers, Activity, Brain } from "lucide-react";
-import { AdvancedAnalyticsPanel } from "@/components/AdvancedAnalyticsPanel";
+import { FlaskConical, Loader2 } from "lucide-react";
 
 const HistoricalSimulatorPanel = lazy(() => import("@/components/HistoricalSimulatorPanel").then(m => ({ default: m.HistoricalSimulatorPanel })));
 const MassiveSimulationDashboard = lazy(() => import("@/components/MassiveSimulationDashboard").then(m => ({ default: m.MassiveSimulationDashboard })));
@@ -33,79 +28,43 @@ const SimulacoesPage = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Simulation Lab"
-        description={`Ambiente de alta performance para backtesting e simulações estocásticas — ${config.name}`}
+        title="Simulações"
+        description="Teste estratégias com simulações Monte Carlo, backtesting e simulação massiva com IA"
         icon={FlaskConical}
-        badge="Quantum Engine v4.2"
       />
-
       <LotteryContextBanner />
       <ComplianceDisclaimer />
 
       {draws.length === 0 ? (
         <EmptyState description="Importe os sorteios primeiro no Dashboard para rodar simulações." />
       ) : (
-        <PlanGate feature="simulacoes" fallbackMessage="Simulações avançadas — disponível no plano Vitalício">
+        <PlanGate feature="simulacoes" fallbackMessage="Simulações avançadas — disponível nos planos Premium e superiores">
           <>
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <Card className="bg-card/80 border-border">
-                <CardContent className="p-3 text-center">
-                  <TrendingUp className="w-5 h-5 text-primary mx-auto mb-1" />
-                  <div className="text-lg font-black text-foreground font-mono">{config.pick}</div>
-                  <div className="text-[10px] text-muted-foreground">Dezenas sorteadas</div>
-                </CardContent>
-              </Card>
-              <Card className="bg-card/80 border-border">
-                <CardContent className="p-3 text-center">
-                  <Layers className="w-5 h-5 text-primary mx-auto mb-1" />
-                  <div className="text-lg font-black text-foreground font-mono">{config.numbers}</div>
-                  <div className="text-[10px] text-muted-foreground">Total de números</div>
-                </CardContent>
-              </Card>
-              <Card className="bg-card/80 border-border">
-                <CardContent className="p-3 text-center">
-                  <Cpu className="w-5 h-5 text-primary mx-auto mb-1" />
-                  <div className="text-lg font-black text-foreground font-mono">7</div>
-                  <div className="text-[10px] text-muted-foreground">Simuladores</div>
-                </CardContent>
-              </Card>
-              <Card className="bg-card/80 border-border">
-                <CardContent className="p-3 text-center">
-                  <BarChart3 className="w-5 h-5 text-primary mx-auto mb-1" />
-                  <div className="text-lg font-black text-foreground font-mono">{draws.length.toLocaleString()}</div>
-                  <div className="text-[10px] text-muted-foreground">Sorteios na base</div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <AdvancedAnalyticsPanel stats={stats} draws={draws} config={config} />
-            <VolatilitySimulationPanel lotteryId={config.id} draws={draws} />
             <ComparativeSimulatorPanel stats={stats} config={config} draws={draws} />
 
-            <SafeSuspense fallback={<LazyFallback />}>
+            <Suspense fallback={<LazyFallback />}>
               <HistoricalSimulatorPanel config={config} draws={draws} stats={stats} />
-            </SafeSuspense>
+            </Suspense>
 
-            <SafeSuspense fallback={<LazyFallback />}>
+            <Suspense fallback={<LazyFallback />}>
               <MassiveSimulationDashboard stats={stats} config={config} draws={draws} />
-            </SafeSuspense>
+            </Suspense>
 
-            <SafeSuspense fallback={<LazyFallback />}>
+            <Suspense fallback={<LazyFallback />}>
               <IntelligentSimulatorPanel config={config} draws={draws} stats={stats} />
-            </SafeSuspense>
+            </Suspense>
 
-            <SafeSuspense fallback={<LazyFallback />}>
+            <Suspense fallback={<LazyFallback />}>
               <MassiveSimulatorPanel stats={stats} config={config} draws={draws} />
-            </SafeSuspense>
+            </Suspense>
 
             <div className="grid lg:grid-cols-2 gap-6">
-              <SafeSuspense fallback={<LazyFallback />}>
+              <Suspense fallback={<LazyFallback />}>
                 <GameSimulator stats={stats} config={config} draws={draws} />
-              </SafeSuspense>
-              <SafeSuspense fallback={<LazyFallback />}>
+              </Suspense>
+              <Suspense fallback={<LazyFallback />}>
                 <BacktestPanel stats={stats} config={config} draws={draws} />
-              </SafeSuspense>
+              </Suspense>
             </div>
           </>
         </PlanGate>

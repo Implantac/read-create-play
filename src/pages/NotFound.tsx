@@ -8,7 +8,7 @@ const NotFound = () => {
   const location = useLocation();
 
   useEffect(() => {
-    console.warn("[Titan] 404 — route not found:", location.pathname);
+    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
   }, [location.pathname]);
 
   return (
@@ -24,7 +24,7 @@ const NotFound = () => {
         <div>
           <h1 className="text-6xl font-bold gradient-brand-text font-display">404</h1>
           <p className="text-lg text-muted-foreground mt-2">Página não encontrada</p>
-          <p className="text-sm text-muted-foreground mt-1 font-mono">{location.pathname}</p>
+          <p className="text-sm text-muted-foreground/60 mt-1 font-mono">{location.pathname}</p>
         </div>
         <Link to="/">
           <Button className="gap-2 gradient-brand text-primary-foreground shadow-lg shadow-primary/20">

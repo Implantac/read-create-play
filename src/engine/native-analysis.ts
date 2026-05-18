@@ -5,58 +5,9 @@
  * Replaces all AI gateway calls with deterministic, statistical processing.
  */
 
-import { NumberStats } from "@/features/statistics/engine";
+import { NumberStats } from "./statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { getLotteryRules, PRIMES, FIBONACCI, LOTOFACIL_FRAME, LOTOFACIL_CENTER } from "@/ai/knowledge/lotteriesKnowledge";
-import { buildConditionalNetwork, scoreByBayesianNetwork, computeMutualInformation } from "@/ai/engines/bayesianNetworkEngine";
-import { computeZoneEntropy, computeGapEntropy } from "@/ai/engines/entropyEngine";
-import { PatternReport } from "./pattern-detector";
-import type { AINumberRanking } from "./autonomous-ai";
-
-interface SimulationBet {
-  bet?: number[];
-  numbers?: number[];
-  avgHits: number;
-  bestHit: number;
-  prizeCount?: number;
-  stability?: number;
-  score?: number;
-  [key: string]: any;
-}
-
-interface SimulationData {
-  bets: any[];
-  totalDraws: number;
-  [key: string]: any;
-}
-
-interface DistributionSummary {
-  avgSum: number;
-  avgEvenRatio: number;
-  avgSpread: number;
-  avgPrizeRate: number;
-  bestHitOverall: number;
-  [key: string]: any;
-}
-
-interface PatternInsights {
-  dominantParity?: string;
-  sumTrend?: string;
-  [key: string]: any;
-}
-
-interface AutonomousReport {
-  rankings?: AINumberRanking[];
-  patterns?: any[];
-  shifts?: any[];
-  entropyAnalysis?: any;
-  chiSquareResult?: any;
-  gapAnalysis?: any[];
-  markovTransitions?: any[];
-  topCooccurrences?: any[];
-  confidenceScore?: number;
-  [key: string]: any;
-}
 
 // ═══════════════════════════════════════════
 // ADVANCED HELPERS
@@ -184,7 +135,7 @@ function fibRatio(game: number[]): number {
 // PATTERN ANALYSIS (text report)
 // ═══════════════════════════════════════════
 export function generatePatternAnalysis(
-  report: PatternReport,
+  report: any,
   config: LotteryConfig,
   drawCount: number
 ): string {
@@ -208,7 +159,7 @@ export function generatePatternAnalysis(
   }
   if (consecutivePatterns?.length) {
     const mostCommon = consecutivePatterns[0];
-    md += `### Sequências Consecutivas\nPadrão mais comum: **${mostCommon.occurrences}** ocorrências com ${mostCommon.consecutiveCount} consecutivos (${mostCommon.percentage.toFixed(1)}%)\n\n`;
+    md += `### Sequências Consecutivas\nPadrão mais comum: **${mostCommon.count}** ocorrências com ${mostCommon.consecutive} consecutivos (${mostCommon.percentage.toFixed(1)}%)\n\n`;
   }
   if (spatialDistribution?.sectors?.length) {
     md += `### Distribuição Espacial\n`;
@@ -251,7 +202,7 @@ export function generatePatternAnalysis(
 // SIMULATION ANALYSIS (text report)
 // ═══════════════════════════════════════════
 export function generateSimulationAnalysis(
-  simulationData: SimulationData,
+  simulationData: any,
   config: LotteryConfig
 ): string {
   const bets = simulationData.bets || [];
@@ -298,9 +249,9 @@ export function generateSimulationAnalysis(
 // MASSIVE SIMULATION ANALYSIS (text report)
 // ═══════════════════════════════════════════
 export function generateMassiveSimAnalysis(
-  topGames: SimulationBet[],
-  patternInsights: PatternInsights,
-  distributionSummary: DistributionSummary,
+  topGames: any[],
+  patternInsights: any,
+  distributionSummary: any,
   config: LotteryConfig,
   totalGenerated: number,
   totalEvaluated: number
@@ -313,108 +264,51 @@ export function generateMassiveSimAnalysis(
   const topNumbers = Object.entries(numFreq).sort((a, b) => b[1] - a[1]).slice(0, 15);
   const bottomNumbers = Object.entries(numFreq).sort((a, b) => a[1] - b[1]).slice(0, 10);
 
-  let md = `## 🚀 Análise da Simulação Massiva v3.0 — ${config.name}\n\n`;
-  md += `**${totalGenerated.toLocaleString()}** jogos gerados → **${totalEvaluated.toLocaleString()}** avaliações → **Top ${topGames.length}** selecionados via **Quantum Scoring**.\n\n`;
+  let md = `## 🚀 Análise da Simulação Massiva — ${config.name}\n\n`;
+  md += `**${totalGenerated.toLocaleString()}** jogos gerados → **${totalEvaluated.toLocaleString()}** avaliados → **Top ${topGames.length}** selecionados\n\n`;
 
   md += `### 🎯 Dezenas "Must-Have"\n`;
   topNumbers.forEach(([n, freq]) => {
     const pct = (freq / topGames.length * 100).toFixed(0);
     const bar = Number(pct) >= 80 ? '🔥' : Number(pct) >= 60 ? '✅' : '➖';
-    md += `- ${bar} **${String(n).padStart(2, '0')}**: presente em ${pct}% dos top jogos (${freq}x)\n`;
+    md += `- ${bar} **${String(n).padStart(2, '0')}**: ${pct}% dos top jogos (${freq}x)\n`;
   });
   md += `\n`;
 
   md += `### ❌ Dezenas "Tóxicas"\n`;
   bottomNumbers.forEach(([n, freq]) => {
-    md += `- **${String(n).padStart(2, '0')}**: apenas ${freq}x nos top jogos (baixo rendimento simulado)\n`;
+    md += `- **${String(n).padStart(2, '0')}**: apenas ${freq}x nos top jogos\n`;
   });
   md += `\n`;
 
   if (distributionSummary) {
-    md += `### 📊 Distribuição dos Top Jogos (Quantum Engine)\n`;
-    md += `- Soma média: **${distributionSummary.avgSum?.toFixed(0) || 'N/A'}** (ponto de equilíbrio estocástico)\n`;
-    md += `- Ratio par/ímpar: **${((distributionSummary.avgEvenRatio || 0) * 100).toFixed(0)}%** pares (tendência central)\n`;
-    md += `- Spread médio: **${distributionSummary.avgSpread?.toFixed(0) || 'N/A'}** (amplitude de cobertura)\n`;
-    md += `- Taxa de premiação: **${(distributionSummary.avgPrizeRate || 0).toFixed(2)}%** (rendimento teórico histórico)\n`;
+    md += `### 📊 Distribuição dos Top Jogos\n`;
+    md += `- Soma média: **${distributionSummary.avgSum?.toFixed(0) || 'N/A'}**\n`;
+    md += `- Ratio par/ímpar: **${((distributionSummary.avgEvenRatio || 0) * 100).toFixed(0)}%** pares\n`;
+    md += `- Spread médio: **${distributionSummary.avgSpread?.toFixed(0) || 'N/A'}**\n`;
+    md += `- Taxa de premiação: **${(distributionSummary.avgPrizeRate || 0).toFixed(2)}%**\n`;
     md += `- Melhor acerto geral: **${distributionSummary.bestHitOverall || 0}** de ${config.pick}\n\n`;
   }
 
-  if (patternInsights && Array.isArray(patternInsights)) {
-    md += `### 🔍 Insights de Padrão (Enterprise v3.0)\n`;
-    patternInsights.slice(0, 4).forEach((insight: any) => {
-      md += `- **${insight.label}**: ${insight.value} (${insight.description})\n`;
-    });
+  if (patternInsights) {
+    md += `### 🔍 Padrões Detectados\n`;
+    if (patternInsights.dominantParity) md += `- Paridade dominante: **${patternInsights.dominantParity}**\n`;
+    if (patternInsights.sumTrend) md += `- Tendência de soma: **${patternInsights.sumTrend}**\n`;
     md += `\n`;
   }
 
-  md += `### 🏆 Top 5 Jogos Otimizados\n`;
+  md += `### 🏆 Top 5 Jogos\n`;
   topGames.slice(0, 5).forEach((g: any, i: number) => {
-    md += `${i + 1}. [${(g.numbers || []).map((n: number) => String(n).padStart(2, '0')).join(', ')}] — **Quantum Score: ${g.score?.toFixed(0) || 'N/A'}**\n`;
+    md += `${i + 1}. [${(g.numbers || []).map((n: number) => String(n).padStart(2, '0')).join(', ')}] — Score: **${g.score?.toFixed(0) || 'N/A'}**\n`;
   });
   md += `\n`;
 
-  md += `### 💡 Recomendações Estratégicas\n`;
-  md += `- **Diversificação Inteligente**: Os top jogos utilizam dezenas com alta correlação positiva.\n`;
-  md += `- **Filtros de Segurança**: As dezenas "tóxicas" devem ser evitadas em combinações de alto custo.\n`;
-  md += `- **Viabilidade**: O Quantum Score indica que estas combinações superam a média aleatória em 34.2% no backtesting.\n\n`;
-  md += `---\n*Análise gerada pelo Quantum Engine v3.0 (Simulação Massiva). Sem custo de créditos.*`;
-  return md;
-}
-
-/**
- * Monte Carlo Strategy Comparison Analysis — v3.0
- */
-export function generateMonteCarloAnalysis(
-  result: any, // MonteCarloResult
-  config: LotteryConfig
-): string {
-  const { performances, robustnessScore, yearlyProjection } = result;
-  if (!performances || performances.length === 0) return "Sem dados de simulação.";
-
-  const top = performances[0];
-  const avgROI = performances.reduce((s: number, p: any) => s + p.expectedValue, 0) / performances.length;
-  
-  let md = `## 🧬 Relatório de Viabilidade Monte Carlo — ${config.name}\n\n`;
-  md += `Análise de **robustez estratégica** baseada em ${result.totalIterations.toLocaleString()} simulações.\n\n`;
-
-  md += `### 🏅 Estratégia Dominante: **${top.label}**\n`;
-  md += `- Expectativa de Valor (ROI): **${top.expectedValue.toFixed(2)}x**\n`;
-  md += `- Consistência do Algoritmo: **${(top.consistency * 100).toFixed(1)}%**\n`;
-  md += `- Melhor acerto simulado: **${top.bestHit}** de ${config.pick}\n\n`;
-
-  md += `### 🛡️ Robustez do Sistema: **${robustnessScore}/100**\n`;
-  if (robustnessScore >= 80) {
-    md += `O sistema apresenta **alta estabilidade**. As médias de acerto são resilientes a variações estatísticas.\n\n`;
-  } else if (robustnessScore >= 50) {
-    md += `O sistema apresenta **estabilidade moderada**. Alguma volatilidade é esperada em curto prazo.\n\n`;
-  } else {
-    md += `O sistema apresenta **baixa estabilidade**. Resultados podem variar significativamente entre ciclos.\n\n`;
-  }
-
-  md += `### 📅 Projeção de Longo Prazo\n`;
-  const bestYear = yearlyProjection.find((p: any) => p.strategy === top.label);
-  if (bestYear) {
-    md += `Seguindo a estratégia **${top.label}** (156 jogos/ano):\n`;
-    md += `- Expectativa de Quadras/Ternos (4+): **~${bestYear.expectedHits4Plus.toFixed(1)}** por ano\n`;
-    md += `- Retorno Financeiro Estimado: **${bestYear.roi.toFixed(2)}x** o capital investido\n\n`;
-  }
-
-  md += `### ⚖️ Comparativo de Performance\n`;
-  performances.slice(0, 5).forEach((p: any) => {
-    const diff = p.expectedValue - avgROI;
-    const diffLabel = diff > 0 ? `(+${diff.toFixed(2)})` : `(${diff.toFixed(2)})`;
-    md += `- **${p.label}**: ${p.expectedValue.toFixed(2)}x ${diffLabel}\n`;
-  });
-  md += `\n`;
-
-  md += `### 💡 Conclusão Técnica\n`;
-  if (top.expectedValue > 1.2) {
-    md += `🚀 **Sinal de Compra**: A estratégia ${top.label} demonstra uma vantagem estatística clara sobre o aleatório.\n`;
-  } else {
-    md += `⚖️ **Sinal Neutro**: As estratégias estão próximas da paridade matemática. Recomendado usar fechamentos para aumentar as chances.\n`;
-  }
-  md += `\n---\n*Relatório gerado pelo Motor Monte Carlo v3.0.*`;
-
+  md += `### 💡 Como Usar\n`;
+  md += `- Priorize dezenas "must-have" na construção de apostas\n`;
+  md += `- Evite concentrar dezenas "tóxicas" no mesmo jogo\n`;
+  md += `- Os top 5 jogos representam as combinações mais otimizadas\n`;
+  md += `- Use como base para fechamentos matemáticos\n\n`;
+  md += `---\n*Análise gerada pelo motor estatístico nativo v2.0.*`;
   return md;
 }
 
@@ -422,7 +316,7 @@ export function generateMonteCarloAnalysis(
 // AUTONOMOUS AI ANALYSIS (text report + 10 games)
 // ═══════════════════════════════════════════
 export function generateAutonomousAnalysis(
-  report: AutonomousReport,
+  report: any,
   config: LotteryConfig
 ): string {
   const topRankings = report.rankings?.slice(0, 25) || [];
@@ -657,7 +551,7 @@ export function generateNativeBets(
   config: LotteryConfig,
   draws: DrawResult[],
   count: number
-): { bets: number[][]; analysis: string; quality: { avgScore: number; scores: number[]; details?: string[][]; grade: string } } {
+): { bets: number[][]; analysis: string; quality: { avgScore: number; scores: number[]; grade: string } } {
   const rules = getLotteryRules(config.id);
   const minNum = config.name === "Super Sete" ? 0 : 1;
   const allNums = Array.from({ length: config.numbers - minNum + 1 }, (_, i) => i + minNum);
@@ -686,12 +580,6 @@ export function generateNativeBets(
 
   // Build co-occurrence map
   const cooccMap = buildCooccurrenceMap(draws, 100);
-
-  // Build Bayesian conditional network
-  const bayesNetwork = buildConditionalNetwork(draws, config.id, 120);
-
-  // Compute mutual information scores
-  const miScores = computeMutualInformation(draws, config.id, 100);
 
   // Repeat analysis
   const [minRepeat, maxRepeat] = idealRepeatCount(config);
@@ -728,7 +616,6 @@ export function generateNativeBets(
 
   const bets: number[][] = [];
   const scores: number[] = [];
-  const qualityDetails: string[][] = [];
   const seenKeys = new Set<string>();
 
   // Strategy profiles for diverse generation
@@ -835,21 +722,17 @@ export function generateNativeBets(
     });
     if (!isDiverse) continue;
 
-    // ═══ SCORING v3.0 (0-100) ═══
+    // ═══ SCORING (0-100) ═══
     let score = 0;
-    const details: string[] = [];
 
     // Sum adherence (0-20)
-    const sumSc = sumScore(candidate, config.id) * 20;
-    score += sumSc;
-    if (sumSc >= 18) details.push("✅ Soma ideal");
-    else if (sumSc < 10) details.push("⚠ Soma fora da faixa");
+    score += sumScore(candidate, config.id) * 20;
 
     // Parity balance (0-15)
     if (rules.idealParityRange) {
       const [minP, maxP] = rules.idealParityRange;
-      if (evens >= minP && evens <= maxP) { score += 15; details.push(`✅ ${evens}P/${config.pick - evens}I`); }
-      else { score += 8; details.push(`⚠ ${evens}P/${config.pick - evens}I`); }
+      if (evens >= minP && evens <= maxP) score += 15;
+      else score += 8;
     } else {
       score += (1 - Math.abs(evens / config.pick - 0.5) * 2) * 15;
     }
@@ -864,9 +747,7 @@ export function generateNativeBets(
 
     // Markov alignment (0-10)
     const markovCount = candidate.filter(n => markovSet.has(n)).length;
-    const markovSc = Math.min(10, (markovCount / config.pick) * 15);
-    score += markovSc;
-    if (markovCount >= 3) details.push(`🔗 ${markovCount} Markov`);
+    score += Math.min(10, (markovCount / config.pick) * 15);
 
     // Co-occurrence boost (0-10)
     const coocBoost = cooccurrenceBoost(candidate, cooccMap);
@@ -878,7 +759,6 @@ export function generateNativeBets(
       return s && s.cycleScore > 1.2;
     }).length;
     score += Math.min(5, overdueCount * 2);
-    if (overdueCount >= 2) details.push(`⏰ ${overdueCount} overdue`);
 
     // Consecutive penalty
     if (mSeq > 2) score -= (mSeq - 2) * 3;
@@ -898,40 +778,10 @@ export function generateNativeBets(
     const pr = primeRatio(candidate);
     if (pr >= 0.2 && pr <= 0.5) score += 3;
 
-    // ═══ NEW v3.0: Bayesian Network bonus (0-8) ═══
-    if (bayesNetwork.length > 0) {
-      const bayesResult = scoreByBayesianNetwork(candidate, bayesNetwork);
-      const bayesBonusVal = Math.min(8, Math.max(0, (bayesResult.networkScore - 40) * 0.15));
-      score += bayesBonusVal;
-      if (bayesResult.networkScore >= 65) details.push("🧠 Bayes+");
-      if (bayesResult.internalConsistency >= 0.7) details.push("🔄 Coerente");
-    }
-
-    // ═══ NEW v3.0: Zone Entropy bonus (0-5) ═══
-    const zoneEnt = computeZoneEntropy(candidate, config.numbers, 5);
-    const gapEnt = computeGapEntropy(candidate);
-    const entropySc = Math.min(5, (zoneEnt + gapEnt) * 3);
-    score += entropySc;
-    if (zoneEnt >= 0.85) details.push("📐 Entropia alta");
-
-    // ═══ NEW v3.0: Mutual Information bonus (0-4) ═══
-    if (miScores.size > 0) {
-      let totalMI = 0;
-      for (const n of candidate) totalMI += miScores.get(n) || 0;
-      const avgMI = totalMI / candidate.length;
-      const allMI = [...miScores.values()];
-      const globalAvgMI = allMI.reduce((a, b) => a + b, 0) / allMI.length;
-      if (globalAvgMI > 0) {
-        const miBonus = Math.min(4, Math.max(0, (avgMI / globalAvgMI - 0.8) * 6));
-        score += miBonus;
-      }
-    }
-
     score = Math.max(0, Math.min(100, Math.round(score)));
     seenKeys.add(key);
     bets.push(candidate);
     scores.push(score);
-    qualityDetails.push(details);
   }
 
   const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
@@ -939,8 +789,8 @@ export function generateNativeBets(
 
   // Build rich analysis text
   const strategyNames = ['Conservadora', 'Equilibrada', 'Agressiva', 'Markov', 'Ciclos', 'Anti-Padrão', 'Cobertura', 'Momentum'];
-  let analysis = `⚡ **${bets.length} apostas** geradas pelo motor nativo v3.0\n`;
-  analysis += `📊 Metodologia: Frequência + Markov + Bayes + Ciclos + Co-ocorrência + Entropia + MI\n\n`;
+  let analysis = `⚡ **${bets.length} apostas** geradas pelo motor nativo v2.0\n`;
+  analysis += `📊 Metodologia: Frequência + Markov + Ciclos + Co-ocorrência + Entropia\n\n`;
 
   bets.forEach((b, i) => {
     const profIdx = i % strategyProfiles.length;
@@ -952,7 +802,7 @@ export function generateNativeBets(
     analysis += `**Jogo ${i + 1}** (${strat}): Soma=${sum}, P=${evens}/I=${config.pick - evens}, Rep=${repeats}, Primos=${primes}, Score=${scores[i]}\n`;
   });
 
-  return { bets, analysis, quality: { avgScore, scores, details: qualityDetails, grade } };
+  return { bets, analysis, quality: { avgScore, scores, grade } };
 }
 
 // ═══════════════════════════════════════════

@@ -1,1 +1,0 @@
-UPDATE profiles SET plan = 'lifetime', updated_at = now() WHERE email = 'etcsuporte889@gmail.com';

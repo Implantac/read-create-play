@@ -1,79 +1,116 @@
-import { NumberStats } from "@/features/statistics/engine";
+import { NumberStats } from "./statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { generateByStrategy, Strategy, STRATEGIES } from "@/features/statistics/strategies";
-import { fastRandom } from "./hp-math-engine";
+import { generateByStrategy, Strategy, STRATEGIES } from "./strategies";
 
 // ═══════════════════════════════════════════════════════
-// Simulador Massivo de Monte Carlo v3.1 — QUANTUM EDITION
-// Otimizado com bitsets, PRNG inline e variância O(1)
+// Simulador Massivo de Monte Carlo
+// Suporta milhões de iterações com batching assíncrono
 // ═══════════════════════════════════════════════════════
 
-import { 
-  MassiveSimConfig, StrategyPerformance, MonteCarloResult, YearlyProjection 
-} from "@/types/engine";
-
-export type { MassiveSimConfig, StrategyPerformance, MonteCarloResult, YearlyProjection };
-
-// ─── Bitset utilities (inline for zero-overhead) ─────
-
-function toBitset(numbers: number[]): Uint32Array {
-  const bs = new Uint32Array(4);
-  for (const n of numbers) {
-    bs[(n - 1) >> 5] |= 1 << ((n - 1) & 31);
-  }
-  return bs;
+export interface MassiveSimConfig {
+  iterations: number;
+  strategies: Strategy[];
+  config: LotteryConfig;
+  compareWithRandom: boolean;
 }
 
-function popcount32(x: number): number {
-  x = x - ((x >>> 1) & 0x55555555);
-  x = (x & 0x33333333) + ((x >>> 2) & 0x33333333);
-  return (((x + (x >>> 4)) & 0x0f0f0f0f) * 0x01010101) >>> 24;
+export interface StrategyPerformance {
+  strategy: Strategy;
+  label: string;
+  totalGames: number;
+  hitDistribution: Record<number, number>; // hits -> count
+  avgHits: number;
+  bestHit: number;
+  hitRate4Plus: number; // % of games with 4+ hits
+  hitRate5Plus: number;
+  hitRateFull: number; // % of games with all hits
+  expectedValue: number; // estimated monetary return ratio
+  consistency: number; // 0-1, lower variance = higher
 }
 
-function bitsetHits(a: Uint32Array, b: Uint32Array): number {
-  return popcount32(a[0] & b[0]) + popcount32(a[1] & b[1]) +
-         popcount32(a[2] & b[2]) + popcount32(a[3] & b[3]);
+export interface MassiveSimResult {
+  totalIterations: number;
+  elapsedMs: number;
+  performances: StrategyPerformance[];
+  convergenceData: { iteration: number; avgHits: number; strategy: string }[];
+  yearlyProjection: YearlyProjection[];
 }
 
-// ─── Prize multipliers ──────────────────────────────────
-
-function getPrizeMultipliers(config: LotteryConfig): Record<number, number> {
-  const multipliers: Record<number, number> = {};
-  for (let i = 0; i <= config.pick; i++) multipliers[i] = 0;
-
-  if (config.prizeTiers && config.prizeTiers.length > 0) {
-    // For a professional app, we use fixed multipliers based on label/tier
-    // This is a simplification, as real prizes are variable, but for simulation it works
-    config.prizeTiers.forEach(tier => {
-      let multiplier = 0;
-      if (tier.hits === config.pick) multiplier = 100000;
-      else if (tier.hits === config.pick - 1) multiplier = 1500;
-      else if (tier.hits === config.pick - 2) multiplier = 50;
-      else if (tier.hits === 2 && config.id === "quina") multiplier = 1;
-      else if (tier.hits === 11 && config.id === "lotofacil") multiplier = 5;
-      else if (tier.hits === 12 && config.id === "lotofacil") multiplier = 10;
-      else if (tier.hits === 13 && config.id === "lotofacil") multiplier = 25;
-      else multiplier = Math.pow(10, tier.hits - (config.pick / 2));
-      
-      multipliers[tier.hits] = Math.max(multipliers[tier.hits] || 0, multiplier);
-    });
-    return multipliers;
-  }
-
-  // Fallback to legacy
-  const { id, pick } = config;
-  switch (id) {
-    case "megasena": multipliers[4] = 50; multipliers[5] = 5000; multipliers[6] = 500000; break;
-    case "lotofacil": multipliers[11] = 5; multipliers[12] = 10; multipliers[13] = 25; multipliers[14] = 1500; multipliers[15] = 100000; break;
-    case "quina": multipliers[2] = 1; multipliers[3] = 5; multipliers[4] = 200; multipliers[5] = 50000; break;
-    case "lotomania": multipliers[0] = 5; multipliers[15] = 10; multipliers[16] = 25; multipliers[17] = 100; multipliers[18] = 1000; multipliers[19] = 20000; multipliers[20] = 500000; break;
-    default: multipliers[pick - 2] = 10; multipliers[pick - 1] = 1000; multipliers[pick] = 100000;
-  }
-  return multipliers;
+export interface YearlyProjection {
+  strategy: string;
+  gamesPerYear: number;
+  expectedHits4Plus: number;
+  expectedHits5Plus: number;
+  expectedFullHits: number;
+  roi: number; // return on investment ratio
 }
 
 /**
- * Run massive batch — v3.0 with bitset comparison and O(1) variance
+ * Generate a random draw based on config
+ */
+function generateRandomDraw(config: LotteryConfig): number[] {
+  const nums: number[] = [];
+  while (nums.length < config.pick) {
+    const n = Math.floor(Math.random() * config.numbers) + 1;
+    if (!nums.includes(n)) nums.push(n);
+  }
+  return nums.sort((a, b) => a - b);
+}
+
+/**
+ * Count hits between a bet and a draw
+ */
+function countHits(bet: number[], draw: number[]): number {
+  let hits = 0;
+  const drawSet = new Set(draw);
+  for (const n of bet) {
+    if (drawSet.has(n)) hits++;
+  }
+  return hits;
+}
+
+/**
+ * Prize multipliers by lottery type (approximate relative to bet cost)
+ */
+function getPrizeMultipliers(lotteryId: string, pick: number): Record<number, number> {
+  const base: Record<number, number> = {};
+  for (let i = 0; i <= pick; i++) base[i] = 0;
+
+  switch (lotteryId) {
+    case "megasena":
+      base[4] = 50; base[5] = 5000; base[6] = 500000;
+      break;
+    case "lotofacil":
+      base[11] = 5; base[12] = 10; base[13] = 25; base[14] = 1500; base[15] = 100000;
+      break;
+    case "quina":
+      base[2] = 1; base[3] = 5; base[4] = 200; base[5] = 50000;
+      break;
+    case "lotomania":
+      base[0] = 5; base[15] = 10; base[16] = 25; base[17] = 100;
+      base[18] = 1000; base[19] = 20000; base[20] = 500000;
+      break;
+    case "duplasena":
+      base[3] = 3; base[4] = 50; base[5] = 5000; base[6] = 300000;
+      break;
+    case "timemania":
+      base[3] = 2; base[4] = 10; base[5] = 50; base[6] = 500; base[7] = 50000;
+      break;
+    case "diadesorte":
+      base[4] = 10; base[5] = 50; base[6] = 2000; base[7] = 200000;
+      break;
+    case "supersete":
+      base[3] = 5; base[4] = 20; base[5] = 200; base[6] = 10000; base[7] = 500000;
+      break;
+    default:
+      base[pick - 2] = 10; base[pick - 1] = 1000; base[pick] = 100000;
+  }
+  return base;
+}
+
+/**
+ * Run massive simulation in a synchronous batch
+ * For very large iterations, call this in chunks via setTimeout
  */
 export function runMassiveBatch(
   stats: NumberStats[],
@@ -81,31 +118,32 @@ export function runMassiveBatch(
   draws: DrawResult[],
   strategy: Strategy,
   iterations: number
-): { hitDist: Record<number, number>; totalHits: number; bestHit: number; convergence: number[]; hitSquaredSum: number } {
+): { hitDist: Record<number, number>; totalHits: number; bestHit: number; convergence: number[] } {
   const hitDist: Record<number, number> = {};
   for (let i = 0; i <= config.pick; i++) hitDist[i] = 0;
 
-  // Pre-compute draw bitsets
-  const drawBitsets = draws.map(d => toBitset(d.numbers));
-  const drawCount = drawBitsets.length;
-
   let totalHits = 0;
-  let hitSquaredSum = 0;
   let bestHit = 0;
   const convergence: number[] = [];
   const sampleInterval = Math.max(1, Math.floor(iterations / 50));
 
   for (let i = 0; i < iterations; i++) {
-    const bet = generateByStrategy(strategy, stats, config);
-    
-    // Pick random historical draw and compare via bitset
-    const drawIdx = Math.floor(fastRandom() * drawCount);
-    const betBs = toBitset(bet);
-    const hits = drawCount > 0 ? bitsetHits(betBs, drawBitsets[drawIdx]) : 0;
+    // Generate bet using strategy
+    const bet = strategy === "smart" || strategy === "hot" || strategy === "cold" || strategy === "balanced"
+      || strategy === "fibonacci" || strategy === "primes" || strategy === "golden"
+      || strategy === "pattern" || strategy === "lowDelay" || strategy === "sectors"
+      || strategy === "trend" || strategy === "cycle" || strategy === "hybrid" || strategy === "ml"
+      ? generateByStrategy(strategy, stats, config)
+      : generateByStrategy("smart", stats, config);
 
+    // Generate random draw to test against
+    const draw = draws.length > 0
+      ? draws[Math.floor(Math.random() * draws.length)].numbers
+      : generateRandomDraw(config);
+
+    const hits = countHits(bet, draw);
     hitDist[hits] = (hitDist[hits] || 0) + 1;
     totalHits += hits;
-    hitSquaredSum += hits * hits;
     if (hits > bestHit) bestHit = hits;
 
     if ((i + 1) % sampleInterval === 0) {
@@ -113,20 +151,20 @@ export function runMassiveBatch(
     }
   }
 
-  return { hitDist, totalHits, bestHit, convergence, hitSquaredSum };
+  return { hitDist, totalHits, bestHit, convergence };
 }
 
 /**
- * Full massive simulation across multiple strategies — v3.0
+ * Full massive simulation across multiple strategies
  */
 export function runMassiveSimulation(
   stats: NumberStats[],
   config: LotteryConfig,
   draws: DrawResult[],
   simConfig: MassiveSimConfig
-): MonteCarloResult {
+): MassiveSimResult {
   const start = performance.now();
-  const prizeMultipliers = getPrizeMultipliers(config);
+  const prizeMultipliers = getPrizeMultipliers(config.id, config.pick);
 
   const performances: StrategyPerformance[] = [];
   const convergenceData: { iteration: number; avgHits: number; strategy: string }[] = [];
@@ -135,6 +173,7 @@ export function runMassiveSimulation(
     ? [...simConfig.strategies, "smart" as Strategy]
     : simConfig.strategies;
 
+  // Deduplicate
   const uniqueStrategies = [...new Set(strategiesToRun)];
 
   for (const strategy of uniqueStrategies) {
@@ -144,6 +183,7 @@ export function runMassiveSimulation(
     const stratInfo = STRATEGIES.find(s => s.id === strategy);
     const label = stratInfo?.label || strategy;
 
+    // Convergence data
     const sampleInterval = Math.max(1, Math.floor(iterPerStrategy / 50));
     batch.convergence.forEach((avg, idx) => {
       convergenceData.push({
@@ -153,32 +193,31 @@ export function runMassiveSimulation(
       });
     });
 
-    const avgHits = iterPerStrategy > 0 ? batch.totalHits / iterPerStrategy : 0;
-
-    // Hit rates via hitDist (no array expansion)
-    let count4Plus = 0, count5Plus = 0;
-    for (const [h, c] of Object.entries(batch.hitDist)) {
-      const hNum = Number(h);
-      if (hNum >= 4) count4Plus += c;
-      if (hNum >= 5) count5Plus += c;
-    }
-    const hitRate4Plus = iterPerStrategy > 0 ? count4Plus / iterPerStrategy : 0;
-    const hitRate5Plus = iterPerStrategy > 0 ? count5Plus / iterPerStrategy : 0;
-    const hitRateFull = iterPerStrategy > 0 ? (batch.hitDist[config.pick] || 0) / iterPerStrategy : 0;
+    // Compute metrics
+    const avgHits = batch.totalHits / iterPerStrategy;
+    const hitRate4Plus = Object.entries(batch.hitDist)
+      .filter(([h]) => Number(h) >= 4)
+      .reduce((s, [, c]) => s + c, 0) / iterPerStrategy;
+    const hitRate5Plus = Object.entries(batch.hitDist)
+      .filter(([h]) => Number(h) >= 5)
+      .reduce((s, [, c]) => s + c, 0) / iterPerStrategy;
+    const hitRateFull = (batch.hitDist[config.pick] || 0) / iterPerStrategy;
 
     // Expected value
     let ev = 0;
     for (const [hits, count] of Object.entries(batch.hitDist)) {
       ev += (prizeMultipliers[Number(hits)] || 0) * count;
     }
-    ev = iterPerStrategy > 0 ? ev / iterPerStrategy : 0;
+    ev /= iterPerStrategy;
 
-    // O(1) variance via Welford's identity: Var = E[X²] - E[X]²
-    const variance = iterPerStrategy > 0
-      ? Math.max(0, batch.hitSquaredSum / iterPerStrategy - avgHits * avgHits)
-      : 0;
+    // Consistency (inverse of coefficient of variation of hits)
+    const hitValues = Object.entries(batch.hitDist).flatMap(([h, c]) =>
+      Array(c).fill(Number(h))
+    );
+    const mean = avgHits;
+    const variance = hitValues.reduce((s, v) => s + (v - mean) ** 2, 0) / hitValues.length;
     const stdDev = Math.sqrt(variance);
-    const consistency = avgHits > 0 ? Math.max(0, 1 - stdDev / avgHits) : 0;
+    const consistency = mean > 0 ? Math.max(0, 1 - stdDev / mean) : 0;
 
     performances.push({
       strategy,
@@ -195,8 +234,10 @@ export function runMassiveSimulation(
     });
   }
 
+  // Sort by expected value
   performances.sort((a, b) => b.expectedValue - a.expectedValue);
 
+  // Yearly projections (assuming 3 games per week = 156/year)
   const gamesPerYear = 156;
   const yearlyProjection: YearlyProjection[] = performances.map(p => ({
     strategy: p.label,
@@ -207,16 +248,11 @@ export function runMassiveSimulation(
     roi: Math.round(p.expectedValue * 100) / 100,
   }));
 
-  const robustnessScore = Math.round(
-    (performances.reduce((acc, p) => acc + p.consistency, 0) / Math.max(1, performances.length)) * 100
-  );
-
   return {
     totalIterations: simConfig.iterations,
     elapsedMs: Math.round(performance.now() - start),
     performances,
     convergenceData,
     yearlyProjection,
-    robustnessScore,
   };
 }

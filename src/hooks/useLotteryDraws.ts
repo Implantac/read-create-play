@@ -1,9 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
-import { DrawResult, LOTTERIES } from "@/data/lotteries";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { DrawResult } from "@/data/lotteries";
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import { refineError } from "@/lib/error-handler";
-
 
 export interface PrizeTierInfo {
   descricao: string;
@@ -30,134 +28,56 @@ export interface DrawResultWithPrizes extends DrawResult {
 export function useLotteryDraws(lotteryId: string) {
   const [draws, setDraws] = useState<DrawResult[]>([]);
   const [drawsWithPrizes, setDrawsWithPrizes] = useState<DrawResultWithPrizes[]>([]);
-  const [dataLotteryId, setDataLotteryId] = useState(lotteryId);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [count, setCount] = useState(0);
-  const [loadedCount, setLoadedCount] = useState(0);
-  const cancelRef = useRef<{ cancelled: boolean }>({ cancelled: false });
-  const currentLotteryRef = useRef(lotteryId);
-
-  const sanitizeNumbers = useCallback((numbers: unknown): number[] => {
-    if (!Array.isArray(numbers)) return [];
-    return numbers
-      .map((value) => Number(value))
-      .filter((value) => Number.isInteger(value) && value >= 0);
-  }, []);
-
-  const mapRows = useCallback((allData: any[]) => {
-    const validRows = allData
-      .filter((row: any) => Number.isInteger(row?.concurso))
-      .map((row: any) => ({
-        ...row,
-        numbers: sanitizeNumbers(row?.numbers),
-      }))
-      .filter((row: any) => row.numbers.length > 0);
-
-    const mapped: DrawResult[] = validRows.map((row: any) => ({
-      concurso: row.concurso,
-      date: row.draw_date || "",
-      numbers: row.numbers,
-      secondDrawNumbers: (row.prize_tiers as any)?.secondDrawNumbers || undefined,
-    }));
-    const mappedWithPrizes: DrawResultWithPrizes[] = validRows.map((row: any) => ({
-      concurso: row.concurso,
-      date: row.draw_date || "",
-      numbers: row.numbers,
-      secondDrawNumbers: (row.prize_tiers as any)?.secondDrawNumbers || undefined,
-      prizeTiers: row.prize_tiers as DrawPrizeData | null,
-    }));
-    return { mapped, mappedWithPrizes };
-  }, [sanitizeNumbers]);
 
   const fetchDraws = useCallback(async () => {
-    // Cancel any in-flight request
-    cancelRef.current.cancelled = true;
-    const signal = { cancelled: false };
-    cancelRef.current = signal;
-
-    const isLotteryChange = currentLotteryRef.current !== lotteryId;
-    currentLotteryRef.current = lotteryId;
-
-    // Only clear data when switching lotteries (not on refetch)
-    if (isLotteryChange) {
-      setDraws([]);
-      setDrawsWithPrizes([]);
-      setLoadedCount(0);
-      setCount(0);
-    }
     setLoading(true);
     try {
-      const { data: initialData, error: initialError, count: totalCount } = await supabase
-        .from("lottery_draws")
-        .select("concurso, draw_date, numbers, prize_tiers", { count: "exact" })
-        .eq("lottery_id", lotteryId)
-        .order("concurso", { ascending: false })
-        .range(0, 49);
+      let allData: any[] = [];
+      let from = 0;
+      const pageSize = 1000;
+      let totalCount = 0;
 
-      if (initialError) throw initialError;
-      if (signal.cancelled) return;
+      while (true) {
+        const { data, error: pageError, count } = await supabase
+          .from("lottery_draws")
+          .select("concurso, draw_date, numbers, prize_tiers", { count: "exact" })
+          .eq("lottery_id", lotteryId)
+          .order("concurso", { ascending: false })
+          .range(from, from + pageSize - 1);
 
-      const total = totalCount ?? 0;
-      setCount(total);
-
-      if (initialData && initialData.length > 0) {
-        const { mapped, mappedWithPrizes } = mapRows(initialData);
-        setDraws(mapped);
-        setDrawsWithPrizes(mappedWithPrizes);
-        setLoadedCount(initialData.length);
-        setDataLotteryId(lotteryId);
-      } else {
-        setDraws([]);
-        setDrawsWithPrizes([]);
-        setLoadedCount(0);
-        setDataLotteryId(lotteryId);
+        if (pageError) throw pageError;
+        if (count !== null) totalCount = count;
+        if (!data || data.length === 0) break;
+        allData = allData.concat(data);
+        if (data.length < pageSize) break;
+        from += pageSize;
       }
 
-      setLoading(false);
+      const mapped: DrawResult[] = allData.map((row: any) => ({
+        concurso: row.concurso,
+        date: row.draw_date || "",
+        numbers: row.numbers || [],
+      }));
 
-      // Background: load remaining draws
-      if (total > 50) {
-        let allData = initialData ? [...initialData] : [];
-        let from = 50;
-        const pageSize = 1000;
+      const mappedWithPrizes: DrawResultWithPrizes[] = allData.map((row: any) => ({
+        concurso: row.concurso,
+        date: row.draw_date || "",
+        numbers: row.numbers || [],
+        prizeTiers: row.prize_tiers as DrawPrizeData | null,
+      }));
 
-        while (from < total) {
-          if (signal.cancelled) return;
-          const { data, error: pageError } = await supabase
-            .from("lottery_draws")
-            .select("concurso, draw_date, numbers, prize_tiers")
-            .eq("lottery_id", lotteryId)
-            .order("concurso", { ascending: false })
-            .range(from, from + pageSize - 1);
-
-          if (pageError) break;
-          if (!data || data.length === 0) break;
-          allData = allData.concat(data);
-          if (!signal.cancelled) setLoadedCount(allData.length);
-          if (data.length < pageSize) break;
-          from += pageSize;
-        }
-
-        if (!signal.cancelled) {
-          const { mapped, mappedWithPrizes } = mapRows(allData);
-          setDraws(mapped);
-          setDrawsWithPrizes(mappedWithPrizes);
-          setDataLotteryId(lotteryId);
-        }
-      }
+      setDraws(mapped);
+      setDrawsWithPrizes(mappedWithPrizes);
+      setCount(totalCount || mapped.length);
     } catch (e) {
       console.error("Error fetching draws:", e);
-      if (!signal.cancelled) {
-        setDraws([]);
-        setDrawsWithPrizes([]);
-        setLoadedCount(0);
-        setDataLotteryId(lotteryId);
-      }
     } finally {
-      if (!signal.cancelled) setLoading(false);
+      setLoading(false);
     }
-  }, [lotteryId, mapRows]);
+  }, [lotteryId]);
 
   const syncDraws = useCallback(async () => {
     setSyncing(true);
@@ -180,13 +100,11 @@ export function useLotteryDraws(lotteryId: string) {
         }
       }
 
-      await fetchDraws().catch(() => {});
-    } catch (e: any) {
+      await fetchDraws();
+    } catch (e) {
       console.error("Sync error:", e);
-      const refined = refineError(e);
-      toast.error(`${refined.title}: ${refined.description} ${refined.recommendation}`);
+      toast.error("Erro ao sincronizar: " + (e instanceof Error ? e.message : "Erro desconhecido"));
     } finally {
-
       setSyncing(false);
     }
   }, [lotteryId, fetchDraws]);
@@ -216,76 +134,32 @@ export function useLotteryDraws(lotteryId: string) {
         toast.warning(`${totalErrors} erros durante a importação`);
       }
 
-      await fetchDraws().catch(() => {});
-    } catch (e: any) {
+      await fetchDraws();
+    } catch (e) {
       console.error("Sync all error:", e);
-      const refined = refineError(e);
-      toast.error(`${refined.title}: ${refined.description} ${refined.recommendation}`);
+      toast.error("Erro ao sincronizar todas as loterias");
     } finally {
-
       setSyncing(false);
     }
   }, [fetchDraws]);
 
-  const addDraw = useCallback((draw: DrawResultWithPrizes) => {
-    const safeNumbers = sanitizeNumbers(draw?.numbers);
-    if (!Number.isInteger(draw?.concurso) || safeNumbers.length === 0) {
-      console.warn("Ignoring invalid draw payload:", draw);
-      return;
-    }
-
-    // Validate draw belongs to current lottery using expected draw number counts
-    const DRAW_NUMBER_COUNTS: Record<string, number> = {
-      megasena: 6, lotofacil: 15, quina: 5, lotomania: 20,
-      duplasena: 12, timemania: 7, diadesorte: 7, supersete: 7,
-    };
-    const expectedCount = DRAW_NUMBER_COUNTS[lotteryId];
-    if (expectedCount && safeNumbers.length !== expectedCount) {
-      console.warn(`Draw has ${safeNumbers.length} numbers but ${lotteryId} expects ${expectedCount}. Ignoring.`);
-      return;
-    }
-
-    const normalizedDraw: DrawResultWithPrizes = {
-      ...draw,
-      date: draw.date || "",
-      numbers: safeNumbers,
-    };
-
-    let inserted = false;
-
+  const addDraw = useCallback((draw: DrawResult) => {
     setDraws(prev => {
-      if (prev.some(d => d.concurso === normalizedDraw.concurso)) return prev;
-      inserted = true;
-      return [normalizedDraw, ...prev].sort((a, b) => b.concurso - a.concurso);
+      if (prev.some(d => d.concurso === draw.concurso)) return prev;
+      return [draw, ...prev].sort((a, b) => b.concurso - a.concurso);
     });
-
-    setDrawsWithPrizes(prev => {
-      if (prev.some(d => d.concurso === normalizedDraw.concurso)) return prev;
-      return [normalizedDraw, ...prev].sort((a, b) => b.concurso - a.concurso);
-    });
-
-    if (inserted) {
-      setCount(prev => prev + 1);
-      setLoadedCount(prev => prev + 1);
-    }
-  }, [sanitizeNumbers, lotteryId]);
+  }, []);
 
   useEffect(() => {
     fetchDraws();
-    return () => {
-      cancelRef.current.cancelled = true;
-    };
   }, [fetchDraws]);
 
-  const hasCurrentLotteryData = dataLotteryId === lotteryId;
-
   return {
-    draws: hasCurrentLotteryData ? draws : [],
-    drawsWithPrizes: hasCurrentLotteryData ? drawsWithPrizes : [],
+    draws,
+    drawsWithPrizes,
     loading,
     syncing,
-    count: hasCurrentLotteryData ? count : 0,
-    loadedCount: hasCurrentLotteryData ? loadedCount : 0,
+    count,
     syncDraws,
     syncAllLotteries,
     addDraw,

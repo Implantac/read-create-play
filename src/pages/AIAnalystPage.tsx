@@ -186,9 +186,8 @@ const AIAnalystPage = () => {
                       {msg.response?.games && msg.response.games.length > 0 && (
                         <div className="mt-3 space-y-2">
                           {msg.response.games.slice(0, 5).map((g, gi) => (
-                            <div key={gi} className="flex items-center gap-2 bg-background/50 rounded-lg p-2 flex-wrap">
+                            <div key={gi} className="flex items-center gap-2 bg-background/50 rounded-lg p-2">
                               <Badge variant="outline" className="shrink-0">{g.grade}</Badge>
-                              {g.roiTier && <ROIBadge tier={g.roiTier} score={g.roiScore} />}
                               <span className="text-xs font-mono">{g.numbers.join("-")}</span>
                               <span className="text-xs text-muted-foreground ml-auto">{g.totalScore}pts</span>
                             </div>
@@ -454,25 +453,7 @@ const AIAnalystPage = () => {
   );
 };
 
-const roiConfig = {
-  excellent: { label: "ROI Alto", color: "bg-green-500/15 text-green-400 border-green-500/30", icon: "🔥" },
-  good: { label: "ROI Bom", color: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30", icon: "📈" },
-  average: { label: "ROI Médio", color: "bg-amber-500/15 text-amber-400 border-amber-500/30", icon: "📊" },
-  below_average: { label: "ROI Baixo", color: "bg-red-500/15 text-red-400 border-red-500/30", icon: "📉" },
-} as const;
-
-function ROIBadge({ tier, score }: { tier: string; score?: number }) {
-  const cfg = roiConfig[tier as keyof typeof roiConfig] || roiConfig.average;
-  return (
-    <Badge variant="outline" className={`${cfg.color} text-[10px] shrink-0 gap-0.5 px-1.5`}>
-      <span>{cfg.icon}</span>
-      <span>{cfg.label}</span>
-      {score != null && <span className="font-mono ml-0.5">{score}%</span>}
-    </Badge>
-  );
-}
-
-
+// ═══ Sub-components ═══
 
 function GameCard({ game, index, copiedIdx, onCopy, onSave, expanded, onToggle }: {
   game: ScoredGame; index: number; copiedIdx: number | null;
@@ -489,9 +470,8 @@ function GameCard({ game, index, copiedIdx, onCopy, onSave, expanded, onToggle }
 
   return (
     <div className="border rounded-lg p-3 hover:bg-muted/30 transition-colors">
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-2">
         <Badge className={`${gradeColor} shrink-0 font-bold`}>{game.grade}</Badge>
-        {game.roiTier && <ROIBadge tier={game.roiTier} score={game.roiScore} />}
         <span className="font-mono text-sm flex-1">{game.numbers.join(" - ")}</span>
         <span className="text-sm font-semibold text-primary">{game.totalScore}pts</span>
         <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={onCopy}>

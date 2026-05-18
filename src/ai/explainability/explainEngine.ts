@@ -16,12 +16,12 @@ export function explainGame(game: ScoredGame, lotteryId: string): string {
     "**Detalhamento do Score:**",
     `• Estatístico: ${game.scores.statistical}/100`,
     `• Estrutural: ${game.scores.structural}/100`,
-    `• Cobertura histórica: ${game.scores.coverage}/100`,
+    `• Cobertura: ${game.scores.coverage}/100`,
     `• Diversidade: ${game.scores.diversity}/100`,
     `• Aderência à estratégia: ${game.scores.strategyFit}/100`,
-    `• Probabilístico (entropia + ciclos): ${game.scores.probability}/100`,
+    `• Probabilístico: ${game.scores.probability}/100`,
     "",
-    "**Análise Multidimensional:**",
+    "**Análise:**",
     ...game.explanation,
     "",
     `⚠️ ${AI_POLICIES.disclaimers.general}`,
@@ -97,17 +97,13 @@ export function explainAnalysis(analysis: HistoricalAnalysis, lotteryId: string)
 
 export function explainStrategy(strategyId: string): string {
   const strategies: Record<string, string> = {
-    conservative: "A estratégia **Conservadora** prioriza números com alta frequência histórica e padrões estáveis. Aplica filtros rigorosos de paridade, soma e sequência. Valida contra ciclos naturais e regressão à média para máxima consistência. Ideal para jogadores que buscam resultados previsíveis.",
-    balanced: "A estratégia **Equilibrada** combina números quentes, médios e frios em proporções balanceadas, calibrada por análise de entropia e alinhamento cíclico. Oferece boa cobertura com diversificação inteligente. A mais versátil para qualquer modalidade.",
-    aggressive: "A estratégia **Agressiva** favorece números atrasados com alto fator de regressão, padrões incomuns e ciclos acelerando. Maior dispersão e menor previsibilidade. Para jogadores que buscam combinações diferenciadas com potencial de alta.",
-    statistical: "Baseada puramente em **análise estatística multidimensional**: z-scores de regressão, ciclos harmônicos, entropia de Shannon, tendências multi-janela e backtesting Monte Carlo. Zero viés subjetivo — decisões 100% data-driven.",
-    exploratory: "Explora combinações **de baixa frequência** e padrões raros usando anti-pares e entropia máxima. Prioriza números com consenso de regressão ascendente. Para quem quer fugir do óbvio e reduzir rateio.",
-    max_coverage: "Maximiza a **dispersão numérica** e entropia do portfólio, cobrindo o maior número de faixas e quadrantes possível. Otimizador de portfólio garante mínima sobreposição. Ideal para fechamentos.",
-    anti_popular: "Evita combinações populares (datas, sequências, visuais) usando penalização progressiva de padrões humanos. Favorece números anti-correlacionados. Reduz o rateio em caso de acerto.",
-    markov: "Utiliza **Cadeias de Markov** para modelar transições entre estados numéricos. Analisa co-ocorrências e pares frequentes para prever quais combinações têm maior probabilidade condicional.",
-    momentum: "Segue o **momentum** de curto prazo: prioriza números com tendência ascendente acelerada e ciclos em fase favorável. Pesos adaptativos reforçam sinais de tendência sobre regressão.",
-    harmonic: "Baseia-se em **padrões harmônicos e periodicidade**: autocorrelação de aparições, ciclos dominantes e previsão do próximo sorteio de retorno. Para jogadores que acreditam em ritmos naturais.",
-    regression: "Estratégia **contrária** baseada na regressão à média: prioriza números subperformando (z-score negativo) com alta probabilidade de correção. Cross-validada em 3 janelas temporais (30/80/150 sorteios).",
+    conservative: "A estratégia conservadora prioriza números com alta frequência histórica e padrões estáveis. Aplica filtros rigorosos de paridade, soma e sequência. Ideal para jogadores que buscam consistência estatística.",
+    balanced: "A estratégia equilibrada combina números quentes, médios e frios em proporções balanceadas. Oferece boa cobertura sem extremos. Versátil para qualquer modalidade.",
+    aggressive: "A estratégia agressiva favorece números atrasados e padrões incomuns. Maior dispersão e menor previsibilidade. Para jogadores que buscam combinações diferenciadas.",
+    statistical: "Baseada puramente em análise estatística. Decisões orientadas por frequência, desvio padrão, tendência e ciclos. Sem viés subjetivo.",
+    exploratory: "Explora combinações menos frequentes e padrões raros. Alta diversidade numérica. Para quem quer fugir do óbvio.",
+    max_coverage: "Maximiza a dispersão numérica cobrindo o maior número de faixas possível. Ideal para fechamentos e desdobramentos.",
+    anti_popular: "Evita combinações populares (datas, sequências). Reduz o rateio em caso de acerto. Baseada em anti-padrões.",
   };
   return strategies[strategyId] || strategies.balanced;
 }

@@ -4,7 +4,6 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { LotterySelector } from "@/components/LotterySelector";
 import { Button } from "@/components/ui/button";
 import { Database, Loader2, LogOut, User, RefreshCw } from "lucide-react";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -30,20 +29,16 @@ export function AppLayout() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-[#050505] selection:bg-primary/20">
-        <div className="fixed inset-0 bg-[radial-gradient(circle_at_1px_1px,_#ffffff11_1px,_transparent_0)] bg-[size:32px_32px] pointer-events-none opacity-20" />
-        <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent pointer-events-none" />
-        
+      <div className="min-h-screen flex w-full bg-background gradient-mesh">
         <AppSidebar />
-        
-        <div className="flex-1 flex flex-col min-w-0 relative">
+        <div className="flex-1 flex flex-col min-w-0">
           {/* Header */}
-          <header className="border-b border-white/5 bg-[#050505]/40 backdrop-blur-2xl sticky top-0 z-50">
+          <header className="border-b border-border/50 glass-panel sticky top-0 z-50">
             {/* Top row - brand + actions */}
-            <div className="h-16 flex items-center gap-3 px-4 sm:px-6">
-              <SidebarTrigger className="shrink-0 text-muted-foreground hover:text-primary transition-colors hover:bg-primary/10 rounded-lg p-2" />
+            <div className="h-14 flex items-center gap-3 px-4">
+              <SidebarTrigger className="shrink-0 text-muted-foreground hover:text-foreground" />
               
-              <div className="w-px h-6 bg-border/40 hidden sm:block" />
+              <div className="w-px h-6 bg-border/50 hidden sm:block" />
 
               {/* Lottery selector - scrollable on mobile */}
               <div className="flex-1 overflow-x-auto scrollbar-hide">
@@ -70,7 +65,7 @@ export function AppLayout() {
                     <Button
                       size="icon"
                       variant="ghost"
-                      onClick={() => void syncDraws()}
+                      onClick={syncDraws}
                       disabled={syncing}
                       className="h-8 w-8 text-muted-foreground hover:text-primary transition-colors"
                     >
@@ -92,19 +87,13 @@ export function AppLayout() {
                 {/* User menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="gap-3 hover:bg-white/[0.04] px-2.5 rounded-xl transition-all border border-transparent hover:border-white/5 h-11">
-                      <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shadow-lg border border-primary/20 relative group overflow-hidden">
-                        <div className="absolute inset-0 bg-primary/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <User className="w-5 h-5 text-primary relative z-10" />
+                    <Button variant="ghost" size="sm" className="gap-2 hover:bg-muted/50 px-1.5">
+                      <div className="w-8 h-8 rounded-full gradient-brand flex items-center justify-center shadow-md shadow-primary/10">
+                        <User className="w-4 h-4 text-primary-foreground" />
                       </div>
-                      <div className="hidden md:flex flex-col items-start leading-none">
-                        <span className="text-[11px] font-black text-white uppercase tracking-wider">
-                          {profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "Trader"}
-                        </span>
-                        <span className="text-[9px] text-primary font-black uppercase tracking-[0.1em]">
-                          {profile?.plan === 'free' ? 'Standard Access' : 'PRO TERMINAL'}
-                        </span>
-                      </div>
+                      <span className="hidden md:inline text-xs text-muted-foreground max-w-[100px] truncate">
+                        {profile?.full_name || user?.email?.split("@")[0] || "Usuário"}
+                      </span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-60 glass-card">
@@ -130,22 +119,14 @@ export function AppLayout() {
           {/* Content */}
           <main className="flex-1 container mx-auto px-4 py-6 md:px-6 lg:px-8 space-y-6">
             <DrawNotificationChecker />
-            <ErrorBoundary fallbackMessage="Erro ao carregar esta seção">
-              <Outlet />
-            </ErrorBoundary>
+            <Outlet />
           </main>
 
           {/* Footer */}
-          <footer className="border-t border-white/5 py-4 bg-[#050505]/60 backdrop-blur-md">
-            <div className="container mx-auto px-6 flex items-center justify-between gap-4 text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.2em]">
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(var(--primary),0.8)]" />
-                <span>TITAN QUANTUM ENGINE V4.2 — REAL-TIME STREAM</span>
-              </div>
-              <div className="flex items-center gap-4">
-                <span>LATENCY: 12MS</span>
-                <span>SYSTEM STATUS: OPERATIONAL</span>
-              </div>
+          <footer className="border-t border-border/30 py-3">
+            <div className="container mx-auto px-4 flex items-center justify-center gap-2 text-[10px] text-muted-foreground/60">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-pulse" />
+              <span className="font-mono tracking-wider uppercase">Titan Loterias — Motor v4.0 • ML • Database</span>
             </div>
           </footer>
         </div>

@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Dna, Play, Loader2, Trophy, Star, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { NumberStats } from "@/features/statistics/engine";
+import { NumberStats } from "@/engine/statistics";
 import { runGeneticAlgorithm, GeneticResult, RiskLevel } from "@/engine/genetic-algorithm";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";

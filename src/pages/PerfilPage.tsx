@@ -26,7 +26,7 @@ export default function PerfilPage() {
     if (user) {
       supabase
         .from("profiles")
-        .update({ theme_preference: newTheme })
+        .update({ theme_preference: newTheme } as any)
         .eq("id", user.id)
         .then();
     }
@@ -52,18 +52,13 @@ export default function PerfilPage() {
         headers: { Authorization: `Bearer ${session?.access_token}` },
       });
       if (error) throw error;
-      if (data?.error === "no_customer") {
-        toast({ title: "Nenhuma assinatura encontrada", description: "Assine um plano primeiro para gerenciar sua assinatura.", variant: "default" });
-        return;
-      }
       if (data?.url) {
         window.open(data.url, "_blank");
       } else {
         throw new Error("URL do portal não recebida");
       }
-    } catch (err) {
-      const error = err as Error;
-      toast({ title: "Erro ao abrir portal", description: error.message, variant: "destructive" });
+    } catch (err: any) {
+      toast({ title: "Erro ao abrir portal", description: err.message, variant: "destructive" });
     } finally {
       setOpeningPortal(false);
     }
@@ -99,9 +94,8 @@ export default function PerfilPage() {
 
       setAvatarUrl(url);
       toast({ title: "Avatar atualizado com sucesso!" });
-    } catch (err) {
-      const error = err as Error;
-      toast({ title: "Erro ao enviar avatar", description: error.message, variant: "destructive" });
+    } catch (err: any) {
+      toast({ title: "Erro ao enviar avatar", description: err.message, variant: "destructive" });
     } finally {
       setUploading(false);
     }
@@ -118,9 +112,8 @@ export default function PerfilPage() {
 
       if (error) throw error;
       toast({ title: "Perfil atualizado com sucesso!" });
-    } catch (err) {
-      const error = err as Error;
-      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+    } catch (err: any) {
+      toast({ title: "Erro ao salvar", description: err.message, variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -191,8 +184,8 @@ export default function PerfilPage() {
           </div>
           <div className="space-y-2">
             <Label>Plano atual</Label>
-            <div className="px-3 py-2 rounded-md bg-muted/50 border border-border/30 text-sm font-medium text-foreground">
-              {profile?.plan === "free" ? "Gratuito" : "Vitalício"}
+            <div className="px-3 py-2 rounded-md bg-muted/50 border border-border/30 text-sm font-medium capitalize text-foreground">
+              {profile?.plan || "free"}
             </div>
           </div>
           {isPaidPlan && (
@@ -292,9 +285,8 @@ export default function PerfilPage() {
                 toast({ title: "Senha alterada com sucesso!" });
                 setNewPassword("");
                 setConfirmPassword("");
-              } catch (err) {
-                const error = err as Error;
-                toast({ title: "Erro ao alterar senha", description: error.message, variant: "destructive" });
+              } catch (err: any) {
+                toast({ title: "Erro ao alterar senha", description: err.message, variant: "destructive" });
               } finally {
                 setChangingPassword(false);
               }

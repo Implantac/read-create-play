@@ -3,7 +3,7 @@
  * Módulo completo com 6 estratégias avançadas para geração de apostas
  */
 
-import { NumberStats } from "@/features/statistics/engine";
+import { NumberStats } from "@/engine/statistics";
 import { DrawResult } from "@/data/lotteries";
 import { getLotteryRules, PRIMES, FIBONACCI } from "./lotteriesKnowledge";
 
@@ -283,226 +283,6 @@ export function strategyCoverage(
 }
 
 // ═══════════════════════════════════════════
-// ESTRATÉGIA 7 — MARKOV (Transições)
-// Usa probabilidades de transição entre sorteios
-// ═══════════════════════════════════════════
-export function strategyMarkov(
-  stats: NumberStats[],
-  draws: DrawResult[],
-  lotteryId: string,
-  topN: number = 18
-): StrategyResult {
-  const rules = getLotteryRules(lotteryId);
-  if (draws.length < 2) return strategyFrequency(stats, draws, topN);
-
-  // Build transition matrix: P(number appears | previous draw contained X)
-  const transitionBoost = new Map<number, number>();
-  const lastDraw = draws[0].numbers;
-  const lastSet = new Set(lastDraw);
-
-  // For each past pair of consecutive draws, learn which numbers follow which
-  const followCount = new Map<number, Map<number, number>>();
-  for (let i = 0; i < Math.min(draws.length - 1, 200); i++) {
-    const current = draws[i].numbers;
-    const prev = draws[i + 1].numbers;
-    for (const p of prev) {
-      if (!followCount.has(p)) followCount.set(p, new Map());
-      const map = followCount.get(p)!;
-      for (const c of current) {
-        map.set(c, (map.get(c) || 0) + 1);
-      }
-    }
-  }
-
-  // Score each number by how strongly it follows the last draw's numbers
-  for (let n = 1; n <= rules.totalNumbers; n++) {
-    let boost = 0;
-    for (const prev of lastDraw) {
-      const map = followCount.get(prev);
-      if (map) {
-        const count = map.get(n) || 0;
-        const total = [...map.values()].reduce((a, b) => a + b, 0);
-        if (total > 0) boost += count / total;
-      }
-    }
-    transitionBoost.set(n, boost);
-  }
-
-  const weights = new Map<number, number>();
-  const scored = stats.map(s => {
-    const tBoost = transitionBoost.get(s.number) || 0;
-    const w = s.frequency * 0.3 + tBoost * 10 + (s.cycleScore > 1 ? 1.5 : 0);
-    weights.set(s.number, Math.max(0.1, w));
-    return { number: s.number, score: w };
-  });
-  scored.sort((a, b) => b.score - a.score);
-
-  return {
-    id: "markov",
-    name: "Cadeia de Markov",
-    description: "Probabilidades de transição: quais números tendem a suceder os do último sorteio.",
-    candidateNumbers: scored.slice(0, topN).map(s => s.number).sort((a, b) => a - b),
-    weights,
-    metrics: {
-      transitionsAnalyzed: Math.min(draws.length - 1, 200),
-      lastDrawSize: lastDraw.length,
-      avgTransitionBoost: [...transitionBoost.values()].reduce((a, b) => a + b, 0) / rules.totalNumbers,
-    },
-  };
-}
-
-// ═══════════════════════════════════════════
-// ESTRATÉGIA 8 — MOMENTUM & TENDÊNCIA
-// Números em aceleração de frequência
-// ═══════════════════════════════════════════
-export function strategyMomentum(
-  stats: NumberStats[],
-  draws: DrawResult[],
-  topN: number = 18
-): StrategyResult {
-  // Multi-window frequency comparison
-  const windows = [5, 15, 50];
-  const freqByWindow: Map<number, number[]> = new Map();
-
-  for (const s of stats) {
-    const freqs = windows.map(w => {
-      const subset = draws.slice(0, Math.min(w, draws.length));
-      return subset.filter(d => d.numbers.includes(s.number)).length / Math.max(1, subset.length);
-    });
-    freqByWindow.set(s.number, freqs);
-  }
-
-  const weights = new Map<number, number>();
-  const scored = stats.map(s => {
-    const [short, mid, long] = freqByWindow.get(s.number) || [0, 0, 0];
-    // Acceleration: short > mid > long means positive momentum
-    const momentum = (short - mid) * 3 + (mid - long) * 1.5;
-    const acceleration = short - 2 * mid + long; // 2nd derivative
-    const w = Math.max(0.1, s.frequency * 0.2 + momentum * 8 + acceleration * 4 + short * 5);
-    weights.set(s.number, w);
-    return { number: s.number, score: w, momentum, acceleration };
-  });
-  scored.sort((a, b) => b.score - a.score);
-
-  const accelerating = scored.filter(s => s.acceleration > 0).length;
-
-  return {
-    id: "momentum",
-    name: "Momentum & Tendência",
-    description: "Identifica números em aceleração — frequência crescente nos últimos concursos.",
-    candidateNumbers: scored.slice(0, topN).map(s => s.number).sort((a, b) => a - b),
-    weights,
-    metrics: {
-      acceleratingNumbers: accelerating,
-      topMomentum: scored[0]?.momentum || 0,
-      windowsUsed: windows.length,
-    },
-  };
-}
-
-// ═══════════════════════════════════════════
-// ESTRATÉGIA 9 — HARMÔNICO MATEMÁTICO
-// Propriedades matemáticas + equilíbrio
-// ═══════════════════════════════════════════
-const PERFECT_SQUARES = new Set([1,4,9,16,25,36,49,64,81,100]);
-const TRIANGULAR = new Set([1,3,6,10,15,21,28,36,45,55,66,78,91]);
-
-export function strategyHarmonic(
-  stats: NumberStats[],
-  lotteryId: string,
-  topN: number = 18
-): StrategyResult {
-  const rules = getLotteryRules(lotteryId);
-  const weights = new Map<number, number>();
-
-  const scored = stats.map(s => {
-    const n = s.number;
-    let w = s.frequency * 0.3;
-
-    // Mathematical property bonuses
-    if (PRIMES.has(n)) w += 2.0;
-    if (FIBONACCI.has(n)) w += 1.8;
-    if (PERFECT_SQUARES.has(n) && n <= rules.totalNumbers) w += 1.5;
-    if (TRIANGULAR.has(n) && n <= rules.totalNumbers) w += 1.2;
-
-    // Digit sum harmony (numbers whose digits sum to common lucky values)
-    const digitSum = String(n).split("").reduce((a, d) => a + parseInt(d), 0);
-    if ([7, 9, 11, 13].includes(digitSum)) w += 0.8;
-
-    // Golden ratio distribution bonus
-    const goldenPos = (n / rules.totalNumbers) * 1.618;
-    const fracPart = goldenPos - Math.floor(goldenPos);
-    if (fracPart > 0.3 && fracPart < 0.7) w += 0.5;
-
-    weights.set(n, Math.max(0.1, w));
-    return { number: n, score: w };
-  });
-  scored.sort((a, b) => b.score - a.score);
-
-  return {
-    id: "harmonic",
-    name: "Harmônico Matemático",
-    description: "Combina primos, Fibonacci, quadrados perfeitos e números triangulares com equilíbrio estrutural.",
-    candidateNumbers: scored.slice(0, topN).map(s => s.number).sort((a, b) => a - b),
-    weights,
-    metrics: {
-      primes: scored.slice(0, topN).filter(s => PRIMES.has(s.number)).length,
-      fibonacci: scored.slice(0, topN).filter(s => FIBONACCI.has(s.number)).length,
-      squares: scored.slice(0, topN).filter(s => PERFECT_SQUARES.has(s.number)).length,
-      triangular: scored.slice(0, topN).filter(s => TRIANGULAR.has(s.number)).length,
-    },
-  };
-}
-
-// ═══════════════════════════════════════════
-// ESTRATÉGIA 10 — REGRESSÃO À MÉDIA
-// Números estatisticamente "devidos"
-// ═══════════════════════════════════════════
-export function strategyRegression(
-  stats: NumberStats[],
-  draws: DrawResult[],
-  lotteryId: string,
-  topN: number = 18
-): StrategyResult {
-  const rules = getLotteryRules(lotteryId);
-  const expectedFreq = (draws.length * rules.pick) / rules.totalNumbers;
-  const weights = new Map<number, number>();
-
-  const scored = stats.map(s => {
-    // How far below expected frequency (positive = underperforming = "due")
-    const deficit = expectedFreq - s.frequency;
-    const deficitRatio = expectedFreq > 0 ? deficit / expectedFreq : 0;
-
-    // Overdue factor: current gap vs average gap
-    const overdueFactor = s.avgGap > 0 ? s.lastSeen / s.avgGap : 0;
-
-    // Combine deficit + overdue with cycle awareness
-    const w = Math.max(0.1,
-      deficitRatio * 5 +
-      (overdueFactor > 1 ? (overdueFactor - 1) * 3 : 0) +
-      (s.cycleScore > 1.2 ? s.cycleScore * 1.5 : 0) +
-      s.frequency * 0.1 // small base frequency to avoid truly rare numbers
-    );
-    weights.set(s.number, w);
-    return { number: s.number, score: w, deficit, overdueFactor };
-  });
-  scored.sort((a, b) => b.score - a.score);
-
-  return {
-    id: "regression",
-    name: "Regressão à Média",
-    description: "Explora números sub-representados que estatisticamente devem convergir para a média.",
-    candidateNumbers: scored.slice(0, topN).map(s => s.number).sort((a, b) => a - b),
-    weights,
-    metrics: {
-      expectedFreq: Math.round(expectedFreq * 10) / 10,
-      maxDeficit: scored[0]?.deficit || 0,
-      overdueNumbers: scored.filter(s => s.overdueFactor > 1.3).length,
-    },
-  };
-}
-
-// ═══════════════════════════════════════════
 // PIPELINE DE GERAÇÃO INTELIGENTE (6 ETAPAS)
 // ═══════════════════════════════════════════
 export interface IntelligentPipelineResult {
@@ -581,10 +361,6 @@ function executeStrategy(
     case "dispersion": return strategyDispersion(stats, lotteryId);
     case "anti_pattern": return strategyAntiPattern(stats, draws, lotteryId);
     case "coverage": return strategyCoverage(stats, lotteryId);
-    case "markov": return strategyMarkov(stats, draws, lotteryId);
-    case "momentum": return strategyMomentum(stats, draws);
-    case "harmonic": return strategyHarmonic(stats, lotteryId);
-    case "regression": return strategyRegression(stats, draws, lotteryId);
     default: return strategyFrequency(stats, draws);
   }
 }
@@ -739,7 +515,7 @@ function selectDiverseGames(
 
 /** Get all available strategy IDs */
 export function getAllStrategyIds(): string[] {
-  return ["frequency", "delay", "balance", "dispersion", "anti_pattern", "coverage", "markov", "momentum", "harmonic", "regression"];
+  return ["frequency", "delay", "balance", "dispersion", "anti_pattern", "coverage"];
 }
 
 /** Get strategy info by ID */
@@ -751,10 +527,6 @@ export function getStrategyInfo(id: string): { id: string; name: string; descrip
     dispersion: { name: "Dispersão", description: "Evita concentração no volante" },
     anti_pattern: { name: "Anti-Padrões", description: "Evita sequências e padrões óbvios" },
     coverage: { name: "Cobertura Máxima", description: "Maximiza cobertura do volante" },
-    markov: { name: "Cadeia de Markov", description: "Probabilidades de transição entre sorteios" },
-    momentum: { name: "Momentum & Tendência", description: "Números em aceleração de frequência" },
-    harmonic: { name: "Harmônico Matemático", description: "Primos, Fibonacci e padrões matemáticos" },
-    regression: { name: "Regressão à Média", description: "Números sub-representados estatisticamente" },
   };
   return { id, ...(map[id] || map.frequency) };
 }

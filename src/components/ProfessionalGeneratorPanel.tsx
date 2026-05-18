@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
-import { AntiPopularitySelector } from "@/components/AntiPopularitySelector";
-import { NumberStats } from "@/features/statistics/engine";
+import { NumberStats } from "@/engine/statistics";
 import { exportToPdf } from "@/engine/pdf-export";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import {
@@ -165,12 +164,10 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
         </div>
       </div>
 
-      <AntiPopularitySelector />
-
-      <Tabs defaultValue="generator" className="w-full mt-4">
+      <Tabs defaultValue="generator" className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-4">
           <TabsTrigger value="generator" className="text-xs gap-1">
-            <Sparkles className="w-3 h-3" /> Gerador Profissional
+            <Sparkles className="w-3 h-3" /> Gerador Pro
           </TabsTrigger>
           <TabsTrigger value="closure" className="text-xs gap-1">
             <Shield className="w-3 h-3" /> Fechamentos
@@ -249,7 +246,7 @@ export function ProfessionalGeneratorPanel({ stats, config, draws }: Props) {
                         {bet.rank <= 3 ? (
                           <Award className={`w-4 h-4 ${
                             bet.rank === 1 ? "text-yellow-400" :
-                            bet.rank === 2 ? "text-gray-500" :
+                            bet.rank === 2 ? "text-gray-400" :
                             "text-amber-600"
                           }`} />
                         ) : (

@@ -18,10 +18,10 @@ export function LotterySelector({ selected, onSelect }: Props) {
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => onSelect(lottery.id)}
-            className={`relative px-3 py-1.5 rounded-lg font-bold text-[11px] uppercase tracking-wider transition-all border flex items-center gap-2 whitespace-nowrap ${
+            className={`relative px-2.5 py-1.5 rounded-lg font-medium text-xs transition-all border flex items-center gap-1.5 whitespace-nowrap ${
               isActive
-                ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20"
-                : "bg-white/[0.03] border-white/5 text-muted-foreground hover:text-foreground hover:border-white/20"
+                ? "bg-primary/15 border-primary/40 text-primary shadow-sm shadow-primary/10"
+                : "bg-transparent border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/40"
             }`}
           >
             <span className="text-sm">{lottery.icon}</span>

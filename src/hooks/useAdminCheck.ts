@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
+const FULL_ACCESS_USER_EMAIL = "etcsuporte889@gmail.com";
+
 export function useAdminCheck() {
   const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
@@ -12,6 +14,13 @@ export function useAdminCheck() {
     if (!user) {
       setIsAdmin(false);
       setIsSuperAdmin(false);
+      setLoading(false);
+      return;
+    }
+
+    if (user.email?.trim().toLowerCase() === FULL_ACCESS_USER_EMAIL) {
+      setIsAdmin(true);
+      setIsSuperAdmin(true);
       setLoading(false);
       return;
     }

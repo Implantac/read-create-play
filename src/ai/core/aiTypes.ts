@@ -4,7 +4,7 @@
  */
 
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { NumberStats } from "@/features/statistics/engine";
+import { NumberStats } from "@/engine/statistics";
 
 // ═══════════════════════════════════════════════════════
 // INTENT TYPES
@@ -27,11 +27,7 @@ export type RiskProfile =
   | "statistical"
   | "exploratory"
   | "max_coverage"
-  | "anti_popular"
-  | "markov"
-  | "momentum"
-  | "harmonic"
-  | "regression";
+  | "anti_popular";
 
 export interface ParsedIntent {
   intent: AIIntent;
@@ -67,16 +63,6 @@ export interface ScoredGame {
   totalScore: number;
   grade: "S" | "A" | "B" | "C" | "D" | "F";
   explanation: string[];
-  roiTier?: "excellent" | "good" | "average" | "below_average";
-  roiScore?: number;
-  scoreBreakdown?: ScoreAdjustment[];
-}
-
-export interface ScoreAdjustment {
-  metric: string;
-  value: number;
-  type: "base" | "bonus" | "penalty";
-  description: string;
 }
 
 export interface GameScores {
@@ -112,11 +98,6 @@ export interface SimulationResult {
   bestGame: { numbers: number[]; avgHits: number };
   worstGame: { numbers: number[]; avgHits: number };
   strategyComparison?: StrategyComparison[];
-  avgPrizeRate?: number;
-  avgStability?: number;
-  confidenceInterval?: { lower: number; upper: number; confidence: number };
-  statisticalSignificance?: { tStatistic: number; significant: boolean; expectedRandom: number };
-  diversityScore?: number;
 }
 
 export interface SimulatedGameResult {
@@ -126,9 +107,6 @@ export interface SimulatedGameResult {
   minHits: number;
   hitDistribution: Record<number, number>;
   stabilityScore: number;
-  prizeRate?: number;
-  consistencyScore?: number;
-  prizeDistribution?: Record<number, number>;
 }
 
 export interface StrategyComparison {

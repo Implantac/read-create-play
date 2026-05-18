@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-export type PlanType = "free" | "premium" | "professional" | "lifetime" | "elite";
+export type PlanType = "free" | "premium" | "professional" | "lifetime";
 
 interface Profile {
   id: string;
@@ -33,10 +33,10 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const LIFETIME_OWNER_EMAIL = "etcsuporte889@gmail.com";
+const FULL_ACCESS_USER_EMAIL = "etcsuporte889@gmail.com";
 
-const isLifetimeOwner = (email?: string | null) =>
-  email?.trim().toLowerCase() === LIFETIME_OWNER_EMAIL;
+const isFullAccessUser = (email?: string | null) =>
+  email?.trim().toLowerCase() === FULL_ACCESS_USER_EMAIL;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -46,33 +46,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [userRole, setUserRole] = useState<string>("user");
 
-  const fetchProfile = async (userId: string, forceLifetime = false) => {
+  const fetchProfile = async (userId: string, forceFullAccess = false) => {
     const { data } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", userId)
       .single();
     if (data) {
-      const p = data as Profile;
-      if ((forceLifetime || isLifetimeOwner(p.email)) && p.plan !== "lifetime") {
-        p.plan = "lifetime";
+      const nextProfile = data as Profile;
+      if (forceFullAccess || isFullAccessUser(nextProfile.email)) {
+        nextProfile.plan = "lifetime";
+        nextProfile.blocked = false;
+        nextProfile.full_name = nextProfile.full_name || "Claudinei da Silva";
       }
-      setProfile(p);
+      setProfile(nextProfile);
     }
   };
 
-  const checkAdmin = async (userId: string): Promise<boolean> => {
+  const checkAdmin = async (userId: string, email?: string | null) => {
+    if (isFullAccessUser(email)) {
+      setIsAdmin(true);
+      setIsSuperAdmin(true);
+      setUserRole("super_admin");
+      return;
+    }
+
     const { data } = await supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", userId)
       .in("role", ["admin", "super_admin"]);
     const roles = (data || []).map((r: any) => r.role as string);
-    const isSA = roles.includes("super_admin");
-    setIsAdmin(roles.includes("admin") || isSA);
-    setIsSuperAdmin(isSA);
-    setUserRole(isSA ? "super_admin" : roles.includes("admin") ? "admin" : roles[0] || "user");
-    return isSA;
+    setIsAdmin(roles.includes("admin") || roles.includes("super_admin"));
+    setIsSuperAdmin(roles.includes("super_admin"));
+    setUserRole(roles.includes("super_admin") ? "super_admin" : roles.includes("admin") ? "admin" : roles[0] || "user");
   };
 
   const syncSubscription = async (accessToken: string) => {
@@ -80,19 +87,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data } = await supabase.functions.invoke("check-subscription", {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      // If token was expired, try refreshing session and retry
-      if (data?.expired_token) {
-        const { data: refreshData } = await supabase.auth.refreshSession();
-        if (refreshData?.session?.access_token) {
-          const { data: retryData } = await supabase.functions.invoke("check-subscription", {
-            headers: { Authorization: `Bearer ${refreshData.session.access_token}` },
-          });
-          if (retryData?.plan) {
-            setProfile(prev => prev ? { ...prev, plan: retryData.plan as PlanType } : prev);
-          }
-          return;
-        }
-      }
       if (data?.plan) {
         setProfile(prev => prev ? { ...prev, plan: data.plan as PlanType } : prev);
       }
@@ -106,11 +100,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let initialLoad = true;
 
     const loadUserData = async (userId: string, accessToken?: string, email?: string | null) => {
-      const shouldForceLifetime = isLifetimeOwner(email);
-      const isSA = await checkAdmin(userId);
+      const fullAccessUser = isFullAccessUser(email);
       await Promise.all([
-        fetchProfile(userId, isSA || shouldForceLifetime),
-        ...(accessToken && !isSA && !shouldForceLifetime ? [syncSubscription(accessToken)] : []),
+        fetchProfile(userId, fullAccessUser),
+        checkAdmin(userId, email),
+        ...(accessToken && !fullAccessUser ? [syncSubscription(accessToken)] : []),
       ]);
     };
 
@@ -182,7 +176,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return Math.max(0, TRIAL_DAYS - elapsed);
   })();
 
-  const isTrialExpired = !isAdmin && profile?.plan === "free" && trialDaysLeft <= 0;
+  const isTrialExpired = !isAdmin && !isFullAccessUser(session?.user?.email) && profile?.plan === "free" && trialDaysLeft <= 0;
 
   return (
     <AuthContext.Provider value={{ session, user: session?.user ?? null, profile, loading, isAdmin, isSuperAdmin, userRole, isTrialExpired, trialDaysLeft, signOut }}>

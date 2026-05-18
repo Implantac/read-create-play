@@ -1,8 +1,7 @@
-import { Crown, Infinity, Settings, Loader2 } from "lucide-react";
+import { Crown, Zap, Sparkles, Infinity, Settings, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
-import { Helmet } from "react-helmet-async";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -11,50 +10,90 @@ import { PlanCard, type PlanData } from "@/components/plans/PlanCard";
 import { PlanFAQ } from "@/components/plans/PlanFAQ";
 import { PlanTrustBar } from "@/components/plans/PlanTrustBar";
 import { PlanComparisonTable } from "@/components/plans/PlanComparisonTable";
-import { refineError } from "@/lib/error-handler";
 
 const basePlans = [
   {
-    id: "lifetime",
-    name: "Enterprise Pro",
-    price: "R$ 79,90",
-    period: " único",
-    icon: Infinity,
-    description: "Acesso vitalício completo a todas as ferramentas e suporte prioritário VIP.",
+    id: "free",
+    name: "Gratuito",
+    monthlyPrice: "R$ 0",
+    annualPrice: "R$ 0",
+    period: "/mês",
+    annualPeriod: "/mês",
+    icon: Zap,
+    description: "Motor estatístico básico",
+    savedBetsLimit: "3 jogos salvos por loteria",
+    features: [
+      "Dashboard com estatísticas",
+      "Gerador básico de números",
+      "Histórico de concursos",
+      "Conferidor de apostas",
+    ],
+    cta: "Plano atual",
+  },
+  {
+    id: "premium",
+    annualId: "premium_annual",
+    name: "Premium",
+    monthlyPrice: "R$ 29,90",
+    annualPrice: "R$ 23,92",
+    annualTotal: "R$ 287,00/ano",
+    period: "/mês",
+    annualPeriod: "/mês",
+    icon: Sparkles,
+    description: "Ferramentas avançadas de geração",
     savedBetsLimit: "Jogos salvos ilimitados",
     features: [
-      "Todas as 8+ loterias",
-      "Alpha Engine Quantum v5.2",
-      "Simulações Massivas ilimitadas",
-      "Gerador Profissional Premium",
-      "Acesso vitalício garantido",
-      "Todas as atualizações futuras",
-      "Sem taxas recorrentes",
-      "Suporte Prioritário VIP",
+      "Tudo do plano Gratuito",
+      "Gerador Profissional com filtros",
+      "Fechamentos inteligentes",
+      "Simulador massivo",
+      "Exportação PDF profissional",
     ],
-    cta: "Garantir acesso vitalício",
-    isLifetime: true,
+    cta: "Assinar Premium",
     highlight: true,
   },
   {
-    id: "elite",
-    name: "Elite Cloud",
-    price: "R$ 149,90",
-    period: " único",
+    id: "professional",
+    annualId: "professional_annual",
+    name: "Profissional",
+    monthlyPrice: "R$ 59,90",
+    annualPrice: "R$ 47,92",
+    annualTotal: "R$ 575,00/ano",
+    period: "/mês",
+    annualPeriod: "/mês",
     icon: Crown,
-    description: "Para quem busca a fronteira da tecnologia lotérica com IA Autônoma dedicada.",
-    savedBetsLimit: "Servidores dedicados",
+    description: "IA + Otimização completa",
+    savedBetsLimit: "Jogos salvos ilimitados",
     features: [
-      "Tudo do Enterprise Pro",
-      "IA Autônoma Dedicada",
-      "Acesso Antecipado Global",
-      "Dashboard Social Premium",
-      "Marketplace de Estratégias",
-      "Configurações sem Limites",
+      "Tudo do plano Premium",
+      "Machine Learning preditivo",
+      "Motor HP Matemático",
+      "Analytics avançado",
+      "Algoritmo Genético + Simulated Annealing",
+      "Suporte prioritário",
     ],
-    cta: "Seja um Membro Elite",
+    cta: "Assinar Profissional",
+  },
+  {
+    id: "lifetime",
+    name: "Vitalício",
+    monthlyPrice: "R$ 497",
+    annualPrice: "R$ 497",
+    period: " único",
+    annualPeriod: " único",
+    icon: Infinity,
+    description: "Acesso permanente a tudo",
+    savedBetsLimit: "Jogos salvos ilimitados",
+    features: [
+      "Tudo do plano Profissional",
+      "Acesso vitalício garantido",
+      "Todas as atualizações futuras",
+      "Prioridade máxima no suporte",
+      "Sem mensalidades nunca mais",
+      "Acesso antecipado a novidades",
+    ],
+    cta: "Comprar Vitalício",
     isLifetime: true,
-    highlight: false,
   },
 ];
 
@@ -62,13 +101,14 @@ export default function PlanosPage() {
   const { profile, session } = useAuth();
   const currentPlan = profile?.plan ?? "free";
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
   const navigate = useNavigate();
 
   const plans: PlanData[] = basePlans.map((p) => ({
     id: p.id,
     name: p.name,
-    price: p.price,
-    period: p.period,
+    price: billingCycle === "annual" ? p.annualPrice : p.monthlyPrice,
+    period: billingCycle === "annual" ? p.annualPeriod : p.period,
     icon: p.icon,
     description: p.description,
     savedBetsLimit: p.savedBetsLimit,
@@ -76,6 +116,7 @@ export default function PlanosPage() {
     cta: p.cta,
     highlight: p.highlight,
     isLifetime: p.isLifetime,
+    annualTotal: billingCycle === "annual" ? (p as any).annualTotal : undefined,
   }));
 
   const handleCheckout = async (planId: string) => {
@@ -84,17 +125,23 @@ export default function PlanosPage() {
       return;
     }
 
+    // Map to annual variant if annual billing selected
+    let checkoutPlanId = planId;
+    if (billingCycle === "annual" && (planId === "premium" || planId === "professional")) {
+      const base = basePlans.find((p) => p.id === planId);
+      checkoutPlanId = (base as any)?.annualId || planId;
+    }
+
     setLoadingPlan(planId);
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { planId },
+        body: { planId: checkoutPlanId },
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       if (error) throw error;
       if (data?.url) window.open(data.url, "_blank");
     } catch (e: any) {
-      const refined = refineError(e);
-      toast.error(`${refined.title}: ${refined.description} ${refined.recommendation}`);
+      toast.error("Erro ao iniciar checkout: " + (e.message || "Tente novamente"));
     } finally {
       setLoadingPlan(null);
     }
@@ -110,8 +157,7 @@ export default function PlanosPage() {
       if (error) throw error;
       if (data?.url) window.open(data.url, "_blank");
     } catch (e: any) {
-      const refined = refineError(e);
-      toast.error(`${refined.title}: ${refined.description} ${refined.recommendation}`);
+      toast.error("Erro ao abrir portal: " + (e.message || "Tente novamente"));
     } finally {
       setLoadingPlan(null);
     }
@@ -119,14 +165,6 @@ export default function PlanosPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 md:px-6 pb-16">
-      <Helmet>
-        <title>Planos e Preços — Titan Loterias</title>
-        <meta name="description" content="Acesso vitalício à plataforma Titan Loterias. Pague uma vez e tenha IA, estatísticas e geradores profissionais para sempre. Confira nossos planos." />
-        <link rel="canonical" href="https://titanloterias.lovable.app/planos" />
-        <meta property="og:title" content="Planos e Preços — Titan Loterias" />
-        <meta property="og:description" content="Acesso vitalício à plataforma Titan Loterias. IA e estatísticas para sempre." />
-        <meta property="og:url" content="https://titanloterias.lovable.app/planos" />
-      </Helmet>
       {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0, y: -15 }}
@@ -136,17 +174,48 @@ export default function PlanosPage() {
       >
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-5">
           <Crown className="w-3.5 h-3.5" />
-          Plano Vitalício
+          Escolha seu plano
         </div>
         <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight mb-3">
-          Pare de apostar no escuro.{" "}
-          <span className="gradient-brand-text">Use inteligência.</span>
+          Desbloqueie o poder da{" "}
+          <span className="gradient-brand-text">análise inteligente</span>
         </h1>
-        <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto mb-3">
-          Acesso vitalício ao Titan Loterias. Pague uma vez e tenha todas as ferramentas de IA para sempre.
+        <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto">
+          Motor estatístico, IA preditiva e algoritmos avançados para maximizar suas chances
         </p>
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold">
-          🔥 Oferta especial por tempo limitado
+      </motion.div>
+
+      {/* Billing Toggle */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15, duration: 0.4 }}
+        className="flex justify-center mb-8"
+      >
+        <div className="inline-flex items-center gap-1 p-1 rounded-full bg-muted/50 border border-border/30">
+          <button
+            onClick={() => setBillingCycle("monthly")}
+            className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
+              billingCycle === "monthly"
+                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Mensal
+          </button>
+          <button
+            onClick={() => setBillingCycle("annual")}
+            className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 relative ${
+              billingCycle === "annual"
+                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Anual
+            <span className="absolute -top-2.5 -right-3 px-1.5 py-0.5 rounded-full bg-accent text-accent-foreground text-[10px] font-bold leading-none">
+              -20%
+            </span>
+          </button>
         </div>
       </motion.div>
 
@@ -159,30 +228,28 @@ export default function PlanosPage() {
         >
           <Button variant="outline" className="gap-2" onClick={handleManageSubscription} disabled={loadingPlan === "manage"}>
             {loadingPlan === "manage" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Settings className="w-4 h-4" />}
-            Gerenciar acesso
+            Gerenciar assinatura
           </Button>
         </motion.div>
       )}
 
-      {/* Grid container for centered cards */}
-      <div className="flex justify-center mb-12">
-        <div className="grid md:grid-cols-2 gap-6 w-full max-w-4xl">
-          {plans.map((plan, i) => {
-            const isCurrent = currentPlan === plan.id;
-            const isUpgrade = plan.id !== "free" && !isCurrent;
-            return (
-              <PlanCard
-                key={plan.id}
-                plan={plan}
-                index={i}
-                isCurrent={isCurrent}
-                isUpgrade={isUpgrade}
-                isLoading={loadingPlan === plan.id}
-                onCheckout={handleCheckout}
-              />
-            );
-          })}
-        </div>
+      {/* Plan Cards */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
+        {plans.map((plan, i) => {
+          const isCurrent = currentPlan === plan.id;
+          const isUpgrade = plan.id !== "free" && !isCurrent;
+          return (
+            <PlanCard
+              key={plan.id}
+              plan={plan}
+              index={i}
+              isCurrent={isCurrent}
+              isUpgrade={isUpgrade}
+              isLoading={loadingPlan === plan.id}
+              onCheckout={handleCheckout}
+            />
+          );
+        })}
       </div>
 
       {/* Trust Bar */}

@@ -32,7 +32,6 @@ interface CaixaResult {
   data?: string;
   dezenas?: string[];
   listaDezenas?: string[];
-  listaDezenasSegundoSorteio?: string[];
   dezenasSorteioMunicipioMae?: string[];
   colunas?: string[][];
   premiacoes?: PrizeTier[];
@@ -70,7 +69,7 @@ function extractPrizeTiers(raw: CaixaResult): object | null {
   if (!raw.premiacoes || !Array.isArray(raw.premiacoes) || raw.premiacoes.length === 0) {
     return null;
   }
-  const result: Record<string, unknown> = {
+  return {
     premiacoes: raw.premiacoes.map(p => ({
       descricao: p.descricao,
       faixa: p.faixa,
@@ -82,11 +81,6 @@ function extractPrizeTiers(raw: CaixaResult): object | null {
     valorEstimado: raw.valorEstimadoProximoConcurso ?? 0,
     valorArrecadado: raw.valorArrecadado ?? 0,
   };
-  // Store Dupla Sena 2nd draw numbers
-  if (raw.listaDezenasSegundoSorteio && raw.listaDezenasSegundoSorteio.length > 0) {
-    result.secondDrawNumbers = raw.listaDezenasSegundoSorteio.map((d: string) => parseInt(d, 10)).filter((n: number) => !isNaN(n));
-  }
-  return result;
 }
 
 serve(async (req) => {

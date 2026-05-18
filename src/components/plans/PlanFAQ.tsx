@@ -3,12 +3,12 @@ import { HelpCircle, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 
 const faqs = [
-  { q: "Como funciona o plano Gratuito?", a: "Você pode usar o plano Gratuito sem limite de tempo para acessar as funcionalidades básicas. O plano Vitalício desbloqueia todas as ferramentas avançadas." },
-  { q: "O plano Vitalício tem alguma taxa recorrente?", a: "Não. O plano Vitalício é um pagamento único de R$ 79,90. Você paga uma vez e tem acesso para sempre a todas as funcionalidades e atualizações, sem cobranças adicionais." },
-  { q: "Como gerencio meu acesso?", a: "Você pode ver o status do seu plano em seu Perfil ou na página de Planos. Como é um acesso vitalício, ele nunca expira." },
+  { q: "Como funciona o período de teste?", a: "Você pode usar o plano Gratuito sem limite de tempo. Ao assinar um plano pago, você terá acesso imediato a todas as funcionalidades do plano escolhido." },
+  { q: "Posso trocar de plano a qualquer momento?", a: "Sim! Você pode fazer upgrade ou downgrade do seu plano quando quiser. Ao fazer upgrade, a diferença será cobrada proporcionalmente. Ao fazer downgrade, o novo valor será aplicado no próximo ciclo de cobrança." },
+  { q: "Como cancelo minha assinatura?", a: "Você pode cancelar a qualquer momento clicando em \"Gerenciar assinatura\" nesta página. O cancelamento é imediato, mas você mantém o acesso até o final do período já pago." },
   { q: "O plano Vitalício inclui atualizações futuras?", a: "Sim! O plano Vitalício garante acesso permanente a todas as funcionalidades atuais e futuras da plataforma, sem nenhum custo adicional." },
-  { q: "Quais formas de pagamento são aceitas?", a: "Aceitamos cartões de crédito, débito e Pix, tudo processado de forma segura pelo Stripe." },
-  { q: "Posso solicitar reembolso?", a: "Sim, oferecemos reembolso integral em até 7 dias após a compra, caso você não esteja satisfeito. Basta entrar em contato com nosso suporte." },
+  { q: "Quais formas de pagamento são aceitas?", a: "Aceitamos cartões de crédito e débito (Visa, Mastercard, Elo, American Express) e Pix, tudo processado de forma segura pelo Stripe." },
+  { q: "Posso solicitar reembolso?", a: "Sim, oferecemos reembolso integral em até 7 dias após a compra, sem perguntas. Basta entrar em contato com nosso suporte." },
 ];
 
 export function PlanFAQ() {

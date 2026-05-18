@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getSupabaseAdmin, getCachedAnalysis, setCachedAnalysis } from "../_shared/ai-cache.ts";
-import { requireUser, unauthorizedResponse } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,9 +10,6 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const auth = await requireUser(req);
-    if (!auth) return unauthorizedResponse(corsHeaders);
-
     const { report, lotteryName, pick, totalNumbers } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
@@ -212,7 +208,7 @@ FILTROS DE QUALIDADE OBRIGATÓRIOS (validar para CADA jogo):
 Responda em português. Seja extremamente técnico, use dados concretos e justificativas numéricas em cada recomendação.`;
 
     // Try multiple models with failover
-    const models = ["google/gemini-2.5-pro", "google/gemini-2.5-flash"];
+    const models = ["google/gemini-2.5-pro", "google/gemini-3-flash-preview", "google/gemini-2.5-flash"];
     let aiAnalysis = "";
     let aiSuccess = false;
 
@@ -267,11 +263,8 @@ INSTRUÇÕES CRÍTICAS:
 Análises baseadas em estatísticas históricas. Não há garantia de ganho financeiro.` },
               { role: "user", content: prompt },
             ],
-            temperature: 0.15,
-            max_tokens: 12000,
-            reasoning: {
-              effort: "high",
-            },
+            temperature: 0.2,
+            max_tokens: 10000,
           }),
         });
 

@@ -1,17 +1,23 @@
-import { NumberStats, generateSmartBet } from "@/features/statistics/engine";
+import { NumberStats, generateSmartBet } from "./statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { evaluateBetQuality, BetQualityReport } from "./bet-quality";
-import { generateByStrategy, Strategy } from "@/features/statistics/strategies";
+import { generateByStrategy, Strategy } from "./strategies";
 import { analyzeFrameCenter, computeIdealFrameCenter, analyzeRowDistribution } from "./generation-filters";
-import { computeAntiPopularityPenalty } from "@/ai/knowledge/jackpotMasterStrategies";
 
 // ═══════════════════════════════════════════════════════
 // GERADOR PROFISSIONAL DE APOSTAS
 // Múltiplas estratégias com scoring, ranking e fechamentos
 // ═══════════════════════════════════════════════════════
 
-import { ProfessionalBet } from "@/types/engine";
-export type { ProfessionalBet };
+export interface ProfessionalBet {
+  numbers: number[];
+  strategy: string;
+  strategyLabel: string;
+  quality: BetQualityReport;
+  statisticalScore: number;
+  probabilityEstimate: number;
+  rank: number;
+}
 
 export interface ClosureConfig {
   baseNumbers: number;   // quantas dezenas o jogador escolhe
@@ -213,12 +219,9 @@ export function generateProfessionalBets(
   }
 
   // Step 7: Rank by combined score (quality + statistical + diversity bonus)
-  // Step 7: Rank by combined score (quality + statistical + diversity bonus + anti-popularity)
   allBets.sort((a, b) => {
-    const penA = computeAntiPopularityPenalty(a.numbers, config.id);
-    const penB = computeAntiPopularityPenalty(b.numbers, config.id);
-    const scoreA = (a.quality.overall * 0.5 + a.statisticalScore * 0.5) * penA;
-    const scoreB = (b.quality.overall * 0.5 + b.statisticalScore * 0.5) * penB;
+    const scoreA = a.quality.overall * 0.5 + a.statisticalScore * 0.5;
+    const scoreB = b.quality.overall * 0.5 + b.statisticalScore * 0.5;
     return scoreB - scoreA;
   });
 

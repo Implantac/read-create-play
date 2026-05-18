@@ -23,7 +23,6 @@ interface CaixaApiResult {
   dezenas?: string[];
   listaDezenas?: string[];
   listaDezenasSegundoSorteio?: string[];
-  colunas?: string[][];
   premiacoes?: { descricao: string; faixa: number; ganhadores: number; valorPremio: number }[];
   acumulou?: boolean;
   valorAcumuladoProximoConcurso?: number;
@@ -35,33 +34,9 @@ export interface LatestDrawResult extends DrawResult {
   prizeTiers?: DrawPrizeData | null;
 }
 
-async function fetchJsonWithTimeout(url: string, timeoutMs = 8000): Promise<CaixaApiResult | null> {
-  const controller = new AbortController();
-  const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
-
-  try {
-    const res = await fetch(url, { signal: controller.signal });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch {
-    return null;
-  } finally {
-    window.clearTimeout(timeoutId);
-  }
-}
-
-async function fetchApiJson(path: string): Promise<CaixaApiResult | null> {
-  const normalizedPath = path.replace(/^\//, "");
-  return (
-    await fetchJsonWithTimeout(`${API_PRIMARY}/${normalizedPath}`)
-  ) ?? (
-    await fetchJsonWithTimeout(`${API_FALLBACK}/${normalizedPath}`)
-  );
-}
-
 function parseApiResult(raw: CaixaApiResult): LatestDrawResult {
-  const dezenas = raw.colunas?.flat() || raw.dezenas || raw.listaDezenas || [];
-
+  const dezenas = raw.dezenas || raw.listaDezenas || [];
+  
   let prizeTiers: DrawPrizeData | null = null;
   if (raw.premiacoes && raw.premiacoes.length > 0) {
     prizeTiers = {
@@ -78,16 +53,10 @@ function parseApiResult(raw: CaixaApiResult): LatestDrawResult {
     };
   }
 
-  // Parse Dupla Sena 2nd draw numbers
-  const secondDrawNumbers = raw.listaDezenasSegundoSorteio && raw.listaDezenasSegundoSorteio.length > 0
-    ? raw.listaDezenasSegundoSorteio.map(d => parseInt(d, 10)).filter(n => !isNaN(n))
-    : undefined;
-
   return {
     concurso: raw.concurso,
     date: raw.data || "",
     numbers: dezenas.map(d => parseInt(d, 10)).filter(n => !isNaN(n)),
-    secondDrawNumbers,
     prizeTiers,
   };
 }
@@ -96,8 +65,27 @@ export async function fetchLatestDraw(lotteryId: string): Promise<LatestDrawResu
   const apiName = API_NAMES[lotteryId];
   if (!apiName) return null;
 
-  const data = await fetchApiJson(`${apiName}/latest`);
-  return data ? parseApiResult(data) : null;
+  try {
+    const res = await fetch(`${API_PRIMARY}/${apiName}/latest`);
+    if (res.ok) {
+      const data = await res.json();
+      return parseApiResult(data);
+    }
+  } catch {
+    // fallback
+  }
+
+  try {
+    const res = await fetch(`${API_FALLBACK}/${apiName}/ultimo`);
+    if (res.ok) {
+      const data = await res.json();
+      return parseApiResult(data);
+    }
+  } catch {
+    // ignore
+  }
+
+  return null;
 }
 
 export async function fetchMultipleDraws(
@@ -122,7 +110,8 @@ export async function fetchMultipleDraws(
     if (concurso < 1) break;
 
     promises.push(
-      fetchApiJson(`${apiName}/${concurso}`)
+      fetch(`${API_PRIMARY}/${apiName}/${concurso}`)
+        .then(res => (res.ok ? res.json() : null))
         .then(data => (data ? parseApiResult(data) : null))
         .catch(() => null)
     );

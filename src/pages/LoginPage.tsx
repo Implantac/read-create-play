@@ -1,4 +1,3 @@
-import { Helmet } from "react-helmet-async";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, Link } from "react-router-dom";
@@ -41,15 +40,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 relative overflow-hidden">
-      <Helmet>
-        <title>Entrar — Titan Loterias</title>
-        <meta name="description" content="Acesse sua conta Titan Loterias e analise sorteios, gere apostas com IA e teste estratégias." />
-        <link rel="canonical" href="https://titanloterias.lovable.app/login" />
-        <meta property="og:title" content="Entrar — Titan Loterias" />
-        <meta property="og:description" content="Acesse sua conta e use IA para análise inteligente de loterias brasileiras." />
-        <meta property="og:url" content="https://titanloterias.lovable.app/login" />
-        <meta property="og:type" content="website" />
-      </Helmet>
       {/* Background effects */}
       <div className="absolute inset-0 gradient-mesh" />
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
@@ -140,7 +130,7 @@ export default function LoginPage() {
                   <span className="w-full border-t border-border/30" />
                 </div>
                 <div className="relative flex justify-center text-[10px] uppercase tracking-widest">
-                  <span className="bg-card px-3 text-muted-foreground">ou</span>
+                  <span className="bg-card px-3 text-muted-foreground/50">ou</span>
                 </div>
               </div>
 
@@ -157,14 +147,14 @@ export default function LoginPage() {
               <p className="text-sm text-center text-muted-foreground pt-2">
                 Não tem conta?{" "}
                 <Link to="/signup" className="text-primary hover:underline font-semibold">
-                  Obter acesso vitalício
+                  Criar conta grátis
                 </Link>
               </p>
             </CardFooter>
           </form>
         </Card>
 
-        <p className="text-center text-[10px] text-muted-foreground mt-4 font-mono uppercase tracking-widest">
+        <p className="text-center text-[10px] text-muted-foreground/40 mt-4 font-mono uppercase tracking-widest">
           Motor estatístico v4.0 • ML • Database
         </p>
       </motion.div>

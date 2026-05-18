@@ -1,5 +1,5 @@
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { NumberStats } from "@/features/statistics/engine";
+import { NumberStats } from "@/engine/statistics";
 import { getPrizeTiers } from "@/services/lotteryApi";
 
 export interface GameEntry {
@@ -38,57 +38,7 @@ export interface SimulationSummary {
   insights: string[];
 }
 
-// ─── Bitset helpers (inline, zero-import) ────────────
-
-function toBitset(numbers: number[]): Uint32Array {
-  const bs = new Uint32Array(4);
-  for (const n of numbers) {
-    bs[(n - 1) >> 5] |= 1 << ((n - 1) & 31);
-  }
-  return bs;
-}
-
-function popcount32(x: number): number {
-  x = x - ((x >>> 1) & 0x55555555);
-  x = (x & 0x33333333) + ((x >>> 2) & 0x33333333);
-  return (((x + (x >>> 4)) & 0x0f0f0f0f) * 0x01010101) >>> 24;
-}
-
-function bitsetHits(a: Uint32Array, b: Uint32Array): number {
-  return popcount32(a[0] & b[0]) + popcount32(a[1] & b[1]) +
-         popcount32(a[2] & b[2]) + popcount32(a[3] & b[3]);
-}
-
-/** Extract matched numbers from two bitsets */
-function bitsetMatchedNumbers(a: Uint32Array, b: Uint32Array, maxNum: number): number[] {
-  const matched: number[] = [];
-  for (let w = 0; w < 4; w++) {
-    let bits = a[w] & b[w];
-    while (bits !== 0) {
-      const bit = bits & (-bits); // lowest set bit
-      const pos = (w << 5) + (31 - Math.clz32(bit)) + 1;
-      if (pos <= maxNum) matched.push(pos);
-      bits ^= bit;
-    }
-  }
-  return matched.sort((a, b) => a - b);
-}
-
-// ─── Game generators ─────────────────────────────────
-
-/** Fisher-Yates partial shuffle — O(pick) */
-function fastRandomPick(maxNumber: number, pick: number): number[] {
-  const pool = new Uint8Array(maxNumber);
-  for (let i = 0; i < maxNumber; i++) pool[i] = i + 1;
-  for (let i = 0; i < pick; i++) {
-    const j = i + Math.floor(Math.random() * (maxNumber - i));
-    const tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
-  }
-  const result: number[] = [];
-  for (let i = 0; i < pick; i++) result.push(pool[i]);
-  return result.sort((a, b) => a - b);
-}
-
+/** Generate games using different strategies */
 export function generateGames(
   count: number,
   config: LotteryConfig,
@@ -98,8 +48,11 @@ export function generateGames(
   const games: GameEntry[] = [];
   const seen = new Set<string>();
   const modeLabels: Record<string, string> = {
-    random: "Aleatório", balanced: "Equilibrado",
-    frequency: "Frequência", delayed: "Atrasados", ai: "IA",
+    random: "Aleatório",
+    balanced: "Equilibrado",
+    frequency: "Frequência",
+    delayed: "Atrasados",
+    ai: "IA",
   };
 
   let attempts = 0;
@@ -109,30 +62,57 @@ export function generateGames(
     attempts++;
     let numbers: number[];
     switch (mode) {
-      case "balanced": numbers = generateBalanced(config, stats); break;
-      case "frequency": numbers = generateByFrequency(config, stats); break;
-      case "delayed": numbers = generateByDelay(config, stats); break;
-      case "ai": numbers = generateAI(config, stats); break;
-      default: numbers = fastRandomPick(config.numbers, config.pick);
+      case "balanced":
+        numbers = generateBalanced(config, stats);
+        break;
+      case "frequency":
+        numbers = generateByFrequency(config, stats);
+        break;
+      case "delayed":
+        numbers = generateByDelay(config, stats);
+        break;
+      case "ai":
+        numbers = generateAI(config, stats);
+        break;
+      default:
+        numbers = generateRandom(config);
     }
     const sorted = numbers.sort((a, b) => a - b);
     const key = sorted.join(",");
     if (seen.has(key)) continue;
     seen.add(key);
-    games.push({ id: games.length + 1, numbers: sorted, label: `${modeLabels[mode]} #${games.length + 1}` });
+    games.push({
+      id: games.length + 1,
+      numbers: sorted,
+      label: `${modeLabels[mode]} #${games.length + 1}`,
+    });
   }
   return games;
 }
 
+function generateRandom(config: LotteryConfig): number[] {
+  const nums: number[] = [];
+  while (nums.length < config.pick) {
+    const n = Math.floor(Math.random() * config.numbers) + 1;
+    if (!nums.includes(n)) nums.push(n);
+  }
+  return nums;
+}
+
 function generateBalanced(config: LotteryConfig, stats: NumberStats[]): number[] {
+  // Half even, half odd, spread across ranges
   const evens = stats.filter(s => s.number % 2 === 0 && s.number <= config.numbers);
   const odds = stats.filter(s => s.number % 2 !== 0 && s.number <= config.numbers);
   const halfEven = Math.floor(config.pick / 2);
   const halfOdd = config.pick - halfEven;
-  const shuffled = (arr: NumberStats[]) => [...arr].sort(() => Math.random() - 0.5);
+
   const picked: number[] = [];
+  const shuffled = (arr: NumberStats[]) => [...arr].sort(() => Math.random() - 0.5);
+
   shuffled(evens).slice(0, halfEven).forEach(s => picked.push(s.number));
   shuffled(odds).slice(0, halfOdd).forEach(s => picked.push(s.number));
+
+  // Fill remaining if needed
   while (picked.length < config.pick) {
     const n = Math.floor(Math.random() * config.numbers) + 1;
     if (!picked.includes(n)) picked.push(n);
@@ -141,29 +121,39 @@ function generateBalanced(config: LotteryConfig, stats: NumberStats[]): number[]
 }
 
 function generateByFrequency(config: LotteryConfig, stats: NumberStats[]): number[] {
-  const sorted = [...stats].filter(s => s.number >= 1 && s.number <= config.numbers).sort((a, b) => b.frequency - a.frequency);
+  const sorted = [...stats]
+    .filter(s => s.number >= 1 && s.number <= config.numbers)
+    .sort((a, b) => b.frequency - a.frequency);
+  // Pick from top 60% with some randomness
   const pool = sorted.slice(0, Math.ceil(sorted.length * 0.6));
-  return pool.sort(() => Math.random() - 0.5).slice(0, config.pick).map(s => s.number);
+  const shuffled = pool.sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, config.pick).map(s => s.number);
 }
 
 function generateByDelay(config: LotteryConfig, stats: NumberStats[]): number[] {
-  const sorted = [...stats].filter(s => s.number >= 1 && s.number <= config.numbers).sort((a, b) => b.lastSeen - a.lastSeen);
+  const sorted = [...stats]
+    .filter(s => s.number >= 1 && s.number <= config.numbers)
+    .sort((a, b) => b.lastSeen - a.lastSeen);
   const pool = sorted.slice(0, Math.ceil(sorted.length * 0.5));
-  return pool.sort(() => Math.random() - 0.5).slice(0, config.pick).map(s => s.number);
+  const shuffled = pool.sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, config.pick).map(s => s.number);
 }
 
 function generateAI(config: LotteryConfig, stats: NumberStats[]): number[] {
+  // Weighted selection combining frequency, delay, trend, and cycle score
   const validStats = stats.filter(s => s.number >= 1 && s.number <= config.numbers);
-  const weights = validStats.map(s => ({
-    number: s.number,
-    weight: s.frequency * 0.3 + s.lastSeen * 0.2 + Math.max(0, s.trend) * 0.25 + s.cycleScore * 0.25 + Math.random() * 2,
-  }));
+  const weights = validStats.map(s => {
+    const freqW = s.frequency * 0.3;
+    const delayW = s.lastSeen * 0.2;
+    const trendW = Math.max(0, s.trend) * 0.25;
+    const cycleW = s.cycleScore * 0.25;
+    return { number: s.number, weight: freqW + delayW + trendW + cycleW + Math.random() * 2 };
+  });
   weights.sort((a, b) => b.weight - a.weight);
   return weights.slice(0, config.pick).map(w => w.number);
 }
 
-// ─── Core simulation — bitset-optimized ─────────────
-
+/** Run simulation: compare games against historical draws */
 export function runHistoricalSimulation(
   games: GameEntry[],
   draws: DrawResult[],
@@ -172,19 +162,8 @@ export function runHistoricalSimulation(
 ): { results: GameResult[]; summary: SimulationSummary } {
   const prizeTiers = getPrizeTiers(config.id);
   const selectedDraws = concursoLimit === "all" ? draws : draws.slice(0, concursoLimit);
-  const drawCount = selectedDraws.length;
-
-  // Pre-compute ALL draw bitsets once
-  const drawBitsets = new Array<Uint32Array>(drawCount);
-  for (let i = 0; i < drawCount; i++) {
-    drawBitsets[i] = toBitset(selectedDraws[i].numbers);
-  }
-
-  // Determine minimum hits threshold for storing detailed results
-  const minDetailThreshold = Math.max(1, Math.min(...prizeTiers.map(p => p.hits)) - 2);
 
   const results: GameResult[] = games.map(game => {
-    const gameBs = toBitset(game.numbers);
     const concursoResults: ConcursoResult[] = [];
     const prizeCount: Record<string, number> = {};
     prizeTiers.forEach(p => { prizeCount[p.label] = 0; });
@@ -192,22 +171,20 @@ export function runHistoricalSimulation(
     let totalHits = 0;
     let bestHits = 0;
 
-    for (let d = 0; d < drawCount; d++) {
-      const hits = bitsetHits(gameBs, drawBitsets[d]);
+    for (const draw of selectedDraws) {
+      const matched = game.numbers.filter(n => draw.numbers.includes(n));
+      const hits = matched.length;
       totalHits += hits;
       if (hits > bestHits) bestHits = hits;
 
-      // Only extract matched numbers for significant hits
-      if (hits >= minDetailThreshold) {
-        const matched = bitsetMatchedNumbers(gameBs, drawBitsets[d], config.numbers);
-        concursoResults.push({
-          concurso: selectedDraws[d].concurso,
-          date: selectedDraws[d].date,
-          hits,
-          matchedNumbers: matched,
-        });
-      }
+      concursoResults.push({
+        concurso: draw.concurso,
+        date: draw.date,
+        hits,
+        matchedNumbers: matched,
+      });
 
+      // Check prize tiers
       for (const tier of prizeTiers) {
         if (hits >= tier.hits) {
           prizeCount[tier.label] = (prizeCount[tier.label] || 0) + 1;
@@ -215,7 +192,9 @@ export function runHistoricalSimulation(
       }
     }
 
-    const avg = drawCount > 0 ? totalHits / drawCount : 0;
+    const avg = selectedDraws.length > 0 ? totalHits / selectedDraws.length : 0;
+
+    // Score: weighted combination of best hits, average, and prizes
     const maxPossible = config.pick;
     const bestNorm = (bestHits / maxPossible) * 40;
     const avgNorm = (avg / maxPossible) * 30;
@@ -226,7 +205,7 @@ export function runHistoricalSimulation(
       gameId: game.id,
       gameNumbers: game.numbers,
       label: game.label,
-      results: concursoResults.sort((a, b) => b.hits - a.hits),
+      results: concursoResults,
       bestHits,
       averageHits: parseFloat(avg.toFixed(2)),
       totalPrizes: prizeCount,
@@ -234,6 +213,7 @@ export function runHistoricalSimulation(
     };
   });
 
+  // Sort by score descending
   results.sort((a, b) => b.score - a.score);
 
   // Build summary
@@ -254,25 +234,34 @@ export function runHistoricalSimulation(
     ? Math.round(results.reduce((s, r) => s + r.score, 0) / results.length)
     : 0;
 
+  // Generate insights
   const insights: string[] = [];
   if (results.length > 0) {
     const best = results[0];
     insights.push(`🏆 Melhor jogo: "${best.label}" com score ${best.score}/100 e máximo de ${best.bestHits} acertos`);
     insights.push(`📊 Média geral de acertos: ${(results.reduce((s, r) => s + r.averageHits, 0) / results.length).toFixed(2)}`);
+
     const topPrize = Object.entries(totalPrizeDistribution).find(([, v]) => v > 0);
-    if (topPrize) insights.push(`🎯 ${topPrize[1]}x premiações na faixa "${topPrize[0]}"`);
+    if (topPrize) {
+      insights.push(`🎯 ${topPrize[1]}x premiações na faixa "${topPrize[0]}"`);
+    }
+
+    // Check balance
     const bestNums = best.gameNumbers;
     const evens = bestNums.filter(n => n % 2 === 0).length;
-    insights.push(`⚖️ Melhor jogo: ${evens} pares / ${bestNums.length - evens} ímpares`);
-    insights.push(`🔢 Soma do melhor jogo: ${bestNums.reduce((s, n) => s + n, 0)}`);
+    const odds = bestNums.length - evens;
+    insights.push(`⚖️ Melhor jogo: ${evens} pares / ${odds} ímpares`);
+
+    const sum = bestNums.reduce((s, n) => s + n, 0);
+    insights.push(`🔢 Soma do melhor jogo: ${sum}`);
   }
 
   return {
     results,
     summary: {
       totalGames: games.length,
-      totalConcursos: drawCount,
-      totalComparisons: games.length * drawCount,
+      totalConcursos: selectedDraws.length,
+      totalComparisons: games.length * selectedDraws.length,
       bestGame: results[0] || null,
       worstGame: results[results.length - 1] || null,
       averageScore: avgScore,

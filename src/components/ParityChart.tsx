@@ -1,14 +1,14 @@
-import { memo, useMemo } from "react";
 import { DrawResult } from "@/data/lotteries";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { CHART_TOOLTIP_STYLE, CHART_AXIS_TICK, CHART_COLORS } from "@/lib/chart-theme";
+import { useMemo } from "react";
 import { Split } from "lucide-react";
 
 interface Props {
   draws: DrawResult[];
 }
 
-export const ParityChart = memo(function ParityChart({ draws }: Props) {
+export function ParityChart({ draws }: Props) {
   const data = useMemo(() => {
     return draws.slice(0, 50).map(d => ({
       concurso: `#${d.concurso}`,
@@ -42,4 +42,4 @@ export const ParityChart = memo(function ParityChart({ draws }: Props) {
       </div>
     </div>
   );
-});
+}

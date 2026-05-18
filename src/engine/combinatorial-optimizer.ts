@@ -1,7 +1,6 @@
-import { NumberStats } from "@/features/statistics/engine";
+import { NumberStats } from "./statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { evaluateBetQuality, BetQualityReport } from "./bet-quality";
-import { fastRandom } from "./hp-math-engine";
 
 // ═══════════════════════════════════════════════════════
 // Otimizador Combinatório
@@ -53,7 +52,7 @@ export function runCombinatorialOptimization(
     const selected: number[] = [];
     while (selected.length < config.pick && pool.length > 0) {
       const totalWeight = pool.reduce((s, p) => s + p.weight, 0);
-      let r = fastRandom() * totalWeight;
+      let r = Math.random() * totalWeight;
       for (let i = 0; i < pool.length; i++) {
         r -= pool[i].weight;
         if (r <= 0) {
@@ -68,19 +67,19 @@ export function runCombinatorialOptimization(
 
   function mutate(bet: number[]): number[] {
     const mutated = [...bet];
-    const mutations = fastRandom() < 0.3 ? 2 : 1;
+    const mutations = Math.random() < 0.3 ? 2 : 1;
     for (let m = 0; m < mutations; m++) {
-      const idx = Math.floor(fastRandom() * mutated.length);
+      const idx = Math.floor(Math.random() * mutated.length);
       let newNum: number;
       do {
         // Prefer nearby numbers or weighted random
-        if (fastRandom() < 0.5) {
-          newNum = mutated[idx] + (fastRandom() < 0.5 ? 1 : -1) * (Math.floor(fastRandom() * 5) + 1);
+        if (Math.random() < 0.5) {
+          newNum = mutated[idx] + (Math.random() < 0.5 ? 1 : -1) * (Math.floor(Math.random() * 5) + 1);
           newNum = Math.max(1, Math.min(config.numbers, newNum));
         } else {
           const pool = [...weightedPool];
           const totalWeight = pool.reduce((s, p) => s + p.weight, 0);
-          let r = fastRandom() * totalWeight;
+          let r = Math.random() * totalWeight;
           newNum = pool[0].number;
           for (const p of pool) {
             r -= p.weight;
@@ -98,7 +97,7 @@ export function runCombinatorialOptimization(
     const arr = [...combined];
     // Shuffle and pick
     for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(fastRandom() * (i + 1));
+      const j = Math.floor(Math.random() * (i + 1));
       [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     return arr.slice(0, config.pick).sort((a, b) => a - b);
@@ -128,8 +127,8 @@ export function runCombinatorialOptimization(
 
     // Crossover random pairs from top
     for (let i = 0; i < populationSize / 4; i++) {
-      const a = population[Math.floor(fastRandom() * Math.min(5, population.length))];
-      const b = population[Math.floor(fastRandom() * Math.min(10, population.length))];
+      const a = population[Math.floor(Math.random() * Math.min(5, population.length))];
+      const b = population[Math.floor(Math.random() * Math.min(10, population.length))];
       const child = crossover(a.bet, b.bet);
       const quality = evaluateBetQuality(child, stats, config, draws);
       newCandidates.push({ bet: child, score: quality.overall, quality });

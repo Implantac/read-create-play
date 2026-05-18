@@ -1,24 +1,79 @@
 // ═══════════════════════════════════════════════════════════════════
-// MOTOR DE SIMULAÇÃO MASSIVA v3.0 — ENTERPRISE QUANTUM EDITION
+// MOTOR DE SIMULAÇÃO MASSIVA v2.0
 // Bitset comparisons, multi-strategy generation, intelligent filtering
 // Suporta milhões de combinações contra histórico completo
 // ═══════════════════════════════════════════════════════════════════
 
-import { NumberStats } from "@/features/statistics/engine";
+import { NumberStats } from "./statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { seedRNG, fastGenerateDraw, fastWeightedDraw, fastCountHits, fastRandom } from "./hp-math-engine";
+import { seedRNG, fastGenerateDraw, fastWeightedDraw, fastCountHits } from "./hp-math-engine";
 
-import { 
-  GenerationMode, MassiveSimJob, SimulatedGame, 
-  MassiveSimProgress, MassiveSimResult, PatternInsight, 
-  DistributionSummary 
-} from "@/types/engine";
+// ─── Types ───────────────────────────────────────────────────────
 
-export type { 
-  GenerationMode, MassiveSimJob, SimulatedGame, 
-  MassiveSimProgress, MassiveSimResult, PatternInsight, 
-  DistributionSummary 
-};
+export type GenerationMode = "random" | "statistical" | "ai_weighted" | "hybrid";
+
+export interface MassiveSimJob {
+  config: LotteryConfig;
+  draws: DrawResult[];
+  stats: NumberStats[];
+  totalGames: number;
+  mode: GenerationMode;
+  batchSize: number; // games per tick (for async)
+  topN: number; // keep top N games
+}
+
+export interface SimulatedGame {
+  numbers: number[];
+  totalHits: number;
+  avgHits: number;
+  bestHit: number;
+  prizeCount: number;
+  hitDistribution: Record<number, number>;
+  stability: number; // lower = more consistent
+  score: number; // composite rank score
+  // Pattern features
+  evenCount: number;
+  oddCount: number;
+  sum: number;
+  consecutivePairs: number;
+  rangeSpread: number;
+  clusters: number; // groups of adjacent numbers
+}
+
+export interface MassiveSimProgress {
+  gamesGenerated: number;
+  gamesEvaluated: number;
+  totalGames: number;
+  elapsedMs: number;
+  opsPerSecond: number;
+  phase: "generating" | "evaluating" | "filtering" | "done";
+}
+
+export interface MassiveSimResult {
+  topGames: SimulatedGame[];
+  totalGenerated: number;
+  totalEvaluated: number;
+  elapsedMs: number;
+  opsPerSecond: number;
+  patternInsights: PatternInsight[];
+  distributionSummary: DistributionSummary;
+}
+
+export interface PatternInsight {
+  label: string;
+  description: string;
+  value: string;
+  trend: "positive" | "negative" | "neutral";
+}
+
+export interface DistributionSummary {
+  avgSum: number;
+  avgEvenRatio: number;
+  avgConsecutive: number;
+  avgSpread: number;
+  bestHitOverall: number;
+  avgPrizeRate: number;
+}
 
 // ─── Bitset Utilities ────────────────────────────────────────────
 
@@ -117,18 +172,12 @@ function analyzePattern(numbers: number[], maxNumber: number): {
 
 // ─── Prize Thresholds ────────────────────────────────────────────
 
-function getPrizeThreshold(config: LotteryConfig): number {
-  if (config.prizeTiers && config.prizeTiers.length > 0) {
-    // Return the minimum hits required for any prize
-    return Math.min(...config.prizeTiers.map(t => t.hits).filter(h => h > 0));
-  }
-  
-  // Fallback to legacy logic
+function getPrizeThreshold(lotteryId: string, pick: number): number {
   const thresholds: Record<string, number> = {
     megasena: 4, lotofacil: 11, quina: 2, lotomania: 15,
     duplasena: 3, timemania: 3, diadesorte: 4, supersete: 3,
   };
-  return thresholds[config.id] ?? Math.max(2, config.pick - 3);
+  return thresholds[lotteryId] ?? Math.max(2, pick - 3);
 }
 
 // ─── Core Simulation Engine ──────────────────────────────────────
@@ -153,7 +202,7 @@ export function runMassiveSimBatch(job: MassiveSimJob): MassiveSimResult {
   // Pre-compute bitsets for all historical draws
   const drawBitsets = draws.map(d => toBitset(d.numbers));
   const drawCount = draws.length;
-  const prizeThreshold = getPrizeThreshold(config);
+  const prizeThreshold = getPrizeThreshold(config.id, config.pick);
 
   // Build weights
   const weights = buildWeights(stats, config, mode);
@@ -167,41 +216,12 @@ export function runMassiveSimBatch(job: MassiveSimJob): MassiveSimResult {
 
   let totalEvaluated = 0;
 
-  // Binary insert helper for top-N (avoids full re-sort)
-  function binaryInsert(arr: SimulatedGame[], item: SimulatedGame, maxLen: number): void {
-    const score = item.score;
-    let lo = 0, hi = arr.length;
-    while (lo < hi) {
-      const mid = (lo + hi) >>> 1;
-      if (arr[mid].score > score) lo = mid + 1;
-      else hi = mid;
-    }
-    if (lo < maxLen) {
-      arr.splice(lo, 0, item);
-      if (arr.length > maxLen) arr.length = maxLen;
-    }
-  }
-
   for (let g = 0; g < totalGames; g++) {
-    // Quantum Multi-Strategy Engine
+    // Generate game based on mode
     let gameNumbers: number[];
-    const rand = fastRandom();
-    
     if (mode === "random") {
       const raw = fastGenerateDraw(config.numbers, config.pick, pool);
       gameNumbers = Array.from(raw);
-    } else if (mode === "hybrid") {
-      // Intelligent diversification
-      if (rand < 0.4) {
-        // AI Weighted
-        gameNumbers = Array.from(fastWeightedDraw(buildWeights(stats, config, "ai_weighted"), config.pick));
-      } else if (rand < 0.7) {
-        // Statistical
-        gameNumbers = Array.from(fastWeightedDraw(buildWeights(stats, config, "statistical"), config.pick));
-      } else {
-        // Pure Random (Discovery mode)
-        gameNumbers = Array.from(fastGenerateDraw(config.numbers, config.pick, pool));
-      }
     } else {
       const raw = fastWeightedDraw(weights, config.pick);
       gameNumbers = Array.from(raw);
@@ -210,8 +230,9 @@ export function runMassiveSimBatch(job: MassiveSimJob): MassiveSimResult {
     // Convert to bitset for fast comparison
     const gameBitset = toBitset(gameNumbers);
 
-    // Use typed array for hit distribution (faster than object)
-    const hitDistArr = new Uint32Array(config.pick + 1);
+    // Evaluate against ALL historical draws
+    const hitDist: Record<number, number> = {};
+    for (let h = 0; h <= config.pick; h++) hitDist[h] = 0;
 
     let totalHits = 0;
     let bestHit = 0;
@@ -220,7 +241,7 @@ export function runMassiveSimBatch(job: MassiveSimJob): MassiveSimResult {
 
     for (let d = 0; d < drawCount; d++) {
       const hits = bitsetIntersectionCount(gameBitset, drawBitsets[d]);
-      hitDistArr[hits]++;
+      hitDist[hits] = (hitDist[hits] || 0) + 1;
       totalHits += hits;
       hitSquaredSum += hits * hits;
       if (hits > bestHit) bestHit = hits;
@@ -236,33 +257,38 @@ export function runMassiveSimBatch(job: MassiveSimJob): MassiveSimResult {
     // Pattern analysis
     const pattern = analyzePattern(gameNumbers, config.numbers);
 
-    // Enterprise Scoring Algorithm v3.0
-    // Balances average return, peak performance, and pattern robustness
+    // Composite score: weighted combination of metrics
     const score =
-      (avgHits / config.pick) * 1000 + // Yield
-      (bestHit / config.pick) * 500 +  // Potential
-      (prizeCount / drawCount) * 2000 + // Frequency
-      (1 / (1 + stability)) * 300 +     // Stability
-      (pattern.rangeSpread / config.numbers) * 200; // Coverage
+      avgHits * 30 +
+      bestHit * 20 +
+      (prizeCount / drawCount) * 100 * 25 +
+      (1 / (1 + stability)) * 15 +
+      (pattern.rangeSpread / config.numbers) * 10;
 
-    // Keep only top N games via binary insert
+    // Keep only top N games
     if (topGames.length < topN || score > minTopScore) {
-      // Convert typed array to object only for stored games
-      const hitDistribution: Record<number, number> = {};
-      for (let h = 0; h <= config.pick; h++) hitDistribution[h] = hitDistArr[h];
-
       const game: SimulatedGame = {
         numbers: gameNumbers,
         totalHits, avgHits: Math.round(avgHits * 1000) / 1000,
         bestHit, prizeCount,
-        hitDistribution,
+        hitDistribution: hitDist,
         stability: Math.round(stability * 1000) / 1000,
         score: Math.round(score * 100) / 100,
         ...pattern,
       };
 
-      binaryInsert(topGames, game, topN);
-      minTopScore = topGames.length >= topN ? topGames[topGames.length - 1].score : -Infinity;
+      if (topGames.length < topN) {
+        topGames.push(game);
+        if (topGames.length === topN) {
+          topGames.sort((a, b) => b.score - a.score);
+          minTopScore = topGames[topGames.length - 1].score;
+        }
+      } else {
+        // Replace worst game
+        topGames[topGames.length - 1] = game;
+        topGames.sort((a, b) => b.score - a.score);
+        minTopScore = topGames[topGames.length - 1].score;
+      }
     }
   }
 

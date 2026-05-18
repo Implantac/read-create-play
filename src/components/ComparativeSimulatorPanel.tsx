@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { NumberStats } from "@/features/statistics/engine";
+import { NumberStats } from "@/engine/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -59,8 +59,8 @@ export function ComparativeSimulatorPanel({ stats, config, draws }: Props) {
 
   const addGame = () => {
     const nums = inputValue
-      .replace(/[^\d,\s-]/g, "")
-      .split(/[\s,-]+/)
+      .replace(/[^\d,\s\-]/g, "")
+      .split(/[\s,\-]+/)
       .map(Number)
       .filter(n => n >= 1 && n <= config.numbers);
 
@@ -287,7 +287,7 @@ export function ComparativeSimulatorPanel({ stats, config, draws }: Props) {
                   <div key={r.game.id} className={`px-3 py-2.5 flex items-center gap-3 ${i === 0 ? "bg-primary/[0.03]" : ""}`}>
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${
                       i === 0 ? "bg-yellow-500/20 text-yellow-500" :
-                      i === 1 ? "bg-gray-400/20 text-gray-500" :
+                      i === 1 ? "bg-gray-400/20 text-gray-400" :
                       i === 2 ? "bg-amber-700/20 text-amber-700" :
                       "bg-muted text-muted-foreground"
                     }`}>
@@ -361,7 +361,7 @@ export function ComparativeSimulatorPanel({ stats, config, draws }: Props) {
 
       {games.length === 0 && !results && (
         <div className="text-center py-8 text-muted-foreground text-sm border border-dashed border-border rounded-lg">
-          <FlaskConical className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
+          <FlaskConical className="w-6 h-6 mx-auto mb-2 text-muted-foreground/40" />
           Insira jogos acima para simular contra o histórico real
         </div>
       )}

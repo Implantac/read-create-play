@@ -1,9 +1,8 @@
-import { NumberStats } from "@/features/statistics/engine";
+import { NumberStats } from "@/engine/statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, ChevronDown, ChevronUp, Flame, Snowflake, RefreshCw, Hash, Target, Zap, Binary, Boxes, Info } from "lucide-react";
+import { BarChart3, ChevronDown, ChevronUp, Flame, Snowflake, RefreshCw, Hash, Target } from "lucide-react";
 import { useState } from "react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Props {
   numbers: number[];
@@ -11,10 +10,9 @@ interface Props {
   config: LotteryConfig;
   draws: DrawResult[];
   defaultOpen?: boolean;
-  strategyId?: string;
 }
 
-function computeGameAnalysis(numbers: number[], stats: NumberStats[], config: LotteryConfig, draws: DrawResult[], strategyId?: string) {
+function computeGameAnalysis(numbers: number[], stats: NumberStats[], config: LotteryConfig, draws: DrawResult[]) {
   const gameStats = numbers.map(n => stats.find(s => s.number === n)).filter(Boolean) as NumberStats[];
   
   // Frequency average
@@ -44,22 +42,6 @@ function computeGameAnalysis(numbers: number[], stats: NumberStats[], config: Lo
   const hot = gameStats.filter(s => s.status === "hot").length;
   const cold = gameStats.filter(s => s.status === "cold").length;
   const normal = gameStats.filter(s => s.status === "normal").length;
-
-  // Advanced AI Metric Calculation
-  let markovScore = 0;
-  let poissonScore = 0;
-  let clusterScore = 0;
-
-  if (strategyId === "markov") {
-    const transitionsCount = gameStats.reduce((acc, s) => acc + (s.trend > 0 ? 1 : 0), 0);
-    markovScore = Math.round((transitionsCount / numbers.length) * 100);
-  } else if (strategyId === "poisson") {
-    const avgGap = gameStats.reduce((acc, s) => acc + s.avgGap, 0) / (gameStats.length || 1);
-    poissonScore = Math.round(Math.min(100, (10 / (avgGap + 1)) * 50));
-  } else if (strategyId === "cluster") {
-    const momentumSum = gameStats.reduce((acc, s) => acc + s.momentum, 0);
-    clusterScore = Math.round(Math.min(100, momentumSum * 15));
-  }
 
   // Strategy classification
   let strategy: string;
@@ -91,13 +73,13 @@ function computeGameAnalysis(numbers: number[], stats: NumberStats[], config: Lo
     avgFreq, avgDelay, delayLabel, delayColor,
     even, odd, sum, repeated, hot, cold, normal,
     strategy, sumInRange, consecutives, ranges,
-    idealMin, idealMax, markovScore, poissonScore, clusterScore
+    idealMin, idealMax
   };
 }
 
-export function GameAnalysisBlock({ numbers, stats, config, draws, defaultOpen = false, strategyId }: Props) {
+export function GameAnalysisBlock({ numbers, stats, config, draws, defaultOpen = false }: Props) {
   const [open, setOpen] = useState(defaultOpen);
-  const analysis = computeGameAnalysis(numbers, stats, config, draws, strategyId);
+  const analysis = computeGameAnalysis(numbers, stats, config, draws);
 
   return (
     <div className="mt-1">
@@ -125,35 +107,6 @@ export function GameAnalysisBlock({ numbers, stats, config, draws, defaultOpen =
               </p>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {/* AI Scores for Advanced Strategies */}
-                {strategyId === "markov" && (
-                  <MetricCard
-                    label="Poder de Transição"
-                    value={`${analysis.markovScore}%`}
-                    icon={<Zap className="w-3 h-3" />}
-                    color="text-primary"
-                    subtitle="Peso: 2.0 (Cadeia de Markov)"
-                  />
-                )}
-                {strategyId === "poisson" && (
-                  <MetricCard
-                    label="Desvio Poisson"
-                    value={`${analysis.poissonScore}%`}
-                    icon={<Binary className="w-3 h-3" />}
-                    color="text-primary"
-                    subtitle="Peso: 1.8 (Probabilidade)"
-                  />
-                )}
-                {strategyId === "cluster" && (
-                  <MetricCard
-                    label="Afinidade Cluster"
-                    value={`${analysis.clusterScore}%`}
-                    icon={<Boxes className="w-3 h-3" />}
-                    color="text-primary"
-                    subtitle="Peso: 2.2 (Afinidade)"
-                  />
-                )}
-
                 {/* Frequency */}
                 <MetricCard
                   label="Frequência média"
@@ -228,43 +181,6 @@ export function GameAnalysisBlock({ numbers, stats, config, draws, defaultOpen =
                 <p className="text-[10px] text-amber-500">
                   ⚠ {analysis.consecutives} par{analysis.consecutives > 1 ? "es" : ""} consecutivo{analysis.consecutives > 1 ? "s" : ""}
                 </p>
-              )}
-
-              {/* Detailed Breakdown for Advanced AI */}
-              {(strategyId === "markov" || strategyId === "poisson" || strategyId === "cluster") && (
-                <div className="pt-2 border-t border-border/30">
-                  <p className="text-[9px] uppercase font-bold text-muted-foreground mb-1.5 flex items-center gap-1">
-                    <Info className="w-2.5 h-2.5 text-primary" /> Breakdown por Dezena (IA)
-                  </p>
-                  <div className="flex flex-wrap gap-1">
-                    {numbers.sort((a, b) => a - b).map(n => {
-                      const s = stats.find(st => st.number === n);
-                      if (!s) return null;
-                      let scoreVal = 0;
-                      let label = "";
-                      if (strategyId === "markov") { scoreVal = s.trend > 0 ? 100 : 30; label = "Transição"; }
-                      else if (strategyId === "poisson") { scoreVal = Math.round(Math.min(100, (10 / (s.avgGap + 1)) * 50)); label = "Poisson"; }
-                      else if (strategyId === "cluster") { scoreVal = Math.round(Math.min(100, s.momentum * 30)); label = "Afinidade"; }
-                      return (
-                        <TooltipProvider key={n}>
-                          <Tooltip delayDuration={200}>
-                            <TooltipTrigger asChild>
-                              <div className="flex flex-col items-center p-1 rounded bg-background/40 border border-border/20 min-w-[32px] cursor-help hover:border-primary/40 transition-colors">
-                                <span className="text-[10px] font-bold font-mono">{String(n).padStart(2, "0")}</span>
-                                <div className="w-full h-1 mt-1 rounded-full bg-muted overflow-hidden">
-                                  <div className="h-full bg-primary" style={{ width: `${scoreVal}%` }} />
-                                </div>
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent side="top" className="text-[10px] p-2 bg-card border-border shadow-xl">
-                              <p className="font-bold">Dezena {n} • Score {label}: {scoreVal}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      );
-                    })}
-                  </div>
-                </div>
               )}
             </div>
           </motion.div>

@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getSupabaseAdmin, getCachedAnalysis, setCachedAnalysis } from "../_shared/ai-cache.ts";
-import { requireUser, unauthorizedResponse } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -14,9 +13,6 @@ serve(async (req) => {
   }
 
   try {
-    const auth = await requireUser(req);
-    if (!auth) return unauthorizedResponse(corsHeaders);
-
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
@@ -25,7 +21,7 @@ serve(async (req) => {
 
     const supabase = await getSupabaseAdmin();
     const lotteryId = lotteryName?.toLowerCase().replace(/\s+/g, "").replace(/á/g, "a") || "unknown";
-    const cacheInput = { lotteryName, totalDraws: simulationData.totalDraws, betsCount: simulationData.bets?.length, v: 2 };
+    const cacheInput = { lotteryName, totalDraws: simulationData.totalDraws, betsCount: simulationData.bets?.length };
     const cached = await getCachedAnalysis(supabase, lotteryId, "ai-simulation-analysis", cacheInput, 6);
     if (cached) {
       return new Response(JSON.stringify({ ...cached, fromCache: true }), {
@@ -34,16 +30,17 @@ serve(async (req) => {
     }
 
     const lotteryStrategies: Record<string, string> = {
-      "Lotofácil": "Lotofácil (15/25): Cobertura por quintil (1-5, 6-10, 11-15, 16-20, 21-25) com 3 números cada. Par/ímpar 7/8 ou 8/7. Soma 170-220. Máx 3 consecutivos. Repetição 8-10 do anterior. 5-6 primos. ≥3 dezenas de ouro (10,11,20,25).",
-      "Mega Sena": "Mega Sena (6/60): ≥3 faixas de 10. Par/ímpar 3/3. Soma 120-220. Máx 1 par consecutivo.",
-      "Quina": "Quina (5/80): ≥3 faixas de 20. Par/ímpar 2/3 ou 3/2. Soma 100-250. Spread ≥40.",
-      "Lotomania": "Lotomania (50/100): ≥85% cobertura por dezena. Par/ímpar 24-26. Soma 2400-2600.",
-      "Dupla Sena": "Dupla Sena (6/50): ≥3 faixas de 10. Par/ímpar 3/3. Soma 100-180.",
-      "Dia de Sorte": "Dia de Sorte (7/31): Cobertura por terço. Par/ímpar 3/4 ou 4/3. Soma 100-130.",
-      "Super Sete": "Super Sete (7 colunas 0-9): Análise por coluna independente.",
-      "Timemania": "Timemania (10/80): ≥5 faixas de 16. Par/ímpar 5/5. Soma 350-450. Spread ≥60.",
+      "Lotofácil": "Lotofácil (15/25): Cobertura por quintil (1-5, 6-10, 11-15, 16-20, 21-25) com 3 números cada. Par/ímpar entre 7/8 e 8/7. Soma ideal: 170-210. Máximo 3 consecutivos.",
+      "Mega Sena": "Mega Sena (6/60): Distribuição em ≥3 dezenas de 10. Par/ímpar 3/3. Soma 120-220. Máximo 1 par consecutivo. Evitar clusters.",
+      "Quina": "Quina (5/80): Distribuição ampla em ≥3 faixas de 20. Par/ímpar 2/3 ou 3/2. Soma 100-250. Spread mínimo 40.",
+      "Lotomania": "Lotomania (50/100): Cobertura ≥85% por dezena. Par/ímpar 24-26/24-26. Soma 2400-2600. Alta diversificação.",
+      "Dupla Sena": "Dupla Sena (6/50): Distribuição em ≥3 faixas de 10. Par/ímpar 3/3. Soma 100-180.",
+      "Dia de Sorte": "Dia de Sorte (7/31): Cobertura por terço (1-10, 11-20, 21-31). Par/ímpar 3/4 ou 4/3. Soma 100-130.",
+      "Super Sete": "Super Sete (7 colunas 0-9): Análise por coluna independente. Variação entre colunas.",
+      "Timemania": "Timemania (10/80): ≥5 faixas de 16 cobertas. Par/ímpar 5/5. Soma 350-450. Spread ≥60.",
     };
 
+    // Pre-compute comparative metrics
     const bets = simulationData.bets || [];
     const avgHits = bets.length > 0 ? bets.reduce((s: number, b: any) => s + b.avgHits, 0) / bets.length : 0;
     const bestOverall = Math.max(...bets.map((b: any) => b.bestHit || 0));
@@ -51,6 +48,7 @@ serve(async (req) => {
       ? (bets.reduce((s: number, b: any) => s + (b.prizeCount || 0), 0) / (bets.length * Math.max(simulationData.totalDraws, 1)) * 100).toFixed(1)
       : "0";
 
+    // Number frequency across all bets
     const numUsage: Record<number, { count: number; avgHits: number; bets: number }> = {};
     bets.forEach((b: any) => {
       (b.bet?.numbers || []).forEach((n: number) => {
@@ -73,21 +71,19 @@ serve(async (req) => {
       .slice(0, 10)
       .map(([n, s]) => `${n}(em ${s.count} jogos, média:${s.avgHits.toFixed(1)})`);
 
-    const systemPrompt = `Você é um analista quantitativo de elite em loterias brasileiras, especializado em backtesting e simulação histórica.
-Analise resultados de simulação contra sorteios reais com rigor estatístico.
-
-METODOLOGIA DE ANÁLISE:
-1. Análise de variância entre jogos para identificar fatores de sucesso
-2. Decomposição de performance por critério: paridade, soma, distribuição, consecutivos
-3. Correlação entre composição numérica e taxa de acerto
-4. Identificação de dezenas que consistentemente contribuem ou prejudicam
-5. Sugestões de substituição baseadas em evidência (trocar X por Y com justificativa)
-
-Formate com markdown (##, ###, **negrito**, listas, tabelas). Português do Brasil.
-Seja preciso: cite números específicos, porcentagens e comparações.
+    const systemPrompt = `Você é um analista quantitativo de elite em loterias brasileiras.
+Analise resultados de simulação de apostas contra sorteios reais com rigor estatístico.
+Formate com markdown (##, ###, **negrito**, listas). Português do Brasil.
 
 ESTRATÉGIA DE REFERÊNCIA:
-${lotteryStrategies[lotteryName] || ""}`;
+${lotteryStrategies[lotteryName] || ""}
+
+OBJETIVOS DA ANÁLISE:
+1. Identificar por que certos jogos performam melhor
+2. Encontrar dezenas que consistentemente prejudicam o desempenho
+3. Sugerir substituições CONCRETAS (trocar X por Y)
+4. Gerar 2 jogos otimizados baseados nos padrões dos melhores
+5. Quantificar cada recomendação com números`;
 
     const userPrompt = `═══ SIMULAÇÃO HISTÓRICA — ${lotteryName} (${lotteryPick}/${lotteryNumbers}) ═══
 Concursos testados: ${simulationData.totalDraws}
@@ -124,82 +120,59 @@ Dezenas com pior performance: ${worstNums.join(", ")}
 ═══ SOLICITAÇÃO ═══
 
 ## 1. RANKING ANALÍTICO
-Ranking dos jogos com explicação técnica detalhada de performance. Identifique o "DNA" dos melhores jogos.
+Ranking dos jogos com explicação técnica de por que cada um performa como performa.
 
 ## 2. DIAGNÓSTICO POR JOGO
-Para cada jogo:
+Para cada jogo, identifique:
 - 2-4 dezenas ineficientes com evidência numérica
-- Substituições concretas ("trocar X por Y porque...")
-- Pontos fortes do jogo
+- Substituições concretas (ex: "trocar 15 por 22 porque...")
+- O que está correto no jogo
 
 ## 3. PADRÕES DOS MELHORES
-- Características compartilhadas pelos top jogos
-- Par/ímpar, soma, spread, cobertura de faixas
-- Dezenas "universais" presentes nos melhores
+- Que características os top jogos compartilham?
+- Par/ímpar, soma, spread, distribuição por faixas
 
 ## 4. JOGOS OTIMIZADOS
-- 3 combinações de ${lotteryPick} dezenas baseadas nos padrões identificados
+- 2 combinações de ${lotteryPick} dezenas baseadas nos padrões identificados
 - Justificativa número a número
-- Perfil: 1 conservador, 1 equilibrado, 1 agressivo
 
-## 5. ANÁLISE DE ROI
-- Estimativa de ROI por jogo (custo vs premiações acumuladas)
-- Jogos com melhor relação custo-benefício
-- Sugestões de portfólio (combinação ótima de jogos)
+## 5. SCORE DE CONFIANÇA
+- 0-100 para cada recomendação
+- Limitações da simulação`;
 
-## 6. SCORE DE CONFIANÇA
-- 0-100 para cada recomendação com fundamentação
-- Limitações da simulação
-- Disclaimer: resultados passados não garantem resultados futuros`;
+    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3-flash-preview",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: 0.25,
+        max_tokens: 8000,
+      }),
+    });
 
-    const models = ["google/gemini-2.5-pro", "google/gemini-2.5-flash"];
-    let analysis = "";
-
-    for (const model of models) {
-      try {
-        const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model,
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: userPrompt },
-            ],
-            temperature: 0.2,
-            max_tokens: 10000,
-            reasoning: {
-              effort: "medium",
-            },
-          }),
+    if (!aiResponse.ok) {
+      if (aiResponse.status === 429) {
+        return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em instantes." }), {
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
-
-        if (aiResponse.ok) {
-          const data = await aiResponse.json();
-          analysis = data.choices?.[0]?.message?.content || "";
-          if (analysis) break;
-        } else {
-          console.error(`Model ${model} failed:`, aiResponse.status);
-          if (aiResponse.status === 429) await new Promise(r => setTimeout(r, 1000));
-          if (aiResponse.status === 402) {
-            return new Response(JSON.stringify({ error: "Créditos de IA esgotados." }), {
-              status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-            });
-          }
-        }
-      } catch (e) {
-        console.error(`Model ${model} exception:`, e);
       }
+      if (aiResponse.status === 402) {
+        return new Response(JSON.stringify({ error: "Créditos de IA esgotados." }), {
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      throw new Error("Erro na análise de IA");
     }
 
-    if (!analysis) {
-      return new Response(JSON.stringify({ success: false, error: "Análise de IA indisponível. Tente novamente." }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    const aiData = await aiResponse.json();
+    const analysis = aiData.choices?.[0]?.message?.content || "Análise não disponível.";
 
     const responseData = { success: true, analysis };
     await setCachedAnalysis(supabase, lotteryId, "ai-simulation-analysis", cacheInput, responseData, 6);

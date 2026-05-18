@@ -16,14 +16,14 @@ export function RecentDraws({ draws }: Props) {
   const [expandedDraw, setExpandedDraw] = useState<number | null>(firstWithPrizes?.concurso ?? null);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-xl bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center shrink-0">
-          <History className="w-6 h-6 text-neon-purple drop-shadow-[0_0_8px_rgba(var(--neon-purple),0.4)]" />
+    <div className="rounded-xl glass-card p-5 space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-lg bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center">
+          <History className="w-4 h-4 text-neon-purple" />
         </div>
         <div>
-          <h3 className="text-lg font-black text-white tracking-tight uppercase leading-none">Historical Results</h3>
-          <p className="text-[10px] text-muted-foreground mt-1 font-bold tracking-widest uppercase opacity-60">Verified Settlement Ledger</p>
+          <h3 className="text-sm font-semibold text-foreground">Últimos Concursos</h3>
+          <p className="text-[10px] text-muted-foreground mt-0.5">Resultados e premiações</p>
         </div>
       </div>
       <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
@@ -37,7 +37,7 @@ export function RecentDraws({ draws }: Props) {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.03 }}
-              className="rounded-xl bg-white/[0.02] border border-white/5 hover:border-primary/40 transition-all duration-500 overflow-hidden group"
+              className="rounded-lg bg-secondary/30 border border-border/30 hover:border-border/60 transition-colors overflow-hidden"
             >
               <div
                 className={`flex items-center gap-3 p-2.5 ${hasPrizes ? "cursor-pointer" : ""}`}
@@ -49,7 +49,7 @@ export function RecentDraws({ draws }: Props) {
                 </div>
                 <div className="flex flex-wrap gap-1.5 flex-1">
                   {draw.numbers.map(n => (
-                    <span key={n} className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black shadow-[0_2px_8px_rgba(0,0,0,0.4)] border border-white/10 bg-[#111] text-primary">
+                    <span key={n} className="lottery-ball text-xs w-7 h-7">
                       {String(n).padStart(2, "0")}
                     </span>
                   ))}

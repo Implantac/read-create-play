@@ -1,4 +1,3 @@
-import { memo, useMemo } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { CHART_TOOLTIP_STYLE, CHART_AXIS_TICK, CHART_COLORS } from "@/lib/chart-theme";
 import { TrendingUp } from "lucide-react";
@@ -7,9 +6,7 @@ interface Props {
   data: { concurso: number; sum: number }[];
 }
 
-export const SumChart = memo(function SumChart({ data }: Props) {
-  const reversed = useMemo(() => [...data].reverse(), [data]);
-
+export function SumChart({ data }: Props) {
   return (
     <div className="rounded-xl glass-card p-5 space-y-4">
       <div className="flex items-center gap-3">
@@ -23,7 +20,7 @@ export const SumChart = memo(function SumChart({ data }: Props) {
       </div>
       <div className="h-48">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={reversed} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
+          <LineChart data={[...data].reverse()} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
             <XAxis dataKey="concurso" tick={CHART_AXIS_TICK} interval="preserveStartEnd" />
             <YAxis tick={CHART_AXIS_TICK} />
             <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
@@ -33,4 +30,4 @@ export const SumChart = memo(function SumChart({ data }: Props) {
       </div>
     </div>
   );
-});
+}

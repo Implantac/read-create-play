@@ -10,9 +10,8 @@ import {
   GitBranch, Layers, RefreshCw, AlertTriangle, Sparkles, ArrowRight, Clock, Hash,
 } from "lucide-react";
 import { toast } from "sonner";
-import ReactMarkdown from "react-markdown";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { NumberStats } from "@/features/statistics/engine";
+import { NumberStats } from "@/engine/statistics";
 import { detectPatterns, PatternReport } from "@/engine/pattern-detector";
 import { generatePatternAnalysis } from "@/engine/native-analysis";
 import {
@@ -704,19 +703,15 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
                     </Button>
                   </div>
                   <div className="prose prose-sm prose-invert max-w-none p-4 rounded-lg bg-muted/20 border border-border">
-                    <div className="text-sm text-foreground leading-relaxed">
-                      <ReactMarkdown
-                        components={{
-                          strong: ({ node, ...props }) => <strong className="text-primary" {...props} />,
-                          h2: ({ node, ...props }) => <h3 className="text-foreground font-bold mt-4 mb-2 text-base" {...props} />,
-                          h3: ({ node, ...props }) => <h4 className="text-foreground font-semibold mt-3 mb-1 text-sm" {...props} />,
-                          li: ({ node, ...props }) => <li className="text-muted-foreground text-xs ml-4" {...props} />,
-                          a: ({ node, ...props }) => <a target="_blank" rel="noopener noreferrer" {...props} />,
-                        }}
-                      >
-                        {aiAnalysis}
-                      </ReactMarkdown>
-                    </div>
+                    <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed"
+                      dangerouslySetInnerHTML={{
+                        __html: aiAnalysis
+                          .replace(/\*\*(.*?)\*\*/g, '<strong class="text-primary">$1</strong>')
+                          .replace(/#{3}\s(.*)/g, '<h4 class="text-foreground font-semibold mt-3 mb-1 text-sm">$1</h4>')
+                          .replace(/#{2}\s(.*)/g, '<h3 class="text-foreground font-bold mt-4 mb-2 text-base">$1</h3>')
+                          .replace(/- (.*)/g, '<li class="text-muted-foreground text-xs ml-4">$1</li>')
+                      }}
+                    />
                   </div>
                 </div>
               )}

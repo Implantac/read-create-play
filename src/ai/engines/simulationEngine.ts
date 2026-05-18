@@ -1,6 +1,6 @@
 /**
  * Native AI — Simulation Engine
- * High-performance simulation with prize tier analysis and historical backtesting
+ * High-performance simulation for game testing
  */
 
 import { DrawResult } from "@/data/lotteries";
@@ -35,16 +35,6 @@ export function simulateGames(
   const gameResults: SimulatedGameResult[] = gameSets.map((gs, idx) => {
     const hitDist: Record<number, number> = {};
     let totalHits = 0, maxHits = 0, minHits = rules.pick;
-    let prizeCount = 0;
-
-    // Prize tier thresholds
-    const prizeTiers = rules.prizeTiers || [];
-    const minPrizeHits = prizeTiers.length > 0
-      ? prizeTiers[prizeTiers.length - 1].hits
-      : Math.ceil(games[idx].length * 0.6);
-
-    // Track prize tier distribution
-    const prizeDistribution: Record<number, number> = {};
 
     for (let i = 0; i < iterations; i++) {
       const draw = generateRandomDraw(rules.totalNumbers, rules.pick);
@@ -53,11 +43,6 @@ export function simulateGames(
       maxHits = Math.max(maxHits, hits);
       minHits = Math.min(minHits, hits);
       hitDist[hits] = (hitDist[hits] || 0) + 1;
-
-      if (hits >= minPrizeHits) {
-        prizeCount++;
-        prizeDistribution[hits] = (prizeDistribution[hits] || 0) + 1;
-      }
     }
 
     const avgHits = totalHits / iterations;
@@ -70,26 +55,7 @@ export function simulateGames(
     variance /= iterations;
     const stabilityScore = Math.max(0, Math.min(100, Math.round(100 - Math.sqrt(variance) * 20)));
 
-    // Prize rate
-    const prizeRate = prizeCount / iterations;
-
-    // Consistency score: how often does the game hit near its average
-    const nearAvgCount = Object.entries(hitDist)
-      .filter(([h]) => Math.abs(Number(h) - avgHits) <= 1)
-      .reduce((s, [, c]) => s + c, 0);
-    const consistencyScore = Math.round((nearAvgCount / iterations) * 100);
-
-    return {
-      numbers: games[idx],
-      avgHits,
-      maxHits,
-      minHits,
-      hitDistribution: hitDist,
-      stabilityScore,
-      prizeRate,
-      consistencyScore,
-      prizeDistribution,
-    };
+    return { numbers: games[idx], avgHits, maxHits, minHits, hitDistribution: hitDist, stabilityScore };
   });
 
   const avgHits = gameResults.reduce((s, g) => s + g.avgHits, 0) / gameResults.length;
@@ -104,38 +70,6 @@ export function simulateGames(
     }
   }
 
-  // Portfolio consistency: how correlated are the games
-  const avgPrizeRate = gameResults.reduce((s, g) => s + (g.prizeRate || 0), 0) / gameResults.length;
-  const avgStability = gameResults.reduce((s, g) => s + g.stabilityScore, 0) / gameResults.length;
-
-  // Confidence interval (95%) for avgHits using CLT
-  const allAvgs = gameResults.map(g => g.avgHits);
-  const meanOfAvgs = allAvgs.reduce((a, b) => a + b, 0) / allAvgs.length;
-  const stdOfAvgs = allAvgs.length > 1
-    ? Math.sqrt(allAvgs.reduce((s, a) => s + (a - meanOfAvgs) ** 2, 0) / (allAvgs.length - 1))
-    : 0;
-  const marginOfError = 1.96 * stdOfAvgs / Math.sqrt(Math.max(1, allAvgs.length));
-
-  // Statistical significance: is portfolio better than random?
-  const expectedRandomHits = rules.pick * rules.pick / rules.totalNumbers;
-  const tStatistic = allAvgs.length > 1
-    ? (meanOfAvgs - expectedRandomHits) / (stdOfAvgs / Math.sqrt(allAvgs.length) + 1e-9)
-    : 0;
-  const isSignificant = Math.abs(tStatistic) > 1.96;
-
-  // Portfolio diversity: avg pairwise overlap
-  let totalOverlap = 0;
-  let pairCount = 0;
-  for (let i = 0; i < games.length; i++) {
-    for (let j = i + 1; j < games.length; j++) {
-      const setJ = new Set(games[j]);
-      totalOverlap += games[i].filter(n => setJ.has(n)).length;
-      pairCount++;
-    }
-  }
-  const avgOverlap = pairCount > 0 ? totalOverlap / pairCount : 0;
-  const diversityScore = Math.max(0, Math.round(100 - (avgOverlap / rules.pick) * 150));
-
   return {
     totalSimulations: iterations * games.length,
     games: gameResults.sort((a, b) => b.avgHits - a.avgHits),
@@ -143,58 +77,5 @@ export function simulateGames(
     hitDistribution,
     bestGame: { numbers: bestGame.numbers, avgHits: bestGame.avgHits },
     worstGame: { numbers: worstGame.numbers, avgHits: worstGame.avgHits },
-    avgPrizeRate,
-    avgStability,
-    confidenceInterval: {
-      lower: Math.max(0, meanOfAvgs - marginOfError),
-      upper: meanOfAvgs + marginOfError,
-      confidence: 0.95,
-    },
-    statisticalSignificance: {
-      tStatistic,
-      significant: isSignificant,
-      expectedRandom: expectedRandomHits,
-    },
-    diversityScore,
   };
-}
-
-/** Backtest games against real historical draws */
-export function backtestGames(
-  games: number[][],
-  draws: DrawResult[],
-  lotteryId: string,
-  window: number = 50
-): { game: number[]; totalHits: number; prizeHits: number; avgHits: number; bestDraw: number; hitsByDraw: number[] }[] {
-  const rules = getLotteryRules(lotteryId);
-  const subset = draws.slice(0, Math.min(window, draws.length));
-  const prizeTiers = rules.prizeTiers || [];
-  const minPrizeHits = prizeTiers.length > 0
-    ? prizeTiers[prizeTiers.length - 1].hits
-    : Math.ceil(rules.pick * 0.6);
-
-  return games.map(game => {
-    const gameSet = new Set(game);
-    let totalHits = 0;
-    let prizeHits = 0;
-    let bestDraw = 0;
-    const hitsByDraw: number[] = [];
-
-    for (const d of subset) {
-      const hits = d.numbers.filter(n => gameSet.has(n)).length;
-      totalHits += hits;
-      hitsByDraw.push(hits);
-      bestDraw = Math.max(bestDraw, hits);
-      if (hits >= minPrizeHits) prizeHits++;
-    }
-
-    return {
-      game,
-      totalHits,
-      prizeHits,
-      avgHits: subset.length > 0 ? totalHits / subset.length : 0,
-      bestDraw,
-      hitsByDraw,
-    };
-  });
 }

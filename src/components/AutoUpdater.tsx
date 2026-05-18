@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DrawResult } from "@/data/lotteries";
 import { fetchLatestDraw, LatestDrawResult } from "@/services/lotteryApi";
 import { DrawPrizeData } from "@/hooks/useLotteryDraws";
-import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, Wifi, WifiOff, Clock, CheckCircle2, Trophy, Users, DollarSign, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,86 +11,50 @@ interface Props {
   lotteryId: string;
   onNewDraw: (draw: DrawResult) => void;
   latestConcurso: number;
-  onSyncTriggered?: () => void;
 }
 
 function formatCurrency(value: number): string {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-const SYNC_COOLDOWN_MS = 30_000; // 30s cooldown between syncs
-
-export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso, onSyncTriggered }: Props) {
+export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso }: Props) {
   const [loading, setLoading] = useState(false);
   const [lastCheck, setLastCheck] = useState<Date | null>(null);
   const [isOnline, setIsOnline] = useState(true);
   const [autoEnabled, setAutoEnabled] = useState(false);
   const [latestFromApi, setLatestFromApi] = useState<LatestDrawResult | null>(null);
 
-  const lotteryIdRef = useRef(lotteryId);
-  lotteryIdRef.current = lotteryId;
-
-  const lastSyncRef = useRef<Record<string, number>>({});
-  const mountedRef = useRef(true);
-
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => { mountedRef.current = false; };
-  }, []);
-
-  const persistAndSync = useCallback(async (lid: string) => {
-    const now = Date.now();
-    const lastSync = lastSyncRef.current[lid] || 0;
-    if (now - lastSync < SYNC_COOLDOWN_MS) {
-      return;
-    }
-    lastSyncRef.current[lid] = now;
-
-    try {
-      await supabase.functions.invoke("sync-lottery-draws", {
-        body: { lottery_id: lid },
-      });
-      if (mountedRef.current) onSyncTriggered?.();
-    } catch (e) {
-      console.warn("Background sync failed:", e);
-    }
-  }, [onSyncTriggered]);
-
   const checkForUpdates = useCallback(async () => {
-    const requestedLottery = lotteryId;
     setLoading(true);
     try {
-      const result = await fetchLatestDraw(requestedLottery);
-      if (!mountedRef.current || lotteryIdRef.current !== requestedLottery) return;
-
+      const result = await fetchLatestDraw(lotteryId);
       setLastCheck(new Date());
 
-      if (result && Array.isArray(result.numbers) && result.numbers.length > 0) {
+      if (result) {
         setLatestFromApi(result);
         if (result.concurso > latestConcurso) {
           onNewDraw(result);
           toast.success(`Novo resultado! Concurso #${result.concurso}`);
-          persistAndSync(requestedLottery);
+        } else {
+          toast.info("Nenhum resultado novo disponível");
         }
         setIsOnline(true);
       } else {
-        setLatestFromApi(null);
         setIsOnline(false);
+        toast.error("Não foi possível conectar à API da Caixa");
       }
     } catch {
-      if (!mountedRef.current || lotteryIdRef.current !== requestedLottery) return;
       setIsOnline(false);
+      toast.error("Erro ao buscar resultados");
     } finally {
-      if (mountedRef.current && lotteryIdRef.current === requestedLottery) setLoading(false);
+      setLoading(false);
     }
-  }, [lotteryId, latestConcurso, onNewDraw, persistAndSync]);
+  }, [lotteryId, latestConcurso, onNewDraw]);
 
-  // On mount / lottery change: one sync + one API check (no duplicates)
+  // Auto-fetch on mount and when lottery changes
   useEffect(() => {
     setLatestFromApi(null);
-    persistAndSync(lotteryId);
     checkForUpdates();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lotteryId]);
 
   // Auto-check every 5 minutes if enabled

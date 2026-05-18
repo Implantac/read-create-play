@@ -11,19 +11,17 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Tabs, TabsContent, TabsList, TabsTrigger,
 } from "@/components/ui/tabs";
 import {
   Users, Crown, TrendingUp, Search, Shield, Loader2, RefreshCw, Ban, CheckCircle2,
-  ShieldCheck, AlertTriangle, History, UserCog, Eye, Zap, Database, Activity, Star,
-  MessageSquare, Clock, AlertCircle, CheckCircle, Mail as MailIcon
+  ShieldCheck, AlertTriangle, History, UserCog, Eye,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { motion } from "framer-motion";
 
 interface Profile {
   id: string;
@@ -49,28 +47,17 @@ interface AuditLog {
   created_at: string;
 }
 
-interface SupportTicket {
-  id: string;
-  user_id: string | null;
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-  protocol: string;
-  status: 'open' | 'in_progress' | 'closed';
-  created_at: string;
-  updated_at: string;
-}
-
-const OWNER_EMAIL = "etcsuporte889@gmail.com";
-
 const PLAN_COLORS: Record<string, string> = {
   free: "bg-muted text-muted-foreground",
+  premium: "bg-primary/20 text-primary",
+  professional: "bg-accent/20 text-accent",
   lifetime: "bg-yellow-500/20 text-yellow-400",
 };
 
 const PLAN_LABELS: Record<string, string> = {
   free: "Gratuito",
+  premium: "Premium",
+  professional: "Profissional",
   lifetime: "Vitalício",
 };
 
@@ -88,26 +75,16 @@ const ROLE_COLORS: Record<string, string> = {
   user: "bg-muted text-muted-foreground border-border",
 };
 
-const ACTION_LABELS: Record<string, string> = {
-  plan_changed: "Plano alterado",
-  role_changed: "Papel alterado",
-  user_blocked: "Usuário bloqueado",
-  user_unblocked: "Usuário desbloqueado",
-};
-
 export default function AdminPage() {
   const { user, isSuperAdmin } = useAuth();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
-  const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [ticketSearch, setTicketSearch] = useState("");
   const [filterPlan, setFilterPlan] = useState("all");
   const [filterRole, setFilterRole] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [filterTicketStatus, setFilterTicketStatus] = useState("all");
   const [updating, setUpdating] = useState<string | null>(null);
   const [drawCount, setDrawCount] = useState(0);
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -119,22 +96,18 @@ export default function AdminPage() {
   const [detailUser, setDetailUser] = useState<Profile | null>(null);
   const { toast } = useToast();
 
-  const isOwner = (email?: string | null) => email?.trim().toLowerCase() === OWNER_EMAIL;
-
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const [profilesRes, drawsRes, rolesRes, logsRes, ticketsRes] = await Promise.all([
+    const [profilesRes, drawsRes, rolesRes, logsRes] = await Promise.all([
       supabase.from("profiles").select("*").order("created_at", { ascending: false }),
       supabase.from("lottery_draws").select("id", { count: "exact", head: true }),
       supabase.from("user_roles").select("*"),
       supabase.from("admin_audit_logs").select("*").order("created_at", { ascending: false }).limit(100),
-      supabase.from("support_tickets").select("*").order("created_at", { ascending: false }),
     ]);
     if (profilesRes.data) setProfiles(profilesRes.data as Profile[]);
     if (drawsRes.count !== null) setDrawCount(drawsRes.count);
     if (rolesRes.data) setRoles(rolesRes.data as UserRole[]);
     if (logsRes.data) setAuditLogs(logsRes.data as AuditLog[]);
-    if (ticketsRes.data) setTickets(ticketsRes.data as SupportTicket[]);
     setLoading(false);
   }, []);
 
@@ -161,14 +134,11 @@ export default function AdminPage() {
     return false;
   };
 
-  const countSuperAdmins = (): number => roles.filter(r => r.role === "super_admin").length;
+  const countSuperAdmins = (): number => {
+    return roles.filter(r => r.role === "super_admin").length;
+  };
 
   const updatePlan = async (userId: string, newPlan: string) => {
-    const profile = profiles.find(p => p.id === userId);
-    if (isOwner(profile?.email)) {
-      toast({ title: "Ação Bloqueada", description: "O plano do proprietário é vitalício e não pode ser alterado.", variant: "destructive" });
-      return;
-    }
     setUpdating(userId);
     const { error } = await supabase
       .from("profiles")
@@ -178,6 +148,7 @@ export default function AdminPage() {
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
+      const profile = profiles.find(p => p.id === userId);
       await logAction("plan_changed", userId, { old_plan: profile?.plan, new_plan: newPlan });
       setProfiles(prev => prev.map(p => p.id === userId ? { ...p, plan: newPlan } : p));
       toast({ title: "Plano atualizado", description: `Plano alterado para ${PLAN_LABELS[newPlan]}.` });
@@ -185,13 +156,9 @@ export default function AdminPage() {
   };
 
   const updateRole = async (userId: string, newRole: string) => {
-    const profile = profiles.find(p => p.id === userId);
-    if (isOwner(profile?.email) && newRole !== "super_admin") {
-      toast({ title: "Ação Bloqueada", description: "O papel do proprietário não pode ser rebaixado.", variant: "destructive" });
-      return;
-    }
     const currentRole = getUserRole(userId);
 
+    // Self-lock protection
     if (isSelfLockRisk(userId, newRole)) {
       setConfirmDialog({
         open: true,
@@ -202,8 +169,13 @@ export default function AdminPage() {
       return;
     }
 
+    // Last super_admin protection
     if (currentRole === "super_admin" && newRole !== "super_admin" && countSuperAdmins() <= 1) {
-      toast({ title: "Ação Bloqueada", description: "Não é possível remover o último Super Admin do sistema.", variant: "destructive" });
+      toast({
+        title: "Ação Bloqueada",
+        description: "Não é possível remover o último Super Admin do sistema.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -218,6 +190,7 @@ export default function AdminPage() {
 
     let error;
     if (newRole === "user") {
+      // Remove role entry (defaults to user)
       if (existingRole) {
         const res = await supabase.from("user_roles").delete().eq("user_id", userId);
         error = res.error;
@@ -235,6 +208,7 @@ export default function AdminPage() {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
       await logAction("role_changed", userId, { old_role: oldRole, new_role: newRole });
+      // Update local state
       if (newRole === "user") {
         setRoles(prev => prev.filter(r => r.user_id !== userId));
       } else if (existingRole) {
@@ -247,16 +221,13 @@ export default function AdminPage() {
   };
 
   const toggleBlock = async (userId: string, currentBlocked: boolean) => {
-    const profile = profiles.find(p => p.id === userId);
-    if (isOwner(profile?.email)) {
-      toast({ title: "Ação Bloqueada", description: "O proprietário do sistema não pode ser bloqueado.", variant: "destructive" });
-      return;
-    }
+    // Prevent blocking super_admin
     const role = getUserRole(userId);
     if (role === "super_admin") {
       toast({ title: "Ação Bloqueada", description: "Não é possível bloquear um Super Admin.", variant: "destructive" });
       return;
     }
+
     if (userId === user?.id) {
       toast({ title: "Ação Bloqueada", description: "Você não pode bloquear a si mesmo.", variant: "destructive" });
       return;
@@ -292,54 +263,40 @@ export default function AdminPage() {
     return matchesSearch && matchesPlan && matchesRole && matchesStatus;
   });
 
-  // Sort: owner first, then super_admins, then admins, then by date
-  const sortedFiltered = [...filtered].sort((a, b) => {
-    if (isOwner(a.email)) return -1;
-    if (isOwner(b.email)) return 1;
-    const roleA = getUserRole(a.id);
-    const roleB = getUserRole(b.id);
-    const order: Record<string, number> = { super_admin: 0, admin: 1, moderator: 2, user: 3 };
-    return (order[roleA] ?? 3) - (order[roleB] ?? 3);
-  });
-
   const planCounts = profiles.reduce((acc, p) => {
     acc[p.plan] = (acc[p.plan] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
-  const blockedCount = profiles.filter(p => p.blocked).length;
-  const adminCount = roles.filter(r => r.role === "admin" || r.role === "super_admin").length;
-
   const stats = [
     { label: "Total Usuários", value: profiles.length, icon: Users, color: "text-primary" },
-    { label: "Administradores", value: adminCount, icon: Shield, color: "text-amber-400" },
-    { label: "Bloqueados", value: blockedCount, icon: Ban, color: "text-destructive" },
-    { label: "Sorteios no BD", value: drawCount, icon: Database, color: "text-primary" },
+    { label: "Premium", value: planCounts["premium"] || 0, icon: Crown, color: "text-primary" },
+    { label: "Profissional", value: planCounts["professional"] || 0, icon: Shield, color: "text-accent" },
+    { label: "Sorteios no BD", value: drawCount, icon: TrendingUp, color: "text-primary" },
   ];
 
-  const getAdminEmail = (adminId: string) => profiles.find(p => p.id === adminId)?.email || adminId.slice(0, 8);
+  const getAdminEmail = (adminId: string) => {
+    return profiles.find(p => p.id === adminId)?.email || adminId.slice(0, 8);
+  };
+
   const getTargetEmail = (targetId: string | null) => {
     if (!targetId) return "—";
     return profiles.find(p => p.id === targetId)?.email || targetId.slice(0, 8);
   };
 
-  const ownerProfile = profiles.find(p => isOwner(p.email));
-
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <ShieldCheck className="w-6 h-6 text-primary" />
-            Painel de Controle
+            Painel Admin
             {isSuperAdmin && (
-              <Badge className="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] uppercase animate-pulse">
-                GOD MODE
+              <Badge className="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] uppercase">
+                Super Admin
               </Badge>
             )}
           </h1>
-          <p className="text-sm text-muted-foreground">Central de administração e gerenciamento do sistema</p>
+          <p className="text-sm text-muted-foreground">Gerencie usuários, planos, papéis e permissões</p>
         </div>
         <Button variant="outline" size="sm" onClick={fetchData} disabled={loading} className="gap-2">
           <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
@@ -347,74 +304,26 @@ export default function AdminPage() {
         </Button>
       </div>
 
-      {/* Owner God Mode Card */}
-      {ownerProfile && isSuperAdmin && (
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-          <Card className="border-amber-500/30 bg-gradient-to-r from-amber-500/5 via-yellow-500/5 to-orange-500/5 relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
-            <CardContent className="p-5 relative">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/20 to-yellow-500/20 border border-amber-500/30 flex items-center justify-center shadow-lg shadow-amber-500/10">
-                  <Crown className="w-7 h-7 text-amber-400" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h2 className="text-lg font-bold text-foreground">{ownerProfile.full_name || "Proprietário"}</h2>
-                    <Badge className="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[9px] uppercase font-bold tracking-wider">
-                      <Star className="w-3 h-3 mr-1" /> Proprietário
-                    </Badge>
-                    <Badge className="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 text-[9px] uppercase font-bold">
-                      Vitalício
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">{ownerProfile.email}</p>
-                  <p className="text-[11px] text-amber-400/70 mt-1 font-mono">
-                    Acesso absoluto • Nível Deus • Controle total irrestrito
-                  </p>
-                </div>
-                <div className="hidden md:flex items-center gap-3">
-                  <div className="text-center px-4 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                    <p className="text-xs text-muted-foreground">Papel</p>
-                    <p className="text-sm font-bold text-amber-400">Super Admin</p>
-                  </div>
-                  <div className="text-center px-4 py-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                    <p className="text-xs text-muted-foreground">Plano</p>
-                    <p className="text-sm font-bold text-yellow-400">♾ Vitalício</p>
-                  </div>
-                  <div className="text-center px-4 py-2 rounded-lg bg-green-500/10 border border-green-500/20">
-                    <p className="text-xs text-muted-foreground">Status</p>
-                    <p className="text-sm font-bold text-green-400">Soberano</p>
-                  </div>
-                </div>
+      {/* Metrics */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {stats.map(s => (
+          <Card key={s.label} className="bg-card/60 border-border/50">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <s.icon className={`w-5 h-5 ${s.color}`} />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{s.label}</p>
+                <p className="text-xl font-bold font-mono text-foreground">{s.value}</p>
               </div>
             </CardContent>
           </Card>
-        </motion.div>
-      )}
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {stats.map((s, i) => (
-          <motion.div key={s.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-            <Card className="bg-card/60 border-border/50 hover:border-primary/20 transition-colors">
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <s.icon className={`w-5 h-5 ${s.color}`} />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">{s.label}</p>
-                  <p className="text-xl font-bold font-mono text-foreground">{s.value}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
         ))}
       </div>
 
       <Tabs defaultValue="users" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4 max-w-xl">
+        <TabsList className="grid w-full grid-cols-3 max-w-md">
           <TabsTrigger value="users" className="gap-1.5"><Users className="w-4 h-4" /> Usuários</TabsTrigger>
-          <TabsTrigger value="tickets" className="gap-1.5"><MessageSquare className="w-4 h-4" /> Suporte</TabsTrigger>
           <TabsTrigger value="roles" className="gap-1.5"><ShieldCheck className="w-4 h-4" /> Papéis</TabsTrigger>
           <TabsTrigger value="audit" className="gap-1.5"><History className="w-4 h-4" /> Auditoria</TabsTrigger>
         </TabsList>
@@ -427,39 +336,22 @@ export default function AdminPage() {
               <CardTitle className="text-base">Distribuição de Planos</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex gap-0.5 h-7 rounded-full overflow-hidden bg-muted">
-                {["free", "lifetime"].map(plan => {
-                  const count = (plan === "lifetime") 
-                    ? (planCounts["lifetime"] || 0) + (planCounts["premium"] || 0) + (planCounts["professional"] || 0)
-                    : planCounts[plan] || 0;
-                  const pct = profiles.length > 0 ? (count / profiles.length) * 100 : 0;
+              <div className="flex gap-2 h-6 rounded-full overflow-hidden bg-muted">
+                {["free", "premium", "professional", "lifetime"].map(plan => {
+                  const pct = profiles.length > 0 ? ((planCounts[plan] || 0) / profiles.length) * 100 : 0;
                   if (pct === 0) return null;
                   return (
                     <div
                       key={plan}
                       className={`h-full flex items-center justify-center text-[10px] font-bold transition-all ${
                         plan === "free" ? "bg-muted-foreground/30 text-foreground" :
-                        "bg-amber-500 text-amber-950"
+                        plan === "premium" ? "bg-primary text-primary-foreground" :
+                        plan === "lifetime" ? "bg-yellow-500 text-yellow-950" :
+                        "bg-accent text-accent-foreground"
                       }`}
                       style={{ width: `${pct}%` }}
-                      title={`${PLAN_LABELS[plan]}: ${count} (${Math.round(pct)}%)`}
                     >
-                      {pct > 12 ? `${PLAN_LABELS[plan]} ${count}` : ""}
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="flex gap-4 mt-2">
-                {["free", "lifetime"].map(plan => {
-                  const count = (plan === "lifetime") 
-                    ? (planCounts["lifetime"] || 0) + (planCounts["premium"] || 0) + (planCounts["professional"] || 0)
-                    : planCounts[plan] || 0;
-                  return (
-                    <div key={plan} className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                      <div className={`w-2 h-2 rounded-full ${
-                        plan === "free" ? "bg-muted-foreground/50" : "bg-amber-500"
-                      }`} />
-                      {PLAN_LABELS[plan]}: {count}
+                      {pct > 10 ? `${PLAN_LABELS[plan]} ${Math.round(pct)}%` : ""}
                     </div>
                   );
                 })}
@@ -472,26 +364,35 @@ export default function AdminPage() {
             <CardHeader className="pb-3">
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                 <div>
-                  <CardTitle className="text-base">Gerenciamento de Usuários</CardTitle>
-                  <CardDescription>{sortedFiltered.length} de {profiles.length} usuários</CardDescription>
+                  <CardTitle className="text-base">Usuários</CardTitle>
+                  <CardDescription>{filtered.length} de {profiles.length}</CardDescription>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="relative w-52">
                     <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
-                    <Input placeholder="Buscar nome ou email..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 h-9" />
+                    <Input
+                      placeholder="Buscar..."
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      className="pl-10 h-9"
+                    />
                   </div>
                   <Select value={filterPlan} onValueChange={setFilterPlan}>
-                    <SelectTrigger className="w-[120px] h-9 text-xs"><SelectValue placeholder="Plano" /></SelectTrigger>
+                    <SelectTrigger className="w-[120px] h-9 text-xs">
+                      <SelectValue placeholder="Plano" />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Todos planos</SelectItem>
                       <SelectItem value="free">Gratuito</SelectItem>
+                      <SelectItem value="premium">Premium</SelectItem>
+                      <SelectItem value="professional">Profissional</SelectItem>
                       <SelectItem value="lifetime">Vitalício</SelectItem>
-                      <SelectItem value="premium" className="hidden">Legacy Premium</SelectItem>
-                      <SelectItem value="professional" className="hidden">Legacy Profissional</SelectItem>
                     </SelectContent>
                   </Select>
                   <Select value={filterRole} onValueChange={setFilterRole}>
-                    <SelectTrigger className="w-[120px] h-9 text-xs"><SelectValue placeholder="Papel" /></SelectTrigger>
+                    <SelectTrigger className="w-[120px] h-9 text-xs">
+                      <SelectValue placeholder="Papel" />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Todos papéis</SelectItem>
                       <SelectItem value="super_admin">Super Admin</SelectItem>
@@ -501,7 +402,9 @@ export default function AdminPage() {
                     </SelectContent>
                   </Select>
                   <Select value={filterStatus} onValueChange={setFilterStatus}>
-                    <SelectTrigger className="w-[110px] h-9 text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
+                    <SelectTrigger className="w-[110px] h-9 text-xs">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Todos</SelectItem>
                       <SelectItem value="active">Ativos</SelectItem>
@@ -531,30 +434,23 @@ export default function AdminPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {sortedFiltered.map(p => {
+                      {filtered.map(p => {
                         const role = getUserRole(p.id);
                         const isSelf = p.id === user?.id;
-                        const isOwnerRow = isOwner(p.email);
                         return (
-                          <TableRow
-                            key={p.id}
-                            className={`
-                              ${p.blocked ? "opacity-60" : ""}
-                              ${isOwnerRow ? "bg-amber-500/5 border-l-2 border-l-amber-500/50" : ""}
-                            `}
-                          >
+                          <TableRow key={p.id} className={p.blocked ? "opacity-60" : ""}>
                             <TableCell className="font-medium text-foreground">
                               <div className="flex items-center gap-1.5">
-                                {isOwnerRow && <Crown className="w-4 h-4 text-amber-400 shrink-0" />}
                                 {p.full_name || "—"}
                                 {isSelf && <Badge variant="outline" className="text-[9px] px-1 py-0">Você</Badge>}
-                                {isOwnerRow && <Badge className="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[8px] px-1 py-0">DONO</Badge>}
                               </div>
                             </TableCell>
-                            <TableCell className="text-muted-foreground text-sm">{p.email || "—"}</TableCell>
+                            <TableCell className="text-muted-foreground text-sm">
+                              {p.email || "—"}
+                            </TableCell>
                             <TableCell>
                               <Badge variant="outline" className={`text-[10px] ${ROLE_COLORS[role] || ROLE_COLORS.user}`}>
-                                {isOwnerRow ? "👑 " : ""}{ROLE_LABELS[role] || role}
+                                {ROLE_LABELS[role] || role}
                               </Badge>
                             </TableCell>
                             <TableCell>
@@ -564,10 +460,12 @@ export default function AdminPage() {
                             </TableCell>
                             <TableCell>
                               {p.blocked ? (
-                                <Badge variant="destructive" className="gap-1"><Ban className="w-3 h-3" /> Bloqueado</Badge>
+                                <Badge variant="destructive" className="gap-1">
+                                  <Ban className="w-3 h-3" /> Bloqueado
+                                </Badge>
                               ) : (
                                 <Badge variant="outline" className="gap-1 text-green-500 border-green-500/30">
-                                  <CheckCircle2 className="w-3 h-3" /> {isOwnerRow ? "Soberano" : "Ativo"}
+                                  <CheckCircle2 className="w-3 h-3" /> Ativo
                                 </Badge>
                               )}
                             </TableCell>
@@ -575,254 +473,73 @@ export default function AdminPage() {
                               {new Date(p.created_at).toLocaleDateString("pt-BR")}
                             </TableCell>
                             <TableCell>
-                              {isOwnerRow ? (
-                                <div className="flex items-center gap-2">
-                                  <Badge className="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[9px]">
-                                    <Shield className="w-3 h-3 mr-1" /> Protegido
-                                  </Badge>
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => setDetailUser(p)}>
-                                    <Eye className="w-4 h-4" />
-                                  </Button>
-                                </div>
-                              ) : (
-                                <div className="flex items-center gap-2">
-                                  {isSuperAdmin && (
-                                    <Select value={role} onValueChange={(v) => updateRole(p.id, v)} disabled={updating === p.id}>
-                                      <SelectTrigger className="w-[130px] h-8 text-xs">
-                                        {updating === p.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <SelectValue />}
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="super_admin">Super Admin</SelectItem>
-                                        <SelectItem value="admin">Admin</SelectItem>
-                                        <SelectItem value="moderator">Moderador</SelectItem>
-                                        <SelectItem value="user">Usuário</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  )}
-                                  <Select value={p.plan} onValueChange={(v) => updatePlan(p.id, v)} disabled={updating === p.id}>
+                              <div className="flex items-center gap-2">
+                                {/* Role selector - only super_admin can change roles */}
+                                {isSuperAdmin && (
+                                  <Select
+                                    value={role}
+                                    onValueChange={(v) => updateRole(p.id, v)}
+                                    disabled={updating === p.id}
+                                  >
                                     <SelectTrigger className="w-[130px] h-8 text-xs">
                                       {updating === p.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <SelectValue />}
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="free">Gratuito</SelectItem>
-                                      <SelectItem value="lifetime">Vitalício</SelectItem>
+                                      <SelectItem value="super_admin">Super Admin</SelectItem>
+                                      <SelectItem value="admin">Admin</SelectItem>
+                                      <SelectItem value="moderator">Moderador</SelectItem>
+                                      <SelectItem value="user">Usuário</SelectItem>
                                     </SelectContent>
                                   </Select>
-                                  <Button
-                                    variant={p.blocked ? "outline" : "destructive"}
-                                    size="sm"
-                                    className="h-8 text-xs gap-1"
-                                    onClick={() => toggleBlock(p.id, p.blocked)}
-                                    disabled={updating === p.id || role === "super_admin"}
-                                  >
-                                    {p.blocked ? (
-                                      <><CheckCircle2 className="w-3 h-3" /> Desbloquear</>
-                                    ) : (
-                                      <><Ban className="w-3 h-3" /> Bloquear</>
-                                    )}
-                                  </Button>
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => setDetailUser(p)}>
-                                    <Eye className="w-4 h-4" />
-                                  </Button>
-                                </div>
-                              )}
+                                )}
+                                {/* Plan selector */}
+                                <Select
+                                  value={p.plan}
+                                  onValueChange={(v) => updatePlan(p.id, v)}
+                                  disabled={updating === p.id}
+                                >
+                                  <SelectTrigger className="w-[130px] h-8 text-xs">
+                                    {updating === p.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <SelectValue />}
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="free">Gratuito</SelectItem>
+                                    <SelectItem value="premium">Premium</SelectItem>
+                                    <SelectItem value="professional">Profissional</SelectItem>
+                                    <SelectItem value="lifetime">Vitalício</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                {/* Block/unblock */}
+                                <Button
+                                  variant={p.blocked ? "outline" : "destructive"}
+                                  size="sm"
+                                  className="h-8 text-xs gap-1"
+                                  onClick={() => toggleBlock(p.id, p.blocked)}
+                                  disabled={updating === p.id || role === "super_admin"}
+                                >
+                                  {p.blocked ? (
+                                    <><CheckCircle2 className="w-3 h-3" /> Desbloquear</>
+                                  ) : (
+                                    <><Ban className="w-3 h-3" /> Bloquear</>
+                                  )}
+                                </Button>
+                                {/* Detail */}
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0"
+                                  onClick={() => setDetailUser(p)}
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         );
                       })}
-                      {sortedFiltered.length === 0 && (
+                      {filtered.length === 0 && (
                         <TableRow>
                           <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                             Nenhum usuário encontrado.
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* TICKETS TAB */}
-        <TabsContent value="tickets">
-          <Card className="bg-card/60 border-border/50">
-            <CardHeader className="pb-3">
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-                <div>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <MessageSquare className="w-5 h-5 text-primary" />
-                    Chamados de Suporte
-                  </CardTitle>
-                  <CardDescription>Gerencie as solicitações de atendimento dos usuários</CardDescription>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="relative w-52">
-                    <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
-                    <Input 
-                      placeholder="Protocolo ou assunto..." 
-                      value={ticketSearch} 
-                      onChange={(e) => setTicketSearch(e.target.value)} 
-                      className="pl-10 h-9" 
-                    />
-                  </div>
-                  <Select value={filterTicketStatus} onValueChange={setFilterTicketStatus}>
-                    <SelectTrigger className="w-[140px] h-9 text-xs">
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos os Status</SelectItem>
-                      <SelectItem value="open">Abertos</SelectItem>
-                      <SelectItem value="in_progress">Em Atendimento</SelectItem>
-                      <SelectItem value="closed">Finalizados</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <div className="flex justify-center py-8">
-                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Protocolo</TableHead>
-                        <TableHead>Usuário</TableHead>
-                        <TableHead>Assunto</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Data</TableHead>
-                        <TableHead>Ações</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {tickets
-                        .filter(t => {
-                          const matchesSearch = t.protocol.toLowerCase().includes(ticketSearch.toLowerCase()) || 
-                                               t.subject.toLowerCase().includes(ticketSearch.toLowerCase()) ||
-                                               t.email.toLowerCase().includes(ticketSearch.toLowerCase());
-                          const matchesStatus = filterTicketStatus === "all" || t.status === filterTicketStatus;
-                          return matchesSearch && matchesStatus;
-                        })
-                        .map(ticket => (
-                          <TableRow key={ticket.id}>
-                            <TableCell className="font-mono text-xs font-bold text-primary">
-                              #{ticket.protocol}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex flex-col">
-                                <span className="text-sm font-medium">{ticket.name}</span>
-                                <span className="text-[10px] text-muted-foreground">{ticket.email}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-sm max-w-[200px] truncate">
-                              {ticket.subject}
-                            </TableCell>
-                            <TableCell>
-                              {ticket.status === 'open' && (
-                                <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/20 gap-1">
-                                  <Clock className="w-3 h-3" /> Aberto
-                                </Badge>
-                              )}
-                              {ticket.status === 'in_progress' && (
-                                <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 gap-1">
-                                  <Activity className="w-3 h-3" /> Em Curso
-                                </Badge>
-                              )}
-                              {ticket.status === 'closed' && (
-                                <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20 gap-1">
-                                  <CheckCircle className="w-3 h-3" /> Finalizado
-                                </Badge>
-                              )}
-                            </TableCell>
-                            <TableCell className="text-xs text-muted-foreground">
-                              {new Date(ticket.created_at).toLocaleDateString("pt-BR")}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <Select 
-                                  value={ticket.status} 
-                                  onValueChange={async (val: any) => {
-                                    const { error } = await supabase
-                                      .from('support_tickets')
-                                      .update({ status: val, updated_at: new Date().toISOString() })
-                                      .eq('id', ticket.id);
-                                    
-                                    if (error) {
-                                      toast({ title: "Erro", description: "Não foi possível atualizar o status.", variant: "destructive" });
-                                    } else {
-                                      setTickets(prev => prev.map(t => t.id === ticket.id ? { ...t, status: val } : t));
-                                      toast({ title: "Sucesso", description: `Ticket #${ticket.protocol} atualizado para ${val}.` });
-                                      await logAction("ticket_status_changed", null, { protocol: ticket.protocol, new_status: val });
-                                    }
-                                  }}
-                                >
-                                  <SelectTrigger className="w-[110px] h-8 text-[10px]">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="open">Aberto</SelectItem>
-                                    <SelectItem value="in_progress">Em Atendimento</SelectItem>
-                                    <SelectItem value="closed">Finalizado</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <Dialog>
-                                  <DialogTrigger asChild>
-                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                      <Eye className="w-4 h-4" />
-                                    </Button>
-                                  </DialogTrigger>
-                                  <DialogContent className="max-w-2xl">
-                                    <DialogHeader>
-                                      <DialogTitle className="flex items-center gap-2">
-                                        <MessageSquare className="w-5 h-5" />
-                                        Detalhes do Chamado #{ticket.protocol}
-                                      </DialogTitle>
-                                    </DialogHeader>
-                                    <div className="space-y-4 py-4">
-                                      <div className="grid grid-cols-2 gap-4 text-sm">
-                                        <div className="space-y-1">
-                                          <p className="text-xs text-muted-foreground uppercase font-bold">Cliente</p>
-                                          <p className="font-medium">{ticket.name}</p>
-                                          <p className="text-muted-foreground">{ticket.email}</p>
-                                        </div>
-                                        <div className="space-y-1 text-right">
-                                          <p className="text-xs text-muted-foreground uppercase font-bold">Data de Abertura</p>
-                                          <p className="font-medium">{new Date(ticket.created_at).toLocaleString("pt-BR")}</p>
-                                          <p className="text-[10px] text-muted-foreground">ID: {ticket.id}</p>
-                                        </div>
-                                      </div>
-                                      <div className="bg-muted/30 p-4 rounded-lg border border-border/50 space-y-2">
-                                        <p className="text-xs text-muted-foreground uppercase font-bold">Assunto</p>
-                                        <p className="font-bold text-foreground">{ticket.subject}</p>
-                                        <div className="h-px bg-border/50 my-2" />
-                                        <p className="text-xs text-muted-foreground uppercase font-bold mb-1">Mensagem</p>
-                                        <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                                          {ticket.message}
-                                        </p>
-                                      </div>
-                                      <div className="flex justify-end gap-2">
-                                        <Button asChild variant="outline" size="sm" className="gap-2">
-                                          <a href={`mailto:${ticket.email}?subject=Re: Suporte Titan Loterias - ${ticket.protocol}`}>
-                                            <MailIcon className="w-4 h-4" /> Responder por E-mail
-                                          </a>
-                                        </Button>
-                                      </div>
-                                    </div>
-                                  </DialogContent>
-                                </Dialog>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      {tickets.length === 0 && (
-                        <TableRow>
-                          <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                            Nenhum chamado de suporte encontrado.
                           </TableCell>
                         </TableRow>
                       )}
@@ -847,12 +564,12 @@ export default function AdminPage() {
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 {[
-                  { role: "super_admin", desc: "Acesso absoluto e irrestrito. Gerencia todos os usuários, papéis, planos e configurações. Nunca é limitado pelo plano comercial. O proprietário do sistema possui este nível permanentemente.", icon: "👑", count: roles.filter(r => r.role === "super_admin").length },
+                  { role: "super_admin", desc: "Acesso absoluto e irrestrito. Gerencia todos os usuários, papéis, planos e configurações. Nunca é limitado pelo plano comercial.", icon: "👑", count: roles.filter(r => r.role === "super_admin").length },
                   { role: "admin", desc: "Acesso administrativo amplo. Pode gerenciar usuários e visualizar métricas. Limitado por definições do Super Admin.", icon: "🛡️", count: roles.filter(r => r.role === "admin").length },
                   { role: "moderator", desc: "Acesso gerencial. Pode visualizar dados e moderar conteúdo. Sem acesso a configurações críticas.", icon: "⚙️", count: roles.filter(r => r.role === "moderator").length },
-                  { role: "user", desc: "Acesso padrão controlado pelo plano comercial (Gratuito ou Vitalício).", icon: "👤", count: profiles.length - roles.length },
+                  { role: "user", desc: "Acesso padrão controlado pelo plano comercial (Gratuito, Premium, Profissional, Vitalício).", icon: "👤", count: profiles.length - roles.length },
                 ].map(item => (
-                  <Card key={item.role} className={`border-border/30 ${item.role === "super_admin" ? "bg-amber-500/5 border-amber-500/20" : "bg-card/40"}`}>
+                  <Card key={item.role} className="bg-card/40 border-border/30">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
                         <span className="text-2xl">{item.icon}</span>
@@ -877,10 +594,10 @@ export default function AdminPage() {
                   <div>
                     <p className="text-sm font-semibold text-amber-400">Precedência de Acesso</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      <strong className="text-amber-400">Proprietário (GOD)</strong> → Super Admin → Admin → Moderador → Plano Comercial → Usuário Padrão.
+                      Super Admin → Admin → Moderador → Plano Comercial → Usuário Padrão.
                       <br />
                       O papel administrativo <strong>sempre</strong> tem prioridade sobre o plano comercial.
-                      O proprietário ({OWNER_EMAIL}) possui acesso soberano e permanente que não pode ser removido.
+                      Um Super Admin com plano "Gratuito" mantém acesso total e irrestrito.
                     </p>
                   </div>
                 </CardContent>
@@ -921,14 +638,11 @@ export default function AdminPage() {
                             {new Date(log.created_at).toLocaleString("pt-BR")}
                           </TableCell>
                           <TableCell className="text-xs">
-                            <div className="flex items-center gap-1">
-                              {isOwner(getAdminEmail(log.admin_id)) && <Crown className="w-3 h-3 text-amber-400" />}
-                              {getAdminEmail(log.admin_id)}
-                            </div>
+                            {getAdminEmail(log.admin_id)}
                           </TableCell>
                           <TableCell>
                             <Badge variant="outline" className="text-[10px]">
-                              {ACTION_LABELS[log.action] || log.action}
+                              {log.action}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-xs text-muted-foreground">
@@ -956,8 +670,12 @@ export default function AdminPage() {
             <DialogDescription>{confirmDialog.description}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}>Cancelar</Button>
-            <Button variant="destructive" onClick={confirmDialog.onConfirm}>Confirmar</Button>
+            <Button variant="outline" onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={confirmDialog.onConfirm}>
+              Confirmar
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -969,9 +687,6 @@ export default function AdminPage() {
             <DialogTitle className="flex items-center gap-2">
               <UserCog className="w-5 h-5" />
               Detalhes do Usuário
-              {detailUser && isOwner(detailUser.email) && (
-                <Badge className="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[9px]">PROPRIETÁRIO</Badge>
-              )}
             </DialogTitle>
           </DialogHeader>
           {detailUser && (
@@ -992,19 +707,17 @@ export default function AdminPage() {
                 <div>
                   <p className="text-xs text-muted-foreground">Papel</p>
                   <Badge variant="outline" className={ROLE_COLORS[getUserRole(detailUser.id)]}>
-                    {isOwner(detailUser.email) ? "👑 " : ""}{ROLE_LABELS[getUserRole(detailUser.id)]}
+                    {ROLE_LABELS[getUserRole(detailUser.id)]}
                   </Badge>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Plano</p>
-                  <Badge className={PLAN_COLORS[isOwner(detailUser.email) ? "lifetime" : detailUser.plan]}>
-                    {isOwner(detailUser.email) ? "♾ Vitalício" : PLAN_LABELS[detailUser.plan]}
-                  </Badge>
+                  <Badge className={PLAN_COLORS[detailUser.plan]}>{PLAN_LABELS[detailUser.plan]}</Badge>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Status</p>
                   <Badge variant={detailUser.blocked ? "destructive" : "outline"} className={detailUser.blocked ? "" : "text-green-500 border-green-500/30"}>
-                    {detailUser.blocked ? "Bloqueado" : isOwner(detailUser.email) ? "Soberano" : "Ativo"}
+                    {detailUser.blocked ? "Bloqueado" : "Ativo"}
                   </Badge>
                 </div>
                 <div>

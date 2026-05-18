@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { NumberStats } from "@/features/statistics/engine";
+import { NumberStats } from "@/engine/statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { evaluateBetQuality, BetQualityReport } from "@/engine/bet-quality";
 import { runCombinatorialOptimization, OptimizationResult } from "@/engine/combinatorial-optimizer";
