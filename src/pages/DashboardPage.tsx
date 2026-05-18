@@ -72,10 +72,10 @@ const DashboardPage = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Dashboard"
-        description={`Análise estatística completa — ${config.name}`}
+        title="Intelligence Terminal"
+        description={`Real-time statistical processing — ${config.name}`}
         icon={BarChart3}
-        badge={draws.length > 0 ? `${draws.length} sorteios` : undefined}
+        badge={draws.length > 0 ? `DB: ${draws.length} RECORDS` : undefined}
       />
       <LotteryContextBanner />
 
