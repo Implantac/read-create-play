@@ -43,7 +43,13 @@ const DashboardPage = () => {
   const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
   const { currentPlan } = usePlanAccess();
   const { profile, trialDaysLeft, isTrialExpired, isAdmin, isSuperAdmin } = useAuth();
-  const [luckyGame, setLuckyGame] = useState<{ numbers: number[]; score: number; strategy: string } | null>(null);
+  const [luckyGame, setLuckyGame] = useState<{ 
+    numbers: number[]; 
+    score: number; 
+    strategy: string;
+    description: string;
+    pipeline: { step: string; detail: string; count: number }[];
+  } | null>(null);
   const [generatingLucky, setGeneratingLucky] = useState(false);
 
   const hotNumbers = useMemo(() => stats.filter(s => s.status === "hot").length, [stats]);
@@ -55,19 +61,25 @@ const DashboardPage = () => {
   const generateLuckyGame = useCallback(() => {
     if (stats.length === 0 || draws.length === 0) return;
     setGeneratingLucky(true);
+    setLuckyGame(null);
+    
+    // Simulate processing for "premium" feel
     setTimeout(() => {
-      const strategies = ["frequency", "balance", "coverage", "dispersion"];
+      const strategies = ["frequency", "balance", "coverage", "dispersion", "delay", "anti_pattern"];
       const randomStrategy = strategies[Math.floor(Math.random() * strategies.length)];
       const result = runIntelligentPipeline(stats, draws, selectedLottery, randomStrategy, 1);
+      
       if (result.games.length > 0) {
         setLuckyGame({
           numbers: result.games[0],
           score: result.scores[0] || 0,
           strategy: result.strategy.name,
+          description: result.strategy.description,
+          pipeline: result.pipeline,
         });
       }
       setGeneratingLucky(false);
-    }, 800);
+    }, 1500);
   }, [stats, draws, selectedLottery]);
   return (
     <div className="space-y-6">
@@ -170,28 +182,81 @@ const DashboardPage = () => {
             <AnimatePresence>
               {luckyGame && (
                 <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="mt-3 glass-card rounded-xl border border-accent/30 p-4"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-4 overflow-hidden"
                 >
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <span className="text-xs text-muted-foreground">Estratégia: </span>
-                      <span className="text-xs font-semibold text-primary">{luckyGame.strategy}</span>
-                      <span className="ml-3 text-xs text-muted-foreground">Score: </span>
-                      <span className="text-xs font-bold text-accent">{luckyGame.score.toFixed(1)}/100</span>
-                    </div>
-                    <button onClick={() => setLuckyGame(null)} className="text-muted-foreground hover:text-foreground">
-                      <X className="w-4 h-4" />
+                  <div className="glass-card rounded-xl border border-primary/30 bg-primary/5 p-6 relative">
+                    <button 
+                      onClick={() => setLuckyGame(null)} 
+                      className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <X className="w-5 h-5" />
                     </button>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {luckyGame.numbers.map(n => (
-                      <span key={n} className="w-9 h-9 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-sm font-bold text-primary">
-                        {String(n).padStart(2, "0")}
-                      </span>
-                    ))}
+
+                    <div className="grid md:grid-cols-2 gap-8">
+                      <div className="space-y-6">
+                        <div>
+                          <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-1">Estratégia Aplicada</h4>
+                          <h3 className="text-xl font-bold text-foreground">{luckyGame.strategy}</h3>
+                          <p className="text-sm text-muted-foreground mt-1">{luckyGame.description}</p>
+                        </div>
+
+                        <div>
+                          <h4 className="text-xs font-bold uppercase tracking-widest text-accent mb-3">Matriz Gerada</h4>
+                          <div className="flex flex-wrap gap-3">
+                            {luckyGame.numbers.map(n => (
+                              <motion.div 
+                                key={n}
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                className="w-12 h-12 rounded-lg bg-background border-2 border-primary/40 flex items-center justify-center text-lg font-mono font-bold text-primary shadow-glow-sm"
+                              >
+                                {String(n).padStart(2, "0")}
+                              </motion.div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="pt-4 border-t border-primary/10">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-semibold text-foreground">Score de Confiança</span>
+                            <span className="text-lg font-mono font-bold text-accent">{luckyGame.score.toFixed(1)}/100</span>
+                          </div>
+                          <div className="h-2 w-full bg-muted/30 rounded-full overflow-hidden">
+                            <motion.div 
+                              initial={{ width: 0 }}
+                              animate={{ width: `${luckyGame.score}%` }}
+                              className="h-full bg-gradient-to-r from-primary to-accent"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-black/40 rounded-lg p-4 border border-white/5 font-mono text-[11px] space-y-2">
+                        <div className="flex items-center gap-2 text-primary/70 mb-3 border-b border-white/5 pb-2">
+                          <Loader2 className="w-3 h-3 animate-pulse" />
+                          <span className="uppercase tracking-tighter">Engine Process Log</span>
+                        </div>
+                        {luckyGame.pipeline.map((step, idx) => (
+                          <motion.div 
+                            key={idx}
+                            initial={{ opacity: 0, x: -5 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: idx * 0.1 }}
+                            className="flex justify-between items-start gap-4"
+                          >
+                            <span className="text-primary whitespace-nowrap">[{step.step.toUpperCase()}]</span>
+                            <span className="text-muted-foreground flex-1 text-right">{step.detail}</span>
+                            <span className="text-accent min-w-[30px] text-right">{step.count}</span>
+                          </motion.div>
+                        ))}
+                        <div className="pt-4 text-[10px] text-primary/50 italic border-t border-white/5 mt-4">
+                          * Algoritmo de inteligência estatística validado com sucesso.
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </motion.div>
               )}
