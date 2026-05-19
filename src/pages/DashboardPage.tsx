@@ -14,7 +14,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal } from "lucide-react";
+import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -61,6 +61,8 @@ const DashboardPage = () => {
   const hotNumbers = useMemo(() => stats.filter(s => s.status === "hot").length, [stats]);
   const coldNumbers = useMemo(() => stats.filter(s => s.status === "cold").length, [stats]);
   const avgDelay = useMemo(() => stats.length > 0 ? Math.round(stats.reduce((a, s) => a + s.lastSeen, 0) / stats.length) : 0, [stats]);
+  const heatingCount = useMemo(() => stats.filter(s => s.trend > 15).length, [stats]);
+
 
   const handleNewDraw = useCallback((draw: any) => addDraw(draw), [addDraw]);
 
@@ -143,11 +145,20 @@ const DashboardPage = () => {
       )}
 
       {loading && (
-        <div className="flex items-center justify-center py-16 gap-3 text-muted-foreground">
-          <Loader2 className="w-5 h-5 animate-spin text-primary" />
-          <span className="text-sm">Carregando resultados...</span>
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="h-32 rounded-xl glass-card animate-pulse bg-muted/20" />
+            ))}
+          </div>
+          <div className="h-64 rounded-xl glass-card animate-pulse bg-muted/20" />
+          <div className="grid lg:grid-cols-2 gap-6">
+            <div className="h-80 rounded-xl glass-card animate-pulse bg-muted/20" />
+            <div className="h-80 rounded-xl glass-card animate-pulse bg-muted/20" />
+          </div>
         </div>
       )}
+
 
       {!loading && draws.length === 0 && (
         <EmptyState
@@ -462,10 +473,11 @@ const DashboardPage = () => {
             className="grid grid-cols-2 lg:grid-cols-4 gap-4"
           >
             <motion.div variants={item}><StatsCard title="Total Concursos" value={draws.length} icon={BarChart3} color="green" subtitle="Resultados históricos" /></motion.div>
+            <motion.div variants={item}><StatsCard title="Tendência Alta" value={heatingCount} icon={Zap} color="amber" subtitle="Números em ascensão" /></motion.div>
             <motion.div variants={item}><StatsCard title="Números Quentes" value={hotNumbers} icon={Flame} color="red" subtitle="Acima da média" /></motion.div>
             <motion.div variants={item}><StatsCard title="Números Frios" value={coldNumbers} icon={Snowflake} color="blue" subtitle="Abaixo da média" /></motion.div>
-            <motion.div variants={item}><StatsCard title="Atraso Médio" value={`${avgDelay}d`} icon={TrendingUp} color="amber" subtitle="Concursos sem aparecer" /></motion.div>
           </motion.div>
+
 
           {/* Saved bets limit card */}
           {limit !== Infinity && (

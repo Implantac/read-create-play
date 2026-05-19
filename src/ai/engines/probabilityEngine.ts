@@ -4,7 +4,7 @@
  */
 
 import { DrawResult } from "@/data/lotteries";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats, computeFrequencyStats } from "@/engine/statistics";
 import { getLotteryRules } from "../knowledge/lotteriesKnowledge";
 
 /** Fast PRNG (xorshift32) */
@@ -157,3 +157,22 @@ export function stressTestGame(
     },
   };
 }
+
+/** Trend Heatmap — analyze frequency changes across windows */
+export function analyzeTrendHeatmap(stats: NumberStats[]): { number: number; trendScore: number; status: string }[] {
+  return stats.map(s => {
+    // Combine trend, momentum and cycle score
+    const score = (s.trend * 0.4) + (s.momentum * 0.3) + (s.cycleScore * 30);
+    let status = "neutral";
+    if (score > 40) status = "heating";
+    else if (score < -20) status = "cooling";
+    else if (s.hotStreak >= 2) status = "streak";
+    
+    return {
+      number: s.number,
+      trendScore: Math.round(score),
+      status
+    };
+  }).sort((a, b) => b.trendScore - a.trendScore);
+}
+

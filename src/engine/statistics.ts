@@ -15,7 +15,10 @@ export interface NumberStats {
   momentum: number; // acceleration of frequency change
   consecutivePairs: number; // how often appears with neighbor ±1
   cycleScore: number; // how "due" the number is based on its cycle
+  expectedAppearance: number; // calculated next expected concurso (relative)
+  hotStreak: number; // current consecutive appearances
 }
+
 
 export function computeFrequencyStats(draws: DrawResult[], totalNumbers: number): NumberStats[] {
   const freq = new Array(totalNumbers + 1).fill(0);
@@ -34,7 +37,11 @@ export function computeFrequencyStats(draws: DrawResult[], totalNumbers: number)
   // Consecutive pair tracking
   const consecutivePairCount = new Array(totalNumbers + 1).fill(0);
 
+  const streak = new Array(totalNumbers + 1).fill(0);
+  let lastDrawNumbers = draws[0]?.numbers || [];
+  
   draws.filter(d => d && Array.isArray(d.numbers)).forEach((draw, i) => {
+
     const numSet = new Set(draw.numbers);
     draw.numbers.forEach(n => {
       if (n < 1 || n > totalNumbers || !appearances[n]) return;
@@ -107,8 +114,11 @@ export function computeFrequencyStats(draws: DrawResult[], totalNumbers: number)
       momentum: momentum * 100,
       consecutivePairs: consecutivePairCount[n],
       cycleScore,
+      expectedAppearance: Math.round(avgGap - lastSeen[n]),
+      hotStreak: draws.slice(0, 5).filter(d => d.numbers.includes(n)).length,
     });
   }
+
   return stats;
 }
 

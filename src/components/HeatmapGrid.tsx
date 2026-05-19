@@ -21,7 +21,7 @@ export function HeatmapGrid({ stats, totalNumbers }: Props) {
           <p className="text-[10px] text-muted-foreground mt-0.5">Intensidade por frequência de aparição</p>
         </div>
       </div>
-      <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${Math.min(totalNumbers, 10)}, 1fr)` }}>
+      <div className="grid gap-1.5 sm:gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(totalNumbers, 10)}, 1fr)` }}>
         {stats.map((s, i) => {
           const intensity = maxFreq > 0 ? s.frequency / maxFreq : 0;
           return (
@@ -30,7 +30,7 @@ export function HeatmapGrid({ stats, totalNumbers }: Props) {
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.008 }}
-              className="aspect-square rounded-lg flex items-center justify-center text-xs font-mono font-bold cursor-default relative group transition-transform hover:scale-110 hover:z-10"
+              className="aspect-square rounded-lg flex items-center justify-center text-[10px] sm:text-xs font-mono font-bold cursor-default relative group transition-all hover:scale-110 hover:z-10 hover:shadow-lg active:scale-95"
               style={{
                 backgroundColor: `hsl(145, 72%, ${12 + intensity * 38}%)`,
                 color: intensity > 0.5 ? "hsl(225, 25%, 5%)" : "hsl(210, 20%, 80%)",
@@ -38,7 +38,8 @@ export function HeatmapGrid({ stats, totalNumbers }: Props) {
               }}
               title={`Nº ${s.number}: ${s.frequency}x`}
             >
-              {s.number}
+              <span className="relative z-10">{s.number}</span>
+
             </motion.div>
           );
         })}
