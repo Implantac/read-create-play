@@ -269,6 +269,59 @@ const DashboardPage = () => {
               )}
             </AnimatePresence>
           </motion.div>
+          
+          {/* Recent Generations History */}
+          {history.length > 0 && (
+            <motion.div variants={item} className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                  <History className="w-4 h-4 text-primary" />
+                  Últimas Simulações
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {history.map((record) => (
+                  <motion.button
+                    key={record.id}
+                    onClick={() => {
+                      setLuckyGame({
+                        numbers: record.numbers,
+                        score: record.score,
+                        strategy: record.strategy,
+                        description: record.description || "",
+                        pipeline: record.pipeline as any,
+                      });
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    className="flex flex-col gap-2 p-3 rounded-xl glass-card border border-border/50 hover:border-primary/40 text-left transition-all"
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] font-bold text-primary uppercase">{record.strategy}</span>
+                      <span className="text-[10px] text-muted-foreground font-mono">
+                        {new Date(record.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      </span>
+                    </div>
+                    <div className="flex gap-1">
+                      {record.numbers.slice(0, 6).map((n, i) => (
+                        <span key={i} className="w-6 h-6 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
+                          {String(n).padStart(2, "0")}
+                        </span>
+                      ))}
+                      {record.numbers.length > 6 && <span className="text-[10px] text-muted-foreground self-center">...</span>}
+                    </div>
+                    <div className="flex justify-between items-center mt-1">
+                      <div className="flex-1 h-1 bg-muted/30 rounded-full mr-3">
+                        <div className="h-full bg-accent rounded-full" style={{ width: `${record.score}%` }} />
+                      </div>
+                      <span className="text-[10px] font-mono font-bold text-accent">{record.score.toFixed(0)}%</span>
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
 
           <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {quickLinks.map(link => (
