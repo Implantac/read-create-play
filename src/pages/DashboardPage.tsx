@@ -72,8 +72,8 @@ const DashboardPage = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Dashboard"
-        description={`Análise estatística completa — ${config.name}`}
+        title="Terminal de Inteligência"
+        description={`Análise de precisão em tempo real — ${config.name}`}
         icon={BarChart3}
         badge={draws.length > 0 ? `${draws.length} sorteios` : undefined}
       />
@@ -147,10 +147,10 @@ const DashboardPage = () => {
               <div className="flex-1 text-center sm:text-left">
                 <h3 className="text-lg font-bold text-foreground flex items-center gap-2 justify-center sm:justify-start">
                   <Clover className="w-5 h-5 text-primary" />
-                  Jogo da Sorte
+                  Engine de Probabilidade
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                  IA gera 1 jogo otimizado com estratégia aleatória para {config.name}
+                  IA processa matrizes de alta confiança para {config.name}
                 </p>
               </div>
               <Button
@@ -162,7 +162,7 @@ const DashboardPage = () => {
                 {generatingLucky ? (
                   <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Gerando...</>
                 ) : (
-                  <><Sparkles className="w-4 h-4 mr-2" /> GERAR JOGO DA SORTE</>
+                  <><Sparkles className="w-4 h-4 mr-2" /> EXECUTAR ENGINE PROBABILITY</>
                 )}
               </Button>
             </div>

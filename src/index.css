@@ -7,59 +7,58 @@
 @layer base {
   :root,
   .dark {
-    --background: 225 25% 5%;
-    --foreground: 210 20% 92%;
+    --background: 222 47% 4%;
+    --foreground: 213 31% 91%;
 
-    --card: 225 22% 9%;
-    --card-foreground: 210 20% 92%;
+    --card: 222 47% 6%;
+    --card-foreground: 213 31% 91%;
 
-    --popover: 225 22% 9%;
-    --popover-foreground: 210 20% 92%;
+    --popover: 222 47% 5%;
+    --popover-foreground: 213 31% 91%;
 
-    --primary: 145 72% 42%;
-    --primary-foreground: 225 25% 5%;
+    --primary: 160 84% 39%;
+    --primary-foreground: 222 47% 2%;
 
-    --secondary: 225 18% 15%;
-    --secondary-foreground: 210 20% 80%;
+    --secondary: 222 47% 12%;
+    --secondary-foreground: 213 31% 80%;
 
-    --muted: 225 16% 12%;
-    --muted-foreground: 215 12% 48%;
+    --muted: 222 47% 10%;
+    --muted-foreground: 215 20% 50%;
 
-    --accent: 48 100% 52%;
-    --accent-foreground: 225 25% 5%;
+    --accent: 199 89% 48%;
+    --accent-foreground: 222 47% 2%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 20% 98%;
 
-    --border: 225 16% 15%;
-    --input: 225 16% 15%;
-    --ring: 145 72% 42%;
+    --border: 222 47% 12%;
+    --input: 222 47% 12%;
+    --ring: 160 84% 39%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    --sidebar-background: 225 24% 7%;
-    --sidebar-foreground: 210 20% 75%;
-    --sidebar-primary: 145 72% 42%;
-    --sidebar-primary-foreground: 225 25% 5%;
-    --sidebar-accent: 225 18% 13%;
-    --sidebar-accent-foreground: 210 20% 85%;
-    --sidebar-border: 225 16% 13%;
-    --sidebar-ring: 145 72% 42%;
+    --sidebar-background: 222 47% 3%;
+    --sidebar-foreground: 213 31% 70%;
+    --sidebar-primary: 160 84% 39%;
+    --sidebar-primary-foreground: 222 47% 2%;
+    --sidebar-accent: 222 47% 8%;
+    --sidebar-accent-foreground: 213 31% 90%;
+    --sidebar-border: 222 47% 8%;
+    --sidebar-ring: 160 84% 39%;
 
-    /* Custom brand tokens */
-    --neon-green: 145 72% 42%;
-    --neon-blue: 195 95% 48%;
-    --neon-amber: 48 100% 52%;
-    --neon-red: 0 72% 55%;
-    --neon-purple: 265 75% 58%;
-    --neon-cyan: 180 85% 48%;
-    --surface-elevated: 225 18% 11%;
-    --surface-glass: 225 20% 8%;
+    /* Enterprise precision tokens */
+    --neon-green: 160 84% 39%;
+    --neon-blue: 199 89% 48%;
+    --neon-amber: 45 93% 47%;
+    --neon-red: 0 84% 60%;
+    --neon-purple: 255 70% 60%;
+    --neon-cyan: 180 80% 45%;
+    --surface-elevated: 222 47% 8%;
+    --surface-glass: 222 47% 4%;
     --glow-green: 0 0% 0% / 0;
     
-    /* Brand gradient stops */
-    --brand-start: 145 72% 42%;
-    --brand-end: 195 95% 48%;
+    --brand-start: 160 84% 39%;
+    --brand-end: 199 89% 48%;
   }
 
   .light {
@@ -193,18 +192,21 @@
     border: 1px solid hsl(var(--border) / 0.4);
   }
   .lottery-ball {
-    @apply w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold font-mono;
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(145 60% 32%) 100%);
-    color: hsl(var(--primary-foreground));
-    box-shadow: 0 2px 8px hsl(145 72% 42% / 0.3), inset 0 1px 0 hsl(145 72% 80% / 0.2);
+    @apply w-10 h-10 rounded-sm flex items-center justify-center text-sm font-bold font-mono transition-all duration-200;
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--primary) / 0.3);
+    color: hsl(var(--foreground));
+    box-shadow: inset 0 0 10px hsl(var(--primary) / 0.05);
   }
   .lottery-ball-hot {
-    background: linear-gradient(135deg, hsl(var(--neon-red)) 0%, hsl(0 72% 40%) 100%);
-    box-shadow: 0 2px 8px hsl(0 72% 55% / 0.3), inset 0 1px 0 hsl(0 72% 80% / 0.2);
+    border-color: hsl(var(--neon-red) / 0.5);
+    background: hsl(var(--neon-red) / 0.1);
+    color: hsl(var(--neon-red));
   }
   .lottery-ball-cold {
-    background: linear-gradient(135deg, hsl(var(--neon-blue)) 0%, hsl(195 95% 35%) 100%);
-    box-shadow: 0 2px 8px hsl(195 95% 48% / 0.3), inset 0 1px 0 hsl(195 95% 80% / 0.2);
+    border-color: hsl(var(--neon-blue) / 0.5);
+    background: hsl(var(--neon-blue) / 0.1);
+    color: hsl(var(--neon-blue));
   }
   .animate-shimmer {
     background: linear-gradient(
