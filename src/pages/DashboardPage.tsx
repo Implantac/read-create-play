@@ -14,7 +14,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History } from "lucide-react";
+import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -53,7 +53,9 @@ const DashboardPage = () => {
     pipeline: { step: string; detail: string; count: number }[];
   } | null>(null);
   const [generatingLucky, setGeneratingLucky] = useState(false);
+  const [selectedHistoryItem, setSelectedHistoryItem] = useState<any | null>(null);
   const { history, saveGeneration } = useGenerationHistory(selectedLottery);
+
 
 
   const hotNumbers = useMemo(() => stats.filter(s => s.status === "hot").length, [stats]);
@@ -283,25 +285,20 @@ const DashboardPage = () => {
                 {history.map((record) => (
                   <motion.button
                     key={record.id}
-                    onClick={() => {
-                      setLuckyGame({
-                        numbers: record.numbers,
-                        score: record.score,
-                        strategy: record.strategy,
-                        description: record.description || "",
-                        pipeline: record.pipeline as any,
-                      });
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
+                    onClick={() => setSelectedHistoryItem(record)}
                     whileHover={{ scale: 1.02 }}
-                    className="flex flex-col gap-2 p-3 rounded-xl glass-card border border-border/50 hover:border-primary/40 text-left transition-all"
+                    className="flex flex-col gap-2 p-3 rounded-xl glass-card border border-border/50 hover:border-primary/40 text-left transition-all relative group"
                   >
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Info className="w-3 h-3 text-primary" />
+                    </div>
                     <div className="flex justify-between items-center">
                       <span className="text-[10px] font-bold text-primary uppercase">{record.strategy}</span>
                       <span className="text-[10px] text-muted-foreground font-mono">
                         {new Date(record.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       </span>
                     </div>
+
                     <div className="flex gap-1">
                       {record.numbers.slice(0, 6).map((n, i) => (
                         <span key={i} className="w-6 h-6 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
@@ -321,6 +318,121 @@ const DashboardPage = () => {
               </div>
             </motion.div>
           )}
+
+          {/* Detailed History Modal */}
+          <AnimatePresence>
+            {selectedHistoryItem && (
+              <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="w-full max-w-3xl glass-card border border-primary/30 bg-card rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+                >
+                  <div className="p-4 border-b border-border/50 flex items-center justify-between bg-primary/5">
+                    <div className="flex items-center gap-2">
+                      <Terminal className="w-4 h-4 text-primary" />
+                      <h3 className="font-bold text-foreground">Relatório Detalhado de Simulação</h3>
+                    </div>
+                    <button 
+                      onClick={() => setSelectedHistoryItem(null)}
+                      className="p-1 rounded-full hover:bg-muted/50 transition-colors"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                    <div className="grid md:grid-cols-2 gap-8">
+                      <div className="space-y-6">
+                        <div>
+                          <h4 className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">Estratégia Utilizada</h4>
+                          <h3 className="text-xl font-bold text-foreground">{selectedHistoryItem.strategy}</h3>
+                          <p className="text-sm text-muted-foreground mt-1">{selectedHistoryItem.description}</p>
+                        </div>
+
+                        <div>
+                          <h4 className="text-[10px] font-bold uppercase tracking-widest text-accent mb-3">Matriz Gerada</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {selectedHistoryItem.numbers.map((n: number) => (
+                              <div 
+                                key={n}
+                                className="w-10 h-10 rounded-lg bg-background border border-primary/30 flex items-center justify-center text-sm font-mono font-bold text-primary shadow-glow-sm"
+                              >
+                                {String(n).padStart(2, "0")}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-foreground">Score de Confiança</span>
+                            <span className="text-sm font-mono font-bold text-accent">{Number(selectedHistoryItem.score).toFixed(1)}%</span>
+                          </div>
+                          <div className="h-1.5 w-full bg-muted/30 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-gradient-to-r from-primary to-accent"
+                              style={{ width: `${selectedHistoryItem.score}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-black/60 rounded-xl p-4 border border-white/5 font-mono text-[11px] space-y-2">
+                        <div className="flex items-center gap-2 text-primary/70 mb-3 border-b border-white/5 pb-2">
+                          <Terminal className="w-3 h-3" />
+                          <span className="uppercase tracking-tighter">Execution Pipeline Log</span>
+                        </div>
+                        {(selectedHistoryItem.pipeline as any[]).map((step, idx) => (
+                          <div 
+                            key={idx}
+                            className="flex justify-between items-start gap-4 border-b border-white/5 py-1 last:border-0"
+                          >
+                            <span className="text-primary/80 shrink-0">[{step.step.toUpperCase()}]</span>
+                            <span className="text-muted-foreground flex-1 text-right truncate">{step.detail}</span>
+                            <span className="text-accent min-w-[30px] text-right">{step.count}</span>
+                          </div>
+                        ))}
+                        <div className="pt-4 text-[10px] text-primary/40 italic mt-2">
+                          Timestamp: {new Date(selectedHistoryItem.created_at).toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 border-t border-border/50 bg-muted/20 flex justify-end gap-3">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setSelectedHistoryItem(null)}
+                    >
+                      Fechar Relatório
+                    </Button>
+                    <Button 
+                      size="sm"
+                      onClick={() => {
+                        setLuckyGame({
+                          numbers: selectedHistoryItem.numbers,
+                          score: selectedHistoryItem.score,
+                          strategy: selectedHistoryItem.strategy,
+                          description: selectedHistoryItem.description || "",
+                          pipeline: selectedHistoryItem.pipeline as any,
+                        });
+                        setSelectedHistoryItem(null);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className="gradient-brand text-primary-foreground"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 mr-2" />
+                      Reaplicar na Engine
+                    </Button>
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
+
 
 
           <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 lg:grid-cols-4 gap-3">
