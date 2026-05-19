@@ -71,6 +71,93 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_strategy_performance: {
+        Row: {
+          avg_hits: number
+          avg_score: number
+          best_hits: number
+          consistency: number
+          created_at: string
+          id: string
+          last_used_at: string
+          lottery_id: string
+          strategy: string
+          total_games: number
+          total_simulations: number
+          updated_at: string
+          user_id: string
+          win_rate: number
+        }
+        Insert: {
+          avg_hits?: number
+          avg_score?: number
+          best_hits?: number
+          consistency?: number
+          created_at?: string
+          id?: string
+          last_used_at?: string
+          lottery_id: string
+          strategy: string
+          total_games?: number
+          total_simulations?: number
+          updated_at?: string
+          user_id: string
+          win_rate?: number
+        }
+        Update: {
+          avg_hits?: number
+          avg_score?: number
+          best_hits?: number
+          consistency?: number
+          created_at?: string
+          id?: string
+          last_used_at?: string
+          lottery_id?: string
+          strategy?: string
+          total_games?: number
+          total_simulations?: number
+          updated_at?: string
+          user_id?: string
+          win_rate?: number
+        }
+        Relationships: []
+      }
+      ai_user_memory: {
+        Row: {
+          confidence: number
+          created_at: string
+          id: string
+          key: string
+          lottery_id: string
+          memory_type: string
+          updated_at: string
+          user_id: string
+          value: Json
+        }
+        Insert: {
+          confidence?: number
+          created_at?: string
+          id?: string
+          key: string
+          lottery_id: string
+          memory_type: string
+          updated_at?: string
+          user_id: string
+          value?: Json
+        }
+        Update: {
+          confidence?: number
+          created_at?: string
+          id?: string
+          key?: string
+          lottery_id?: string
+          memory_type?: string
+          updated_at?: string
+          user_id?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       lottery_draws: {
         Row: {
           concurso: number
@@ -185,6 +272,87 @@ export type Database = {
         }
         Relationships: []
       }
+      simulation_scenarios: {
+        Row: {
+          created_at: string
+          id: string
+          lottery_id: string
+          name: string
+          regime_stability: number
+          result_metrics: Json | null
+          risk_profile: string
+          updated_at: string
+          user_id: string
+          volatility: number
+          weights: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lottery_id: string
+          name: string
+          regime_stability: number
+          result_metrics?: Json | null
+          risk_profile: string
+          updated_at?: string
+          user_id: string
+          volatility: number
+          weights: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lottery_id?: string
+          name?: string
+          regime_stability?: number
+          result_metrics?: Json | null
+          risk_profile?: string
+          updated_at?: string
+          user_id?: string
+          volatility?: number
+          weights?: Json
+        }
+        Relationships: []
+      }
+      support_tickets: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          protocol: string
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          protocol: string
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          protocol?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -216,6 +384,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_blocked: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
