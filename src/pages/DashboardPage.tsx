@@ -68,23 +68,26 @@ const DashboardPage = () => {
     setLuckyGame(null);
     
     // Simulate processing for "premium" feel
-    setTimeout(() => {
+    setTimeout(async () => {
       const strategies = ["frequency", "balance", "coverage", "dispersion", "delay", "anti_pattern"];
       const randomStrategy = strategies[Math.floor(Math.random() * strategies.length)];
       const result = runIntelligentPipeline(stats, draws, selectedLottery, randomStrategy, 1);
       
       if (result.games.length > 0) {
-        setLuckyGame({
+        const gameData = {
           numbers: result.games[0],
           score: result.scores[0] || 0,
           strategy: result.strategy.name,
           description: result.strategy.description,
           pipeline: result.pipeline,
-        });
+        };
+        setLuckyGame(gameData);
+        await saveGeneration(gameData);
       }
       setGeneratingLucky(false);
     }, 1500);
-  }, [stats, draws, selectedLottery]);
+  }, [stats, draws, selectedLottery, saveGeneration]);
+
   return (
     <div className="space-y-6">
       <PageHeader
