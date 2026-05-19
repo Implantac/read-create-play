@@ -92,7 +92,7 @@ const colorMap = {
 const lotteries = ["Mega-Sena", "Lotofácil", "Quina", "Lotomania", "Dupla Sena", "Timemania", "Dia de Sorte", "Super Sete"];
 
 const stats = [
-  { value: "7.500+", label: "Usuários ativos" },
+  { value: "10.000+", label: "Sorteios analisados" },
   { value: "8", label: "Loterias suportadas" },
   { value: "14+", label: "Algoritmos de IA" },
   { value: "99.9%", label: "Uptime" },
@@ -215,8 +215,8 @@ export default function LandingPage() {
             <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/40 group-hover:scale-110 transition-all duration-300 overflow-hidden">
               <img src="/logo.png" alt="Titan Loterias" className="w-10 h-10 object-contain" />
             </div>
-            <span className="text-lg font-black tracking-tighter uppercase">
-              Titan <span className="bg-primary text-primary-foreground px-1 rounded-sm">Terminal</span>
+            <span className="text-lg font-bold tracking-tight">
+              Titan <span className="text-primary text-glow-green">Loterias</span>
             </span>
           </Link>
           <div className="flex items-center gap-3">
@@ -271,9 +271,9 @@ export default function LandingPage() {
               Motor Estatístico v4.0 + IA
             </motion.div>
 
-            <motion.h1 custom={1} variants={fadeUp} className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.9] uppercase">
-              Statistical <br />
-              <span className="gradient-brand-text">Intelligence</span>
+            <motion.h1 custom={1} variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
+              Análise de loterias{" "}
+              <span className="gradient-brand-text">com inteligência artificial</span>
             </motion.h1>
 
             <motion.p custom={2} variants={fadeUp} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">

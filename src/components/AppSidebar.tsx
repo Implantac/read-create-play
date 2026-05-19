@@ -92,8 +92,8 @@ export function AppSidebar() {
           {!collapsed && (
             <div>
               <div className="flex items-center gap-1.5">
-                <h1 className="text-sm font-black tracking-tighter text-sidebar-accent-foreground uppercase flex items-center">
-                  Titan<span className="bg-primary text-primary-foreground px-1 ml-0.5 rounded-sm">Terminal</span>
+                <h1 className="text-base font-bold tracking-tight text-sidebar-accent-foreground">
+                  Titan<span className="gradient-brand-text ml-1">Loterias</span>
                 </h1>
                 {isAdmin && (
                   <span className={`px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded border animate-pulse ${
@@ -105,9 +105,9 @@ export function AppSidebar() {
                   </span>
                 )}
               </div>
-                <p className="text-[9px] text-primary/60 font-mono tracking-[0.2em] font-bold">
-                  INTELLIGENCE CORE
-                </p>
+              <p className="text-[10px] text-muted-foreground font-mono tracking-wider uppercase">
+                Motor v4.0
+              </p>
             </div>
           )}
         </Link>
@@ -267,7 +267,7 @@ export function AppSidebar() {
                 <Crown className="w-4 h-4 text-accent shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold text-sidebar-accent-foreground">
-                    {currentPlan === "free" ? "Upgrade" : currentPlan === "premium" ? "Premium" : "Titan"}
+                    {currentPlan === "free" ? "Upgrade" : currentPlan === "premium" ? "Premium" : "Pro"}
                   </p>
                   <p className="text-[10px] text-muted-foreground truncate">
                     {currentPlan === "free" ? "Desbloquear recursos" : "Plano ativo"}

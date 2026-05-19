@@ -7,11 +7,11 @@
 @layer base {
   :root,
   .dark {
-    --background: 225 30% 3%;
-    --foreground: 210 20% 95%;
+    --background: 225 25% 5%;
+    --foreground: 210 20% 92%;
 
-    --card: 225 24% 6%;
-    --card-foreground: 210 20% 95%;
+    --card: 225 22% 9%;
+    --card-foreground: 210 20% 92%;
 
     --popover: 225 22% 9%;
     --popover-foreground: 210 20% 92%;
@@ -37,7 +37,7 @@
 
     --radius: 0.75rem;
 
-    --sidebar-background: 225 28% 4.5%;
+    --sidebar-background: 225 24% 7%;
     --sidebar-foreground: 210 20% 75%;
     --sidebar-primary: 145 72% 42%;
     --sidebar-primary-foreground: 225 25% 5%;
@@ -53,8 +53,9 @@
     --neon-red: 0 72% 55%;
     --neon-purple: 265 75% 58%;
     --neon-cyan: 180 85% 48%;
-    --surface-elevated: 225 20% 8%;
-    --surface-glass: 225 25% 4%;
+    --surface-elevated: 225 18% 11%;
+    --surface-glass: 225 20% 8%;
+    --glow-green: 0 0% 0% / 0;
     
     /* Brand gradient stops */
     --brand-start: 145 72% 42%;
@@ -107,7 +108,7 @@
     --neon-cyan: 180 75% 40%;
     --surface-elevated: 0 0% 100%;
     --surface-glass: 220 14% 97%;
-    
+    --glow-green: 0 0% 0% / 0;
 
     --brand-start: 145 72% 36%;
     --brand-end: 195 85% 42%;
@@ -121,11 +122,11 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
     letter-spacing: -0.02em;
   }
 
@@ -182,16 +183,14 @@
     background-clip: text;
   }
   .glass-panel {
-    background: hsl(var(--surface-glass) / 0.7);
-    backdrop-filter: blur(24px) saturate(1.5);
-    border: 1px solid hsl(var(--border) / 0.4);
-    box-shadow: inset 0 0 0 1px hsl(var(--foreground) / 0.02);
+    background: hsl(var(--surface-glass) / 0.6);
+    backdrop-filter: blur(20px) saturate(1.2);
+    border: 1px solid hsl(var(--border) / 0.5);
   }
   .glass-card {
-    background: hsl(var(--card) / 0.8);
-    backdrop-filter: blur(16px) saturate(1.2);
-    border: 1px solid hsl(var(--border) / 0.3);
-    box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.5);
+    background: hsl(var(--card) / 0.7);
+    backdrop-filter: blur(12px) saturate(1.1);
+    border: 1px solid hsl(var(--border) / 0.4);
   }
   .lottery-ball {
     @apply w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold font-mono;
