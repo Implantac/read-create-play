@@ -143,11 +143,20 @@ const DashboardPage = () => {
       )}
 
       {loading && (
-        <div className="flex items-center justify-center py-16 gap-3 text-muted-foreground">
-          <Loader2 className="w-5 h-5 animate-spin text-primary" />
-          <span className="text-sm">Carregando resultados...</span>
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="h-32 rounded-xl glass-card animate-pulse bg-muted/20" />
+            ))}
+          </div>
+          <div className="h-64 rounded-xl glass-card animate-pulse bg-muted/20" />
+          <div className="grid lg:grid-cols-2 gap-6">
+            <div className="h-80 rounded-xl glass-card animate-pulse bg-muted/20" />
+            <div className="h-80 rounded-xl glass-card animate-pulse bg-muted/20" />
+          </div>
         </div>
       )}
+
 
       {!loading && draws.length === 0 && (
         <EmptyState
