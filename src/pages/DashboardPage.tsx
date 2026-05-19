@@ -53,6 +53,8 @@ const DashboardPage = () => {
     pipeline: { step: string; detail: string; count: number }[];
   } | null>(null);
   const [generatingLucky, setGeneratingLucky] = useState(false);
+  const { history, saveGeneration } = useGenerationHistory(selectedLottery);
+
 
   const hotNumbers = useMemo(() => stats.filter(s => s.status === "hot").length, [stats]);
   const coldNumbers = useMemo(() => stats.filter(s => s.status === "cold").length, [stats]);
