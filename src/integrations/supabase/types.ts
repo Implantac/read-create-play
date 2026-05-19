@@ -158,6 +158,42 @@ export type Database = {
         }
         Relationships: []
       }
+      generation_history: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          lottery_id: string
+          numbers: number[]
+          pipeline: Json | null
+          score: number
+          strategy: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          lottery_id: string
+          numbers: number[]
+          pipeline?: Json | null
+          score: number
+          strategy: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          lottery_id?: string
+          numbers?: number[]
+          pipeline?: Json | null
+          score?: number
+          strategy?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       lottery_draws: {
         Row: {
           concurso: number
