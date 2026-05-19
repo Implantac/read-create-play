@@ -44,7 +44,7 @@ const fadeUp = {
 const features = [
   {
     icon: BarChart3,
-    title: "Análise Estatística",
+    title: "Intelligence Hub",
     description: "Frequência, atraso, paridade, soma e distribuição por faixa de todos os sorteios históricos.",
     color: "green" as const,
   },
@@ -56,7 +56,7 @@ const features = [
   },
   {
     icon: Target,
-    title: "Gerador Profissional",
+    title: "Otimizador Combinatorial",
     description: "Gere apostas otimizadas com algoritmos genéticos, simulated annealing e Monte Carlo.",
     color: "amber" as const,
   },
@@ -68,7 +68,7 @@ const features = [
   },
   {
     icon: Dices,
-    title: "Simulação Massiva",
+    title: "Monte Carlo Engine",
     description: "Simule milhões de jogos em segundos e descubra probabilidades reais.",
     color: "purple" as const,
   },
@@ -272,13 +272,12 @@ export default function LandingPage() {
             </motion.div>
 
             <motion.h1 custom={1} variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
-              Análise de loterias{" "}
-              <span className="gradient-brand-text">com inteligência artificial</span>
+              Inteligência de Dados{" "}
+              <span className="gradient-brand-text">aplicada a loterias</span>
             </motion.h1>
 
             <motion.p custom={2} variants={fadeUp} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              A plataforma mais avançada do Brasil para análise estatística, geração de apostas e simulação de loterias.
-              Algoritmos de Machine Learning analisando milhares de sorteios.
+              O Terminal de Inteligência mais avançado do país para análise de padrões, modelos de ML e otimização de matrizes estatísticas.
             </motion.p>
 
             <motion.div custom={3} variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
@@ -396,9 +395,9 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {[
-              { step: "01", icon: Database, title: "Dados Sincronizados", desc: "Todos os sorteios históricos são importados automaticamente da API da Caixa." },
-              { step: "02", icon: Brain, title: "IA Analisa", desc: "Nossos algoritmos de Machine Learning processam padrões, frequências e tendências." },
-              { step: "03", icon: Target, title: "Apostas Otimizadas", desc: "Receba sugestões de jogos baseados em análise profunda e probabilidades reais." },
+              { step: "01", icon: Database, title: "Data Ingestion", desc: "Integração via API com sincronização atômica de todos os sorteios históricos." },
+              { step: "02", icon: Brain, title: "Neural Analysis", desc: "Modelos proprietários identificam anomalias estatísticas e padrões de retenção." },
+              { step: "03", icon: Target, title: "Optimal Outputs", desc: "Entrega de matrizes otimizadas baseadas em filtros de alta probabilidade real." },
             ].map((item, i) => (
               <motion.div
                 key={item.step}

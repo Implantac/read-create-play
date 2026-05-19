@@ -25,38 +25,38 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 const workflowGroups: { label: string; items: { title: string; url: string; icon: any; requiredFeature?: Feature; tooltip: string }[] }[] = [
   {
-    label: "Analisar",
+    label: "Inteligência de Dados",
     items: [
-      { title: "Dashboard", url: "/", icon: BarChart3, tooltip: "Visão geral, últimos resultados e resumo da loteria selecionada." },
-      { title: "Estatísticas", url: "/estatisticas", icon: PieChart, tooltip: "Frequência, atraso, paridade, soma e distribuição detalhada dos números." },
-      { title: "Matriz de Análise", url: "/matriz", icon: Grid3X3, tooltip: "Score inteligente, farol de dezenas e desdobramento automático." },
-      { title: "Histórico", url: "/historico", icon: History, tooltip: "Consulte todos os resultados passados dos sorteios." },
+      { title: "Terminal", url: "/", icon: BarChart3, tooltip: "Terminal central de inteligência e resumo de fluxos históricos." },
+      { title: "Padrões Históricos", url: "/estatisticas", icon: PieChart, tooltip: "Frequência, desvio padrão e análise consolidada de tendências." },
+      { title: "Matriz de Precisão", url: "/matriz", icon: Grid3X3, tooltip: "Score algorítmico e farol de saturação de dezenas." },
+      { title: "Database Global", url: "/historico", icon: History, tooltip: "Acesso total à base de dados histórica sincronizada." },
     ],
   },
   {
-    label: "Simular",
+    label: "Laboratório de Estratégias",
     items: [
-      { title: "Simulações", url: "/simulacoes", icon: FlaskConical, requiredFeature: "simulacoes", tooltip: "Simule milhares de sorteios e avalie desempenho com Monte Carlo." },
-      { title: "Estratégias IA", url: "/estrategias", icon: Brain, requiredFeature: "estrategias_basicas", tooltip: "Explore estratégias estatísticas e inteligentes." },
-      { title: "ROI", url: "/roi", icon: TrendingUp, requiredFeature: "roi_dashboard", tooltip: "Acompanhe o retorno sobre investimento das suas apostas." },
-      { title: "Laboratório", url: "/laboratorio", icon: Search, requiredFeature: "estrategias_ml", tooltip: "Teste, compare e descubra as melhores estratégias." },
+      { title: "Engine de Simulação", url: "/simulacoes", icon: FlaskConical, requiredFeature: "simulacoes", tooltip: "Execução massiva de cenários via Monte Carlo." },
+      { title: "Modelos de ML", url: "/estrategias", icon: Brain, requiredFeature: "estrategias_basicas", tooltip: "Estratégias orientadas por Machine Learning." },
+      { title: "Analytics ROI", url: "/roi", icon: TrendingUp, requiredFeature: "roi_dashboard", tooltip: "Monitoramento de performance financeira e retorno." },
+      { title: "Strategy Lab", url: "/laboratorio", icon: Search, requiredFeature: "estrategias_ml", tooltip: "Ambiente de testes para otimização de estratégias." },
     ],
   },
   {
-    label: "Gerar",
+    label: "Otimização Combinatorial",
     items: [
-      { title: "Gerador", url: "/gerador", icon: Sparkles, tooltip: "Gere jogos inteligentes com filtros avançados." },
-      { title: "Fechamentos", url: "/fechamentos", icon: Grid3X3, requiredFeature: "fechamentos", tooltip: "Crie fechamentos matemáticos com garantia mínima de acertos." },
-      { title: "IA Autônoma", url: "/ia-autonoma", icon: Zap, requiredFeature: "ia_autonoma", tooltip: "IA com aprendizado contínuo para análises e previsões." },
+      { title: "Otimizador de Matrizes", url: "/gerador", icon: Sparkles, tooltip: "Geração de matrizes otimizadas com algoritmos de elite." },
+      { title: "Fechamentos HP", url: "/fechamentos", icon: Grid3X3, requiredFeature: "fechamentos", tooltip: "Fechamentos de alta performance com garantia matemática." },
+      { title: "IA Autônoma v4", url: "/ia-autonoma", icon: Zap, requiredFeature: "ia_autonoma", tooltip: "Sistema neural autônomo para detecção de anomalias." },
     ],
   },
   {
-    label: "Validar",
+    label: "Validação & Auditoria",
     items: [
-      { title: "AI Analyst", url: "/ai-analyst", icon: Bot, requiredFeature: "ai_analyst", tooltip: "Analista virtual para simular jogos, avaliar qualidade e sugerir estratégias." },
-      { title: "Chat IA", url: "/ai-chat", icon: MessageCircle, tooltip: "Converse com a IA para tirar dúvidas ou pedir análises." },
-      { title: "Minhas Apostas", url: "/minhas-apostas", icon: ClipboardCheck, tooltip: "Confira e gerencie o histórico completo das suas apostas." },
-      { title: "Jogos Salvos", url: "/jogos-salvos", icon: Star, tooltip: "Veja seus jogos salvos e analise o desempenho deles." },
+      { title: "AI Analyst Pro", url: "/ai-analyst", icon: Bot, requiredFeature: "ai_analyst", tooltip: "Analista de precisão para auditoria de jogos e estratégias." },
+      { title: "Interface Neural", url: "/ai-chat", icon: MessageCircle, tooltip: "Prompt direto para consulta à base de conhecimento Titan." },
+      { title: "Registro de Fluxos", url: "/minhas-apostas", icon: ClipboardCheck, tooltip: "Histórico completo de auditoria das suas apostas." },
+      { title: "Portfolio de Jogos", url: "/jogos-salvos", icon: Star, tooltip: "Gerenciamento de ativos salvos e performance acumulada." },
     ],
   },
 ];
