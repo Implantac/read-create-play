@@ -107,8 +107,9 @@ export function AppSidebar() {
                 )}
               </div>
               <p className="text-[10px] text-muted-foreground font-mono tracking-wider uppercase">
-                Motor v4.0
+                Neural Engine v5.2
               </p>
+
             </div>
           )}
         </Link>

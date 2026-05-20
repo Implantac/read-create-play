@@ -15,8 +15,9 @@ import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { TitanCommandCenter } from "@/components/TitanCommandCenter";
 import { TechnicalIndicators } from "@/components/TechnicalIndicators";
+import { AlphaMomentumSignal } from "@/components/AlphaMomentumSignal";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, ShieldCheck, Activity } from "lucide-react";
+import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, ShieldCheck, Activity, Cpu } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 import { Link } from "react-router-dom";
@@ -40,13 +41,6 @@ const item = {
   show: { opacity: 1, y: 0 },
 };
 
-const quickLinks = [
-  { title: "Gerador", description: "Gerar jogos inteligentes", icon: Sparkles, url: "/gerador", color: "text-primary" },
-  { title: "Simulações", description: "Testar contra o histórico", icon: FlaskConical, url: "/simulacoes", color: "text-neon-blue", badge: "Monte Carlo" },
-  { title: "Estatísticas", description: "Análise consolidada", icon: PieChart, url: "/estatisticas", color: "text-accent" },
-  { title: "Estratégias IA", description: "Machine Learning e IA", icon: Brain, url: "/estrategias", color: "text-neon-purple" },
-];
-
 const DashboardPage = () => {
   const { config, draws, drawsWithPrizes, loading, syncing, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery } = useLotteryContext();
   const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
@@ -60,18 +54,10 @@ const DashboardPage = () => {
     pipeline: { step: string; detail: string; count: number }[];
   } | null>(null);
   const [generatingLucky, setGeneratingLucky] = useState(false);
-  const [selectedHistoryItem, setSelectedHistoryItem] = useState<any | null>(null);
   const { history, saveGeneration } = useGenerationHistory(selectedLottery);
 
-
   const analytics = useMemo(() => calculateAnalyticsSnapshot(stats, draws), [stats, draws]);
-  const { hotNumbers, coldNumbers, avgDelay, maxDelay, volatilityIndex, saturationScore, complexityScore } = analytics;
-  const heatingCount = useMemo(() => stats.filter(s => s.trend > 15).length, [stats]);
-  const isSaturated = saturationScore > 75;
-  const isHighlyVolatile = volatilityIndex > 20;
-
-
-
+  const isSaturated = analytics.saturationScore > 75;
 
   const handleNewDraw = useCallback((draw: any) => addDraw(draw), [addDraw]);
 
@@ -80,7 +66,6 @@ const DashboardPage = () => {
     setGeneratingLucky(true);
     setLuckyGame(null);
     
-    // Simulate processing for "premium" feel
     setTimeout(async () => {
       const strategies = ["frequency", "balance", "coverage", "dispersion", "delay", "anti_pattern"];
       const randomStrategy = strategies[Math.floor(Math.random() * strategies.length)];
@@ -102,17 +87,17 @@ const DashboardPage = () => {
       }
       setGeneratingLucky(false);
     }, 1500);
-  }, [stats, draws, selectedLottery, saveGeneration]);
+  }, [stats, draws, selectedLottery, saveGeneration, config]);
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-6 pb-12 relative">
       {/* 📊 MARKET TICKER */}
-      <div className="fixed top-0 left-0 right-0 z-[50] h-7 bg-black/90 backdrop-blur-md border-b border-primary/20 flex items-center overflow-hidden pointer-events-none sm:left-64">
+      <div className="fixed top-0 left-0 right-0 z-[50] h-7 bg-black/95 backdrop-blur-md border-b border-primary/20 flex items-center overflow-hidden pointer-events-none sm:left-64">
         <div className="flex animate-scroll whitespace-nowrap py-1">
           {[1, 2, 3].map(i => (
             <div key={i} className="flex items-center gap-6 px-4">
               <span className="text-[10px] font-bold flex items-center gap-1.5 text-primary">
-                <Activity className="w-3 h-3" /> {config.name.toUpperCase()} TERMINAL ACTIVE
+                <Cpu className="w-3 h-3" /> NEURAL ENGINE v5.2 ACTIVE
               </span>
               <span className="text-[10px] text-muted-foreground flex items-center gap-1.5">
                 <TrendingUp className="w-3 h-3 text-primary" /> MOMENTUM: {analytics.momentumIndex.toFixed(2)}
@@ -121,10 +106,10 @@ const DashboardPage = () => {
                 <Zap className="w-3 h-3 text-accent" /> SATURAÇÃO: {analytics.saturationScore.toFixed(1)}%
               </span>
               <span className="text-[10px] text-muted-foreground flex items-center gap-1.5">
-                <Activity className="w-3 h-3 text-primary" /> COMPLEXIDADE: {analytics.complexityScore.toFixed(0)}%
+                <Activity className="w-3 h-3 text-primary" /> ALPHA SIGNAL: STABLE
               </span>
               <span className="text-[10px] text-muted-foreground flex items-center gap-1.5 border-r border-white/10 pr-6">
-                <History className="w-3 h-3" /> UPTIME: 99.9%
+                <ShieldCheck className="w-3 h-3 text-emerald-500" /> AUDIT: PASSED
               </span>
             </div>
           ))}
@@ -133,58 +118,40 @@ const DashboardPage = () => {
 
       <PageHeader
         title="Terminal de Inteligência"
-        description={`Análise de precisão em tempo real — ${config.name}`}
+        description={`Análise de precisão institucional — ${config.name}`}
         icon={BarChart3}
         badge={draws.length > 0 ? `${draws.length} sorteios` : undefined}
       />
-      <LotteryContextBanner />
-      <TitanCommandCenter />
       
-      <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-              <Terminal className="w-3 h-3" />
-              Indicadores Técnicos de Precisão
-            </h3>
-            <Badge variant="outline" className="text-[9px] bg-primary/5 border-primary/20">LIVE DATA</Badge>
-          </div>
-          <TechnicalIndicators analytics={analytics} />
-        </div>
+      <LotteryContextBanner />
+      
+      <div className="space-y-6">
+        <TitanCommandCenter />
         
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-              <Zap className="w-3 h-3" />
-              Alpha Momentum Signal
-            </h3>
+        <div className="grid lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                <Terminal className="w-3 h-3 text-primary" />
+                Indicadores Técnicos de Precisão
+              </h3>
+              <Badge variant="outline" className="text-[9px] bg-primary/5 border-primary/20 font-mono">LIVE FEED</Badge>
+            </div>
+            <TechnicalIndicators analytics={analytics} />
           </div>
-          <div className="glass-card rounded-xl p-4 border border-primary/20 bg-primary/5 relative overflow-hidden group">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-bold text-primary uppercase">Sinal Alpha</span>
-              <Badge className="bg-primary text-primary-foreground text-[9px] font-bold">ALPHA-BETA V5</Badge>
+          
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                <Zap className="w-3 h-3 text-accent" />
+                Alpha Momentum Signal
+              </h3>
             </div>
-            <div className="flex items-baseline gap-2 mb-4">
-              <span className="text-3xl font-black font-mono text-foreground italic">{(100 - analytics.saturationScore + analytics.momentumIndex).toFixed(1)}</span>
-              <span className="text-xs text-primary font-bold">α-STR</span>
-            </div>
-            <div className="space-y-2">
-              <div className="flex justify-between text-[9px] font-bold uppercase text-muted-foreground">
-                <span>Signal Reliability</span>
-                <span>{analytics.complexityScore.toFixed(0)}%</span>
-              </div>
-              <div className="h-1.5 w-full bg-black/40 rounded-full overflow-hidden">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${analytics.complexityScore}%` }}
-                  className="h-full bg-gradient-to-r from-primary to-accent"
-                />
-              </div>
-            </div>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
+            <AlphaMomentumSignal analytics={analytics} />
           </div>
         </div>
       </div>
+
 
       {/* Trial countdown banner */}
       {profile?.plan === "free" && !isTrialExpired && !isAdmin && !isSuperAdmin && (
