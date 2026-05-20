@@ -11,23 +11,38 @@ interface Props {
 export function PageHeader({ title, description, icon: Icon, badge }: Props) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="flex items-start gap-4 mb-6"
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-white/5"
     >
-      <div className="w-12 h-12 rounded-xl gradient-brand flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
-        <Icon className="w-6 h-6 text-primary-foreground" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <h1 className="text-xl font-bold text-foreground tracking-tight">{title}</h1>
-          {badge && (
-            <span className="text-[10px] font-mono font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-              {badge}
-            </span>
-          )}
+      <div className="flex items-start gap-4">
+        <div className="w-12 h-12 rounded-xl bg-primary/5 border border-primary/20 flex items-center justify-center shrink-0 shadow-lg shadow-primary/5 group">
+          <Icon className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
         </div>
-        <p className="text-sm text-muted-foreground mt-0.5">{description}</p>
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-2xl font-black text-foreground tracking-tighter uppercase italic">{title}</h1>
+            {badge && (
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest px-2.5 py-1 rounded bg-accent/10 text-accent border border-accent/20 animate-pulse">
+                {badge}
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest opacity-70">{description}</p>
+        </div>
+      </div>
+      
+      {/* Platform Metadata - Terminal Style */}
+      <div className="hidden md:flex items-center gap-4 text-[10px] font-mono text-muted-foreground/40">
+        <div className="flex flex-col items-end">
+          <span className="uppercase">Precision Level</span>
+          <span className="text-primary font-bold">99.8%</span>
+        </div>
+        <div className="w-px h-8 bg-white/5" />
+        <div className="flex flex-col items-end">
+          <span className="uppercase">Uptime</span>
+          <span className="text-accent font-bold">99.9%</span>
+        </div>
       </div>
     </motion.div>
   );
