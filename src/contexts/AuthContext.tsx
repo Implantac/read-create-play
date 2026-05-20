@@ -88,12 +88,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const authStorageKey = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`;
     let initialLoad = true;
 
-    const loadUserData = async (userId: string, accessToken?: string, email?: string | null) => {
-      const fullAccessUser = isFullAccessUser(email);
+    const loadUserData = async (userId: string, accessToken?: string) => {
       await Promise.all([
-        fetchProfile(userId, fullAccessUser),
-        checkAdmin(userId, email),
-        ...(accessToken && !fullAccessUser ? [syncSubscription(accessToken)] : []),
+        fetchProfile(userId),
+        checkAdmin(userId),
+        ...(accessToken ? [syncSubscription(accessToken)] : []),
       ]);
     };
 
@@ -102,7 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         if (session?.user) {
           if (!initialLoad) {
-            await loadUserData(session.user.id, undefined, session.user.email);
+            await loadUserData(session.user.id);
           }
         } else {
           setProfile(null);
@@ -133,7 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         setSession(session);
         if (session?.user) {
-          await loadUserData(session.user.id, session.access_token, session.user.email);
+          await loadUserData(session.user.id, session.access_token);
         }
       })
       .catch(() => {
@@ -165,7 +164,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return Math.max(0, TRIAL_DAYS - elapsed);
   })();
 
-  const isTrialExpired = !isAdmin && !isFullAccessUser(session?.user?.email) && profile?.plan === "free" && trialDaysLeft <= 0;
+  const isTrialExpired = !isAdmin && !isSuperAdmin && profile?.plan === "free" && trialDaysLeft <= 0;
 
   return (
     <AuthContext.Provider value={{ session, user: session?.user ?? null, profile, loading, isAdmin, isSuperAdmin, userRole, isTrialExpired, trialDaysLeft, signOut }}>
