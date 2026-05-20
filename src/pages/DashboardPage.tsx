@@ -259,18 +259,16 @@ const DashboardPage = () => {
 
                         <div className="pt-4 border-t border-primary/10">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-semibold text-foreground">Score de Confiança Analítica</span>
-                            <div className="flex items-center gap-2">
-                              {luckyGame.score > 85 && <Badge className="bg-primary/20 text-primary border-primary/30 text-[9px]">ELITE</Badge>}
-                              <span className="text-lg font-mono font-bold text-accent">{luckyGame.score.toFixed(1)}/100</span>
-                            </div>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-foreground">Score de Confiança Analítica</span>
+                            <TitanScoreBadge score={luckyGame.score} />
                           </div>
                           <div className="h-2 w-full bg-muted/30 rounded-full overflow-hidden">
                             <motion.div 
                               initial={{ width: 0 }}
                               animate={{ width: `${luckyGame.score}%` }}
-                              transition={{ duration: 1, ease: "easeOut" }}
-                              className="h-full bg-gradient-to-r from-primary to-accent"
+                              transition={{ duration: 1.2, ease: "easeOut" }}
+                              className="h-full bg-gradient-to-r from-primary via-accent to-primary animate-shimmer"
+                              style={{ backgroundSize: '200% 100%' }}
                             />
                           </div>
                         </div>
@@ -488,12 +486,14 @@ const DashboardPage = () => {
             variants={container}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+            className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4"
           >
-            <motion.div variants={item}><StatsCard title="Total Concursos" value={draws.length} icon={BarChart3} color="green" subtitle="Resultados históricos" /></motion.div>
-            <motion.div variants={item}><StatsCard title="Tendência Alta" value={heatingCount} icon={Zap} color="amber" subtitle="Números em ascensão" /></motion.div>
-            <motion.div variants={item}><StatsCard title="Números Quentes" value={hotNumbers} icon={Flame} color="red" subtitle="Acima da média" /></motion.div>
-            <motion.div variants={item}><StatsCard title="Números Frios" value={coldNumbers} icon={Snowflake} color="blue" subtitle="Abaixo da média" /></motion.div>
+            <motion.div variants={item} className="lg:col-span-1"><StatsCard title="Total Concursos" value={draws.length} icon={BarChart3} color="green" subtitle="Resultados históricos" /></motion.div>
+            <motion.div variants={item} className="lg:col-span-1"><StatsCard title="Tendência Alta" value={heatingCount} icon={Zap} color="amber" subtitle="Números em ascensão" /></motion.div>
+            <motion.div variants={item} className="lg:col-span-1"><StatsCard title="Saturação" value={`${saturationScore.toFixed(1)}%`} icon={Activity} color={saturationScore > 75 ? "red" : "green"} subtitle="Risco de inversão" /></motion.div>
+            <motion.div variants={item} className="lg:col-span-1"><StatsCard title="Volatilidade" value={`${volatilityIndex.toFixed(1)}%`} icon={TrendingUp} color={volatilityIndex > 20 ? "amber" : "blue"} subtitle="Variação de frequência" /></motion.div>
+            <motion.div variants={item} className="lg:col-span-1 hidden xl:block"><StatsCard title="Complexidade" value={`${complexityScore.toFixed(0)}%`} icon={Brain} color="blue" subtitle="Entropia de dados" /></motion.div>
+            <motion.div variants={item} className="lg:col-span-1 hidden xl:block"><StatsCard title="Números Quentes" value={hotNumbers} icon={Flame} color="red" subtitle="Acima da média" /></motion.div>
           </motion.div>
 
 
