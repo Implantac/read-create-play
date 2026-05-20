@@ -41,6 +41,13 @@ const item = {
   show: { opacity: 1, y: 0 },
 };
 
+const quickLinks = [
+  { title: "Gerador", description: "Gerar jogos inteligentes", icon: Sparkles, url: "/gerador", color: "text-primary" },
+  { title: "Simulações", description: "Testar contra o histórico", icon: FlaskConical, url: "/simulacoes", color: "text-neon-blue", badge: "Monte Carlo" },
+  { title: "Estatísticas", description: "Análise consolidada", icon: PieChart, url: "/estatisticas", color: "text-accent" },
+  { title: "Estratégias IA", description: "Machine Learning e IA", icon: Brain, url: "/estrategias", color: "text-neon-purple" },
+];
+
 const DashboardPage = () => {
   const { config, draws, drawsWithPrizes, loading, syncing, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery } = useLotteryContext();
   const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
@@ -54,10 +61,13 @@ const DashboardPage = () => {
     pipeline: { step: string; detail: string; count: number }[];
   } | null>(null);
   const [generatingLucky, setGeneratingLucky] = useState(false);
+  const [selectedHistoryItem, setSelectedHistoryItem] = useState<any | null>(null);
   const { history, saveGeneration } = useGenerationHistory(selectedLottery);
 
   const analytics = useMemo(() => calculateAnalyticsSnapshot(stats, draws), [stats, draws]);
-  const isSaturated = analytics.saturationScore > 75;
+  const { volatilityIndex, saturationScore, complexityScore } = analytics;
+  const heatingCount = useMemo(() => stats.filter(s => s.trend > 15).length, [stats]);
+  const isSaturated = saturationScore > 75;
 
   const handleNewDraw = useCallback((draw: any) => addDraw(draw), [addDraw]);
 
@@ -88,6 +98,7 @@ const DashboardPage = () => {
       setGeneratingLucky(false);
     }, 1500);
   }, [stats, draws, selectedLottery, saveGeneration, config]);
+
 
   return (
     <div className="space-y-6 pb-12 relative">
