@@ -1,12 +1,26 @@
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
-import { Terminal, Activity, Zap, ShieldCheck, Cpu } from "lucide-react";
+import { Terminal, Activity, Zap, ShieldCheck, Cpu, Database, Network } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useMemo } from "react";
 import { calculatePredictiveEntropy } from "@/engine/predictive-entropy";
 
 export const TitanCommandCenter = () => {
-  const { draws, stats } = useLotteryContext();
+  const { draws, stats, selectedLottery } = useLotteryContext();
+  const [uptime, setUptime] = React.useState(0);
+
+  React.useEffect(() => {
+    const timer = setInterval(() => setUptime(u => u + 1), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatUptime = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
 
   const entropyData = useMemo(() => {
     return calculatePredictiveEntropy(stats, draws);
@@ -31,12 +45,15 @@ export const TitanCommandCenter = () => {
             v5.0 — Neural Network Core • Multi-Threaded Processing
           </p>
         </div>
-        <div className="flex gap-2">
-          <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 animate-pulse font-mono text-[9px]">
-            {entropyData.entropy > 50 ? "SISTEMA EM ALERTA" : "ESTADO: NOMINAL"}
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 font-mono text-[9px]">
+            UPTIME: {formatUptime(uptime)}
+          </Badge>
+          <Badge variant="outline" className={`${entropyData.entropy > 50 ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-primary/5 text-primary border-primary/20'} animate-pulse font-mono text-[9px]`}>
+            {entropyData.chaosLevel === "EXTREME" ? "CRITICAL ENTROPY" : `ENTROPY: ${entropyData.chaosLevel}`}
           </Badge>
           <Badge variant="outline" className="bg-emerald-500/5 text-emerald-500 border-emerald-500/20 font-mono text-[9px]">
-            SYNC: {draws.length > 0 ? "VINCULADO" : "PENDENTE"}
+            NODE: CLOUD-SÃO-PAULO-01
           </Badge>
         </div>
       </div>
@@ -85,10 +102,11 @@ export const TitanCommandCenter = () => {
             </span>
           </div>
           <div className="font-mono text-[9px] text-primary/60 space-y-1 h-24 overflow-hidden">
-            <p>[SYSTEM] Neural weights updated</p>
-            <p>[WORKER] Monte Carlo simulation complete</p>
-            <p>[CORE] Entropy threshold: 0.124</p>
-            <p className="animate-pulse">[AI] Scanning for convergences...</p>
+            <p className="flex items-center gap-2"><Database className="w-2.5 h-2.5" /> [DB] Synced {draws.length} records for {selectedLottery}</p>
+            <p className="flex items-center gap-2"><Network className="w-2.5 h-2.5" /> [P2P] Neural weights redistributed</p>
+            <p className="flex items-center gap-2 text-amber-500/80"><Zap className="w-2.5 h-2.5" /> [CORE] Entropy signal: {entropyData.signalStrength.toFixed(0)}% strength</p>
+            <p className="animate-pulse flex items-center gap-2"><Cpu className="w-2.5 h-2.5" /> [IA] Processing quantum patterns...</p>
+            <p className="text-primary/30 text-[8px] mt-1">{`> exec --optimize --lottery=${selectedLottery}`}</p>
           </div>
         </div>
       </div>
