@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getSupabaseAdmin } from "../_shared/ai-cache.ts";
+import { requireUserAuth } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,6 +13,9 @@ serve(async (req) => {
   }
 
   try {
+    const auth = await requireUserAuth(req, { requireAdmin: true });
+    if (auth instanceof Response) return auth;
+
     const supabase = await getSupabaseAdmin();
 
     const { data, error } = await supabase
