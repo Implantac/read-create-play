@@ -13,6 +13,7 @@ import { AutoUpdater } from "@/components/AutoUpdater";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
+import { TitanCommandCenter } from "@/components/TitanCommandCenter";
 import { motion, AnimatePresence } from "framer-motion";
 import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, ShieldCheck, Activity } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -111,6 +112,7 @@ const DashboardPage = () => {
         badge={draws.length > 0 ? `${draws.length} sorteios` : undefined}
       />
       <LotteryContextBanner />
+      <TitanCommandCenter />
 
       {/* Trial countdown banner */}
       {profile?.plan === "free" && !isTrialExpired && !isAdmin && !isSuperAdmin && (
