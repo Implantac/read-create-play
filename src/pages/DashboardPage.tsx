@@ -14,7 +14,9 @@ import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap } from "lucide-react";
+import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, ShieldCheck, Activity } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -36,7 +38,7 @@ const item = {
 
 const quickLinks = [
   { title: "Gerador", description: "Gerar jogos inteligentes", icon: Sparkles, url: "/gerador", color: "text-primary" },
-  { title: "Simulações", description: "Testar contra o histórico", icon: FlaskConical, url: "/simulacoes", color: "text-neon-blue" },
+  { title: "Simulações", description: "Testar contra o histórico", icon: FlaskConical, url: "/simulacoes", color: "text-neon-blue", badge: "Monte Carlo" },
   { title: "Estatísticas", description: "Análise consolidada", icon: PieChart, url: "/estatisticas", color: "text-accent" },
   { title: "Estratégias IA", description: "Machine Learning e IA", icon: Brain, url: "/estrategias", color: "text-neon-purple" },
 ];
@@ -61,6 +63,9 @@ const DashboardPage = () => {
   const analytics = useMemo(() => calculateAnalyticsSnapshot(stats, draws), [stats, draws]);
   const { hotNumbers, coldNumbers, avgDelay, maxDelay, volatilityIndex, saturationScore } = analytics;
   const heatingCount = useMemo(() => stats.filter(s => s.trend > 15).length, [stats]);
+  const isSaturated = saturationScore > 75;
+  const isHighlyVolatile = volatilityIndex > 20;
+
 
 
 
@@ -125,13 +130,21 @@ const DashboardPage = () => {
                 </p>
               </div>
             </div>
-            <Link to="/planos">
-              <Button size="sm" className="gradient-brand text-primary-foreground gap-1.5 shadow-lg shadow-primary/20">
-                <Crown className="w-3.5 h-3.5" />
-                Ver Planos
-              </Button>
-            </Link>
+            <div className="flex items-center gap-3">
+              {isSaturated && (
+                <Badge variant="outline" className="hidden sm:flex bg-amber-500/10 text-amber-500 border-amber-500/20 text-[10px] animate-pulse">
+                  ALTA SATURAÇÃO DETECTADA
+                </Badge>
+              )}
+              <Link to="/planos">
+                <Button size="sm" className="gradient-brand text-primary-foreground gap-1.5 shadow-lg shadow-primary/20">
+                  <Crown className="w-3.5 h-3.5" />
+                  Ver Planos
+                </Button>
+              </Link>
+            </div>
           </div>
+
           {/* Progress bar */}
           <div className="mt-3 h-1.5 rounded-full bg-muted/50 overflow-hidden">
             <motion.div
@@ -242,17 +255,22 @@ const DashboardPage = () => {
 
                         <div className="pt-4 border-t border-primary/10">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-semibold text-foreground">Score de Confiança</span>
-                            <span className="text-lg font-mono font-bold text-accent">{luckyGame.score.toFixed(1)}/100</span>
+                            <span className="text-sm font-semibold text-foreground">Score de Confiança Analítica</span>
+                            <div className="flex items-center gap-2">
+                              {luckyGame.score > 85 && <Badge className="bg-primary/20 text-primary border-primary/30 text-[9px]">ELITE</Badge>}
+                              <span className="text-lg font-mono font-bold text-accent">{luckyGame.score.toFixed(1)}/100</span>
+                            </div>
                           </div>
                           <div className="h-2 w-full bg-muted/30 rounded-full overflow-hidden">
                             <motion.div 
                               initial={{ width: 0 }}
                               animate={{ width: `${luckyGame.score}%` }}
+                              transition={{ duration: 1, ease: "easeOut" }}
                               className="h-full bg-gradient-to-r from-primary to-accent"
                             />
                           </div>
                         </div>
+
                       </div>
 
                       <div className="bg-black/40 rounded-lg p-4 border border-white/5 font-mono text-[11px] space-y-2">
@@ -411,35 +429,30 @@ const DashboardPage = () => {
                         </div>
                       </div>
                     </div>
-                  </div>
+                        {/* Analysis Grid */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
+                            <span className="text-[10px] text-muted-foreground uppercase">Volatilidade</span>
+                            <p className={`text-sm font-bold ${volatilityIndex > 20 ? 'text-neon-red' : 'text-primary'}`}>
+                              {volatilityIndex.toFixed(1)}%
+                            </p>
+                          </div>
+                          <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
+                            <span className="text-[10px] text-muted-foreground uppercase">Saturação</span>
+                            <p className={`text-sm font-bold ${saturationScore > 75 ? 'text-neon-amber' : 'text-primary'}`}>
+                              {saturationScore.toFixed(1)}%
+                            </p>
+                          </div>
+                        </div>
 
-                  <div className="p-4 border-t border-border/50 bg-muted/20 flex justify-end gap-3">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setSelectedHistoryItem(null)}
-                    >
-                      Fechar Relatório
-                    </Button>
-                    <Button 
-                      size="sm"
-                      onClick={() => {
-                        setLuckyGame({
-                          numbers: selectedHistoryItem.numbers,
-                          score: selectedHistoryItem.score,
-                          strategy: selectedHistoryItem.strategy,
-                          description: selectedHistoryItem.description || "",
-                          pipeline: selectedHistoryItem.pipeline as any,
-                        });
-                        setSelectedHistoryItem(null);
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      className="gradient-brand text-primary-foreground"
-                    >
-                      <Sparkles className="w-3.5 h-3.5 mr-2" />
-                      Reaplicar na Engine
-                    </Button>
-                  </div>
+                        <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
+                          <ShieldCheck className="w-4 h-4 text-primary" />
+                          <p className="text-[10px] text-muted-foreground leading-tight">
+                            {getComplianceNotice()}
+                          </p>
+                        </div>
+                      </div>
+
                 </motion.div>
               </div>
             )}
