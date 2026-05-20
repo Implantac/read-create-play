@@ -22,7 +22,8 @@ import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { usePlanAccess } from "@/hooks/usePlanAccess";
 import { useGenerationHistory } from "@/hooks/useGenerationHistory";
-
+import { calculateAnalyticsSnapshot, getComplianceNotice } from "@/engine/analytics-core";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const container = {
   hidden: { opacity: 0 },
@@ -57,11 +58,10 @@ const DashboardPage = () => {
   const { history, saveGeneration } = useGenerationHistory(selectedLottery);
 
 
-
-  const hotNumbers = useMemo(() => stats.filter(s => s.status === "hot").length, [stats]);
-  const coldNumbers = useMemo(() => stats.filter(s => s.status === "cold").length, [stats]);
-  const avgDelay = useMemo(() => stats.length > 0 ? Math.round(stats.reduce((a, s) => a + s.lastSeen, 0) / stats.length) : 0, [stats]);
+  const analytics = useMemo(() => calculateAnalyticsSnapshot(stats, draws), [stats, draws]);
+  const { hotNumbers, coldNumbers, avgDelay, maxDelay, volatilityIndex, saturationScore } = analytics;
   const heatingCount = useMemo(() => stats.filter(s => s.trend > 15).length, [stats]);
+
 
 
   const handleNewDraw = useCallback((draw: any) => addDraw(draw), [addDraw]);
@@ -148,16 +148,17 @@ const DashboardPage = () => {
         <div className="space-y-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="h-32 rounded-xl glass-card animate-pulse bg-muted/20" />
+              <Skeleton key={i} className="h-32 rounded-xl bg-muted/20" />
             ))}
           </div>
-          <div className="h-64 rounded-xl glass-card animate-pulse bg-muted/20" />
+          <Skeleton className="h-64 rounded-xl bg-muted/20" />
           <div className="grid lg:grid-cols-2 gap-6">
-            <div className="h-80 rounded-xl glass-card animate-pulse bg-muted/20" />
-            <div className="h-80 rounded-xl glass-card animate-pulse bg-muted/20" />
+            <Skeleton className="h-80 rounded-xl bg-muted/20" />
+            <Skeleton className="h-80 rounded-xl bg-muted/20" />
           </div>
         </div>
       )}
+
 
 
       {!loading && draws.length === 0 && (
@@ -542,6 +543,9 @@ const DashboardPage = () => {
             <SumChart data={sumData} />
             <RecentDraws draws={drawsWithPrizes} />
           </div>
+          <p className="text-[10px] text-muted-foreground/50 text-center max-w-md mx-auto">
+            {getComplianceNotice()}
+          </p>
         </>
       )}
     </div>
@@ -549,3 +553,4 @@ const DashboardPage = () => {
 };
 
 export default DashboardPage;
+

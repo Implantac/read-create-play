@@ -9,6 +9,9 @@ import { LotteryProvider } from "@/contexts/LotteryContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminGuard } from "@/components/AdminGuard";
 import { AppLayout } from "@/components/AppLayout";
+import { lazy, Suspense } from "react";
+import { Loader2 } from "lucide-react";
+
 import DashboardPage from "@/pages/DashboardPage";
 import GeradorPage from "@/pages/GeradorPage";
 import EstrategiasPage from "@/pages/EstrategiasPage";
