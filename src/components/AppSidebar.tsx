@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { SystemAuditStatus } from "@/components/SystemAuditStatus";
 
 const workflowGroups: { label: string; items: { title: string; url: string; icon: any; requiredFeature?: Feature; tooltip: string }[] }[] = [
   {
@@ -113,7 +114,12 @@ export function AppSidebar() {
         </Link>
       </SidebarHeader>
 
-      <SidebarContent className="px-2 py-3">
+      <SidebarContent className="px-2 py-3 scrollbar-hide">
+        {!collapsed && (
+          <div className="px-2 mb-4">
+            <SystemAuditStatus />
+          </div>
+        )}
         {/* Active lottery indicator */}
         <div className={`mx-1 mb-3 rounded-lg bg-primary/5 border border-primary/15 transition-all ${collapsed ? "p-2 flex justify-center" : "px-3 py-2"}`}>
           {collapsed ? (
