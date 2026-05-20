@@ -1,11 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+import { requireUserAuth, corsHeaders } from "../_shared/auth.ts";
 
 const PLAN_PRICES: Record<string, { price_id: string; mode: "subscription" | "payment" }> = {
   premium: { price_id: "price_1TFfc9CzGT9FnNQptfREBkbH", mode: "subscription" },
@@ -20,18 +15,10 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const supabaseClient = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-  );
+  const auth = await requireUserAuth(req);
+  if (auth instanceof Response) return auth;
 
   try {
-    const authHeader = req.headers.get("Authorization")!;
-    const token = authHeader.replace("Bearer ", "");
-    const { data } = await supabaseClient.auth.getUser(token);
-    const user = data.user;
-    if (!user?.email) throw new Error("User not authenticated");
-
     const { planId } = await req.json();
     const planConfig = PLAN_PRICES[planId];
     if (!planConfig) throw new Error(`Invalid plan: ${planId}`);
@@ -40,7 +27,7 @@ serve(async (req) => {
       apiVersion: "2025-08-27.basil",
     });
 
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    const customers = await stripe.customers.list({ email: auth.email!, limit: 1 });
     let customerId: string | undefined;
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
@@ -48,12 +35,12 @@ serve(async (req) => {
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      customer_email: customerId ? undefined : user.email,
+      customer_email: customerId ? undefined : auth.email!,
       line_items: [{ price: planConfig.price_id, quantity: 1 }],
       mode: planConfig.mode,
       success_url: `${req.headers.get("origin")}/payment-success?plan=${planId}`,
       cancel_url: `${req.headers.get("origin")}/planos`,
-      metadata: { user_id: user.id, plan_id: planId },
+      metadata: { user_id: auth.userId, plan_id: planId },
     });
 
     return new Response(JSON.stringify({ url: session.url }), {
