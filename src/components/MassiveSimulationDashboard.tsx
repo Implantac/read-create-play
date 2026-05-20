@@ -424,13 +424,17 @@ export function MassiveSimulationDashboard({ stats, config, draws }: Props) {
                     </div>
                   ) : (
                     <div className="prose prose-sm prose-invert max-w-none p-4 rounded-lg bg-muted/20 border border-border">
-                      <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed"
+                      <div
+                        className="text-sm text-foreground whitespace-pre-wrap leading-relaxed"
                         dangerouslySetInnerHTML={{
-                          __html: aiAnalysis
-                            .replace(/\*\*(.*?)\*\*/g, '<strong class="text-primary">$1</strong>')
-                            .replace(/#{3}\s(.*)/g, '<h4 class="text-foreground font-semibold mt-3 mb-1 text-sm">$1</h4>')
-                            .replace(/#{2}\s(.*)/g, '<h3 class="text-foreground font-bold mt-4 mb-2 text-base">$1</h3>')
-                            .replace(/- (.*)/g, '<li class="text-muted-foreground text-xs ml-4">$1</li>')
+                          __html: DOMPurify.sanitize(
+                            aiAnalysis
+                              .replace(/\*\*(.*?)\*\*/g, '<strong class="text-primary">$1</strong>')
+                              .replace(/#{3}\s(.*)/g, '<h4 class="text-foreground font-semibold mt-3 mb-1 text-sm">$1</h4>')
+                              .replace(/#{2}\s(.*)/g, '<h3 class="text-foreground font-bold mt-4 mb-2 text-base">$1</h3>')
+                              .replace(/- (.*)/g, '<li class="text-muted-foreground text-xs ml-4">$1</li>'),
+                            { ALLOWED_TAGS: ['strong', 'h3', 'h4', 'li', 'ul', 'ol', 'br', 'p', 'em'], ALLOWED_ATTR: ['class'] }
+                          ),
                         }}
                       />
                     </div>
