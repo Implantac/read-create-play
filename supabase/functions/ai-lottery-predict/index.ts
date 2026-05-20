@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { requireUserAuth } from "../_shared/auth.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCachedAnalysis, setCachedAnalysis } from "../_shared/ai-cache.ts";
 
@@ -343,6 +344,9 @@ serve(async (req) => {
   }
 
   try {
+    const auth = await requireUserAuth(req, { allowedPlans: ["premium", "professional", "lifetime"] });
+    if (auth instanceof Response) return auth;
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
