@@ -26,6 +26,8 @@ import { usePlanAccess } from "@/hooks/usePlanAccess";
 import { useGenerationHistory } from "@/hooks/useGenerationHistory";
 import { calculateAnalyticsSnapshot, getComplianceNotice } from "@/engine/analytics-core";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TitanScoreBadge } from "@/components/TitanScoreBadge";
+import { evaluateBetQuality } from "@/engine/bet-quality";
 
 const container = {
   hidden: { opacity: 0 },
@@ -61,7 +63,7 @@ const DashboardPage = () => {
 
 
   const analytics = useMemo(() => calculateAnalyticsSnapshot(stats, draws), [stats, draws]);
-  const { hotNumbers, coldNumbers, avgDelay, maxDelay, volatilityIndex, saturationScore } = analytics;
+  const { hotNumbers, coldNumbers, avgDelay, maxDelay, volatilityIndex, saturationScore, complexityScore } = analytics;
   const heatingCount = useMemo(() => stats.filter(s => s.trend > 15).length, [stats]);
   const isSaturated = saturationScore > 75;
   const isHighlyVolatile = volatilityIndex > 20;
@@ -83,9 +85,12 @@ const DashboardPage = () => {
       const result = runIntelligentPipeline(stats, draws, selectedLottery, randomStrategy, 1);
       
       if (result.games.length > 0) {
+        const bet = result.games[0];
+        const qualityReport = evaluateBetQuality(bet, stats, config, draws);
+        
         const gameData = {
-          numbers: result.games[0],
-          score: result.scores[0] || 0,
+          numbers: bet,
+          score: qualityReport.overall,
           strategy: result.strategy.name,
           description: result.strategy.description,
           pipeline: result.pipeline,
@@ -161,13 +166,12 @@ const DashboardPage = () => {
         <div className="space-y-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map(i => (
-              <Skeleton key={i} className="h-32 rounded-xl bg-muted/20" />
+              <Skeleton key={i} className="h-28 rounded-xl bg-muted/10 border border-white/5" />
             ))}
           </div>
-          <Skeleton className="h-64 rounded-xl bg-muted/20" />
-          <div className="grid lg:grid-cols-2 gap-6">
-            <Skeleton className="h-80 rounded-xl bg-muted/20" />
-            <Skeleton className="h-80 rounded-xl bg-muted/20" />
+          <div className="grid lg:grid-cols-3 gap-6">
+            <Skeleton className="h-64 lg:col-span-2 rounded-xl bg-muted/10 border border-white/5" />
+            <Skeleton className="h-64 rounded-xl bg-muted/10 border border-white/5" />
           </div>
         </div>
       )}
@@ -255,18 +259,16 @@ const DashboardPage = () => {
 
                         <div className="pt-4 border-t border-primary/10">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-semibold text-foreground">Score de Confiança Analítica</span>
-                            <div className="flex items-center gap-2">
-                              {luckyGame.score > 85 && <Badge className="bg-primary/20 text-primary border-primary/30 text-[9px]">ELITE</Badge>}
-                              <span className="text-lg font-mono font-bold text-accent">{luckyGame.score.toFixed(1)}/100</span>
-                            </div>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-foreground">Score de Confiança Analítica</span>
+                            <TitanScoreBadge score={luckyGame.score} />
                           </div>
                           <div className="h-2 w-full bg-muted/30 rounded-full overflow-hidden">
                             <motion.div 
                               initial={{ width: 0 }}
                               animate={{ width: `${luckyGame.score}%` }}
-                              transition={{ duration: 1, ease: "easeOut" }}
-                              className="h-full bg-gradient-to-r from-primary to-accent"
+                              transition={{ duration: 1.2, ease: "easeOut" }}
+                              className="h-full bg-gradient-to-r from-primary via-accent to-primary animate-shimmer"
+                              style={{ backgroundSize: '200% 100%' }}
                             />
                           </div>
                         </div>
@@ -337,11 +339,9 @@ const DashboardPage = () => {
                       ))}
                       {record.numbers.length > 6 && <span className="text-[10px] text-muted-foreground self-center">...</span>}
                     </div>
-                    <div className="flex justify-between items-center mt-1">
-                      <div className="flex-1 h-1 bg-muted/30 rounded-full mr-3">
-                        <div className="h-full bg-accent rounded-full" style={{ width: `${record.score}%` }} />
-                      </div>
-                      <span className="text-[10px] font-mono font-bold text-accent">{record.score.toFixed(0)}%</span>
+                    <div className="flex justify-between items-center mt-auto pt-2 border-t border-white/5">
+                      <TitanScoreBadge score={record.score} label="Titan" />
+                      <span className="text-[9px] font-mono text-muted-foreground">ID: {record.id.slice(0, 8)}</span>
                     </div>
                   </motion.button>
                 ))}
@@ -395,15 +395,15 @@ const DashboardPage = () => {
                           </div>
                         </div>
 
-                        <div>
+                        <div className="pt-4 border-t border-white/5">
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-[10px] font-bold uppercase tracking-widest text-foreground">Score de Confiança</span>
-                            <span className="text-sm font-mono font-bold text-accent">{Number(selectedHistoryItem.score).toFixed(1)}%</span>
+                            <TitanScoreBadge score={selectedHistoryItem.score} />
                           </div>
                           <div className="h-1.5 w-full bg-muted/30 rounded-full overflow-hidden">
                             <div 
-                              className="h-full bg-gradient-to-r from-primary to-accent"
-                              style={{ width: `${selectedHistoryItem.score}%` }}
+                              className="h-full bg-gradient-to-r from-primary via-accent to-primary animate-shimmer"
+                              style={{ width: `${selectedHistoryItem.score}%`, backgroundSize: '200% 100%' }}
                             />
                           </div>
                         </div>
@@ -465,14 +465,14 @@ const DashboardPage = () => {
               <motion.div key={link.url} variants={item}>
                 <Link
                   to={link.url}
-                  className="flex items-center gap-3 rounded-xl glass-card p-4 border border-border hover:border-primary/30 transition-all duration-300 hover:translate-y-[-2px] group"
+                  className="flex items-center gap-3 rounded-xl glass-card p-4 border border-white/5 hover:border-primary/40 transition-all duration-300 hover:translate-y-[-4px] group hover:shadow-lg hover:shadow-primary/5 active:scale-95"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-primary/5 border border-primary/10 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-                    <link.icon className={`w-5 h-5 ${link.color}`} />
+                  <div className="w-11 h-11 rounded-lg bg-primary/5 border border-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-all group-hover:rotate-3">
+                    <link.icon className={`w-5 h-5 ${link.color} group-hover:scale-110 transition-transform`} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-foreground">{link.title}</p>
-                    <p className="text-[10px] text-muted-foreground truncate">{link.description}</p>
+                    <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{link.title}</p>
+                    <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">{link.description}</p>
                   </div>
                 </Link>
               </motion.div>
@@ -484,12 +484,14 @@ const DashboardPage = () => {
             variants={container}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+            className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4"
           >
-            <motion.div variants={item}><StatsCard title="Total Concursos" value={draws.length} icon={BarChart3} color="green" subtitle="Resultados históricos" /></motion.div>
-            <motion.div variants={item}><StatsCard title="Tendência Alta" value={heatingCount} icon={Zap} color="amber" subtitle="Números em ascensão" /></motion.div>
-            <motion.div variants={item}><StatsCard title="Números Quentes" value={hotNumbers} icon={Flame} color="red" subtitle="Acima da média" /></motion.div>
-            <motion.div variants={item}><StatsCard title="Números Frios" value={coldNumbers} icon={Snowflake} color="blue" subtitle="Abaixo da média" /></motion.div>
+            <motion.div variants={item} className="lg:col-span-1"><StatsCard title="Total Concursos" value={draws.length} icon={BarChart3} color="green" subtitle="Resultados históricos" /></motion.div>
+            <motion.div variants={item} className="lg:col-span-1"><StatsCard title="Tendência Alta" value={heatingCount} icon={Zap} color="amber" subtitle="Números em ascensão" /></motion.div>
+            <motion.div variants={item} className="lg:col-span-1"><StatsCard title="Saturação" value={`${saturationScore.toFixed(1)}%`} icon={Activity} color={saturationScore > 75 ? "red" : "green"} subtitle="Risco de inversão" /></motion.div>
+            <motion.div variants={item} className="lg:col-span-1"><StatsCard title="Volatilidade" value={`${volatilityIndex.toFixed(1)}%`} icon={TrendingUp} color={volatilityIndex > 20 ? "amber" : "blue"} subtitle="Variação de frequência" /></motion.div>
+            <motion.div variants={item} className="lg:col-span-1 hidden xl:block"><StatsCard title="Complexidade" value={`${complexityScore.toFixed(0)}%`} icon={Brain} color="blue" subtitle="Entropia de dados" /></motion.div>
+            <motion.div variants={item} className="lg:col-span-1 hidden xl:block"><StatsCard title="Números Quentes" value={hotNumbers} icon={Flame} color="red" subtitle="Acima da média" /></motion.div>
           </motion.div>
 
 
