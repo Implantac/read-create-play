@@ -76,14 +76,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const loadUserData = async (userId: string, accessToken?: string) => {
-    await Promise.all([
-      fetchProfile(userId),
-      checkAdmin(userId),
-      ...(accessToken ? [syncSubscription(accessToken)] : []),
-    ]);
-  };
-
   useEffect(() => {
     const authStorageKey = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`;
     let initialLoad = true;
