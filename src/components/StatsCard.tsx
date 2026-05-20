@@ -1,7 +1,6 @@
-import { motion, AnimatePresence } from "framer-motion";
 import { LucideIcon, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Props {
   title: string;
@@ -9,6 +8,7 @@ interface Props {
   subtitle?: string;
   icon: LucideIcon;
   color?: "green" | "blue" | "amber" | "red";
+  trend?: number;
 }
 
 const colorMap = {
@@ -39,12 +39,13 @@ const valueColorMap = {
   red: "text-neon-red",
 };
 
-export function StatsCard({ title, value, subtitle, icon: Icon, color = "green" }: Props) {
+export function StatsCard({ title, value, subtitle, icon: Icon, color = "green", trend }: Props) {
   return (
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`rounded-xl glass-card p-5 transition-all duration-300 hover:translate-y-[-2px] group relative overflow-hidden ${colorMap[color]}`}
+      whileHover={{ y: -4 }}
+      className={`rounded-xl glass-card p-5 transition-all duration-300 group relative overflow-hidden border ${colorMap[color]}`}
     >
       <div className="flex items-center justify-between mb-3 relative z-10">
         <div className="flex items-center gap-1.5">
@@ -66,23 +67,33 @@ export function StatsCard({ title, value, subtitle, icon: Icon, color = "green" 
           <Icon className={`w-4 h-4 ${iconColorMap[color]}`} />
         </div>
       </div>
-      <div className={`text-3xl font-bold font-mono relative z-10 transition-all group-hover:tracking-tight ${valueColorMap[color]}`}>
-        <AnimatePresence mode="wait">
-          <motion.span
-            key={String(value)}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 10 }}
-          >
-            {value}
-          </motion.span>
-        </AnimatePresence>
+      <div className="flex items-end justify-between relative z-10">
+        <div className={`text-3xl font-bold font-mono transition-all group-hover:tracking-tight ${valueColorMap[color]}`}>
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={String(value)}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+            >
+              {value}
+            </motion.span>
+          </AnimatePresence>
+        </div>
+        {trend !== undefined && (
+          <div className={`flex items-center gap-1 text-[10px] font-bold ${trend > 0 ? 'text-primary' : trend < 0 ? 'text-neon-red' : 'text-muted-foreground'}`}>
+            {trend > 0 ? '↑' : trend < 0 ? '↓' : '•'}
+            {Math.abs(trend).toFixed(1)}%
+          </div>
+        )}
       </div>
       {subtitle && <p className="text-[11px] text-muted-foreground mt-1.5 relative z-10">{subtitle}</p>}
       
       {/* Decorative background element */}
       <div className={`absolute -right-2 -bottom-2 w-24 h-24 rounded-full ${iconBgMap[color]} blur-2xl opacity-0 group-hover:opacity-20 transition-opacity`} />
+      
+      {/* Subtle grid pattern */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none group-hover:opacity-[0.05] transition-opacity" style={{ backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)', backgroundSize: '16px 16px' }} />
     </motion.div>
   );
 }
-
