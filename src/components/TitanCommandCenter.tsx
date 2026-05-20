@@ -32,11 +32,11 @@ export const TitanCommandCenter = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 animate-pulse">
-            SISTEMA OPERACIONAL
+          <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 animate-pulse font-mono text-[9px]">
+            {entropyData.entropy > 50 ? "SISTEMA EM ALERTA" : "ESTADO: NOMINAL"}
           </Badge>
-          <Badge variant="outline" className="bg-emerald-500/5 text-emerald-500 border-emerald-500/20">
-            LATÊNCIA: 12MS
+          <Badge variant="outline" className="bg-emerald-500/5 text-emerald-500 border-emerald-500/20 font-mono text-[9px]">
+            SYNC: {draws.length > 0 ? "VINCULADO" : "PENDENTE"}
           </Badge>
         </div>
       </div>
