@@ -29,7 +29,9 @@ export function AppLayout() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background gradient-mesh">
+      <div className="min-h-screen flex w-full bg-[#050505] text-slate-200 selection:bg-primary/30 selection:text-primary-foreground">
+        <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))] pointer-events-none" />
+        <div className="fixed inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] brightness-100 contrast-150 pointer-events-none" />
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
           {/* Header */}
