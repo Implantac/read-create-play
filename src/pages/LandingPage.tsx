@@ -29,6 +29,9 @@ import {
   Users,
   Database,
   Quote,
+  Activity,
+  Terminal,
+  History,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
@@ -421,6 +424,82 @@ export default function LandingPage() {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Terminal Preview Section */}
+      <section className="py-20 md:py-28 overflow-hidden relative">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="container mx-auto px-4 relative">
+          <motion.div 
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="glass-card rounded-2xl border border-white/10 p-4 md:p-8 bg-black/60 shadow-2xl relative"
+          >
+            <div className="absolute -top-3 left-10 flex items-center gap-2 px-3 py-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full uppercase tracking-widest shadow-lg shadow-primary/40">
+              <Activity className="w-3 h-3" /> Live Technical Data
+            </div>
+            
+            <div className="grid lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-6">
+                <div className="space-y-2">
+                  <h3 className="text-2xl md:text-3xl font-bold tracking-tighter">Performance de nível Bloomberg</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed max-w-lg">
+                    Monitore indicadores técnicos em tempo real, calculados em nanossegundos por nossa engine proprietária. Identifique anomalias estatísticas antes que elas aconteçam.
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { label: "VIX-L Volatility", value: "14.22", trend: "up", color: "text-primary" },
+                    { label: "Momentum IA", value: "84.5", trend: "up", color: "text-primary" },
+                    { label: "Entropy Index", value: "0.42", trend: "down", color: "text-destructive" },
+                    { label: "Signal Strength", value: "92%", trend: "up", color: "text-accent" },
+                  ].map((stat, i) => (
+                    <div key={i} className="p-4 rounded-xl bg-white/5 border border-white/10">
+                      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-1">{stat.label}</p>
+                      <div className="flex items-baseline gap-2">
+                        <span className={`text-xl font-mono font-bold ${stat.color}`}>{stat.value}</span>
+                        <span className={`text-[10px] ${stat.trend === 'up' ? 'text-primary' : 'text-destructive'}`}>
+                          {stat.trend === 'up' ? '↑' : '↓'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="bg-black/80 rounded-xl border border-white/5 p-4 font-mono text-[10px] space-y-2 overflow-hidden relative">
+                <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-2">
+                  <span className="text-primary font-bold">TITAN_OS_TERMINAL</span>
+                  <div className="flex gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-destructive/50" />
+                    <div className="w-2 h-2 rounded-full bg-amber-500/50" />
+                    <div className="w-2 h-2 rounded-full bg-primary/50" />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-primary/70">{`> initializing quantum_core...`}</p>
+                  <p className="text-muted-foreground">{`> status: nominal`}</p>
+                  <p className="text-muted-foreground">{`> loading historical_matrix[mega_sena]`}</p>
+                  <p className="text-emerald-500">{`> matrix_sync: complete [2,842 nodes]`}</p>
+                  <p className="text-primary/70">{`> executing monte_carlo_sim(1m)`}</p>
+                  <p className="text-muted-foreground">{`> signal: 0.8422 correlation detected`}</p>
+                  <p className="text-accent animate-pulse">{`> alert: hot_streak pattern detected`}</p>
+                  <p className="text-muted-foreground mt-4">{`> recommendation: deploy coverage_strategy`}</p>
+                  <div className="w-full h-1 bg-muted/30 rounded-full mt-2 overflow-hidden">
+                    <motion.div 
+                      className="h-full bg-primary"
+                      initial={{ width: 0 }}
+                      whileInView={{ width: "80%" }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 

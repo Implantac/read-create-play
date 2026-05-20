@@ -17,6 +17,8 @@ export interface AnalyticsSnapshot {
   volatilityIndex: number; // Measure of how much numbers change positions in frequency rankings
   saturationScore: number; // Likelihood of the current "hot" set being replaced
   complexityScore: number; // Measure of non-randomness in historical sequences
+  momentumIndex: number; // Short-term trend strength (last 10 draws)
+  dispersionRatio: number; // How "spread" the results are vs theoretical average
 }
 
 export function calculateAnalyticsSnapshot(stats: NumberStats[], draws: DrawResult[]): AnalyticsSnapshot {
@@ -32,6 +34,8 @@ export function calculateAnalyticsSnapshot(stats: NumberStats[], draws: DrawResu
       volatilityIndex: 0,
       saturationScore: 0,
       complexityScore: 0,
+      momentumIndex: 0,
+      dispersionRatio: 0,
     };
   }
 
@@ -67,6 +71,8 @@ export function calculateAnalyticsSnapshot(stats: NumberStats[], draws: DrawResu
     volatilityIndex,
     saturationScore,
     complexityScore,
+    momentumIndex: stats.reduce((acc, s) => acc + Math.max(0, s.trend), 0) / stats.length * 10,
+    dispersionRatio: draws.length > 5 ? (avgDelay / 1.5) : 0, // Simplified dispersion logic
   };
 }
 
