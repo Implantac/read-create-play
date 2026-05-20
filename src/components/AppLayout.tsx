@@ -129,7 +129,7 @@ export function AppLayout() {
             <div className="container mx-auto px-4 flex flex-col items-center justify-center gap-2">
               <div className="flex items-center gap-2 text-[10px] text-muted-foreground/60">
                 <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-pulse" />
-                <span className="font-mono tracking-wider uppercase">Titan Loterias — Motor v4.0 • ML • Database</span>
+                <span className="font-mono tracking-wider uppercase">Titan Loterias — Motor v5.0 • Neural Core • Quantum Stats</span>
               </div>
               <p className="text-[9px] text-muted-foreground/40 max-w-xs text-center leading-relaxed">
                 As loterias são eventos aleatórios. As análises Titan possuem caráter estritamente estatístico e não garantem premiações.
