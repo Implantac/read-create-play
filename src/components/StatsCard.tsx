@@ -1,4 +1,4 @@
-import { LucideIcon, Info } from "lucide-react";
+import { LucideIcon, Info, TrendingUp, TrendingDown } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -37,6 +37,35 @@ const valueColorMap = {
   blue: "text-neon-blue",
   amber: "text-accent",
   red: "text-neon-red",
+};
+
+const Sparkline = ({ color }: { color: string }) => {
+  const points = Array.from({ length: 10 }, (_, i) => ({
+    x: (i * 100) / 9,
+    y: 20 + Math.random() * 60
+  }));
+  const pathData = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')}`;
+
+  return (
+    <div className="h-8 w-full mt-2 overflow-hidden opacity-50 group-hover:opacity-100 transition-opacity">
+      <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <path
+          d={pathData}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={color}
+        />
+        <path
+          d={`${pathData} L 100,100 L 0,100 Z`}
+          fill="currentColor"
+          className={`${color} opacity-10`}
+        />
+      </svg>
+    </div>
+  );
 };
 
 export function StatsCard({ title, value, subtitle, icon: Icon, color = "green", trend }: Props) {
@@ -87,7 +116,9 @@ export function StatsCard({ title, value, subtitle, icon: Icon, color = "green",
           </div>
         )}
       </div>
-      {subtitle && <p className="text-[11px] text-muted-foreground mt-1.5 relative z-10">{subtitle}</p>}
+      {subtitle && <p className="text-[11px] text-muted-foreground mt-1.5 relative z-10 leading-tight">{subtitle}</p>}
+      
+      <Sparkline color={iconColorMap[color]} />
       
       {/* Decorative background element */}
       <div className={`absolute -right-2 -bottom-2 w-24 h-24 rounded-full ${iconBgMap[color]} blur-2xl opacity-0 group-hover:opacity-20 transition-opacity`} />
