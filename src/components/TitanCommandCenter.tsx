@@ -1,8 +1,16 @@
 import { motion } from "framer-motion";
 import { Terminal, Activity, Zap, ShieldCheck, Cpu } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useLotteryContext } from "@/contexts/LotteryContext";
+import { useMemo } from "react";
+import { calculatePredictiveEntropy } from "@/engine/predictive-entropy";
 
 export const TitanCommandCenter = () => {
+  const { draws, stats } = useLotteryContext();
+
+  const entropyData = useMemo(() => {
+    return calculatePredictiveEntropy(stats, draws);
+  }, [stats, draws]);
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -24,11 +32,11 @@ export const TitanCommandCenter = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 animate-pulse">
-            SISTEMA OPERACIONAL
+          <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 animate-pulse font-mono text-[9px]">
+            {entropyData.entropy > 50 ? "SISTEMA EM ALERTA" : "ESTADO: NOMINAL"}
           </Badge>
-          <Badge variant="outline" className="bg-emerald-500/5 text-emerald-500 border-emerald-500/20">
-            LATÊNCIA: 12MS
+          <Badge variant="outline" className="bg-emerald-500/5 text-emerald-500 border-emerald-500/20 font-mono text-[9px]">
+            SYNC: {draws.length > 0 ? "VINCULADO" : "PENDENTE"}
           </Badge>
         </div>
       </div>
@@ -42,27 +50,30 @@ export const TitanCommandCenter = () => {
             <span className="text-[10px] font-mono text-emerald-500">OPTIMAL</span>
           </div>
           <div className="h-24 flex items-end gap-1">
-            {[40, 70, 45, 90, 65, 80, 50, 85, 95, 60, 75, 55].map((h, i) => (
-              <motion.div 
-                key={i}
-                initial={{ height: 0 }}
-                animate={{ height: `${h}%` }}
-                className="flex-1 bg-primary/20 rounded-t-sm"
-              />
-            ))}
+            {[40, 70, 45, 90, 65, 80, 50, 85, 95, 60, 75, 55].map((h, i) => {
+              const animatedH = i % 2 === 0 ? h : h * (1 + (Math.sin(Date.now() / 1000) * 0.1));
+              return (
+                <motion.div 
+                  key={i}
+                  initial={{ height: 0 }}
+                  animate={{ height: `${animatedH}%` }}
+                  className={`flex-1 ${entropyData.entropy > 50 ? 'bg-amber-500/40' : 'bg-primary/20'} rounded-t-sm transition-colors duration-500`}
+                />
+              );
+            })}
           </div>
         </div>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b border-white/5 pb-2">
             <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-              <Zap className="w-3 h-3" /> Predictive Entropy
+            <Zap className="w-3 h-3" /> Predictive Entropy
             </span>
-            <span className="text-[10px] font-mono text-primary">87.4%</span>
+            <span className="text-[10px] font-mono text-primary">{entropyData.entropy.toFixed(1)}%</span>
           </div>
           <div className="bg-black/20 rounded-lg p-3 border border-white/5 h-24 flex flex-col justify-center">
             <p className="text-[10px] text-muted-foreground leading-relaxed italic">
-              A convergência de padrões sugere uma quebra de tendência nos próximos 3 ciclos. Recomenda-se estratégia de cobertura.
+              {entropyData.recommendation}
             </p>
           </div>
         </div>
