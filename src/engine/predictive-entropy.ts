@@ -9,8 +9,10 @@ export function calculatePredictiveEntropy(stats: NumberStats[], draws: DrawResu
   entropy: number;
   stability: number;
   recommendation: string;
+  chaosLevel: "LOW" | "MODERATE" | "HIGH" | "EXTREME";
+  signalStrength: number;
 } {
-  if (draws.length < 10) return { entropy: 0, stability: 100, recommendation: "Dados insuficientes" };
+  if (draws.length < 10) return { entropy: 0, stability: 100, recommendation: "Dados insuficientes", chaosLevel: "LOW", signalStrength: 0 };
 
   // Cálculo simplificado de entropia baseado na variação de somas recentes
   const recentSams = draws.slice(0, 10).map(d => d.numbers.reduce((a, b) => a + b, 0));
@@ -27,5 +29,8 @@ export function calculatePredictiveEntropy(stats: NumberStats[], draws: DrawResu
     recommendation = "Instabilidade Moderada: Diversifique com Equilíbrio Estrutural.";
   }
 
-  return { entropy, stability, recommendation };
+  const chaosLevel = entropy > 80 ? "EXTREME" : entropy > 60 ? "HIGH" : entropy > 40 ? "MODERATE" : "LOW";
+  const signalStrength = Math.max(0, 100 - (entropy / 2));
+
+  return { entropy, stability, recommendation, chaosLevel, signalStrength };
 }
