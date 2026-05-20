@@ -29,7 +29,9 @@ export function AppLayout() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background gradient-mesh">
+      <div className="min-h-screen flex w-full bg-[#050505] text-slate-200 selection:bg-primary/30 selection:text-primary-foreground">
+        <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))] pointer-events-none" />
+        <div className="fixed inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] brightness-100 contrast-150 pointer-events-none" />
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
           {/* Header */}
@@ -127,7 +129,7 @@ export function AppLayout() {
             <div className="container mx-auto px-4 flex flex-col items-center justify-center gap-2">
               <div className="flex items-center gap-2 text-[10px] text-muted-foreground/60">
                 <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-pulse" />
-                <span className="font-mono tracking-wider uppercase">Titan Loterias — Motor v4.0 • ML • Database</span>
+                <span className="font-mono tracking-wider uppercase">Titan Loterias — Motor v5.0 • Neural Core • Quantum Stats</span>
               </div>
               <p className="text-[9px] text-muted-foreground/40 max-w-xs text-center leading-relaxed">
                 As loterias são eventos aleatórios. As análises Titan possuem caráter estritamente estatístico e não garantem premiações.
