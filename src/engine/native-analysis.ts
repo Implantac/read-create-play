@@ -552,6 +552,14 @@ export function generateNativeBets(
   draws: DrawResult[],
   count: number
 ): { bets: number[][]; analysis: string; quality: { avgScore: number; scores: number[]; grade: string } } {
+  const { entropy } = (function() {
+    if (draws.length < 10) return { entropy: 50 };
+    const recentSams = draws.slice(0, 10).map(d => d.numbers.reduce((a, b) => a + b, 0));
+    const avgSum = recentSams.reduce((a, b) => a + b, 0) / 10;
+    const variance = recentSams.reduce((a, b) => a + Math.pow(b - avgSum, 2), 0) / 10;
+    return { entropy: Math.min(100, Math.sqrt(variance) * 2) };
+  })();
+
   const rules = getLotteryRules(config.id);
   const minNum = config.name === "Super Sete" ? 0 : 1;
   const allNums = Array.from({ length: config.numbers - minNum + 1 }, (_, i) => i + minNum);
@@ -631,6 +639,14 @@ export function generateNativeBets(
     { name: 'Cobertura', topBias: 0.45, poolMult: 3.0, markovWeight: 0.2, cycleWeight: 0.2 },
     { name: 'Momentum', topBias: 0.60, poolMult: 2.2, markovWeight: 0.4, cycleWeight: 0.1 },
   ];
+
+  // Entropia bias: Se entropia for alta (>60), favorece estratégias de Cobertura e Anti-Padrão
+  if (entropy > 60) {
+    strategyProfiles.unshift(
+      { name: 'Cobertura (Entropia)', topBias: 0.40, poolMult: 3.5, markovWeight: 0.1, cycleWeight: 0.1 },
+      { name: 'Anti-Padrão (Entropia)', topBias: 0.20, poolMult: 4.5, markovWeight: 0.2, cycleWeight: 0.2 }
+    );
+  }
 
   for (let attempt = 0; attempt < 3000 && bets.length < count; attempt++) {
     const profileIdx = bets.length % strategyProfiles.length;
