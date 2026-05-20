@@ -26,6 +26,8 @@ import { usePlanAccess } from "@/hooks/usePlanAccess";
 import { useGenerationHistory } from "@/hooks/useGenerationHistory";
 import { calculateAnalyticsSnapshot, getComplianceNotice } from "@/engine/analytics-core";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TitanScoreBadge } from "@/components/TitanScoreBadge";
+import { evaluateBetQuality } from "@/engine/bet-quality";
 
 const container = {
   hidden: { opacity: 0 },
@@ -61,7 +63,7 @@ const DashboardPage = () => {
 
 
   const analytics = useMemo(() => calculateAnalyticsSnapshot(stats, draws), [stats, draws]);
-  const { hotNumbers, coldNumbers, avgDelay, maxDelay, volatilityIndex, saturationScore } = analytics;
+  const { hotNumbers, coldNumbers, avgDelay, maxDelay, volatilityIndex, saturationScore, complexityScore } = analytics;
   const heatingCount = useMemo(() => stats.filter(s => s.trend > 15).length, [stats]);
   const isSaturated = saturationScore > 75;
   const isHighlyVolatile = volatilityIndex > 20;
@@ -83,9 +85,12 @@ const DashboardPage = () => {
       const result = runIntelligentPipeline(stats, draws, selectedLottery, randomStrategy, 1);
       
       if (result.games.length > 0) {
+        const bet = result.games[0];
+        const qualityReport = evaluateBetQuality(bet, stats, config, draws);
+        
         const gameData = {
-          numbers: result.games[0],
-          score: result.scores[0] || 0,
+          numbers: bet,
+          score: qualityReport.overall,
           strategy: result.strategy.name,
           description: result.strategy.description,
           pipeline: result.pipeline,
@@ -161,13 +166,12 @@ const DashboardPage = () => {
         <div className="space-y-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map(i => (
-              <Skeleton key={i} className="h-32 rounded-xl bg-muted/20" />
+              <Skeleton key={i} className="h-28 rounded-xl bg-muted/10 border border-white/5" />
             ))}
           </div>
-          <Skeleton className="h-64 rounded-xl bg-muted/20" />
-          <div className="grid lg:grid-cols-2 gap-6">
-            <Skeleton className="h-80 rounded-xl bg-muted/20" />
-            <Skeleton className="h-80 rounded-xl bg-muted/20" />
+          <div className="grid lg:grid-cols-3 gap-6">
+            <Skeleton className="h-64 lg:col-span-2 rounded-xl bg-muted/10 border border-white/5" />
+            <Skeleton className="h-64 rounded-xl bg-muted/10 border border-white/5" />
           </div>
         </div>
       )}

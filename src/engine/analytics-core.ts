@@ -16,6 +16,7 @@ export interface AnalyticsSnapshot {
   leastFrequent: NumberStats | null;
   volatilityIndex: number; // Measure of how much numbers change positions in frequency rankings
   saturationScore: number; // Likelihood of the current "hot" set being replaced
+  complexityScore: number; // Measure of non-randomness in historical sequences
 }
 
 export function calculateAnalyticsSnapshot(stats: NumberStats[], draws: DrawResult[]): AnalyticsSnapshot {
@@ -30,6 +31,7 @@ export function calculateAnalyticsSnapshot(stats: NumberStats[], draws: DrawResu
       leastFrequent: null,
       volatilityIndex: 0,
       saturationScore: 0,
+      complexityScore: 0,
     };
   }
 
@@ -49,6 +51,10 @@ export function calculateAnalyticsSnapshot(stats: NumberStats[], draws: DrawResu
   const risingCold = stats.filter(s => s.status === "cold" && s.trend > 0).length;
   const fallingHot = stats.filter(s => s.status === "hot" && s.trend < 0).length;
   const saturationScore = stats.length > 0 ? ((risingCold + fallingHot) / stats.length) * 100 : 0;
+  
+  // Complexity: calculated based on standard deviation of gaps across all numbers
+  const avgStdDev = stats.reduce((s, st) => s + st.stdDev, 0) / stats.length;
+  const complexityScore = Math.min(100, (avgStdDev / 10) * 100);
 
   return {
     hotNumbers,
@@ -60,6 +66,7 @@ export function calculateAnalyticsSnapshot(stats: NumberStats[], draws: DrawResu
     leastFrequent,
     volatilityIndex,
     saturationScore,
+    complexityScore,
   };
 }
 
