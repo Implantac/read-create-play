@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { requireUserAuth } from "../_shared/auth.ts";
 import { getSupabaseAdmin, getCachedAnalysis, setCachedAnalysis } from "../_shared/ai-cache.ts";
 
 const corsHeaders = {
@@ -13,6 +14,9 @@ serve(async (req) => {
   }
 
   try {
+    const auth = await requireUserAuth(req, { allowedPlans: ["premium", "professional", "lifetime"] });
+    if (auth instanceof Response) return auth;
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 

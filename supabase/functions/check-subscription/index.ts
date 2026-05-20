@@ -14,7 +14,6 @@ const PRODUCT_TO_PLAN: Record<string, string> = {
 };
 
 const LIFETIME_PRICE_ID = "price_1TFflFCzGT9FnNQpKT7INteS";
-const FULL_ACCESS_EMAIL = "etcsuporte889@gmail.com";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -39,21 +38,6 @@ serve(async (req) => {
     if (userError) throw new Error(`Auth error: ${userError.message}`);
     const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated");
-
-    if (user.email.trim().toLowerCase() === FULL_ACCESS_EMAIL) {
-      await supabaseClient
-        .from("profiles")
-        .update({ plan: "lifetime", blocked: false })
-        .eq("id", user.id);
-
-      await supabaseClient
-        .from("user_roles")
-        .upsert({ user_id: user.id, role: "super_admin" }, { onConflict: "user_id,role" });
-
-      return new Response(JSON.stringify({ plan: "lifetime", subscribed: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
