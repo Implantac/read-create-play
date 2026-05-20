@@ -140,15 +140,50 @@ const DashboardPage = () => {
       <LotteryContextBanner />
       <TitanCommandCenter />
       
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-            <Terminal className="w-3 h-3" />
-            Indicadores Técnicos de Precisão
-          </h3>
-          <Badge variant="outline" className="text-[9px] bg-primary/5 border-primary/20">LIVE DATA</Badge>
+      <div className="grid lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+              <Terminal className="w-3 h-3" />
+              Indicadores Técnicos de Precisão
+            </h3>
+            <Badge variant="outline" className="text-[9px] bg-primary/5 border-primary/20">LIVE DATA</Badge>
+          </div>
+          <TechnicalIndicators analytics={analytics} />
         </div>
-        <TechnicalIndicators analytics={analytics} />
+        
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+              <Zap className="w-3 h-3" />
+              Alpha Momentum Signal
+            </h3>
+          </div>
+          <div className="glass-card rounded-xl p-4 border border-primary/20 bg-primary/5 relative overflow-hidden group">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-bold text-primary uppercase">Sinal Alpha</span>
+              <Badge className="bg-primary text-primary-foreground text-[9px] font-bold">ALPHA-BETA V5</Badge>
+            </div>
+            <div className="flex items-baseline gap-2 mb-4">
+              <span className="text-3xl font-black font-mono text-foreground italic">{(100 - analytics.saturationScore + analytics.momentumIndex).toFixed(1)}</span>
+              <span className="text-xs text-primary font-bold">α-STR</span>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-[9px] font-bold uppercase text-muted-foreground">
+                <span>Signal Reliability</span>
+                <span>{analytics.complexityScore.toFixed(0)}%</span>
+              </div>
+              <div className="h-1.5 w-full bg-black/40 rounded-full overflow-hidden">
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${analytics.complexityScore}%` }}
+                  className="h-full bg-gradient-to-r from-primary to-accent"
+                />
+              </div>
+            </div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
+          </div>
+        </div>
       </div>
 
       {/* Trial countdown banner */}
