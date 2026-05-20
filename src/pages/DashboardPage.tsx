@@ -137,32 +137,31 @@ const DashboardPage = () => {
       
       <LotteryContextBanner />
       
-      <div className="space-y-6">
-        <TitanCommandCenter />
+      <TitanCommandCenter />
+      
+      <div className="grid lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+              <Terminal className="w-3 h-3 text-primary" />
+              Indicadores Técnicos de Precisão
+            </h3>
+            <Badge variant="outline" className="text-[9px] bg-primary/5 border-primary/20 font-mono">LIVE FEED</Badge>
+          </div>
+          <TechnicalIndicators analytics={analytics} />
+        </div>
         
-        <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                <Terminal className="w-3 h-3 text-primary" />
-                Indicadores Técnicos de Precisão
-              </h3>
-              <Badge variant="outline" className="text-[9px] bg-primary/5 border-primary/20 font-mono">LIVE FEED</Badge>
-            </div>
-            <TechnicalIndicators analytics={analytics} />
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+              <Zap className="w-3 h-3 text-accent" />
+              Alpha Momentum Signal
+            </h3>
           </div>
-          
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                <Zap className="w-3 h-3 text-accent" />
-                Alpha Momentum Signal
-              </h3>
-            </div>
-            <AlphaMomentumSignal analytics={analytics} />
-          </div>
+          <AlphaMomentumSignal analytics={analytics} />
         </div>
       </div>
+
 
 
       {/* Trial countdown banner */}
