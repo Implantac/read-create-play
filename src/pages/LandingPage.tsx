@@ -29,6 +29,9 @@ import {
   Users,
   Database,
   Quote,
+  Activity,
+  Terminal,
+  History,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
