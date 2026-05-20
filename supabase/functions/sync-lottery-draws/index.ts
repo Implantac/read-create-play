@@ -179,7 +179,9 @@ serve(async (req) => {
 
         const lastStored = existing?.[0]?.concurso || 0;
         const startFrom = Math.max(fromConcurso, lastStored + 1);
-        const endAt = toConcurso || latestConcurso;
+        const requestedEnd = toConcurso || latestConcurso;
+        const hardCap = Math.min(requestedEnd, latestConcurso, startFrom + MAX_RANGE - 1);
+        const endAt = hardCap;
 
         if (startFrom > endAt) {
           console.log(`${lottery.id}: already up to date (${lastStored})`);
