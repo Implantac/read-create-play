@@ -339,11 +339,9 @@ const DashboardPage = () => {
                       ))}
                       {record.numbers.length > 6 && <span className="text-[10px] text-muted-foreground self-center">...</span>}
                     </div>
-                    <div className="flex justify-between items-center mt-1">
-                      <div className="flex-1 h-1 bg-muted/30 rounded-full mr-3">
-                        <div className="h-full bg-accent rounded-full" style={{ width: `${record.score}%` }} />
-                      </div>
-                      <span className="text-[10px] font-mono font-bold text-accent">{record.score.toFixed(0)}%</span>
+                    <div className="flex justify-between items-center mt-auto pt-2 border-t border-white/5">
+                      <TitanScoreBadge score={record.score} label="Titan" />
+                      <span className="text-[9px] font-mono text-muted-foreground">ID: {record.id.slice(0, 8)}</span>
                     </div>
                   </motion.button>
                 ))}
@@ -397,15 +395,15 @@ const DashboardPage = () => {
                           </div>
                         </div>
 
-                        <div>
+                        <div className="pt-4 border-t border-white/5">
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-[10px] font-bold uppercase tracking-widest text-foreground">Score de Confiança</span>
-                            <span className="text-sm font-mono font-bold text-accent">{Number(selectedHistoryItem.score).toFixed(1)}%</span>
+                            <TitanScoreBadge score={selectedHistoryItem.score} />
                           </div>
                           <div className="h-1.5 w-full bg-muted/30 rounded-full overflow-hidden">
                             <div 
-                              className="h-full bg-gradient-to-r from-primary to-accent"
-                              style={{ width: `${selectedHistoryItem.score}%` }}
+                              className="h-full bg-gradient-to-r from-primary via-accent to-primary animate-shimmer"
+                              style={{ width: `${selectedHistoryItem.score}%`, backgroundSize: '200% 100%' }}
                             />
                           </div>
                         </div>
@@ -467,14 +465,14 @@ const DashboardPage = () => {
               <motion.div key={link.url} variants={item}>
                 <Link
                   to={link.url}
-                  className="flex items-center gap-3 rounded-xl glass-card p-4 border border-border hover:border-primary/30 transition-all duration-300 hover:translate-y-[-2px] group"
+                  className="flex items-center gap-3 rounded-xl glass-card p-4 border border-white/5 hover:border-primary/40 transition-all duration-300 hover:translate-y-[-4px] group hover:shadow-lg hover:shadow-primary/5 active:scale-95"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-primary/5 border border-primary/10 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-                    <link.icon className={`w-5 h-5 ${link.color}`} />
+                  <div className="w-11 h-11 rounded-lg bg-primary/5 border border-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-all group-hover:rotate-3">
+                    <link.icon className={`w-5 h-5 ${link.color} group-hover:scale-110 transition-transform`} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-foreground">{link.title}</p>
-                    <p className="text-[10px] text-muted-foreground truncate">{link.description}</p>
+                    <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{link.title}</p>
+                    <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">{link.description}</p>
                   </div>
                 </Link>
               </motion.div>
