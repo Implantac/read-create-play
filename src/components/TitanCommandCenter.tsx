@@ -1,8 +1,16 @@
 import { motion } from "framer-motion";
 import { Terminal, Activity, Zap, ShieldCheck, Cpu } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useLotteryContext } from "@/contexts/LotteryContext";
+import { useMemo } from "react";
+import { calculatePredictiveEntropy } from "@/engine/predictive-entropy";
 
 export const TitanCommandCenter = () => {
+  const { draws, stats } = useLotteryContext();
+
+  const entropyData = useMemo(() => {
+    return calculatePredictiveEntropy(stats, draws);
+  }, [stats, draws]);
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -56,13 +64,13 @@ export const TitanCommandCenter = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b border-white/5 pb-2">
             <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-              <Zap className="w-3 h-3" /> Predictive Entropy
+            <Zap className="w-3 h-3" /> Predictive Entropy
             </span>
-            <span className="text-[10px] font-mono text-primary">87.4%</span>
+            <span className="text-[10px] font-mono text-primary">{entropyData.entropy.toFixed(1)}%</span>
           </div>
           <div className="bg-black/20 rounded-lg p-3 border border-white/5 h-24 flex flex-col justify-center">
             <p className="text-[10px] text-muted-foreground leading-relaxed italic">
-              A convergência de padrões sugere uma quebra de tendência nos próximos 3 ciclos. Recomenda-se estratégia de cobertura.
+              {entropyData.recommendation}
             </p>
           </div>
         </div>
