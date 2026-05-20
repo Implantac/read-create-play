@@ -50,14 +50,17 @@ export const TitanCommandCenter = () => {
             <span className="text-[10px] font-mono text-emerald-500">OPTIMAL</span>
           </div>
           <div className="h-24 flex items-end gap-1">
-            {[40, 70, 45, 90, 65, 80, 50, 85, 95, 60, 75, 55].map((h, i) => (
-              <motion.div 
-                key={i}
-                initial={{ height: 0 }}
-                animate={{ height: `${h}%` }}
-                className="flex-1 bg-primary/20 rounded-t-sm"
-              />
-            ))}
+            {[40, 70, 45, 90, 65, 80, 50, 85, 95, 60, 75, 55].map((h, i) => {
+              const animatedH = i % 2 === 0 ? h : h * (1 + (Math.sin(Date.now() / 1000) * 0.1));
+              return (
+                <motion.div 
+                  key={i}
+                  initial={{ height: 0 }}
+                  animate={{ height: `${animatedH}%` }}
+                  className={`flex-1 ${entropyData.entropy > 50 ? 'bg-amber-500/40' : 'bg-primary/20'} rounded-t-sm transition-colors duration-500`}
+                />
+              );
+            })}
           </div>
         </div>
 
