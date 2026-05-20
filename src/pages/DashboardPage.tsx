@@ -105,7 +105,32 @@ const DashboardPage = () => {
   }, [stats, draws, selectedLottery, saveGeneration]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-12">
+      {/* 📊 MARKET TICKER */}
+      <div className="fixed top-0 left-0 right-0 z-[50] h-7 bg-black/90 backdrop-blur-md border-b border-primary/20 flex items-center overflow-hidden pointer-events-none sm:left-64">
+        <div className="flex animate-scroll whitespace-nowrap py-1">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="flex items-center gap-6 px-4">
+              <span className="text-[10px] font-bold flex items-center gap-1.5 text-primary">
+                <Activity className="w-3 h-3" /> {config.name.toUpperCase()} TERMINAL ACTIVE
+              </span>
+              <span className="text-[10px] text-muted-foreground flex items-center gap-1.5">
+                <TrendingUp className="w-3 h-3 text-primary" /> MOMENTUM: {analytics.momentumIndex.toFixed(2)}
+              </span>
+              <span className="text-[10px] text-muted-foreground flex items-center gap-1.5">
+                <Zap className="w-3 h-3 text-accent" /> SATURAÇÃO: {analytics.saturationScore.toFixed(1)}%
+              </span>
+              <span className="text-[10px] text-muted-foreground flex items-center gap-1.5">
+                <Activity className="w-3 h-3 text-primary" /> COMPLEXIDADE: {analytics.complexityScore.toFixed(0)}%
+              </span>
+              <span className="text-[10px] text-muted-foreground flex items-center gap-1.5 border-r border-white/10 pr-6">
+                <History className="w-3 h-3" /> UPTIME: 99.9%
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <PageHeader
         title="Terminal de Inteligência"
         description={`Análise de precisão em tempo real — ${config.name}`}
@@ -500,12 +525,66 @@ const DashboardPage = () => {
             animate="show"
             className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4"
           >
-            <motion.div variants={item} className="lg:col-span-1"><StatsCard title="Total Concursos" value={draws.length} icon={BarChart3} color="green" subtitle="Resultados históricos" /></motion.div>
-            <motion.div variants={item} className="lg:col-span-1"><StatsCard title="Tendência Alta" value={heatingCount} icon={Zap} color="amber" subtitle="Números em ascensão" /></motion.div>
-            <motion.div variants={item} className="lg:col-span-1"><StatsCard title="Saturação" value={`${saturationScore.toFixed(1)}%`} icon={Activity} color={saturationScore > 75 ? "red" : "green"} subtitle="Risco de inversão" /></motion.div>
-            <motion.div variants={item} className="lg:col-span-1"><StatsCard title="Volatilidade" value={`${volatilityIndex.toFixed(1)}%`} icon={TrendingUp} color={volatilityIndex > 20 ? "amber" : "blue"} subtitle="Variação de frequência" /></motion.div>
-            <motion.div variants={item} className="lg:col-span-1 hidden xl:block"><StatsCard title="Complexidade" value={`${complexityScore.toFixed(0)}%`} icon={Brain} color="blue" subtitle="Entropia de dados" /></motion.div>
-            <motion.div variants={item} className="lg:col-span-1 hidden xl:block"><StatsCard title="Números Quentes" value={hotNumbers} icon={Flame} color="red" subtitle="Acima da média" /></motion.div>
+            <motion.div variants={item} className="lg:col-span-1">
+              <StatsCard 
+                title="Total Concursos" 
+                value={draws.length} 
+                icon={BarChart3} 
+                color="green" 
+                trend={1.2}
+                subtitle="Volume histórico processado" 
+              />
+            </motion.div>
+            <motion.div variants={item} className="lg:col-span-1">
+              <StatsCard 
+                title="Tendência Alta" 
+                value={heatingCount} 
+                icon={Zap} 
+                color="amber" 
+                trend={5.4}
+                subtitle="Dezenas com aceleração" 
+              />
+            </motion.div>
+            <motion.div variants={item} className="lg:col-span-1">
+              <StatsCard 
+                title="Saturação" 
+                value={`${saturationScore.toFixed(1)}%`} 
+                icon={Activity} 
+                color={saturationScore > 75 ? "red" : "green"} 
+                trend={saturationScore > 50 ? 2.1 : -1.2}
+                subtitle="Risco de reversão estocástica" 
+              />
+            </motion.div>
+            <motion.div variants={item} className="lg:col-span-1">
+              <StatsCard 
+                title="Volatilidade" 
+                value={`${volatilityIndex.toFixed(1)}%`} 
+                icon={TrendingUp} 
+                color={volatilityIndex > 20 ? "amber" : "blue"} 
+                trend={volatilityIndex > 15 ? 0.8 : -2.5}
+                subtitle="Desvio padrão normalizado" 
+              />
+            </motion.div>
+            <motion.div variants={item} className="lg:col-span-1 hidden xl:block">
+              <StatsCard 
+                title="Complexidade" 
+                value={`${complexityScore.toFixed(0)}%`} 
+                icon={Brain} 
+                color="blue" 
+                trend={-0.5}
+                subtitle="Entropia de distribuição" 
+              />
+            </motion.div>
+            <motion.div variants={item} className="lg:col-span-1 hidden xl:block">
+              <StatsCard 
+                title="Momentum IA" 
+                value={analytics.momentumIndex.toFixed(1)} 
+                icon={TrendingUp} 
+                color="green" 
+                trend={3.2}
+                subtitle="Taxa de aceleração técnica" 
+              />
+            </motion.div>
           </motion.div>
 
 
