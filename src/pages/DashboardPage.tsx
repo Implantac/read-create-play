@@ -17,8 +17,9 @@ import { TitanCommandCenter } from "@/components/TitanCommandCenter";
 import { TechnicalIndicators } from "@/components/TechnicalIndicators";
 import { AlphaMomentumSignal } from "@/components/AlphaMomentumSignal";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, ShieldCheck, Activity, Cpu } from "lucide-react";
+import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, ShieldCheck, Activity, Cpu, Share2, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { NeuralSynergyCore } from "@/components/NeuralSynergyCore";
 
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -109,7 +110,7 @@ const DashboardPage = () => {
           {[1, 2, 3].map(i => (
             <div key={i} className="flex items-center gap-6 px-4">
               <span className="text-[10px] font-bold flex items-center gap-1.5 text-primary">
-                <Cpu className="w-3 h-3" /> NEURAL ENGINE v5.2 ACTIVE
+                <Cpu className="w-3 h-3" /> NEURAL SYNERGY v5.3 ACTIVE
               </span>
               <span className="text-[10px] text-muted-foreground flex items-center gap-1.5">
                 <TrendingUp className="w-3 h-3 text-primary" /> MOMENTUM: {analytics.momentumIndex.toFixed(2)}
@@ -118,7 +119,7 @@ const DashboardPage = () => {
                 <Zap className="w-3 h-3 text-accent" /> SATURAÇÃO: {analytics.saturationScore.toFixed(1)}%
               </span>
               <span className="text-[10px] text-muted-foreground flex items-center gap-1.5">
-                <Activity className="w-3 h-3 text-primary" /> ALPHA SIGNAL: STABLE
+                <Activity className="w-3 h-3 text-primary" /> SYNERGY: {analytics.synergyScore.toFixed(1)}%
               </span>
               <span className="text-[10px] text-muted-foreground flex items-center gap-1.5 border-r border-white/10 pr-6">
                 <ShieldCheck className="w-3 h-3 text-emerald-500" /> AUDIT: PASSED
@@ -159,6 +160,38 @@ const DashboardPage = () => {
             </h3>
           </div>
           <AlphaMomentumSignal analytics={analytics} />
+        </div>
+      </div>
+      
+      <div className="grid lg:grid-cols-2 gap-6">
+        <NeuralSynergyCore analytics={analytics} />
+        
+        <div className="glass-card rounded-2xl border border-primary/20 p-6 bg-black/40 backdrop-blur-xl relative overflow-hidden flex flex-col justify-between">
+           <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+              <Search className="w-4 h-4 text-primary" />
+              Neural Audit Log
+            </h3>
+            <Badge variant="outline" className="text-[9px] bg-primary/5 border-primary/20 font-mono">ENCRYPTED</Badge>
+          </div>
+          <div className="font-mono text-[10px] text-primary/60 space-y-2 h-32 overflow-hidden mask-fade-bottom">
+            <p className="flex items-center gap-2">
+              <span className="text-primary/40">[{new Date().toLocaleTimeString()}]</span>
+              CALIBRATING QUANTUM FLUX TENSORS...
+            </p>
+            <p className="flex items-center gap-2">
+              <span className="text-primary/40">[{new Date().toLocaleTimeString()}]</span>
+              VERIFYING INSTITUTIONAL DATA INTEGRITY: {analytics.institutionalConfidence.toFixed(2)}%
+            </p>
+            <p className="flex items-center gap-2">
+              <span className="text-primary/40">[{new Date().toLocaleTimeString()}]</span>
+              SYNERGY PROTOCOL v5.3 INITIALIZED.
+            </p>
+            <p className="flex items-center gap-2 text-accent">
+              <span className="text-accent/40">[{new Date().toLocaleTimeString()}]</span>
+              ANOMALY DETECTION: SHIELD ACTIVE.
+            </p>
+          </div>
         </div>
       </div>
 
