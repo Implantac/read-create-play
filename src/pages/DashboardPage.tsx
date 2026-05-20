@@ -14,6 +14,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { TitanCommandCenter } from "@/components/TitanCommandCenter";
+import { TechnicalIndicators } from "@/components/TechnicalIndicators";
 import { motion, AnimatePresence } from "framer-motion";
 import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, ShieldCheck, Activity } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -113,6 +114,17 @@ const DashboardPage = () => {
       />
       <LotteryContextBanner />
       <TitanCommandCenter />
+      
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+            <Terminal className="w-3 h-3" />
+            Indicadores Técnicos de Precisão
+          </h3>
+          <Badge variant="outline" className="text-[9px] bg-primary/5 border-primary/20">LIVE DATA</Badge>
+        </div>
+        <TechnicalIndicators analytics={analytics} />
+      </div>
 
       {/* Trial countdown banner */}
       {profile?.plan === "free" && !isTrialExpired && !isAdmin && !isSuperAdmin && (
