@@ -90,17 +90,20 @@ serve(async (req) => {
   }
 
   try {
-    const auth = await requireUserAuth(req);
+    const auth = await requireUserAuth(req, { requireAdmin: true });
     if (auth instanceof Response) return auth;
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    const MAX_RANGE = 500;
     const body = await req.json().catch(() => ({}));
-    const targetLottery = body.lottery_id || null;
-    const fromConcurso = body.from_concurso || 1;
-    const toConcurso = body.to_concurso || null;
+    const targetLottery = typeof body.lottery_id === "string" ? body.lottery_id : null;
+    const rawFrom = Number(body.from_concurso);
+    const rawTo = body.to_concurso == null ? null : Number(body.to_concurso);
+    const fromConcurso = Number.isInteger(rawFrom) && rawFrom > 0 ? rawFrom : 1;
+    const toConcurso = rawTo != null && Number.isInteger(rawTo) && rawTo > 0 ? rawTo : null;
 
     const lotteriesFilter = targetLottery
       ? LOTTERIES.filter((l) => l.id === targetLottery)
@@ -176,7 +179,9 @@ serve(async (req) => {
 
         const lastStored = existing?.[0]?.concurso || 0;
         const startFrom = Math.max(fromConcurso, lastStored + 1);
-        const endAt = toConcurso || latestConcurso;
+        const requestedEnd = toConcurso || latestConcurso;
+        const hardCap = Math.min(requestedEnd, latestConcurso, startFrom + MAX_RANGE - 1);
+        const endAt = hardCap;
 
         if (startFrom > endAt) {
           console.log(`${lottery.id}: already up to date (${lastStored})`);
@@ -243,7 +248,7 @@ serve(async (req) => {
   } catch (e) {
     console.error("Sync error:", e);
     return new Response(
-      JSON.stringify({ success: false, error: e instanceof Error ? e.message : "Unknown error" }),
+      JSON.stringify({ success: false, error: "Sync failed" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

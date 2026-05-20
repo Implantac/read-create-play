@@ -44,7 +44,11 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error("customer-portal error:", error);
+    const msg = (error as Error)?.message === "No Stripe customer found"
+      ? "No active subscription found"
+      : "Unable to open billing portal";
+    return new Response(JSON.stringify({ error: msg }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });
