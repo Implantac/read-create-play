@@ -100,6 +100,7 @@ const DashboardPage = () => {
   }, [stats, draws, selectedLottery, saveGeneration, config]);
 
 
+
   return (
     <div className="space-y-6 pb-12 relative">
       {/* 📊 MARKET TICKER */}
