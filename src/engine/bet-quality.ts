@@ -161,10 +161,20 @@ export function evaluateBetQuality(
   });
   if (maxOverlap === bet.length) warnings.push("Aposta idêntica a resultado recente!");
 
+  // 10. Neural Confidence / Momentum Interaction
+  const avgMomentum = betStats.reduce((s, st) => s + (st.momentum || 0), 0) / (betStats.length || 1);
+  const alphaScore = Math.min(100, Math.max(0, 50 + avgMomentum * 5));
+  dimensions.push({
+    name: "Confiança Alpha Momentum",
+    score: Math.round(alphaScore),
+    detail: `Aceleração técnica: ${avgMomentum.toFixed(2)}`,
+  });
+  if (avgMomentum > 2) strengths.push("Aceleração técnica premium detectada");
+
   // Overall score (weighted average)
-  const weights = [12, 12, 10, 10, 8, 15, 12, 11, 10]; // must sum to 100
+  const weights = [10, 10, 10, 10, 8, 15, 12, 11, 10, 4]; // must sum to 100
   const overall = Math.round(
-    dimensions.reduce((s, d, i) => s + d.score * (weights[i] / 100), 0)
+    dimensions.reduce((s, d, i) => s + (d.score * (weights[i] || 0) / 100), 0)
   );
 
   const grade: BetQualityReport["grade"] =
