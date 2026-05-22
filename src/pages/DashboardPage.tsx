@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { StatsCard } from "@/components/StatsCard";
 import { FrequencyChart } from "@/components/FrequencyChart";
@@ -23,8 +23,38 @@ import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConica
 // Some build outputs may accidentally emit an `Activity` identifier reference;
 // we explicitly define it here to prevent a blank screen.
 const Activity = ActivitySquare;
+
 import { Badge } from "@/components/ui/badge";
 import { NeuralSynergyCore } from "@/components/NeuralSynergyCore";
+
+// FIX: Hide Lovable edit badge injected by the host (id: `lovable-badge-cta`).
+// Do it after mount to avoid server/SSR issues.
+const useHideLovableBadge = () => {
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    const ensureHidden = () => {
+      const el = document.getElementById("lovable-badge-cta");
+      if (el) el.remove();
+
+      if (!document.getElementById("lovable-hide-badge-style")) {
+        const s = document.createElement("style");
+        s.id = "lovable-hide-badge-style";
+        s.textContent = "#lovable-badge-cta{display:none !important;}";
+        document.head.appendChild(s);
+      }
+    };
+
+    ensureHidden();
+
+    // Fallback: some hosts inject it slightly after mount
+    const t = window.setInterval(ensureHidden, 250);
+    window.setTimeout(() => window.clearInterval(t), 2500);
+
+    return () => window.clearInterval(t);
+  }, []);
+};
+
 
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -55,6 +85,7 @@ const quickLinks = [
 ];
 
 const DashboardPage = () => {
+  useHideLovableBadge();
   const { config, draws, drawsWithPrizes, loading, syncing, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery } = useLotteryContext();
   const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
   const { currentPlan } = usePlanAccess();
