@@ -33,23 +33,30 @@ const useHideLovableBadge = () => {
   useEffect(() => {
     if (typeof document === "undefined") return;
 
+    // Hide as early as possible (avoid flicker)
+    if (!document.getElementById("lovable-hide-badge-style")) {
+      const s = document.createElement("style");
+      s.id = "lovable-hide-badge-style";
+      s.textContent = "#lovable-badge-cta{display:none !important;}";
+      document.head.appendChild(s);
+    }
+
     const ensureHidden = () => {
       const el = document.getElementById("lovable-badge-cta");
       if (el) el.remove();
 
-      if (!document.getElementById("lovable-hide-badge-style")) {
-        const s = document.createElement("style");
-        s.id = "lovable-hide-badge-style";
-        s.textContent = "#lovable-badge-cta{display:none !important;}";
-        document.head.appendChild(s);
+      // Some hosts may attach wrappers; double-check by attribute too
+      const maybe = document.querySelector('[aria-label="Edit with Lovable"], [id="lovable-badge-cta"]');
+      if (maybe && (maybe as HTMLElement).id === "lovable-badge-cta") {
+        (maybe as HTMLElement).remove();
       }
     };
 
     ensureHidden();
 
     // Fallback: some hosts inject it slightly after mount
-    const t = window.setInterval(ensureHidden, 250);
-    window.setTimeout(() => window.clearInterval(t), 2500);
+    const t = window.setInterval(ensureHidden, 150);
+    window.setTimeout(() => window.clearInterval(t), 3000);
 
     return () => window.clearInterval(t);
   }, []);
