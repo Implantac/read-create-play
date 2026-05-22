@@ -20,7 +20,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/landing" replace />;
   }
 
-  if (profile?.blocked) {
+  if (profile?.blocked && !isSuperAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center space-y-4 max-w-md px-6">

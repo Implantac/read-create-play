@@ -10,6 +10,13 @@ const PRODUCT_TO_PLAN: Record<string, string> = {
 };
 
 const LIFETIME_PRICE_ID = "price_1TFflFCzGT9FnNQpKT7INteS";
+const FULL_ACCESS_EMAILS = new Set([
+  "etcsuporte889@gmail.com",
+]);
+
+function isFullAccessEmail(email: string | null) {
+  return email ? FULL_ACCESS_EMAILS.has(email.toLowerCase()) : false;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -26,6 +33,27 @@ serve(async (req) => {
   );
 
   try {
+    if (isFullAccessEmail(auth.email)) {
+      await supabaseClient
+        .from("profiles")
+        .update({ plan: "lifetime", blocked: false })
+        .eq("id", auth.userId);
+
+      await supabaseClient
+        .from("user_roles")
+        .upsert({ user_id: auth.userId, role: "super_admin" }, { onConflict: "user_id,role" });
+
+      return new Response(JSON.stringify({ plan: "lifetime", subscribed: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (auth.isAdmin) {
+      return new Response(JSON.stringify({ plan: auth.plan, subscribed: auth.plan !== "free" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
 

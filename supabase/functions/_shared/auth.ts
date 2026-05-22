@@ -5,6 +5,7 @@ export interface AuthResult {
   email: string | null;
   plan: string;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
 }
 
 export const corsHeaders = {
@@ -25,6 +26,12 @@ export function forbidden(message = "Forbidden") {
     status: 403,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
+}
+
+const FULL_ACCESS_EMAILS = new Set(["etcsuporte889@gmail.com"]);
+
+function isFullAccessEmail(email: string | null) {
+  return email ? FULL_ACCESS_EMAILS.has(email.toLowerCase()) : false;
 }
 
 /**
@@ -50,17 +57,19 @@ export async function requireUserAuth(
 
   const userId = userData.user.id;
   const email = userData.user.email ?? null;
+  const isFullAccessUser = isFullAccessEmail(email);
 
   const [{ data: profile }, { data: roles }] = await Promise.all([
     supabase.from("profiles").select("plan, blocked").eq("id", userId).maybeSingle(),
     supabase.from("user_roles").select("role").eq("user_id", userId),
   ]);
 
-  if (profile?.blocked) return forbidden("Account suspended");
+  if (profile?.blocked && !isFullAccessUser) return forbidden("Account suspended");
 
   const roleList = (roles ?? []).map((r: any) => r.role as string);
-  const isAdmin = roleList.includes("admin") || roleList.includes("super_admin");
-  const plan = profile?.plan ?? "free";
+  const isSuperAdmin = isFullAccessUser || roleList.includes("super_admin");
+  const isAdmin = isFullAccessUser || roleList.includes("admin") || isSuperAdmin;
+  const plan = isFullAccessUser ? "lifetime" : profile?.plan ?? "free";
 
   if (opts.requireAdmin && !isAdmin) return forbidden("Admin only");
 
@@ -68,5 +77,5 @@ export async function requireUserAuth(
     return forbidden("Plan upgrade required");
   }
 
-  return { userId, email, plan, isAdmin };
+  return { userId, email, plan, isAdmin, isSuperAdmin };
 }

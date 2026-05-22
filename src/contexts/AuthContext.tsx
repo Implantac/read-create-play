@@ -33,6 +33,11 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+const FULL_ACCESS_EMAIL = "etcsuporte889@gmail.com";
+
+function isFullAccessEmail(email?: string | null) {
+  return email?.toLowerCase() === FULL_ACCESS_EMAIL;
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -42,16 +47,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [userRole, setUserRole] = useState<string>("user");
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = async (userId: string, email?: string | null) => {
     const { data } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", userId)
       .single();
-    if (data) setProfile(data as Profile);
+    if (data) {
+      setProfile(isFullAccessEmail(email) ? { ...(data as Profile), plan: "lifetime", blocked: false } : data as Profile);
+    }
   };
 
-  const checkAdmin = async (userId: string) => {
+  const checkAdmin = async (userId: string, email?: string | null) => {
+    if (isFullAccessEmail(email)) {
+      setIsAdmin(true);
+      setIsSuperAdmin(true);
+      setUserRole("super_admin");
+      return;
+    }
+
     const { data } = await supabase
       .from("user_roles")
       .select("role")
@@ -80,10 +94,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const authStorageKey = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`;
     let initialLoad = true;
 
-    const loadUserData = async (userId: string, accessToken?: string) => {
+    const loadUserData = async (userId: string, accessToken?: string, email?: string | null) => {
       await Promise.all([
-        fetchProfile(userId),
-        checkAdmin(userId),
+        fetchProfile(userId, email),
+        checkAdmin(userId, email),
         ...(accessToken ? [syncSubscription(accessToken)] : []),
       ]);
     };
@@ -93,7 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         if (session?.user) {
           if (!initialLoad) {
-            await loadUserData(session.user.id);
+            await loadUserData(session.user.id, undefined, session.user.email);
           }
         } else {
           setProfile(null);
@@ -124,7 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         setSession(session);
         if (session?.user) {
-          await loadUserData(session.user.id, session.access_token);
+          await loadUserData(session.user.id, session.access_token, session.user.email);
         }
       })
       .catch(() => {

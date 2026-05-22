@@ -75,6 +75,8 @@ const ROLE_COLORS: Record<string, string> = {
   user: "bg-muted text-muted-foreground border-border",
 };
 
+const FULL_ACCESS_EMAIL = "etcsuporte889@gmail.com";
+
 export default function AdminPage() {
   const { user, isSuperAdmin } = useAuth();
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -138,7 +140,21 @@ export default function AdminPage() {
     return roles.filter(r => r.role === "super_admin").length;
   };
 
+  const isFullAccessProfile = (profile?: Profile | null): boolean => {
+    return profile?.email?.toLowerCase() === FULL_ACCESS_EMAIL;
+  };
+
   const updatePlan = async (userId: string, newPlan: string) => {
+    const profile = profiles.find(p => p.id === userId);
+    if (isFullAccessProfile(profile) && newPlan !== "lifetime") {
+      toast({
+        title: "Ação Bloqueada",
+        description: "A conta de acesso total é vitalícia e não pode ser rebaixada.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setUpdating(userId);
     const { error } = await supabase
       .from("profiles")
@@ -148,7 +164,6 @@ export default function AdminPage() {
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
-      const profile = profiles.find(p => p.id === userId);
       await logAction("plan_changed", userId, { old_plan: profile?.plan, new_plan: newPlan });
       setProfiles(prev => prev.map(p => p.id === userId ? { ...p, plan: newPlan } : p));
       toast({ title: "Plano atualizado", description: `Plano alterado para ${PLAN_LABELS[newPlan]}.` });
@@ -157,6 +172,16 @@ export default function AdminPage() {
 
   const updateRole = async (userId: string, newRole: string) => {
     const currentRole = getUserRole(userId);
+    const profile = profiles.find(p => p.id === userId);
+
+    if (isFullAccessProfile(profile) && newRole !== "super_admin") {
+      toast({
+        title: "Ação Bloqueada",
+        description: "A conta de acesso total deve permanecer como Super Admin.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     // Self-lock protection
     if (isSelfLockRisk(userId, newRole)) {
@@ -221,6 +246,12 @@ export default function AdminPage() {
   };
 
   const toggleBlock = async (userId: string, currentBlocked: boolean) => {
+    const profile = profiles.find(p => p.id === userId);
+    if (isFullAccessProfile(profile)) {
+      toast({ title: "Ação Bloqueada", description: "A conta de acesso total não pode ser bloqueada.", variant: "destructive" });
+      return;
+    }
+
     // Prevent blocking super_admin
     const role = getUserRole(userId);
     if (role === "super_admin") {
@@ -437,8 +468,11 @@ export default function AdminPage() {
                       {filtered.map(p => {
                         const role = getUserRole(p.id);
                         const isSelf = p.id === user?.id;
+                        const isFullAccess = isFullAccessProfile(p);
+                        const displayPlan = isFullAccess ? "lifetime" : p.plan;
+                        const displayBlocked = isFullAccess ? false : p.blocked;
                         return (
-                          <TableRow key={p.id} className={p.blocked ? "opacity-60" : ""}>
+                          <TableRow key={p.id} className={displayBlocked ? "opacity-60" : ""}>
                             <TableCell className="font-medium text-foreground">
                               <div className="flex items-center gap-1.5">
                                 {p.full_name || "—"}
@@ -454,12 +488,12 @@ export default function AdminPage() {
                               </Badge>
                             </TableCell>
                             <TableCell>
-                              <Badge className={PLAN_COLORS[p.plan] || ""}>
-                                {PLAN_LABELS[p.plan] || p.plan}
+                              <Badge className={PLAN_COLORS[displayPlan] || ""}>
+                                {PLAN_LABELS[displayPlan] || displayPlan}
                               </Badge>
                             </TableCell>
                             <TableCell>
-                              {p.blocked ? (
+                              {displayBlocked ? (
                                 <Badge variant="destructive" className="gap-1">
                                   <Ban className="w-3 h-3" /> Bloqueado
                                 </Badge>
@@ -479,7 +513,7 @@ export default function AdminPage() {
                                   <Select
                                     value={role}
                                     onValueChange={(v) => updateRole(p.id, v)}
-                                    disabled={updating === p.id}
+                                    disabled={updating === p.id || isFullAccess}
                                   >
                                     <SelectTrigger className="w-[130px] h-8 text-xs">
                                       {updating === p.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <SelectValue />}
@@ -494,9 +528,9 @@ export default function AdminPage() {
                                 )}
                                 {/* Plan selector */}
                                 <Select
-                                  value={p.plan}
+                                  value={displayPlan}
                                   onValueChange={(v) => updatePlan(p.id, v)}
-                                  disabled={updating === p.id}
+                                  disabled={updating === p.id || isFullAccess}
                                 >
                                   <SelectTrigger className="w-[130px] h-8 text-xs">
                                     {updating === p.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <SelectValue />}
@@ -510,13 +544,13 @@ export default function AdminPage() {
                                 </Select>
                                 {/* Block/unblock */}
                                 <Button
-                                  variant={p.blocked ? "outline" : "destructive"}
+                                  variant={displayBlocked ? "outline" : "destructive"}
                                   size="sm"
                                   className="h-8 text-xs gap-1"
-                                  onClick={() => toggleBlock(p.id, p.blocked)}
-                                  disabled={updating === p.id || role === "super_admin"}
+                                  onClick={() => toggleBlock(p.id, displayBlocked)}
+                                  disabled={updating === p.id || role === "super_admin" || isFullAccess}
                                 >
-                                  {p.blocked ? (
+                                  {displayBlocked ? (
                                     <><CheckCircle2 className="w-3 h-3" /> Desbloquear</>
                                   ) : (
                                     <><Ban className="w-3 h-3" /> Bloquear</>
