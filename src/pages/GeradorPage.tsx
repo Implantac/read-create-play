@@ -21,6 +21,7 @@ const MonteCarloPanel = lazy(() => import("@/components/MonteCarloPanel").then(m
 const BetOptimizerPanel = lazy(() => import("@/components/BetOptimizerPanel").then(m => ({ default: m.BetOptimizerPanel })));
 const BetChecker = lazy(() => import("@/components/BetChecker").then(m => ({ default: m.BetChecker })));
 const ExtremeGeneratorPanel = lazy(() => import("@/components/ExtremeGeneratorPanel").then(m => ({ default: m.ExtremeGeneratorPanel })));
+const WinningsSimulator = lazy(() => import("@/components/WinningsSimulator").then(m => ({ default: m.WinningsSimulator })));
 
 const LazyFallback = () => (
   <div className="flex items-center justify-center py-8 text-muted-foreground">
