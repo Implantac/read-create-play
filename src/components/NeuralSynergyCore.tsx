@@ -62,19 +62,11 @@ export const NeuralSynergyCore = ({ analytics }: NeuralSynergyCoreProps) => {
             </span>
             <div className="relative h-20 bg-black/40 rounded-lg border border-white/5 flex items-center justify-center overflow-hidden">
               <svg className="absolute inset-0 w-full h-full opacity-30">
-                <motion.path
+                <path
                   d="M 0 40 Q 50 10 100 40 T 200 40 T 300 40 T 400 40"
                   fill="transparent"
                   stroke="var(--primary)"
                   strokeWidth="2"
-                  animate={{
-                    d: [
-                      "M 0 40 Q 50 10 100 40 T 200 40 T 300 40 T 400 40",
-                      "M 0 40 Q 50 70 100 40 T 200 40 T 300 40 T 400 40",
-                      "M 0 40 Q 50 10 100 40 T 200 40 T 300 40 T 400 40",
-                    ]
-                  }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                 />
               </svg>
               <div className="relative z-10 text-center">

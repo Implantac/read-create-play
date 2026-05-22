@@ -44,7 +44,9 @@ const Sparkline = ({ color }: { color: string }) => {
     x: (i * 100) / 9,
     y: 20 + Math.random() * 60
   }));
-  const pathData = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')}`;
+  const pathData = points.length > 0
+    ? `M ${points.map(p => `${p.x},${p.y}`).join(' L ')}`
+    : "M 0,50 L 100,50";
 
   return (
     <div className="h-8 w-full mt-2 overflow-hidden opacity-50 group-hover:opacity-100 transition-opacity">
