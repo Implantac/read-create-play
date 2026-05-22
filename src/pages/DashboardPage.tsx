@@ -17,7 +17,7 @@ import { TitanCommandCenter } from "@/components/TitanCommandCenter";
 import { TechnicalIndicators } from "@/components/TechnicalIndicators";
 import { AlphaMomentumSignal } from "@/components/AlphaMomentumSignal";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, ShieldCheck, Activity, Cpu, Share2, Search } from "lucide-react";
+import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { NeuralSynergyCore } from "@/components/NeuralSynergyCore";
 
@@ -104,31 +104,6 @@ const DashboardPage = () => {
 
   return (
     <div className="space-y-6 pb-12 relative">
-      {/* 📊 MARKET TICKER */}
-      <div className="fixed top-0 left-0 right-0 z-[50] h-7 bg-black/95 backdrop-blur-md border-b border-primary/20 flex items-center overflow-hidden pointer-events-none sm:left-64">
-        <div className="flex animate-scroll whitespace-nowrap py-1">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="flex items-center gap-6 px-4">
-              <span className="text-[10px] font-bold flex items-center gap-1.5 text-primary">
-                <Cpu className="w-3 h-3" /> NEURAL SYNERGY v5.3 ACTIVE
-              </span>
-              <span className="text-[10px] text-muted-foreground flex items-center gap-1.5">
-                <TrendingUp className="w-3 h-3 text-primary" /> MOMENTUM: {analytics.momentumIndex.toFixed(2)}
-              </span>
-              <span className="text-[10px] text-muted-foreground flex items-center gap-1.5">
-                <Zap className="w-3 h-3 text-accent" /> SATURAÇÃO: {analytics.saturationScore.toFixed(1)}%
-              </span>
-              <span className="text-[10px] text-muted-foreground flex items-center gap-1.5">
-                <Activity className="w-3 h-3 text-primary" /> SYNERGY: {analytics.synergyScore.toFixed(1)}%
-              </span>
-              <span className="text-[10px] text-muted-foreground flex items-center gap-1.5 border-r border-white/10 pr-6">
-                <ShieldCheck className="w-3 h-3 text-emerald-500" /> AUDIT: PASSED
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
       <PageHeader
         title="Terminal de Inteligência"
         description={`Análise de precisão institucional — ${config.name}`}
