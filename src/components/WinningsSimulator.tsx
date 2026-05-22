@@ -66,8 +66,8 @@ const PRIZE_TABLE: Record<string, Record<number, { value: number; label: string 
   supersete: { 7: { value: 2000000, label: "7 col" }, 6: { value: 15000, label: "6 col" }, 5: { value: 1000, label: "5 col" }, 4: { value: 50, label: "4 col" }, 3: { value: 3, label: "3 col" } },
 };
 
-function getPrize(lotteryId: string, hits: number, realPrizes?: DrawResultWithPrizes["prize_tiers"]): { value: number; label: string } | null {
-  // Try real prize from draw's prize_tiers if provided
+function getPrize(lotteryId: string, hits: number, realPrizes?: DrawResultWithPrizes["prizeTiers"]): { value: number; label: string } | null {
+  // Try real prize from draw's prizeTiers if provided
   if (realPrizes && Array.isArray(realPrizes)) {
     const tier = (realPrizes as any[]).find((t: any) => Number(t.acertos ?? t.hits) === hits && Number(t.valor ?? t.value ?? 0) > 0);
     if (tier) return { value: Number(tier.valor ?? tier.value), label: `${hits} acertos` };
@@ -154,7 +154,7 @@ export function WinningsSimulator({ lotteryId, pick, maxNumbers, draws, drawsWit
       for (const bet of bets) {
         const hits = matchHits(bet.numbers, draw.numbers, lotteryId);
         hitDist[hits] = (hitDist[hits] || 0) + 1;
-        const prize = getPrize(lotteryId, hits, drawWithPrizes?.prize_tiers as any);
+        const prize = getPrize(lotteryId, hits, drawWithPrizes?.prizeTiers as any);
         if (prize) {
           totalPrize += prize.value;
           drawPrize += prize.value;
