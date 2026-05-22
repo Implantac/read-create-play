@@ -1,4 +1,4 @@
--- Grant full and unrestricted access to the owner/support account.
+-- Grant full and unrestricted access to the owner/support accounts.
 -- Grants access to the confirmed support address.
 -- Idempotent: safe to run more than once.
 
