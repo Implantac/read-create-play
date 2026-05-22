@@ -17,7 +17,12 @@ import { TitanCommandCenter } from "@/components/TitanCommandCenter";
 import { TechnicalIndicators } from "@/components/TechnicalIndicators";
 import { AlphaMomentumSignal } from "@/components/AlphaMomentumSignal";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, Search } from "lucide-react";
+import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, Search, ActivitySquare, ShieldCheck } from "lucide-react";
+
+// FIX: ensure Activity symbol is never referenced globally in runtime.
+// Some build outputs may accidentally emit an `Activity` identifier reference;
+// we explicitly define it here to prevent a blank screen.
+const Activity = ActivitySquare;
 import { Badge } from "@/components/ui/badge";
 import { NeuralSynergyCore } from "@/components/NeuralSynergyCore";
 
@@ -506,7 +511,7 @@ const DashboardPage = () => {
                         </div>
 
                         <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
-                          <ShieldCheck className="w-4 h-4 text-primary" />
+<ShieldCheck className="w-4 h-4 text-primary" />
                           <p className="text-[10px] text-muted-foreground leading-tight">
                             {getComplianceNotice()}
                           </p>
@@ -570,7 +575,7 @@ const DashboardPage = () => {
               <StatsCard 
                 title="Saturação" 
                 value={`${saturationScore.toFixed(1)}%`} 
-                icon={Activity} 
+icon={ActivitySquare}
                 color={saturationScore > 75 ? "red" : "green"} 
                 trend={saturationScore > 50 ? 2.1 : -1.2}
                 subtitle="Risco de reversão estocástica" 
