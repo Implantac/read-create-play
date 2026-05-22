@@ -118,6 +118,17 @@ const GeradorPage = () => {
             </Suspense>
           </PlanGate>
 
+          {/* Winnings simulator — past + future projection (FREE) */}
+          <Suspense fallback={<LazyFallback />}>
+            <WinningsSimulator
+              lotteryId={selectedLottery}
+              pick={config.pick}
+              maxNumbers={config.numbers}
+              draws={draws}
+              drawsWithPrizes={drawsWithPrizes}
+            />
+          </Suspense>
+
           {/* Bet Checker stays FREE */}
           <Suspense fallback={<LazyFallback />}>
             <BetChecker draws={draws} drawsWithPrizes={drawsWithPrizes} lotteryId={selectedLottery} maxNumbers={config.numbers} pick={config.pick} />
