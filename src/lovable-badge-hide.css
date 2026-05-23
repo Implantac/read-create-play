@@ -1,0 +1,9 @@
+/* Hide Lovable injected UI globally */
+#lovable-badge-cta,
+#lovable-badge-cta * {
+  display: none !important;
+}
+#lovable-hide-badge-style {
+  display: none !important;
+}
+
