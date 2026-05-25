@@ -1,4 +1,9 @@
-/* (REMOVIDO) Arquivo originalmente usado para esconder UI injetada pelo Lovable.
-   Mantido aqui por enquanto para não quebrar possíveis builds antigas. 
-   Depois confirme que não há mais import/referência e então apague este arquivo. */
+/* Hide Lovable injected UI globally. */
+#lovable-badge-cta,
+#lovable-badge-cta * {
+  display: none !important;
+}
 
+#lovable-hide-badge-style {
+  display: none !important;
+}
