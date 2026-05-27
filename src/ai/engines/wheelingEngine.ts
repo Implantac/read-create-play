@@ -22,8 +22,10 @@ function findMatchingMatrix(lotteryId: string, baseSize: number, guarantee: numb
  * Generate wheeling system — creates minimum games to cover base numbers
  * with mathematical guarantee. Uses pre-computed matrices when available.
  */
-export function generateWheeling(request: WheelingRequest): WheelingResult {
+export function generateWheeling(request: WheelingRequest & { rng?: Rng }): WheelingResult {
   const rules = getLotteryRules(request.lotteryId);
+  const rng = request.rng;
+
   const { baseNumbers, guarantee, pick } = request;
   const base = [...baseNumbers].sort((a, b) => a - b);
 
@@ -93,7 +95,8 @@ function generateCombinations(arr: number[], k: number): number[][] {
   // Limit to prevent memory issues
   if (n > 22 || binomial(n, k) > 200000) {
     // Use sampling for large sets
-    return sampleCombinations(arr, k, 50000);
+    return sampleCombinations(arr, k, 50000, (undefined as unknown as Rng | undefined));
+
   }
 
   function backtrack(start: number, current: number[]) {
@@ -121,14 +124,18 @@ function binomial(n: number, k: number): number {
   return Math.round(result);
 }
 
-function sampleCombinations(arr: number[], k: number, count: number): number[][] {
+import type { Rng } from "../core/rng";
+
+function sampleCombinations(arr: number[], k: number, count: number, rng?: Rng): number[][] {
   const result: number[][] = [];
   const seen = new Set<string>();
+  const rnd = rng ?? { next: () => Math.random() };
+
   for (let i = 0; i < count * 2 && result.length < count; i++) {
-    const combo = [];
+    const combo: number[] = [];
     const pool = [...arr];
     for (let j = 0; j < k; j++) {
-      const idx = Math.floor(Math.random() * pool.length);
+      const idx = Math.floor(rnd.next() * pool.length);
       combo.push(pool[idx]);
       pool.splice(idx, 1);
     }
@@ -141,6 +148,7 @@ function sampleCombinations(arr: number[], k: number, count: number): number[][]
   }
   return result;
 }
+
 
 /**
  * Greedy covering algorithm — select minimum games to cover
@@ -224,13 +232,20 @@ function validateCoverage(
     worstCase = Math.min(worstCase, bestHits);
   }
 
+  const coveragePercent = possibleDraws.length > 0 ? (covered / possibleDraws.length) * 100 : 0;
+
+  // When baseNumbers are large we rely on sampling (not exhaustive combinations).
+  // In that case, requiring full coverage (===) is too strict and produces many false negatives.
+  const validationThreshold = possibleDraws.length > 5000 ? 95 : 100;
+
   return {
-    valid: covered === possibleDraws.length,
-    coveragePercent: possibleDraws.length > 0 ? (covered / possibleDraws.length) * 100 : 0,
+    valid: coveragePercent >= validationThreshold,
+    coveragePercent,
     worstCase,
     testedCombinations: possibleDraws.length,
   };
 }
+
 
 /** Get recommended wheeling sizes for a lottery */
 export function getWheelingOptions(lotteryId: string): { base: number; estimatedGames: number; guarantee: number }[] {

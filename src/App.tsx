@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider } from "@/contexts/AuthProvider";
 import { LotteryProvider } from "@/contexts/LotteryContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminGuard } from "@/components/AdminGuard";

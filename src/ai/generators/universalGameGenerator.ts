@@ -10,6 +10,7 @@ import { getStrategy } from "../knowledge/strategiesKnowledge";
 import { computePatternProfile } from "../engines/patternEngine";
 import type { RiskProfile, IntentFilters, ScoredGame } from "../core/aiTypes";
 import { scoreGame } from "../engines/rankingEngine";
+import type { Rng } from "../core/rng";
 
 interface GeneratorConfig {
   lotteryId: string;
@@ -18,26 +19,33 @@ interface GeneratorConfig {
   filters: IntentFilters;
   stats: NumberStats[];
   draws: DrawResult[];
+  rng?: Rng;
 }
 
 /** Main generation function — generates, filters and ranks games */
 export function generateGames(config: GeneratorConfig): ScoredGame[] {
+
   const rules = getLotteryRules(config.lotteryId);
   const strategy = getStrategy(config.riskProfile);
   const prevDraw = config.draws.length > 0 ? config.draws[0].numbers : undefined;
 
   // Build weighted pool
   const pool = buildWeightedPool(config.stats, strategy.filters, config.filters);
+  const rng = config.rng;
 
   // Generate candidates (10x requested count for filtering)
   const candidateCount = Math.max(config.count * 20, 500);
+
   const candidates: number[][] = [];
 
   for (let attempt = 0; attempt < candidateCount * 3 && candidates.length < candidateCount; attempt++) {
-    const game = weightedSample(pool, rules.pick);
+    const game = weightedSample(pool, rules.pick, rng);
+
+
     if (!game) continue;
 
     // Quick filter
+
     if (config.filters.customNumbers) {
       const gameSet = new Set(game);
       if (!config.filters.customNumbers.every(n => gameSet.has(n))) continue;
@@ -102,16 +110,42 @@ function buildWeightedPool(
 }
 
 /** Weighted random sampling without replacement */
-function weightedSample(pool: { number: number; weight: number }[], pick: number): number[] | null {
+function weightedSample(
+  pool: { number: number; weight: number }[],
+  pick: number,
+  rng?: Rng
+): number[] | null {
+
   const available = pool.filter(p => p.weight > 0);
-  if (available.length < pick) return null;
+
+  // Fallback: se os filtros deixaram poucos candidatos,
+  // tenta um amostrador uniforme (resiliente) em vez de retornar null.
+  if (available.length < pick) {
+    const fallback = pool
+      .filter(p => p.weight > 0)
+      .map(p => p.number);
+    if (fallback.length < pick) return null;
+
+    // Fisher–Yates shuffle com uniformidade
+    const arr = [...fallback];
+    const rnd = rng ?? { next: () => Math.random() };
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(rnd.next() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+
+    return arr.slice(0, pick).sort((a, b) => a - b);
+  }
 
   const selected: number[] = [];
   const remaining = [...available];
 
+  const rnd = rng ?? { next: () => Math.random() };
   for (let i = 0; i < pick; i++) {
     const totalWeight = remaining.reduce((s, p) => s + p.weight, 0);
-    let r = Math.random() * totalWeight;
+    let r = rnd.next() * totalWeight;
+
+
     let idx = 0;
     for (; idx < remaining.length; idx++) {
       r -= remaining[idx].weight;

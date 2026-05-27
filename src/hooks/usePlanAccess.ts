@@ -59,6 +59,7 @@ export function usePlanAccess() {
   const { profile, isAdmin, isSuperAdmin } = useAuth();
   const currentPlan: PlanType = (isAdmin || isSuperAdmin) ? "lifetime" : (profile?.plan ?? "free");
 
+
   const hasAccess = (feature: Feature): boolean => {
     if (isAdmin || isSuperAdmin) return true;
     return PLAN_HIERARCHY[currentPlan] >= PLAN_HIERARCHY[FEATURE_MIN_PLAN[feature]];

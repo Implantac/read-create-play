@@ -1,7 +1,8 @@
-import { createContext, useContext } from "react";
-import { Session, User } from "@supabase/supabase-js";
+import type { Session, User } from "@supabase/supabase-js";
 
 export type PlanType = "free" | "premium" | "professional" | "lifetime";
+
+// Types only — used to keep AuthContext/AuthProvider split without Fast Refresh warnings.
 
 
 export interface Profile {
@@ -29,13 +30,5 @@ export interface AuthContextType {
   isTrialExpired: boolean;
   trialDaysLeft: number;
   signOut: () => Promise<void>;
-}
-
-export const AuthContext = createContext<AuthContextType | null>(null);
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be within AuthProvider");
-  return ctx;
 }
 

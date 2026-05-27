@@ -12,9 +12,13 @@ import { generateWheeling, getWheelingOptions } from "../engines/wheelingEngine"
 import { simulateGames } from "../engines/simulationEngine";
 import { analyzeHistory } from "../engines/statisticsEngine";
 import { rankGames, scoreGame } from "../engines/rankingEngine";
+
+import { createXorshift32, hashStringToSeed } from "../core/rng";
+
 import { explainGame, explainWheeling, explainSimulation, explainAnalysis, explainStrategy } from "../explainability/explainEngine";
 import { AI_CONFIG } from "../core/aiConfig";
 import { AI_POLICIES } from "../core/aiPolicies";
+
 
 export class NativeAIOrchestrator {
   async process(request: AIRequest): Promise<AIResponse> {
@@ -25,7 +29,14 @@ export class NativeAIOrchestrator {
       request.lotteryId
     );
 
+    // Deterministic seed from lotteryId + input
+    const seed = hashStringToSeed(`${request.lotteryId || "lotofacil"}::${request.input}`);
+
+    // Deterministic local RNG (no global Math.random overwrite)
+    const rng = createXorshift32(seed);
+
     const lotteryId = parsedIntent.lotteryId || request.lotteryId || "lotofacil";
+
     const draws = request.draws || [];
     const stats = request.stats || [];
 
@@ -70,7 +81,10 @@ export class NativeAIOrchestrator {
     };
 
     return response;
+
   }
+
+
 
   private async handleGenerate(
     intent: ParsedIntent, lotteryId: string, draws: DrawResult[], stats: NumberStats[], engines: string[]
@@ -84,7 +98,9 @@ export class NativeAIOrchestrator {
       filters: intent.filters,
       stats,
       draws,
+      rng: createXorshift32(hashStringToSeed(`${lotteryId}::generate::${intent.quantity}::${intent.rawInput}`)),
     });
+
 
     const suggestions = [
       "Simular esses jogos para avaliar desempenho",
@@ -148,7 +164,9 @@ export class NativeAIOrchestrator {
     const games = generateGames({
       lotteryId, count: Math.min(intent.quantity, 20),
       riskProfile: intent.riskProfile, filters: intent.filters, stats, draws,
+      rng: createXorshift32(hashStringToSeed(`${lotteryId}::simulate::${intent.quantity}::${intent.rawInput}`)),
     });
+
 
     const iterations = Math.min(AI_CONFIG.maxSimulations, Math.max(1000, intent.quantity * 1000));
     const simulation = simulateGames(games.map(g => g.numbers), lotteryId, iterations);
