@@ -25,6 +25,8 @@ export type WorkerResult<T = unknown> = {
   data: T;
 };
 
+// NOTE: UI às vezes faz cast com base em invariantes parciais.
+// Este “shape” serve apenas para tipagem/checagem leve.
 export type WorkerSimulationResult = {
   topGames?: unknown[];
   totalGenerated?: number;
@@ -33,11 +35,22 @@ export type WorkerSimulationResult = {
   opsPerSecond?: number;
   patternInsights?: unknown;
   distributionSummary?: unknown;
-  performances?: unknown;
-  convergenceData?: unknown;
-  yearlyProjection?: unknown;
+
+  performances?: Array<unknown>;
+  convergenceData?: Array<unknown>;
+  yearlyProjection?: Array<unknown>;
   totalIterations?: number;
 };
+
+export function isWorkerSimulationResult(x: unknown): x is WorkerSimulationResult {
+  if (!isRecord(x)) return false;
+  const d = x as Record<string, unknown>;
+  return (
+    ("totalGenerated" in d || "totalIterations" in d) &&
+    (typeof d.totalGenerated === "number" || typeof d.totalIterations === "number")
+  );
+}
+
 
 export type AnyWorkerPayload = unknown;
 

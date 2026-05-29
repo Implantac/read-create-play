@@ -230,8 +230,9 @@ self.onmessage = (e: MessageEvent) => {
 
     const start = performance.now();
     const prizeMultipliers = getPrizeMultipliers(config.id, config.pick);
-    const performances: any[] = [];
-    const convergenceData: any[] = [];
+    const performances: MonteCarloResult["data"]["performances"] = [];
+    const convergenceData: MonteCarloResult["data"]["convergenceData"] = [];
+
 
     const strategiesToRun = simConfig.compareWithRandom
       ? [...new Set([...simConfig.strategies, "smart"])]
@@ -259,8 +260,13 @@ self.onmessage = (e: MessageEvent) => {
       }
 
       convergence.forEach((avg, idx) => {
-        convergenceData.push({ iteration: (idx + 1) * sampleInterval, avgHits: Math.round(avg * 1000) / 1000, strategy: label });
+        convergenceData.push({
+          iteration: (idx + 1) * sampleInterval,
+          avgHits: Math.round(avg * 1000) / 1000,
+          strategy: label,
+        });
       });
+
 
       const avgHits = totalHits / iterPerStrategy;
       const hitRate4Plus = Object.entries(hitDist).filter(([h]) => Number(h) >= 4).reduce((s, [, c]) => s + c, 0) / iterPerStrategy;
@@ -293,13 +299,15 @@ self.onmessage = (e: MessageEvent) => {
     performances.sort((a, b) => b.expectedValue - a.expectedValue);
 
     const gamesPerYear = 156;
-    const yearlyProjection = performances.map((p: any) => ({
-      strategy: p.label, gamesPerYear,
-      expectedHits4Plus: Math.round(p.hitRate4Plus / 100 * gamesPerYear * 10) / 10,
-      expectedHits5Plus: Math.round(p.hitRate5Plus / 100 * gamesPerYear * 10) / 10,
-      expectedFullHits: Math.round(p.hitRateFull / 100 * gamesPerYear * 10000) / 10000,
+    const yearlyProjection = performances.map((p) => ({
+      strategy: p.label,
+      gamesPerYear,
+      expectedHits4Plus: Math.round((p.hitRate4Plus / 100) * gamesPerYear * 10) / 10,
+      expectedHits5Plus: Math.round((p.hitRate5Plus / 100) * gamesPerYear * 10) / 10,
+      expectedFullHits: Math.round((p.hitRateFull / 100) * gamesPerYear * 10000) / 10000,
       roi: Math.round(p.expectedValue * 100) / 100,
     }));
+
 
     self.postMessage({
       type: "result",

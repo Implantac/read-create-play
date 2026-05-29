@@ -12,6 +12,7 @@ import type {
   SimulatedGame,
 } from "@/engine/massive-simulation-engine";
 import MassiveSimWorker from "@/workers/massive-sim.worker?worker";
+import { isWorkerMessage, isWorkerProgress, isWorkerResult } from "@/core/workerContracts";
 
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -93,16 +94,28 @@ export function MassiveSimulationDashboard({ stats, config, draws }: Props) {
     workerRef.current = worker;
 
     worker.onmessage = (e: MessageEvent) => {
-      const { type, data } = e.data;
-      if (type === "progress") {
-        setProgress(data as MassiveSimProgress);
-      } else if (type === "result") {
-        setResult(data as MassiveSimResult);
-        setRunning(false);
-        toast.success(`${data.totalGenerated.toLocaleString()} jogos simulados em ${(data.elapsedMs / 1000).toFixed(1)}s`);
-        worker.terminate();
-        workerRef.current = null;
+      const msg = e.data as unknown;
+
+      if (isWorkerMessage(msg)) {
+        if (isWorkerProgress(msg) && msg.type === "progress") {
+          setProgress(msg.data as MassiveSimProgress);
+          return;
+        }
+
+        if (isWorkerResult(msg) && msg.type === "result") {
+          const d = msg.data as Partial<MassiveSimResult>;
+          if (typeof d?.totalGenerated === "number" && typeof d?.elapsedMs === "number") {
+            setResult(d as MassiveSimResult);
+            setRunning(false);
+            toast.success(`${d.totalGenerated.toLocaleString()} jogos simulados em ${(d.elapsedMs / 1000).toFixed(1)}s`);
+            worker.terminate();
+            workerRef.current = null;
+          }
+          return;
+        }
       }
+
+      // fallback: ignore unknown worker payloads
     };
 
     worker.onerror = (err) => {
