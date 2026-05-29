@@ -7,14 +7,32 @@
 
 import { NumberStats } from "./statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { getLotteryRules, PRIMES, FIBONACCI, LOTOFACIL_FRAME, LOTOFACIL_CENTER } from "@/ai/knowledge/lotteriesKnowledge";
+import type {
+  AutonomousReport,
+  DistributionSummary,
+  MassiveTopGame,
+  NativePatternAnalysisReport,
+  PatternInsights,
+  SimulationData,
+} from "@/core/nativeAnalysisTypes";
+
+import {
+  getLotteryRules,
+  PRIMES,
+  FIBONACCI,
+  LOTOFACIL_FRAME,
+  LOTOFACIL_CENTER,
+} from "@/ai/knowledge/lotteriesKnowledge";
 
 // ═══════════════════════════════════════════
 // ADVANCED HELPERS
 // ═══════════════════════════════════════════
 
 /** Build Markov transition matrix from draws */
-function buildMarkovMatrix(draws: DrawResult[], totalNumbers: number): Map<number, Map<number, number>> {
+function buildMarkovMatrix(
+  draws: DrawResult[],
+  _totalNumbers: number
+): Map<number, Map<number, number>> {
   const transitions = new Map<number, Map<number, number>>();
   for (let i = 1; i < draws.length; i++) {
     const prev = new Set(draws[i].numbers);
@@ -31,7 +49,11 @@ function buildMarkovMatrix(draws: DrawResult[], totalNumbers: number): Map<numbe
 }
 
 /** Get top Markov successors for a set of numbers */
-function getMarkovSuccessors(lastDraw: number[], markov: Map<number, Map<number, number>>, topN: number): { number: number; score: number }[] {
+function getMarkovSuccessors(
+  lastDraw: number[],
+  markov: Map<number, Map<number, number>>,
+  topN: number
+): { number: number; score: number }[] {
   const scores = new Map<number, number>();
   for (const num of lastDraw) {
     const row = markov.get(num);
@@ -47,7 +69,7 @@ function getMarkovSuccessors(lastDraw: number[], markov: Map<number, Map<number,
 }
 
 /** Build co-occurrence matrix from draws */
-function buildCooccurrenceMap(draws: DrawResult[], topN: number): Map<string, number> {
+function buildCooccurrenceMap(draws: DrawResult[], _topN: number): Map<string, number> {
   const pairs = new Map<string, number>();
   for (const d of draws.slice(0, 200)) {
     const nums = d.numbers;
@@ -77,20 +99,23 @@ function cooccurrenceBoost(game: number[], cooccMap: Map<string, number>): numbe
 
 /** Count repeats from previous draw */
 function countRepeats(game: number[], lastDraw: number[]): number {
-  return game.filter(n => lastDraw.includes(n)).length;
+  return game.filter((n) => lastDraw.includes(n)).length;
 }
 
 /** Compute ideal repeat count based on lottery rules */
 function idealRepeatCount(config: LotteryConfig): [number, number] {
   const rules = getLotteryRules(config.id);
-  return rules.avgRepeatFromPrevious || [Math.floor(config.pick * 0.2), Math.ceil(config.pick * 0.45)];
+  return rules.avgRepeatFromPrevious || [
+    Math.floor(config.pick * 0.2),
+    Math.ceil(config.pick * 0.45),
+  ];
 }
 
 /** Check frame/center balance for Lotofácil */
 function frameBalance(game: number[], lotteryId: string): number {
-  if (lotteryId !== 'lotofacil') return 1;
-  const frameCount = game.filter(n => LOTOFACIL_FRAME.has(n)).length;
-  const centerCount = game.filter(n => LOTOFACIL_CENTER.has(n)).length;
+  if (lotteryId !== "lotofacil") return 1;
+  const frameCount = game.filter((n) => LOTOFACIL_FRAME.has(n)).length;
+  const centerCount = game.filter((n) => LOTOFACIL_CENTER.has(n)).length;
   const rules = getLotteryRules(lotteryId);
   const idealFrame = rules.idealFrameRange || [8, 11];
   if (frameCount >= idealFrame[0] && frameCount <= idealFrame[1]) return 1;
@@ -99,10 +124,15 @@ function frameBalance(game: number[], lotteryId: string): number {
 
 /** Compute consecutive sequences count */
 function maxConsecutive(game: number[]): number {
-  let max = 1, cur = 1;
+  let max = 1;
+  let cur = 1;
   for (let i = 1; i < game.length; i++) {
-    if (game[i] - game[i - 1] === 1) { cur++; max = Math.max(max, cur); }
-    else cur = 1;
+    if (game[i] - game[i - 1] === 1) {
+      cur++;
+      max = Math.max(max, cur);
+    } else {
+      cur = 1;
+    }
   }
   return max;
 }
@@ -123,30 +153,38 @@ function sumScore(game: number[], lotteryId: string): number {
 
 /** Prime ratio in game */
 function primeRatio(game: number[]): number {
-  return game.filter(n => PRIMES.has(n)).length / game.length;
+  return game.filter((n) => PRIMES.has(n)).length / game.length;
 }
 
 /** Fibonacci ratio in game */
 function fibRatio(game: number[]): number {
-  return game.filter(n => FIBONACCI.has(n)).length / game.length;
+  return game.filter((n) => FIBONACCI.has(n)).length / game.length;
 }
 
 // ═══════════════════════════════════════════
 // PATTERN ANALYSIS (text report)
 // ═══════════════════════════════════════════
+
+// Local helper types were centralized to '@/core/nativeAnalysisTypes'.
+// Keeping them here would increase duplication during future modularization.
+
+
 export function generatePatternAnalysis(
-  report: any,
+  report: NativePatternAnalysisReport,
   config: LotteryConfig,
   drawCount: number
 ): string {
-  const { summary, parityPatterns, sumPatterns, consecutivePatterns, spatialDistribution, hotStreaks, frequencyTrends } = report;
+  const { summary, parityPatterns, sumPatterns, consecutivePatterns, spatialDistribution, frequencyTrends } =
+    report;
 
   const top10Trending = (frequencyTrends || []).slice(0, 10);
-  const rising = top10Trending.filter((f: any) => f.momentum > 0);
-  const declining = top10Trending.filter((f: any) => f.momentum < 0);
+  const rising = top10Trending.filter((f) => f.momentum > 0);
+  const declining = top10Trending.filter((f) => f.momentum < 0);
 
   const bestParity = parityPatterns?.[0];
-  const sumRange = sumPatterns?.find((s: any) => s.count === Math.max(...sumPatterns.map((p: any) => p.count)));
+  const sumRange = sumPatterns?.find(
+    (s) => s.count === Math.max(...(sumPatterns.map((p) => p.count)))
+  );
 
   let md = `## 📊 Análise de Padrões — ${config.name}\n\n`;
   md += `Análise baseada nos últimos **${drawCount}** concursos.\n\n`;
@@ -155,7 +193,7 @@ export function generatePatternAnalysis(
     md += `### Paridade\nPadrão dominante: **${bestParity.evens}P/${bestParity.odds}I** (${bestParity.percentage.toFixed(1)}% dos sorteios)\n\n`;
   }
   if (sumRange) {
-    md += `### Soma\nFaixa mais frequente: **${sumRange.rangeLabel}** (${sumRange.percentage.toFixed(1)}%)\nSoma média: **${summary?.avgSum?.toFixed(0) || 'N/A'}** | Desvio: **${summary?.sumStdDev?.toFixed(1) || 'N/A'}**\n\n`;
+    md += `### Soma\nFaixa mais frequente: **${sumRange.rangeLabel}** (${sumRange.percentage.toFixed(1)}%)\nSoma média: **${summary?.avgSum?.toFixed(0) || "N/A"}** | Desvio: **${summary?.sumStdDev?.toFixed(1) || "N/A"}**\n\n`;
   }
   if (consecutivePatterns?.length) {
     const mostCommon = consecutivePatterns[0];
@@ -163,37 +201,54 @@ export function generatePatternAnalysis(
   }
   if (spatialDistribution?.sectors?.length) {
     md += `### Distribuição Espacial\n`;
-    spatialDistribution.sectors.forEach((s: any) => {
+    spatialDistribution.sectors.forEach((s) => {
       md += `- **${s.label}**: média ${s.avgCount.toFixed(1)} dezenas\n`;
     });
     md += `\n`;
   }
   if (rising.length > 0) {
     md += `### 🔥 Dezenas em Alta\n`;
-    md += rising.map((f: any) => `**${String(f.number).padStart(2, '0')}** (momentum: +${f.momentum.toFixed(1)})`).join(', ') + '\n\n';
+    md += rising
+      .map((f) => `**${String(f.number).padStart(2, "0")}** (momentum: +${f.momentum.toFixed(1)})`)
+      .join(", ") + `\n\n`;
   }
   if (declining.length > 0) {
     md += `### ❄️ Dezenas em Declínio\n`;
-    md += declining.map((f: any) => `**${String(f.number).padStart(2, '0')}** (momentum: ${f.momentum.toFixed(1)})`).join(', ') + '\n\n';
+    md += declining
+      .map((f) => `**${String(f.number).padStart(2, "0")}** (momentum: ${f.momentum.toFixed(1)})`)
+      .join(", ") + `\n\n`;
   }
   if (report.cooccurrenceMatrix?.length > 0) {
     md += `### 🔗 Pares Frequentes\n`;
-    report.cooccurrenceMatrix.slice(0, 8).forEach((c: any) => {
-      md += `- **(${String(c.num1).padStart(2, '0')}, ${String(c.num2).padStart(2, '0')})**: ${c.count}x (lift: ${c.lift?.toFixed(2) || 'N/A'})\n`;
+    report.cooccurrenceMatrix.slice(0, 8).forEach((c) => {
+      md += `- **(${String(c.num1).padStart(2, "0")}, ${String(c.num2).padStart(2, "0")})**: ${c.count}x (lift: ${c.lift?.toFixed(2) || "N/A"})\n`;
     });
     md += `\n`;
   }
   if (report.cycleDetection?.length > 0) {
-    const overdue = report.cycleDetection.filter((c: any) => c.status === 'overdue');
+    const overdue = report.cycleDetection.filter((c) => c.status === "overdue");
     if (overdue.length > 0) {
       md += `### ⏰ Dezenas Atrasadas (Overdue)\n`;
-      md += overdue.slice(0, 10).map((c: any) => `**${String(c.number).padStart(2, '0')}** (atraso: ${c.currentGap}, média: ${c.avgCycle.toFixed(1)})`).join(', ') + '\n\n';
+      md += overdue
+        .slice(0, 10)
+        .map(
+          (c) => `**${String(c.number).padStart(2, "0")}** (atraso: ${c.currentGap}, média: ${c.avgCycle.toFixed(1)})`
+        )
+        .join(", ") + `\n\n`;
     }
   }
+
   if (summary?.overallScore !== undefined) {
     md += `### 🎯 Score Geral dos Dados\n`;
-    md += `**${summary.overallScore}/100** — ${summary.overallScore >= 70 ? 'Dados de alta qualidade com padrões claros' : summary.overallScore >= 50 ? 'Dados moderados, padrões parciais' : 'Dados ruidosos, recomenda-se cautela'}\n\n`;
+    md += `**${summary.overallScore}/100** — ${
+      summary.overallScore >= 70
+        ? "Dados de alta qualidade com padrões claros"
+        : summary.overallScore >= 50
+          ? "Dados moderados, padrões parciais"
+          : "Dados ruidosos, recomenda-se cautela"
+    }\n\n`;
   }
+
   md += `---\n*Análise gerada pelo motor estatístico nativo v2.0. Sem custo de créditos.*`;
   return md;
 }
@@ -201,8 +256,12 @@ export function generatePatternAnalysis(
 // ═══════════════════════════════════════════
 // SIMULATION ANALYSIS (text report)
 // ═══════════════════════════════════════════
+
+// Simulation types centralized to '@/core/nativeAnalysisTypes'.
+
+
 export function generateSimulationAnalysis(
-  simulationData: any,
+  simulationData: SimulationData,
   config: LotteryConfig
 ): string {
   const bets = simulationData.bets || [];
@@ -210,12 +269,15 @@ export function generateSimulationAnalysis(
 
   if (bets.length === 0) return "Sem dados de simulação disponíveis.";
 
-  const avgHits = bets.reduce((s: number, b: any) => s + b.avgHits, 0) / bets.length;
-  const bestOverall = Math.max(...bets.map((b: any) => b.bestHit || 0));
-  const totalPrizes = bets.reduce((s: number, b: any) => s + (b.prizeCount || 0), 0);
-  const avgPrizeRate = (totalPrizes / (bets.length * Math.max(totalDraws, 1)) * 100);
+  const avgHits = bets.reduce((s, b) => s + b.avgHits, 0) / bets.length;
+  const bestOverall = Math.max(...bets.map((b) => b.bestHit || 0));
+  const totalPrizes = bets.reduce((s, b) => s + (b.prizeCount || 0), 0);
+  const avgPrizeRate = (totalPrizes / (bets.length * Math.max(totalDraws, 1))) * 100;
 
-  const ranked = [...bets].sort((a: any, b: any) => (b.avgHits + b.bestHit * 0.5) - (a.avgHits + a.bestHit * 0.5));
+  const ranked = [...bets].sort(
+    (a, b) =>
+      b.avgHits + (b.bestHit || 0) * 0.5 - (a.avgHits + (a.bestHit || 0) * 0.5)
+  );
   const best3 = ranked.slice(0, 3);
 
   let md = `## 📈 Análise da Simulação — ${config.name}\n\n`;
@@ -227,12 +289,12 @@ export function generateSimulationAnalysis(
   md += `- Taxa de premiação: **${avgPrizeRate.toFixed(2)}%**\n\n`;
 
   md += `### 🏆 Top 3 Apostas\n`;
-  best3.forEach((b: any, i: number) => {
-    md += `${i + 1}. [${(b.bet || []).map((n: number) => String(n).padStart(2, '0')).join(', ')}] — Média: ${b.avgHits.toFixed(2)}, Melhor: ${b.bestHit}, Prêmios: ${b.prizeCount || 0}\n`;
+  best3.forEach((b, i) => {
+    md += `${i + 1}. [${(b.bet || []).map((n) => String(n).padStart(2, "0")).join(", ")}] — Média: ${b.avgHits.toFixed(2)}, Melhor: ${b.bestHit}, Prêmios: ${b.prizeCount || 0}\n`;
   });
   md += `\n`;
 
-  const stableBets = bets.filter((b: any) => (b.stability || 0) > 0.7);
+  const stableBets = bets.filter((b) => (b.stability || 0) > 0.7);
   md += `### Estabilidade\n**${stableBets.length}** de ${bets.length} apostas têm alta estabilidade (>70%)\n\n`;
 
   md += `### 💡 Recomendações\n`;
@@ -248,44 +310,54 @@ export function generateSimulationAnalysis(
 // ═══════════════════════════════════════════
 // MASSIVE SIMULATION ANALYSIS (text report)
 // ═══════════════════════════════════════════
+
+// Massive simulation types centralized to '@/core/nativeAnalysisTypes'.
+
+
 export function generateMassiveSimAnalysis(
-  topGames: any[],
-  patternInsights: any,
-  distributionSummary: any,
+  topGames: MassiveTopGame[],
+  patternInsights: PatternInsights,
+  distributionSummary: DistributionSummary,
   config: LotteryConfig,
   totalGenerated: number,
   totalEvaluated: number
 ): string {
   const numFreq: Record<number, number> = {};
-  topGames.forEach((g: any) => {
-    (g.numbers || []).forEach((n: number) => { numFreq[n] = (numFreq[n] || 0) + 1; });
+  topGames.forEach((g) => {
+    (g.numbers || []).forEach((n) => {
+      numFreq[n] = (numFreq[n] || 0) + 1;
+    });
   });
 
-  const topNumbers = Object.entries(numFreq).sort((a, b) => b[1] - a[1]).slice(0, 15);
-  const bottomNumbers = Object.entries(numFreq).sort((a, b) => a[1] - b[1]).slice(0, 10);
+  const topNumbers = Object.entries(numFreq)
+    .sort((a, b) => Number(b[1]) - Number(a[1]))
+    .slice(0, 15);
+  const bottomNumbers = Object.entries(numFreq)
+    .sort((a, b) => Number(a[1]) - Number(b[1]))
+    .slice(0, 10);
 
   let md = `## 🚀 Análise da Simulação Massiva — ${config.name}\n\n`;
   md += `**${totalGenerated.toLocaleString()}** jogos gerados → **${totalEvaluated.toLocaleString()}** avaliados → **Top ${topGames.length}** selecionados\n\n`;
 
   md += `### 🎯 Dezenas "Must-Have"\n`;
   topNumbers.forEach(([n, freq]) => {
-    const pct = (freq / topGames.length * 100).toFixed(0);
-    const bar = Number(pct) >= 80 ? '🔥' : Number(pct) >= 60 ? '✅' : '➖';
-    md += `- ${bar} **${String(n).padStart(2, '0')}**: ${pct}% dos top jogos (${freq}x)\n`;
+    const pct = ((Number(freq) / Math.max(topGames.length, 1)) * 100).toFixed(0);
+    const bar = Number(pct) >= 80 ? "🔥" : Number(pct) >= 60 ? "✅" : "➖";
+    md += `- ${bar} **${String(n).padStart(2, "0")}**: ${pct}% dos top jogos (${freq}x)\n`;
   });
   md += `\n`;
 
   md += `### ❌ Dezenas "Tóxicas"\n`;
   bottomNumbers.forEach(([n, freq]) => {
-    md += `- **${String(n).padStart(2, '0')}**: apenas ${freq}x nos top jogos\n`;
+    md += `- **${String(n).padStart(2, "0")}**: apenas ${freq}x nos top jogos\n`;
   });
   md += `\n`;
 
   if (distributionSummary) {
     md += `### 📊 Distribuição dos Top Jogos\n`;
-    md += `- Soma média: **${distributionSummary.avgSum?.toFixed(0) || 'N/A'}**\n`;
+    md += `- Soma média: **${distributionSummary.avgSum?.toFixed(0) || "N/A"}**\n`;
     md += `- Ratio par/ímpar: **${((distributionSummary.avgEvenRatio || 0) * 100).toFixed(0)}%** pares\n`;
-    md += `- Spread médio: **${distributionSummary.avgSpread?.toFixed(0) || 'N/A'}**\n`;
+    md += `- Spread médio: **${distributionSummary.avgSpread?.toFixed(0) || "N/A"}**\n`;
     md += `- Taxa de premiação: **${(distributionSummary.avgPrizeRate || 0).toFixed(2)}%**\n`;
     md += `- Melhor acerto geral: **${distributionSummary.bestHitOverall || 0}** de ${config.pick}\n\n`;
   }
@@ -298,8 +370,8 @@ export function generateMassiveSimAnalysis(
   }
 
   md += `### 🏆 Top 5 Jogos\n`;
-  topGames.slice(0, 5).forEach((g: any, i: number) => {
-    md += `${i + 1}. [${(g.numbers || []).map((n: number) => String(n).padStart(2, '0')).join(', ')}] — Score: **${g.score?.toFixed(0) || 'N/A'}**\n`;
+  topGames.slice(0, 5).forEach((g, i) => {
+    md += `${i + 1}. [${(g.numbers || []).map((n) => String(n).padStart(2, "0")).join(", ")}] — Score: **${g.score?.toFixed(0) || "N/A"}**\n`;
   });
   md += `\n`;
 
@@ -315,8 +387,12 @@ export function generateMassiveSimAnalysis(
 // ═══════════════════════════════════════════
 // AUTONOMOUS AI ANALYSIS (text report + 10 games)
 // ═══════════════════════════════════════════
+
+// Autonomous analysis types centralized to '@/core/nativeAnalysisTypes'.
+
+
 export function generateAutonomousAnalysis(
-  report: any,
+  report: AutonomousReport,
   config: LotteryConfig
 ): string {
   const topRankings = report.rankings?.slice(0, 25) || [];
@@ -326,67 +402,84 @@ export function generateAutonomousAnalysis(
   const chiSquare = report.chiSquareResult || {};
   const gaps = report.gapAnalysis?.slice(0, 15) || [];
   const markov = report.markovTransitions?.slice(0, 15) || [];
-  const cooccurrences = report.topCooccurrences?.slice(0, 10) || [];
+
   const rules = getLotteryRules(config.id);
 
-  const tierS = topRankings.filter((r: any) => r.compositeScore >= 80);
-  const tierA = topRankings.filter((r: any) => r.compositeScore >= 60 && r.compositeScore < 80);
+  const tierS = topRankings.filter((r) => r.compositeScore >= 80);
+  const tierA = topRankings.filter((r) => r.compositeScore >= 60 && r.compositeScore < 80);
 
   let md = `## 🧠 Análise Autônoma Profunda — ${config.name}\n\n`;
   md += `Score de confiança: **${report.confidenceScore || 0}/100**\n`;
   md += `Metodologia: Frequência + Markov + Entropia + Chi² + Ciclos + Co-ocorrência\n\n`;
 
-  // Rankings
   md += `### 🏅 Ranking de Dezenas\n`;
   if (tierS.length > 0) {
-    md += `**Tier S** (score ≥80): ${tierS.map((r: any) => `**${String(r.number).padStart(2, '0')}** (${r.compositeScore})`).join(', ')}\n\n`;
+    md += `**Tier S** (score ≥80): ${tierS
+      .map((r) => `**${String(r.number).padStart(2, "0")}** (${r.compositeScore})`)
+      .join(", ")}\n\n`;
   }
   if (tierA.length > 0) {
-    md += `**Tier A** (score ≥60): ${tierA.map((r: any) => `**${String(r.number).padStart(2, '0')}** (${r.compositeScore})`).join(', ')}\n\n`;
+    md += `**Tier A** (score ≥60): ${tierA
+      .map((r) => `**${String(r.number).padStart(2, "0")}** (${r.compositeScore})`)
+      .join(", ")}\n\n`;
   }
 
-  // Entropy
   if (entropy.entropy !== undefined) {
     const entropyPct = ((entropy.entropy / Math.log2(config.numbers)) * 100).toFixed(1);
-    md += `### 📐 Análise de Entropia\nEntropia: **${entropy.entropy?.toFixed(3) || 'N/A'}** (${entropyPct}% da máxima)\n`;
-    md += `${Number(entropyPct) > 95 ? '✅ Distribuição muito uniforme' : Number(entropyPct) > 85 ? '⚠️ Leve concentração' : '❌ Concentração significativa'}\n\n`;
+    md += `### 📐 Análise de Entropia\nEntropia: **${entropy.entropy?.toFixed(3) || "N/A"}** (${entropyPct}% da máxima)\n`;
+    md += `${
+      Number(entropyPct) > 95
+        ? "✅ Distribuição muito uniforme"
+        : Number(entropyPct) > 85
+          ? "⚠️ Leve concentração"
+          : "❌ Concentração significativa"
+    }\n\n`;
   }
 
-  // Chi-square
   if (chiSquare.chiSquare !== undefined) {
-    md += `### 📊 Teste Chi-Quadrado\nχ² = **${chiSquare.chiSquare?.toFixed(2) || 'N/A'}** | p-valor = **${chiSquare.pValue?.toFixed(4) || 'N/A'}**\n`;
-    md += `${(chiSquare.pValue || 1) > 0.05 ? '✅ Sem evidência de não-aleatoriedade' : '⚠️ Distribuição não-uniforme detectada'}\n\n`;
+    md += `### 📊 Teste Chi-Quadrado\nχ² = **${chiSquare.chiSquare?.toFixed(2) || "N/A"}** | p-valor = **${chiSquare.pValue?.toFixed(4) || "N/A"}**\n`;
+    md += `${(chiSquare.pValue || 1) > 0.05 ? "✅ Sem evidência de não-aleatoriedade" : "⚠️ Distribuição não-uniforme detectada"}\n\n`;
   }
 
-  // Gaps
   if (gaps.length > 0) {
-    const overdue = gaps.filter((g: any) => g.currentGap > g.avgGap * 1.3);
+    const overdue = gaps.filter((g) => g.currentGap > g.avgGap * 1.3);
     if (overdue.length > 0) {
-      md += `### ⏰ Dezenas Atrasadas\n${overdue.map((g: any) => `**${String(g.number).padStart(2, '0')}** (gap: ${g.currentGap}, média: ${g.avgGap.toFixed(1)})`).join(', ')}\n\n`;
+      md += `### ⏰ Dezenas Atrasadas\n${overdue
+        .map((g) => `**${String(g.number).padStart(2, "0")}** (gap: ${g.currentGap}, média: ${g.avgGap.toFixed(1)})`)
+        .join(", ")}\n\n`;
     }
   }
 
-  // Markov
   if (markov.length > 0) {
-    md += `### 🔗 Transições de Markov\nTop transições: ${markov.slice(0, 8).map((m: any) => `${String(m.from).padStart(2, '0')}→${String(m.to).padStart(2, '0')} (${m.count}x)`).join(', ')}\n\n`;
+    md += `### 🔗 Transições de Markov\nTop transições: ${markov
+      .slice(0, 8)
+      .map((m) => `${String(m.from).padStart(2, "0")}→${String(m.to).padStart(2, "0")} (${m.count}x)`)
+      .join(", ")}\n\n`;
   }
 
-  // Patterns
   if (patterns.length > 0) {
     md += `### 🔍 Padrões Detectados\n`;
-    patterns.slice(0, 5).forEach((p: any) => {
-      md += `- **${p.type || p.name}**: ${p.description || `Score: ${p.score || 'N/A'}`}\n`;
+    patterns.slice(0, 5).forEach((p) => {
+      md += `- **${p.type || p.name}**: ${p.description || `Score: ${p.score || "N/A"}`}
+`;
     });
     md += `\n`;
   }
 
-  // Shifts
   if (shifts.length > 0) {
     md += `### 📈 Mudanças de Regime\n`;
-    const risingShifts = shifts.filter((s: any) => s.direction === 'up' || s.shift > 0);
-    const fallingShifts = shifts.filter((s: any) => s.direction === 'down' || s.shift < 0);
-    if (risingShifts.length > 0) md += `Em alta: ${risingShifts.slice(0, 5).map((s: any) => `**${String(s.number).padStart(2, '0')}**`).join(', ')}\n`;
-    if (fallingShifts.length > 0) md += `Em queda: ${fallingShifts.slice(0, 5).map((s: any) => `**${String(s.number).padStart(2, '0')}**`).join(', ')}\n`;
+    const risingShifts = shifts.filter((s) => s.direction === "up" || s.shift > 0);
+    const fallingShifts = shifts.filter((s) => s.direction === "down" || s.shift < 0);
+    if (risingShifts.length > 0)
+      md += `Em alta: ${risingShifts
+        .slice(0, 5)
+        .map((s) => `**${String(s.number).padStart(2, "0")}**`)
+        .join(", ")}\n`;
+    if (fallingShifts.length > 0)
+      md += `Em queda: ${fallingShifts
+        .slice(0, 5)
+        .map((s) => `**${String(s.number).padStart(2, "0")}**`)
+        .join(", ")}\n`;
     md += `\n`;
   }
 
@@ -394,31 +487,32 @@ export function generateAutonomousAnalysis(
   md += `- Priorize dezenas Tier S e A como núcleo das apostas\n`;
   md += `- Inclua 1-2 dezenas atrasadas (overdue) para diversificação\n`;
   md += `- Respeite transições de Markov para sequências prováveis\n`;
-  md += `- Mantenha soma dentro da faixa ideal: **${rules.idealSumRange?.[0] || '?'}–${rules.idealSumRange?.[1] || '?'}**\n`;
-  md += `- Paridade ideal: **${rules.idealParityRange?.[0] || '?'}–${rules.idealParityRange?.[1] || '?'}** pares\n`;
-  if (config.id === 'lotofacil') {
+  md += `- Mantenha soma dentro da faixa ideal: **${rules.idealSumRange?.[0] || "?"}–${rules.idealSumRange?.[1] || "?"}**\n`;
+  md += `- Paridade ideal: **${rules.idealParityRange?.[0] || "?"}–${rules.idealParityRange?.[1] || "?"}** pares\n`;
+  if (config.id === "lotofacil") {
     md += `- Moldura/Centro ideal: **${rules.idealFrameRange?.[0] || 8}–${rules.idealFrameRange?.[1] || 11}** na moldura\n`;
   }
   md += `\n`;
 
-  // Generate 10 games using enhanced strategy
-  const allRanked = topRankings.map((r: any) => r.number);
-  const overdueList = gaps.filter((g: any) => g.isOverdue || g.currentGap > (g.avgGap || 5) * 1.2).map((g: any) => g.number);
-  const markovFavored = markov.slice(0, 10).map((m: any) => m.to);
+  const allRanked = topRankings.map((r) => r.number);
+  const overdueList = gaps
+    .filter((g) => ("isOverdue" in g ? (g as unknown as { isOverdue?: boolean }).isOverdue : false) || g.currentGap > (g.avgGap || 5) * 1.2)
+    .map((g) => g.number);
+  const markovFavored = markov.slice(0, 10).map((m) => m.to);
 
   md += `## 🎯 10 JOGOS OTIMIZADOS\n\n`;
 
   const strategies = [
-    { name: 'Conservador', desc: 'Núcleo Tier S/A, alta frequência' },
-    { name: 'Conservador', desc: 'Frequência + co-ocorrência forte' },
-    { name: 'Conservador', desc: 'Estabilidade máxima, soma ideal' },
-    { name: 'Equilibrado', desc: 'Mix frequência + Markov + ciclos' },
-    { name: 'Equilibrado', desc: 'Transições de Markov + momentum' },
-    { name: 'Equilibrado', desc: 'Dispersão otimizada + primos' },
-    { name: 'Agressivo', desc: 'Overdue + momentum positivo' },
-    { name: 'Agressivo', desc: 'Anti-padrão + dezenas em alta' },
-    { name: 'Contrário', desc: 'Dezenas frias com ciclo favorável' },
-    { name: 'Cobertura Máxima', desc: 'Máxima dispersão + Fibonacci' },
+    { name: "Conservador", desc: "Núcleo Tier S/A, alta frequência" },
+    { name: "Conservador", desc: "Frequência + co-ocorrência forte" },
+    { name: "Conservador", desc: "Estabilidade máxima, soma ideal" },
+    { name: "Equilibrado", desc: "Mix frequência + Markov + ciclos" },
+    { name: "Equilibrado", desc: "Transições de Markov + momentum" },
+    { name: "Equilibrado", desc: "Dispersão otimizada + primos" },
+    { name: "Agressivo", desc: "Overdue + momentum positivo" },
+    { name: "Agressivo", desc: "Anti-padrão + dezenas em alta" },
+    { name: "Contrário", desc: "Dezenas frias com ciclo favorável" },
+    { name: "Cobertura Máxima", desc: "Máxima dispersão + Fibonacci" },
   ];
 
   const seenGames = new Set<string>();
@@ -427,33 +521,36 @@ export function generateAutonomousAnalysis(
   for (let g = 0; g < 10; g++) {
     let pool = [...allRanked];
 
-    // Enrich pool based on strategy
     if (g >= 3 && g < 6) {
-      markovFavored.forEach((n: number) => { if (!pool.includes(n)) pool.push(n); });
+      markovFavored.forEach((n) => {
+        if (!pool.includes(n)) pool.push(n);
+      });
     }
     if (g >= 6 && g < 8) {
-      overdueList.forEach((n: number) => { if (!pool.includes(n)) pool.push(n); });
+      overdueList.forEach((n) => {
+        if (!pool.includes(n)) pool.push(n);
+      });
     }
     if (g === 8) {
-      // Contrarian: reverse ranking
       pool = [...allRanked].reverse();
-      overdueList.forEach((n: number) => { if (!pool.includes(n)) pool.unshift(n); });
+      overdueList.forEach((n) => {
+        if (!pool.includes(n)) pool.unshift(n);
+      });
     }
     if (g === 9) {
-      // Max coverage: spread across all ranges
       const rangeSize = Math.ceil(config.numbers / 5);
       pool = [];
       for (let r = 0; r < 5; r++) {
         const lo = r * rangeSize + 1;
         const hi = Math.min((r + 1) * rangeSize, config.numbers);
-        const rangeNums = allRanked.filter((n: number) => n >= lo && n <= hi);
+        const rangeNums = allRanked.filter((n) => n >= lo && n <= hi);
         pool.push(...rangeNums.slice(0, Math.ceil(config.pick / 5) + 1));
       }
-      // Add Fibonacci
-      FIBONACCI.forEach(n => { if (n <= config.numbers && !pool.includes(n)) pool.push(n); });
+      FIBONACCI.forEach((n) => {
+        if (n <= config.numbers && !pool.includes(n)) pool.push(n);
+      });
     }
 
-    // Ensure enough in pool
     if (pool.length < config.pick) {
       for (let n = 1; n <= config.numbers; n++) {
         if (!pool.includes(n)) pool.push(n);
@@ -461,7 +558,6 @@ export function generateAutonomousAnalysis(
       }
     }
 
-    // Generate game with bias
     let bestGame: number[] | null = null;
     let bestScore = -1;
 
@@ -471,9 +567,13 @@ export function generateAutonomousAnalysis(
 
       while (game.length < config.pick && available.length > 0) {
         const bias = g < 3 ? 0.75 : g < 6 ? 0.5 : 0.3;
-        const idx = Math.random() < bias
-          ? Math.floor(Math.random() * Math.min(available.length, Math.ceil(config.pick * 1.5)))
-          : Math.floor(Math.random() * available.length);
+        const idx =
+          Math.random() < bias
+            ? Math.floor(
+                Math.random() *
+                  Math.min(available.length, Math.ceil(config.pick * 1.5))
+              )
+            : Math.floor(Math.random() * available.length);
         const safeIdx = Math.min(idx, available.length - 1);
         const num = available[safeIdx];
         if (!game.includes(num) && num >= 1 && num <= config.numbers) {
@@ -488,29 +588,30 @@ export function generateAutonomousAnalysis(
       }
 
       game.sort((a, b) => a - b);
-      const key = game.join(',');
+      const key = game.join(",");
       if (seenGames.has(key)) continue;
 
-      // Score this game
       let score = 0;
-      // Sum score
       score += sumScore(game, config.id) * 25;
-      // Parity
-      const evens = game.filter(n => n % 2 === 0).length;
-      const idealParity = rules.idealParityRange || [Math.floor(config.pick * 0.4), Math.ceil(config.pick * 0.6)];
+
+      const evens = game.filter((n) => n % 2 === 0).length;
+      const idealParity =
+        rules.idealParityRange || [
+          Math.floor(config.pick * 0.4),
+          Math.ceil(config.pick * 0.6),
+        ];
       if (evens >= idealParity[0] && evens <= idealParity[1]) score += 20;
       else score += 10;
-      // Consecutive
+
       const maxSeq = maxConsecutive(game);
-      if (maxSeq <= (rules.maxRecommendedSequence || 3)) score += 15;
-      else score += 5;
-      // Frame balance (Lotofácil)
+      score += maxSeq <= (rules.maxRecommendedSequence || 3) ? 15 : 5;
+
       score += frameBalance(game, config.id) * 10;
-      // Ranking position bonus
+
       const rankedSet = new Set(allRanked.slice(0, config.pick + 5));
-      const inRanked = game.filter(n => rankedSet.has(n)).length;
+      const inRanked = game.filter((n) => rankedSet.has(n)).length;
       score += (inRanked / config.pick) * 20;
-      // Prime/Fib bonus
+
       score += primeRatio(game) * 5;
       score += fibRatio(game) * 5;
 
@@ -521,16 +622,16 @@ export function generateAutonomousAnalysis(
     }
 
     if (!bestGame) continue;
-    const key = bestGame.join(',');
+    const key = bestGame.join(",");
     if (seenGames.has(key)) continue;
     seenGames.add(key);
 
     gameIndex++;
     const confidence = Math.round(Math.min(95, bestScore));
-    const nums = bestGame.map(n => String(n).padStart(2, '0')).join(', ');
+    const nums = bestGame.map((n) => String(n).padStart(2, "0")).join(", ");
     const sum = bestGame.reduce((a, b) => a + b, 0);
-    const evens = bestGame.filter(n => n % 2 === 0).length;
-    const primes = bestGame.filter(n => PRIMES.has(n)).length;
+    const evens = bestGame.filter((n) => n % 2 === 0).length;
+    const primes = bestGame.filter((n) => PRIMES.has(n)).length;
 
     md += `GAME_START\nJogo ${gameIndex} - ${strategies[g].name} (Confiança: ${confidence}/100)\n`;
     md += `Estratégia: ${strategies[g].desc}\n`;
@@ -551,10 +652,16 @@ export function generateNativeBets(
   config: LotteryConfig,
   draws: DrawResult[],
   count: number
-): { bets: number[][]; analysis: string; quality: { avgScore: number; scores: number[]; grade: string } } {
-  const { entropy } = (function() {
+): {
+  bets: number[][];
+  analysis: string;
+  quality: { avgScore: number; scores: number[]; grade: string };
+} {
+  const { entropy } = (() => {
     if (draws.length < 10) return { entropy: 50 };
-    const recentSams = draws.slice(0, 10).map(d => d.numbers.reduce((a, b) => a + b, 0));
+    const recentSams = draws
+      .slice(0, 10)
+      .map((d) => d.numbers.reduce((a, b) => a + b, 0));
     const avgSum = recentSams.reduce((a, b) => a + b, 0) / 10;
     const variance = recentSams.reduce((a, b) => a + Math.pow(b - avgSum, 2), 0) / 10;
     return { entropy: Math.min(100, Math.sqrt(variance) * 2) };
@@ -564,15 +671,19 @@ export function generateNativeBets(
   const minNum = config.name === "Super Sete" ? 0 : 1;
   const allNums = Array.from({ length: config.numbers - minNum + 1 }, (_, i) => i + minNum);
 
-  // Frequency maps
   const freq50: Record<number, number> = {};
   const freq30: Record<number, number> = {};
   const freq10: Record<number, number> = {};
   const lastSeen: Record<number, number> = {};
-  for (const n of allNums) { freq50[n] = 0; freq30[n] = 0; freq10[n] = 0; lastSeen[n] = 999; }
+  for (const n of allNums) {
+    freq50[n] = 0;
+    freq30[n] = 0;
+    freq10[n] = 0;
+    lastSeen[n] = 999;
+  }
 
   draws.forEach((d, i) => {
-    d.numbers.forEach(n => {
+    d.numbers.forEach((n) => {
       if (i < 50) freq50[n] = (freq50[n] || 0) + 1;
       if (i < 30) freq30[n] = (freq30[n] || 0) + 1;
       if (i < 10) freq10[n] = (freq10[n] || 0) + 1;
@@ -580,71 +691,58 @@ export function generateNativeBets(
     });
   });
 
-  // Build Markov matrix
   const markov = buildMarkovMatrix(draws.slice(0, 100), config.numbers);
   const lastDraw = draws[0]?.numbers || [];
   const markovSuccessors = getMarkovSuccessors(lastDraw, markov, 20);
-  const markovSet = new Set(markovSuccessors.map(m => m.number));
+  const markovSet = new Set(markovSuccessors.map((m) => m.number));
 
-  // Build co-occurrence map
   const cooccMap = buildCooccurrenceMap(draws, 100);
 
-  // Repeat analysis
   const [minRepeat, maxRepeat] = idealRepeatCount(config);
 
-  // Composite score per number (enhanced)
-  const compositeScores = allNums.map(n => {
-    const s = stats.find(st => st.number === n);
-    let score = 0;
-    // Historical frequency (normalized)
-    score += (freq50[n] || 0) * 1.5;
-    // Recent frequency (higher weight)
-    score += (freq30[n] || 0) * 2;
-    score += (freq10[n] || 0) * 3;
-    // Trend
-    if (s?.trend && s.trend > 0) score += s.trend * 8;
-    // Cycle (overdue bonus)
-    if (s?.cycleScore && s.cycleScore > 1) score += (s.cycleScore - 1) * 12;
-    // Recency
-    if (lastSeen[n] <= 2) score += 6;
-    else if (lastSeen[n] <= 5) score += 3;
-    // Momentum
-    if (s?.momentum && s.momentum > 0) score += s.momentum * 0.005;
-    // Markov boost
-    if (markovSet.has(n)) {
-      const ms = markovSuccessors.find(m => m.number === n);
-      score += (ms?.score || 0) * 0.5;
-    }
-    // Prime/Fibonacci subtle boost
-    if (PRIMES.has(n)) score += 1;
-    if (FIBONACCI.has(n)) score += 0.5;
-
-    return { number: n, score };
-  }).sort((a, b) => b.score - a.score);
+  const compositeScores = allNums
+    .map((n) => {
+      const s = stats.find((st) => st.number === n);
+      let score = 0;
+      score += (freq50[n] || 0) * 1.5;
+      score += (freq30[n] || 0) * 2;
+      score += (freq10[n] || 0) * 3;
+      if (s?.trend && s.trend > 0) score += s.trend * 8;
+      if (s?.cycleScore && s.cycleScore > 1) score += (s.cycleScore - 1) * 12;
+      if (lastSeen[n] <= 2) score += 6;
+      else if (lastSeen[n] <= 5) score += 3;
+      if (s?.momentum && s.momentum > 0) score += s.momentum * 0.005;
+      if (markovSet.has(n)) {
+        const ms = markovSuccessors.find((m) => m.number === n);
+        score += (ms?.score || 0) * 0.5;
+      }
+      if (PRIMES.has(n)) score += 1;
+      if (FIBONACCI.has(n)) score += 0.5;
+      return { number: n, score };
+    })
+    .sort((a, b) => b.score - a.score);
 
   const bets: number[][] = [];
   const scores: number[] = [];
   const seenKeys = new Set<string>();
 
-  // Strategy profiles for diverse generation
   const strategyProfiles = [
-    { name: 'Conservadora', topBias: 0.80, poolMult: 1.8, markovWeight: 0.2, cycleWeight: 0.1 },
-    { name: 'Conservadora', topBias: 0.75, poolMult: 2.0, markovWeight: 0.3, cycleWeight: 0.1 },
-    { name: 'Equilibrada', topBias: 0.55, poolMult: 2.5, markovWeight: 0.4, cycleWeight: 0.3 },
-    { name: 'Equilibrada', topBias: 0.50, poolMult: 2.8, markovWeight: 0.3, cycleWeight: 0.4 },
-    { name: 'Agressiva', topBias: 0.35, poolMult: 3.0, markovWeight: 0.2, cycleWeight: 0.6 },
-    { name: 'Markov', topBias: 0.40, poolMult: 2.0, markovWeight: 0.7, cycleWeight: 0.2 },
-    { name: 'Ciclos', topBias: 0.30, poolMult: 3.5, markovWeight: 0.1, cycleWeight: 0.8 },
-    { name: 'Anti-Padrão', topBias: 0.25, poolMult: 4.0, markovWeight: 0.3, cycleWeight: 0.3 },
-    { name: 'Cobertura', topBias: 0.45, poolMult: 3.0, markovWeight: 0.2, cycleWeight: 0.2 },
-    { name: 'Momentum', topBias: 0.60, poolMult: 2.2, markovWeight: 0.4, cycleWeight: 0.1 },
+    { name: "Conservadora", topBias: 0.8, poolMult: 1.8, markovWeight: 0.2, cycleWeight: 0.1 },
+    { name: "Conservadora", topBias: 0.75, poolMult: 2.0, markovWeight: 0.3, cycleWeight: 0.1 },
+    { name: "Equilibrada", topBias: 0.55, poolMult: 2.5, markovWeight: 0.4, cycleWeight: 0.3 },
+    { name: "Equilibrada", topBias: 0.5, poolMult: 2.8, markovWeight: 0.3, cycleWeight: 0.4 },
+    { name: "Agressiva", topBias: 0.35, poolMult: 3.0, markovWeight: 0.2, cycleWeight: 0.6 },
+    { name: "Markov", topBias: 0.4, poolMult: 2.0, markovWeight: 0.7, cycleWeight: 0.2 },
+    { name: "Ciclos", topBias: 0.3, poolMult: 3.5, markovWeight: 0.1, cycleWeight: 0.8 },
+    { name: "Anti-Padrão", topBias: 0.25, poolMult: 4.0, markovWeight: 0.3, cycleWeight: 0.3 },
+    { name: "Cobertura", topBias: 0.45, poolMult: 3.0, markovWeight: 0.2, cycleWeight: 0.2 },
+    { name: "Momentum", topBias: 0.6, poolMult: 2.2, markovWeight: 0.4, cycleWeight: 0.1 },
   ];
 
-  // Entropia bias: Se entropia for alta (>60), favorece estratégias de Cobertura e Anti-Padrão
   if (entropy > 60) {
     strategyProfiles.unshift(
-      { name: 'Cobertura (Entropia)', topBias: 0.40, poolMult: 3.5, markovWeight: 0.1, cycleWeight: 0.1 },
-      { name: 'Anti-Padrão (Entropia)', topBias: 0.20, poolMult: 4.5, markovWeight: 0.2, cycleWeight: 0.2 }
+      { name: "Cobertura (Entropia)", topBias: 0.4, poolMult: 3.5, markovWeight: 0.1, cycleWeight: 0.1 },
+      { name: "Anti-Padrão (Entropia)", topBias: 0.2, poolMult: 4.5, markovWeight: 0.2, cycleWeight: 0.2 }
     );
   }
 
@@ -652,25 +750,29 @@ export function generateNativeBets(
     const profileIdx = bets.length % strategyProfiles.length;
     const profile = strategyProfiles[Math.min(profileIdx, strategyProfiles.length - 1)];
 
-    // Build weighted pool
     const poolSize = Math.min(allNums.length, Math.ceil(config.pick * profile.poolMult));
-    const pool = compositeScores.slice(0, poolSize).map(c => ({
+    const pool = compositeScores.slice(0, poolSize).map((c) => ({
       number: c.number,
-      weight: c.score * (1 - profile.markovWeight - profile.cycleWeight)
-        + (markovSet.has(c.number) ? (markovSuccessors.find(m => m.number === c.number)?.score || 0) * profile.markovWeight : 0)
-        + ((stats.find(s => s.number === c.number)?.cycleScore || 0) > 1 ? 10 * profile.cycleWeight : 0),
+      weight:
+        c.score * (1 - profile.markovWeight - profile.cycleWeight) +
+        (markovSet.has(c.number)
+          ? (
+              markovSuccessors.find((m) => m.number === c.number)?.score || 0
+            ) * profile.markovWeight
+          : 0) +
+        ((stats.find((s) => s.number === c.number)?.cycleScore || 0) > 1
+          ? 10 * profile.cycleWeight
+          : 0),
     }));
 
-    // Add some random numbers for aggressive/coverage strategies
     if (profile.topBias < 0.4) {
       const extras = allNums
-        .filter(n => !pool.find(p => p.number === n))
+        .filter((n) => !pool.find((p) => p.number === n))
         .sort(() => Math.random() - 0.5)
         .slice(0, Math.floor(config.pick * 0.3));
-      extras.forEach(n => pool.push({ number: n, weight: 2 }));
+      extras.forEach((n) => pool.push({ number: n, weight: 2 }));
     }
 
-    // Weighted sampling
     const candidate: number[] = [];
     const remaining = [...pool];
 
@@ -687,7 +789,6 @@ export function generateNativeBets(
       remaining.splice(idx, 1);
     }
 
-    // Fill if needed
     while (candidate.length < config.pick) {
       const n = Math.floor(Math.random() * config.numbers) + minNum;
       if (!candidate.includes(n)) candidate.push(n);
@@ -695,11 +796,10 @@ export function generateNativeBets(
 
     candidate.sort((a, b) => a - b);
     if (new Set(candidate).size !== config.pick) continue;
-    const key = candidate.join(',');
+
+    const key = candidate.join(",");
     if (seenKeys.has(key)) continue;
 
-    // ═══ VALIDATION FILTERS ═══
-    // Sum range
     const sum = candidate.reduce((a, b) => a + b, 0);
     if (rules.idealSumRange) {
       const [lo, hi] = rules.idealSumRange;
@@ -707,44 +807,35 @@ export function generateNativeBets(
       if (sum < lo - margin || sum > hi + margin) continue;
     }
 
-    // Parity
-    const evens = candidate.filter(n => n % 2 === 0).length;
+    const evens = candidate.filter((n) => n % 2 === 0).length;
     if (rules.idealParityRange) {
       const [minP, maxP] = rules.idealParityRange;
       if (evens < minP - 1 || evens > maxP + 1) continue;
     }
 
-    // Consecutive sequences
     const mSeq = maxConsecutive(candidate);
     if (mSeq > (rules.maxRecommendedSequence || 3)) continue;
 
-    // Repeat from last draw
     if (lastDraw.length > 0) {
       const repeats = countRepeats(candidate, lastDraw);
       if (repeats < Math.max(0, minRepeat - 1) || repeats > maxRepeat + 1) continue;
     }
 
-    // Frame balance (Lotofácil)
-    if (config.id === 'lotofacil') {
-      const frameCount = candidate.filter(n => LOTOFACIL_FRAME.has(n)).length;
+    if (config.id === "lotofacil") {
+      const frameCount = candidate.filter((n) => LOTOFACIL_FRAME.has(n)).length;
       const idealFrame = rules.idealFrameRange || [8, 11];
       if (frameCount < idealFrame[0] - 1 || frameCount > idealFrame[1] + 1) continue;
     }
 
-    // Diversity from existing bets
-    const isDiverse = bets.every(b => {
-      const overlap = candidate.filter(n => b.includes(n)).length;
+    const isDiverse = bets.every((b) => {
+      const overlap = candidate.filter((n) => b.includes(n)).length;
       return config.pick - overlap >= Math.max(2, Math.floor(config.pick * 0.15));
     });
     if (!isDiverse) continue;
 
-    // ═══ SCORING (0-100) ═══
     let score = 0;
-
-    // Sum adherence (0-20)
     score += sumScore(candidate, config.id) * 20;
 
-    // Parity balance (0-15)
     if (rules.idealParityRange) {
       const [minP, maxP] = rules.idealParityRange;
       if (evens >= minP && evens <= maxP) score += 15;
@@ -753,48 +844,40 @@ export function generateNativeBets(
       score += (1 - Math.abs(evens / config.pick - 0.5) * 2) * 15;
     }
 
-    // Frequency bonus (0-15)
     const avgFreq = candidate.reduce((s, n) => s + (freq30[n] || 0), 0) / config.pick;
     score += Math.min(15, avgFreq * 1.5);
 
-    // Recent frequency (0-10)
     const avgRecent = candidate.reduce((s, n) => s + (freq10[n] || 0), 0) / config.pick;
     score += Math.min(10, avgRecent * 2.5);
 
-    // Markov alignment (0-10)
-    const markovCount = candidate.filter(n => markovSet.has(n)).length;
+    const markovCount = candidate.filter((n) => markovSet.has(n)).length;
     score += Math.min(10, (markovCount / config.pick) * 15);
 
-    // Co-occurrence boost (0-10)
     const coocBoost = cooccurrenceBoost(candidate, cooccMap);
     score += Math.min(10, coocBoost * 0.3);
 
-    // Cycle/overdue (0-5)
-    const overdueCount = candidate.filter(n => {
-      const s = stats.find(st => st.number === n);
-      return s && s.cycleScore > 1.2;
+    const overdueCount = candidate.filter((n) => {
+      const s = stats.find((st) => st.number === n);
+      return Boolean(s && s.cycleScore > 1.2);
     }).length;
     score += Math.min(5, overdueCount * 2);
 
-    // Consecutive penalty
     if (mSeq > 2) score -= (mSeq - 2) * 3;
 
-    // Repeat from last draw bonus (0-5)
     if (lastDraw.length > 0) {
       const repeats = countRepeats(candidate, lastDraw);
       if (repeats >= minRepeat && repeats <= maxRepeat) score += 5;
     }
 
-    // Frame bonus for Lotofácil (0-5)
-    if (config.id === 'lotofacil') {
+    if (config.id === "lotofacil") {
       score += (frameBalance(candidate, config.id) - 0.7) / 0.3 * 5;
     }
 
-    // Prime ratio (0-3)
     const pr = primeRatio(candidate);
     if (pr >= 0.2 && pr <= 0.5) score += 3;
 
     score = Math.max(0, Math.min(100, Math.round(score)));
+
     seenKeys.add(key);
     bets.push(candidate);
     scores.push(score);
@@ -803,18 +886,19 @@ export function generateNativeBets(
   const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
   const grade = avgScore >= 90 ? "S" : avgScore >= 80 ? "A" : avgScore >= 70 ? "B" : avgScore >= 60 ? "C" : "D";
 
-  // Build rich analysis text
-  const strategyNames = ['Conservadora', 'Equilibrada', 'Agressiva', 'Markov', 'Ciclos', 'Anti-Padrão', 'Cobertura', 'Momentum'];
+  const strategyNames = ["Conservadora", "Equilibrada", "Agressiva", "Markov", "Ciclos", "Anti-Padrão", "Cobertura", "Momentum"];
+  void strategyNames;
+
   let analysis = `⚡ **${bets.length} apostas** geradas pelo motor nativo v2.0\n`;
   analysis += `📊 Metodologia: Frequência + Markov + Ciclos + Co-ocorrência + Entropia\n\n`;
 
   bets.forEach((b, i) => {
     const profIdx = i % strategyProfiles.length;
-    const strat = strategyProfiles[profIdx]?.name || 'Mista';
+    const strat = strategyProfiles[profIdx]?.name || "Mista";
     const sum = b.reduce((a, c) => a + c, 0);
-    const evens = b.filter(n => n % 2 === 0).length;
+    const evens = b.filter((n) => n % 2 === 0).length;
     const repeats = lastDraw.length > 0 ? countRepeats(b, lastDraw) : 0;
-    const primes = b.filter(n => PRIMES.has(n)).length;
+    const primes = b.filter((n) => PRIMES.has(n)).length;
     analysis += `**Jogo ${i + 1}** (${strat}): Soma=${sum}, P=${evens}/I=${config.pick - evens}, Rep=${repeats}, Primos=${primes}, Score=${scores[i]}\n`;
   });
 
@@ -825,7 +909,13 @@ export function generateNativeBets(
 // NATIVE BET IMPROVEMENT v2.0
 // ═══════════════════════════════════════════
 export function generateNativeImprovements(
-  betsToImprove: { numbers: number[]; label?: string; avgHits?: number; bestHit?: number; prizeHits?: number }[],
+  betsToImprove: {
+    numbers: number[];
+    label?: string;
+    avgHits?: number;
+    bestHit?: number;
+    prizeHits?: number;
+  }[],
   stats: NumberStats[],
   config: LotteryConfig,
   draws: DrawResult[]
@@ -836,41 +926,47 @@ export function generateNativeImprovements(
 
   const freq10: Record<number, number> = {};
   for (const n of allNums) freq10[n] = 0;
-  draws.slice(0, 10).forEach(d => d.numbers.forEach(n => { freq10[n] = (freq10[n] || 0) + 1; }));
+  draws.slice(0, 10).forEach((d) => d.numbers.forEach((n) => {
+    freq10[n] = (freq10[n] || 0) + 1;
+  }));
 
   const markov = buildMarkovMatrix(draws.slice(0, 50), config.numbers);
   const lastDraw = draws[0]?.numbers || [];
   const markovSuccessors = getMarkovSuccessors(lastDraw, markov, 15);
-  const markovSet = new Set(markovSuccessors.map(m => m.number));
+  const markovSet = new Set(markovSuccessors.map((m) => m.number));
 
-  return betsToImprove.map(bet => {
+  return betsToImprove.map((bet) => {
     const nums = [...bet.numbers];
-    const statsMap = new Map(stats.map(s => [s.number, s]));
+    const statsMap = new Map(stats.map((s) => [s.number, s] as const));
 
-    // Score each number in bet
-    const scored = nums.map(n => {
-      const s = statsMap.get(n);
-      let score = (s?.frequency || 0) * 0.2 + (s?.recentFreq || 0) * 0.3 + (s?.cycleScore || 0) * 0.2 + (freq10[n] || 0) * 2;
-      if (markovSet.has(n)) score += 3;
-      if (s?.trend && s.trend > 0) score += s.trend * 2;
-      return { number: n, score };
-    }).sort((a, b) => a.score - b.score);
+    const scored = nums
+      .map((n) => {
+        const s = statsMap.get(n);
+        let score =
+          (s?.frequency || 0) * 0.2 +
+          (s?.recentFreq || 0) * 0.3 +
+          (s?.cycleScore || 0) * 0.2 +
+          (freq10[n] || 0) * 2;
+        if (markovSet.has(n)) score += 3;
+        if (s?.trend && s.trend > 0) score += s.trend * 2;
+        return { number: n, score };
+      })
+      .sort((a, b) => a.score - b.score);
 
     const replaceCount = Math.min(3, Math.max(1, Math.floor(nums.length * 0.15)));
-    const toRemove = scored.slice(0, replaceCount).map(s => s.number);
-    const remaining = nums.filter(n => !toRemove.includes(n));
+    const toRemove = scored.slice(0, replaceCount).map((s) => s.number);
+    const remaining = nums.filter((n) => !toRemove.includes(n));
 
-    // Find replacements considering balance
     const mid = config.numbers / 2;
-    const evenCount = remaining.filter(r => r % 2 === 0).length;
-    const highCount = remaining.filter(r => r > mid).length;
+    const evenCount = remaining.filter((r) => r % 2 === 0).length;
+    const highCount = remaining.filter((r) => r > mid).length;
     const idealEvens = rules.idealParityRange ? rules.idealParityRange[0] : Math.round(config.pick / 2);
     const needEven = idealEvens - evenCount;
     const needHigh = Math.round(config.pick / 2) - highCount;
 
     const candidates = allNums
-      .filter(n => !remaining.includes(n))
-      .map(n => {
+      .filter((n) => !remaining.includes(n))
+      .map((n) => {
         const s = statsMap.get(n);
         let score = (s?.frequency || 0) * 0.2 + (s?.recentFreq || 0) * 0.3 + (freq10[n] || 0) * 2;
         if (markovSet.has(n)) score += 5;
@@ -884,37 +980,40 @@ export function generateNativeImprovements(
       })
       .sort((a, b) => b.score - a.score);
 
-    const toAdd = candidates.slice(0, replaceCount).map(c => c.number);
+    const toAdd = candidates.slice(0, replaceCount).map((c) => c.number);
     const suggested = [...remaining, ...toAdd].sort((a, b) => a - b);
 
     const reasons: string[] = [];
-    toRemove.forEach(n => {
+
+    toRemove.forEach((n) => {
       const s = statsMap.get(n);
-      if (s && s.status === 'cold') reasons.push(`${String(n).padStart(2, '0')} (frio) removido`);
-      else if (s && s.trend && s.trend < 0) reasons.push(`${String(n).padStart(2, '0')} (queda) removido`);
+      if (s && s.status === "cold") reasons.push(`${String(n).padStart(2, "0")} (frio) removido`);
+      else if (s && s.trend && s.trend < 0) reasons.push(`${String(n).padStart(2, "0")} (queda) removido`);
     });
-    toAdd.forEach(n => {
-      if (markovSet.has(n)) reasons.push(`${String(n).padStart(2, '0')} adicionado (Markov)`);
+
+    toAdd.forEach((n) => {
+      if (markovSet.has(n)) reasons.push(`${String(n).padStart(2, "0")} adicionado (Markov)`);
       else {
         const s = statsMap.get(n);
-        if (s && s.status === 'hot') reasons.push(`${String(n).padStart(2, '0')} adicionado (quente)`);
-        else if (s && s.cycleScore && s.cycleScore > 1.2) reasons.push(`${String(n).padStart(2, '0')} adicionado (overdue)`);
+        if (s && s.status === "hot") reasons.push(`${String(n).padStart(2, "0")} adicionado (quente)`);
+        else if (s && s.cycleScore && s.cycleScore > 1.2) reasons.push(`${String(n).padStart(2, "0")} adicionado (overdue)`);
       }
     });
 
-    const oldSum = nums.reduce((a, b) => a + b, 0);
-    const newSum = suggested.reduce((a, b) => a + b, 0);
     const oldSumScore = sumScore(nums, config.id);
     const newSumScore = sumScore(suggested, config.id);
     const gain = Math.round((newSumScore - oldSumScore) * 100);
 
-    if (reasons.length === 0) reasons.push('Números estatisticamente fracos substituídos por candidatos mais fortes');
+    if (reasons.length === 0) {
+      reasons.push("Números estatisticamente fracos substituídos por candidatos mais fortes");
+    }
 
     return {
       original: bet.numbers,
       suggested,
-      reason: reasons.join('. ') + '.',
+      reason: reasons.join(". ") + ".",
       expectedGain: gain > 0 ? `+${gain}% soma otimizada` : "+10-20% estimado",
     };
   });
 }
+

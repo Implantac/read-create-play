@@ -137,6 +137,58 @@ function generateByStrategy(strategy: string, stats: StatInput[], config: Config
   }
 }
 
+// ─── Worker job/result typing (minimal, no runtime change) ───
+
+type MonteCarloJob = {
+  type: "run_monte_carlo";
+  stats: StatInput[];
+  config: ConfigInput;
+  draws: Array<{ concurso: number; date: string; numbers: number[] }>;
+  simConfig: {
+    iterations: number;
+    strategies: string[];
+    compareWithRandom?: boolean;
+  };
+};
+
+type MonteCarloProgress = {
+  type: "progress";
+  data: { completed: number; total: number; strategy: string };
+};
+
+type MonteCarloResult = {
+  type: "result";
+  data: {
+    totalIterations: number;
+    elapsedMs: number;
+    performances: Array<{
+      strategy: string;
+      label: string;
+      totalGames: number;
+      hitDistribution: Record<number, number>;
+      avgHits: number;
+      bestHit: number;
+      hitRate4Plus: number;
+      hitRate5Plus: number;
+      hitRateFull: number;
+      expectedValue: number;
+      consistency: number;
+    }>;
+    convergenceData: Array<{ iteration: number; avgHits: number; strategy: string }>;
+    yearlyProjection: Array<{
+      strategy: string;
+      gamesPerYear: number;
+      expectedHits4Plus: number;
+      expectedHits5Plus: number;
+      expectedFullHits: number;
+      roi: number;
+    }>;
+  };
+};
+
+type WorkerRunMCTypedMsg = { type: "run_monte_carlo"; job: MonteCarloJob };
+
+
 // ─── Simulation logic ───
 
 function countHits(bet: number[], draw: number[]): number {
@@ -171,10 +223,11 @@ const STRATEGY_LABELS: Record<string, string> = {
 };
 
 self.onmessage = (e: MessageEvent) => {
-  const { type, job } = e.data;
+  const { type, job } = e.data as WorkerRunMCTypedMsg;
 
   if (type === "run_monte_carlo") {
     const { stats, config, draws, simConfig } = job;
+
     const start = performance.now();
     const prizeMultipliers = getPrizeMultipliers(config.id, config.pick);
     const performances: any[] = [];

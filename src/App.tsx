@@ -40,7 +40,23 @@ const SuportePage = lazy(() => import("./pages/SuportePage"));
 const InstallPage = lazy(() => import("./pages/InstallPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 45_000,
+      gcTime: 15 * 60_000,
+      retry: 2,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
+      refetchOnMount: false,
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+});
+
+
 
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-[60vh]">

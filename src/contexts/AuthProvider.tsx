@@ -3,11 +3,16 @@ import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthContext, type AuthContextType, type PlanType, type Profile } from "./AuthContext";
 
-const FULL_ACCESS_EMAIL = "etcsuporte889@gmail.com";
+// SECURITY: fallback de acesso administrativo via RBAC.
+// O app anteriormente usava um FULL_ACCESS_EMAIL hardcoded.
+// Mantemos compatibilidade apenas como fallback (se ainda existir), mas a fonte de verdade passa a ser `user_roles`.
+const FULL_ACCESS_EMAIL_FALLBACK = import.meta.env.VITE_FULL_ACCESS_EMAIL_FALLBACK ?? "";
 
 function isFullAccessEmail(email?: string | null) {
-  return email?.toLowerCase() === FULL_ACCESS_EMAIL;
+  if (!FULL_ACCESS_EMAIL_FALLBACK) return false;
+  return email?.toLowerCase() === FULL_ACCESS_EMAIL_FALLBACK.toLowerCase();
 }
+
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
