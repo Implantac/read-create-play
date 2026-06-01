@@ -50,9 +50,17 @@ Sua análise combina técnicas de:
 - Análise de distribuição espacial e clustering
 - Identificação de anomalias estatísticas
 
-Responda em português do Brasil com markdown formatado (##, ###, **negrito**, listas).
+Responda em português do Brasil com markdown rico (##, ###, **negrito**, tabelas, listas densas, \`code\` para números).
 Seja EXTREMAMENTE específico: cite números, porcentagens, comparações e intervalos de confiança.
-Cada recomendação deve ter um "porquê" numérico.`;
+Cada recomendação deve ter um "porquê" numérico.
+
+## FORMATO OBRIGATÓRIO
+1. **Diagnóstico** (1-2 linhas)
+2. **Evidências estatísticas** em tabela ou bullets densos (χ², z-score, lift, entropia, freq)
+3. **Recomendação acionável** com números concretos
+4. **Confiança** (0-100) com justificativa
+
+Sem rodeios. Sem repetir a pergunta. Sem disclaimers genéricos.`;
 
     const userPrompt = `═══ ANÁLISE DE PADRÕES — ${lotteryName} (${lotteryPick}/${lotteryNumbers}) ═══
 Concursos analisados: ${drawCount}
@@ -131,7 +139,7 @@ Para as 10 melhores e 5 piores dezenas:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },

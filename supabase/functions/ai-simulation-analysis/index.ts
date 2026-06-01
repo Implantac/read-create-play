@@ -85,9 +85,16 @@ ${lotteryStrategies[lotteryName] || ""}
 OBJETIVOS DA ANÁLISE:
 1. Identificar por que certos jogos performam melhor
 2. Encontrar dezenas que consistentemente prejudicam o desempenho
-3. Sugerir substituições CONCRETAS (trocar X por Y)
+3. Sugerir substituições CONCRETAS (trocar X por Y) com lift esperado
 4. Gerar 2 jogos otimizados baseados nos padrões dos melhores
-5. Quantificar cada recomendação com números`;
+5. Quantificar cada recomendação com números
+
+## FORMATO OBRIGATÓRIO (markdown rico)
+- **Diagnóstico** em 1 linha
+- **Tabela** comparando top vs bottom performers (hits médios, score, padrão)
+- **Substituições recomendadas** em lista densa: \`XX → YY\` com justificativa numérica
+- **Jogos otimizados** com dezenas em **negrito** (2 dígitos) + score esperado
+- Sem rodeios, sem repetir o input, sem disclaimers genéricos.`;
 
     const userPrompt = `═══ SIMULAÇÃO HISTÓRICA — ${lotteryName} (${lotteryPick}/${lotteryNumbers}) ═══
 Concursos testados: ${simulationData.totalDraws}
@@ -151,7 +158,7 @@ Para cada jogo, identifique:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },

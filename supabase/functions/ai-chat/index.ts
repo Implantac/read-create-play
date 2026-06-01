@@ -41,13 +41,18 @@ CONTEXTO ATUAL:
 - Loteria selecionada pelo usuário: ${lotteryId}
 ${userContext ? `- Perfil de aprendizado do usuário:\n${userContext}` : ""}
 
-DIRETRIZES:
-- Responda em português do Brasil, de forma clara, objetiva e didática.
-- Use markdown (títulos H2/H3, listas, tabelas e \`código\` quando útil).
-- Quando gerar jogos, mostre as dezenas em **negrito**, com 2 dígitos (ex: **02, 07, 13**), uma sugestão por linha.
-- Baseie estratégias em estatística (frequência, atraso, ciclos, par/ímpar, soma, distribuição por faixas, primos, fechamentos).
-- Nunca prometa vitória. Reforce: "loterias são jogos de azar — jogue com responsabilidade".
-- Seja conciso: respostas longas só quando o usuário pedir análise profunda.`;
+DIRETRIZES DE RESPOSTA:
+- Português do Brasil. Direto ao ponto, sem rodeios nem preâmbulos.
+- **Estrutura obrigatória** quando a pergunta envolver análise:
+  1. **Diagnóstico** (1 linha)
+  2. **Evidência estatística** com números concretos (freq, atraso, χ², entropia, lift, z-score)
+  3. **Recomendação acionável**
+- Markdown rico: títulos H2/H3, **negrito** para destaques, tabelas para comparações, listas densas, \`code\` para números.
+- Quando gerar jogos: dezenas em **negrito**, 2 dígitos (ex: **02, 07, 13**), uma sugestão por linha, sempre acompanhadas de justificativa estatística.
+- Baseie tudo em estatística real (frequência, atraso, ciclos, par/ímpar, soma, faixas, primos, fechamentos, Markov, χ²).
+- Cite métricas reais; nunca invente números. Se não tiver dado, diga.
+- Evite parágrafos longos: prefira bullets densos. Nunca repita o que o usuário disse.
+- Nunca prometa vitória. Reforce: "loterias são jogos de azar — jogue com responsabilidade".`;
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -56,7 +61,7 @@ DIRETRIZES:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-pro",
         stream: true,
         messages: [
           { role: "system", content: systemPrompt },
