@@ -28,15 +28,12 @@ export function forbidden(message = "Forbidden") {
   });
 }
 
-const FULL_ACCESS_EMAILS = new Set(["etcsuporte889@gmail.com"]);
-
-function isFullAccessEmail(email: string | null) {
-  return email ? FULL_ACCESS_EMAILS.has(email.toLowerCase()) : false;
-}
-
 /**
  * Verifies the JWT from the request and optionally checks plan/admin gating.
  * Returns a Response on failure (caller should return it directly) or AuthResult on success.
+ *
+ * Privileged status (admin/super_admin) and plan MUST come from the database
+ * (user_roles + profiles). No hardcoded e-mails / backdoors.
  */
 export async function requireUserAuth(
   req: Request,
@@ -57,19 +54,18 @@ export async function requireUserAuth(
 
   const userId = userData.user.id;
   const email = userData.user.email ?? null;
-  const isFullAccessUser = isFullAccessEmail(email);
 
   const [{ data: profile }, { data: roles }] = await Promise.all([
     supabase.from("profiles").select("plan, blocked").eq("id", userId).maybeSingle(),
     supabase.from("user_roles").select("role").eq("user_id", userId),
   ]);
 
-  if (profile?.blocked && !isFullAccessUser) return forbidden("Account suspended");
+  if (profile?.blocked) return forbidden("Account suspended");
 
   const roleList = (roles ?? []).map((r: any) => r.role as string);
-  const isSuperAdmin = isFullAccessUser || roleList.includes("super_admin");
-  const isAdmin = isFullAccessUser || roleList.includes("admin") || isSuperAdmin;
-  const plan = isFullAccessUser ? "lifetime" : profile?.plan ?? "free";
+  const isSuperAdmin = roleList.includes("super_admin");
+  const isAdmin = roleList.includes("admin") || isSuperAdmin;
+  const plan = profile?.plan ?? "free";
 
   if (opts.requireAdmin && !isAdmin) return forbidden("Admin only");
 
