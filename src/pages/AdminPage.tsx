@@ -75,7 +75,7 @@ const ROLE_COLORS: Record<string, string> = {
   user: "bg-muted text-muted-foreground border-border",
 };
 
-const FULL_ACCESS_EMAIL = "etcsuporte889@gmail.com";
+
 
 export default function AdminPage() {
   const { user, isSuperAdmin } = useAuth();
@@ -141,7 +141,10 @@ export default function AdminPage() {
   };
 
   const isFullAccessProfile = (profile?: Profile | null): boolean => {
-    return profile?.email?.toLowerCase() === FULL_ACCESS_EMAIL;
+    // Privileged status is derived from user_roles only.
+    if (!profile?.id) return false;
+    const role = roles.find(r => r.user_id === profile.id)?.role;
+    return role === "super_admin";
   };
 
   const updatePlan = async (userId: string, newPlan: string) => {

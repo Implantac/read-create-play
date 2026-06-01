@@ -10,7 +10,9 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const auth = await requireUserAuth(req);
+    const auth = await requireUserAuth(req, {
+      allowedPlans: ["premium", "professional", "lifetime"],
+    });
     if (auth instanceof Response) return auth;
 
     const body = await req.json().catch(() => ({}));

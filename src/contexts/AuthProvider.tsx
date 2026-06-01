@@ -3,12 +3,6 @@ import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthContext, type AuthContextType, type PlanType, type Profile } from "./AuthContext";
 
-const FULL_ACCESS_EMAIL = "etcsuporte889@gmail.com";
-
-function isFullAccessEmail(email?: string | null) {
-  return email?.toLowerCase() === FULL_ACCESS_EMAIL;
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -17,30 +11,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [userRole, setUserRole] = useState<string>("user");
 
-  const fetchProfile = async (userId: string, email?: string | null) => {
+  const fetchProfile = async (userId: string, _email?: string | null) => {
     const { data } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", userId)
       .single();
 
-    if (data) {
-      setProfile(
-        isFullAccessEmail(email)
-          ? ({ ...(data as Profile), plan: "lifetime", blocked: false } satisfies Profile)
-          : (data as Profile)
-      );
-    }
+    if (data) setProfile(data as Profile);
   };
 
-  const checkAdmin = async (userId: string, email?: string | null) => {
-    if (isFullAccessEmail(email)) {
-      setIsAdmin(true);
-      setIsSuperAdmin(true);
-      setUserRole("super_admin");
-      return;
-    }
-
+  const checkAdmin = async (userId: string, _email?: string | null) => {
+    // Privileged status is sourced exclusively from the user_roles table.
     const { data } = await supabase
       .from("user_roles")
       .select("role")
