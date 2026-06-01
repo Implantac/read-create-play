@@ -80,7 +80,14 @@ REGRAS:
 - Identifique padrões recorrentes nas melhores combinações
 - Sugira 3 combinações otimizadas com justificativa número a número
 - Compare os padrões encontrados com as distribuições ideais para ${lotteryName}
-- Dê um score de confiança (0-100) com fundamentação`;
+- Dê um score de confiança (0-100) com fundamentação
+
+## FORMATO OBRIGATÓRIO (markdown rico)
+- **Diagnóstico** em 1-2 linhas
+- **Tabela comparativa** top vs bottom (freq, soma, par/ímpar, faixas)
+- **3 jogos otimizados** com dezenas em **negrito** (2 dígitos) + score esperado + justificativa numérica por dezena
+- **Confiança final** (0-100) com fundamentação estatística (χ², entropia, lift)
+- Direto ao ponto. Sem rodeios. Sem disclaimers genéricos.`;
 
     const gamesReport = topGames.slice(0, 20).map((g: any, i: number) => {
       const nums = (g.numbers || []).join(",");
