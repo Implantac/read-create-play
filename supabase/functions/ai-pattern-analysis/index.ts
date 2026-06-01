@@ -60,7 +60,7 @@ Cada recomendação deve ter um "porquê" numérico.
 3. **Recomendação acionável** com números concretos
 4. **Confiança** (0-100) com justificativa
 
-Sem rodeios. Sem repetir a pergunta. Sem disclaimers genéricos.\`;
+Sem rodeios. Sem repetir a pergunta. Sem disclaimers genéricos.`;
 
     const userPrompt = `═══ ANÁLISE DE PADRÕES — ${lotteryName} (${lotteryPick}/${lotteryNumbers}) ═══
 Concursos analisados: ${drawCount}
