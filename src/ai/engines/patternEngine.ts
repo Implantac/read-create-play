@@ -15,6 +15,7 @@ export interface PatternProfile {
   frameCenterBalance: number;  // 0-1 (Lotofácil)
   repeatScore: number;         // 0-1 how well repeat matches historical avg
   dispersalScore: number;      // 0-1 how spread out numbers are
+  decadeBalance: number;       // 0-1 spread across decades (avoid all-same-decade)
   overallScore: number;        // weighted composite
 }
 
@@ -93,21 +94,38 @@ export function computePatternProfile(
   const idealGap = (rules.totalNumbers - 1) / (rules.pick - 1);
   const dispersalScore = Math.max(0, 1 - Math.abs(avgGap - idealGap) / idealGap);
 
+  // Decade balance — spread across decades (1-10, 11-20, ...). Penalize concentration.
+  const decadeBuckets = Math.max(2, Math.ceil(rules.totalNumbers / 10));
+  const decadeCounts = new Array(decadeBuckets).fill(0);
+  for (const n of sorted) {
+    const idx = Math.min(Math.floor((n - 1) / 10), decadeBuckets - 1);
+    decadeCounts[idx]++;
+  }
+  const usedDecades = decadeCounts.filter(c => c > 0).length;
+  const idealDecades = Math.min(decadeBuckets, Math.max(2, Math.ceil(rules.pick / 3)));
+  const maxInOneDecade = Math.max(...decadeCounts);
+  const concentrationPenalty = maxInOneDecade > Math.ceil(rules.pick * 0.6) ? 0.5 : 1;
+  const decadeBalance = Math.max(
+    0,
+    Math.min(1, (usedDecades / idealDecades) * concentrationPenalty),
+  );
+
   const overallScore = (
-    parityBalance * 0.15 +
-    sumProximity * 0.15 +
-    sequencePenalty * 0.15 +
-    rowBalance * 0.10 +
-    colBalance * 0.10 +
-    frameCenterBalance * 0.10 +
+    parityBalance * 0.14 +
+    sumProximity * 0.16 +
+    sequencePenalty * 0.13 +
+    rowBalance * 0.09 +
+    colBalance * 0.09 +
+    frameCenterBalance * 0.09 +
     repeatScore * 0.10 +
-    dispersalScore * 0.15
+    dispersalScore * 0.10 +
+    decadeBalance * 0.10
   );
 
   return {
     parityBalance, sumProximity, sequencePenalty,
     rowBalance, colBalance, frameCenterBalance,
-    repeatScore, dispersalScore, overallScore,
+    repeatScore, dispersalScore, decadeBalance, overallScore,
   };
 }
 

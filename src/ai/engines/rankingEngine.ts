@@ -34,7 +34,9 @@ export function scoreGame(
   // Structural score: pattern profile
   const structScore = Math.round(pattern.overallScore * 100);
 
-  // Coverage score: backtesting
+  // Coverage score: lift observado vs esperado nos últimos 30 sorteios.
+  // Lift = média de acertos / acertos esperados pela hipótese de uniformidade.
+  // Lift = 1.0 → uniforme (50 pts); >1.0 boost; <1.0 penalidade.
   const recent = draws.slice(0, 30);
   const gameSet = new Set(sorted);
   let totalHits = 0;
@@ -42,26 +44,33 @@ export function scoreGame(
     totalHits += d.numbers.filter(n => gameSet.has(n)).length;
   }
   const avgHits = recent.length > 0 ? totalHits / recent.length : 0;
-  const expectedHits = rules.pick * sorted.length / rules.totalNumbers;
-  const coverageScore = Math.min(100, Math.round((avgHits / expectedHits) * 100));
+  const expectedHits = (rules.pick * sorted.length) / rules.totalNumbers;
+  const lift = expectedHits > 0 ? avgHits / expectedHits : 1;
+  // Mapeia lift∈[0.5,1.5] → score∈[0,100], com 1.0 = 50.
+  const coverageScore = Math.max(0, Math.min(100, Math.round(50 + (lift - 1) * 100)));
 
   // Diversity score: how different from average
   const avgFreq = selectedStats.reduce((s, st) => s + st.frequency, 0) / selectedStats.length;
   const freqVariance = selectedStats.reduce((s, st) => s + (st.frequency - avgFreq) ** 2, 0) / selectedStats.length;
   const diversityScore = Math.min(100, Math.round(Math.sqrt(freqVariance) * riskConfig.diversityWeight * 5));
 
-  // Strategy fit
+  // Strategy fit — agora inclui repeatScore (alinhamento histórico) e decadeBalance (variedade).
   const strategyFit = Math.round(
-    (pattern.parityBalance * 20 +
-    pattern.sumProximity * 20 +
-    pattern.sequencePenalty * riskConfig.sequencePenalty * 15 +
-    pattern.dispersalScore * 15 +
-    (statScore / 100) * 30) 
+    pattern.parityBalance * 15 +
+    pattern.sumProximity * 18 +
+    pattern.sequencePenalty * riskConfig.sequencePenalty * 12 +
+    pattern.dispersalScore * 12 +
+    pattern.repeatScore * 10 +
+    pattern.decadeBalance * 8 +
+    (statScore / 100) * 25
   );
 
-  // Probability score (simplified)
+  // Probability score — inclui equilíbrio par/ímpar, soma, dispersão e décadas.
   const probScore = Math.round(
-    (pattern.sumProximity * 30 + pattern.parityBalance * 30 + pattern.dispersalScore * 40)
+    pattern.sumProximity * 25 +
+    pattern.parityBalance * 25 +
+    pattern.dispersalScore * 25 +
+    pattern.decadeBalance * 25
   );
 
   const w = AI_CONFIG.scoringWeights;
@@ -113,6 +122,11 @@ function buildExplanation(
 
   if (pattern.dispersalScore >= 0.7) lines.push("✅ Boa dispersão numérica");
   else lines.push("⚠️ Números concentrados em uma faixa");
+
+  if (pattern.decadeBalance >= 0.7) lines.push("✅ Variedade adequada entre as dezenas");
+  else lines.push("⚠️ Dezenas concentradas em poucas décadas");
+
+  if (pattern.repeatScore >= 0.7) lines.push("✅ Repetição vs sorteio anterior dentro da faixa histórica");
 
   if (lotteryId === "lotofacil" && pattern.frameCenterBalance >= 0.8)
     lines.push("✅ Equilíbrio moldura/centro adequado");
