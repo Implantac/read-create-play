@@ -33,12 +33,23 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
   const pool = buildWeightedPool(config.stats, strategy.filters, config.filters);
   const rng = config.rng;
 
+  // Pré-computações p/ rejeição rápida
+  const [sumLo, sumHi] = rules.idealSumRange;
+  const sumSlack = (sumHi - sumLo) * 0.25; // tolera 25% além da faixa ideal
+  const [parityLo, parityHi] = rules.idealParityRange;
+  const [repLo, repHi] = rules.avgRepeatFromPrevious;
+  const prevSet = prevDraw ? new Set(prevDraw) : null;
+  // assinaturas dos últimos sorteios (evita reproduzir resultado já saído)
+  const recentSignatures = new Set(
+    config.draws.slice(0, 50).map(d => [...d.numbers].sort((a, b) => a - b).join(",")),
+  );
+
   // Generate candidates (10x requested count for filtering)
   const candidateCount = Math.max(config.count * 20, 500);
 
   const candidates: number[][] = [];
 
-  for (let attempt = 0; attempt < candidateCount * 3 && candidates.length < candidateCount; attempt++) {
+  for (let attempt = 0; attempt < candidateCount * 4 && candidates.length < candidateCount; attempt++) {
     const game = weightedSample(pool, rules.pick, rng);
 
 
@@ -54,12 +65,37 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
       if (game.some(n => config.filters.excludeNumbers!.includes(n))) continue;
     }
 
+    // Rejeição rápida por soma fora da faixa histórica (com slack)
+    const gameSum = game.reduce((a, b) => a + b, 0);
+    if (gameSum < sumLo - sumSlack || gameSum > sumHi + sumSlack) continue;
+
+    // Rejeição rápida por paridade extrema
+    const evenCount = game.filter(n => n % 2 === 0).length;
+    if (evenCount < Math.max(0, parityLo - 1) || evenCount > Math.min(rules.pick, parityHi + 1)) continue;
+
+    // Repetição vs sorteio anterior fora da faixa histórica
+    if (prevSet) {
+      let rep = 0;
+      for (const n of game) if (prevSet.has(n)) rep++;
+      if (rep < Math.max(0, repLo - 1) || rep > Math.min(rules.pick, repHi + 1)) continue;
+    }
+
+    // Rejeita combinações já sorteadas recentemente
+    if (recentSignatures.has(game.join(","))) continue;
+
+    // Rejeita concentração extrema numa única dezena (>60% em uma década)
+    const decadeBuckets = Math.max(2, Math.ceil(rules.totalNumbers / 10));
+    const decadeCounts = new Array(decadeBuckets).fill(0);
+    for (const n of game) decadeCounts[Math.min(Math.floor((n - 1) / 10), decadeBuckets - 1)]++;
+    if (Math.max(...decadeCounts) > Math.ceil(rules.pick * 0.6)) continue;
+
     const pattern = computePatternProfile(game, config.lotteryId, prevDraw);
 
     // Apply filters
     if (config.filters.balanceParity && pattern.parityBalance < 0.5) continue;
     if (config.filters.avoidSequences && pattern.sequencePenalty < 0.5) continue;
     if (pattern.sumProximity < 0.3) continue; // always filter extreme sums
+    if (pattern.decadeBalance < 0.35) continue; // exige variedade de décadas
 
     candidates.push(game);
   }
