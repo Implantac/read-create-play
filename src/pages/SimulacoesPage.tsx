@@ -14,6 +14,7 @@ const IntelligentSimulatorPanel = lazy(() => import("@/components/IntelligentSim
 const MassiveSimulatorPanel = lazy(() => import("@/components/MassiveSimulatorPanel").then(m => ({ default: m.MassiveSimulatorPanel })));
 const GameSimulator = lazy(() => import("@/components/GameSimulator").then(m => ({ default: m.GameSimulator })));
 const BacktestPanel = lazy(() => import("@/components/BacktestPanel").then(m => ({ default: m.BacktestPanel })));
+const BaselineBenchmarkPanel = lazy(() => import("@/components/BaselineBenchmarkPanel").then(m => ({ default: m.BaselineBenchmarkPanel })));
 
 const LazyFallback = () => (
   <div className="flex items-center justify-center py-8 text-muted-foreground">
@@ -41,6 +42,10 @@ const SimulacoesPage = () => {
         <PlanGate feature="simulacoes" fallbackMessage="Simulações avançadas — disponível nos planos Premium e superiores">
           <>
             <ComparativeSimulatorPanel stats={stats} config={config} draws={draws} />
+
+            <Suspense fallback={<LazyFallback />}>
+              <BaselineBenchmarkPanel stats={stats} config={config} draws={draws} />
+            </Suspense>
 
             <Suspense fallback={<LazyFallback />}>
               <HistoricalSimulatorPanel config={config} draws={draws} stats={stats} />
