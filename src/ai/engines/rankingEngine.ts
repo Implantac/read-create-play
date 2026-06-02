@@ -123,6 +123,11 @@ function buildExplanation(
   if (pattern.dispersalScore >= 0.7) lines.push("✅ Boa dispersão numérica");
   else lines.push("⚠️ Números concentrados em uma faixa");
 
+  if (pattern.decadeBalance >= 0.7) lines.push("✅ Variedade adequada entre as dezenas");
+  else lines.push("⚠️ Dezenas concentradas em poucas décadas");
+
+  if (pattern.repeatScore >= 0.7) lines.push("✅ Repetição vs sorteio anterior dentro da faixa histórica");
+
   if (lotteryId === "lotofacil" && pattern.frameCenterBalance >= 0.8)
     lines.push("✅ Equilíbrio moldura/centro adequado");
 
