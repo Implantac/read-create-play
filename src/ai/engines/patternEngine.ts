@@ -15,6 +15,7 @@ export interface PatternProfile {
   frameCenterBalance: number;  // 0-1 (Lotofácil)
   repeatScore: number;         // 0-1 how well repeat matches historical avg
   dispersalScore: number;      // 0-1 how spread out numbers are
+  decadeBalance: number;       // 0-1 spread across decades (avoid all-same-decade)
   overallScore: number;        // weighted composite
 }
 
