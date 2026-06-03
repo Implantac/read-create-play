@@ -112,17 +112,18 @@ const lifetimePlan = {
   originalPrice: LAUNCH_ORIGINAL,
   period: " pagamento único",
   features: [
-    "Acesso vitalício a todas as funcionalidades",
-    "Todas as 8 loterias suportadas",
-    "IA, Machine Learning e Motor HP exclusivo",
-    "Gerador profissional + Otimizador combinatorial",
-    "Backtesting e simulação massiva ilimitados",
-    "Todas as atualizações futuras incluídas",
-    "Suporte prioritário VIP",
-    "Sem mensalidades — pague uma vez e use para sempre",
+    "Tudo destravado. Para sempre. Sem upsell, sem trava, sem pegadinha.",
+    "8 loterias completas: Mega, Lotofácil, Quina, Lotomania, Dupla, Timemania, Dia de Sorte e Super Sete",
+    "IA + Machine Learning + Motor HP — exclusivos do Titan",
+    "Gerador profissional, otimizador combinatorial e fechamentos garantidos",
+    "Backtesting e simulação massiva ilimitados (1M+ jogos)",
+    "Todas as atualizações futuras grátis — para sempre",
+    "Suporte VIP no WhatsApp com resposta em minutos",
+    "Garantia incondicional de 7 dias: não gostou, devolvemos 100%",
   ],
-  cta: "Garantir Acesso Vitalício",
+  cta: "QUERO MINHA VAGA AGORA",
 };
+
 
 export default function LandingPage() {
   const navigate = useNavigate();
