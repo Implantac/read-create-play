@@ -1,7 +1,7 @@
 import {
   BarChart3, Sparkles, FlaskConical, History, Zap, Grid3X3,
   Brain, ShieldCheck, Crown, PieChart, TrendingUp, ClipboardCheck, Bot, Lock,
-  Smartphone, MessageCircle, Star, Search, User,
+  Smartphone, MessageCircle, Star, Search, User, FileSpreadsheet,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { usePlanAccess, type Feature } from "@/hooks/usePlanAccess";
@@ -47,6 +47,7 @@ const workflowGroups: { label: string; items: { title: string; url: string; icon
     label: "Otimização Combinatorial",
     items: [
       { title: "Otimizador de Matrizes", url: "/gerador", icon: Sparkles, tooltip: "Geração de matrizes otimizadas com algoritmos de elite." },
+      { title: "Planilhas Matriz", url: "/planilhas-matriz", icon: FileSpreadsheet, requiredFeature: "fechamentos", tooltip: "Modelos tipo planilha Farol: 21x50, 19x5, 17x8, 13x6 e conferidor." },
       { title: "Fechamentos HP", url: "/fechamentos", icon: Grid3X3, requiredFeature: "fechamentos", tooltip: "Fechamentos de alta performance com garantia matemática." },
       { title: "IA Autônoma v4", url: "/ia-autonoma", icon: Zap, requiredFeature: "ia_autonoma", tooltip: "Sistema neural autônomo para detecção de anomalias." },
     ],

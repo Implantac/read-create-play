@@ -34,6 +34,7 @@ const JogosSalvosPage = lazy(() => import("@/pages/JogosSalvosPage"));
 const FechamentosPage = lazy(() => import("@/pages/FechamentosPage"));
 const StrategyLabPage = lazy(() => import("@/pages/StrategyLabPage"));
 const MatrizAnalisePage = lazy(() => import("@/pages/MatrizAnalisePage"));
+const PlanilhasMatrizPage = lazy(() => import("@/pages/PlanilhasMatrizPage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage"));
 const SuportePage = lazy(() => import("./pages/SuportePage"));
@@ -101,6 +102,7 @@ function App() {
                 <Route path="/ai-chat" element={<AIChatPage />} />
                 <Route path="/estatisticas" element={<EstatisticasPage />} />
                 <Route path="/matriz" element={<MatrizAnalisePage />} />
+                <Route path="/planilhas-matriz" element={<PlanilhasMatrizPage />} />
                 <Route path="/fechamentos" element={<FechamentosPage />} />
                 <Route path="/historico" element={<HistoricoPage />} />
                 <Route path="/roi" element={<ROIDashboardPage />} />
