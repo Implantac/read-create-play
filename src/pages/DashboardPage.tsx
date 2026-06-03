@@ -75,6 +75,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TitanScoreBadge } from "@/components/TitanScoreBadge";
 import { evaluateBetQuality } from "@/engine/bet-quality";
 import { StrategyBriefingPanel } from "@/components/StrategyBriefingPanel";
+import { BettingBudgetPlanner } from "@/components/BettingBudgetPlanner";
 
 const container = {
   hidden: { opacity: 0 },
@@ -158,7 +159,10 @@ const DashboardPage = () => {
       <LotteryContextBanner />
 
       {draws.length > 0 && (
-        <StrategyBriefingPanel config={config} stats={stats} draws={draws} />
+        <div className="grid xl:grid-cols-[1.1fr_0.9fr] gap-6">
+          <StrategyBriefingPanel config={config} stats={stats} draws={draws} />
+          <BettingBudgetPlanner config={config} stats={stats} draws={draws} compact />
+        </div>
       )}
       
       <TitanCommandCenter />

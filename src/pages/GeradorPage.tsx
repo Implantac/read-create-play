@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { ComplianceDisclaimer } from "@/components/ComplianceDisclaimer";
 import { StrategyBriefingPanel } from "@/components/StrategyBriefingPanel";
+import { BettingBudgetPlanner } from "@/components/BettingBudgetPlanner";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { Sparkles, Loader2 } from "lucide-react";
 
@@ -54,6 +55,8 @@ const GeradorPage = () => {
       ) : (
         <>
           <StrategyBriefingPanel config={config} stats={stats} draws={draws} compact />
+
+          <BettingBudgetPlanner config={config} stats={stats} draws={draws} />
 
           {/* FREE: Basic generator + number picker + saved bets + bet checker */}
           <BetGenerator stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
