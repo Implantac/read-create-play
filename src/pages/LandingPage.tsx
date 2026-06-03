@@ -485,14 +485,13 @@ export default function LandingPage() {
               Promoção de Lançamento • Vagas Limitadas
             </div>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
-              Acesso{" "}
-              <span className="gradient-brand-text">vitalício</span> por
-              <br className="hidden md:block" /> pagamento único
+              Pague <span className="gradient-brand-text">UMA vez</span>.
+              <br className="hidden md:block" /> Use para <span className="gradient-brand-text">SEMPRE</span>.
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto text-base md:text-lg">
-              Sem mensalidades. Sem renovação. Sem letras miúdas.
-              <br />Garanta o Titan Loterias <span className="text-foreground font-semibold">para sempre</span> pelo preço de lançamento.
+              Enquanto os concorrentes cobram R$ 97/mês (R$ 1.164/ano), você trava o Titan completo por menos de <span className="text-foreground font-semibold">3 mensalidades</span> — e nunca mais paga nada.
             </p>
+
           </motion.div>
 
           <motion.div
