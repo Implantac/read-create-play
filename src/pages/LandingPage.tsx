@@ -249,7 +249,7 @@ export default function LandingPage() {
                   className="rounded-md"
                 >
                   <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-8 h-12 w-full">
-                    Começar Grátis <ChevronRight className="w-4 h-4" />
+                    Garantir Acesso Vitalício <ChevronRight className="w-4 h-4" />
                   </Button>
                 </motion.div>
               <Link to="/login">
