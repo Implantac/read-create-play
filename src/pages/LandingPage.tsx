@@ -355,18 +355,19 @@ export default function LandingPage() {
             className="text-center mb-14"
           >
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              Como funciona
+              De curioso a jogador estratégico em <span className="gradient-brand-text">3 minutos</span>
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Em 3 passos simples, comece a usar o poder da análise estatística.
+              Sem planilha, sem manual de 200 páginas. Você abre, escolhe a loteria e a inteligência trabalha por você.
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {[
-              { step: "01", icon: Database, title: "Data Ingestion", desc: "Integração via API com sincronização atômica de todos os sorteios históricos." },
-              { step: "02", icon: Brain, title: "Neural Analysis", desc: "Modelos proprietários identificam anomalias estatísticas e padrões de retenção." },
-              { step: "03", icon: Target, title: "Optimal Outputs", desc: "Entrega de matrizes otimizadas baseadas em filtros de alta probabilidade real." },
+              { step: "01", icon: Database, title: "Conecte-se aos dados", desc: "Em 1 clique, você acessa 10.000+ sorteios oficiais da Caixa, atualizados em tempo real." },
+              { step: "02", icon: Brain, title: "A IA faz o trabalho pesado", desc: "Redes neurais e algoritmos quantitativos varrem milhões de combinações enquanto você toma um café." },
+              { step: "03", icon: Target, title: "Receba jogos otimizados", desc: "Apostas filtradas por probabilidade real, paridade e dispersão. Você só joga — sem achismo." },
+
             ].map((item, i) => (
               <motion.div
                 key={item.step}
