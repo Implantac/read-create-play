@@ -461,230 +461,118 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing */}
-      <section className="py-20 md:py-28">
-        <div className="container mx-auto px-4">
+      {/* Pricing — Launch Promo: Lifetime Only */}
+      <section className="py-20 md:py-28 relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-neon-amber/5 rounded-full blur-[140px] pointer-events-none" />
+        <div className="container mx-auto px-4 relative">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-14"
+            className="text-center mb-12"
           >
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              Planos para cada{" "}
-              <span className="gradient-brand-text">jogador</span>
-            </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto mb-6">
-              Comece grátis e evolua quando quiser. Sem surpresas.
-            </p>
-            <div className="inline-flex items-center gap-3 bg-muted/50 rounded-full p-1 border border-border/50">
-              <button
-                onClick={() => setBillingCycle("monthly")}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-                  billingCycle === "monthly"
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Mensal
-              </button>
-              <button
-                onClick={() => setBillingCycle("annual")}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 ${
-                  billingCycle === "annual"
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Anual
-                <span className="px-1.5 py-0.5 rounded-full bg-neon-green/20 text-neon-green text-[10px] font-bold">
-                  -20%
-                </span>
-              </button>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-neon-amber/10 border border-neon-amber/30 text-neon-amber text-xs font-mono font-bold tracking-widest uppercase mb-5 animate-pulse-glow">
+              <Sparkles className="w-3.5 h-3.5" />
+              Promoção de Lançamento • Vagas Limitadas
             </div>
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
+              Acesso{" "}
+              <span className="gradient-brand-text">vitalício</span> por
+              <br className="hidden md:block" /> pagamento único
+            </h2>
+            <p className="text-muted-foreground max-w-xl mx-auto text-base md:text-lg">
+              Sem mensalidades. Sem renovação. Sem letras miúdas.
+              <br />Garanta o Titan Loterias <span className="text-foreground font-semibold">para sempre</span> pelo preço de lançamento.
+            </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-            {plans.map((plan, i) => {
-              const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                const rotateX = ((y - centerY) / centerY) * -10;
-                const rotateY = ((x - centerX) / centerX) * 10;
-                e.currentTarget.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03,1.03,1.03)`;
-                // Update glow overlay position
-                const glowEl = e.currentTarget.querySelector('[data-glow]') as HTMLElement;
-                if (glowEl) {
-                  glowEl.style.opacity = '1';
-                  glowEl.style.background = `radial-gradient(250px circle at ${x}px ${y}px, hsl(var(--primary) / 0.15), transparent 70%)`;
-                }
-              };
-              const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-                e.currentTarget.style.transform = `perspective(600px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)`;
-                const glowEl = e.currentTarget.querySelector('[data-glow]') as HTMLElement;
-                if (glowEl) {
-                  glowEl.style.opacity = '0';
-                }
-              };
-              return (
-              <motion.div
-                key={plan.name}
-                initial={{ opacity: 0, x: i % 2 === 0 ? -60 : 60, rotateY: i % 2 === 0 ? 12 : -12, scale: 0.9 }}
-                whileInView={{ opacity: 1, x: 0, rotateY: 0, scale: 1 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ delay: i * 0.15, duration: 0.6, type: "spring", stiffness: 80, damping: 15 }}
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
-                style={{ transition: "transform 0.15s ease-out", transformStyle: "preserve-3d" }}
-                className={`rounded-xl p-6 border relative overflow-hidden group/card ${
-                  plan.highlight
-                    ? "glass-card border-primary/30 glow-green"
-                    : (plan as any).isLifetime
-                    ? "glass-card border-neon-amber/30 shadow-lg shadow-neon-amber/5"
-                    : "glass-card border-border/30"
-                }`}
-              >
-                {/* Animated border glow */}
-                <div className="pointer-events-none absolute -inset-[1px] rounded-xl opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 z-0"
-                  style={{
-                    background: 'conic-gradient(from var(--border-angle, 0deg), hsl(var(--primary) / 0.6), hsl(var(--neon-blue) / 0.6), hsl(var(--neon-purple) / 0.4), hsl(var(--primary) / 0.6))',
-                    animation: 'border-rotate 3s linear infinite',
-                  }}
-                />
-                {/* Inner background to mask the border glow center */}
-                <div className="pointer-events-none absolute inset-[1px] rounded-[11px] bg-card z-[1] opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
-                <div data-glow className="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 z-[2]" />
-                <div className="relative z-[3]">
-                {(plan as any).isLifetime && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="px-3 py-1 rounded-full bg-neon-amber text-background text-[10px] font-mono font-bold uppercase tracking-wider whitespace-nowrap">
-                      Pagamento Único
-                    </span>
-                  </div>
-                )}
-                {plan.highlight && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="px-3 py-1 rounded-full gradient-brand text-primary-foreground text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1">
-                      <Star className="w-3 h-3" /> Mais Popular
-                    </span>
-                  </div>
-                )}
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-foreground">{plan.name}</h3>
-                  <div className="mt-2 flex items-baseline gap-1">
-                    <AnimatePresence mode="wait">
-                      <motion.span
-                        key={billingCycle}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        transition={{ duration: 0.2 }}
-                        className="text-3xl font-bold font-mono text-foreground"
-                      >
-                        {billingCycle === "annual" ? (plan as any).annualPrice : plan.price}
-                      </motion.span>
-                    </AnimatePresence>
-                    <span className="text-sm text-muted-foreground">
-                      {billingCycle === "annual" ? (plan as any).annualPeriod : plan.period}
-                    </span>
-                  </div>
-                  {billingCycle === "annual" && (plan as any).annualTotal && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Cobrado {(plan as any).annualTotal}
-                    </p>
-                  )}
+          <motion.div
+            initial={{ opacity: 0, y: 40, scale: 0.95 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.7, type: "spring", stiffness: 80, damping: 16 }}
+            className="max-w-2xl mx-auto"
+          >
+            <div className="relative rounded-2xl p-8 md:p-10 glass-card border-2 border-neon-amber/40 shadow-2xl shadow-neon-amber/10 overflow-hidden">
+              {/* Rotating border glow */}
+              <div
+                className="pointer-events-none absolute -inset-[2px] rounded-2xl opacity-60 z-0"
+                style={{
+                  background:
+                    "conic-gradient(from var(--border-angle, 0deg), hsl(var(--neon-amber) / 0.6), hsl(var(--primary) / 0.5), hsl(var(--neon-purple) / 0.4), hsl(var(--neon-amber) / 0.6))",
+                  animation: "border-rotate 5s linear infinite",
+                }}
+              />
+              <div className="pointer-events-none absolute inset-[2px] rounded-2xl bg-card z-[1]" />
+
+              <div className="relative z-[2]">
+                <div className="absolute -top-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+                  <span className="px-4 py-1.5 rounded-full bg-neon-amber text-background text-[11px] font-mono font-bold uppercase tracking-widest whitespace-nowrap shadow-lg shadow-neon-amber/30">
+                    💎 Pagamento Único
+                  </span>
                 </div>
-                <ul className="space-y-2.5 mb-6">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <CheckCircle className="w-4 h-4 text-primary shrink-0" />
-                      {f}
+
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+                    {lifetimePlan.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Tudo. Para sempre. Por um único pagamento.
+                  </p>
+                </div>
+
+                <div className="text-center mb-8">
+                  <div className="flex items-baseline justify-center gap-3 mb-2">
+                    <span className="text-xl text-muted-foreground line-through font-mono">
+                      {lifetimePlan.originalPrice}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md bg-destructive/15 text-destructive text-xs font-bold">
+                      -70%
+                    </span>
+                  </div>
+                  <div className="flex items-baseline justify-center gap-2">
+                    <span className="text-5xl md:text-6xl font-extrabold font-mono gradient-brand-text">
+                      {lifetimePlan.price}
+                    </span>
+                    <span className="text-sm text-muted-foreground">{lifetimePlan.period}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-3 font-mono">
+                    🔥 Apenas <span className="text-neon-amber font-bold">{LAUNCH_SPOTS} vagas</span> ao preço de lançamento
+                  </p>
+                </div>
+
+                <ul className="space-y-3 mb-8 max-w-md mx-auto">
+                  {lifetimePlan.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2.5 text-sm text-foreground/90">
+                      <CheckCircle className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                      <span>{f}</span>
                     </li>
                   ))}
                 </ul>
+
+                <motion.div
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                >
                   <Button
+                    size="lg"
                     onClick={(e) => handleCtaClick(e, "/signup")}
-                    className={`w-full ${
-                      plan.highlight
-                        ? "gradient-brand text-primary-foreground shadow-lg shadow-primary/20"
-                        : (plan as any).isLifetime
-                        ? "bg-neon-amber text-background hover:bg-neon-amber/90 shadow-lg shadow-neon-amber/20"
-                        : ""
-                    }`}
-                    variant={plan.highlight ? "default" : (plan as any).isLifetime ? "default" : "outline"}
+                    className="w-full bg-neon-amber text-background hover:bg-neon-amber/90 shadow-xl shadow-neon-amber/30 gap-2 text-base h-14 font-bold"
                   >
-                    {plan.cta}
+                    {lifetimePlan.cta} <ArrowRight className="w-5 h-5" />
                   </Button>
-                </div>
-              </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+                </motion.div>
 
-      {/* Testimonials */}
-      <section className="py-20 md:py-28">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-14"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              O que nossos{" "}
-              <span className="gradient-brand-text">jogadores</span> dizem
-            </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              Milhares de usuários já transformaram sua forma de jogar nas loterias.
-            </p>
+                <p className="text-center text-xs text-muted-foreground mt-4">
+                  ✓ Pagamento 100% seguro &nbsp;•&nbsp; ✓ Acesso imediato &nbsp;•&nbsp; ✓ Garantia de 7 dias
+                </p>
+              </div>
+            </div>
           </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto" style={{ perspective: "1000px" }}>
-            {[
-              { name: "Carlos M.", initials: "CM", role: "Jogador da Mega-Sena", text: "Com o Titan Loterias, comecei a entender padrões que nunca havia percebido. A análise de frequência e atraso me ajudou a montar jogos muito mais estratégicos." },
-              { name: "Ana Paula S.", initials: "AS", role: "Jogadora da Lotofácil", text: "O gerador profissional é sensacional! Já acertei 13 pontos duas vezes desde que comecei a usar. A IA realmente faz diferença nas escolhas." },
-              { name: "Roberto F.", initials: "RF", role: "Apostador profissional", text: "Uso o plano Pro há 6 meses e o backtesting mudou completamente minha estratégia. Consigo testar minhas ideias antes de investir dinheiro real." },
-              { name: "Mariana L.", initials: "ML", role: "Jogadora da Quina", text: "A simulação massiva me mostrou que algumas combinações são muito mais prováveis do que eu imaginava. Ferramenta indispensável!" },
-              { name: "Fernando G.", initials: "FG", role: "Jogador assíduo", text: "Já testei várias plataformas, mas nenhuma chega perto do Titan. Os dados são sempre atualizados e a interface é muito intuitiva." },
-              { name: "Juliana R.", initials: "JR", role: "Jogadora casual", text: "Mesmo no plano grátis, já consegui informações valiosas. O dashboard é lindo e fácil de entender. Super recomendo!" },
-            ].map((t, i) => (
-              <motion.div
-                key={t.name}
-                initial={{ opacity: 0, rotateY: 90, scale: 0.8 }}
-                whileInView={{ opacity: 1, rotateY: 0, scale: 1 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{
-                  delay: i * 0.15,
-                  duration: 0.7,
-                  type: "spring",
-                  stiffness: 80,
-                  damping: 14,
-                }}
-                whileHover={{ y: -8, rotateY: -5, scale: 1.03, transition: { duration: 0.25 } }}
-                className="glass-card rounded-xl border border-border/30 p-6 space-y-4 hover:border-primary/20 transition-colors"
-                style={{ transformStyle: "preserve-3d", backfaceVisibility: "hidden" }}
-              >
-                <Quote className="w-6 h-6 text-primary/40" />
-                <p className="text-sm text-muted-foreground leading-relaxed">{t.text}</p>
-                <div className="flex items-center gap-3 pt-2 border-t border-border/20">
-                  <Avatar className="w-9 h-9">
-                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">{t.initials}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="text-sm font-semibold text-foreground">{t.name}</div>
-                    <div className="text-[11px] text-muted-foreground">{t.role}</div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </section>
+
 
       {/* FAQ */}
       <section ref={faqRef} className="py-20 md:py-28 bg-card/20" style={{ perspective: 1200 }}>
