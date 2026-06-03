@@ -646,11 +646,10 @@ export default function LandingPage() {
               <Zap className="w-7 h-7 text-primary-foreground" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-              Pronto para jogar com{" "}
-              <span className="gradient-brand-text">inteligência</span>?
+              Daqui a 1 ano você vai estar na <span className="gradient-brand-text">mesma situação</span> — ou jogando de outro nível.
             </h2>
             <p className="text-muted-foreground">
-              Junte-se a milhares de jogadores que já usam o Titan Loterias para tomar decisões baseadas em dados.
+              R$ 297 hoje. Para sempre. Ou R$ 1.164/ano nos concorrentes. A matemática já fez a escolha por você.
             </p>
               <motion.div
                 whileHover={{ scale: 1.06, boxShadow: "0 0 30px hsl(var(--primary) / 0.5)" }}
@@ -659,9 +658,10 @@ export default function LandingPage() {
                 className="rounded-md inline-block"
               >
                 <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-10 h-12">
-                  Garantir Vitalício por R$ 297 <ArrowRight className="w-4 h-4" />
+                  QUERO MINHA VAGA POR R$ 297 <ArrowRight className="w-4 h-4" />
                 </Button>
               </motion.div>
+
           </div>
         </motion.div>
       </section>
