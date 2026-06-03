@@ -6,6 +6,7 @@
 import { NumberStats } from "@/engine/statistics";
 import { DrawResult } from "@/data/lotteries";
 import { getLotteryRules, PRIMES, FIBONACCI } from "./lotteriesKnowledge";
+import type { LotteryRules } from "../core/aiTypes";
 
 export interface StrategyResult {
   id: string;
@@ -212,7 +213,7 @@ export function strategyAntiPattern(
     // Penalize popular numbers (anti-popular)
     const popularityPenalty = s.frequency / draws.length;
     // Favor numbers with irregular patterns
-    const irregularity = (s as any).stdDevInterval || 1;
+    const irregularity = (s as { stdDevInterval?: number }).stdDevInterval ?? 1;
     
     const score = irregularity * 2 - seqPenalty * 3 - popularityPenalty * 1.5;
     weights.set(s.number, Math.max(0.1, score));
@@ -386,7 +387,7 @@ function generateFilteredCombinations(
   strategy: StrategyResult,
   pick: number,
   count: number,
-  rules: any
+  rules: LotteryRules
 ): number[][] {
   const pool = strategy.candidateNumbers;
   if (pool.length < pick) return [];
@@ -446,7 +447,7 @@ function generateFilteredCombinations(
 function computeGameScore(
   game: number[],
   stats: NumberStats[],
-  rules: any,
+  rules: LotteryRules,
   avgSum: number
 ): number {
   let score = 0;

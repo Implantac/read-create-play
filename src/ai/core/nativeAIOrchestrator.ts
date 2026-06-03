@@ -7,6 +7,7 @@ import { DrawResult } from "@/data/lotteries";
 import { NumberStats } from "@/engine/statistics";
 import type { AIRequest, AIResponse, AIIntent, ParsedIntent, ResponseMetadata } from "../core/aiTypes";
 import { detectIntent } from "../intent/detectIntent";
+import { isAIRequest, isWheelingResult } from "../core/aiTypes";
 import { generateGames } from "../generators/universalGameGenerator";
 import { generateWheeling, getWheelingOptions } from "../engines/wheelingEngine";
 import { simulateGames } from "../engines/simulationEngine";
@@ -23,6 +24,23 @@ import { AI_POLICIES } from "../core/aiPolicies";
 export class NativeAIOrchestrator {
   async process(request: AIRequest): Promise<AIResponse> {
     const startTime = performance.now();
+
+    // Leve validação de borda (evita payloads quebrados do UI/handlers)
+    if (!isAIRequest(request)) {
+      const errorResponse: AIResponse = {
+        intent: "generate_games",
+        explanation: "Invalid AI request payload.",
+        suggestions: ["Verifique os dados enviados."],
+        metadata: {
+          processingTimeMs: 0,
+          enginesUsed: ["inputValidation"],
+          confidence: 0,
+          cached: false,
+        },
+      };
+      errorResponse.metadata.processingTimeMs = Math.round(performance.now() - startTime);
+      return errorResponse;
+    }
 
     const parsedIntent = detectIntent(
       request.input,
@@ -142,10 +160,23 @@ export class NativeAIOrchestrator {
       pick: rules.pick,
     });
 
+    // Defensive check: garante que o payload do engine respeita o contrato
+    const wheelingResult = isWheelingResult(result)
+      ? result
+      : {
+          games: [],
+          baseNumbers,
+          totalGames: 0,
+          guarantee,
+          estimatedCost: 0,
+          coverageValidation: { valid: false, coveragePercent: 0, worstCase: 0, testedCombinations: 0 },
+          explanation: "Wheeling engine produced an invalid result.",
+        };
+
     return {
       intent: "create_wheeling",
-      wheeling: result,
-      explanation: explainWheeling(result),
+      wheeling: wheelingResult,
+      explanation: explainWheeling(wheelingResult),
       suggestions: [
         "Simular este fechamento",
         "Ajustar as dezenas-base",

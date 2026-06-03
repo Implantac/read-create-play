@@ -8,6 +8,7 @@ import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { STRATEGIES, Strategy } from "@/engine/strategies";
 import type { MassiveSimResult } from "@/engine/massive-simulator";
 import MonteCarloWorker from "@/workers/monte-carlo.worker?worker";
+import { isWorkerMessage, isWorkerProgress, isWorkerResult, isWorkerSimulationResult } from "@/core/workerContracts";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Rocket, Play, Trophy, TrendingUp, BarChart3,
@@ -82,16 +83,32 @@ export function MassiveSimulatorPanel({ stats, config, draws }: Props) {
     workerRef.current = worker;
 
     worker.onmessage = (e: MessageEvent) => {
-      const { type, data } = e.data;
-      if (type === "progress") {
-        setProgress(Math.round((data.completed / data.total) * 100));
-      } else if (type === "result") {
-        setResult(data as MassiveSimResult);
-        setProgress(100);
-        setRunning(false);
-        worker.terminate();
-        workerRef.current = null;
+      const msg = e.data as unknown;
+
+      if (isWorkerMessage(msg)) {
+        if (isWorkerProgress(msg) && msg.type === "progress") {
+          const d = msg.data as { completed?: unknown; total?: unknown };
+          const completed = typeof d.completed === "number" ? d.completed : 0;
+          const total = typeof d.total === "number" && d.total > 0 ? d.total : 0;
+          if (total > 0) setProgress(Math.round((completed / total) * 100));
+          return;
+        }
+
+        if (isWorkerResult(msg) && msg.type === "result") {
+          // Massive simulator panel uses Monte Carlo worker whose result typing differs.
+          // Keep runtime behavior intact; only tighten the check.
+          if (isWorkerSimulationResult(msg.data)) {
+            setResult(msg.data as MassiveSimResult);
+          }
+          setProgress(100);
+          setRunning(false);
+          worker.terminate();
+          workerRef.current = null;
+          return;
+        }
       }
+
+      // Fallback: ignore unknown worker payloads
     };
 
     worker.onerror = () => {

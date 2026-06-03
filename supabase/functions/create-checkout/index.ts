@@ -19,6 +19,13 @@ serve(async (req) => {
   if (auth instanceof Response) return auth;
 
   try {
+    if (auth.isSuperAdmin || auth.plan === "lifetime") {
+      return new Response(JSON.stringify({ plan: "lifetime", subscribed: true, url: null }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
     const { planId } = await req.json();
     const planConfig = PLAN_PRICES[planId];
     if (!planConfig) throw new Error(`Invalid plan: ${planId}`);

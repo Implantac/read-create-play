@@ -12,6 +12,7 @@ import type {
   SimulatedGame,
 } from "@/engine/massive-simulation-engine";
 import MassiveSimWorker from "@/workers/massive-sim.worker?worker";
+import { isWorkerMessage, isWorkerProgress, isWorkerResult } from "@/core/workerContracts";
 
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -54,6 +55,29 @@ const TREND_ICONS = {
   neutral: <Minus className="w-3.5 h-3.5 text-muted-foreground" />,
 };
 
+function isMassiveSimProgressPayload(data: unknown): data is MassiveSimProgress {
+  if (typeof data !== "object" || data === null) return false;
+  const d = data as Record<string, unknown>;
+  return (
+    typeof d.gamesGenerated === "number" &&
+    typeof d.gamesEvaluated === "number" &&
+    typeof d.totalGames === "number" &&
+    typeof d.elapsedMs === "number" &&
+    typeof d.opsPerSecond === "number" &&
+    (d.phase === "generating" || d.phase === "evaluating" || d.phase === "filtering" || d.phase === "done")
+  );
+}
+
+function toNativePatternInsights(insights: MassiveSimResult["patternInsights"]) {
+  const findValue = (needle: string) =>
+    insights.find((item) => item.label.toLowerCase().includes(needle))?.value;
+
+  return {
+    dominantParity: findValue("par"),
+    sumTrend: findValue("soma"),
+  };
+}
+
 export function MassiveSimulationDashboard({ stats, config, draws }: Props) {
   const [totalGames, setTotalGames] = useState(50_000);
   const [mode, setMode] = useState<GenerationMode>("hybrid");
@@ -93,16 +117,30 @@ export function MassiveSimulationDashboard({ stats, config, draws }: Props) {
     workerRef.current = worker;
 
     worker.onmessage = (e: MessageEvent) => {
-      const { type, data } = e.data;
-      if (type === "progress") {
-        setProgress(data as MassiveSimProgress);
-      } else if (type === "result") {
-        setResult(data as MassiveSimResult);
-        setRunning(false);
-        toast.success(`${data.totalGenerated.toLocaleString()} jogos simulados em ${(data.elapsedMs / 1000).toFixed(1)}s`);
-        worker.terminate();
-        workerRef.current = null;
+      const msg = e.data as unknown;
+
+      if (isWorkerMessage(msg)) {
+        if (isWorkerProgress(msg) && msg.type === "progress") {
+          if (isMassiveSimProgressPayload(msg.data)) {
+            setProgress(msg.data);
+          }
+          return;
+        }
+
+        if (isWorkerResult(msg) && msg.type === "result") {
+          const d = msg.data as Partial<MassiveSimResult>;
+          if (typeof d?.totalGenerated === "number" && typeof d?.elapsedMs === "number") {
+            setResult(d as MassiveSimResult);
+            setRunning(false);
+            toast.success(`${d.totalGenerated.toLocaleString()} jogos simulados em ${(d.elapsedMs / 1000).toFixed(1)}s`);
+            worker.terminate();
+            workerRef.current = null;
+          }
+          return;
+        }
       }
+
+      // fallback: ignore unknown worker payloads
     };
 
     worker.onerror = (err) => {
@@ -142,7 +180,7 @@ export function MassiveSimulationDashboard({ stats, config, draws }: Props) {
       const { generateMassiveSimAnalysis } = await import("@/engine/native-analysis");
       const analysis = generateMassiveSimAnalysis(
         result.topGames.slice(0, 15),
-        result.patternInsights,
+        toNativePatternInsights(result.patternInsights),
         result.distributionSummary,
         config,
         result.totalGenerated,

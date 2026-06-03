@@ -30,9 +30,12 @@ export function useGenerationHistory(lotteryId: string) {
       .limit(10);
 
     if (!error && data) {
-      setHistory(data as any[]);
+      // Supabase returns `pipeline` as JSON; keep runtime behavior, only loosen typing safely.
+      setHistory(data as unknown as GenerationRecord[]);
     }
+
     setLoading(false);
+
   }, [lotteryId]);
 
   useEffect(() => {
@@ -68,8 +71,9 @@ export function useGenerationHistory(lotteryId: string) {
       return null;
     }
 
-    setHistory(prev => [data as any, ...prev].slice(0, 10));
+    setHistory(prev => [data as unknown as GenerationRecord, ...prev].slice(0, 10));
     return data;
+
   }, [lotteryId]);
 
   const deleteGeneration = useCallback(async (id: string) => {

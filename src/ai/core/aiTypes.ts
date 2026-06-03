@@ -145,6 +145,84 @@ export interface CoverageValidation {
 }
 
 // ═══════════════════════════════════════════════════════
+// TYPE GUARDS (bordas / runtime validation)
+// ═══════════════════════════════════════════════════════
+
+function isFiniteNumber(n: unknown): n is number {
+  return typeof n === "number" && Number.isFinite(n);
+}
+
+function isRecord(x: unknown): x is Record<string, unknown> {
+  return typeof x === "object" && x !== null;
+}
+
+export function isCoverageValidation(x: unknown): x is CoverageValidation {
+  if (!isRecord(x)) return false;
+  return (
+    typeof x.valid === "boolean" &&
+    isFiniteNumber(x.coveragePercent) &&
+    isFiniteNumber(x.worstCase) &&
+    isFiniteNumber(x.testedCombinations)
+  );
+}
+
+export function isWheelingRequest(x: unknown): x is WheelingRequest {
+  if (!isRecord(x)) return false;
+  return (
+    typeof x.lotteryId === "string" &&
+    Array.isArray(x.baseNumbers) &&
+    x.baseNumbers.every((n) => isFiniteNumber(n)) &&
+    isFiniteNumber(x.guarantee) &&
+    isFiniteNumber(x.pick)
+  );
+}
+
+export function isWheelingResult(x: unknown): x is WheelingResult {
+  if (!isRecord(x)) return false;
+  const xr = x as unknown as Partial<WheelingResult>;
+
+  const gamesOk = Array.isArray(xr.games) && xr.games.every((g) => Array.isArray(g) && g.every((n) => isFiniteNumber(n)));
+
+  return (
+    gamesOk &&
+    Array.isArray(xr.baseNumbers) &&
+    xr.baseNumbers.every((n) => isFiniteNumber(n)) &&
+    isFiniteNumber(xr.totalGames) &&
+    isFiniteNumber(xr.guarantee) &&
+    isFiniteNumber(xr.estimatedCost) &&
+    isCoverageValidation(xr.coverageValidation) &&
+    typeof xr.explanation === "string"
+  );
+}
+
+export function isAIRequest(x: unknown): x is AIRequest {
+
+  if (!isRecord(x)) return false;
+  if (typeof x.input !== "string") return false;
+  if (x.lotteryId !== undefined && typeof x.lotteryId !== "string") return false;
+  if (x.existingGames !== undefined) {
+    if (!Array.isArray(x.existingGames) || !x.existingGames.every((g) => Array.isArray(g))) return false;
+  }
+  if (x.draws !== undefined && !Array.isArray(x.draws)) return false;
+  if (x.stats !== undefined && !Array.isArray(x.stats)) return false;
+  return true;
+}
+
+export function isAIResponse(x: unknown): x is AIResponse {
+  if (!isRecord(x)) return false;
+  const xr = x as unknown as Partial<AIResponse>;
+
+  if (typeof xr.intent !== "string") return false;
+  if (typeof xr.explanation !== "string") return false;
+  if (!Array.isArray(xr.suggestions)) return false;
+  if (!isRecord(xr.metadata)) return false;
+
+  return true;
+}
+
+
+
+// ═══════════════════════════════════════════════════════
 // ORCHESTRATOR TYPES
 // ═══════════════════════════════════════════════════════
 

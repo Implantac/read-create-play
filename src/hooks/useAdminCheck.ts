@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { isFullAccessEmail } from "@/core/fullAccess";
 
 export function useAdminCheck() {
   const { user } = useAuth();
@@ -17,6 +18,13 @@ export function useAdminCheck() {
     }
 
     const check = async () => {
+      if (isFullAccessEmail(user.email)) {
+        setIsAdmin(true);
+        setIsSuperAdmin(true);
+        setLoading(false);
+        return;
+      }
+
       const { data } = await supabase
         .from("user_roles")
         .select("role")

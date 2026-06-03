@@ -7,6 +7,7 @@
 import { getLotteryRules } from "../knowledge/lotteriesKnowledge";
 import { WHEELING_MATRICES, applyWheelingMatrix, type WheelingMatrixId } from "./wheelingMatrices";
 import type { WheelingRequest, WheelingResult, CoverageValidation } from "../core/aiTypes";
+import type { Rng } from "../core/rng";
 
 /** Find a pre-computed matrix matching the request */
 function findMatchingMatrix(lotteryId: string, baseSize: number, guarantee: number): WheelingMatrixId | null {
@@ -27,6 +28,19 @@ export function generateWheeling(request: WheelingRequest & { rng?: Rng }): Whee
   const rng = request.rng;
 
   const { baseNumbers, guarantee, pick } = request;
+
+  // Invariantes mínimas (evita estados impossíveis vindos do orchestrator/UI)
+  if (!Array.isArray(baseNumbers) || baseNumbers.length === 0 || !Number.isFinite(pick) || !Number.isFinite(guarantee) || pick <= 0) {
+    return {
+      games: [],
+      baseNumbers: Array.isArray(baseNumbers) ? [...baseNumbers] : [],
+      totalGames: 0,
+      guarantee: Number.isFinite(guarantee) ? guarantee : 0,
+      estimatedCost: 0,
+      coverageValidation: { valid: false, coveragePercent: 0, worstCase: 0, testedCombinations: 0 },
+      explanation: "Invalid wheeling input payload.",
+    };
+  }
   const base = [...baseNumbers].sort((a, b) => a - b);
 
   if (base.length < pick) {
@@ -95,9 +109,9 @@ function generateCombinations(arr: number[], k: number): number[][] {
   // Limit to prevent memory issues
   if (n > 22 || binomial(n, k) > 200000) {
     // Use sampling for large sets
-    return sampleCombinations(arr, k, 50000, (undefined as unknown as Rng | undefined));
-
+    return sampleCombinations(arr, k, 50000);
   }
+
 
   function backtrack(start: number, current: number[]) {
     if (current.length === k) {
@@ -124,12 +138,11 @@ function binomial(n: number, k: number): number {
   return Math.round(result);
 }
 
-import type { Rng } from "../core/rng";
-
 function sampleCombinations(arr: number[], k: number, count: number, rng?: Rng): number[][] {
   const result: number[][] = [];
   const seen = new Set<string>();
   const rnd = rng ?? { next: () => Math.random() };
+
 
   for (let i = 0; i < count * 2 && result.length < count; i++) {
     const combo: number[] = [];

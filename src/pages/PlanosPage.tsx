@@ -10,6 +10,7 @@ import { PlanCard, type PlanData } from "@/components/plans/PlanCard";
 import { PlanFAQ } from "@/components/plans/PlanFAQ";
 import { PlanTrustBar } from "@/components/plans/PlanTrustBar";
 import { PlanComparisonTable } from "@/components/plans/PlanComparisonTable";
+import { usePlanAccess } from "@/hooks/usePlanAccess";
 
 const basePlans = [
   {
@@ -98,8 +99,8 @@ const basePlans = [
 ];
 
 export default function PlanosPage() {
-  const { profile, session } = useAuth();
-  const currentPlan = profile?.plan ?? "free";
+  const { session } = useAuth();
+  const { currentPlan, isAdmin, isSuperAdmin } = usePlanAccess();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
   const navigate = useNavigate();
@@ -220,7 +221,7 @@ export default function PlanosPage() {
       </motion.div>
 
       {/* Manage subscription */}
-      {currentPlan !== "free" && (
+      {currentPlan !== "free" && !isAdmin && !isSuperAdmin && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
