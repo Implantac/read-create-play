@@ -612,14 +612,15 @@ export default function LandingPage() {
           >
             <Accordion type="single" collapsible className="space-y-3">
               {[
-                { q: "O Titan Loterias garante que vou ganhar?", a: "Não. Loterias são jogos de azar e nenhuma ferramenta pode garantir prêmios. O Titan oferece análises estatísticas e algoritmos para ajudar você a tomar decisões mais informadas." },
-                { q: "Quais loterias são suportadas?", a: "Atualmente suportamos Mega-Sena, Lotofácil, Quina, Lotomania, Dupla Sena, Timemania, Dia de Sorte e Super Sete. Todas com dados sincronizados da Caixa." },
-                { q: "Como funciona a inteligência artificial?", a: "Nossos modelos de Machine Learning analisam padrões históricos como frequência, atraso, paridade e distribuição para gerar apostas estatisticamente otimizadas." },
-                { q: "O acesso vitalício é realmente para sempre?", a: "Sim! Com um único pagamento você garante acesso completo ao Titan Loterias para sempre, incluindo todas as atualizações futuras. Sem mensalidades, sem renovações, sem cobranças recorrentes." },
-                { q: "Por que a promoção de lançamento é por tempo limitado?", a: "Estamos lançando o Titan Loterias com vagas limitadas ao preço promocional de R$ 297 (de R$ 997). Após o encerramento das vagas, o valor retorna ao preço normal e os planos passam a ser mensais." },
-                { q: "Os dados dos sorteios são confiáveis?", a: "Sim. Todos os resultados são sincronizados automaticamente a partir das fontes oficiais da Caixa Econômica Federal." },
-                { q: "Preciso instalar algum aplicativo?", a: "Não. O Titan Loterias funciona 100% no navegador, em qualquer dispositivo — computador, tablet ou celular." },
+                { q: "Vou ganhar na loteria garantido?", a: "Quem promete isso está te enganando. Loteria é jogo de azar — ninguém garante prêmio. O que o Titan faz é tirar o achismo da jogada: você decide com base em 10.000+ sorteios reais, IA e estatística pesada, jogando com vantagem matemática em vez de palpite." },
+                { q: "Funciona pra qual loteria?", a: "Todas as 8 principais da Caixa: Mega-Sena, Lotofácil, Quina, Lotomania, Dupla Sena, Timemania, Dia de Sorte e Super Sete — com dados oficiais sincronizados em tempo real." },
+                { q: "Sou leigo. Vou conseguir usar?", a: "Sim. Você não precisa entender nada de estatística. Escolhe a loteria, clica em \"Gerar\" e recebe os jogos já otimizados. Os relatórios traduzem tudo em linguagem simples — tipo \"esse jogo tem alinhamento alto com os padrões dos últimos 200 sorteios\"." },
+                { q: "Vitalício é vitalício mesmo? Sem pegadinha?", a: "Vitalício de verdade. Um pagamento de R$ 297, acesso completo PARA SEMPRE, com todas as atualizações futuras inclusas. Sem mensalidade, sem renovação, sem cartão recorrente. Nunca." },
+                { q: "Por que essa promoção é limitada?", a: "São apenas 100 vagas vitalícias no preço de lançamento (R$ 297 em vez de R$ 997). Depois que encerrarem, voltamos para o modelo de assinatura mensal a R$ 97/mês. Quem entrar agora trava o acesso pra vida toda." },
+                { q: "E se eu não gostar?", a: "Devolvemos 100% do seu dinheiro em até 7 dias. Sem perguntas, sem burocracia, sem ressentimento. Você só corre risco se NÃO testar." },
+                { q: "Preciso instalar alguma coisa?", a: "Não. Funciona 100% no navegador — computador, tablet ou celular. Em 30 segundos você já está rodando análises." },
               ].map((item, i) => (
+
                 <AccordionItem key={i} value={`faq-${i}`} className="glass-card border border-border/30 rounded-xl px-5 data-[state=open]:border-primary/20">
                   <AccordionTrigger className="text-sm font-medium text-foreground hover:no-underline gap-3">
                     <span className="flex items-center gap-2.5 text-left">
