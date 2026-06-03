@@ -1,0 +1,35 @@
+project_id = "cghydrrvebnkdugdlcia"
+
+[functions.ai-simulation-analysis]
+verify_jwt = true
+
+[functions.ai-lottery-predict]
+verify_jwt = true
+
+[functions.sync-lottery-draws]
+verify_jwt = true
+
+[functions.ai-pattern-analysis]
+verify_jwt = true
+
+[functions.ai-autonomous-learning]
+verify_jwt = true
+
+[functions.ai-massive-simulation]
+verify_jwt = true
+
+[functions.cleanup-expired-cache]
+verify_jwt = true
+
+[functions.check-subscription]
+verify_jwt = true
+
+[functions.create-checkout]
+verify_jwt = true
+
+[functions.customer-portal]
+verify_jwt = true
+
+[functions.ai-chat]
+verify_jwt = true
+

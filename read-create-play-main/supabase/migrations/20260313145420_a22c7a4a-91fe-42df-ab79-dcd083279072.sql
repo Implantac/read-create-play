@@ -1,0 +1,1 @@
+ALTER TABLE public.lottery_draws ADD COLUMN IF NOT EXISTS prize_tiers jsonb DEFAULT NULL;

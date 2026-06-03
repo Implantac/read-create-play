@@ -1,0 +1,217 @@
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Zap, Loader2, Mail, Lock, User, ArrowRight, Phone } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
+
+export default function SignupPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
+  const { toast } = useToast();
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanPhone = phone.replace(/\D/g, "");
+    if (cleanPhone.length < 10 || cleanPhone.length > 11) {
+      toast({ title: "Telefone inválido", description: "Informe um número com DDD (10 ou 11 dígitos).", variant: "destructive" });
+      return;
+    }
+    if (password.length < 6) {
+      toast({ title: "Senha fraca", description: "A senha deve ter no mínimo 6 caracteres.", variant: "destructive" });
+      return;
+    }
+
+    setLoading(true);
+
+    // Check if phone is already in use
+    const { data: phoneExists } = await supabase.rpc("check_phone_exists", { _phone: cleanPhone });
+
+    if (phoneExists) {
+      setLoading(false);
+      toast({ title: "Telefone já cadastrado", description: "Este número de telefone já está vinculado a outra conta.", variant: "destructive" });
+      return;
+    }
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName, phone_number: cleanPhone },
+        emailRedirectTo: window.location.origin,
+      },
+    });
+    setLoading(false);
+    if (error) {
+      toast({ title: "Erro ao cadastrar", description: error.message, variant: "destructive" });
+    } else {
+      setSent(true);
+    }
+  };
+
+  if (sent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4 relative overflow-hidden">
+        <div className="absolute inset-0 gradient-mesh" />
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="relative z-10 w-full max-w-md">
+          <Card className="glass-card shadow-2xl shadow-primary/5 text-center">
+            <CardHeader>
+              <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center">
+                <Mail className="w-8 h-8 text-primary" />
+              </div>
+              <CardTitle className="text-xl">Verifique seu email</CardTitle>
+              <CardDescription>
+                Enviamos um link de confirmação para <strong className="text-foreground">{email}</strong>. Clique no link para ativar sua conta.
+              </CardDescription>
+            </CardHeader>
+            <CardFooter className="justify-center">
+              <Link to="/login">
+                <Button variant="outline" className="gap-2">Voltar ao login</Button>
+              </Link>
+            </CardFooter>
+          </Card>
+        </motion.div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 relative overflow-hidden">
+      {/* Background effects */}
+      <div className="absolute inset-0 gradient-mesh" />
+      <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/3 left-1/4 w-80 h-80 bg-neon-blue/5 rounded-full blur-3xl" />
+      <div className="absolute inset-0 opacity-[0.02]" style={{
+        backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
+        backgroundSize: '60px 60px'
+      }} />
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="w-full max-w-md relative z-10"
+      >
+        <Card className="glass-card shadow-2xl shadow-primary/5">
+          <CardHeader className="text-center space-y-4 pb-2">
+            <motion.div
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+            >
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25 mx-auto overflow-hidden">
+                <img src="/logo.png" alt="Titan Loterias" className="w-14 h-14 object-contain" />
+              </div>
+            </motion.div>
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">
+                Criar <span className="gradient-brand-text">Conta</span>
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                7 dias grátis • Comece agora
+              </p>
+            </div>
+          </CardHeader>
+          <form onSubmit={handleSignup}>
+            <CardContent className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Nome completo</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="name"
+                    placeholder="Seu nome"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="pl-10 h-11 bg-muted/30 border-border/50 focus:border-primary/50 focus:ring-primary/20 transition-colors"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Telefone (com DDD)</Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="(11) 99999-0000"
+                    value={phone}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/\D/g, "").slice(0, 11);
+                      const formatted = v.length > 6
+                        ? `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`
+                        : v.length > 2
+                        ? `(${v.slice(0,2)}) ${v.slice(2)}`
+                        : v.length > 0
+                        ? `(${v}`
+                        : "";
+                      setPhone(formatted);
+                    }}
+                    className="pl-10 h-11 bg-muted/30 border-border/50 focus:border-primary/50 focus:ring-primary/20 transition-colors"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10 h-11 bg-muted/30 border-border/50 focus:border-primary/50 focus:ring-primary/20 transition-colors"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Senha</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Mínimo 6 caracteres"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10 h-11 bg-muted/30 border-border/50 focus:border-primary/50 focus:ring-primary/20 transition-colors"
+                    required
+                  />
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="flex flex-col gap-3 pt-2">
+              <Button type="submit" className="w-full h-11 gradient-brand text-primary-foreground font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-shadow" disabled={loading}>
+                {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                Criar conta grátis
+                {!loading && <ArrowRight className="w-4 h-4 ml-2" />}
+              </Button>
+              <p className="text-sm text-center text-muted-foreground pt-2">
+                Já tem conta?{" "}
+                <Link to="/login" className="text-primary hover:underline font-semibold">
+                  Entrar
+                </Link>
+              </p>
+            </CardFooter>
+          </form>
+        </Card>
+
+        <p className="text-center text-[10px] text-muted-foreground/40 mt-4 font-mono uppercase tracking-widest">
+          Motor estatístico v4.0 • ML • Database
+        </p>
+      </motion.div>
+    </div>
+  );
+}
