@@ -229,18 +229,18 @@ export default function LandingPage() {
             animate="visible"
             className="max-w-3xl mx-auto text-center space-y-6"
           >
-            <motion.div custom={0} variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-mono font-semibold tracking-wider uppercase">
+            <motion.div custom={0} variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-neon-amber/10 border border-neon-amber/30 text-neon-amber text-xs font-mono font-semibold tracking-wider uppercase">
               <Sparkles className="w-3.5 h-3.5" />
-              Motor Estatístico v4.0 + IA
+              Lançamento • Apenas {LAUNCH_SPOTS} vagas vitalícias
             </motion.div>
 
-            <motion.h1 custom={1} variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
-              Inteligência de Dados{" "}
-              <span className="gradient-brand-text">aplicada a loterias</span>
+            <motion.h1 custom={1} variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]">
+              Pare de apostar no escuro.{" "}
+              <span className="gradient-brand-text">Comece a apostar com matemática.</span>
             </motion.h1>
 
             <motion.p custom={2} variants={fadeUp} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              O Terminal de Inteligência mais avançado do país para análise de padrões, modelos de ML e otimização de matrizes estatísticas.
+              A única plataforma do Brasil que combina <span className="text-foreground font-semibold">+10.000 sorteios oficiais</span>, IA de ponta e 14 algoritmos estatísticos para você jogar com vantagem real — não com palpite.
             </motion.p>
 
             <motion.div custom={3} variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
@@ -251,15 +251,20 @@ export default function LandingPage() {
                   className="rounded-md"
                 >
                   <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-8 h-12 w-full">
-                    Garantir Acesso Vitalício <ChevronRight className="w-4 h-4" />
+                    Quero Vitalício por R$ 297 <ChevronRight className="w-4 h-4" />
                   </Button>
                 </motion.div>
               <Link to="/login">
                 <Button size="lg" variant="outline" className="gap-2 text-base px-8 h-12 border-border/50 hover:border-primary/30 hover:text-primary">
-                  Já tenho conta
+                  Já sou membro
                 </Button>
               </Link>
             </motion.div>
+
+            <motion.p custom={3} variants={fadeUp} className="text-xs text-muted-foreground/80 font-mono pt-1">
+              ✓ Pagamento único &nbsp;•&nbsp; ✓ Sem mensalidade nunca &nbsp;•&nbsp; ✓ 7 dias de garantia
+            </motion.p>
+
 
             {/* Supported lotteries */}
             <motion.div custom={4} variants={fadeUp} className="pt-8 flex flex-wrap items-center justify-center gap-2">
