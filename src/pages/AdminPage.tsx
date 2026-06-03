@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { isFullAccessEmail } from "@/core/fullAccess";
 
 interface Profile {
   id: string;
@@ -75,8 +76,6 @@ const ROLE_COLORS: Record<string, string> = {
   user: "bg-muted text-muted-foreground border-border",
 };
 
-const FULL_ACCESS_EMAIL = "etcsuporte889@gmail.com";
-
 export default function AdminPage() {
   const { user, isSuperAdmin } = useAuth();
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -116,6 +115,8 @@ export default function AdminPage() {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const getUserRole = (userId: string): string => {
+    const profile = profiles.find(p => p.id === userId);
+    if (isFullAccessProfile(profile)) return "super_admin";
     const r = roles.find(r => r.user_id === userId);
     return r?.role || "user";
   };
@@ -137,11 +138,13 @@ export default function AdminPage() {
   };
 
   const countSuperAdmins = (): number => {
-    return roles.filter(r => r.role === "super_admin").length;
+    const fullAccessCount = profiles.some(isFullAccessProfile) ? 1 : 0;
+    const roleCount = roles.filter(r => r.role === "super_admin").length;
+    return Math.max(fullAccessCount, roleCount);
   };
 
   const isFullAccessProfile = (profile?: Profile | null): boolean => {
-    return profile?.email?.toLowerCase() === FULL_ACCESS_EMAIL;
+    return isFullAccessEmail(profile?.email);
   };
 
   const updatePlan = async (userId: string, newPlan: string) => {
@@ -284,18 +287,21 @@ export default function AdminPage() {
 
   // Filters
   const filtered = profiles.filter(p => {
+    const effectivePlan = isFullAccessProfile(p) ? "lifetime" : p.plan;
+    const effectiveBlocked = isFullAccessProfile(p) ? false : p.blocked;
     const matchesSearch = (p.email?.toLowerCase() || "").includes(search.toLowerCase()) ||
       (p.full_name?.toLowerCase() || "").includes(search.toLowerCase());
-    const matchesPlan = filterPlan === "all" || p.plan === filterPlan;
+    const matchesPlan = filterPlan === "all" || effectivePlan === filterPlan;
     const matchesRole = filterRole === "all" || getUserRole(p.id) === filterRole;
     const matchesStatus = filterStatus === "all" ||
-      (filterStatus === "active" && !p.blocked) ||
-      (filterStatus === "blocked" && p.blocked);
+      (filterStatus === "active" && !effectiveBlocked) ||
+      (filterStatus === "blocked" && effectiveBlocked);
     return matchesSearch && matchesPlan && matchesRole && matchesStatus;
   });
 
   const planCounts = profiles.reduce((acc, p) => {
-    acc[p.plan] = (acc[p.plan] || 0) + 1;
+    const effectivePlan = isFullAccessProfile(p) ? "lifetime" : p.plan;
+    acc[effectivePlan] = (acc[effectivePlan] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
@@ -598,10 +604,10 @@ export default function AdminPage() {
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 {[
-                  { role: "super_admin", desc: "Acesso absoluto e irrestrito. Gerencia todos os usuários, papéis, planos e configurações. Nunca é limitado pelo plano comercial.", icon: "👑", count: roles.filter(r => r.role === "super_admin").length },
+                  { role: "super_admin", desc: "Acesso absoluto e irrestrito. Gerencia todos os usuários, papéis, planos e configurações. Nunca é limitado pelo plano comercial.", icon: "👑", count: countSuperAdmins() },
                   { role: "admin", desc: "Acesso administrativo amplo. Pode gerenciar usuários e visualizar métricas. Limitado por definições do Super Admin.", icon: "🛡️", count: roles.filter(r => r.role === "admin").length },
                   { role: "moderator", desc: "Acesso gerencial. Pode visualizar dados e moderar conteúdo. Sem acesso a configurações críticas.", icon: "⚙️", count: roles.filter(r => r.role === "moderator").length },
-                  { role: "user", desc: "Acesso padrão controlado pelo plano comercial (Gratuito, Premium, Profissional, Vitalício).", icon: "👤", count: profiles.length - roles.length },
+                  { role: "user", desc: "Acesso padrão controlado pelo plano comercial (Gratuito, Premium, Profissional, Vitalício).", icon: "👤", count: profiles.filter(p => getUserRole(p.id) === "user").length },
                 ].map(item => (
                   <Card key={item.role} className="bg-card/40 border-border/30">
                     <CardContent className="p-4">
@@ -746,12 +752,17 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Plano</p>
-                  <Badge className={PLAN_COLORS[detailUser.plan]}>{PLAN_LABELS[detailUser.plan]}</Badge>
+                  <Badge className={PLAN_COLORS[isFullAccessProfile(detailUser) ? "lifetime" : detailUser.plan]}>
+                    {PLAN_LABELS[isFullAccessProfile(detailUser) ? "lifetime" : detailUser.plan]}
+                  </Badge>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Status</p>
-                  <Badge variant={detailUser.blocked ? "destructive" : "outline"} className={detailUser.blocked ? "" : "text-green-500 border-green-500/30"}>
-                    {detailUser.blocked ? "Bloqueado" : "Ativo"}
+                  <Badge
+                    variant={!isFullAccessProfile(detailUser) && detailUser.blocked ? "destructive" : "outline"}
+                    className={!isFullAccessProfile(detailUser) && detailUser.blocked ? "" : "text-green-500 border-green-500/30"}
+                  >
+                    {!isFullAccessProfile(detailUser) && detailUser.blocked ? "Bloqueado" : "Ativo"}
                   </Badge>
                 </div>
                 <div>

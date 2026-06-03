@@ -11,6 +11,12 @@ serve(async (req) => {
   if (auth instanceof Response) return auth;
 
   try {
+    if (auth.isSuperAdmin || auth.plan === "lifetime") {
+      return new Response(JSON.stringify({ plan: "lifetime", subscribed: true, url: null }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
 

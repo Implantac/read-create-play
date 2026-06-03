@@ -55,6 +55,29 @@ const TREND_ICONS = {
   neutral: <Minus className="w-3.5 h-3.5 text-muted-foreground" />,
 };
 
+function isMassiveSimProgressPayload(data: unknown): data is MassiveSimProgress {
+  if (typeof data !== "object" || data === null) return false;
+  const d = data as Record<string, unknown>;
+  return (
+    typeof d.gamesGenerated === "number" &&
+    typeof d.gamesEvaluated === "number" &&
+    typeof d.totalGames === "number" &&
+    typeof d.elapsedMs === "number" &&
+    typeof d.opsPerSecond === "number" &&
+    (d.phase === "generating" || d.phase === "evaluating" || d.phase === "filtering" || d.phase === "done")
+  );
+}
+
+function toNativePatternInsights(insights: MassiveSimResult["patternInsights"]) {
+  const findValue = (needle: string) =>
+    insights.find((item) => item.label.toLowerCase().includes(needle))?.value;
+
+  return {
+    dominantParity: findValue("par"),
+    sumTrend: findValue("soma"),
+  };
+}
+
 export function MassiveSimulationDashboard({ stats, config, draws }: Props) {
   const [totalGames, setTotalGames] = useState(50_000);
   const [mode, setMode] = useState<GenerationMode>("hybrid");
@@ -98,7 +121,9 @@ export function MassiveSimulationDashboard({ stats, config, draws }: Props) {
 
       if (isWorkerMessage(msg)) {
         if (isWorkerProgress(msg) && msg.type === "progress") {
-          setProgress(msg.data as MassiveSimProgress);
+          if (isMassiveSimProgressPayload(msg.data)) {
+            setProgress(msg.data);
+          }
           return;
         }
 
@@ -155,7 +180,7 @@ export function MassiveSimulationDashboard({ stats, config, draws }: Props) {
       const { generateMassiveSimAnalysis } = await import("@/engine/native-analysis");
       const analysis = generateMassiveSimAnalysis(
         result.topGames.slice(0, 15),
-        result.patternInsights,
+        toNativePatternInsights(result.patternInsights),
         result.distributionSummary,
         config,
         result.totalGenerated,

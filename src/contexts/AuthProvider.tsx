@@ -2,17 +2,13 @@ import { useEffect, useState, ReactNode } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthContext, type AuthContextType, type PlanType, type Profile } from "./AuthContext";
+import { isFullAccessEmail } from "@/core/fullAccess";
 
-// SECURITY: fallback de acesso administrativo via RBAC.
-// O app anteriormente usava um FULL_ACCESS_EMAIL hardcoded.
-// Mantemos compatibilidade apenas como fallback (se ainda existir), mas a fonte de verdade passa a ser `user_roles`.
-const FULL_ACCESS_EMAIL_FALLBACK = import.meta.env.VITE_FULL_ACCESS_EMAIL_FALLBACK ?? "";
-
-function isFullAccessEmail(email?: string | null) {
-  if (!FULL_ACCESS_EMAIL_FALLBACK) return false;
-  return email?.toLowerCase() === FULL_ACCESS_EMAIL_FALLBACK.toLowerCase();
-}
-
+const asFullAccessProfile = (profile: Profile): Profile => ({
+  ...profile,
+  plan: "lifetime",
+  blocked: false,
+});
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -32,7 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (data) {
       setProfile(
         isFullAccessEmail(email)
-          ? ({ ...(data as Profile), plan: "lifetime", blocked: false } satisfies Profile)
+          ? asFullAccessProfile(data as Profile)
           : (data as Profile)
       );
     }
@@ -72,7 +68,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       if (data?.plan) {
-        setProfile((prev) => (prev ? { ...prev, plan: data.plan as PlanType } : prev));
+        setProfile((prev) => {
+          if (!prev) return prev;
+          return isFullAccessEmail(prev.email)
+            ? asFullAccessProfile(prev)
+            : { ...prev, plan: data.plan as PlanType };
+        });
       }
     } catch (e) {
       // Keep behavior (no breaking UI): log and continue.
@@ -162,7 +163,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   })();
 
   const isTrialExpired =
-    !isAdmin && !isSuperAdmin && profile?.plan === "free" && trialDaysLeft <= 0;
+    !isFullAccessEmail(session?.user.email) &&
+    !isAdmin &&
+    !isSuperAdmin &&
+    profile?.plan === "free" &&
+    trialDaysLeft <= 0;
 
   const value: AuthContextType = {
     session,

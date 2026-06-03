@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { useAuth, PlanType } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "next-themes";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -14,12 +14,14 @@ import { useToast } from "@/hooks/use-toast";
 import { useSoundSettings } from "@/hooks/useSoundSettings";
 import { playTierPreview } from "@/lib/alert-sounds";
 import UserPreferencesPanel from "@/components/UserPreferencesPanel";
+import { usePlanAccess } from "@/hooks/usePlanAccess";
 
 export default function PerfilPage() {
   const { user, profile, session } = useAuth();
   const { toast } = useToast();
   const sound = useSoundSettings();
   const { theme, setTheme } = useTheme();
+  const { currentPlan, isAdmin, isSuperAdmin } = usePlanAccess();
 
   const handleThemeChange = (newTheme: string) => {
     setTheme(newTheme);
@@ -43,7 +45,7 @@ export default function PerfilPage() {
   const [changingPassword, setChangingPassword] = useState(false);
   const [openingPortal, setOpeningPortal] = useState(false);
 
-  const isPaidPlan = profile?.plan && profile.plan !== "free";
+  const isPaidPlan = currentPlan !== "free";
 
   const handleManageSubscription = async () => {
     setOpeningPortal(true);
@@ -185,10 +187,10 @@ export default function PerfilPage() {
           <div className="space-y-2">
             <Label>Plano atual</Label>
             <div className="px-3 py-2 rounded-md bg-muted/50 border border-border/30 text-sm font-medium capitalize text-foreground">
-              {profile?.plan || "free"}
+              {currentPlan}
             </div>
           </div>
-          {isPaidPlan && (
+          {isPaidPlan && !isAdmin && !isSuperAdmin && (
             <Button
               onClick={handleManageSubscription}
               disabled={openingPortal}

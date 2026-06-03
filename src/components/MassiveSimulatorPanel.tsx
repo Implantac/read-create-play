@@ -8,7 +8,7 @@ import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { STRATEGIES, Strategy } from "@/engine/strategies";
 import type { MassiveSimResult } from "@/engine/massive-simulator";
 import MonteCarloWorker from "@/workers/monte-carlo.worker?worker";
-import { isWorkerMessage, isWorkerProgress, isWorkerResult } from "@/core/workerContracts";
+import { isWorkerMessage, isWorkerProgress, isWorkerResult, isWorkerSimulationResult } from "@/core/workerContracts";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Rocket, Play, Trophy, TrendingUp, BarChart3,
@@ -97,8 +97,7 @@ export function MassiveSimulatorPanel({ stats, config, draws }: Props) {
         if (isWorkerResult(msg) && msg.type === "result") {
           // Massive simulator panel uses Monte Carlo worker whose result typing differs.
           // Keep runtime behavior intact; only tighten the check.
-          const d = msg.data as Partial<MassiveSimResult> & { totalIterations?: unknown };
-          if (typeof d?.totalIterations === "number" || typeof d?.totalGenerated === "number") {
+          if (isWorkerSimulationResult(msg.data)) {
             setResult(msg.data as MassiveSimResult);
           }
           setProgress(100);
