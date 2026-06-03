@@ -525,8 +525,9 @@ export default function LandingPage() {
                     {lifetimePlan.name}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    Tudo. Para sempre. Por um único pagamento.
+                    O arsenal completo. Por menos do que você gasta no bolão do mês.
                   </p>
+
                 </div>
 
                 <div className="text-center mb-8">
