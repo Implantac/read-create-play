@@ -47,41 +47,42 @@ const fadeUp = {
 const features = [
   {
     icon: BarChart3,
-    title: "Intelligence Hub",
-    description: "Frequência, atraso, paridade, soma e distribuição por faixa de todos os sorteios históricos.",
+    title: "Raio-X dos Sorteios",
+    description: "Veja em segundos quais dezenas estão quentes, frias e atrasadas — com gráficos que a Caixa nunca vai te mostrar.",
     color: "green" as const,
   },
   {
     icon: Brain,
-    title: "Inteligência Artificial",
-    description: "Modelos de ML e redes neurais que identificam padrões ocultos nos resultados.",
+    title: "IA que Aprende com Você",
+    description: "Redes neurais treinadas em +10.000 sorteios reais identificam padrões invisíveis ao olho humano.",
     color: "blue" as const,
   },
   {
     icon: Target,
-    title: "Otimizador Combinatorial",
-    description: "Gere apostas otimizadas com algoritmos genéticos, simulated annealing e Monte Carlo.",
+    title: "Gerador Cirúrgico",
+    description: "Algoritmos genéticos e Monte Carlo criam jogos otimizados — pare de apostar no chute, comece a apostar com matemática.",
     color: "amber" as const,
   },
   {
     icon: TrendingUp,
-    title: "Backtesting",
-    description: "Teste suas estratégias contra todo o histórico e veja a performance real.",
+    title: "Backtest Brutal",
+    description: "Teste qualquer estratégia contra TODO o histórico oficial. Descubra na prática o que funciona — antes de gastar 1 real.",
     color: "red" as const,
   },
   {
     icon: Dices,
-    title: "Monte Carlo Engine",
-    description: "Simule milhões de jogos em segundos e descubra probabilidades reais.",
+    title: "1 Milhão de Simulações",
+    description: "Rode 1.000.000 de cenários em segundos e enxergue as probabilidades reais de cada combinação.",
     color: "purple" as const,
   },
   {
     icon: Shield,
-    title: "Banco de Dados Completo",
-    description: "Todos os sorteios da Caixa sincronizados automaticamente em tempo real.",
+    title: "Dados Oficiais 24/7",
+    description: "Sincronização automática com a Caixa. Resultado novo? Sua análise já está atualizada antes de você abrir o app.",
     color: "cyan" as const,
   },
 ];
+
 
 const colorMap = {
   green: "from-primary/20 to-primary/5 border-primary/20 text-primary",
