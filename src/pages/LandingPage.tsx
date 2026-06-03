@@ -312,12 +312,13 @@ export default function LandingPage() {
             className="text-center mb-14"
           >
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              Tudo que você precisa para{" "}
-              <span className="gradient-brand-text">jogar melhor</span>
+              6 armas que transformam{" "}
+              <span className="gradient-brand-text">azar em estratégia</span>
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Ferramentas profissionais de análise e geração de apostas, alimentadas por dados reais e inteligência artificial.
+              Enquanto o resto do Brasil aposta no chute, você joga com o mesmo arsenal usado por analistas quantitativos.
             </p>
+
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
