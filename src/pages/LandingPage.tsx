@@ -47,41 +47,42 @@ const fadeUp = {
 const features = [
   {
     icon: BarChart3,
-    title: "Intelligence Hub",
-    description: "Frequência, atraso, paridade, soma e distribuição por faixa de todos os sorteios históricos.",
+    title: "Raio-X dos Sorteios",
+    description: "Veja em segundos quais dezenas estão quentes, frias e atrasadas — com gráficos que a Caixa nunca vai te mostrar.",
     color: "green" as const,
   },
   {
     icon: Brain,
-    title: "Inteligência Artificial",
-    description: "Modelos de ML e redes neurais que identificam padrões ocultos nos resultados.",
+    title: "IA que Aprende com Você",
+    description: "Redes neurais treinadas em +10.000 sorteios reais identificam padrões invisíveis ao olho humano.",
     color: "blue" as const,
   },
   {
     icon: Target,
-    title: "Otimizador Combinatorial",
-    description: "Gere apostas otimizadas com algoritmos genéticos, simulated annealing e Monte Carlo.",
+    title: "Gerador Cirúrgico",
+    description: "Algoritmos genéticos e Monte Carlo criam jogos otimizados — pare de apostar no chute, comece a apostar com matemática.",
     color: "amber" as const,
   },
   {
     icon: TrendingUp,
-    title: "Backtesting",
-    description: "Teste suas estratégias contra todo o histórico e veja a performance real.",
+    title: "Backtest Brutal",
+    description: "Teste qualquer estratégia contra TODO o histórico oficial. Descubra na prática o que funciona — antes de gastar 1 real.",
     color: "red" as const,
   },
   {
     icon: Dices,
-    title: "Monte Carlo Engine",
-    description: "Simule milhões de jogos em segundos e descubra probabilidades reais.",
+    title: "1 Milhão de Simulações",
+    description: "Rode 1.000.000 de cenários em segundos e enxergue as probabilidades reais de cada combinação.",
     color: "purple" as const,
   },
   {
     icon: Shield,
-    title: "Banco de Dados Completo",
-    description: "Todos os sorteios da Caixa sincronizados automaticamente em tempo real.",
+    title: "Dados Oficiais 24/7",
+    description: "Sincronização automática com a Caixa. Resultado novo? Sua análise já está atualizada antes de você abrir o app.",
     color: "cyan" as const,
   },
 ];
+
 
 const colorMap = {
   green: "from-primary/20 to-primary/5 border-primary/20 text-primary",
@@ -111,17 +112,18 @@ const lifetimePlan = {
   originalPrice: LAUNCH_ORIGINAL,
   period: " pagamento único",
   features: [
-    "Acesso vitalício a todas as funcionalidades",
-    "Todas as 8 loterias suportadas",
-    "IA, Machine Learning e Motor HP exclusivo",
-    "Gerador profissional + Otimizador combinatorial",
-    "Backtesting e simulação massiva ilimitados",
-    "Todas as atualizações futuras incluídas",
-    "Suporte prioritário VIP",
-    "Sem mensalidades — pague uma vez e use para sempre",
+    "Tudo destravado. Para sempre. Sem upsell, sem trava, sem pegadinha.",
+    "8 loterias completas: Mega, Lotofácil, Quina, Lotomania, Dupla, Timemania, Dia de Sorte e Super Sete",
+    "IA + Machine Learning + Motor HP — exclusivos do Titan",
+    "Gerador profissional, otimizador combinatorial e fechamentos garantidos",
+    "Backtesting e simulação massiva ilimitados (1M+ jogos)",
+    "Todas as atualizações futuras grátis — para sempre",
+    "Suporte VIP no WhatsApp com resposta em minutos",
+    "Garantia incondicional de 7 dias: não gostou, devolvemos 100%",
   ],
-  cta: "Garantir Acesso Vitalício",
+  cta: "QUERO MINHA VAGA AGORA",
 };
+
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -227,18 +229,18 @@ export default function LandingPage() {
             animate="visible"
             className="max-w-3xl mx-auto text-center space-y-6"
           >
-            <motion.div custom={0} variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-mono font-semibold tracking-wider uppercase">
+            <motion.div custom={0} variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-neon-amber/10 border border-neon-amber/30 text-neon-amber text-xs font-mono font-semibold tracking-wider uppercase">
               <Sparkles className="w-3.5 h-3.5" />
-              Motor Estatístico v4.0 + IA
+              Lançamento • Apenas {LAUNCH_SPOTS} vagas vitalícias
             </motion.div>
 
-            <motion.h1 custom={1} variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
-              Inteligência de Dados{" "}
-              <span className="gradient-brand-text">aplicada a loterias</span>
+            <motion.h1 custom={1} variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]">
+              Pare de apostar no escuro.{" "}
+              <span className="gradient-brand-text">Comece a apostar com matemática.</span>
             </motion.h1>
 
             <motion.p custom={2} variants={fadeUp} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              O Terminal de Inteligência mais avançado do país para análise de padrões, modelos de ML e otimização de matrizes estatísticas.
+              A única plataforma do Brasil que combina <span className="text-foreground font-semibold">+10.000 sorteios oficiais</span>, IA de ponta e 14 algoritmos estatísticos para você jogar com vantagem real — não com palpite.
             </motion.p>
 
             <motion.div custom={3} variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
@@ -249,15 +251,20 @@ export default function LandingPage() {
                   className="rounded-md"
                 >
                   <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-8 h-12 w-full">
-                    Garantir Acesso Vitalício <ChevronRight className="w-4 h-4" />
+                    Quero Vitalício por R$ 297 <ChevronRight className="w-4 h-4" />
                   </Button>
                 </motion.div>
               <Link to="/login">
                 <Button size="lg" variant="outline" className="gap-2 text-base px-8 h-12 border-border/50 hover:border-primary/30 hover:text-primary">
-                  Já tenho conta
+                  Já sou membro
                 </Button>
               </Link>
             </motion.div>
+
+            <motion.p custom={3} variants={fadeUp} className="text-xs text-muted-foreground/80 font-mono pt-1">
+              ✓ Pagamento único &nbsp;•&nbsp; ✓ Sem mensalidade nunca &nbsp;•&nbsp; ✓ 7 dias de garantia
+            </motion.p>
+
 
             {/* Supported lotteries */}
             <motion.div custom={4} variants={fadeUp} className="pt-8 flex flex-wrap items-center justify-center gap-2">
@@ -305,12 +312,13 @@ export default function LandingPage() {
             className="text-center mb-14"
           >
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              Tudo que você precisa para{" "}
-              <span className="gradient-brand-text">jogar melhor</span>
+              6 armas que transformam{" "}
+              <span className="gradient-brand-text">azar em estratégia</span>
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Ferramentas profissionais de análise e geração de apostas, alimentadas por dados reais e inteligência artificial.
+              Enquanto o resto do Brasil aposta no chute, você joga com o mesmo arsenal usado por analistas quantitativos.
             </p>
+
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -347,18 +355,19 @@ export default function LandingPage() {
             className="text-center mb-14"
           >
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
-              Como funciona
+              De curioso a jogador estratégico em <span className="gradient-brand-text">3 minutos</span>
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Em 3 passos simples, comece a usar o poder da análise estatística.
+              Sem planilha, sem manual de 200 páginas. Você abre, escolhe a loteria e a inteligência trabalha por você.
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {[
-              { step: "01", icon: Database, title: "Data Ingestion", desc: "Integração via API com sincronização atômica de todos os sorteios históricos." },
-              { step: "02", icon: Brain, title: "Neural Analysis", desc: "Modelos proprietários identificam anomalias estatísticas e padrões de retenção." },
-              { step: "03", icon: Target, title: "Optimal Outputs", desc: "Entrega de matrizes otimizadas baseadas em filtros de alta probabilidade real." },
+              { step: "01", icon: Database, title: "Conecte-se aos dados", desc: "Em 1 clique, você acessa 10.000+ sorteios oficiais da Caixa, atualizados em tempo real." },
+              { step: "02", icon: Brain, title: "A IA faz o trabalho pesado", desc: "Redes neurais e algoritmos quantitativos varrem milhões de combinações enquanto você toma um café." },
+              { step: "03", icon: Target, title: "Receba jogos otimizados", desc: "Apostas filtradas por probabilidade real, paridade e dispersão. Você só joga — sem achismo." },
+
             ].map((item, i) => (
               <motion.div
                 key={item.step}
@@ -476,14 +485,13 @@ export default function LandingPage() {
               Promoção de Lançamento • Vagas Limitadas
             </div>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
-              Acesso{" "}
-              <span className="gradient-brand-text">vitalício</span> por
-              <br className="hidden md:block" /> pagamento único
+              Pague <span className="gradient-brand-text">UMA vez</span>.
+              <br className="hidden md:block" /> Use para <span className="gradient-brand-text">SEMPRE</span>.
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto text-base md:text-lg">
-              Sem mensalidades. Sem renovação. Sem letras miúdas.
-              <br />Garanta o Titan Loterias <span className="text-foreground font-semibold">para sempre</span> pelo preço de lançamento.
+              Enquanto os concorrentes cobram R$ 97/mês (R$ 1.164/ano), você trava o Titan completo por menos de <span className="text-foreground font-semibold">3 mensalidades</span> — e nunca mais paga nada.
             </p>
+
           </motion.div>
 
           <motion.div
@@ -517,8 +525,9 @@ export default function LandingPage() {
                     {lifetimePlan.name}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    Tudo. Para sempre. Por um único pagamento.
+                    O arsenal completo. Por menos do que você gasta no bolão do mês.
                   </p>
+
                 </div>
 
                 <div className="text-center mb-8">
@@ -603,14 +612,15 @@ export default function LandingPage() {
           >
             <Accordion type="single" collapsible className="space-y-3">
               {[
-                { q: "O Titan Loterias garante que vou ganhar?", a: "Não. Loterias são jogos de azar e nenhuma ferramenta pode garantir prêmios. O Titan oferece análises estatísticas e algoritmos para ajudar você a tomar decisões mais informadas." },
-                { q: "Quais loterias são suportadas?", a: "Atualmente suportamos Mega-Sena, Lotofácil, Quina, Lotomania, Dupla Sena, Timemania, Dia de Sorte e Super Sete. Todas com dados sincronizados da Caixa." },
-                { q: "Como funciona a inteligência artificial?", a: "Nossos modelos de Machine Learning analisam padrões históricos como frequência, atraso, paridade e distribuição para gerar apostas estatisticamente otimizadas." },
-                { q: "O acesso vitalício é realmente para sempre?", a: "Sim! Com um único pagamento você garante acesso completo ao Titan Loterias para sempre, incluindo todas as atualizações futuras. Sem mensalidades, sem renovações, sem cobranças recorrentes." },
-                { q: "Por que a promoção de lançamento é por tempo limitado?", a: "Estamos lançando o Titan Loterias com vagas limitadas ao preço promocional de R$ 297 (de R$ 997). Após o encerramento das vagas, o valor retorna ao preço normal e os planos passam a ser mensais." },
-                { q: "Os dados dos sorteios são confiáveis?", a: "Sim. Todos os resultados são sincronizados automaticamente a partir das fontes oficiais da Caixa Econômica Federal." },
-                { q: "Preciso instalar algum aplicativo?", a: "Não. O Titan Loterias funciona 100% no navegador, em qualquer dispositivo — computador, tablet ou celular." },
+                { q: "Vou ganhar na loteria garantido?", a: "Quem promete isso está te enganando. Loteria é jogo de azar — ninguém garante prêmio. O que o Titan faz é tirar o achismo da jogada: você decide com base em 10.000+ sorteios reais, IA e estatística pesada, jogando com vantagem matemática em vez de palpite." },
+                { q: "Funciona pra qual loteria?", a: "Todas as 8 principais da Caixa: Mega-Sena, Lotofácil, Quina, Lotomania, Dupla Sena, Timemania, Dia de Sorte e Super Sete — com dados oficiais sincronizados em tempo real." },
+                { q: "Sou leigo. Vou conseguir usar?", a: "Sim. Você não precisa entender nada de estatística. Escolhe a loteria, clica em \"Gerar\" e recebe os jogos já otimizados. Os relatórios traduzem tudo em linguagem simples — tipo \"esse jogo tem alinhamento alto com os padrões dos últimos 200 sorteios\"." },
+                { q: "Vitalício é vitalício mesmo? Sem pegadinha?", a: "Vitalício de verdade. Um pagamento de R$ 297, acesso completo PARA SEMPRE, com todas as atualizações futuras inclusas. Sem mensalidade, sem renovação, sem cartão recorrente. Nunca." },
+                { q: "Por que essa promoção é limitada?", a: "São apenas 100 vagas vitalícias no preço de lançamento (R$ 297 em vez de R$ 997). Depois que encerrarem, voltamos para o modelo de assinatura mensal a R$ 97/mês. Quem entrar agora trava o acesso pra vida toda." },
+                { q: "E se eu não gostar?", a: "Devolvemos 100% do seu dinheiro em até 7 dias. Sem perguntas, sem burocracia, sem ressentimento. Você só corre risco se NÃO testar." },
+                { q: "Preciso instalar alguma coisa?", a: "Não. Funciona 100% no navegador — computador, tablet ou celular. Em 30 segundos você já está rodando análises." },
               ].map((item, i) => (
+
                 <AccordionItem key={i} value={`faq-${i}`} className="glass-card border border-border/30 rounded-xl px-5 data-[state=open]:border-primary/20">
                   <AccordionTrigger className="text-sm font-medium text-foreground hover:no-underline gap-3">
                     <span className="flex items-center gap-2.5 text-left">
@@ -636,11 +646,10 @@ export default function LandingPage() {
               <Zap className="w-7 h-7 text-primary-foreground" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-              Pronto para jogar com{" "}
-              <span className="gradient-brand-text">inteligência</span>?
+              Daqui a 1 ano você vai estar na <span className="gradient-brand-text">mesma situação</span> — ou jogando de outro nível.
             </h2>
             <p className="text-muted-foreground">
-              Junte-se a milhares de jogadores que já usam o Titan Loterias para tomar decisões baseadas em dados.
+              R$ 297 hoje. Para sempre. Ou R$ 1.164/ano nos concorrentes. A matemática já fez a escolha por você.
             </p>
               <motion.div
                 whileHover={{ scale: 1.06, boxShadow: "0 0 30px hsl(var(--primary) / 0.5)" }}
@@ -649,9 +658,10 @@ export default function LandingPage() {
                 className="rounded-md inline-block"
               >
                 <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-10 h-12">
-                  Garantir Vitalício por R$ 297 <ArrowRight className="w-4 h-4" />
+                  QUERO MINHA VAGA POR R$ 297 <ArrowRight className="w-4 h-4" />
                 </Button>
               </motion.div>
+
           </div>
         </motion.div>
       </section>
