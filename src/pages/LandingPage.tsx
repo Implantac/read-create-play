@@ -606,7 +606,8 @@ export default function LandingPage() {
                 { q: "O Titan Loterias garante que vou ganhar?", a: "Não. Loterias são jogos de azar e nenhuma ferramenta pode garantir prêmios. O Titan oferece análises estatísticas e algoritmos para ajudar você a tomar decisões mais informadas." },
                 { q: "Quais loterias são suportadas?", a: "Atualmente suportamos Mega-Sena, Lotofácil, Quina, Lotomania, Dupla Sena, Timemania, Dia de Sorte e Super Sete. Todas com dados sincronizados da Caixa." },
                 { q: "Como funciona a inteligência artificial?", a: "Nossos modelos de Machine Learning analisam padrões históricos como frequência, atraso, paridade e distribuição para gerar apostas estatisticamente otimizadas." },
-                { q: "Posso cancelar meu plano a qualquer momento?", a: "Sim! Você pode cancelar ou mudar de plano quando quiser, sem multas ou taxas adicionais." },
+                { q: "O acesso vitalício é realmente para sempre?", a: "Sim! Com um único pagamento você garante acesso completo ao Titan Loterias para sempre, incluindo todas as atualizações futuras. Sem mensalidades, sem renovações, sem cobranças recorrentes." },
+                { q: "Por que a promoção de lançamento é por tempo limitado?", a: "Estamos lançando o Titan Loterias com vagas limitadas ao preço promocional de R$ 297 (de R$ 997). Após o encerramento das vagas, o valor retorna ao preço normal e os planos passam a ser mensais." },
                 { q: "Os dados dos sorteios são confiáveis?", a: "Sim. Todos os resultados são sincronizados automaticamente a partir das fontes oficiais da Caixa Econômica Federal." },
                 { q: "Preciso instalar algum aplicativo?", a: "Não. O Titan Loterias funciona 100% no navegador, em qualquer dispositivo — computador, tablet ou celular." },
               ].map((item, i) => (
