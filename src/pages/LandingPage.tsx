@@ -101,69 +101,27 @@ const stats = [
   { value: "99.9%", label: "Uptime" },
 ];
 
-const plans = [
-  {
-    name: "Grátis",
-    price: "R$ 0",
-    annualPrice: "R$ 0",
-    period: "/mês",
-    annualPeriod: "/mês",
-    features: ["Dashboard básico", "Frequência e atraso", "1 loteria", "Gerador simples"],
-    cta: "Começar Grátis",
-    highlight: false,
-  },
-  {
-    name: "Pro",
-    price: "R$ 29",
-    annualPrice: "R$ 23",
-    annualTotal: "R$ 287,00/ano",
-    period: "/mês",
-    annualPeriod: "/mês",
-    features: [
-      "Todas as loterias",
-      "IA e Machine Learning",
-      "Gerador profissional",
-      "Backtesting completo",
-      "Simulação massiva",
-      "Suporte prioritário",
-    ],
-    cta: "Assinar Pro",
-    highlight: true,
-  },
-  {
-    name: "Titan",
-    price: "R$ 59",
-    annualPrice: "R$ 47",
-    annualTotal: "R$ 575,00/ano",
-    period: "/mês",
-    annualPeriod: "/mês",
-    features: [
-      "Tudo do Pro",
-      "Motor HP exclusivo",
-      "Algoritmos genéticos",
-      "Otimizador combinatorial",
-      "Suporte prioritário",
-    ],
-    cta: "Assinar Titan",
-    highlight: false,
-  },
-  {
-    name: "Vitalício",
-    price: "R$ 497",
-    annualPrice: "R$ 497",
-    period: " único",
-    annualPeriod: " único",
-    features: [
-      "Tudo incluso para sempre",
-      "Todas as atualizações futuras",
-      "Prioridade máxima",
-      "Sem mensalidades",
-    ],
-    cta: "Comprar Vitalício",
-    highlight: false,
-    isLifetime: true,
-  },
-];
+const LAUNCH_PRICE = "R$ 297";
+const LAUNCH_ORIGINAL = "R$ 997";
+const LAUNCH_SPOTS = 100;
+
+const lifetimePlan = {
+  name: "Acesso Vitalício",
+  price: LAUNCH_PRICE,
+  originalPrice: LAUNCH_ORIGINAL,
+  period: " pagamento único",
+  features: [
+    "Acesso vitalício a todas as funcionalidades",
+    "Todas as 8 loterias suportadas",
+    "IA, Machine Learning e Motor HP exclusivo",
+    "Gerador profissional + Otimizador combinatorial",
+    "Backtesting e simulação massiva ilimitados",
+    "Todas as atualizações futuras incluídas",
+    "Suporte prioritário VIP",
+    "Sem mensalidades — pague uma vez e use para sempre",
+  ],
+  cta: "Garantir Acesso Vitalício",
+};
 
 export default function LandingPage() {
   const navigate = useNavigate();
