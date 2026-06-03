@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { ComplianceDisclaimer } from "@/components/ComplianceDisclaimer";
 import { ComparativeSimulatorPanel } from "@/components/ComparativeSimulatorPanel";
+import { StrategyBriefingPanel } from "@/components/StrategyBriefingPanel";
 import { FlaskConical, Loader2 } from "lucide-react";
 
 const HistoricalSimulatorPanel = lazy(() => import("@/components/HistoricalSimulatorPanel").then(m => ({ default: m.HistoricalSimulatorPanel })));
@@ -41,6 +42,8 @@ const SimulacoesPage = () => {
       ) : (
         <PlanGate feature="simulacoes" fallbackMessage="Simulações avançadas — disponível nos planos Premium e superiores">
           <>
+            <StrategyBriefingPanel config={config} stats={stats} draws={draws} compact />
+
             <ComparativeSimulatorPanel stats={stats} config={config} draws={draws} />
 
             <Suspense fallback={<LazyFallback />}>

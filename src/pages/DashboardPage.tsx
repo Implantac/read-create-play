@@ -74,6 +74,7 @@ import { calculateAnalyticsSnapshot, getComplianceNotice } from "@/engine/analyt
 import { Skeleton } from "@/components/ui/skeleton";
 import { TitanScoreBadge } from "@/components/TitanScoreBadge";
 import { evaluateBetQuality } from "@/engine/bet-quality";
+import { StrategyBriefingPanel } from "@/components/StrategyBriefingPanel";
 
 const container = {
   hidden: { opacity: 0 },
@@ -155,6 +156,10 @@ const DashboardPage = () => {
       />
       
       <LotteryContextBanner />
+
+      {draws.length > 0 && (
+        <StrategyBriefingPanel config={config} stats={stats} draws={draws} />
+      )}
       
       <TitanCommandCenter />
       
@@ -725,4 +730,3 @@ icon={ActivitySquare}
 };
 
 export default DashboardPage;
-
