@@ -195,10 +195,10 @@ export const FarolDezenas = memo(function FarolDezenas({ data, totalNumbers, pic
                     type="button"
                     onClick={() => toggleNumber(r.number)}
                     disabled={!interactive}
-                    className={`relative aspect-square rounded-xl border flex flex-col items-center justify-center transition-all duration-200 hover:scale-110 hover:z-10 hover:shadow-lg hover:ring-2 ${s.bg} ${s.ring} ${
-                      interactive ? "cursor-pointer" : "cursor-default"
+                    className={`relative aspect-square rounded-xl border flex flex-col items-center justify-center transition-all duration-300 hover:scale-110 hover:z-20 hover:shadow-2xl hover:shadow-black/40 hover:ring-2 ${s.bg} ${s.ring} ${
+                      interactive ? "cursor-pointer active:scale-90" : "cursor-default"
                     } ${
-                      isSelected ? "ring-2 ring-primary ring-offset-2 ring-offset-background scale-105 shadow-lg shadow-primary/30" : ""
+                      isSelected ? "ring-2 ring-primary ring-offset-2 ring-offset-background scale-110 shadow-2xl shadow-primary/40 z-10" : "shadow-sm shadow-black/20"
                     }`}
                   >
                     {isSelected && (
