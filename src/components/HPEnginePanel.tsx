@@ -246,7 +246,7 @@ export function HPEnginePanel({ stats, config, draws }: Props) {
                             fontSize: 12,
                           }}
                           formatter={(val: number, name: string) => {
-                            if (name === "pct") return [`${val}%`, "Percentual"];
+                            if (name === "pct") return [`${formatNumber(val)}%`, "Percentual"];
                             return [val.toLocaleString(), "Contagem"];
                           }}
                         />
