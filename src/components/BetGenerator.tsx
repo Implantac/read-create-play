@@ -34,15 +34,23 @@ export function BetGenerator({ stats, config, onSaveBet }: Props) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap gap-2">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="flex flex-wrap gap-3 p-4 rounded-2xl bg-primary/5 border border-primary/20 backdrop-blur-sm">
         {[1, 3, 5, 10].map(n => (
-          <Button key={n} variant="outline" size="sm" onClick={() => generate(n)} disabled={generating} className="text-xs">
-            <RefreshCw className={`w-3 h-3 mr-1.5 ${generating ? "animate-spin" : ""}`} />
-            {n} jogo{n > 1 ? "s" : ""} inteligente{n > 1 ? "s" : ""}
+          <Button 
+            key={n} 
+            variant="outline" 
+            size="sm" 
+            onClick={() => generate(n)} 
+            disabled={generating} 
+            className="flex-1 min-w-[120px] h-10 px-4 rounded-xl border-primary/20 bg-background/50 hover:bg-primary/10 text-primary font-black uppercase tracking-widest text-[10px] transition-all hover:scale-105 active:scale-95 group"
+          >
+            <Sparkles className={`w-3.5 h-3.5 mr-2 ${generating ? "animate-pulse" : "group-hover:rotate-12 transition-transform"}`} />
+            {n} {n > 1 ? "Matrizes" : "Matriz"} Elite
           </Button>
         ))}
       </div>
+
 
       <div className="grid gap-4">
         {bets.map((bet, i) => (
