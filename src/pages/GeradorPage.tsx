@@ -79,7 +79,6 @@ const GeradorPage = () => {
   const prevStep = () => setStep(s => Math.max(s - 1, 1));
 
   return (
-  return (
     <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700 pb-20 px-1">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
         <div className="space-y-1.5">
