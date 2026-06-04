@@ -124,7 +124,7 @@ export default function FechamentosPage() {
     if (!generatedGames || !currentMatrix) return;
     exportToPdf({
       title: `Fechamento — ${currentMatrix.name}`,
-      subtitle: `${generatedGames.length} jogos · Garantia ${currentMatrix.guarantee}+ acertos · Custo R$ ${(generatedGames.length * betPrice).toFixed(2)}`,
+      subtitle: `${formatNumber(generatedGames.length)} jogos · Garantia ${currentMatrix.guarantee}+ acertos · Custo ${formatCurrency(generatedGames.length * betPrice)}`,
       config,
       bets: generatedGames.map((g, i) => ({
         numbers: g,
