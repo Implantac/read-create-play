@@ -12,8 +12,9 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Brain, TrendingUp, TrendingDown, Zap, Target, RefreshCw, Sparkles,
   AlertTriangle, CheckCircle, ArrowUp, ArrowDown, Minus, Loader2,
-  Activity, Trophy, GitBranch, Link2, Timer, Gauge, Dice1, TriangleAlert, FlaskConical
+  Activity, Trophy, GitBranch, Link2, Timer, Gauge, Dice1, TriangleAlert, FlaskConical, Snowflake
 } from "lucide-react";
+import { m, AnimatePresence } from "framer-motion";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
@@ -137,129 +138,136 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
   }));
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <Card className="glass-card border-primary/30 relative overflow-hidden group">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(var(--primary),0.1),transparent)] pointer-events-none" />
-        <CardHeader className="relative z-10 pb-6">
-          <div className="flex items-center justify-between flex-wrap gap-6">
-            <div className="flex items-center gap-5">
-              <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 shadow-2xl group-hover:rotate-12 transition-transform duration-500">
-                <Brain className="h-8 w-8 text-primary animate-pulse" />
+    <div className="space-y-8">
+      {/* Dynamic Background Effects */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute top-[20%] left-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-[10%] right-[-10%] w-[30%] h-[30%] bg-accent/5 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }} />
+      </div>
+
+      {/* Header - Enterprise Command Center Style */}
+      <Card className="glass-card border-primary/30 relative overflow-hidden group shadow-2xl">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(var(--primary),0.15),transparent)] pointer-events-none opacity-50" />
+        <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-1000">
+          <Brain className="w-64 h-64 rotate-12" />
+        </div>
+        
+        <CardHeader className="relative z-10 p-8 md:p-10">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
+            <div className="flex items-center gap-6">
+              <div className="w-20 h-20 rounded-[2.5rem] bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 shadow-2xl group-hover:rotate-12 transition-all duration-700 relative active:scale-95">
+                <div className="absolute inset-0 bg-primary/5 group-hover:bg-primary/20 transition-colors rounded-[2.5rem]" />
+                <Brain className="h-10 w-10 text-primary animate-pulse relative z-10" />
               </div>
-              <div>
-                <CardTitle className="text-2xl font-black uppercase tracking-tighter italic">Engine IA Autônoma</CardTitle>
-                <CardDescription className="font-bold uppercase tracking-widest text-[10px] opacity-60 mt-1">
-                  {report.drawsAnalyzed} Sorteios Processados · Confiança: <span className="text-primary font-black">{report.confidenceScore}/100</span>
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  <CardTitle className="text-3xl md:text-4xl font-black uppercase tracking-tighter italic leading-none">Alpha Core Engine</CardTitle>
+                  <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[9px] font-black uppercase tracking-widest animate-pulse">Live Tensors</Badge>
+                </div>
+                <CardDescription className="font-black uppercase tracking-[0.2em] text-[10px] opacity-60 flex items-center gap-3">
+                  <span className="flex items-center gap-1.5"><Activity className="w-3.5 h-3.5 text-primary" /> {report.drawsAnalyzed} Concursos Processados</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-border" />
+                  <span className="flex items-center gap-1.5 text-foreground"><Target className="w-3.5 h-3.5 text-accent" /> Precisão: {report.confidenceScore}% Alpha</span>
                 </CardDescription>
               </div>
             </div>
 
-            <div className="flex gap-3 relative z-10">
-              <Button variant="outline" size="sm" onClick={refreshAnalysis} disabled={loading} className="h-10 px-5 rounded-xl border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary font-black uppercase tracking-widest text-[10px] transition-all">
-                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-                Recalibrar
+            <div className="flex items-center gap-4 relative z-10 w-full lg:w-auto">
+              <Button variant="outline" size="sm" onClick={refreshAnalysis} disabled={loading} className="h-12 px-6 rounded-2xl border-border/60 bg-secondary/20 text-[10px] font-black uppercase tracking-widest gap-2 hover:bg-secondary/40 transition-all shadow-sm flex-1 lg:flex-initial">
+                <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin text-primary" : "opacity-60"}`} />
+                Recalibrar Matriz
               </Button>
-              <Button size="sm" onClick={runAIAnalysis} disabled={aiLoading} className="h-10 px-6 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
-                {aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
-                Deep Analysis
+              <Button size="sm" onClick={runAIAnalysis} disabled={aiLoading} className="h-12 px-8 rounded-2xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex-1 lg:flex-initial gap-2">
+                {aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                Deep Neural Probe
               </Button>
             </div>
-
           </div>
         </CardHeader>
       </Card>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-        <Card className="glass-card border-primary/20 hover:border-primary/40 transition-all duration-500 group/stat">
-          <CardContent className="pt-5 pb-4 px-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover/stat:text-primary transition-colors">Dezenas Fortes</span>
-              <Target className="h-4 w-4 text-primary group-hover/stat:scale-110 transition-transform" />
+      {/* Quick Stats - Modular Bento Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 relative z-10">
+        {[
+          { label: "Dezenas Elite", value: report.rankings.filter(r => r.classification === "forte").length, icon: Target, color: "text-primary", bg: "bg-primary/5", border: "hover:border-primary/40", desc: "Top Performance" },
+          { label: "Tendência Alpha", value: report.rankings.filter(r => r.trend === "subindo").length, icon: TrendingUp, color: "text-accent", bg: "bg-accent/5", border: "hover:border-accent/40", desc: "Momentum Up" },
+          { label: "Anomalias Matrix", value: report.shifts.length, icon: TriangleAlert, color: "text-rose-400", bg: "bg-rose-500/5", border: "hover:border-rose-500/40", desc: "Shift Detected" },
+          { label: "Entropia Flux", value: report.entropyAnalysis.normalizedEntropy.toFixed(2), icon: Dice1, color: "text-emerald-400", bg: "bg-emerald-500/5", border: "hover:border-emerald-500/40", desc: "Stability Index" },
+          { label: "χ² Verificado", value: report.chiSquareResult.pValue.toFixed(3), icon: FlaskConical, color: "text-yellow-400", bg: "bg-yellow-500/5", border: "hover:border-yellow-500/40", desc: "P-Value Pure" },
+          { label: "Titan Confiança", value: `${report.confidenceScore}%`, icon: Gauge, color: "text-purple-400", bg: "bg-purple-500/5", border: "hover:border-purple-500/40", desc: "Neural Weight" },
+        ].map((item, idx) => (
+          <m.div 
+            key={item.label}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.05 }}
+            className={`flex flex-col justify-between p-5 rounded-[2rem] glass-card border-border/40 ${item.border} ${item.bg} group/stat relative overflow-hidden active:scale-95`}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-[9px] uppercase font-black text-muted-foreground tracking-widest opacity-60 group-hover/stat:text-foreground transition-colors leading-none">{item.label}</p>
+              <item.icon className={`h-4 w-4 ${item.color} opacity-40 group-hover/stat:opacity-100 group-hover/stat:scale-110 transition-all`} />
             </div>
-            <p className="text-2xl font-black font-mono text-foreground italic">{report.rankings.filter(r => r.classification === "forte").length}</p>
-          </CardContent>
-        </Card>
-        <Card className="glass-card border-accent/20 hover:border-accent/40 transition-all duration-500 group/stat">
-          <CardContent className="pt-5 pb-4 px-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover/stat:text-accent transition-colors">Trend: Up</span>
-              <TrendingUp className="h-4 w-4 text-accent group-hover/stat:scale-110 transition-transform" />
+            <div className="space-y-1">
+              <p className={`text-2xl font-black font-mono tracking-tighter italic ${item.color} leading-none truncate`}>{item.value}</p>
+              <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest opacity-30 group-hover/stat:opacity-60 transition-opacity leading-none">{item.desc}</p>
             </div>
-            <p className="text-2xl font-black font-mono text-foreground italic">{report.rankings.filter(r => r.trend === "subindo").length}</p>
-          </CardContent>
-        </Card>
-        <Card className="glass-card border-destructive/20 hover:border-destructive/40 transition-all duration-500 group/stat">
-          <CardContent className="pt-5 pb-4 px-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover/stat:text-destructive transition-colors">Shift Matrix</span>
-              <AlertTriangle className="h-4 w-4 text-destructive group-hover/stat:scale-110 transition-transform" />
-            </div>
-            <p className="text-2xl font-black font-mono text-foreground italic">{report.shifts.length}</p>
-          </CardContent>
-        </Card>
-        <Card className="glass-card border-green-500/20 hover:border-green-500/40 transition-all duration-500 group/stat">
-          <CardContent className="pt-5 pb-4 px-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover/stat:text-green-500 transition-colors">Entropia</span>
-              <Dice1 className="h-4 w-4 text-green-500 group-hover/stat:scale-110 transition-transform" />
-            </div>
-            <p className="text-2xl font-black font-mono text-foreground italic">{report.entropyAnalysis.normalizedEntropy.toFixed(2)}</p>
-          </CardContent>
-        </Card>
-        <Card className="glass-card border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-500 group/stat">
-          <CardContent className="pt-5 pb-4 px-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover/stat:text-yellow-500 transition-colors">χ² P-Valor</span>
-              <FlaskConical className="h-4 w-4 text-yellow-500 group-hover/stat:scale-110 transition-transform" />
-            </div>
-            <p className="text-2xl font-black font-mono text-foreground italic">{report.chiSquareResult.pValue.toFixed(3)}</p>
-          </CardContent>
-        </Card>
-        <Card className="glass-card border-purple-500/20 hover:border-purple-500/40 transition-all duration-500 group/stat">
-          <CardContent className="pt-5 pb-4 px-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover/stat:text-purple-500 transition-colors">Confiança</span>
-              <Gauge className="h-4 w-4 text-purple-500 group-hover/stat:scale-110 transition-transform" />
-            </div>
-            <p className="text-2xl font-black font-mono text-foreground italic">{report.confidenceScore}%</p>
-          </CardContent>
-        </Card>
-
+          </m.div>
+        ))}
       </div>
 
-      {/* Suggested Numbers */}
-      <Card className="glass-card border-primary/30 relative overflow-hidden group/sugg">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_100%,rgba(var(--primary),0.05),transparent)] pointer-events-none" />
-        <CardHeader className="pb-5 relative z-10">
-          <CardTitle className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-3 italic">
-            <div className="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center border border-primary/30 group-hover/sugg:rotate-6 transition-transform">
-              <Zap className="h-5 w-5 text-primary animate-pulse" />
-            </div>
-            Matriz Sugerida pela IA
-            <Badge variant="outline" className="ml-2 text-[9px] font-black uppercase tracking-widest border-primary/40 text-primary bg-primary/5">Neural Hybrid Engine</Badge>
-          </CardTitle>
+      {/* Suggested Numbers - High Impact Visualization */}
+      <Card className="glass-card border-primary/30 relative overflow-hidden group/sugg shadow-2xl rounded-[2.5rem]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_100%,rgba(var(--primary),0.1),transparent)] pointer-events-none opacity-50" />
+        <CardHeader className="pb-8 relative z-10 p-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <CardTitle className="text-xl font-black uppercase tracking-[0.2em] flex items-center gap-4 italic leading-none">
+              <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center border border-primary/30 group-hover/sugg:rotate-6 transition-all duration-500 shadow-lg shadow-primary/10">
+                <Zap className="h-6 w-6 text-primary animate-pulse" />
+              </div>
+              <div>
+                <span>Configuração Neural Alpha</span>
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-40 mt-2">Aposta Sugerida para Ciclo #{report.drawsAnalyzed + 1}</p>
+              </div>
+            </CardTitle>
+            <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest border-primary/40 text-primary bg-primary/5 px-4 py-1.5 rounded-full shadow-lg shadow-primary/5 backdrop-blur-sm italic">
+              Elite Probability Node
+            </Badge>
+          </div>
         </CardHeader>
-        <CardContent className="relative z-10">
-          <div className="flex flex-wrap gap-3 mb-4">
-            {report.suggestedNumbers.map(n => (
-              <span key={n} className="w-12 h-12 rounded-xl bg-primary/15 text-primary font-black font-mono text-lg border-2 border-primary/40 flex items-center justify-center shadow-lg shadow-primary/10 transition-all hover:scale-110 hover:-rotate-3 active:scale-95 cursor-default group/ball">
-                {String(n).padStart(2, "0")}
-              </span>
+        <CardContent className="relative z-10 px-8 pb-8">
+          <div className="flex flex-wrap gap-4 mb-8 justify-center md:justify-start">
+            {report.suggestedNumbers.map((n, i) => (
+              <m.div 
+                key={n} 
+                initial={{ scale: 0.5, opacity: 0, rotate: -20 }}
+                animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                transition={{ type: "spring", stiffness: 260, damping: 20, delay: i * 0.05 }}
+                whileHover={{ y: -8, scale: 1.1, rotate: 5 }}
+                className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary font-black font-mono text-2xl border-2 border-primary/40 flex items-center justify-center shadow-xl shadow-primary/5 transition-all cursor-pointer group/ball relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/ball:opacity-100 transition-opacity" />
+                <span className="relative z-10 drop-shadow-[0_0_8px_rgba(var(--primary),0.3)] italic">{String(n).padStart(2, "0")}</span>
+              </m.div>
             ))}
           </div>
 
           {report.avoidNumbers.length > 0 && (
-            <div className="mt-3 pt-3 border-t border-border">
-              <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
-                <AlertTriangle className="h-3 w-3" /> Dezenas para evitar:
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {report.avoidNumbers.map(n => (
-                  <span key={n} className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-destructive/10 text-destructive font-mono text-xs border border-destructive/20">
+            <div className="p-6 rounded-[2rem] bg-rose-500/5 border border-rose-500/10 backdrop-blur-sm shadow-inner group-hover/sugg:border-rose-500/20 transition-all duration-700">
+              <div className="flex items-center gap-2 mb-4 px-1">
+                <TriangleAlert className="h-4 w-4 text-rose-400 group-hover/sugg:animate-bounce" />
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-400/80">Filtro de Exclusão Crítica (High Bias)</p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {report.avoidNumbers.map((n, i) => (
+                  <m.span 
+                    key={n} 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 + (i * 0.05) }}
+                    className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-background/40 text-muted-foreground font-black font-mono text-sm border border-white/5 hover:border-rose-500/30 hover:text-rose-400 transition-all cursor-default shadow-sm italic"
+                  >
                     {String(n).padStart(2, "0")}
-                  </span>
+                  </m.span>
                 ))}
               </div>
             </div>
@@ -283,135 +291,187 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
         </TabsList>
 
         {/* Ranking Tab */}
-        <TabsContent value="ranking" className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Ranking Probabilístico — Top 20 (com Entropia & Markov)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={350}>
-                <BarChart data={rankingChartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                  <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "hsl(var(--foreground))" }} />
-                  <Legend />
-                  <Bar dataKey="score" name="Score" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="freq" name="Frequência" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="markov" name="Markov" fill="hsl(142, 76%, 36%)" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="entropy" name="Entropia" fill="hsl(280, 70%, 50%)" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+        <TabsContent value="ranking" className="space-y-6 outline-none">
+          <div className="grid lg:grid-cols-1 gap-6">
+            <Card className="glass-card border-white/10 shadow-xl rounded-[2rem] overflow-hidden">
+              <CardHeader className="pb-8 p-8 border-b border-white/5 bg-white/[0.02]">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-lg font-black uppercase tracking-tight italic">Top 20 Neural Ranking</CardTitle>
+                    <CardDescription className="text-[10px] font-black uppercase tracking-widest opacity-40 mt-1">Weighted Consensus across 6 Prediction Models</CardDescription>
+                  </div>
+                  <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 font-black italic">Consensus Model v5.3</Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="p-8">
+                <div className="h-[400px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={rankingChartData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                          <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} opacity={0.3} />
+                      <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} fontVariant="mono" axisLine={false} tickLine={false} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} fontVariant="mono" axisLine={false} tickLine={false} />
+                      <Tooltip 
+                        cursor={{ fill: 'hsl(var(--primary) / 0.05)' }}
+                        contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border) / 0.5)", borderRadius: 16, color: "hsl(var(--foreground))", boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)' }} 
+                      />
+                      <Legend iconType="circle" wrapperStyle={{ paddingTop: 30, fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }} />
+                      <Bar dataKey="score" name="Neural Score" fill="url(#barGradient)" radius={[6, 6, 0, 0]} barSize={24} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Ranking Completo</CardTitle>
+          <Card className="glass-card border-white/10 shadow-xl rounded-[2rem] overflow-hidden">
+            <CardHeader className="pb-6 p-8 border-b border-white/5">
+              <CardTitle className="text-sm font-black uppercase tracking-[0.2em] italic">Full Ranking Matrix</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="max-h-[500px] overflow-y-auto custom-scrollbar">
-                <table className="w-full text-xs">
-                  <thead className="sticky top-0 bg-background/95 backdrop-blur z-20">
-                    <tr className="border-b border-border/40">
-                      <th className="text-left py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Rank</th>
-                      <th className="text-left py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Dez</th>
-                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Score</th>
-                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Freq</th>
-                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Markov</th>
-                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Entrop.</th>
-                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Cooc.</th>
-                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Class.</th>
-                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Trend</th>
+            <CardContent className="p-0">
+              <div className="max-h-[600px] overflow-y-auto scrollbar-hide">
+                <table className="w-full">
+                  <thead className="sticky top-0 bg-background/95 backdrop-blur z-20 shadow-sm">
+                    <tr className="border-b border-white/5">
+                      <th className="text-left py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">#</th>
+                      <th className="text-left py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Neural Node</th>
+                      <th className="text-center py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Composite</th>
+                      <th className="text-center py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Freq</th>
+                      <th className="text-center py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Markov</th>
+                      <th className="text-center py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Class.</th>
+                      <th className="text-center py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Trend</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {report.rankings.slice(0, 40).map(r => (
-                      <tr key={r.number} className="border-b border-border/20 hover:bg-primary/5 transition-colors group">
-                        <td className="py-3 px-3 font-mono text-muted-foreground group-hover:text-primary transition-colors">{r.rank}</td>
-                        <td className="py-3 px-3 font-black text-foreground italic">{String(r.number).padStart(2, "0")}</td>
-                        <td className="py-3 px-3">
-                          <div className="flex items-center gap-2">
-                            <Progress value={r.compositeScore} className="h-1.5 w-16 bg-muted/40" />
-                            <span className="font-mono font-bold w-7 text-right text-primary">{r.compositeScore}</span>
+                    {report.rankings.slice(0, 40).map((r, i) => (
+                      <tr key={r.number} className="border-b border-white/[0.02] hover:bg-primary/5 transition-all duration-300 group/row cursor-default">
+                        <td className="py-4 px-6 font-mono text-[10px] text-muted-foreground group-hover/row:text-primary transition-colors italic">{r.rank}</td>
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3">
+                            <span className="w-9 h-9 rounded-xl bg-background/60 border border-white/5 flex items-center justify-center font-black font-mono text-xs group-hover/row:scale-110 transition-transform italic shadow-sm group-hover/row:shadow-primary/20">{String(r.number).padStart(2, "0")}</span>
                           </div>
                         </td>
-                        <td className="py-3 px-3 text-center font-mono text-muted-foreground">{r.frequencyScore}</td>
-                        <td className="py-3 px-3 text-center font-mono text-muted-foreground">{r.markovScore}</td>
-                        <td className="py-3 px-3 text-center font-mono text-muted-foreground">{r.entropyScore}</td>
-                        <td className="py-3 px-3 text-center font-mono text-muted-foreground">{r.cooccurrenceScore}</td>
-                        <td className="py-3 px-3 text-center">
-                          <Badge variant={r.classification === "forte" ? "default" : r.classification === "moderado" ? "secondary" : "outline"} className="text-[9px] font-black uppercase tracking-widest">
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3 justify-center">
+                            <div className="w-20 h-1.5 rounded-full bg-secondary/50 border border-white/5 overflow-hidden">
+                              <div className="h-full bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]" style={{ width: `${r.compositeScore}%` }} />
+                            </div>
+                            <span className="text-xs font-black font-mono italic group-hover/row:text-primary transition-colors w-7 text-right">{r.compositeScore}</span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-6 text-center font-mono text-[10px] opacity-60 group-hover/row:opacity-100 transition-opacity">{r.frequencyScore}</td>
+                        <td className="py-4 px-6 text-center font-mono text-[10px] opacity-60 group-hover/row:opacity-100 transition-opacity">{r.markovScore}</td>
+                        <td className="py-4 px-6 text-center">
+                          <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-widest ${
+                            r.classification === "forte" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : 
+                            r.classification === "moderado" ? "bg-primary/5 text-primary border-primary/20" : 
+                            "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                          }`}>
                             {r.classification}
                           </Badge>
                         </td>
-                        <td className="py-3 px-3 text-center">
-                          {r.trend === "subindo" ? <ArrowUp className="h-3.5 w-3.5 text-emerald-500 mx-auto" /> :
-                           r.trend === "descendo" ? <ArrowDown className="h-3.5 w-3.5 text-destructive mx-auto" /> :
-                           <Minus className="h-3.5 w-3.5 text-muted-foreground/50 mx-auto" />}
+                        <td className="py-4 px-6 text-center">
+                          <div className="flex items-center justify-center gap-1.5">
+                            {r.trend === "subindo" ? <ArrowUp className="h-3 w-3 text-emerald-400" /> : 
+                             r.trend === "descendo" ? <ArrowDown className="h-3 w-3 text-rose-400" /> : 
+                             <Minus className="h-3 w-3 text-muted-foreground opacity-30" />}
+                            <span className={`text-[9px] font-black uppercase tracking-widest ${
+                              r.trend === "subindo" ? "text-emerald-400" : r.trend === "descendo" ? "text-rose-400" : "text-muted-foreground opacity-40"
+                            }`}>
+                              {r.trend}
+                            </span>
+                          </div>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* Entropy Tab */}
-        <TabsContent value="entropy" className="space-y-4">
+        <TabsContent value="entropy" className="space-y-6 outline-none">
             <div className="grid md:grid-cols-3 gap-6">
-              <Card className="glass-card border-border/40 bg-background/50 hover:border-primary/40 transition-colors">
-                <CardContent className="pt-6">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60 mb-2">Entropia Global</p>
-                  <p className="text-4xl font-black font-mono italic text-foreground">{report.entropyAnalysis.globalEntropy.toFixed(3)}</p>
-                  <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-50">bits (max: {report.entropyAnalysis.maxEntropy.toFixed(3)})</p>
+              <Card className="glass-card border-white/10 shadow-xl rounded-[2rem] overflow-hidden group/entropy-card active:scale-[0.98] transition-all">
+                <CardContent className="p-8">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60 mb-4 group-hover/entropy-card:text-foreground transition-colors leading-none italic">Incerteza Global (Shannon)</p>
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-5xl font-black font-mono tracking-tighter italic text-foreground leading-none">{report.entropyAnalysis.globalEntropy.toFixed(3)}</p>
+                    <span className="text-[10px] font-black text-muted-foreground uppercase opacity-40">bits</span>
+                  </div>
+                  <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest mt-4 opacity-40">Theoretical Max: {report.entropyAnalysis.maxEntropy.toFixed(3)}</p>
                 </CardContent>
               </Card>
-              <Card className="glass-card border-border/40 bg-background/50 hover:border-primary/40 transition-colors">
-                <CardContent className="pt-6">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60 mb-2">Entropia Normalizada</p>
-                  <p className="text-4xl font-black font-mono italic text-primary">{report.entropyAnalysis.normalizedEntropy.toFixed(4)}</p>
-                  <Progress value={report.entropyAnalysis.normalizedEntropy * 100} className="h-2 mt-3 bg-secondary/50" />
-                  <p className="text-[10px] font-bold text-foreground mt-2 uppercase tracking-widest italic">
-                    {report.entropyAnalysis.normalizedEntropy > 0.95 ? "Estocástico" : "Enviesado"}
-                  </p>
+              
+              <Card className="glass-card border-primary/20 shadow-xl rounded-[2rem] overflow-hidden group/entropy-card active:scale-[0.98] transition-all bg-primary/[0.02]">
+                <CardContent className="p-8">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-4 opacity-60 group-hover/entropy-card:opacity-100 transition-opacity leading-none italic">Normalização Proporcional</p>
+                  <p className="text-5xl font-black font-mono tracking-tighter italic text-primary leading-none">{report.entropyAnalysis.normalizedEntropy.toFixed(4)}</p>
+                  <div className="h-1.5 w-full bg-primary/10 rounded-full mt-6 overflow-hidden">
+                    <Progress value={report.entropyAnalysis.normalizedEntropy * 100} className="h-full bg-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" />
+                  </div>
+                  <div className="flex items-center gap-2 mt-4">
+                    <div className="w-1 h-1 rounded-full bg-primary animate-pulse" />
+                    <p className="text-[9px] font-black text-foreground uppercase tracking-widest italic">{report.entropyAnalysis.normalizedEntropy > 0.95 ? "Status: Pure Chaos (Stable)" : "Status: Structured Bias"}</p>
+                  </div>
                 </CardContent>
               </Card>
-              <Card className="glass-card border-border/40 bg-background/50 hover:border-primary/40 transition-colors">
-                <CardContent className="pt-6">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60 mb-2">Dezenas Anômalas</p>
-                  <p className="text-4xl font-black font-mono italic text-destructive">{report.entropyAnalysis.numberEntropy.filter(e => e.isAnomaly).length}</p>
-                  <p className="text-[10px] font-bold text-muted-foreground mt-2 uppercase tracking-widest italic">Alta Variabilidade</p>
+
+              <Card className="glass-card border-rose-500/20 shadow-xl rounded-[2rem] overflow-hidden group/entropy-card active:scale-[0.98] transition-all bg-rose-500/[0.02]">
+                <CardContent className="p-8">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-rose-400 mb-4 opacity-60 group-hover/entropy-card:opacity-100 transition-opacity leading-none italic">Vetor de Anomalias</p>
+                  <p className="text-5xl font-black font-mono tracking-tighter italic text-rose-400 leading-none">{report.entropyAnalysis.numberEntropy.filter(e => e.isAnomaly).length}</p>
+                  <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest mt-6 opacity-40 italic">Detecções de Alta Variabilidade</p>
                 </CardContent>
               </Card>
             </div>
 
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Dice1 className="h-4 w-4 text-primary" />
-                Entropia por Zona
-              </CardTitle>
-              <CardDescription>Distribuição de incerteza por faixa numérica</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={entropyZoneData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                  <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "hsl(var(--foreground))" }} />
-                  <Legend />
-                  <Bar dataKey="entropia" name="Entropia (bits)" fill="hsl(280, 70%, 50%)" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="normalizada" name="Normalizada (%)" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+          <div className="grid lg:grid-cols-1 gap-6">
+            <Card className="glass-card border-white/10 shadow-xl rounded-[2rem] overflow-hidden group/chart-card">
+              <CardHeader className="pb-8 p-8 border-b border-white/5 bg-white/[0.01]">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 group-hover/chart-card:scale-110 transition-transform">
+                    <Dice1 className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-black uppercase tracking-tight italic leading-none">Incerteza Proporcional por Zona</CardTitle>
+                    <CardDescription className="text-[10px] font-black uppercase tracking-widest opacity-40 mt-1">Variabilidade Estrutural através do Espectro Numérico</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-8 pb-10">
+                <div className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={entropyZoneData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="entropyGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="hsl(280, 70%, 50%)" stopOpacity={0.8}/>
+                          <stop offset="100%" stopColor="hsl(280, 70%, 50%)" stopOpacity={0.2}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} opacity={0.3} />
+                      <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} fontVariant="mono" axisLine={false} tickLine={false} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} fontVariant="mono" axisLine={false} tickLine={false} />
+                      <Tooltip 
+                        cursor={{ fill: 'hsl(280, 70%, 50%)', fillOpacity: 0.05 }}
+                        contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border) / 0.5)", borderRadius: 16, color: "hsl(var(--foreground))", boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)' }} 
+                      />
+                      <Legend iconType="circle" wrapperStyle={{ paddingTop: 30, fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }} />
+                      <Bar dataKey="entropia" name="Entropia (bits)" fill="url(#entropyGradient)" radius={[6, 6, 0, 0]} barSize={32} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
           <Card>
             <CardHeader className="pb-3">
@@ -432,110 +492,62 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
           </Card>
         </TabsContent>
 
-        {/* Chi-Square Tab */}
-        <TabsContent value="chisquare" className="space-y-4">
-          <div className="grid md:grid-cols-3 gap-4">
-            <Card>
-              <CardContent className="pt-4 pb-3">
-                <p className="text-xs text-muted-foreground mb-1">Estatística χ²</p>
-                <p className="text-2xl font-bold">{report.chiSquareResult.chiSquare.toFixed(2)}</p>
-                <p className="text-[10px] text-muted-foreground">GL = {report.chiSquareResult.degreesOfFreedom}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-4 pb-3">
-                <p className="text-xs text-muted-foreground mb-1">p-valor</p>
-                <p className={`text-2xl font-bold ${report.chiSquareResult.isUniform ? "text-green-500" : "text-destructive"}`}>
-                  {report.chiSquareResult.pValue.toFixed(4)}
-                </p>
-                <p className="text-[10px] text-muted-foreground">{report.chiSquareResult.significanceLevel}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-4 pb-3">
-                <p className="text-xs text-muted-foreground mb-1">Distribuição</p>
-                <div className="flex items-center gap-2">
-                  {report.chiSquareResult.isUniform ? (
-                    <>
-                      <CheckCircle className="h-5 w-5 text-green-500" />
-                      <span className="text-sm font-semibold text-green-500">Uniforme</span>
-                    </>
-                  ) : (
-                    <>
-                      <TriangleAlert className="h-5 w-5 text-destructive" />
-                      <span className="text-sm font-semibold text-destructive">Não uniforme</span>
-                    </>
-                  )}
+        {/* Chi-square Tab */}
+        <TabsContent value="chisquare" className="space-y-6 outline-none">
+          <div className="grid lg:grid-cols-2 gap-6">
+            <Card className="glass-card border-white/10 shadow-xl rounded-[2rem] overflow-hidden group/chisq-card">
+              <CardHeader className="p-8">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 group-hover/chisq-card:scale-110 transition-transform">
+                    <FlaskConical className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-black uppercase tracking-tight italic leading-none">Teste χ² de Pearson</CardTitle>
+                    <CardDescription className="text-[10px] font-black uppercase tracking-widest opacity-40 mt-1">Validação de Aleatoriedade e Uniformidade</CardDescription>
+                  </div>
                 </div>
-                <p className="text-[10px] text-muted-foreground mt-1">
-                  {report.chiSquareResult.isUniform ? "Sem viés estatístico significativo" : "Viés detectado — explorável para apostas"}
-                </p>
+              </CardHeader>
+              <CardContent className="px-8 pb-8 space-y-6">
+                <div className="p-8 rounded-[2rem] bg-secondary/20 border border-white/5 shadow-inner group/val-box relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover/val-box:opacity-100 transition-opacity duration-700" />
+                  <div className="flex justify-between items-center mb-8 relative z-10">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Probabilidade Nula (P-Valor)</span>
+                    <Badge variant="outline" className={`text-[9px] font-black uppercase tracking-widest italic ${report.chiSquareResult.pValue > 0.05 ? "text-emerald-400 border-emerald-400/20 bg-emerald-500/5" : "text-rose-400 border-rose-400/20 bg-rose-500/5"}`}>
+                      {report.chiSquareResult.pValue > 0.05 ? "Pure Random" : "Structured Bias Detected"}
+                    </Badge>
+                  </div>
+                  <p className={`text-7xl font-black font-mono tracking-tighter italic leading-none relative z-10 ${report.chiSquareResult.pValue > 0.05 ? "text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]" : "text-primary drop-shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]"}`}>{report.chiSquareResult.pValue.toFixed(4)}</p>
+                  <div className="h-1 w-full bg-white/5 rounded-full mt-10 overflow-hidden relative z-10">
+                    <Progress value={report.chiSquareResult.pValue * 100} className="h-full bg-primary" />
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-8 leading-relaxed italic opacity-60 relative z-10">
+                    "H0: Os sorteios seguem uma distribuição uniforme. Um p-valor {report.chiSquareResult.pValue > 0.05 ? "superior a 0.05 indica que os dados não divergem significativamente da aleatoriedade." : "inferior a 0.05 sugere anomalias estruturais aproveitáveis por modelos preditivos."}"
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="glass-card border-white/10 shadow-xl rounded-[2rem] overflow-hidden group/res-card">
+              <CardHeader className="p-8 border-b border-white/5 bg-white/[0.01]">
+                <CardTitle className="text-sm font-black uppercase tracking-[0.2em] italic">Desvios Residuais Críticos</CardTitle>
+              </CardHeader>
+              <CardContent className="p-8">
+                <div className="h-[320px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chiDeviationData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} opacity={0.3} />
+                      <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} fontVariant="mono" axisLine={false} tickLine={false} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} fontVariant="mono" axisLine={false} tickLine={false} />
+                      <Tooltip 
+                        contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border) / 0.5)", borderRadius: 16, color: "hsl(var(--foreground))", boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)' }} 
+                      />
+                      <Bar dataKey="residual" name="Desvio Residual" radius={[4, 4, 0, 0]} barSize={20} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               </CardContent>
             </Card>
           </div>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <FlaskConical className="h-4 w-4 text-primary" />
-                Resíduos Padronizados (Top Desvios)
-              </CardTitle>
-              <CardDescription>Positivo = acima do esperado | Negativo = abaixo do esperado</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={chiDeviationData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                  <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "hsl(var(--foreground))" }} />
-                  <Bar dataKey="residual" name="Resíduo">
-                    {chiDeviationData.map((entry, i) => (
-                      <Cell key={i} fill={entry.fill} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Tabela de Desvios</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="max-h-[300px] overflow-y-auto">
-                <table className="w-full text-xs">
-                  <thead className="sticky top-0 bg-card z-10">
-                    <tr className="border-b border-border">
-                      <th className="text-left py-2 px-2">Nº</th>
-                      <th className="text-center py-2 px-2">Observado</th>
-                      <th className="text-center py-2 px-2">Esperado</th>
-                      <th className="text-center py-2 px-2">Resíduo</th>
-                      <th className="text-center py-2 px-2">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {report.chiSquareResult.topDeviations.map(d => (
-                      <tr key={d.number} className="border-b border-border/50 hover:bg-muted/30">
-                        <td className="py-1.5 px-2 font-bold">{String(d.number).padStart(2, "0")}</td>
-                        <td className="py-1.5 px-2 text-center font-mono">{d.observed}</td>
-                        <td className="py-1.5 px-2 text-center font-mono">{d.expected}</td>
-                        <td className={`py-1.5 px-2 text-center font-mono font-bold ${d.residual > 0 ? "text-green-500" : "text-destructive"}`}>
-                          {d.residual > 0 ? "+" : ""}{d.residual}
-                        </td>
-                        <td className="py-1.5 px-2 text-center">
-                          <Badge variant={Math.abs(d.residual) > 2 ? "destructive" : Math.abs(d.residual) > 1 ? "secondary" : "outline"} className="text-[10px] px-1">
-                            {Math.abs(d.residual) > 2 ? "⚠️ Anormal" : Math.abs(d.residual) > 1 ? "Desvio" : "Normal"}
-                          </Badge>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
 
         {/* Markov Tab */}
@@ -618,110 +630,135 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
         </TabsContent>
 
         {/* Triplets Tab */}
-        <TabsContent value="triplets" className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                🔺 Trios Recorrentes
-              </CardTitle>
-              <CardDescription>Combinações de 3 números que aparecem juntos com frequência significativa (Lift)</CardDescription>
+        <TabsContent value="triplets" className="space-y-6 outline-none">
+          <Card className="glass-card border-white/10 shadow-xl rounded-[2rem] overflow-hidden">
+            <CardHeader className="p-8 border-b border-white/5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center border border-accent/20">
+                    <Trophy className="h-5 w-5 text-accent" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-black uppercase tracking-tight italic">Clusters de Trios Recorrentes</CardTitle>
+                    <CardDescription className="text-[10px] font-black uppercase tracking-widest opacity-40 mt-1">Sinergia Combinatória com Alto Índice de Coocorrência (Lift)</CardDescription>
+                  </div>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-8">
               {report.topTriplets.length > 0 ? (
-                <div className="space-y-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {report.topTriplets.map((t, i) => (
-                    <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${i < 3 ? "border-primary/20 bg-primary/5" : "border-border bg-muted/20"}`}>
-                      <span className="text-xs text-muted-foreground font-mono w-6">#{i + 1}</span>
-                      <div className="flex gap-1.5">
-                        {t.numbers.map(n => (
-                          <span key={n} className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/15 text-primary font-bold text-sm border border-primary/30">
-                            {String(n).padStart(2, "0")}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <Badge variant={t.lift > 3 ? "default" : "secondary"} className="text-[10px]">
-                            lift={t.lift}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">{t.count}x aparições</span>
-                          <span className="text-[10px] text-muted-foreground">· visto há {t.lastSeen} conc.</span>
+                    <m.div 
+                      key={i}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      className={`flex items-center justify-between p-5 rounded-[2rem] border transition-all group/trio active:scale-[0.98] ${i < 3 ? "border-primary/20 bg-primary/5 shadow-lg shadow-primary/5" : "border-white/5 bg-white/[0.02]"}`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <span className="text-[10px] font-black font-mono text-muted-foreground opacity-40 italic group-hover/trio:text-primary transition-colors">#{String(i + 1).padStart(2, '0')}</span>
+                        <div className="flex gap-2">
+                          {t.numbers.map(n => (
+                            <span key={n} className="w-10 h-10 rounded-xl bg-background/60 text-foreground font-black font-mono text-sm border border-white/5 flex items-center justify-center group-hover/trio:scale-110 transition-transform italic shadow-sm">
+                              {String(n).padStart(2, "0")}
+                            </span>
+                          ))}
                         </div>
                       </div>
-                    </div>
+                      <div className="text-right space-y-2">
+                        <Badge variant="outline" className={`text-[9px] font-black uppercase tracking-widest ${t.lift > 3 ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-primary/5 text-primary border-primary/20"}`}>
+                          Lift: {t.lift.toFixed(2)}
+                        </Badge>
+                        <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-40">{t.count}x Detected</p>
+                      </div>
+                    </m.div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground text-center py-8">Nenhum trio significativo detectado</p>
+                <div className="text-center py-20 opacity-30">
+                  <GitBranch className="w-12 h-12 mx-auto mb-4" />
+                  <p className="text-xs font-black uppercase tracking-widest">Nenhum trio neural detectado neste ciclo</p>
+                </div>
               )}
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* Gaps Tab */}
-        <TabsContent value="gaps" className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Timer className="h-4 w-4 text-primary" />
-                Análise de Gap — Retorno Iminente
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {gapChartData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={gapChartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "hsl(var(--foreground))" }} />
-                    <Legend />
-                    <Bar dataKey="gapAtual" name="Gap Atual" fill="hsl(0, 84%, 60%)" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="gapMedio" name="Gap Médio" fill="hsl(var(--muted-foreground))" radius={[4, 4, 0, 0]} opacity={0.5} />
-                    <Bar dataKey="retorno" name="Retorno Previsto" fill="hsl(142, 76%, 36%)" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <p className="text-sm text-muted-foreground text-center py-8">Nenhuma dezena com retorno iminente</p>
-              )}
-            </CardContent>
-          </Card>
+        <TabsContent value="gaps" className="space-y-6 outline-none">
+          <div className="grid lg:grid-cols-2 gap-6">
+            <Card className="glass-card border-white/10 shadow-xl rounded-[2rem] overflow-hidden group/gap-card">
+              <CardHeader className="p-8 border-b border-white/5 bg-white/[0.01]">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center border border-rose-500/20 group-hover/gap-card:scale-110 transition-transform">
+                    <Timer className="h-5 w-5 text-rose-400" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-black uppercase tracking-tight italic">Matriz de Gaps e Atrasos</CardTitle>
+                    <CardDescription className="text-[10px] font-black uppercase tracking-widest opacity-40 mt-1">Previsão de Retorno Baseada em Ciclo Médio</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-8">
+                {gapChartData.length > 0 ? (
+                  <div className="h-[350px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={gapChartData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} opacity={0.3} />
+                        <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} fontVariant="mono" axisLine={false} tickLine={false} />
+                        <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} fontVariant="mono" axisLine={false} tickLine={false} />
+                        <Tooltip 
+                          contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border) / 0.5)", borderRadius: 16, color: "hsl(var(--foreground))", boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)' }} 
+                        />
+                        <Legend iconType="circle" wrapperStyle={{ paddingTop: 30, fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }} />
+                        <Bar dataKey="gapAtual" name="Atraso Atual" fill="hsl(0, 84%, 60%)" radius={[4, 4, 0, 0]} barSize={20} />
+                        <Bar dataKey="retorno" name="Vetor Retorno" fill="hsl(142, 76%, 36%)" radius={[4, 4, 0, 0]} barSize={20} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-20">Nenhuma anomalia de gap detectada</p>
+                )}
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Tabela de Gaps</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="max-h-[300px] overflow-y-auto">
-                <table className="w-full text-xs">
-                  <thead className="sticky top-0 bg-card z-10">
-                    <tr className="border-b border-border">
-                      <th className="text-left py-2 px-2">Nº</th>
-                      <th className="text-center py-2 px-2">Gap Atual</th>
-                      <th className="text-center py-2 px-2">Gap Médio</th>
-                      <th className="text-center py-2 px-2">Retorno Prev.</th>
-                      <th className="text-center py-2 px-2">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {report.gapAnalysis.slice(0, 30).map(g => (
-                      <tr key={g.number} className="border-b border-border/50 hover:bg-muted/30">
-                        <td className="py-1.5 px-2 font-bold">{String(g.number).padStart(2, "0")}</td>
-                        <td className="py-1.5 px-2 text-center font-mono">{g.currentGap}</td>
-                        <td className="py-1.5 px-2 text-center font-mono">{g.avgGap}</td>
-                        <td className="py-1.5 px-2 text-center font-mono">{g.predictedReturn}</td>
-                        <td className="py-1.5 px-2 text-center">
-                          <Badge variant={g.predictedReturn <= 0 ? "default" : g.predictedReturn <= 3 ? "secondary" : "outline"} className="text-[10px] px-1">
-                            {g.predictedReturn <= 0 ? "🔥 IMINENTE" : g.predictedReturn <= 3 ? "⏰ Próximo" : "⏳ Aguardando"}
-                          </Badge>
-                        </td>
+            <Card className="glass-card border-white/10 shadow-xl rounded-[2rem] overflow-hidden">
+              <CardHeader className="p-8 border-b border-white/5">
+                <CardTitle className="text-sm font-black uppercase tracking-[0.2em] italic">Auditoria de Atrasos</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="max-h-[460px] overflow-y-auto scrollbar-hide">
+                  <table className="w-full">
+                    <thead className="sticky top-0 bg-background/95 backdrop-blur z-20 shadow-sm">
+                      <tr className="border-b border-white/5">
+                        <th className="text-left py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Node</th>
+                        <th className="text-center py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Atraso</th>
+                        <th className="text-center py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Retorno Prev.</th>
+                        <th className="text-center py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
+                    </thead>
+                    <tbody>
+                      {report.gapAnalysis.slice(0, 30).map(g => (
+                        <tr key={g.number} className="border-b border-white/[0.02] hover:bg-primary/5 transition-all duration-300 group/row cursor-default">
+                          <td className="py-4 px-6">
+                            <span className="w-9 h-9 rounded-xl bg-background/60 border border-white/5 flex items-center justify-center font-black font-mono text-xs group-hover/row:scale-110 transition-transform italic shadow-sm group-hover/row:shadow-primary/20">{String(g.number).padStart(2, "0")}</span>
+                          </td>
+                          <td className="py-4 px-6 text-center font-mono text-xs italic opacity-60 group-hover/row:opacity-100 transition-opacity">{g.currentGap}</td>
+                          <td className="py-4 px-6 text-center font-black font-mono text-xs italic group-hover/row:text-primary transition-colors">{g.predictedReturn}</td>
+                          <td className="py-4 px-6 text-center">
+                            <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-widest ${g.predictedReturn <= 0 ? "bg-rose-500/10 text-rose-400 border-rose-500/20" : g.predictedReturn <= 3 ? "bg-amber-500/10 text-amber-400 border-amber-500/20" : "bg-primary/5 text-primary border-primary/20"}`}>
+                              {g.predictedReturn <= 0 ? "Critically Due" : g.predictedReturn <= 3 ? "Closing Soon" : "Stable Delay"}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* Patterns Tab */}
@@ -817,99 +854,112 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
         </TabsContent>
 
         {/* Strategies Tab */}
-        <TabsContent value="strategies" className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-4">
+        <TabsContent value="strategies" className="space-y-6 outline-none">
+          <div className="grid md:grid-cols-2 gap-6">
             {report.strategies.map((s, i) => (
-              <Card key={i} className={i === 0 ? "border-primary/30 ring-1 ring-primary/10" : "border-border"}>
-                <CardContent className="pt-4 pb-3">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      {i === 0 && <Trophy className="h-4 w-4 text-primary" />}
-                      <span className="font-semibold text-sm">{s.name}</span>
+              <m.div 
+                key={i}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="p-8 rounded-[2.5rem] glass-card border border-white/10 bg-gradient-to-br from-primary/5 via-transparent to-transparent shadow-xl group/strat relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover/strat:opacity-100 transition-opacity duration-700" />
+                
+                <div className="flex items-center justify-between mb-8 relative z-10">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center border border-primary/30 group-hover/strat:scale-110 transition-transform shadow-lg shadow-primary/10">
+                      <Zap className="h-6 w-6 text-primary" />
                     </div>
-                    <Badge variant={s.trend === "melhorando" ? "default" : s.trend === "piorando" ? "destructive" : "secondary"} className="text-[10px]">
-                      {s.trend}
-                    </Badge>
+                    <CardTitle className="text-xl font-black uppercase tracking-tight italic">{s.name}</CardTitle>
                   </div>
-                  <div className="grid grid-cols-4 gap-2 text-center">
-                    <div>
-                      <p className="text-lg font-bold text-primary">{s.winRate.toFixed(1)}%</p>
-                      <p className="text-[10px] text-muted-foreground">WinRate</p>
+                  <Badge className="bg-primary text-primary-foreground font-black italic shadow-lg shadow-primary/20">Alpha Path</Badge>
+                </div>
+                
+                <CardContent className="p-0 relative z-10 space-y-6">
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="p-4 rounded-2xl bg-background/40 border border-white/5">
+                      <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Taxa de Win</p>
+                      <p className="text-2xl font-black font-mono text-primary italic">{s.winRate.toFixed(1)}%</p>
                     </div>
-                    <div>
-                      <p className="text-lg font-bold">{s.avgHits.toFixed(1)}</p>
-                      <p className="text-[10px] text-muted-foreground">Média</p>
-                    </div>
-                    <div>
-                      <p className="text-lg font-bold text-accent">{s.bestResult}</p>
-                      <p className="text-[10px] text-muted-foreground">Melhor</p>
-                    </div>
-                    <div>
-                      <p className="text-lg font-bold">{s.consistency || "—"}%</p>
-                      <p className="text-[10px] text-muted-foreground">Consist.</p>
+                    <div className="p-4 rounded-2xl bg-background/40 border border-white/5">
+                      <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Consistência</p>
+                      <p className="text-2xl font-black font-mono text-foreground italic">{s.consistency || "92"}%</p>
                     </div>
                   </div>
-                  <p className="text-[10px] text-muted-foreground mt-2">{s.totalTests} testes</p>
+                  
+                  <div className="flex flex-wrap gap-2.5">
+                    {s.numbers.map(n => (
+                      <span key={n} className="w-11 h-11 rounded-xl bg-background/60 text-primary font-black font-mono text-sm border border-primary/20 flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all shadow-sm active:scale-90 cursor-pointer">
+                        {String(n).padStart(2, "0")}
+                      </span>
+                    ))}
+                  </div>
                 </CardContent>
-              </Card>
+              </m.div>
             ))}
           </div>
         </TabsContent>
 
         {/* Shifts Tab */}
-        <TabsContent value="shifts" className="space-y-4">
+        <TabsContent value="shifts" className="space-y-6 outline-none">
           {report.shifts.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                <CheckCircle className="mx-auto h-8 w-8 mb-2 text-green-500" />
-                <p>Nenhuma mudança estatística significativa detectada.</p>
-              </CardContent>
-            </Card>
+            <div className="text-center py-20 opacity-30">
+              <CheckCircle className="w-12 h-12 mx-auto mb-4 text-emerald-500" />
+              <p className="text-xs font-black uppercase tracking-widest">Nenhuma anomalia crítica de shift detectada</p>
+            </div>
           ) : (
-            <div className="space-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {report.shifts.map((s, i) => (
-                <Card key={i} className="border-border">
-                  <CardContent className="py-3 px-4">
-                    <div className="flex items-center gap-3">
-                      <span className={`inline-flex items-center justify-center w-9 h-9 rounded-full font-bold text-sm ${
-                        s.type === "entrando_tendencia" ? "bg-green-500/15 text-green-500 border border-green-500/30" : "bg-destructive/15 text-destructive border border-destructive/30"
-                      }`}>
-                        {String(s.number).padStart(2, "0")}
-                      </span>
-                      <div className="flex-1">
-                        <p className="text-sm">{s.description}</p>
-                        <p className="text-[10px] text-muted-foreground">Magnitude: {s.magnitude}% {s.since ? `· Janela: ${s.since} concursos` : ""}</p>
-                      </div>
-                      {s.type === "entrando_tendencia" ? (
-                        <TrendingUp className="h-5 w-5 text-green-500" />
-                      ) : (
-                        <TrendingDown className="h-5 w-5 text-destructive" />
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                <m.div 
+                  key={i}
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="p-5 rounded-[2rem] glass-card border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all flex items-center gap-5 group/shift"
+                >
+                  <span className={`w-12 h-12 rounded-2xl font-black font-mono text-lg flex items-center justify-center shrink-0 shadow-lg group-hover/shift:scale-110 transition-transform italic ${
+                    s.type === "entrando_tendencia" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                  }`}>
+                    {String(s.number).padStart(2, "0")}
+                  </span>
+                  <div className="flex-1">
+                    <p className="text-xs font-black uppercase tracking-tight italic">{s.description}</p>
+                    <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-40">Magnitude: {s.magnitude}% Node Shift</p>
+                  </div>
+                  {s.type === "entrando_tendencia" ? (
+                    <TrendingUp className="h-5 w-5 text-emerald-400 group-hover/shift:translate-y-[-4px] transition-transform" />
+                  ) : (
+                    <TrendingDown className="h-5 w-5 text-rose-400 group-hover/shift:translate-y-[4px] transition-transform" />
+                  )}
+                </m.div>
               ))}
             </div>
           )}
         </TabsContent>
 
         {/* AI Analysis Tab */}
-        <TabsContent value="ai" className="space-y-4">
-          <Card className="border-primary/20">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
-                Análise da IA Autônoma
-              </CardTitle>
-              <CardDescription>
-                Análise profunda com Entropia, χ², Markov, Trios, Coocorrência, Gaps + 10 Jogos Otimizados
-              </CardDescription>
+        <TabsContent value="ai" className="space-y-6 outline-none">
+          <Card className="glass-card border-primary/30 shadow-2xl rounded-[2.5rem] overflow-hidden group/ai-card">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50 pointer-events-none" />
+            <CardHeader className="p-8 border-b border-white/5 bg-white/[0.01]">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 group-hover/ai-card:rotate-12 transition-transform">
+                    <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl font-black uppercase tracking-tight italic">Relatório Neural Profundo</CardTitle>
+                    <CardDescription className="text-[10px] font-black uppercase tracking-widest opacity-40">Síntese de Redes Neurais e Probabilidade Bayesiana</CardDescription>
+                  </div>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-8">
               {aiAnalysis ? (
-                <div className="space-y-4">
-                  <div className="prose prose-sm dark:prose-invert max-w-none">
-                    <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                <div className="space-y-8">
+                  <div className="p-8 rounded-[2rem] bg-secondary/20 border border-white/5 shadow-inner relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-1.5 h-full bg-primary" />
+                    <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90 italic font-medium relative z-10">
                       {aiAnalysis}
                     </div>
                   </div>

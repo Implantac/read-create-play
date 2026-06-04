@@ -10,15 +10,16 @@ const IAAutonomaPage = () => {
   const { config, draws, stats } = useLotteryContext();
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
+    <div className="space-y-10 animate-in fade-in duration-700 max-w-7xl mx-auto">
       <PageHeader
         title="Protocolo IA Autônomo"
-        description="Redes neurais em regime de aprendizado contínuo para detecção de anomalias estatísticas."
+        description="Redes neurais em regime de aprendizado contínuo para detecção de anomalias estatísticas e padrões ocultos."
         icon={Brain}
-        badge="NEURAL ACTIVE"
+        badge="ALPHA NEURAL CORE"
       />
+      
       <div className="relative group">
-        <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-1000" />
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-[2rem] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-1000 pointer-events-none" />
         <LotteryContextBanner />
       </div>
 
@@ -26,7 +27,7 @@ const IAAutonomaPage = () => {
       {draws.length === 0 ? (
         <EmptyState description="Importe os sorteios primeiro no Dashboard para ativar a IA Autônoma." />
       ) : (
-        <PlanGate feature="ia_autonoma" fallbackMessage="IA Autônoma com aprendizado contínuo">
+        <PlanGate feature="ia_autonoma" fallbackMessage="IA Autônoma com aprendizado contínuo para usuários de elite">
           <AIAutonomousDashboard config={config} draws={draws} stats={stats} />
         </PlanGate>
       )}
