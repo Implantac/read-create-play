@@ -11,6 +11,8 @@ import { Bookmark, Trophy, TrendingUp, BarChart3, ChevronDown, ChevronUp, Loader
 import { m, AnimatePresence } from "framer-motion";
 import { useSavedBets, SavedBet } from "@/hooks/useSavedBets";
 import { useLotteryContext } from "@/contexts/LotteryContext";
+import { StatsCard } from "@/components/common/StatsCard";
+
 
 const DRAW_RANGE_OPTIONS = [
   { value: "10", label: "Últimos 10" },
