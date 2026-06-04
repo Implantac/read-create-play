@@ -12,8 +12,9 @@ import { m, AnimatePresence } from "framer-motion";
 import { 
   BarChart3, Loader2, RefreshCw, Sparkles, FlaskConical, PieChart, 
   Brain, Clover, X, Crown, History, Info, Terminal, Zap, Search, 
-  ShieldCheck, CheckCircle2, TrendingUp, Activity as LucideActivity 
+  ShieldCheck, CheckCircle2, TrendingUp, Grid3X3, Activity as LucideActivity 
 } from "lucide-react";
+
 
 const Activity = LucideActivity;
 
