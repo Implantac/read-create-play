@@ -147,7 +147,7 @@ export default function LotofacilPremiumPage() {
 
         {/* --- OVERVIEW TAB --- */}
         <TabsContent value="overview" className="space-y-6">
-          <div className="grid lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <StatsCard title="Score Elite" value={topElite.length} icon={Crown} />
             <StatsCard title="Ciclo Atual" value={`#${cycle?.currentCycle || 0}`} icon={Clock} />
             <StatsCard title="Prob. Fechamento" value={`${(100 - (cycle?.missingNumbers.length || 0) * 4).toFixed(0)}%`} icon={Target} />
