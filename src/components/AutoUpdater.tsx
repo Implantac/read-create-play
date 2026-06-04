@@ -6,16 +6,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, Wifi, WifiOff, Clock, CheckCircle2, Trophy, Users, DollarSign, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { formatCurrency, formatNumber } from "@/utils/formatters";
 
 interface Props {
   lotteryId: string;
   onNewDraw: (draw: DrawResult) => void;
   latestConcurso: number;
   syncDraws?: (isSilent?: boolean) => Promise<{ success: boolean; result?: any; error?: string }>;
-}
-
-function formatCurrency(value: number): string {
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
 export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso, syncDraws }: Props) {
