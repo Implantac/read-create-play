@@ -41,10 +41,34 @@ const DashboardPage = () => {
   }, [stats, draws, selectedLottery, saveGeneration, config]);
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-black tracking-tighter">Olá, Titan!</h1>
-        <p className="text-muted-foreground">Bem-vindo ao seu assistente de decisões lotéricas.</p>
+    <div className="space-y-10 animate-in fade-in duration-700 max-w-7xl mx-auto">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded bg-primary/10 border border-primary/20 text-[9px] font-black text-primary uppercase tracking-[0.2em] italic">System v5.3 Alpha</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic flex items-baseline gap-3">
+            Olá, <span className="gradient-brand-text">Titan!</span>
+          </h1>
+          <p className="text-sm text-muted-foreground font-medium max-w-md">Seu terminal avançado de inteligência estatística para decisões de alta performance.</p>
+        </div>
+        
+        <div className="flex items-center gap-3">
+          <Button variant="outline" className="h-12 rounded-xl border-border/60 font-bold uppercase tracking-widest text-[10px] px-6 hover:bg-secondary/40 transition-all shadow-sm">
+            <History className="w-4 h-4 mr-2 opacity-60" /> Ver Atividade
+          </Button>
+          <Button onClick={generateGame} disabled={generating} className="h-12 rounded-xl gradient-brand font-black uppercase tracking-widest text-[10px] px-8 shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+            {generating ? (
+              <m.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}>
+                <Zap className="w-4 h-4" />
+              </m.div>
+            ) : (
+              <Sparkles className="w-4 h-4 mr-2" />
+            )}
+            {generating ? "Calibrando..." : "Gerar Aposta Master"}
+          </Button>
+        </div>
       </div>
 
       <LotteryContextBanner />
