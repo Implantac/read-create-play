@@ -1,4 +1,4 @@
-import { Crown, CheckCircle2, Loader2, ShieldCheck, Gem } from "lucide-react";
+import { Crown, CheckCircle2, Loader2, ShieldCheck, Gem, TrendingUp, Zap, Users, Brain, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Badge } from "@/components/ui/badge";
 
 export function PricingSection() {
   const { session } = useAuth();
@@ -38,103 +39,139 @@ export function PricingSection() {
     }
   };
 
+  const plans = [
+    {
+      name: "Plano Gratuito",
+      price: "R$ 0",
+      description: "Recursos básicos para análise.",
+      features: [
+        "3 Jogos salvos por loteria",
+        "Estatísticas básicas",
+        "Histórico de sorteios",
+        "Conferidor simples",
+      ],
+      cta: "Começar Grátis",
+      popular: false,
+      color: "bg-muted/50 border-white/5",
+      icon: Shield
+    },
+    {
+      name: "Plano ELITE",
+      price: LAUNCH_PRICE,
+      description: "O poder total do Titan OS.",
+      features: [
+        "Acesso Vitalício",
+        "IA Autônoma v4",
+        "Simulações Massivas",
+        "ROI Dashboard",
+        "Afiliados & Gamificação",
+        "Strategy Lab Pro",
+        "Suporte VIP",
+        "Sem mensalidade",
+      ],
+      cta: "Garantir Vaga Vitalícia",
+      popular: true,
+      color: "bg-primary/5 border-primary/20",
+      icon: Crown
+    }
+  ];
+
   return (
-    <section id="pricing" className="py-24 md:py-40 relative">
+    <section id="pricing" className="py-24 md:py-40 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(160,84,45,0.05),transparent)] pointer-events-none" />
+      
       <div className="container mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16 space-y-4"
+          className="text-center mb-20 space-y-4"
         >
-          <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic">
-            Investimento <span className="gradient-brand-text">Único</span>
+          <Badge variant="outline" className="px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.3em] bg-primary/10 text-primary border-primary/20 mb-4">
+            Escolha sua Estratégia
+          </Badge>
+          <h2 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic">
+            Investimento em <span className="gradient-brand-text">Performance</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-70">
-            Acesso vitalício sem mensalidades. Garanta sua vaga no protocolo de elite hoje mesmo.
+            Assuma o controle dos seus jogos com as ferramentas de elite do mercado.
           </p>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          className="max-w-5xl mx-auto relative rounded-[2.5rem] border-4 border-neon-amber/40 p-1 overflow-hidden shadow-2xl shadow-neon-amber/20"
-        >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(245,158,11,0.15),transparent)] pointer-events-none" />
-          
-          <div className="relative bg-card/60 backdrop-blur-2xl rounded-[2.2rem] p-8 md:p-14">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div className="space-y-8">
-                <div>
-                  <div className="flex items-center gap-2 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-neon-amber/20 flex items-center justify-center border border-neon-amber/30">
-                      <Gem className="w-5 h-5 text-neon-amber" />
-                    </div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-neon-amber opacity-80">Titan Professional Network</span>
+        <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          {plans.map((plan, idx) => (
+            <motion.div
+              key={plan.name}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1 }}
+              className={`relative rounded-[2.5rem] border-2 p-1 overflow-hidden transition-all duration-500 hover:translate-y-[-8px] ${plan.popular ? 'border-primary/40 shadow-2xl shadow-primary/20 scale-105 z-10' : 'border-white/10 hover:border-primary/20 shadow-xl'}`}
+            >
+              <div className={`relative ${plan.color} backdrop-blur-2xl rounded-[2.3rem] p-10 h-full flex flex-col`}>
+                {plan.popular && (
+                  <div className="absolute top-6 right-8">
+                    <Badge className="bg-primary text-primary-foreground font-black uppercase tracking-widest text-[8px] px-3">Mais Popular</Badge>
                   </div>
-                  <h3 className="text-3xl md:text-4xl font-black uppercase tracking-tighter italic">Titan <span className="text-neon-amber">Full Node</span></h3>
-                  <p className="text-muted-foreground text-sm mt-3 font-medium leading-relaxed opacity-70">
-                    Acesso completo e perpétuo a todas as ferramentas de inteligência artificial, geradores e simuladores da plataforma.
-                  </p>
+                )}
+                
+                <div className="flex items-center gap-3 mb-8">
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border ${plan.popular ? 'bg-primary/20 border-primary/30' : 'bg-muted/50 border-white/10'}`}>
+                    <plan.icon className={`w-6 h-6 ${plan.popular ? 'text-primary' : 'text-muted-foreground'}`} />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black uppercase italic tracking-tighter">{plan.name}</h3>
+                    <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">{plan.description}</p>
+                  </div>
                 </div>
 
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {[
-                    "Acesso vitalício",
-                    "8 Loterias integradas",
-                    "IA e Machine Learning",
-                    "Geradores Pro",
-                    "Simulações massivas",
-                    "Atualizações inclusas",
-                    "Suporte VIP",
-                    "Sem mensalidade",
-                  ].map((feature, i) => (
-                    <li key={i} className="flex items-center gap-3 text-sm">
-                      <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
-                      <span className="font-medium">{feature}</span>
+                <div className="flex items-baseline gap-1 mb-8">
+                  <span className="text-5xl font-black font-mono tracking-tighter italic">{plan.price}</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-40 ml-1">
+                    {plan.price === "R$ 0" ? "/ sempre" : "/ pagamento único"}
+                  </span>
+                </div>
+
+                <ul className="space-y-4 mb-10 flex-1">
+                  {plan.features.map((feature, i) => (
+                    <li key={i} className="flex items-center gap-3 text-sm font-medium">
+                      <CheckCircle2 className={`w-4 h-4 shrink-0 ${plan.popular ? 'text-primary' : 'text-muted-foreground'}`} />
+                      <span className={plan.popular ? 'text-foreground' : 'text-muted-foreground'}>{feature}</span>
                     </li>
                   ))}
                 </ul>
-              </div>
-
-              <div className="bg-white/[0.03] border-2 border-white/10 rounded-[2rem] p-10 flex flex-col items-center text-center relative overflow-hidden group/price">
-                <div className="absolute inset-0 bg-gradient-to-b from-neon-amber/5 via-transparent to-transparent opacity-0 group-hover/price:opacity-100 transition-opacity" />
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-50 mb-4 relative z-10">Unique Activation</p>
-                
-                <div className="flex items-center gap-3 mb-2 relative z-10">
-                  <span className="text-muted-foreground line-through text-xl font-mono font-bold opacity-40">{ORIGINAL_PRICE}</span>
-                  <span className="bg-primary/20 text-primary text-[10px] font-black px-3 py-1 rounded-full border border-primary/30">-70% OFF</span>
-                </div>
-                
-                <div className="flex items-baseline gap-1 mb-8 relative z-10">
-                  <span className="text-6xl font-black font-mono tracking-tighter italic text-foreground">{LAUNCH_PRICE}</span>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-40 ml-1">Pagamento Único</span>
-                </div>
 
                 <Button 
-                  size="lg" 
-                  onClick={handleCheckout} 
+                  onClick={plan.price === "R$ 0" ? () => navigate("/signup") : handleCheckout}
                   disabled={loadingPlan}
-                  className="w-full h-16 rounded-2xl text-lg font-black uppercase tracking-widest gradient-brand text-primary-foreground shadow-2xl shadow-primary/30 hover:scale-[1.03] active:scale-95 transition-all relative z-10"
+                  className={`w-full h-16 rounded-2xl text-base font-black uppercase tracking-widest transition-all ${plan.popular ? 'gradient-brand text-primary-foreground shadow-xl shadow-primary/20 hover:scale-[1.02]' : 'bg-background hover:bg-muted border-2 border-white/10'}`}
                 >
-                  {loadingPlan ? <Loader2 className="w-6 h-6 animate-spin" /> : "Garantir Vaga Vitalícia"}
+                  {loadingPlan && plan.popular ? <Loader2 className="w-5 h-5 animate-spin" /> : plan.cta}
                 </Button>
-
-                <div className="mt-6 flex items-center justify-center gap-6 opacity-40">
-                  <div className="flex flex-col items-center">
-                    <ShieldCheck className="w-5 h-5 mb-1" />
-                    <span className="text-[8px] font-black uppercase tracking-tighter">Compra Segura</span>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <Star className="w-5 h-5 mb-1 text-neon-amber fill-neon-amber" />
-                    <span className="text-[8px] font-black uppercase tracking-tighter">7 Dias Garantia</span>
-                  </div>
-                </div>
               </div>
-            </div>
-          </div>
-        </motion.div>
+            </motion.div>
+          ))}
+        </div>
+        
+        <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
+           <div className="flex flex-col items-center gap-2">
+             <TrendingUp className="w-8 h-8" />
+             <p className="text-[10px] font-black uppercase tracking-widest text-center">Analytics ROI</p>
+           </div>
+           <div className="flex flex-col items-center gap-2">
+             <Zap className="w-8 h-8" />
+             <p className="text-[10px] font-black uppercase tracking-widest text-center">IA Autônoma</p>
+           </div>
+           <div className="flex flex-col items-center gap-2">
+             <Users className="w-8 h-8" />
+             <p className="text-[10px] font-black uppercase tracking-widest text-center">Gestão de Rede</p>
+           </div>
+           <div className="flex flex-col items-center gap-2">
+             <Brain className="w-8 h-8" />
+             <p className="text-[10px] font-black uppercase tracking-widest text-center">Neural Core</p>
+           </div>
+        </div>
       </div>
     </section>
   );
