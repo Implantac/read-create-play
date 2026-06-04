@@ -217,7 +217,7 @@ export default function FechamentosPage() {
                         </span>
                         <span className="flex items-center gap-1">
                           <Coins className="w-3 h-3" />
-                          Custo: <strong className="text-accent">R$ {cost.toFixed(2)}</strong>
+                          Custo: <strong className="text-accent">{formatCurrency(cost)}</strong>
                         </span>
                       </div>
                     </div>
