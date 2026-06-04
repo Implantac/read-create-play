@@ -123,7 +123,7 @@ export function RecentDraws({ draws }: Props) {
                                   <span className={`font-bold ${
                                     tier.ganhadores > 0 ? "text-primary" : "text-muted-foreground"
                                   }`}>
-                                    {tier.ganhadores.toLocaleString("pt-BR")}
+                                    {formatNumber(tier.ganhadores)}
                                   </span>
                                 </td>
                                 <td className="px-2 py-1.5 text-right font-mono">
