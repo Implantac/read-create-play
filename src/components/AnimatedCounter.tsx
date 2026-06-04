@@ -46,7 +46,7 @@ export function AnimatedCounter({ value, label, index }: AnimatedCounterProps) {
       if (decimals > 0) {
         setDisplay(current.toFixed(decimals));
       } else {
-        setDisplay(Math.round(current).toLocaleString("pt-BR"));
+        setDisplay(formatNumber(Math.round(current)));
       }
 
       if (step >= steps) {
