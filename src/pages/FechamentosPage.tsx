@@ -48,6 +48,7 @@ const BET_PRICES: Record<string, number> = {
   timemania: 3.5,
   diadesorte: 2.5,
   supersete: 2.5,
+  mais_milionaria: 6.0,
 };
 
 const MATRIX_LIST = Object.entries(WHEELING_MATRICES).map(([id, m]) => ({
