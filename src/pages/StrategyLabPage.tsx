@@ -345,7 +345,7 @@ export default function StrategyLabPage() {
                   <div className="flex items-center gap-2">
                     {!configOpen && selectedStrategies.length > 0 && (
                       <span className="text-[10px] text-muted-foreground">
-                        {selectedStrategies.length} estratégias • {gamesPerStrategy} jogos • {PROFILE_INFO[profile].label}
+                        {formatNumber(selectedStrategies.length)} estratégias • {formatNumber(gamesPerStrategy)} jogos • {PROFILE_INFO[profile].label}
                       </span>
                     )}
                     <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${configOpen ? "rotate-180" : ""}`} />
