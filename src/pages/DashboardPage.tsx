@@ -6,7 +6,7 @@ import { useGenerationHistory } from "@/hooks/useGenerationHistory";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { evaluateBetQuality } from "@/engine/stats/bet-quality";
 import { m } from "framer-motion";
-import { Sparkles, Bot, Target, Zap, BarChart3, ChevronRight, Grid3X3, User, History, Brain, Snowflake, TrendingUp, Smartphone } from "lucide-react";
+import { Sparkles, Bot, Target, Zap, BarChart3, ChevronRight, Grid3X3, User, History, Brain, Snowflake, TrendingUp, Smartphone, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
