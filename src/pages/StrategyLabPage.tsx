@@ -154,7 +154,7 @@ export default function StrategyLabPage() {
           }, ...prev].slice(0, 10));
         }
 
-        toast.success(`${res.rankings.length} estratégias testadas em ${res.elapsedMs}ms`);
+        toast.success(`${formatNumber(res.rankings.length)} estratégias testadas em ${formatNumber(res.elapsedMs)}ms`);
         setActiveTab("bestgames");
       } catch (err) {
         console.error(err);
