@@ -1,29 +1,32 @@
 import { motion } from "framer-motion";
 import { Quote, Star } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-const testimonials = [
-  {
-    name: "Ricardo Silva",
-    role: "Analista de Dados",
-    content: "O Titan Loterias mudou completamente minha forma de enxergar os sorteios. A precisão da IA é assustadora.",
-    initials: "RS",
-  },
-  {
-    name: "Ana Oliveira",
-    role: "Jogadora Profissional",
-    content: "As ferramentas de backtest me economizaram centenas de reais em apostas sem sentido. Agora só jogo com estratégia.",
-    initials: "AO",
-  },
-  {
-    name: "Marcos Santos",
-    role: "Entusiasta de Matemática",
-    content: "Melhor plataforma do Brasil. O otimizador de matrizes é simplesmente fantástico para quem busca cobertura real.",
-    initials: "MS",
-  },
-];
-
 export function Testimonials() {
+  const { t } = useTranslation();
+
+  const testimonials = [
+    {
+      name: t("landing.testimonials.items.t1.name"),
+      role: t("landing.testimonials.items.t1.role"),
+      content: t("landing.testimonials.items.t1.content"),
+      initials: "RS",
+    },
+    {
+      name: t("landing.testimonials.items.t2.name"),
+      role: t("landing.testimonials.items.t2.role"),
+      content: t("landing.testimonials.items.t2.content"),
+      initials: "AO",
+    },
+    {
+      name: t("landing.testimonials.items.t3.name"),
+      role: t("landing.testimonials.items.t3.role"),
+      content: t("landing.testimonials.items.t3.content"),
+      initials: "MS",
+    },
+  ];
+
   return (
     <section className="py-24 md:py-40 bg-card/20 border-y border-border/40">
       <div className="container mx-auto px-6">
@@ -34,10 +37,10 @@ export function Testimonials() {
           className="text-center mb-16 space-y-4"
         >
           <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic">
-            Quem usa, <span className="gradient-brand-text">Aprova</span>
+            {t("landing.testimonials.title").split(", ").map((word, i) => i === 1 ? <span key={i} className="gradient-brand-text">{word} </span> : word + ", ")}
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-70">
-            Junte-se a milhares de jogadores que já profissionalizaram suas estratégias.
+            {t("landing.testimonials.subtitle")}
           </p>
         </motion.div>
 
