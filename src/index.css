@@ -7,58 +7,59 @@
 @layer base {
   :root,
   .dark {
-    --background: 222 47% 4%;
-    --foreground: 213 31% 91%;
+    --background: 222 47% 2%;
+    --foreground: 213 31% 94%;
 
-    --card: 222 47% 6%;
-    --card-foreground: 213 31% 91%;
+    --card: 222 47% 4%;
+    --card-foreground: 213 31% 94%;
 
-    --popover: 222 47% 5%;
-    --popover-foreground: 213 31% 91%;
+    --popover: 222 47% 3%;
+    --popover-foreground: 213 31% 94%;
 
-    --primary: 160 84% 39%;
+    --primary: 160 84% 45%;
     --primary-foreground: 222 47% 2%;
 
-    --secondary: 222 47% 12%;
-    --secondary-foreground: 213 31% 80%;
+    --secondary: 222 47% 8%;
+    --secondary-foreground: 213 31% 85%;
 
-    --muted: 222 47% 10%;
-    --muted-foreground: 215 20% 50%;
+    --muted: 222 47% 6%;
+    --muted-foreground: 215 20% 60%;
 
-    --accent: 199 89% 48%;
+    --accent: 199 89% 55%;
     --accent-foreground: 222 47% 2%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 20% 98%;
 
-    --border: 222 47% 12%;
-    --input: 222 47% 12%;
-    --ring: 160 84% 39%;
+    --border: 222 47% 8%;
+    --input: 222 47% 8%;
+    --ring: 160 84% 45%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 222 47% 3%;
-    --sidebar-foreground: 213 31% 70%;
-    --sidebar-primary: 160 84% 39%;
+    --sidebar-background: 222 47% 1.5%;
+    --sidebar-foreground: 213 31% 80%;
+    --sidebar-primary: 160 84% 45%;
     --sidebar-primary-foreground: 222 47% 2%;
-    --sidebar-accent: 222 47% 8%;
-    --sidebar-accent-foreground: 213 31% 90%;
-    --sidebar-border: 222 47% 8%;
-    --sidebar-ring: 160 84% 39%;
+    --sidebar-accent: 222 47% 5%;
+    --sidebar-accent-foreground: 213 31% 95%;
+    --sidebar-border: 222 47% 5%;
+    --sidebar-ring: 160 84% 45%;
 
     /* Enterprise precision tokens */
-    --neon-green: 160 84% 39%;
-    --neon-blue: 199 89% 48%;
-    --neon-amber: 45 93% 47%;
+    --neon-green: 160 84% 45%;
+    --neon-blue: 199 89% 55%;
+    --neon-amber: 45 93% 55%;
     --neon-red: 0 84% 60%;
-    --neon-purple: 255 70% 60%;
-    --neon-cyan: 180 80% 45%;
-    --surface-elevated: 222 47% 8%;
-    --surface-glass: 222 47% 4%;
-    --glow-green: 0 0% 0% / 0;
+    --neon-purple: 255 70% 65%;
+    --neon-cyan: 180 80% 50%;
+    --surface-elevated: 222 47% 6%;
+    --surface-glass: 222 47% 1%;
+    --glow-green: 160 84% 45% / 0.15;
     
-    --brand-start: 160 84% 39%;
-    --brand-end: 199 89% 48%;
+    --brand-start: 160 84% 45%;
+    --brand-end: 199 89% 55%;
+
   }
 
   .light {

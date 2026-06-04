@@ -9,23 +9,24 @@ interface Props {
 
 export function LotterySelector({ selected, onSelect }: Props) {
   return (
-    <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-hide -mx-2 px-2 mask-fade-right">
+    <div className="flex items-center gap-2 overflow-x-auto pb-3 scrollbar-hide -mx-2 px-2 mask-fade-right">
       {LOTTERIES.map((lottery) => {
         const isActive = selected === lottery.id;
         return (
           <motion.button
             key={lottery.id}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
+            whileHover={{ scale: 1.05, y: -1 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => onSelect(lottery.id)}
-            className={`relative px-3 py-1.5 rounded-lg font-medium text-xs transition-all border flex items-center gap-2 whitespace-nowrap shadow-sm ${
+            className={`relative px-4 py-2 rounded-xl font-bold text-xs transition-all duration-300 border flex items-center gap-2.5 whitespace-nowrap shadow-md ${
               isActive
-                ? "bg-primary/20 border-primary/50 text-primary ring-1 ring-primary/20"
-                : "bg-muted/30 border-border/50 text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                ? "bg-primary/20 border-primary/50 text-primary ring-2 ring-primary/10 shadow-primary/10"
+                : "bg-secondary/40 border-border/40 text-muted-foreground hover:text-foreground hover:bg-secondary/60 hover:border-border/60"
             }`}
           >
-            <span className="text-sm shrink-0">{lottery.icon}</span>
-            <span className="text-[11px] sm:text-xs">{lottery.name}</span>
+            <span className="text-lg shrink-0 drop-shadow-sm">{lottery.icon}</span>
+            <span className="text-[11px] sm:text-xs uppercase tracking-wider">{lottery.name}</span>
+
             {isActive && (
               <motion.div
                 layoutId="active-pill"

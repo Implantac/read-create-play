@@ -41,15 +41,20 @@ export const StatsCard = memo(({
   }
 
   return (
-    <Card className={cn("overflow-hidden transition-all hover:shadow-lg hover:shadow-primary/5 glass-card border-white/5 group", className)}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground group-hover:text-primary transition-colors">
+    <Card className={cn("overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 glass-card border-white/5 group hover:-translate-y-1", className)}>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground group-hover:text-primary transition-colors">
           {title}
         </CardTitle>
-        {Icon && <Icon className="h-3.5 w-3.5 text-primary/70 group-hover:text-primary group-hover:scale-110 transition-all" />}
+        {Icon && (
+          <div className="p-1.5 rounded-md bg-primary/5 border border-primary/10 group-hover:bg-primary/20 group-hover:border-primary/30 transition-all duration-500 group-hover:scale-110">
+            <Icon className="h-3.5 w-3.5 text-primary" />
+          </div>
+        )}
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-black tracking-tighter text-foreground font-mono">{value}</div>
+        <div className="text-3xl font-black tracking-tight text-foreground font-mono group-hover:text-glow-green transition-all">{value}</div>
+
         {(description || trend) && (
           <p className="text-[10px] text-muted-foreground mt-1.5 flex items-center gap-1.5 font-medium uppercase tracking-tight">
             {trend && (
