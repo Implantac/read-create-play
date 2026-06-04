@@ -52,18 +52,25 @@ const DashboardPage = () => {
     <div className="space-y-12 animate-in fade-in duration-700 max-w-7xl mx-auto px-4 sm:px-6">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-4">
         <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Intelligence Assistant v6.0</span>
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Neural Core Active</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10">
+              <Activity className="w-3 h-3 text-muted-foreground animate-pulse" />
+              <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">Sincronização 100%</span>
+            </div>
           </div>
           <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-tight">
             Sua Melhor <span className="gradient-brand-text">Oportunidade</span> Hoje
           </h1>
           <p className="text-sm text-muted-foreground font-medium max-w-lg leading-relaxed">
-            Nossa IA já analisou milhões de combinações. Aqui está a recomendação de alta probabilidade para você.
+            O assistente Titan processou {stats.length} dezenas e {draws.length} concursos. Receba agora sua recomendação de alta convergência.
           </p>
         </div>
       </div>
+
 
       {/* Main Recommendation Card - Zero Scroll Focus */}
       <section className="relative group">
@@ -110,16 +117,17 @@ const DashboardPage = () => {
                 </div>
 
                 <div className="w-full lg:w-[320px] p-8 rounded-[2rem] bg-background/40 border border-white/5 backdrop-blur-md shadow-inner text-center space-y-8">
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="space-y-1">
-                      <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest opacity-60">IA Trust</p>
-                      <p className="text-3xl font-black italic tracking-tighter tabular-nums gradient-brand-text leading-none">{luckyGame.score}%</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 space-y-1">
+                      <p className="text-[9px] uppercase font-black text-primary/60 tracking-widest">IA Trust</p>
+                      <p className="text-2xl font-black italic tracking-tighter tabular-nums gradient-brand-text leading-none">{luckyGame.score}%</p>
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest opacity-60">Tendência</p>
-                      <p className="text-3xl font-black italic tracking-tighter text-emerald-400 leading-none">Alta</p>
+                    <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 space-y-1">
+                      <p className="text-[9px] uppercase font-black text-emerald-400/60 tracking-widest">Tendência</p>
+                      <p className="text-2xl font-black italic tracking-tighter text-emerald-400 leading-none">Alta</p>
                     </div>
                   </div>
+
 
                   <div className="space-y-3">
                     <Button onClick={generateGame} className="w-full h-14 rounded-2xl gradient-brand font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
