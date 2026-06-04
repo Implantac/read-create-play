@@ -98,7 +98,7 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso, syncDraws }:
             {lastCheck && (
               <p className="text-[10px] text-muted-foreground flex items-center gap-1.5 mt-1 font-bold uppercase tracking-widest opacity-60">
                 <Clock className="w-3 h-3" />
-                Checked: {lastCheck.toLocaleTimeString("pt-BR")}
+                Checked: {formatTime(lastCheck)}
               </p>
             )}
           </div>
