@@ -8,8 +8,9 @@ import { Progress } from "@/components/ui/progress";
 import { 
   BarChart3, Flame, Snowflake, TrendingUp, Clock, 
   Target, Filter, Brain, Zap, Shield, Info,
-  Search, ArrowUpRight, ArrowDownRight, Activity
+  Search, ArrowUpRight, ArrowDownRight, Activity, Crown
 } from "lucide-react";
+
 import { m, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { 
