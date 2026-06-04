@@ -310,11 +310,11 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
           </Button>
           
           <div className="flex items-center gap-1 mx-2">
-            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Página</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t("common.page")}</span>
             <span className="px-3 py-1 rounded-lg bg-primary/10 border border-primary/20 text-xs font-black text-primary font-mono">
               {currentPage + 1}
             </span>
-            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">de {totalPages}</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t("common.of")} {totalPages}</span>
           </div>
 
           <Button
