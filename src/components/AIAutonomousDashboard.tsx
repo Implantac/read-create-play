@@ -630,110 +630,135 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
         </TabsContent>
 
         {/* Triplets Tab */}
-        <TabsContent value="triplets" className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                🔺 Trios Recorrentes
-              </CardTitle>
-              <CardDescription>Combinações de 3 números que aparecem juntos com frequência significativa (Lift)</CardDescription>
+        <TabsContent value="triplets" className="space-y-6 outline-none">
+          <Card className="glass-card border-white/10 shadow-xl rounded-[2rem] overflow-hidden">
+            <CardHeader className="p-8 border-b border-white/5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center border border-accent/20">
+                    <Trophy className="h-5 w-5 text-accent" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-black uppercase tracking-tight italic">Clusters de Trios Recorrentes</CardTitle>
+                    <CardDescription className="text-[10px] font-black uppercase tracking-widest opacity-40 mt-1">Sinergia Combinatória com Alto Índice de Coocorrência (Lift)</CardDescription>
+                  </div>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-8">
               {report.topTriplets.length > 0 ? (
-                <div className="space-y-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {report.topTriplets.map((t, i) => (
-                    <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border ${i < 3 ? "border-primary/20 bg-primary/5" : "border-border bg-muted/20"}`}>
-                      <span className="text-xs text-muted-foreground font-mono w-6">#{i + 1}</span>
-                      <div className="flex gap-1.5">
-                        {t.numbers.map(n => (
-                          <span key={n} className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/15 text-primary font-bold text-sm border border-primary/30">
-                            {String(n).padStart(2, "0")}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <Badge variant={t.lift > 3 ? "default" : "secondary"} className="text-[10px]">
-                            lift={t.lift}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">{t.count}x aparições</span>
-                          <span className="text-[10px] text-muted-foreground">· visto há {t.lastSeen} conc.</span>
+                    <m.div 
+                      key={i}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      className={`flex items-center justify-between p-5 rounded-[2rem] border transition-all group/trio active:scale-[0.98] ${i < 3 ? "border-primary/20 bg-primary/5 shadow-lg shadow-primary/5" : "border-white/5 bg-white/[0.02]"}`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <span className="text-[10px] font-black font-mono text-muted-foreground opacity-40 italic group-hover/trio:text-primary transition-colors">#{String(i + 1).padStart(2, '0')}</span>
+                        <div className="flex gap-2">
+                          {t.numbers.map(n => (
+                            <span key={n} className="w-10 h-10 rounded-xl bg-background/60 text-foreground font-black font-mono text-sm border border-white/5 flex items-center justify-center group-hover/trio:scale-110 transition-transform italic shadow-sm">
+                              {String(n).padStart(2, "0")}
+                            </span>
+                          ))}
                         </div>
                       </div>
-                    </div>
+                      <div className="text-right space-y-2">
+                        <Badge variant="outline" className={`text-[9px] font-black uppercase tracking-widest ${t.lift > 3 ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-primary/5 text-primary border-primary/20"}`}>
+                          Lift: {t.lift.toFixed(2)}
+                        </Badge>
+                        <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-40">{t.count}x Detected</p>
+                      </div>
+                    </m.div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground text-center py-8">Nenhum trio significativo detectado</p>
+                <div className="text-center py-20 opacity-30">
+                  <GitBranch className="w-12 h-12 mx-auto mb-4" />
+                  <p className="text-xs font-black uppercase tracking-widest">Nenhum trio neural detectado neste ciclo</p>
+                </div>
               )}
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* Gaps Tab */}
-        <TabsContent value="gaps" className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Timer className="h-4 w-4 text-primary" />
-                Análise de Gap — Retorno Iminente
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {gapChartData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={gapChartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "hsl(var(--foreground))" }} />
-                    <Legend />
-                    <Bar dataKey="gapAtual" name="Gap Atual" fill="hsl(0, 84%, 60%)" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="gapMedio" name="Gap Médio" fill="hsl(var(--muted-foreground))" radius={[4, 4, 0, 0]} opacity={0.5} />
-                    <Bar dataKey="retorno" name="Retorno Previsto" fill="hsl(142, 76%, 36%)" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <p className="text-sm text-muted-foreground text-center py-8">Nenhuma dezena com retorno iminente</p>
-              )}
-            </CardContent>
-          </Card>
+        <TabsContent value="gaps" className="space-y-6 outline-none">
+          <div className="grid lg:grid-cols-2 gap-6">
+            <Card className="glass-card border-white/10 shadow-xl rounded-[2rem] overflow-hidden group/gap-card">
+              <CardHeader className="p-8 border-b border-white/5 bg-white/[0.01]">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center border border-rose-500/20 group-hover/gap-card:scale-110 transition-transform">
+                    <Timer className="h-5 w-5 text-rose-400" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-black uppercase tracking-tight italic">Matriz de Gaps e Atrasos</CardTitle>
+                    <CardDescription className="text-[10px] font-black uppercase tracking-widest opacity-40 mt-1">Previsão de Retorno Baseada em Ciclo Médio</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-8">
+                {gapChartData.length > 0 ? (
+                  <div className="h-[350px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={gapChartData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} opacity={0.3} />
+                        <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} fontVariant="mono" axisLine={false} tickLine={false} />
+                        <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} fontVariant="mono" axisLine={false} tickLine={false} />
+                        <Tooltip 
+                          contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border) / 0.5)", borderRadius: 16, color: "hsl(var(--foreground))", boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)' }} 
+                        />
+                        <Legend iconType="circle" wrapperStyle={{ paddingTop: 30, fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }} />
+                        <Bar dataKey="gapAtual" name="Atraso Atual" fill="hsl(0, 84%, 60%)" radius={[4, 4, 0, 0]} barSize={20} />
+                        <Bar dataKey="retorno" name="Vetor Retorno" fill="hsl(142, 76%, 36%)" radius={[4, 4, 0, 0]} barSize={20} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-20">Nenhuma anomalia de gap detectada</p>
+                )}
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Tabela de Gaps</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="max-h-[300px] overflow-y-auto">
-                <table className="w-full text-xs">
-                  <thead className="sticky top-0 bg-card z-10">
-                    <tr className="border-b border-border">
-                      <th className="text-left py-2 px-2">Nº</th>
-                      <th className="text-center py-2 px-2">Gap Atual</th>
-                      <th className="text-center py-2 px-2">Gap Médio</th>
-                      <th className="text-center py-2 px-2">Retorno Prev.</th>
-                      <th className="text-center py-2 px-2">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {report.gapAnalysis.slice(0, 30).map(g => (
-                      <tr key={g.number} className="border-b border-border/50 hover:bg-muted/30">
-                        <td className="py-1.5 px-2 font-bold">{String(g.number).padStart(2, "0")}</td>
-                        <td className="py-1.5 px-2 text-center font-mono">{g.currentGap}</td>
-                        <td className="py-1.5 px-2 text-center font-mono">{g.avgGap}</td>
-                        <td className="py-1.5 px-2 text-center font-mono">{g.predictedReturn}</td>
-                        <td className="py-1.5 px-2 text-center">
-                          <Badge variant={g.predictedReturn <= 0 ? "default" : g.predictedReturn <= 3 ? "secondary" : "outline"} className="text-[10px] px-1">
-                            {g.predictedReturn <= 0 ? "🔥 IMINENTE" : g.predictedReturn <= 3 ? "⏰ Próximo" : "⏳ Aguardando"}
-                          </Badge>
-                        </td>
+            <Card className="glass-card border-white/10 shadow-xl rounded-[2rem] overflow-hidden">
+              <CardHeader className="p-8 border-b border-white/5">
+                <CardTitle className="text-sm font-black uppercase tracking-[0.2em] italic">Auditoria de Atrasos</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="max-h-[460px] overflow-y-auto scrollbar-hide">
+                  <table className="w-full">
+                    <thead className="sticky top-0 bg-background/95 backdrop-blur z-20 shadow-sm">
+                      <tr className="border-b border-white/5">
+                        <th className="text-left py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Node</th>
+                        <th className="text-center py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Atraso</th>
+                        <th className="text-center py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Retorno Prev.</th>
+                        <th className="text-center py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
+                    </thead>
+                    <tbody>
+                      {report.gapAnalysis.slice(0, 30).map(g => (
+                        <tr key={g.number} className="border-b border-white/[0.02] hover:bg-primary/5 transition-all duration-300 group/row cursor-default">
+                          <td className="py-4 px-6">
+                            <span className="w-9 h-9 rounded-xl bg-background/60 border border-white/5 flex items-center justify-center font-black font-mono text-xs group-hover/row:scale-110 transition-transform italic shadow-sm group-hover/row:shadow-primary/20">{String(g.number).padStart(2, "0")}</span>
+                          </td>
+                          <td className="py-4 px-6 text-center font-mono text-xs italic opacity-60 group-hover/row:opacity-100 transition-opacity">{g.currentGap}</td>
+                          <td className="py-4 px-6 text-center font-black font-mono text-xs italic group-hover/row:text-primary transition-colors">{g.predictedReturn}</td>
+                          <td className="py-4 px-6 text-center">
+                            <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-widest ${g.predictedReturn <= 0 ? "bg-rose-500/10 text-rose-400 border-rose-500/20" : g.predictedReturn <= 3 ? "bg-amber-500/10 text-amber-400 border-amber-500/20" : "bg-primary/5 text-primary border-primary/20"}`}>
+                              {g.predictedReturn <= 0 ? "Critically Due" : g.predictedReturn <= 3 ? "Closing Soon" : "Stable Delay"}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* Patterns Tab */}
