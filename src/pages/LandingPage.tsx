@@ -11,7 +11,9 @@ import { AnimatedCounter } from "@/components/AnimatedCounter";
 import { FloatingCTA } from "@/components/FloatingCTA";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { SocialProofBar } from "@/components/SocialProofBar";
+import { Testimonials } from "@/components/Testimonials";
 import { FloatingLotteryBalls } from "@/components/FloatingLotteryBalls";
+
 import { burstConfetti } from "@/lib/confetti";
 import {
   Zap,
