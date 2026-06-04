@@ -285,7 +285,7 @@ export default function StrategyLabPage() {
                   {bestGamesCount > 0 && (
                     <Badge className="text-xs gap-1.5 py-1.5 px-3 bg-green-500/10 text-green-500 border-green-500/20">
                       <Star className="w-3 h-3" />
-                      {bestGamesCount} nota A+
+                      {formatNumber(bestGamesCount)} nota A+
                     </Badge>
                   )}
                 </>
