@@ -280,7 +280,7 @@ const AIAnalystPage = () => {
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold text-sm">{formatNumber(genResult.games.length)} jogos gerados</h3>
                     <Badge variant="outline" className="text-xs">
-                      {genResult.metadata?.processingTimeMs}ms
+                      {formatNumber(genResult.metadata?.processingTimeMs)}ms
                     </Badge>
                   </div>
                   <div className="grid gap-2">
