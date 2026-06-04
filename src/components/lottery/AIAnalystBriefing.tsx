@@ -56,10 +56,10 @@ export function AIAnalystBriefing({ confidence, reasons }: AIAnalystBriefingProp
         </div>
       </div>
 
-      <div className="pt-2 border-t border-white/5">
-        <p className="text-[9px] text-muted-foreground leading-relaxed italic flex items-start gap-2">
-          <Zap className="w-3 h-3 text-primary shrink-0 mt-0.5" />
-          "O motor Titan validou esta combinação contra 2.5M de cenários. A estrutura atual maximiza a probabilidade de prêmios intermediários."
+      <div className="pt-3 border-t border-primary/10">
+        <p className="text-[10px] text-muted-foreground leading-relaxed italic flex items-start gap-3 bg-background/40 p-3 rounded-xl border border-white/5">
+          <Zap className="w-4 h-4 text-primary shrink-0 mt-0.5 animate-pulse" />
+          "Validação Alpha concluída: esta configuração otimiza o fluxo de entropia recente, alinhando-se aos clusters de coocorrência mais estáveis dos últimos 50 ciclos."
         </p>
       </div>
     </div>
