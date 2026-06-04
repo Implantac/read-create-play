@@ -119,7 +119,7 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso, syncDraws }:
           <Button
             size="sm"
             variant="outline"
-            onClick={checkForUpdates}
+            onClick={() => checkForUpdates()}
             disabled={loading}
             className="border-border hover:border-primary"
           >

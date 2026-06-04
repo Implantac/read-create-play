@@ -161,7 +161,26 @@ const DashboardPage = () => {
         description={`Análise de precisão institucional — ${config.name}`}
         icon={BarChart3}
         badge={draws.length > 0 ? `${draws.length} sorteios` : undefined}
-      />
+      >
+        <div className="flex items-center gap-2">
+          {lastSyncAt && (
+            <div className="hidden md:flex flex-col items-end mr-2">
+              <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">Última Sincronização</span>
+              <span className="text-xs font-mono text-primary/80">{new Date(lastSyncAt).toLocaleTimeString("pt-BR")}</span>
+            </div>
+          )}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => syncDraws()}
+            disabled={syncing}
+            className="border-primary/20 hover:border-primary/50 bg-primary/5 gap-2"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin text-primary" : ""}`} />
+            <span className="hidden sm:inline">{syncing ? "Sincronizando..." : "Atualizar Dados"}</span>
+          </Button>
+        </div>
+      </PageHeader>
       
       <LotteryContextBanner />
 
