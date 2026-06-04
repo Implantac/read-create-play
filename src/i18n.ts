@@ -63,52 +63,40 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'pt', // Forçar português como padrão
+    lng: 'pt',
     fallbackLng: 'pt',
     interpolation: {
       escapeValue: false,
-      format: (value, format, lng) => {
-        if (value instanceof Date) {
-          if (format === 'dateTime') {
-            return new Intl.DateTimeFormat(ptBrLocale, {
-              dateStyle: 'short',
-              timeStyle: 'short',
-            }).format(value);
-          }
-          if (format === 'date') {
-            return new Intl.DateTimeFormat(ptBrLocale, {
-              dateStyle: 'short',
-            }).format(value);
-          }
-          if (format === 'time') {
-            return new Intl.DateTimeFormat(ptBrLocale, {
-              timeStyle: 'short',
-            }).format(value);
-          }
-          return new Intl.DateTimeFormat(ptBrLocale).format(value);
-        }
-        if (typeof value === 'number') {
-          if (format === 'currency') {
-            return new Intl.NumberFormat(ptBrLocale, {
-              style: 'currency',
-              currency: 'BRL',
-            }).format(value);
-          }
-          if (format === 'percent') {
-            return new Intl.NumberFormat(ptBrLocale, {
-              style: 'percent',
-              minimumFractionDigits: 2,
-            }).format(value / 100);
-          }
-          return new Intl.NumberFormat(ptBrLocale).format(value);
-        }
-        return value;
-      },
     },
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
     }
   });
+
+// Formatadores globais para datas, horas e números em PT-BR
+i18n.services.formatter?.add('date', (value: any) => {
+  return new Intl.DateTimeFormat(ptBrLocale, { dateStyle: 'short' }).format(value);
+});
+
+i18n.services.formatter?.add('dateTime', (value: any) => {
+  return new Intl.DateTimeFormat(ptBrLocale, { dateStyle: 'short', timeStyle: 'short' }).format(value);
+});
+
+i18n.services.formatter?.add('time', (value: any) => {
+  return new Intl.DateTimeFormat(ptBrLocale, { timeStyle: 'short' }).format(value);
+});
+
+i18n.services.formatter?.add('currency', (value: any) => {
+  return new Intl.NumberFormat(ptBrLocale, { style: 'currency', currency: 'BRL' }).format(value);
+});
+
+i18n.services.formatter?.add('number', (value: any) => {
+  return new Intl.NumberFormat(ptBrLocale).format(value);
+});
+
+i18n.services.formatter?.add('percent', (value: any) => {
+  return new Intl.NumberFormat(ptBrLocale, { style: 'percent', minimumFractionDigits: 2 }).format(value / 100);
+});
 
 export default i18n;
