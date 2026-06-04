@@ -223,7 +223,7 @@ export function HPEnginePanel({ stats, config, draws }: Props) {
 
               <div className="p-2 rounded bg-primary/5 border border-primary/20 text-center">
                 <p className="text-xs text-muted-foreground">Média de acertos</p>
-                <p className="text-2xl font-black font-mono text-primary">{simResult.avgHits}</p>
+                <p className="text-2xl font-black font-mono text-primary">{formatNumber(simResult.avgHits)}</p>
               </div>
 
               {/* Hit distribution chart */}
