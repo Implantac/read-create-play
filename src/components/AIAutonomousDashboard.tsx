@@ -434,28 +434,44 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
             </div>
 
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Dice1 className="h-4 w-4 text-primary" />
-                Entropia por Zona
-              </CardTitle>
-              <CardDescription>Distribuição de incerteza por faixa numérica</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={entropyZoneData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                  <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "hsl(var(--foreground))" }} />
-                  <Legend />
-                  <Bar dataKey="entropia" name="Entropia (bits)" fill="hsl(280, 70%, 50%)" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="normalizada" name="Normalizada (%)" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+          <div className="grid lg:grid-cols-1 gap-6">
+            <Card className="glass-card border-white/10 shadow-xl rounded-[2rem] overflow-hidden group/chart-card">
+              <CardHeader className="pb-8 p-8 border-b border-white/5 bg-white/[0.01]">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 group-hover/chart-card:scale-110 transition-transform">
+                    <Dice1 className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-black uppercase tracking-tight italic leading-none">Incerteza Proporcional por Zona</CardTitle>
+                    <CardDescription className="text-[10px] font-black uppercase tracking-widest opacity-40 mt-1">Variabilidade Estrutural através do Espectro Numérico</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-8 pb-10">
+                <div className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={entropyZoneData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="entropyGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="hsl(280, 70%, 50%)" stopOpacity={0.8}/>
+                          <stop offset="100%" stopColor="hsl(280, 70%, 50%)" stopOpacity={0.2}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} opacity={0.3} />
+                      <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} fontVariant="mono" axisLine={false} tickLine={false} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} fontVariant="mono" axisLine={false} tickLine={false} />
+                      <Tooltip 
+                        cursor={{ fill: 'hsl(280, 70%, 50%)', fillOpacity: 0.05 }}
+                        contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border) / 0.5)", borderRadius: 16, color: "hsl(var(--foreground))", boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)' }} 
+                      />
+                      <Legend iconType="circle" wrapperStyle={{ paddingTop: 30, fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }} />
+                      <Bar dataKey="entropia" name="Entropia (bits)" fill="url(#entropyGradient)" radius={[6, 6, 0, 0]} barSize={32} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
           <Card>
             <CardHeader className="pb-3">
