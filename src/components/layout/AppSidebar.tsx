@@ -128,15 +128,15 @@ export function AppSidebar() {
         {/* Active lottery indicator */}
         <div className={`mx-2 mb-6 rounded-xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 transition-all duration-500 hover:border-primary/40 group/lottery ${collapsed ? "p-2.5 flex justify-center" : "px-4 py-3"}`}>
           {collapsed ? (
-            <span className="text-xl drop-shadow-md group-hover/lottery:scale-110 transition-transform" title={config.name}>{config.icon}</span>
+            <span className="text-xl drop-shadow-md group-hover/lottery:scale-110 transition-transform" title={config?.name || "Loto"}>{config?.icon || "🍀"}</span>
           ) : (
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-background/50 border border-primary/20 flex items-center justify-center shrink-0 shadow-inner group-hover/lottery:rotate-6 transition-transform duration-500">
-                <span className="text-xl drop-shadow-sm">{config.icon}</span>
+                <span className="text-xl drop-shadow-sm">{config?.icon || "🍀"}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-black text-primary uppercase tracking-wider truncate">{config.name}</p>
-                <p className="text-[9px] text-muted-foreground font-mono font-bold opacity-60 tracking-tight">{config.pick} / {config.numbers}</p>
+                <p className="text-[11px] font-black text-primary uppercase tracking-wider truncate">{config?.name || "Loteria"}</p>
+                <p className="text-[9px] text-muted-foreground font-mono font-bold opacity-60 tracking-tight">{config?.pick || 0} / {config?.numbers || 0}</p>
               </div>
             </div>
           )}

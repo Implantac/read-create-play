@@ -30,8 +30,8 @@ interface LotteryContextType {
 const LotteryContext = createContext<LotteryContextType | null>(null);
 
 export function LotteryProvider({ children }: { children: ReactNode }) {
-  const [selectedLottery, setSelectedLottery] = useState("megasena");
-  const config = LOTTERIES.find(l => l.id === selectedLottery)!;
+  const [selectedLottery, setSelectedLottery] = useState("lotofacil");
+  const config = useMemo(() => LOTTERIES.find(l => l.id === selectedLottery) || LOTTERIES[0], [selectedLottery]);
   const { draws, drawsWithPrizes, loading, syncing, lastSyncAt, syncError, count, syncDraws, syncAllLotteries, addDraw } = useLotteryDraws(selectedLottery);
   
   // Implement periodic sync (every 10 minutes)
