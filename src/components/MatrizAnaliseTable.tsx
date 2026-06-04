@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUpDown, ArrowUp, ArrowDown, TrendingUp, TrendingDown, Minus, Filter, TableProperties, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   data: MatrixRow[];
