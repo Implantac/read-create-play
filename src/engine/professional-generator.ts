@@ -1,7 +1,7 @@
-import { NumberStats, generateSmartBet } from "./statistics";
+import { NumberStats, generateSmartBet } from "@/engine/stats/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { evaluateBetQuality, BetQualityReport } from "./bet-quality";
-import { generateByStrategy, Strategy } from "./strategies";
+import { evaluateBetQuality, BetQualityReport } from "@/engine/stats/bet-quality";
+import { generateByStrategy, Strategy } from "@/engine/strategies";
 import { analyzeFrameCenter, computeIdealFrameCenter, analyzeRowDistribution } from "./generation-filters";
 
 // ═══════════════════════════════════════════════════════

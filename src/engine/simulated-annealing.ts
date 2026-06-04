@@ -1,7 +1,7 @@
-import { NumberStats } from "./statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { evaluateBetQuality, BetQualityReport } from "./bet-quality";
-import { RiskLevel } from "./genetic-algorithm";
+import { evaluateBetQuality, BetQualityReport } from "@/engine/stats/bet-quality";
+import { RiskLevel } from "@/engine/ai/genetic-algorithm";
 
 // ═══════════════════════════════════════════════════════
 // SIMULATED ANNEALING

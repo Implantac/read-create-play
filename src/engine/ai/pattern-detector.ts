@@ -1,5 +1,5 @@
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { NumberStats } from "./statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 
 // ═══════════════════════════════════════════════════════════════════
 // DETECTOR DE PADRÕES ESTATÍSTICOS v2.1

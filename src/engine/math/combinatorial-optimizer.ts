@@ -1,6 +1,6 @@
-import { NumberStats } from "./statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { evaluateBetQuality, BetQualityReport } from "./bet-quality";
+import { evaluateBetQuality, BetQualityReport } from "@/engine/stats/bet-quality";
 
 // ═══════════════════════════════════════════════════════
 // Otimizador Combinatório

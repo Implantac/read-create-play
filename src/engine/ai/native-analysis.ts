@@ -5,7 +5,7 @@
  * Replaces all AI gateway calls with deterministic, statistical processing.
  */
 
-import { NumberStats } from "./statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import type {
   AutonomousReport,

@@ -1,5 +1,5 @@
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { NumberStats } from "./statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 
 export interface AINumberRanking {
   number: number;

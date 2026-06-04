@@ -1,6 +1,6 @@
-import { NumberStats, generateSmartBet } from "./statistics";
+import { NumberStats, generateSmartBet } from "@/engine/stats/statistics";
 import { LotteryConfig } from "@/data/lotteries";
-import { getConsensusRanking, runAllModels } from "./ml-models";
+import { getConsensusRanking, runAllModels } from "@/engine/ai/ml-models";
 
 export type Strategy =
   | "smart"
