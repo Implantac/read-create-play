@@ -13,6 +13,7 @@ import { evaluateBetQuality } from "@/engine/stats/bet-quality";
 import { toast } from "sonner";
 
 import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 const GeradorPage = () => {
   const { config, stats, draws, selectedLottery } = useLotteryContext();
@@ -20,10 +21,16 @@ const GeradorPage = () => {
   const { saveGeneration } = useGenerationHistory(selectedLottery);
   const location = useLocation();
   
-  const [step, setStep] = useState(() => {
-    return location.state?.fromOnboarding ? 2 : 1;
-  });
+  const [step, setStep] = useState(1);
   const [strategy, setStrategy] = useState<string>("balance");
+
+  useEffect(() => {
+    if (location.state?.fromOnboarding) {
+      setStep(2);
+      // Opcional: já disparar a geração se quiser ainda mais rápido
+    }
+  }, [location.state]);
+
 
   const [quantity, setQuantity] = useState(1);
   const [generating, setGenerating] = useState(false);
