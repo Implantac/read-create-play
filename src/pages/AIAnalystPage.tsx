@@ -259,7 +259,7 @@ const AIAnalystPage = () => {
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Quantidade: {genCount}</label>
+                  <label className="text-sm font-medium mb-2 block">Quantidade: {formatNumber(genCount)}</label>
                   <Slider value={[genCount]} onValueChange={v => setGenCount(v[0])}
                     min={1} max={50} step={1} />
                 </div>
