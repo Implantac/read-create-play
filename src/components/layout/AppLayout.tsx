@@ -62,13 +62,13 @@ export function AppLayout() {
                 {/* Draw count badge */}
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="hidden lg:flex items-center gap-2 px-3 py-2 rounded-xl bg-secondary/30 border border-border/40 cursor-default group transition-all hover:border-primary/30 shadow-inner">
-                      <Database className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
-                      <span className="text-xs font-mono font-black text-foreground/90">
-
-                        {loading ? <Loader2 className="w-3 h-3 animate-spin inline" /> : count}
+                    <div className="hidden lg:flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-secondary/30 border border-border/40 cursor-default group transition-all hover:border-primary/40 shadow-inner">
+                      <Database className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
+                      <span className="text-sm font-mono font-black text-foreground/90">
+                        {loading ? <Loader2 className="w-4 h-4 animate-spin inline" /> : count.toLocaleString()}
                       </span>
                     </div>
+
                   </TooltipTrigger>
                   <TooltipContent>Sorteios carregados no banco</TooltipContent>
                 </Tooltip>
