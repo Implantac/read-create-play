@@ -116,9 +116,28 @@ export default function FechamentosPage() {
   const generateGames = () => {
     if (!selectedMatrix) return;
     const result = applyWheelingMatrix(selectedMatrix, baseNumbers);
-    if (result.error) return;
+    if (result.error) {
+      toast.error(result.error);
+      return;
+    }
     setGeneratedGames(result.games);
+    
+    // Track XP for wheeling
+    if (config.id === 'lotofacil') {
+      supabase.rpc('track_user_action', { _user_id: 'current', _action: 'simulation' }).then();
+    }
   };
+
+  const getRecommendation = () => {
+    if (config.id !== 'lotofacil' || baseNumbers.length === 0) return null;
+    const count = baseNumbers.length;
+    if (count >= 21) return { id: 'lotofacil_21_50', name: 'PLAN 21X50', efficiency: '92%', risk: 'Médio' };
+    if (count >= 19) return { id: 'lotofacil_19_5', name: 'PLAN 19X5', efficiency: '88%', risk: 'Médio' };
+    if (count >= 17) return { id: 'lotofacil_17_8', name: 'PLAN 17X8', efficiency: '85%', risk: 'Baixo' };
+    return null;
+  };
+
+  const recommendation = getRecommendation();
 
   const handleExportPdf = () => {
     if (!generatedGames || !currentMatrix) return;
