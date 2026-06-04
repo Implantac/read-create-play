@@ -147,7 +147,7 @@ export default function LotofacilPremiumPage() {
 
         {/* --- OVERVIEW TAB --- */}
         <TabsContent value="overview" className="space-y-6">
-          <div className="grid lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <StatsCard title="Score Elite" value={topElite.length} icon={Crown} />
             <StatsCard title="Ciclo Atual" value={`#${cycle?.currentCycle || 0}`} icon={Clock} />
             <StatsCard title="Prob. Fechamento" value={`${(100 - (cycle?.missingNumbers.length || 0) * 4).toFixed(0)}%`} icon={Target} />
@@ -220,10 +220,10 @@ export default function LotofacilPremiumPage() {
                         </div>
                       </div>
                     ))}
-                    <div className="p-4 border-b border-primary/10 flex items-center justify-center hover:bg-primary/10 transition-colors cursor-pointer" onClick={() => setActiveTab("intelligence")}>
+                    <div className="p-4 border-b border-primary/10 flex items-center justify-center hover:bg-primary/10 transition-colors cursor-pointer" onClick={() => setActiveTab("matrix")}>
                       <div className="text-center space-y-1">
-                        <p className="text-[9px] font-black text-primary uppercase tracking-widest">Ver Todas</p>
-                        <Layers className="w-4 h-4 text-primary mx-auto" />
+                        <p className="text-[9px] font-black text-primary uppercase tracking-widest">Matriz HP</p>
+                        <LayoutGrid className="w-4 h-4 text-primary mx-auto" />
                       </div>
                     </div>
                   </div>
@@ -332,13 +332,20 @@ export default function LotofacilPremiumPage() {
               </div>
             </div>
           </div>
+          <div className="grid lg:grid-cols-2 gap-6">
+            <HeatmapIntensity />
+            <InsightsCenter />
+          </div>
         </TabsContent>
 
         {/* --- STRATEGY TAB --- */}
         <TabsContent value="strategy" className="space-y-6">
-          <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-6">
+          <div className="grid lg:grid-cols-[1fr_1fr] gap-6">
             <StrategyBriefingPanel config={config} stats={stats} draws={draws} />
-            <BettingBudgetPlanner config={config} stats={stats} draws={draws} />
+            <div className="space-y-6">
+              <BettingBudgetPlanner config={config} stats={stats} draws={draws} />
+              <NotificationsPanel />
+            </div>
           </div>
         </TabsContent>
 
