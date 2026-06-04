@@ -24,14 +24,16 @@ import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { SystemAuditStatus } from "@/components/SystemAuditStatus";
 
-const workflowGroups: { label: string; items: { title: string; url: string; icon: any; requiredFeature?: Feature; tooltip: string }[] }[] = [
+const workflowGroups: { label: string; items: { title: string; url: string; icon: any; requiredFeature?: Feature; tooltip: string; badge?: string }[] }[] = [
   {
     label: "Menu Principal",
     items: [
       { title: "Dashboard", url: "/", icon: BarChart3, tooltip: "Terminal central de inteligência e resumo de fluxos." },
       { title: "Gerador de Jogos", url: "/gerador", icon: Sparkles, tooltip: "Geração assistida de apostas inteligentes." },
+      { title: "Lotofácil Elite", url: "/lotofacil-premium", icon: Crown, tooltip: "Ambiente profissional exclusivo para Lotofácil.", badge: "PREMIUM" },
       { title: "Fechamentos", url: "/fechamentos", icon: Grid3X3, requiredFeature: "fechamentos", tooltip: "Fechamentos matemáticos de alta performance." },
       { title: "Central de Análise", url: "/analise", icon: PieChart, tooltip: "Estatísticas avançadas, tendências e farol neural." },
+      { title: "IA Autônoma", url: "/ia-autonoma", icon: Brain, tooltip: "Predição preditiva baseada em redes neurais." },
       { title: "Histórico", url: "/historico", icon: History, tooltip: "Seus jogos, resultados e auditoria de apostas." },
     ],
   },
@@ -142,6 +144,11 @@ export function AppSidebar() {
                               {!collapsed && (
                                 <>
                                   <span className="flex-1 tracking-tight">{item.title}</span>
+                                  {item.badge && (
+                                    <span className="ml-2 px-1.5 py-0.5 text-[8px] font-black bg-primary/20 text-primary border border-primary/20 rounded-md">
+                                      {item.badge}
+                                    </span>
+                                  )}
                                   {locked && <Lock className="h-3 w-3 text-muted-foreground/40 shrink-0 ml-1" />}
                                 </>
                               )}
