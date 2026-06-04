@@ -143,28 +143,28 @@ const MatrizAnalisePage = () => {
         )}
 
         {/* Score methodology */}
-        <div className="rounded-2xl glass-card p-6 flex flex-col md:flex-row items-center gap-6 border border-primary/20 relative overflow-hidden group">
+        <div className="rounded-[2.5rem] glass-card p-8 flex flex-col lg:flex-row items-center gap-10 border border-primary/20 relative overflow-hidden group shadow-2xl">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent pointer-events-none" />
-          <div className="flex items-center gap-4 relative z-10 shrink-0">
-            <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-              <BarChart3 className="w-6 h-6 text-primary" />
+          <div className="flex items-center gap-6 relative z-10 shrink-0">
+            <div className="w-16 h-16 rounded-[1.25rem] bg-primary/10 border border-primary/20 flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500">
+              <BarChart3 className="w-8 h-8 text-primary" />
             </div>
             <div>
-              <p className="font-black text-foreground uppercase tracking-widest text-xs italic">Algoritmo de Scoring</p>
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-60 mt-0.5">Distribuição Ponderada (5 Pilares)</p>
+              <p className="font-black text-foreground uppercase tracking-[0.3em] text-xs italic leading-none">Algoritmo Scoring v5.3</p>
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] opacity-40 mt-3 leading-none italic">Distribuição Ponderada (Alpha-Net)</p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-4 relative z-10">
+          <div className="flex flex-wrap gap-x-8 gap-y-6 relative z-10 w-full lg:w-auto">
             {[
-              { label: "Frequência Total", val: "30%", color: "text-emerald-400" },
+              { label: "Frequência Alpha", val: "30%", color: "text-emerald-400" },
               { label: "Ciclos Recentes", val: "25%", color: "text-blue-400" },
-              { label: "Variação Atraso", val: "20%", color: "text-amber-400" },
-              { label: "Momentum", val: "15%", color: "text-purple-400" },
-              { label: "Entropia", val: "10%", color: "text-pink-400" },
+              { label: "Variação Delta", val: "20%", color: "text-amber-400" },
+              { label: "Momentum Hype", val: "15%", color: "text-purple-400" },
+              { label: "Entropia Local", val: "10%", color: "text-pink-400" },
             ].map((item, idx) => (
-              <div key={idx} className="flex flex-col border-l border-border/40 pl-4">
-                <span className={`text-base font-black font-mono italic ${item.color}`}>{item.val}</span>
-                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-50">{item.label}</span>
+              <div key={idx} className="flex flex-col border-l border-white/5 pl-6 group/item hover:border-primary/40 transition-colors">
+                <span className={`text-2xl font-black font-mono italic ${item.color} leading-none tracking-tighter`}>{item.val}</span>
+                <span className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground opacity-30 mt-3 group-hover/item:opacity-60 transition-opacity italic">{item.label}</span>
               </div>
             ))}
           </div>
