@@ -30,7 +30,7 @@ export const ReferralSystem = {
 
       if (affiliate) {
         // Registra a indicação
-        await supabase.from("referrals").insert({
+        await supabase.from("affiliate_referrals" as any).insert({
           referrer_id: affiliate.user_id,
           referred_id: newUserId,
           status: 'active'
