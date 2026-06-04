@@ -81,6 +81,7 @@ const Sparkline = ({ pattern }: { pattern: boolean[] }) => {
 };
 
 export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Props) {
+  const { t } = useTranslation();
   const [sortKey, setSortKey] = useState<SortKey>("rank");
   const [sortAsc, setSortAsc] = useState(true);
   const [filter, setFilter] = useState<FilterMode>("all");
