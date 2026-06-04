@@ -427,7 +427,6 @@ export default function AdminPage() {
               ) : (
                 <div className="overflow-x-auto">
                   <Table>
-                  <Table>
                     <TableHeader>
                       <TableRow>
                         <TableHead>Usuário</TableHead>
@@ -462,7 +461,6 @@ export default function AdminPage() {
                         </TableRow>
                       )}
                     </TableBody>
-                  </Table>
                   </Table>
                 </div>
               )}
