@@ -53,9 +53,9 @@ export function trendIcon(t: string) {
 
 export function MetricBox({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className={`text-center p-2.5 rounded-xl border ${accent ? "bg-primary/10 border-primary/20" : "bg-muted/10 border-border"}`}>
-      <div className={`text-base font-mono font-black ${accent ? "text-primary" : "text-foreground"}`}>{value}</div>
-      <div className="text-[9px] text-muted-foreground mt-0.5">{label}</div>
+    <div className={`text-center p-4 rounded-[1.25rem] border transition-all duration-300 group hover:shadow-lg ${accent ? "bg-primary/10 border-primary/20 hover:bg-primary/20" : "bg-white/[0.02] border-white/5 hover:border-white/10"}`}>
+      <div className={`text-xl font-mono font-black italic tracking-tighter leading-none ${accent ? "text-primary" : "text-foreground opacity-80"}`}>{value}</div>
+      <div className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground mt-3 opacity-40 leading-none italic">{label}</div>
     </div>
   );
 }
