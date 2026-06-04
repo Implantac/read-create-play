@@ -35,7 +35,6 @@ const EstrategiasPage = lazy(() => import("@/pages/EstrategiasPage"));
 const LotofacilPremiumPage = lazy(() => import("@/pages/LotofacilPremiumPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -100,6 +99,10 @@ const AppContent = () => {
           <Route path="/fechamentos" element={<FechamentosPage />} />
           <Route path="/analise" element={<AnaliseCentralPage />} />
           <Route path="/historico" element={<HistoricoUnificadoPage />} />
+          <Route path="/ia-chat" element={<AIChatPage />} />
+          <Route path="/ia-autonoma" element={<IAAutonomaPage />} />
+          <Route path="/estrategias" element={<EstrategiasPage />} />
+          <Route path="/lotofacil-premium" element={<LotofacilPremiumPage />} />
           <Route path="/perfil" element={<PerfilPage />} />
           <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
         </Route>
