@@ -64,8 +64,8 @@ const resources = {
               "description": "Simule milhões de cenários e combinações para descobrir as chances reais de acerto em cada modalidade."
             },
             "sync": {
-              "title": "Sync Institucional",
-              "description": "Conexão direta com resultados oficiais atualizada em milissegundos."
+              "title": "Resultados em Tempo Real",
+              "description": "Acesso imediato aos resultados oficiais da Caixa Econômica Federal, sincronizados automaticamente."
             }
           }
         },
