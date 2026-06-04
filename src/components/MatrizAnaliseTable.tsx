@@ -126,76 +126,88 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-          <TableProperties className="w-4 h-4 text-primary" />
-        </div>
-        <div className="flex-1">
-          <h3 className="text-sm font-semibold text-foreground">Ranking Completo</h3>
-          <p className="text-[10px] text-muted-foreground mt-0.5">Classificação detalhada de todas as dezenas</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform">
+            <TableProperties className="w-6 h-6 text-primary" />
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-foreground uppercase tracking-widest italic">Ranking Probabilístico</h3>
+            <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase tracking-widest opacity-60">Matriz de Performance Individual</p>
+          </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <Filter className="w-4 h-4 text-muted-foreground" />
+      <div className="flex items-center gap-3 flex-wrap p-4 rounded-2xl bg-secondary/10 border border-border/40">
+        <Filter className="w-4 h-4 text-primary opacity-60" />
         {filters.map(f => (
           <Button
             key={f.value}
             size="sm"
             variant={filter === f.value ? "default" : "outline"}
             onClick={() => setFilter(f.value)}
-            className="h-7 text-xs px-3 gap-1.5"
+            className={`h-8 px-4 rounded-xl font-black uppercase tracking-widest text-[9px] transition-all ${
+              filter === f.value 
+                ? "gradient-brand text-primary-foreground shadow-lg shadow-primary/20" 
+                : "border-border/60 bg-background/50 hover:bg-primary/10 text-muted-foreground"
+            }`}
           >
             {f.label}
-            <span className="text-[10px] opacity-70">({f.count})</span>
+            <span className="ml-1.5 opacity-60">[{f.count}]</span>
           </Button>
         ))}
-        <span className="text-xs text-muted-foreground ml-auto font-mono">{filtered.length} resultados</span>
+        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-auto opacity-40 italic">{filtered.length} Ativos Encontrados</span>
       </div>
 
-      <div className="rounded-xl border border-border/50 overflow-hidden glass-card">
+
+      <div className="rounded-2xl border border-border/40 overflow-hidden glass-card shadow-2xl relative group/table">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none opacity-50" />
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/20 hover:bg-muted/20">
+            <TableRow className="bg-secondary/40 hover:bg-secondary/40 border-b border-border/40">
               {columns.map(([key, label]) => (
                 <TableHead
                   key={key}
-                  className="cursor-pointer select-none whitespace-nowrap hover:text-foreground transition-colors"
+                  className="cursor-pointer select-none whitespace-nowrap hover:text-primary transition-colors py-4 px-4"
                   onClick={() => toggleSort(key)}
                 >
-                  <span className="flex items-center gap-1.5">
+                  <span className="flex items-center gap-2 font-black text-[10px] uppercase tracking-widest text-muted-foreground">
                     {label}
                     <SortIcon active={sortKey === key} asc={sortAsc} />
                   </span>
                 </TableHead>
               ))}
-              <TableHead className="whitespace-nowrap">Últimos 30</TableHead>
-              <TableHead>Farol</TableHead>
+              <TableHead className="whitespace-nowrap font-black text-[10px] uppercase tracking-widest text-muted-foreground py-4 px-4">Momento (30)</TableHead>
+              <TableHead className="font-black text-[10px] uppercase tracking-widest text-muted-foreground py-4 px-4">Status</TableHead>
             </TableRow>
           </TableHeader>
+
           <TableBody>
             {filtered.map((row, i) => (
               <TableRow
                 key={row.number}
-                className={`hover:bg-muted/20 transition-colors ${i % 2 === 0 ? "bg-transparent" : "bg-muted/5"}`}
+                className={`hover:bg-primary/5 transition-colors border-b border-border/20 group/row ${i % 2 === 0 ? "bg-transparent" : "bg-white/[0.02]"}`}
               >
-                <TableCell className="font-mono text-xs text-muted-foreground w-12">
-                  <span className={`${row.rank <= 3 ? "text-amber-400 font-bold" : ""}`}>
-                    {row.rank}º
+
+                <TableCell className="font-mono text-xs text-muted-foreground w-12 px-4 py-3">
+                  <span className={`font-black italic ${row.rank <= 3 ? "text-amber-400 opacity-100" : "opacity-40"}`}>
+                    {String(row.rank).padStart(2, '0')}
                   </span>
                 </TableCell>
-                <TableCell>
-                  <span className={`inline-flex items-center justify-center w-9 h-9 rounded-xl text-xs font-bold transition-all ${
+
+                <TableCell className="px-4 py-3">
+                  <span className={`inline-flex items-center justify-center w-10 h-10 rounded-xl text-sm font-black font-mono transition-all italic group-hover/row:scale-110 ${
                     row.signal === "green"
-                      ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 shadow-sm shadow-emerald-500/10"
+                      ? "bg-emerald-500/20 text-emerald-400 border-2 border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
                       : row.signal === "red"
-                      ? "bg-red-500/15 text-red-400 border border-red-500/20 shadow-sm shadow-red-500/10"
-                      : "bg-amber-500/15 text-amber-400 border border-amber-500/20 shadow-sm shadow-amber-500/10"
+                      ? "bg-red-500/20 text-red-400 border-2 border-red-500/40 shadow-[0_0_15px_rgba(239,68,68,0.2)]"
+                      : "bg-amber-500/20 text-amber-400 border-2 border-amber-500/40 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
                   }`}>
                     {String(row.number).padStart(2, "0")}
                   </span>
                 </TableCell>
+
                 <TableCell>
                   <ScoreBar score={row.score} />
                 </TableCell>
