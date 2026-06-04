@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useSavedBets } from "@/hooks/useSavedBets";
+import { NeuralMapVisualization } from "@/components/NeuralMapVisualization";
 
 const AIAnalystPage = () => {
   const { config, draws, stats, selectedLottery } = useLotteryContext();
@@ -551,16 +552,18 @@ function AnalysisTab({ draws, lotteryId, stats, config }: any) {
       <CardContent className="space-y-6">
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium mb-2 block">Janela: {formatNumber(window)} concursos</label>
+            <label className="text-sm font-medium mb-2 block uppercase tracking-widest text-[10px]">Janela de Análise: {formatNumber(window)} concursos</label>
             <Slider value={[window]} onValueChange={v => setWindow(v[0])} min={10} max={500} step={10} />
           </div>
           <div className="flex items-end">
-            <Button onClick={handleAnalyze} disabled={loading || draws.length === 0} className="w-full">
-              {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <BarChart3 className="h-4 w-4 mr-2" />}
-              Analisar
+            <Button onClick={handleAnalyze} disabled={loading || draws.length === 0} className="w-full gradient-brand h-12 uppercase font-black tracking-widest text-xs">
+              {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Brain className="h-4 w-4 mr-2" />}
+              Deep Neural Analysis
             </Button>
           </div>
         </div>
+
+        <NeuralMapVisualization />
 
         {result?.analysis && (
           <div className="space-y-4">
