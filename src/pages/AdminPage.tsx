@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,30 +23,13 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { isFullAccessEmail } from "@/core/fullAccess";
+import { Profile, AuditLog, UserRole, UserWithRole } from "@/types/database";
+import { profileService } from "@/services/profiles/profileService";
+import { adminService } from "@/services/admin/adminService";
+import { UserRow } from "@/components/admin/UserRow";
+import { AuditLogTable } from "@/components/admin/AuditLogTable";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-interface Profile {
-  id: string;
-  email: string | null;
-  full_name: string | null;
-  plan: string;
-  created_at: string;
-  blocked: boolean;
-  phone_number: string | null;
-}
-
-interface UserRole {
-  user_id: string;
-  role: string;
-}
-
-interface AuditLog {
-  id: string;
-  admin_id: string;
-  action: string;
-  target_user_id: string | null;
-  details: any;
-  created_at: string;
-}
 
 const PLAN_COLORS: Record<string, string> = {
   free: "bg-muted text-muted-foreground",
