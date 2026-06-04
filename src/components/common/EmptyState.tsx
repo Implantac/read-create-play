@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 interface Props {
   title?: string;
   description?: string;
-  onImport?: () => void;
+  onImport?: (isSilent?: boolean) => void;
   onImportAll?: () => void;
   lotteryName?: string;
   syncing?: boolean;
