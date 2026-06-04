@@ -109,23 +109,27 @@ export function DrawNotificationChecker() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <Card className="border border-primary/30 bg-primary/5 backdrop-blur">
-          <CardHeader className="py-3 px-4">
-            <CardTitle className="flex items-center gap-2 text-sm">
-              <Bell className="h-4 w-4 text-primary" />
-              <span>Ative as notificações para ser avisado quando suas apostas tiverem acertos!</span>
+        <Card className="border border-primary/30 bg-primary/10 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-transparent pointer-events-none" />
+          <CardHeader className="py-4 px-5">
+            <CardTitle className="flex items-center gap-3 text-sm relative">
+              <div className="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center shrink-0 border border-primary/30 group-hover:rotate-12 transition-transform duration-500">
+                <Bell className="h-5 w-5 text-primary animate-pulse" />
+              </div>
+              <span className="font-bold tracking-tight text-foreground/90 leading-tight">Mantenha-se informado! Ative notificações push para alertas de acertos em tempo real.</span>
               <div className="ml-auto flex items-center gap-2">
-                <Button size="sm" variant="default" onClick={handleEnableNotifications} className="h-7 text-xs">
-                  <BellRing className="h-3 w-3 mr-1" />
+                <Button size="sm" variant="default" onClick={handleEnableNotifications} className="h-9 px-5 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
+                  <BellRing className="h-3.5 w-3.5 mr-1.5" />
                   Ativar
                 </Button>
-                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setDismissed(true)}>
-                  <X className="h-3 w-3" />
+                <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg text-muted-foreground hover:bg-white/5" onClick={() => setDismissed(true)}>
+                  <X className="h-4 w-4" />
                 </Button>
               </div>
             </CardTitle>
           </CardHeader>
         </Card>
+
       </motion.div>
     );
   }
@@ -142,33 +146,42 @@ export function DrawNotificationChecker() {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
       >
-        <Card className={`border ${isWinner ? "border-accent/50 bg-accent/5" : "border-primary/30 bg-primary/5"} backdrop-blur`}>
-          <CardHeader className="py-3 px-4">
-            <CardTitle className="flex items-center gap-2 text-sm">
-              {isWinner ? (
-                <Trophy className="h-4 w-4 text-accent animate-bounce" />
-              ) : (
-                <BellRing className="h-4 w-4 text-primary" />
-              )}
-              <span>
-                {isWinner ? "🎉 Parabéns! Jogo premiado!" : `Concurso ${bestMatch.concurso} — ${matches.length} aposta(s) com acertos`}
-              </span>
-              <div className="ml-auto flex items-center gap-1">
+        <Card className={`border-2 ${isWinner ? "border-accent bg-accent/10 shadow-accent/20" : "border-primary/40 bg-primary/10 shadow-primary/20"} backdrop-blur-2xl rounded-2xl shadow-2xl relative overflow-hidden group`}>
+          <div className={`absolute inset-0 bg-gradient-to-br ${isWinner ? "from-accent/20" : "from-primary/20"} via-transparent to-transparent pointer-events-none`} />
+          <CardHeader className="py-4 px-5">
+            <CardTitle className="flex items-center gap-3 text-sm relative">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${isWinner ? "bg-accent/30 border-accent/40" : "bg-primary/30 border-primary/40"} shadow-inner group-hover:rotate-6 transition-transform duration-500`}>
+                {isWinner ? (
+                  <Trophy className="h-6 w-6 text-accent animate-bounce" />
+                ) : (
+                  <BellRing className="h-6 w-6 text-primary animate-pulse" />
+                )}
+              </div>
+              <div className="flex flex-col">
+                <span className={`text-[10px] font-black uppercase tracking-widest ${isWinner ? "text-accent" : "text-primary"} opacity-80 mb-0.5`}>
+                  {isWinner ? "Elite Result Detected" : "Acertos Identificados"}
+                </span>
+                <span className="font-black text-base tracking-tight text-foreground italic">
+                  {isWinner ? "PARABÉNS! JOGO PREMIADO!" : `CONCURSO #${bestMatch.concurso} • ${matches.length} JOGOS`}
+                </span>
+              </div>
+              <div className="ml-auto flex items-center gap-2">
                 {supported && permission === "granted" && (
-                  <Badge variant="outline" className="text-[10px] text-primary border-primary/30">
-                    <Bell className="h-2.5 w-2.5 mr-1" />
-                    Push ON
+                  <Badge variant="outline" className={`hidden sm:flex text-[10px] font-bold uppercase tracking-widest ${isWinner ? "text-accent border-accent/40" : "text-primary border-primary/40"}`}>
+                    <Bell className="h-2.5 w-2.5 mr-1.5" />
+                    Push Active
                   </Badge>
                 )}
-                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setExpanded(!expanded)}>
-                  {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                <Button size="icon" variant="ghost" className={`h-9 w-9 rounded-xl ${isWinner ? "hover:bg-accent/20" : "hover:bg-primary/20"} transition-all`} onClick={() => setExpanded(!expanded)}>
+                  {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 </Button>
-                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setDismissed(true)}>
-                  <X className="h-3 w-3" />
+                <Button size="icon" variant="ghost" className={`h-9 w-9 rounded-xl ${isWinner ? "hover:bg-accent/20" : "hover:bg-primary/20"} transition-all`} onClick={() => setDismissed(true)}>
+                  <X className="h-4 w-4" />
                 </Button>
               </div>
             </CardTitle>
           </CardHeader>
+
 
           {expanded && (
             <CardContent className="pt-0 px-4 pb-3 space-y-2">
