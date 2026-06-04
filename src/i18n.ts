@@ -35,13 +35,13 @@ const resources = {
           "badge": "Protocolo Elite • {{count}} vagas vitalícias restantes",
           "title": "Pare de apostar no escuro.",
           "subtitle": "Jogue com Matemática.",
-          "description": "A única plataforma do Brasil que funde +10.000 sorteios, redes neurais e 14 algoritmos de elite.",
+          "description": "A plataforma de inteligência artificial para loterias mais completa do Brasil. Analise Mega-Sena, Lotofácil e Quina com probabilidade matemática avançada.",
           "cta_primary": "Desbloquear Acesso Vitalício",
           "cta_secondary": "Login de Membro"
         },
         "features": {
           "title": "Recursos da Plataforma Titan",
-          "subtitle": "A mais completa análise de loterias com inteligência artificial e estatísticas profissionais.",
+          "subtitle": "Utilize as mesmas ferramentas de análise de dados usadas por profissionais para otimizar suas apostas na Mega-Sena e outras loterias.",
           "items": {
             "xray": {
               "title": "Análise Estatística de Loterias",
@@ -56,16 +56,16 @@ const resources = {
               "description": "Crie jogos otimizados matematicamente para aumentar suas chances de ganhar na loteria."
             },
             "backtest": {
-              "title": "Backtest Brutal",
-              "description": "Valide sua estratégia contra o histórico completo antes de realizar qualquer aposta."
+              "title": "Simulador de Resultados",
+              "description": "Valide suas estratégias de jogo contra todo o histórico de sorteios reais antes de apostar seu dinheiro."
             },
             "simulation": {
-              "title": "Simulação Massiva",
-              "description": "Execute 1.000.000 de cenários Monte Carlo para enxergar probabilidades reais."
+              "title": "Probabilidade Matemática",
+              "description": "Simule milhões de cenários e combinações para descobrir as chances reais de acerto em cada modalidade."
             },
             "sync": {
-              "title": "Sync Institucional",
-              "description": "Conexão direta com resultados oficiais atualizada em milissegundos."
+              "title": "Resultados em Tempo Real",
+              "description": "Acesso imediato aos resultados oficiais da Caixa Econômica Federal, sincronizados automaticamente."
             }
           }
         },
@@ -89,16 +89,16 @@ const resources = {
         "how_it_works": {
           "title": "Como Funciona o Titan Loterias",
           "step1": {
-            "title": "Coleta de Big Data",
-            "desc": "Nossos servidores monitoram resultados de todas as loterias oficiais em tempo real."
+            "title": "Análise de Big Data",
+            "desc": "Monitoramos todos os resultados oficiais das loterias brasileiras para alimentar nossa base de dados estatísticos."
           },
           "step2": {
-            "title": "Processamento Neural",
-            "desc": "A IA processa mais de 1 milhão de combinações para cada sorteio buscando anomalias."
+            "title": "Cálculo de Tendências",
+            "desc": "Nossa inteligência artificial analisa milhões de combinações em busca de padrões e anomalias estatísticas recorrentes."
           },
           "step3": {
-            "title": "Geração de Estratégias",
-            "desc": "Algoritmos genéticos criam matrizes de jogos com o maior equilíbrio estatístico possível."
+            "title": "Apostas Otimizadas",
+            "desc": "Você recebe sugestões de jogos baseadas em modelos matemáticos de alta performance para aumentar suas chances."
           },
           "status_label": "Status do Sistema",
           "status_value": "Operando em Alta Fidelidade"
