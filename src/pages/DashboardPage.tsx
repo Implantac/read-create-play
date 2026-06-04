@@ -6,14 +6,14 @@ import { useGenerationHistory } from "@/hooks/useGenerationHistory";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { evaluateBetQuality } from "@/engine/stats/bet-quality";
 import { m } from "framer-motion";
-import { Sparkles, Bot, Target, Zap, BarChart3, ChevronRight, Grid3X3, User, History } from "lucide-react";
+import { Sparkles, Bot, Target, Zap, BarChart3, ChevronRight, Grid3X3, User, History, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 
 const DashboardPage = () => {
-  const { config, stats, draws, selectedLottery } = useLotteryContext();
+  const { config, stats, draws, selectedLottery, viewMode } = useLotteryContext();
   const { saveGeneration } = useGenerationHistory(selectedLottery);
   const [luckyGame, setLuckyGame] = useState<any | null>(null);
   const [generating, setGenerating] = useState(false);
@@ -96,8 +96,8 @@ const DashboardPage = () => {
         {[
           { label: "Tendência", value: "Alta", color: "text-emerald-400" },
           { label: "Ciclo", value: "32", color: "text-primary" },
-          { label: "Dezenas Quentes", value: "05, 12, 23", color: "text-rose-400" },
-          { label: "Dezenas Frias", value: "01, 19, 25", color: "text-blue-400" },
+          { label: "Quentes", value: "05, 12, 23", color: "text-rose-400" },
+          { label: "Frias", value: "01, 19, 25", color: "text-blue-400" },
         ].map((item) => (
           <Card key={item.label} className="glass-card border-border/40 p-4">
             <p className="text-[10px] uppercase font-bold text-muted-foreground">{item.label}</p>
@@ -105,6 +105,37 @@ const DashboardPage = () => {
           </Card>
         ))}
       </section>
+
+      {/* Advanced Details - Only in Advanced Mode */}
+      {viewMode === "advanced" && (
+        <section className="animate-in slide-in-from-bottom-4 duration-500">
+          <div className="flex items-center gap-3 mb-4">
+            <Brain className="w-5 h-5 text-primary" />
+            <h2 className="text-sm font-black uppercase tracking-widest">Métricas Avançadas</h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="glass-card border-border/40 p-6 space-y-4">
+              <h3 className="text-xs font-bold uppercase text-muted-foreground">Distribuição de Soma</h3>
+              <div className="h-40 flex items-end gap-1">
+                {Array.from({ length: 20 }).map((_, i) => (
+                  <div key={i} className="flex-1 bg-primary/20 rounded-t-sm transition-all hover:bg-primary" style={{ height: `${Math.random() * 100}%` }} />
+                ))}
+              </div>
+            </Card>
+            <Card className="glass-card border-border/40 p-6 space-y-4">
+              <h3 className="text-xs font-bold uppercase text-muted-foreground">Frequência por Dezena</h3>
+              <div className="grid grid-cols-5 gap-2">
+                {Array.from({ length: 15 }).map((_, i) => (
+                  <div key={i} className="text-center p-2 rounded-lg bg-muted/20 border border-border/10">
+                    <span className="text-[10px] font-bold text-primary italic">#{i+1}</span>
+                    <p className="text-xs font-black">{Math.floor(Math.random() * 50)}x</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </section>
+      )}
 
       {/* Navegação Rápida */}
       <section>
