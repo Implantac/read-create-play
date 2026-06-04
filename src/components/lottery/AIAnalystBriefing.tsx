@@ -1,67 +1,135 @@
-import { m, AnimatePresence } from "framer-motion";
-import { Brain, CheckCircle2, ShieldCheck, Zap } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import React from 'react';
+import { m, AnimatePresence } from 'framer-motion';
+import { 
+  Brain, 
+  Target, 
+  TrendingUp, 
+  Zap, 
+  ShieldCheck, 
+  ChevronRight, 
+  BarChart3,
+  Cpu,
+  Fingerprint,
+  Info
+} from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 
-interface AIAnalystBriefingProps {
-  confidence: number;
+interface BriefingProps {
+  game?: number[];
+  score?: number;
+  confidence?: number;
+  strategy?: string;
   reasons: string[];
+  lotteryName?: string;
+  onClose?: () => void;
 }
 
-export function AIAnalystBriefing({ confidence, reasons }: AIAnalystBriefingProps) {
+export const AIAnalystBriefing = ({ game, score, confidence, strategy, reasons, lotteryName, onClose }: BriefingProps) => {
+  const finalScore = score ?? confidence ?? 85;
+  const displayStrategy = strategy ?? "Análise Neural";
+  
   return (
-    <div className="p-5 rounded-2xl bg-primary/5 border border-primary/20 space-y-5 animate-in fade-in slide-in-from-bottom-2 shadow-inner relative overflow-hidden">
-      <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-        <Brain className="w-20 h-20 text-primary" />
-      </div>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Brain className="w-4 h-4 text-primary animate-pulse" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Analista de Precisão IA Titan</span>
+    <m.div 
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      className="w-full mx-auto overflow-hidden rounded-[2rem] border border-primary/20 bg-black/60 backdrop-blur-3xl shadow-2xl"
+    >
+      {/* Header */}
+      <div className="relative p-6 pb-4">
+        <div className="absolute top-0 right-0 p-4 opacity-10">
+          <Brain className="w-16 h-16 text-primary" />
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-black uppercase text-muted-foreground">Confiança</span>
-          <Badge variant="outline" className="text-emerald-400 bg-emerald-400/10 border-emerald-400/20 text-[9px] font-mono">
-            {confidence}%
-          </Badge>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-widest text-muted-foreground opacity-60">
-          <span>Score de Assertividade</span>
-          <span>{confidence}/100</span>
-        </div>
-        <Progress value={confidence} className="h-1 bg-white/5" />
-      </div>
-
-      <div className="space-y-2">
-        <p className="text-[10px] font-black uppercase tracking-widest text-primary/80 flex items-center gap-2">
-          <ShieldCheck className="w-3.5 h-3.5" />
-          Diagnóstico Neural
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {reasons.map((reason, idx) => (
-            <m.div 
-              key={idx}
-              initial={{ opacity: 0, x: -5 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: idx * 0.1 }}
-              className="flex items-center gap-2 bg-white/5 px-2.5 py-2 rounded-lg border border-white/5"
-            >
-              <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
-              <span className="text-[10px] text-foreground font-medium leading-tight">{reason}</span>
-            </m.div>
-          ))}
+        
+        <div className="space-y-3 relative z-10">
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="bg-primary/10 border-primary/20 text-primary font-mono text-[9px] uppercase tracking-widest px-2">
+              Neural Analysis
+            </Badge>
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          </div>
+          
+          <h2 className="text-xl font-black italic uppercase tracking-tighter text-foreground leading-none">
+            Análise do <span className="gradient-brand-text">Especialista</span>
+          </h2>
+          {lotteryName && (
+            <p className="text-[10px] text-muted-foreground font-medium max-w-md">
+              Processamento de convergência estatística para a {lotteryName}.
+            </p>
+          )}
         </div>
       </div>
 
-      <div className="pt-3 border-t border-primary/10">
-        <p className="text-[10px] text-muted-foreground leading-relaxed italic flex items-start gap-3 bg-background/40 p-3 rounded-xl border border-white/5">
-          <Zap className="w-4 h-4 text-primary shrink-0 mt-0.5 animate-pulse" />
-          "Validação Alpha concluída: esta configuração otimiza o fluxo de entropia recente, alinhando-se aos clusters de coocorrência mais estáveis dos últimos 50 ciclos."
-        </p>
+      <div className="p-6 pt-2 space-y-6">
+        {/* Main Stats Grid */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Confiança</span>
+              <Cpu className="w-3.5 h-3.5 text-primary" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-2xl font-black italic tabular-nums text-primary leading-none">{finalScore}%</p>
+              <Progress value={finalScore} className="h-1 bg-primary/20" />
+            </div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Estratégia</span>
+              <Target className="w-3.5 h-3.5 text-emerald-400" />
+            </div>
+            <p className="text-sm font-black italic text-foreground leading-tight truncate">{displayStrategy}</p>
+            <div className="flex items-center gap-1 mt-1">
+              <ShieldCheck className="w-3 h-3 text-emerald-400" />
+              <span className="text-[8px] font-bold text-emerald-400 uppercase">Verificado</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Reasons List */}
+        <div className="space-y-3">
+          <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-60 flex items-center gap-2">
+            <BarChart3 className="w-3.5 h-3.5" />
+            Insights de Probabilidade
+          </h3>
+          
+          <div className="grid gap-2">
+            {reasons.slice(0, 3).map((reason, idx) => (
+              <m.div 
+                key={idx}
+                initial={{ x: -10, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: idx * 0.1 }}
+                className="flex items-center gap-3 p-3 rounded-xl bg-secondary/10 border border-white/5 group hover:border-primary/40 transition-all"
+              >
+                <div className="w-6 h-6 rounded-lg bg-background border border-white/10 flex items-center justify-center shrink-0 shadow-lg">
+                  <Fingerprint className="w-3.5 h-3.5 text-primary" />
+                </div>
+                <p className="text-[11px] font-bold text-foreground/90 leading-tight">{reason}</p>
+                <ChevronRight className="w-3.5 h-3.5 text-primary ml-auto opacity-40" />
+              </m.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Insight Box */}
+        <div className="p-4 rounded-2xl bg-gradient-to-br from-primary/10 via-background to-background border border-primary/20 relative overflow-hidden group">
+          <div className="flex gap-3">
+            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+              <Info className="w-4 h-4 text-primary" />
+            </div>
+            <div className="space-y-1">
+              <h4 className="text-[10px] font-black uppercase tracking-wider text-primary">Core Insight</h4>
+              <p className="text-[10px] text-muted-foreground leading-relaxed italic line-clamp-2">
+                Padrão de repetição estável detectado. Recomendado para apostas estruturadas.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </m.div>
   );
-}
+};

@@ -5,19 +5,24 @@ import { useSavedBets } from "@/hooks/useSavedBets";
 import { useGenerationHistory } from "@/hooks/useGenerationHistory";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { evaluateBetQuality } from "@/engine/stats/bet-quality";
-import { m } from "framer-motion";
-import { Sparkles, Bot, Target, Zap, BarChart3, ChevronRight, Grid3X3, User, History, Brain, Snowflake, TrendingUp, Smartphone, RefreshCw, Crown, Terminal as TerminalIcon, Activity, Shield, Layers } from "lucide-react";
+import { m, AnimatePresence } from "framer-motion";
+import { Sparkles, Bot, Target, Zap, BarChart3, ChevronRight, Grid3X3, User, History, Brain, Snowflake, TrendingUp, Smartphone, RefreshCw, Crown, Terminal as TerminalIcon, Activity, Shield, Layers, X, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { TitanHealthGauge } from "@/components/TitanHealthGauge";
+import { AIAnalystBriefing } from "@/components/lottery/AIAnalystBriefing";
+import { TitanCommandCenter } from "@/components/TitanCommandCenter";
+
 
 const DashboardPage = () => {
   const { config, stats, draws, selectedLottery, viewMode } = useLotteryContext();
   const { saveGeneration } = useGenerationHistory(selectedLottery);
   const [luckyGame, setLuckyGame] = useState<any | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [showBriefing, setShowBriefing] = useState(false);
+
 
   const generateGame = useCallback(() => {
     if (stats.length === 0 || draws.length === 0) return;
@@ -32,8 +37,10 @@ const DashboardPage = () => {
           score: quality.overall, 
           strategy: "Equilíbrio Neural",
           description: "Geração equilibrada baseada em padrões de alta frequência.",
+          reasons: quality.strengths.length > 0 ? quality.strengths : ["Equilíbrio estrutural", "Frequência ideal", "Dispersão técnica"],
           pipeline: { filters: [], score: quality.overall }
         };
+
         setLuckyGame(gameData);
         await saveGeneration(gameData);
       }
@@ -45,18 +52,25 @@ const DashboardPage = () => {
     <div className="space-y-12 animate-in fade-in duration-700 max-w-7xl mx-auto px-4 sm:px-6">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-4">
         <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Intelligence Assistant v6.0</span>
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Neural Core Active</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10">
+              <Activity className="w-3 h-3 text-muted-foreground animate-pulse" />
+              <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">Sincronização 100%</span>
+            </div>
           </div>
           <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-tight">
             Sua Melhor <span className="gradient-brand-text">Oportunidade</span> Hoje
           </h1>
           <p className="text-sm text-muted-foreground font-medium max-w-lg leading-relaxed">
-            Nossa IA já analisou milhões de combinações. Aqui está a recomendação de alta probabilidade para você.
+            O assistente Titan processou {stats.length} dezenas e {draws.length} concursos. Receba agora sua recomendação de alta convergência.
           </p>
         </div>
       </div>
+
 
       {/* Main Recommendation Card - Zero Scroll Focus */}
       <section className="relative group">
@@ -103,16 +117,17 @@ const DashboardPage = () => {
                 </div>
 
                 <div className="w-full lg:w-[320px] p-8 rounded-[2rem] bg-background/40 border border-white/5 backdrop-blur-md shadow-inner text-center space-y-8">
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="space-y-1">
-                      <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest opacity-60">IA Trust</p>
-                      <p className="text-3xl font-black italic tracking-tighter tabular-nums gradient-brand-text leading-none">{luckyGame.score}%</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 space-y-1">
+                      <p className="text-[9px] uppercase font-black text-primary/60 tracking-widest">IA Trust</p>
+                      <p className="text-2xl font-black italic tracking-tighter tabular-nums gradient-brand-text leading-none">{luckyGame.score}%</p>
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest opacity-60">Tendência</p>
-                      <p className="text-3xl font-black italic tracking-tighter text-emerald-400 leading-none">Alta</p>
+                    <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 space-y-1">
+                      <p className="text-[9px] uppercase font-black text-emerald-400/60 tracking-widest">Tendência</p>
+                      <p className="text-2xl font-black italic tracking-tighter text-emerald-400 leading-none">Alta</p>
                     </div>
                   </div>
+
 
                   <div className="space-y-3">
                     <Button onClick={generateGame} className="w-full h-14 rounded-2xl gradient-brand font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
@@ -122,9 +137,11 @@ const DashboardPage = () => {
                       <Button asChild variant="outline" className="h-12 rounded-xl border-border/40 font-bold uppercase tracking-widest text-[9px]">
                         <Link to="/fechamentos">Ver Fechamentos</Link>
                       </Button>
-                      <Button variant="ghost" className="h-12 rounded-xl bg-white/5 border border-white/5 font-bold uppercase tracking-widest text-[9px] hover:bg-white/10">
+                      <Button variant="ghost" onClick={() => setShowBriefing(true)} className="h-12 rounded-xl bg-white/5 border border-white/5 font-bold uppercase tracking-widest text-[9px] hover:bg-white/10 flex items-center gap-2">
+                        <Info className="w-3 h-3 text-primary" />
                         Ver Explicação
                       </Button>
+
                     </div>
                   </div>
                 </div>
@@ -153,6 +170,32 @@ const DashboardPage = () => {
           </CardContent>
         </Card>
       </section>
+
+      {/* Briefing Modal */}
+      <AnimatePresence>
+        {showBriefing && luckyGame && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <div className="relative w-full max-w-2xl">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setShowBriefing(false)}
+                className="absolute top-4 right-4 z-[60] text-white hover:bg-white/10"
+              >
+                <X className="w-6 h-6" />
+              </Button>
+              <AIAnalystBriefing 
+                game={luckyGame.numbers}
+                score={luckyGame.score}
+                strategy={luckyGame.strategy}
+                reasons={luckyGame.reasons || ["Distribuição equilibrada", "Alta probabilidade estatística", "Tendência positiva"]}
+                lotteryName={config.name}
+              />
+            </div>
+          </div>
+        )}
+      </AnimatePresence>
+
 
       {/* Primary Actions Grid - Quick Access */}
       <section className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -221,38 +264,43 @@ const DashboardPage = () => {
         </div>
 
         {/* Sidebar Status */}
-        <div className="lg:col-span-4 space-y-6">
-          <div className="flex items-center gap-2 px-1">
-            <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60 flex items-center gap-2">
-              <Activity className="w-4 h-4 text-primary" />
-              Consoles de Diagnóstico
-            </h2>
-          </div>
+        <div className="lg:col-span-4 space-y-8">
+          <TitanCommandCenter />
           
           <div className="space-y-4">
-            <TitanHealthGauge 
-              value={94.8} 
-              label="Neural Core" 
-              sublabel="Processamento Ativo" 
-              color="hsl(var(--primary))" 
-            />
-            <div className="p-6 rounded-3xl bg-background/40 border border-border/40 space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Segurança de Dados</span>
-                <Shield className="w-4 h-4 text-emerald-400" />
+            <div className="flex items-center gap-2 px-1">
+              <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60 flex items-center gap-2">
+                <Activity className="w-4 h-4 text-primary" />
+                Saúde do Sistema
+              </h2>
+            </div>
+            
+            <div className="space-y-4">
+              <TitanHealthGauge 
+                value={94.8} 
+                label="Neural Core" 
+                sublabel="Processamento Ativo" 
+                color="hsl(var(--primary))" 
+              />
+              <div className="p-6 rounded-3xl bg-background/40 border border-border/40 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Segurança de Dados</span>
+                  <Shield className="w-4 h-4 text-emerald-400" />
+                </div>
+                <div className="h-1.5 w-full bg-secondary/40 rounded-full overflow-hidden">
+                  <m.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: "98%" }}
+                    className="h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                  />
+                </div>
+                <p className="text-[10px] font-bold text-muted-foreground text-center italic">Monitoramento Biométrico Ativo</p>
               </div>
-              <div className="h-1.5 w-full bg-secondary/40 rounded-full overflow-hidden">
-                <m.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: "98%" }}
-                  className="h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
-                />
-              </div>
-              <p className="text-[10px] font-bold text-muted-foreground text-center italic">Monitoramento Biométrico Ativo</p>
             </div>
           </div>
         </div>
       </div>
+
 
 
 
