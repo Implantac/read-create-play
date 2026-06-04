@@ -357,7 +357,7 @@ export default function AdminPage() {
                       }`}
                       style={{ width: `${pct}%` }}
                     >
-                      {pct > 10 ? `${PLAN_LABELS[plan]} ${Math.round(pct)}%` : ""}
+                      {pct > 10 ? `${PLAN_LABELS[plan]} ${formatNumber(Math.round(pct))}%` : ""}
                     </div>
                   );
                 })}
