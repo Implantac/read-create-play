@@ -98,7 +98,7 @@ export function NumberPickerGrid({ config, stats, onSaveBet }: Props) {
 
       {/* Grid */}
       <div
-        className="grid gap-1.5"
+        className="grid gap-2 relative z-10"
         style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
       >
         {Array.from({ length: config.numbers }, (_, i) => i + 1).map(n => {
@@ -111,32 +111,34 @@ export function NumberPickerGrid({ config, stats, onSaveBet }: Props) {
             <motion.button
               key={n}
               whileTap={{ scale: 0.9 }}
+              whileHover={{ y: -1 }}
               onClick={() => toggle(n)}
               className={`
-                relative aspect-square rounded-lg text-xs font-mono font-bold
-                flex items-center justify-center transition-all duration-150
-                border
+                relative aspect-square rounded-xl text-xs font-black font-mono
+                flex items-center justify-center transition-all duration-300
+                border-2
                 ${isSelected
-                  ? "bg-primary text-primary-foreground border-primary shadow-md shadow-primary/30 scale-105"
+                  ? "bg-primary text-primary-foreground border-primary shadow-xl shadow-primary/20 scale-110 z-10 italic"
                   : isHot
-                    ? "bg-neon-red/10 text-neon-red border-neon-red/30 hover:bg-neon-red/20"
+                    ? "bg-neon-red/10 text-neon-red border-neon-red/40 hover:bg-neon-red/20 hover:border-neon-red/60"
                     : isCold
-                      ? "bg-neon-blue/10 text-neon-blue border-neon-blue/30 hover:bg-neon-blue/20"
-                      : "bg-secondary/50 text-foreground/80 border-border/50 hover:bg-secondary hover:text-foreground"
+                      ? "bg-neon-blue/10 text-neon-blue border-neon-blue/40 hover:bg-neon-blue/20 hover:border-neon-blue/60"
+                      : "bg-secondary/20 text-foreground/70 border-border/40 hover:bg-secondary/40 hover:text-foreground hover:border-border/60"
                 }
               `}
             >
               {String(n).padStart(2, "0")}
               {isHot && !isSelected && (
-                <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-neon-red" />
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-neon-red border-2 border-background animate-pulse shadow-[0_0_8px_rgba(255,0,0,0.5)]" />
               )}
               {isCold && !isSelected && (
-                <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-neon-blue" />
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-neon-blue border-2 border-background animate-pulse shadow-[0_0_8px_rgba(0,180,255,0.5)]" />
               )}
             </motion.button>
           );
         })}
       </div>
+
 
       {/* Legend */}
       <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-widest opacity-60">
