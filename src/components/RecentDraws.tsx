@@ -4,6 +4,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { History, ChevronDown, ChevronUp, Trophy, Users, DollarSign, TrendingUp } from "lucide-react";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 
+interface Props {
+  draws: DrawResultWithPrizes[];
+}
+
 export function RecentDraws({ draws }: Props) {
   const firstWithPrizes = draws.find(d => d.prizeTiers?.premiacoes?.length);
   const [expandedDraw, setExpandedDraw] = useState<number | null>(firstWithPrizes?.concurso ?? null);
