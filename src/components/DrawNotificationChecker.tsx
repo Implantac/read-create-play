@@ -31,29 +31,33 @@ export function DrawNotificationChecker() {
   const notifiedConcursos = useRef<Set<string>>(new Set());
 
   const checkMatches = useCallback(() => {
-    if (!draws.length || !savedBets.length) return;
+    if (!draws.length || !savedBets.length) {
+      setMatches([]);
+      return;
+    }
 
     const latestDraw = draws[0];
     if (latestDraw.concurso === lastCheckedConcurso) return;
 
-    const results: MatchResult[] = [];
+    // Use a Set for faster lookups
     const drawSet = new Set(latestDraw.numbers);
+    const minMatchRequired = Math.max(2, Math.floor(config.pick * 0.3));
 
-    for (const bet of savedBets) {
-      const matched = bet.numbers.filter(n => drawSet.has(n));
-      if (matched.length >= Math.max(2, Math.floor(config.pick * 0.3))) {
-        results.push({
+    const results: MatchResult[] = savedBets
+      .map(bet => {
+        const matched = bet.numbers.filter(n => drawSet.has(n));
+        return {
           betId: bet.id,
           betNumbers: bet.numbers,
           matchedNumbers: matched,
           matchCount: matched.length,
           concurso: latestDraw.concurso,
           strategy: bet.strategy,
-        });
-      }
-    }
+        };
+      })
+      .filter(r => r.matchCount >= minMatchRequired)
+      .sort((a, b) => b.matchCount - a.matchCount);
 
-    results.sort((a, b) => b.matchCount - a.matchCount);
     setMatches(results);
     setLastCheckedConcurso(latestDraw.concurso);
     setDismissed(false);
@@ -66,7 +70,7 @@ export function DrawNotificationChecker() {
       const isWinner = best.matchCount >= config.pick;
       const lotteryName = LOTTERIES.find(l => l.id === selectedLottery)?.name || selectedLottery;
 
-      // Play tier-based alert sound (different melody per match level)
+      // Play tier-based alert sound
       playMatchAlert(best.matchCount, config.pick);
 
       sendNotification(
@@ -78,6 +82,8 @@ export function DrawNotificationChecker() {
             ? `Você acertou ${best.matchCount}/${config.pick} no concurso #${latestDraw.concurso}!`
             : `Melhor resultado: ${best.matchCount}/${config.pick} acertos no concurso #${latestDraw.concurso}`,
           tag: notifKey,
+          icon: "/pwa-192x192.png",
+          badge: "/pwa-192x192.png"
         }
       );
     }

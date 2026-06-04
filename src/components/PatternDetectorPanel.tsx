@@ -75,7 +75,7 @@ export function PatternDetectorPanel({ config, draws, stats }: Props) {
     setLoadingAi(true);
     try {
       await new Promise(r => setTimeout(r, 200));
-      const analysis = generatePatternAnalysis(report, config, parseInt(drawCount));
+      const analysis = generatePatternAnalysis(report as any, config, parseInt(drawCount));
       setAiAnalysis(analysis);
     } catch (e: any) {
       toast.error(e.message || "Erro na análise");

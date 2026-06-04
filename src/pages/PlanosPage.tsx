@@ -1,4 +1,4 @@
-import { Crown, Zap, Sparkles, Infinity, Settings, Loader2 } from "lucide-react";
+import { Crown, Zap, Sparkles, Infinity, Settings, Loader2, CheckCircle2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
@@ -6,137 +6,29 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { PlanCard, type PlanData } from "@/components/plans/PlanCard";
 import { PlanFAQ } from "@/components/plans/PlanFAQ";
 import { PlanTrustBar } from "@/components/plans/PlanTrustBar";
-import { PlanComparisonTable } from "@/components/plans/PlanComparisonTable";
 import { usePlanAccess } from "@/hooks/usePlanAccess";
-
-const basePlans = [
-  {
-    id: "free",
-    name: "Gratuito",
-    monthlyPrice: "R$ 0",
-    annualPrice: "R$ 0",
-    period: "/mês",
-    annualPeriod: "/mês",
-    icon: Zap,
-    description: "Motor estatístico básico",
-    savedBetsLimit: "3 jogos salvos por loteria",
-    features: [
-      "Dashboard com estatísticas",
-      "Gerador básico de números",
-      "Histórico de concursos",
-      "Conferidor de apostas",
-    ],
-    cta: "Plano atual",
-  },
-  {
-    id: "premium",
-    annualId: "premium_annual",
-    name: "Premium",
-    monthlyPrice: "R$ 29,90",
-    annualPrice: "R$ 23,92",
-    annualTotal: "R$ 287,00/ano",
-    period: "/mês",
-    annualPeriod: "/mês",
-    icon: Sparkles,
-    description: "Ferramentas avançadas de geração",
-    savedBetsLimit: "Jogos salvos ilimitados",
-    features: [
-      "Tudo do plano Gratuito",
-      "Gerador Profissional com filtros",
-      "Fechamentos inteligentes",
-      "Simulador massivo",
-      "Exportação PDF profissional",
-    ],
-    cta: "Assinar Premium",
-    highlight: true,
-  },
-  {
-    id: "professional",
-    annualId: "professional_annual",
-    name: "Profissional",
-    monthlyPrice: "R$ 59,90",
-    annualPrice: "R$ 47,92",
-    annualTotal: "R$ 575,00/ano",
-    period: "/mês",
-    annualPeriod: "/mês",
-    icon: Crown,
-    description: "IA + Otimização completa",
-    savedBetsLimit: "Jogos salvos ilimitados",
-    features: [
-      "Tudo do plano Premium",
-      "Machine Learning preditivo",
-      "Motor HP Matemático",
-      "Analytics avançado",
-      "Algoritmo Genético + Simulated Annealing",
-      "Suporte prioritário",
-    ],
-    cta: "Assinar Profissional",
-  },
-  {
-    id: "lifetime",
-    name: "Vitalício",
-    monthlyPrice: "R$ 497",
-    annualPrice: "R$ 497",
-    period: " único",
-    annualPeriod: " único",
-    icon: Infinity,
-    description: "Acesso permanente a tudo",
-    savedBetsLimit: "Jogos salvos ilimitados",
-    features: [
-      "Tudo do plano Profissional",
-      "Acesso vitalício garantido",
-      "Todas as atualizações futuras",
-      "Prioridade máxima no suporte",
-      "Sem mensalidades nunca mais",
-      "Acesso antecipado a novidades",
-    ],
-    cta: "Comprar Vitalício",
-    isLifetime: true,
-  },
-];
 
 export default function PlanosPage() {
   const { session } = useAuth();
   const { currentPlan, isAdmin, isSuperAdmin } = usePlanAccess();
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
-  const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
+  const [loadingPlan, setLoadingPlan] = useState(false);
   const navigate = useNavigate();
 
-  const plans: PlanData[] = basePlans.map((p) => ({
-    id: p.id,
-    name: p.name,
-    price: billingCycle === "annual" ? p.annualPrice : p.monthlyPrice,
-    period: billingCycle === "annual" ? p.annualPeriod : p.period,
-    icon: p.icon,
-    description: p.description,
-    savedBetsLimit: p.savedBetsLimit,
-    features: p.features,
-    cta: p.cta,
-    highlight: p.highlight,
-    isLifetime: p.isLifetime,
-    annualTotal: billingCycle === "annual" ? (p as any).annualTotal : undefined,
-  }));
+  const LAUNCH_PRICE = "R$ 297";
+  const ORIGINAL_PRICE = "R$ 997";
 
-  const handleCheckout = async (planId: string) => {
+  const handleCheckout = async () => {
     if (!session) {
       navigate("/login");
       return;
     }
 
-    // Map to annual variant if annual billing selected
-    let checkoutPlanId = planId;
-    if (billingCycle === "annual" && (planId === "premium" || planId === "professional")) {
-      const base = basePlans.find((p) => p.id === planId);
-      checkoutPlanId = (base as any)?.annualId || planId;
-    }
-
-    setLoadingPlan(planId);
+    setLoadingPlan(true);
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { planId: checkoutPlanId },
+        body: { planId: "lifetime" },
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       if (error) throw error;
@@ -144,123 +36,129 @@ export default function PlanosPage() {
     } catch (e: any) {
       toast.error("Erro ao iniciar checkout: " + (e.message || "Tente novamente"));
     } finally {
-      setLoadingPlan(null);
+      setLoadingPlan(false);
     }
   };
 
-  const handleManageSubscription = async () => {
-    if (!session) return;
-    setLoadingPlan("manage");
-    try {
-      const { data, error } = await supabase.functions.invoke("customer-portal", {
-        headers: { Authorization: `Bearer ${session.access_token}` },
-      });
-      if (error) throw error;
-      if (data?.url) window.open(data.url, "_blank");
-    } catch (e: any) {
-      toast.error("Erro ao abrir portal: " + (e.message || "Tente novamente"));
-    } finally {
-      setLoadingPlan(null);
-    }
-  };
+  const isLifetime = currentPlan === "lifetime" || isAdmin || isSuperAdmin;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 md:px-6 pb-16">
+    <div className="max-w-4xl mx-auto px-4 md:px-6 pb-16">
       {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0, y: -15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center pt-8 pb-6"
+        className="text-center pt-8 pb-10"
       >
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-5">
-          <Crown className="w-3.5 h-3.5" />
-          Escolha seu plano
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-neon-amber/10 border border-neon-amber/20 text-neon-amber text-xs font-bold uppercase tracking-widest mb-5">
+          <Star className="w-3.5 h-3.5 fill-current" />
+          Promoção de Lançamento
         </div>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight mb-3">
-          Desbloqueie o poder da{" "}
-          <span className="gradient-brand-text">análise inteligente</span>
+        <h1 className="text-3xl md:text-5xl font-extrabold text-foreground tracking-tight mb-4">
+          Acesso Vitalício <span className="gradient-brand-text">Sem Mensalidades</span>
         </h1>
-        <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto">
-          Motor estatístico, IA preditiva e algoritmos avançados para maximizar suas chances
+        <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
+          Trave seu acesso permanente a toda a inteligência do Titan hoje mesmo por um valor único.
         </p>
       </motion.div>
 
-      {/* Billing Toggle */}
+      {/* Main Promo Card */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15, duration: 0.4 }}
-        className="flex justify-center mb-8"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.1 }}
+        className={`relative rounded-3xl border p-1 overflow-hidden shadow-2xl ${
+          isLifetime ? "border-primary/50" : "border-neon-amber/30"
+        }`}
       >
-        <div className="inline-flex items-center gap-1 p-1 rounded-full bg-muted/50 border border-border/30">
-          <button
-            onClick={() => setBillingCycle("monthly")}
-            className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-              billingCycle === "monthly"
-                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Mensal
-          </button>
-          <button
-            onClick={() => setBillingCycle("annual")}
-            className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 relative ${
-              billingCycle === "annual"
-                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Anual
-            <span className="absolute -top-2.5 -right-3 px-1.5 py-0.5 rounded-full bg-accent text-accent-foreground text-[10px] font-bold leading-none">
-              -20%
-            </span>
-          </button>
+        <div className="absolute inset-0 bg-gradient-to-b from-neon-amber/10 via-transparent to-transparent opacity-50" />
+        
+        <div className="relative bg-black/40 backdrop-blur-xl rounded-[22px] p-6 md:p-10">
+          <div className="grid md:grid-cols-2 gap-10 items-center">
+            <div className="space-y-6">
+              <div>
+                <Badge className="bg-neon-amber text-black font-bold mb-4 uppercase tracking-widest text-[10px]">
+                  Oferta Limitada
+                </Badge>
+                <h2 className="text-2xl md:text-3xl font-bold">Titan Loterias <span className="text-neon-amber">Full</span></h2>
+                <p className="text-muted-foreground text-sm mt-2">
+                  A ferramenta definitiva para quem leva as loterias a sério. Use matemática a seu favor.
+                </p>
+              </div>
+
+              <ul className="space-y-3">
+                {[
+                  "Acesso vitalício sem renovação",
+                  "Todas as 8 Loterias integradas",
+                  "Inteligência Artificial e ML",
+                  "Geradores e Otimizadores Pro",
+                  "Backtests e Simulações massivas",
+                  "Atualizações futuras inclusas",
+                  "Suporte VIP prioritário",
+                ].map((feature, i) => (
+                  <li key={i} className="flex items-center gap-3 text-sm">
+                    <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                    </div>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-8 flex flex-col items-center text-center">
+              <p className="text-muted-foreground text-xs uppercase font-bold tracking-widest mb-1">Pagamento Único</p>
+              <div className="flex items-center gap-3 mb-1">
+                <span className="text-muted-foreground line-through text-lg">{ORIGINAL_PRICE}</span>
+                <span className="bg-primary/20 text-primary text-xs font-bold px-2 py-0.5 rounded">-70%</span>
+              </div>
+              <div className="flex items-baseline gap-1 mb-6">
+                <span className="text-5xl font-black tracking-tighter">{LAUNCH_PRICE}</span>
+                <span className="text-muted-foreground font-medium">à vista</span>
+              </div>
+
+              {isLifetime ? (
+                <div className="w-full space-y-4">
+                  <div className="w-full py-4 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center gap-2 text-primary font-bold">
+                    <CheckCircle2 className="w-5 h-5" />
+                    ACesso Vitalício Ativo
+                  </div>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
+                    Agradecemos pela confiança!
+                  </p>
+                </div>
+              ) : (
+                <Button 
+                  size="lg" 
+                  onClick={handleCheckout} 
+                  disabled={loadingPlan}
+                  className="w-full h-14 text-lg font-black uppercase tracking-wider shadow-lg shadow-primary/20 hover:scale-105 transition-all"
+                >
+                  {loadingPlan ? <Loader2 className="w-5 h-5 animate-spin" /> : "Garantir Vaga Agora"}
+                </Button>
+              )}
+              
+              {!isLifetime && (
+                <p className="text-[10px] text-muted-foreground mt-4 uppercase tracking-widest">
+                  Cartão, Pix ou Boleto • 7 Dias de Garantia
+                </p>
+              )}
+            </div>
+          </div>
         </div>
       </motion.div>
 
-      {/* Manage subscription */}
-      {currentPlan !== "free" && !isAdmin && !isSuperAdmin && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex justify-center mb-8"
-        >
-          <Button variant="outline" className="gap-2" onClick={handleManageSubscription} disabled={loadingPlan === "manage"}>
-            {loadingPlan === "manage" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Settings className="w-4 h-4" />}
-            Gerenciar assinatura
-          </Button>
-        </motion.div>
-      )}
-
-      {/* Plan Cards */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
-        {plans.map((plan, i) => {
-          const isCurrent = currentPlan === plan.id;
-          const isUpgrade = plan.id !== "free" && !isCurrent;
-          return (
-            <PlanCard
-              key={plan.id}
-              plan={plan}
-              index={i}
-              isCurrent={isCurrent}
-              isUpgrade={isUpgrade}
-              isLoading={loadingPlan === plan.id}
-              onCheckout={handleCheckout}
-            />
-          );
-        })}
-      </div>
-
-      {/* Trust Bar */}
       <PlanTrustBar />
-
-      {/* Comparison Table */}
-      <PlanComparisonTable />
-
-      {/* FAQ */}
       <PlanFAQ />
+    </div>
+  );
+}
+
+function Badge({ children, className }: { children: React.ReactNode, className?: string }) {
+  return (
+    <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${className}`}>
+      {children}
     </div>
   );
 }

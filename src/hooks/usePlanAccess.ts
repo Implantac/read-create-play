@@ -2,9 +2,10 @@ import { useAuth, PlanType } from "@/contexts/AuthContext";
 
 const PLAN_HIERARCHY: Record<PlanType, number> = {
   free: 0,
+  lifetime: 1,
+  // Keep others for backward compatibility if needed, but treat as lifetime
   premium: 1,
-  professional: 2,
-  lifetime: 3,
+  professional: 1,
 };
 
 export type Feature =
@@ -32,20 +33,20 @@ const FEATURE_MIN_PLAN: Record<Feature, PlanType> = {
   gerador_basico: "free",
   historico: "free",
   conferidor: "free",
-  gerador_avancado: "premium",
-  gerador_profissional: "premium",
-  fechamentos: "premium",
-  simulacoes: "premium",
-  simulacoes_avancadas: "premium",
-  export_pdf: "premium",
-  estrategias_basicas: "premium",
-  roi_dashboard: "premium",
-  ia_autonoma: "professional",
-  ai_analyst: "professional",
-  estrategias_ml: "professional",
-  estrategias_hp: "professional",
-  estrategias_analytics: "professional",
-  otimizacao: "professional",
+  gerador_avancado: "lifetime",
+  gerador_profissional: "lifetime",
+  fechamentos: "lifetime",
+  simulacoes: "lifetime",
+  simulacoes_avancadas: "lifetime",
+  export_pdf: "lifetime",
+  estrategias_basicas: "lifetime",
+  roi_dashboard: "lifetime",
+  ia_autonoma: "lifetime",
+  ai_analyst: "lifetime",
+  estrategias_ml: "lifetime",
+  estrategias_hp: "lifetime",
+  estrategias_analytics: "lifetime",
+  otimizacao: "lifetime",
 };
 
 export const PLAN_LIMITS = {

@@ -32,7 +32,7 @@ export function useLotteryDraws(lotteryId: string) {
   const [syncing, setSyncing] = useState(false);
   const [count, setCount] = useState(0);
 
-  const fetchDraws = useCallback(async () => {
+  const fetchDraws = useCallback(async (limitCount = 2000) => {
     setLoading(true);
     try {
       let allData: any[] = [];
@@ -40,7 +40,7 @@ export function useLotteryDraws(lotteryId: string) {
       const pageSize = 1000;
       let totalCount = 0;
 
-      while (true) {
+      while (allData.length < limitCount) {
         const { data, error: pageError, count } = await supabase
           .from("lottery_draws")
           .select("concurso, draw_date, numbers, prize_tiers", { count: "exact" })
@@ -56,13 +56,13 @@ export function useLotteryDraws(lotteryId: string) {
         from += pageSize;
       }
 
-      const mapped: DrawResult[] = allData.map((row: any) => ({
+      const mapped: DrawResult[] = allData.map((row) => ({
         concurso: row.concurso,
         date: row.draw_date || "",
         numbers: row.numbers || [],
       }));
 
-      const mappedWithPrizes: DrawResultWithPrizes[] = allData.map((row: any) => ({
+      const mappedWithPrizes: DrawResultWithPrizes[] = allData.map((row) => ({
         concurso: row.concurso,
         date: row.draw_date || "",
         numbers: row.numbers || [],
@@ -74,6 +74,7 @@ export function useLotteryDraws(lotteryId: string) {
       setCount(totalCount || mapped.length);
     } catch (e) {
       console.error("Error fetching draws:", e);
+      toast.error("Erro ao carregar sorteios");
     } finally {
       setLoading(false);
     }

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { DrawResult } from "@/data/lotteries";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { StatsCard } from "@/components/StatsCard";
 import { FrequencyChart } from "@/components/FrequencyChart";
@@ -107,7 +108,14 @@ const DashboardPage = () => {
     pipeline: { step: string; detail: string; count: number }[];
   } | null>(null);
   const [generatingLucky, setGeneratingLucky] = useState(false);
-  const [selectedHistoryItem, setSelectedHistoryItem] = useState<any | null>(null);
+  const [selectedHistoryItem, setSelectedHistoryItem] = useState<{
+    numbers: number[];
+    score: number;
+    strategy: string;
+    description: string;
+    pipeline: { step: string; detail: string; count: number }[];
+    created_at: string;
+  } | null>(null);
   const { history, saveGeneration } = useGenerationHistory(selectedLottery);
 
   const analytics = useMemo(() => calculateAnalyticsSnapshot(stats, draws), [stats, draws]);
@@ -115,7 +123,7 @@ const DashboardPage = () => {
   const heatingCount = useMemo(() => stats.filter(s => s.trend > 15).length, [stats]);
   const isSaturated = saturationScore > 75;
 
-  const handleNewDraw = useCallback((draw: any) => addDraw(draw), [addDraw]);
+  const handleNewDraw = useCallback((draw: DrawResult) => addDraw(draw), [addDraw]);
 
   const generateLuckyGame = useCallback(() => {
     if (stats.length === 0 || draws.length === 0) return;
@@ -526,7 +534,7 @@ const DashboardPage = () => {
                           <Terminal className="w-3 h-3" />
                           <span className="uppercase tracking-tighter">Execution Pipeline Log</span>
                         </div>
-                        {(selectedHistoryItem.pipeline as any[]).map((step, idx) => (
+                        {selectedHistoryItem.pipeline.map((step, idx) => (
                           <div 
                             key={idx}
                             className="flex justify-between items-start gap-4 border-b border-white/5 py-1 last:border-0"
