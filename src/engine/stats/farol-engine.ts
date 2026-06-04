@@ -111,11 +111,11 @@ export function computeFarolStats(
     const trendScore = 50 + s.trend;
     const cycleScoreVal = cycleStats.missingNumbers.includes(n) ? 100 : 30;
     
-    // Correlation top associations
+    // Correlation top associations - calculate percentage relative to frequency
     const correlations = Array.from(correlationMap.get(n)?.entries() || [])
-      .map(([num, count]) => ({ number: num, percentage: (count / s.frequency) * 100 }))
+      .map(([num, count]) => ({ number: num, percentage: (count / (s.frequency || 1)) * 100 }))
       .sort((a, b) => b.percentage - a.percentage)
-      .slice(0, 5);
+      .slice(0, 10);
       
     const correlationScore = correlations.length > 0 ? correlations[0].percentage : 50;
 

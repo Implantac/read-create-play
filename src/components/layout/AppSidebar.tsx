@@ -29,6 +29,7 @@ const workflowGroups: { label: string; items: { title: string; url: string; icon
     label: "Inteligência de Dados",
     items: [
       { title: "Terminal", url: "/", icon: BarChart3, tooltip: "Terminal central de inteligência e resumo de fluxos históricos." },
+      { title: "FAROL Estatístico", url: "/farol", icon: Zap, tooltip: "Score Titan, Ciclos e Análise de Tendências em Tempo Real." },
       { title: "Padrões Históricos", url: "/estatisticas", icon: PieChart, tooltip: "Frequência, desvio padrão e análise consolidada de tendências." },
       { title: "Matriz de Precisão", url: "/matriz", icon: Grid3X3, tooltip: "Score algorítmico e farol de saturação de dezenas." },
       { title: "Database Global", url: "/historico", icon: History, tooltip: "Acesso total à base de dados histórica sincronizada." },
