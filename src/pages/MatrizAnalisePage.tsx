@@ -85,13 +85,23 @@ const MatrizAnalisePage = () => {
   return (
     <SelectedBetsProvider>
       <div className="space-y-6">
-        <PageHeader
-          title="Matriz de Análise"
-          description={`Score inteligente e ranking completo — ${config.name}`}
-          icon={Grid3X3}
-          badge={`${draws.length} sorteios`}
-        />
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded bg-primary/10 border border-primary/20 text-[9px] font-black text-primary uppercase tracking-[0.2em] italic">Intelligence Matrix v5.3</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic leading-none">
+            Matriz de <span className="gradient-brand-text">Análise</span>
+          </h1>
+          <p className="text-sm text-muted-foreground font-medium max-w-md">Score inteligente e ranking combinatório completo para detecção de anomalias.</p>
+        </div>
+      </div>
+      
+      <div className="relative group">
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-[2rem] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-1000 pointer-events-none" />
         <LotteryContextBanner />
+      </div>
         <ComplianceDisclaimer />
 
         {/* Summary Cards */}
