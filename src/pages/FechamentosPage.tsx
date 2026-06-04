@@ -21,6 +21,7 @@ import {
 import { m, AnimatePresence } from "framer-motion";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 const BET_PRICES: Record<string, number> = {
   lotofacil: 3.0,
@@ -228,58 +229,58 @@ const FechamentosPage = () => {
                   })}
                 </div>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6 border-t border-border/20">
-                <Button variant="outline" onClick={autoSelectNumbers} className="rounded-xl px-8 font-bold gap-2">
-                  <Brain className="w-4 h-4" /> Escolha Inteligente
-                </Button>
-                <Button 
-                  onClick={handleGenerate} 
-                  disabled={baseNumbers.length !== currentMatrix.baseSize || generating}
-                  className="rounded-xl px-12 h-12 font-black gap-2"
-                >
-                  {generating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Play className="w-5 h-5 fill-current" />}
-                  Gerar {currentMatrix.games.length} Jogos
-                </Button>
-                <Button variant="ghost" onClick={() => setStep(1)} className="gap-2">
-                  <ChevronLeft className="w-4 h-4" /> Mudar Modelo
-                </Button>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-10 border-t border-white/5 mt-10 relative z-10">
+                  <Button variant="outline" onClick={autoSelectNumbers} className="rounded-xl px-8 h-12 font-black gap-2 border-white/10 hover:bg-white/5 italic">
+                    <Brain className="w-4 h-4" /> Escolha Inteligente
+                  </Button>
+                  <Button 
+                    onClick={handleGenerate} 
+                    disabled={baseNumbers.length !== currentMatrix.baseSize || generating}
+                    className="rounded-xl px-12 h-14 font-black gap-3 shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all italic"
+                  >
+                    {generating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Play className="w-5 h-5 fill-current" />}
+                    Deploy {currentMatrix.games.length} Jogos
+                  </Button>
+                  <Button variant="ghost" onClick={() => setStep(1)} className="gap-2 font-black opacity-40 hover:opacity-100 italic transition-opacity">
+                    <ChevronLeft className="w-4 h-4" /> Mudar Modelo
+                  </Button>
                 </div>
               </Card>
             </div>
           )}
 
           {step === 3 && currentMatrix && generatedGames && (
-            <div className="space-y-8">
-              <div className="text-center space-y-2">
-                <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto border border-primary/40 mb-4">
-                  <Shield className="w-8 h-8 text-primary" />
+            <div className="space-y-10">
+              <div className="text-center space-y-3">
+                <div className="w-20 h-20 rounded-[1.5rem] gradient-brand flex items-center justify-center mx-auto shadow-2xl shadow-primary/30 mb-6 group active:scale-95 transition-transform">
+                  <Shield className="w-10 h-10 text-primary-foreground group-hover:rotate-12 transition-transform" />
                 </div>
-                <h3 className="text-2xl font-black uppercase tracking-tighter">Fechamento Concluído</h3>
-                <p className="text-muted-foreground">{generatedGames.length} jogos gerados com {currentMatrix.guarantee} acertos garantidos.</p>
+                <h3 className="text-3xl font-black uppercase tracking-tighter italic">Fechamento <span className="gradient-brand-text">Concluído</span></h3>
+                <p className="text-sm text-muted-foreground font-medium italic opacity-60">Deploy de <span className="text-foreground font-black">{generatedGames.length}</span> jogos com integridade <span className="text-primary font-black">{currentMatrix.guarantee} SYNC</span>.</p>
               </div>
 
               <div className="grid md:grid-cols-3 gap-6">
-                <Card className="glass-card border-border/40 p-4 space-y-2">
-                  <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Investimento Total</p>
-                  <p className="text-2xl font-black text-accent">{formatCurrency(generatedGames.length * betPrice)}</p>
-                </Card>
-                <Card className="glass-card border-border/40 p-4 space-y-2">
-                  <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Cobertura Matemática</p>
-                  <p className="text-2xl font-black text-primary">92.4%</p>
-                </Card>
-                <Card className="glass-card border-border/40 p-4 space-y-2">
-                  <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Garantia Titan</p>
-                  <p className="text-2xl font-black text-foreground">{currentMatrix.guarantee}+ Pontos</p>
-                </Card>
+                <div className="glass-card border-white/5 bg-white/[0.01] p-8 rounded-[2rem] space-y-4 group hover:border-accent/40 transition-colors">
+                  <p className="text-[9px] uppercase font-black text-muted-foreground tracking-[0.2em] opacity-40 leading-none italic">Investimento</p>
+                  <p className="text-3xl font-black font-mono tracking-tighter italic text-accent leading-none group-hover:scale-105 transition-transform origin-left">{formatCurrency(generatedGames.length * betPrice)}</p>
+                </div>
+                <div className="glass-card border-white/5 bg-white/[0.01] p-8 rounded-[2rem] space-y-4 group hover:border-primary/40 transition-colors">
+                  <p className="text-[9px] uppercase font-black text-muted-foreground tracking-[0.2em] opacity-40 leading-none italic">Cobertura Alpha</p>
+                  <p className="text-3xl font-black font-mono tracking-tighter italic text-primary leading-none group-hover:scale-105 transition-transform origin-left">92.4%</p>
+                </div>
+                <div className="glass-card border-white/5 bg-white/[0.01] p-8 rounded-[2rem] space-y-4 group hover:border-foreground/20 transition-colors">
+                  <p className="text-[9px] uppercase font-black text-muted-foreground tracking-[0.2em] opacity-40 leading-none italic">Dataset Grade</p>
+                  <p className="text-3xl font-black font-mono tracking-tighter italic text-foreground leading-none group-hover:scale-105 transition-transform origin-left">{currentMatrix.guarantee}+ SYNC</p>
+                </div>
               </div>
 
-              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 scrollbar-hide">
+              <div className="grid grid-cols-1 gap-3 max-h-[500px] overflow-y-auto pr-4 scrollbar-hide py-2">
                 {generatedGames.map((game, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 rounded-xl glass-card border border-border/20">
-                    <span className="text-[10px] font-black text-muted-foreground w-12 shrink-0">#{i + 1}</span>
-                    <div className="flex flex-wrap gap-1 flex-1 justify-center">
+                  <div key={i} className="flex items-center justify-between p-6 rounded-3xl glass-card border border-white/5 hover:border-primary/20 transition-all group active:scale-[0.99]">
+                    <span className="text-[10px] font-black font-mono text-muted-foreground w-12 shrink-0 opacity-40 group-hover:opacity-100 italic transition-opacity">#{String(i + 1).padStart(3, '0')}</span>
+                    <div className="flex flex-wrap gap-2 flex-1 justify-center">
                       {game.map(n => (
-                        <span key={n} className="w-8 h-8 rounded-lg bg-primary/5 border border-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
+                        <span key={n} className="w-10 h-10 rounded-xl bg-background/60 border border-white/5 flex items-center justify-center text-sm font-black font-mono text-primary shadow-inner group-hover:scale-110 transition-transform italic">
                           {String(n).padStart(2, '0')}
                         </span>
                       ))}
@@ -288,15 +289,15 @@ const FechamentosPage = () => {
                 ))}
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-                <Button size="lg" className="rounded-xl px-12 font-black gap-2" onClick={handleSaveAll}>
-                  <Save className="w-5 h-5" /> Salvar Tudo
+              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-10 border-t border-white/5">
+                <Button size="lg" className="rounded-[1.25rem] px-12 h-16 text-sm font-black gap-3 shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all italic" onClick={handleSaveAll}>
+                  <Save className="w-6 h-6" /> Salvar Dataset
                 </Button>
-                <Button variant="outline" size="lg" className="rounded-xl px-12 font-black gap-2">
-                  <Download className="w-5 h-5" /> Exportar PDF
+                <Button variant="outline" size="lg" className="rounded-[1.25rem] px-12 h-16 text-sm font-black gap-3 border-white/10 hover:bg-white/5 italic">
+                  <Download className="w-6 h-6 text-primary" /> Exportar PDF
                 </Button>
-                <Button variant="ghost" size="lg" className="rounded-xl px-12 font-black" onClick={() => setStep(1)}>
-                  Novo Fechamento
+                <Button variant="ghost" size="lg" className="rounded-[1.25rem] px-12 h-16 text-sm font-black opacity-40 hover:opacity-100 italic transition-opacity" onClick={() => setStep(1)}>
+                  Novo Deploy
                 </Button>
               </div>
             </div>
