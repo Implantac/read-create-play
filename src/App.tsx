@@ -29,7 +29,12 @@ const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage"));
 const SuportePage = lazy(() => import("./pages/SuportePage"));
 const InstallPage = lazy(() => import("./pages/InstallPage"));
 const AdminPage = lazy(() => import("@/pages/AdminPage"));
+const AIChatPage = lazy(() => import("@/pages/AIChatPage"));
+const IAAutonomaPage = lazy(() => import("@/pages/IAAutonomaPage"));
+const EstrategiasPage = lazy(() => import("@/pages/EstrategiasPage"));
+const LotofacilPremiumPage = lazy(() => import("@/pages/LotofacilPremiumPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
