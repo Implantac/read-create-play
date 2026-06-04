@@ -29,6 +29,7 @@ const DelayChart = lazy(() => import("@/components/DelayChart").then(m => ({ def
 const AutoUpdater = lazy(() => import("@/components/AutoUpdater").then(m => ({ default: m.AutoUpdater })));
 const TitanCommandCenter = lazy(() => import("@/components/TitanCommandCenter").then(m => ({ default: m.TitanCommandCenter })));
 const NeuralSynergyCore = lazy(() => import("@/components/NeuralSynergyCore").then(m => ({ default: m.NeuralSynergyCore })));
+const NeuralMissionCenter = lazy(() => import("@/components/NeuralMissionCenter").then(m => ({ default: m.NeuralMissionCenter })));
 
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
@@ -170,10 +171,13 @@ const DashboardPage = () => {
           <div className="space-y-6">
             <StrategyBriefingPanel config={config} stats={stats} draws={draws} />
             <div className="grid md:grid-cols-2 gap-6">
-              <GamificationCard />
+              <NeuralMissionCenter />
               <InsightsCenter />
             </div>
-            <ROIQuickView />
+            <div className="grid md:grid-cols-2 gap-6">
+              <GamificationCard />
+              <ROIQuickView />
+            </div>
             <NotificationsPanel />
           </div>
           <BettingBudgetPlanner config={config} stats={stats} draws={draws} compact />
