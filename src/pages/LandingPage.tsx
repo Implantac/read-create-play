@@ -1,6 +1,7 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 
@@ -32,6 +33,7 @@ import {
   Activity,
   Terminal,
   History,
+  MessageCircle,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
@@ -44,45 +46,6 @@ const fadeUp = {
   }),
 };
 
-const features = [
-  {
-    icon: BarChart3,
-    title: "Raio-X dos Sorteios",
-    description: "Analise dezenas quentes, frias e atrasadas com visualização técnica avançada.",
-    color: "green" as const,
-  },
-  {
-    icon: Brain,
-    title: "IA Preditiva",
-    description: "Redes neurais processam tendências invisíveis em +10.000 sorteios oficiais.",
-    color: "blue" as const,
-  },
-  {
-    icon: Target,
-    title: "Otimizador Elite",
-    description: "Algoritmos genéticos criam matrizes de alta cobertura matemática.",
-    color: "amber" as const,
-  },
-  {
-    icon: TrendingUp,
-    title: "Backtest Brutal",
-    description: "Valide sua estratégia contra o histórico completo antes de realizar qualquer aposta.",
-    color: "red" as const,
-  },
-  {
-    icon: Dices,
-    title: "Simulação Massiva",
-    description: "Execute 1.000.000 de cenários Monte Carlo para enxergar probabilidades reais.",
-    color: "purple" as const,
-  },
-  {
-    icon: Shield,
-    title: "Sync Institucional",
-    description: "Conexão direta com resultados oficiais atualizada em milissegundos.",
-    color: "cyan" as const,
-  },
-];
-
 const colorMap = {
   green: "from-primary/20 to-primary/5 border-primary/20 text-primary",
   blue: "from-neon-blue/20 to-neon-blue/5 border-neon-blue/20 text-neon-blue",
@@ -94,14 +57,8 @@ const colorMap = {
 
 const lotteries = ["Mega-Sena", "Lotofácil", "Quina", "Lotomania", "Dupla Sena", "Timemania", "Dia de Sorte", "Super Sete"];
 
-const stats = [
-  { value: "10.000+", label: "Sorteios analisados" },
-  { value: "8", label: "Loterias suportadas" },
-  { value: "14+", label: "Algoritmos de IA" },
-  { value: "99.9%", label: "Uptime" },
-];
-
 const LAUNCH_SPOTS = 100;
+
 
 export default function LandingPage() {
   const navigate = useNavigate();
