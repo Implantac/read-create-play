@@ -1,4 +1,4 @@
-import { Crown, Zap, Sparkles, Infinity, Settings, Loader2, CheckCircle2, Star } from "lucide-react";
+import { Crown, Zap, Sparkles, Infinity, Settings, Loader2, CheckCircle2, Star, ShieldCheck, Gem } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
@@ -51,16 +51,17 @@ export default function PlanosPage() {
         transition={{ duration: 0.5 }}
         className="text-center pt-8 pb-10"
       >
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-neon-amber/10 border border-neon-amber/20 text-neon-amber text-xs font-bold uppercase tracking-widest mb-5">
-          <Star className="w-3.5 h-3.5 fill-current" />
-          Promoção de Lançamento
+        <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-neon-amber/10 border-2 border-neon-amber/30 text-neon-amber text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-neon-amber/5 backdrop-blur-md mb-8">
+          <div className="w-2 h-2 rounded-full bg-neon-amber animate-pulse shadow-[0_0_8px_rgba(var(--neon-amber),1)]" />
+          Limited Access Protocol • {LAUNCH_PRICE} Final Offer
         </div>
-        <h1 className="text-3xl md:text-5xl font-extrabold text-foreground tracking-tight mb-4">
-          Acesso Vitalício <span className="gradient-brand-text">Sem Mensalidades</span>
+        <h1 className="text-4xl md:text-6xl font-black text-foreground tracking-tighter uppercase italic leading-[0.9] mb-6">
+          Acesso Vitalício <span className="gradient-brand-text block mt-2">Zero Mensalidade</span>
         </h1>
-        <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
-          Trave seu acesso permanente a toda a inteligência do Titan hoje mesmo por um valor único.
+        <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto font-medium opacity-70">
+          Trave seu acesso permanente à rede de inteligência neural Titan hoje mesmo por um investimento único e irrepetível.
         </p>
+
       </motion.div>
 
       {/* Main Promo Card */}
@@ -68,24 +69,28 @@ export default function PlanosPage() {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.1 }}
-        className={`relative rounded-3xl border p-1 overflow-hidden shadow-2xl ${
-          isLifetime ? "border-primary/50" : "border-neon-amber/30"
+        className={`relative rounded-[2.5rem] border-4 p-1 overflow-hidden shadow-2xl transition-all duration-700 ${
+          isLifetime ? "border-primary/40 shadow-primary/20" : "border-neon-amber/40 shadow-neon-amber/20 hover:scale-[1.01]"
         }`}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-neon-amber/10 via-transparent to-transparent opacity-50" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(var(--neon-amber),0.15),transparent)] pointer-events-none opacity-50" />
         
-        <div className="relative bg-black/40 backdrop-blur-xl rounded-[22px] p-6 md:p-10">
-          <div className="grid md:grid-cols-2 gap-10 items-center">
-            <div className="space-y-6">
+        <div className="relative bg-black/60 backdrop-blur-2xl rounded-[2.2rem] p-8 md:p-14">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-8">
               <div>
-                <Badge className="bg-neon-amber text-black font-bold mb-4 uppercase tracking-widest text-[10px]">
-                  Oferta Limitada
-                </Badge>
-                <h2 className="text-2xl md:text-3xl font-bold">Titan Loterias <span className="text-neon-amber">Full</span></h2>
-                <p className="text-muted-foreground text-sm mt-2">
-                  A ferramenta definitiva para quem leva as loterias a sério. Use matemática a seu favor.
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-neon-amber/20 flex items-center justify-center border border-neon-amber/30">
+                    <Gem className="w-5 h-5 text-neon-amber" />
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-neon-amber opacity-80">Titan Professional Network</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tighter italic">Titan <span className="text-neon-amber">Full Node</span></h2>
+                <p className="text-muted-foreground text-sm mt-3 font-medium leading-relaxed opacity-70">
+                  Infraestrutura completa de processamento estatístico para quem opera com seriedade e volume de dados institucional.
                 </p>
               </div>
+
 
               <ul className="space-y-3">
                 {[
@@ -107,23 +112,26 @@ export default function PlanosPage() {
               </ul>
             </div>
 
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-8 flex flex-col items-center text-center">
-              <p className="text-muted-foreground text-xs uppercase font-bold tracking-widest mb-1">Pagamento Único</p>
-              <div className="flex items-center gap-3 mb-1">
-                <span className="text-muted-foreground line-through text-lg">{ORIGINAL_PRICE}</span>
-                <span className="bg-primary/20 text-primary text-xs font-bold px-2 py-0.5 rounded">-70%</span>
+            <div className="bg-white/[0.03] border-2 border-white/10 rounded-[2rem] p-10 flex flex-col items-center text-center relative overflow-hidden group/price">
+              <div className="absolute inset-0 bg-gradient-to-b from-neon-amber/5 via-transparent to-transparent opacity-0 group-hover/price:opacity-100 transition-opacity" />
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-50 mb-4 relative z-10">Unique Node Activation</p>
+              <div className="flex items-center gap-3 mb-2 relative z-10">
+                <span className="text-muted-foreground line-through text-xl font-mono font-bold opacity-40">{ORIGINAL_PRICE}</span>
+                <span className="bg-primary/20 text-primary text-[10px] font-black px-3 py-1 rounded-full border border-primary/30 shadow-lg shadow-primary/10">-70% DISCOUNT</span>
               </div>
-              <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-5xl font-black tracking-tighter">{LAUNCH_PRICE}</span>
-                <span className="text-muted-foreground font-medium">à vista</span>
+              <div className="flex items-baseline gap-1 mb-8 relative z-10 group-hover:scale-105 transition-transform duration-500">
+                <span className="text-6xl font-black font-mono tracking-tighter italic text-foreground">{LAUNCH_PRICE}</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-40 ml-1">Paid Once</span>
               </div>
+
 
               {isLifetime ? (
                 <div className="w-full space-y-4">
-                  <div className="w-full py-4 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center gap-2 text-primary font-bold">
-                    <CheckCircle2 className="w-5 h-5" />
-                    ACesso Vitalício Ativo
+                  <div className="w-full py-5 rounded-2xl bg-primary/10 border-2 border-primary/30 flex items-center justify-center gap-3 text-primary font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-primary/10 italic">
+                    <ShieldCheck className="w-5 h-5" />
+                    Neural Node Active
                   </div>
+
                   <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
                     Agradecemos pela confiança!
                   </p>
@@ -133,10 +141,11 @@ export default function PlanosPage() {
                   size="lg" 
                   onClick={handleCheckout} 
                   disabled={loadingPlan}
-                  className="w-full h-14 text-lg font-black uppercase tracking-wider shadow-lg shadow-primary/20 hover:scale-105 transition-all"
+                  className="w-full h-16 rounded-2xl text-lg font-black uppercase tracking-widest gradient-brand text-primary-foreground shadow-2xl shadow-primary/30 hover:scale-[1.03] active:scale-95 transition-all relative z-10"
                 >
-                  {loadingPlan ? <Loader2 className="w-5 h-5 animate-spin" /> : "Garantir Vaga Agora"}
+                  {loadingPlan ? <Loader2 className="w-6 h-6 animate-spin" /> : "Ativar Network"}
                 </Button>
+
               )}
               
               {!isLifetime && (

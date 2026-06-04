@@ -310,83 +310,85 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
               <CardTitle className="text-base">Ranking Completo</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="max-h-[400px] overflow-y-auto">
+              <div className="max-h-[500px] overflow-y-auto custom-scrollbar">
                 <table className="w-full text-xs">
-                  <thead className="sticky top-0 bg-card z-10">
-                    <tr className="border-b border-border">
-                      <th className="text-left py-2 px-1">#</th>
-                      <th className="text-left py-2 px-1">Nº</th>
-                      <th className="text-center py-2 px-1">Score</th>
-                      <th className="text-center py-2 px-1">Freq</th>
-                      <th className="text-center py-2 px-1">Markov</th>
-                      <th className="text-center py-2 px-1">Entropia</th>
-                      <th className="text-center py-2 px-1">Cooc.</th>
-                      <th className="text-center py-2 px-1">Class.</th>
-                      <th className="text-center py-2 px-1">Dir.</th>
+                  <thead className="sticky top-0 bg-background/95 backdrop-blur z-20">
+                    <tr className="border-b border-border/40">
+                      <th className="text-left py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Rank</th>
+                      <th className="text-left py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Dez</th>
+                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Score</th>
+                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Freq</th>
+                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Markov</th>
+                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Entrop.</th>
+                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Cooc.</th>
+                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Class.</th>
+                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Trend</th>
                     </tr>
                   </thead>
                   <tbody>
                     {report.rankings.slice(0, 40).map(r => (
-                      <tr key={r.number} className="border-b border-border/50 hover:bg-muted/30">
-                        <td className="py-1.5 px-1 font-mono text-muted-foreground">{r.rank}</td>
-                        <td className="py-1.5 px-1 font-bold">{String(r.number).padStart(2, "0")}</td>
-                        <td className="py-1.5 px-1 text-center">
-                          <div className="flex items-center gap-1">
-                            <Progress value={r.compositeScore} className="h-1.5 flex-1" />
-                            <span className="font-mono w-7 text-right">{r.compositeScore}</span>
+                      <tr key={r.number} className="border-b border-border/20 hover:bg-primary/5 transition-colors group">
+                        <td className="py-3 px-3 font-mono text-muted-foreground group-hover:text-primary transition-colors">{r.rank}</td>
+                        <td className="py-3 px-3 font-black text-foreground italic">{String(r.number).padStart(2, "0")}</td>
+                        <td className="py-3 px-3">
+                          <div className="flex items-center gap-2">
+                            <Progress value={r.compositeScore} className="h-1.5 w-16 bg-muted/40" />
+                            <span className="font-mono font-bold w-7 text-right text-primary">{r.compositeScore}</span>
                           </div>
                         </td>
-                        <td className="py-1.5 px-1 text-center font-mono">{r.frequencyScore}</td>
-                        <td className="py-1.5 px-1 text-center font-mono">{r.markovScore}</td>
-                        <td className="py-1.5 px-1 text-center font-mono">{r.entropyScore}</td>
-                        <td className="py-1.5 px-1 text-center font-mono">{r.cooccurrenceScore}</td>
-                        <td className="py-1.5 px-1 text-center">
-                          <Badge variant={r.classification === "forte" ? "default" : r.classification === "moderado" ? "secondary" : "outline"} className="text-[10px] px-1">
+                        <td className="py-3 px-3 text-center font-mono text-muted-foreground">{r.frequencyScore}</td>
+                        <td className="py-3 px-3 text-center font-mono text-muted-foreground">{r.markovScore}</td>
+                        <td className="py-3 px-3 text-center font-mono text-muted-foreground">{r.entropyScore}</td>
+                        <td className="py-3 px-3 text-center font-mono text-muted-foreground">{r.cooccurrenceScore}</td>
+                        <td className="py-3 px-3 text-center">
+                          <Badge variant={r.classification === "forte" ? "default" : r.classification === "moderado" ? "secondary" : "outline"} className="text-[9px] font-black uppercase tracking-widest">
                             {r.classification}
                           </Badge>
                         </td>
-                        <td className="py-1.5 px-1 text-center">
-                          {r.trend === "subindo" ? <ArrowUp className="h-3 w-3 text-green-500 mx-auto" /> :
-                           r.trend === "descendo" ? <ArrowDown className="h-3 w-3 text-destructive mx-auto" /> :
-                           <Minus className="h-3 w-3 text-muted-foreground mx-auto" />}
+                        <td className="py-3 px-3 text-center">
+                          {r.trend === "subindo" ? <ArrowUp className="h-3.5 w-3.5 text-emerald-500 mx-auto" /> :
+                           r.trend === "descendo" ? <ArrowDown className="h-3.5 w-3.5 text-destructive mx-auto" /> :
+                           <Minus className="h-3.5 w-3.5 text-muted-foreground/50 mx-auto" />}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
+
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* Entropy Tab */}
         <TabsContent value="entropy" className="space-y-4">
-          <div className="grid md:grid-cols-3 gap-4">
-            <Card>
-              <CardContent className="pt-4 pb-3">
-                <p className="text-xs text-muted-foreground mb-1">Entropia Global</p>
-                <p className="text-2xl font-bold">{report.entropyAnalysis.globalEntropy.toFixed(3)}</p>
-                <p className="text-[10px] text-muted-foreground">de {report.entropyAnalysis.maxEntropy.toFixed(3)} bits (max)</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-4 pb-3">
-                <p className="text-xs text-muted-foreground mb-1">Entropia Normalizada</p>
-                <p className="text-2xl font-bold">{report.entropyAnalysis.normalizedEntropy.toFixed(4)}</p>
-                <Progress value={report.entropyAnalysis.normalizedEntropy * 100} className="h-2 mt-2" />
-                <p className="text-[10px] text-muted-foreground mt-1">
-                  {report.entropyAnalysis.normalizedEntropy > 0.95 ? "🎲 Quase uniforme" : report.entropyAnalysis.normalizedEntropy > 0.85 ? "⚠️ Levemente enviesada" : "🔥 Significativamente enviesada"}
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-4 pb-3">
-                <p className="text-xs text-muted-foreground mb-1">Dezenas Anômalas</p>
-                <p className="text-2xl font-bold text-destructive">{report.entropyAnalysis.numberEntropy.filter(e => e.isAnomaly).length}</p>
-                <p className="text-[10px] text-muted-foreground">Alta variabilidade entre janelas</p>
-              </CardContent>
-            </Card>
-          </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              <Card className="glass-card border-border/40 bg-background/50 hover:border-primary/40 transition-colors">
+                <CardContent className="pt-6">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60 mb-2">Entropia Global</p>
+                  <p className="text-4xl font-black font-mono italic text-foreground">{report.entropyAnalysis.globalEntropy.toFixed(3)}</p>
+                  <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-50">bits (max: {report.entropyAnalysis.maxEntropy.toFixed(3)})</p>
+                </CardContent>
+              </Card>
+              <Card className="glass-card border-border/40 bg-background/50 hover:border-primary/40 transition-colors">
+                <CardContent className="pt-6">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60 mb-2">Entropia Normalizada</p>
+                  <p className="text-4xl font-black font-mono italic text-primary">{report.entropyAnalysis.normalizedEntropy.toFixed(4)}</p>
+                  <Progress value={report.entropyAnalysis.normalizedEntropy * 100} className="h-2 mt-3 bg-secondary/50" />
+                  <p className="text-[10px] font-bold text-foreground mt-2 uppercase tracking-widest italic">
+                    {report.entropyAnalysis.normalizedEntropy > 0.95 ? "Estocástico" : "Enviesado"}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="glass-card border-border/40 bg-background/50 hover:border-primary/40 transition-colors">
+                <CardContent className="pt-6">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60 mb-2">Dezenas Anômalas</p>
+                  <p className="text-4xl font-black font-mono italic text-destructive">{report.entropyAnalysis.numberEntropy.filter(e => e.isAnomaly).length}</p>
+                  <p className="text-[10px] font-bold text-muted-foreground mt-2 uppercase tracking-widest italic">Alta Variabilidade</p>
+                </CardContent>
+              </Card>
+            </div>
+
 
           <Card>
             <CardHeader className="pb-3">
