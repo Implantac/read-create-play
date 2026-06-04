@@ -99,6 +99,23 @@ export function SavedBetsPanel() {
   return (
     <div className="rounded-2xl glass-card p-6 space-y-6 relative overflow-hidden group">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
+      
+      {/* Quick Summary Bar */}
+      <div className="grid grid-cols-3 gap-2 relative z-10">
+        <div className="p-2 rounded-xl bg-white/5 border border-white/5 flex flex-col items-center">
+          <p className="text-[8px] font-black uppercase text-muted-foreground">Total</p>
+          <p className="text-sm font-black text-foreground">{statsSummary.total}</p>
+        </div>
+        <div className="p-2 rounded-xl bg-yellow-500/5 border border-yellow-500/10 flex flex-col items-center">
+          <p className="text-[8px] font-black uppercase text-yellow-500/60">Rank S</p>
+          <p className="text-sm font-black text-yellow-500">{statsSummary.sGrade}</p>
+        </div>
+        <div className="p-2 rounded-xl bg-emerald-500/5 border border-emerald-500/10 flex flex-col items-center">
+          <p className="text-[8px] font-black uppercase text-emerald-500/60">Rank A</p>
+          <p className="text-sm font-black text-emerald-500">{statsSummary.aGrade}</p>
+        </div>
+      </div>
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 shadow-lg group-hover:rotate-6 transition-transform duration-500">
