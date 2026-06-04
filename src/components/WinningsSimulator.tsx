@@ -9,6 +9,7 @@ import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { formatCurrency, formatNumber, formatPercent } from "@/utils/formatters";
 import {
   Calculator, TrendingUp, History, Sparkles, Plus, X, Trophy,
   Coins, ChartLine, Bot, User as UserIcon, AlertTriangle
