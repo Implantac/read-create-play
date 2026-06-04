@@ -172,35 +172,32 @@ export default function LandingPage() {
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <FloatingCTA />
       {/* Nav */}
-      <nav className="fixed top-0 inset-x-0 z-50 glass-panel border-b border-border/30">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/40 group-hover:scale-110 transition-all duration-300 overflow-hidden">
-              <img src="/logo.png" alt="Titan Loterias" className="w-10 h-10 object-contain" />
+      <nav className="fixed top-0 inset-x-0 z-50 glass-panel border-b border-border/40 h-20 flex items-center">
+        <div className="container mx-auto px-6 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-2xl shadow-primary/20 group-hover:shadow-primary/40 group-hover:scale-110 transition-all duration-500 overflow-hidden border border-white/10 bg-background/50">
+              <img src="/logo.png" alt="Titan Loterias" className="w-12 h-12 object-contain" />
             </div>
-            <span className="text-lg font-bold tracking-tight">
-              Titan <span className="text-primary text-glow-green">Loterias</span>
-            </span>
+            <div className="flex flex-col">
+              <span className="text-xl font-black tracking-tighter uppercase italic leading-none">
+                Titan<span className="gradient-brand-text ml-0.5">Loterias</span>
+              </span>
+              <span className="text-[9px] font-black tracking-[0.3em] uppercase opacity-40">Neural Engine v5.3</span>
+            </div>
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-6">
+            <Link to="/signup" className="text-[10px] font-black uppercase tracking-widest text-neon-amber hover:text-neon-amber/80 transition-all">Acesso Vitalício</Link>
+            <Link to="/login" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all">Login</Link>
             <Link to="/signup">
-              <Button variant="ghost" size="sm" className="text-neon-amber hover:text-neon-amber/80 font-semibold">
-                Acesso Vitalício
-              </Button>
-            </Link>
-            <Link to="/login">
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                Entrar
-              </Button>
-            </Link>
-            <Link to="/signup">
-              <Button size="sm" className="gradient-brand text-primary-foreground shadow-lg shadow-primary/20 gap-1.5">
-                Criar Conta <ArrowRight className="w-3.5 h-3.5" />
+              <Button size="sm" className="h-10 px-6 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
+                Join Network <ArrowRight className="w-3.5 h-3.5 ml-2" />
               </Button>
             </Link>
           </div>
+          {/* Mobile menu button could go here */}
         </div>
       </nav>
+
 
       {/* Hero */}
       <section ref={heroRef} className="relative pt-32 pb-20 md:pt-44 md:pb-32 gradient-mesh overflow-hidden">
@@ -229,19 +226,20 @@ export default function LandingPage() {
             animate="visible"
             className="max-w-3xl mx-auto text-center space-y-6"
           >
-            <motion.div custom={0} variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-neon-amber/10 border border-neon-amber/30 text-neon-amber text-xs font-mono font-semibold tracking-wider uppercase">
-              <Sparkles className="w-3.5 h-3.5" />
-              Lançamento • Apenas {LAUNCH_SPOTS} vagas vitalícias
+            <motion.div custom={0} variants={fadeUp} className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-neon-amber/10 border-2 border-neon-amber/30 text-neon-amber text-[10px] font-black tracking-[0.2em] uppercase shadow-lg shadow-neon-amber/5 backdrop-blur-md">
+              <div className="w-2 h-2 rounded-full bg-neon-amber animate-pulse shadow-[0_0_8px_rgba(var(--neon-amber),1)]" />
+              Protocolo Elite • {LAUNCH_SPOTS} vagas vitalícias restantes
             </motion.div>
 
-            <motion.h1 custom={1} variants={fadeUp} className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]">
+            <motion.h1 custom={1} variants={fadeUp} className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.9] uppercase italic">
               Pare de apostar no escuro.{" "}
-              <span className="gradient-brand-text">Comece a apostar com matemática.</span>
+              <span className="gradient-brand-text block mt-4">Jogue com Matemática.</span>
             </motion.h1>
 
-            <motion.p custom={2} variants={fadeUp} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              A única plataforma do Brasil que combina <span className="text-foreground font-semibold">+10.000 sorteios oficiais</span>, IA de ponta e 14 algoritmos estatísticos para você jogar com vantagem real — não com palpite.
+            <motion.p custom={2} variants={fadeUp} className="text-lg md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-medium opacity-80">
+              A única plataforma do Brasil que funde <span className="text-foreground font-black italic underline decoration-primary decoration-4 underline-offset-4">+10.000 sorteios</span>, redes neurais e 14 algoritmos de elite.
             </motion.p>
+
 
             <motion.div custom={3} variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <motion.div
@@ -250,15 +248,16 @@ export default function LandingPage() {
                   transition={{ type: "spring", stiffness: 300, damping: 15 }}
                   className="rounded-md"
                 >
-                  <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-xl shadow-primary/25 gap-2 text-base px-8 h-12 w-full">
-                    Quero Vitalício por R$ 297 <ChevronRight className="w-4 h-4" />
+                  <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground shadow-2xl shadow-primary/30 gap-3 text-lg px-10 h-16 rounded-2xl font-black uppercase tracking-widest transition-all">
+                    Unlock Lifetime Access <ChevronRight className="w-5 h-5" />
                   </Button>
                 </motion.div>
               <Link to="/login">
-                <Button size="lg" variant="outline" className="gap-2 text-base px-8 h-12 border-border/50 hover:border-primary/30 hover:text-primary">
-                  Já sou membro
+                <Button size="lg" variant="outline" className="gap-3 text-lg px-10 h-16 rounded-2xl border-white/10 bg-white/5 hover:bg-white/10 text-foreground font-black uppercase tracking-widest transition-all border-2">
+                  Member Login
                 </Button>
               </Link>
+
             </motion.div>
 
             <motion.p custom={3} variants={fadeUp} className="text-xs text-muted-foreground/80 font-mono pt-1">
