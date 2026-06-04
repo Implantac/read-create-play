@@ -382,7 +382,7 @@ const AIAnalystPage = () => {
             <CardContent className="space-y-6">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Simulações: {simCount.toLocaleString()}</label>
+                  <label className="text-sm font-medium mb-2 block">Simulações: {formatNumber(simCount)}</label>
                   <div className="flex gap-2">
                     {[1000, 10000, 50000, 100000].map(n => (
                       <Button key={n} variant={simCount === n ? "default" : "outline"} size="sm"
