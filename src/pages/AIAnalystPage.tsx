@@ -190,7 +190,7 @@ const AIAnalystPage = () => {
                             <div key={gi} className="flex items-center gap-2 bg-background/50 rounded-lg p-2">
                               <Badge variant="outline" className="shrink-0">{g.grade}</Badge>
                               <span className="text-xs font-mono">{g.numbers.join("-")}</span>
-                              <span className="text-xs text-muted-foreground ml-auto">{g.totalScore}pts</span>
+                              <span className="text-xs text-muted-foreground ml-auto">{formatNumber(g.totalScore)}pts</span>
                             </div>
                           ))}
                         </div>
