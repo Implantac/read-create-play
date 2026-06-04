@@ -284,11 +284,14 @@ const DashboardPage = () => {
       {loading && (
         <div className="space-y-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <LoadingSkeleton variant="card" count={4} />
+            <StatsCard title="Total de Sorteios" value="..." loading />
+            <StatsCard title="Última Atualização" value="..." loading />
+            <StatsCard title="Tendência Geral" value="..." loading />
+            <StatsCard title="Confidence Index" value="..." loading />
           </div>
           <div className="grid lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              <LoadingSkeleton variant="chart" count={1} />
+              <FrequencyChart stats={[]} loading />
             </div>
             <div>
               <LoadingSkeleton variant="list" count={1} />
@@ -296,8 +299,6 @@ const DashboardPage = () => {
           </div>
         </div>
       )}
-
-
 
       {!loading && draws.length === 0 && (
         <EmptyState
