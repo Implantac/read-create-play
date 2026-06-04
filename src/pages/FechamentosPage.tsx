@@ -103,15 +103,24 @@ const FechamentosPage = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-700 pb-20">
-      <PageHeader
-        title="Fechamentos Matemáticos"
-        description="Otimização combinatória com garantia mínima de acertos"
-        icon={Grid3X3}
-        badge="PRECISION"
-      />
-
-      <LotteryContextBanner />
+    <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700 pb-20 px-1">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded bg-primary/10 border border-primary/20 text-[9px] font-black text-primary uppercase tracking-[0.2em] italic">Combinatorial Engine v5.3</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic leading-none">
+            Fechamentos <span className="gradient-brand-text">Matemáticos</span>
+          </h1>
+          <p className="text-sm text-muted-foreground font-medium max-w-md">Otimização combinatória de alta performance com garantia mínima de acertos.</p>
+        </div>
+      </div>
+      
+      <div className="relative group">
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-[2rem] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-1000 pointer-events-none" />
+        <LotteryContextBanner />
+      </div>
 
       <div className="flex justify-between items-center mb-10 px-4">
         {[1, 2, 3].map((i) => (
