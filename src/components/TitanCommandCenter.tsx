@@ -53,8 +53,9 @@ export const TitanCommandCenter = () => {
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-card rounded-2xl border border-primary/20 p-6 bg-black/40 backdrop-blur-xl relative overflow-hidden group"
+      className="glass-card rounded-[2.5rem] border border-primary/20 p-8 bg-black/40 backdrop-blur-2xl relative overflow-hidden group"
     >
+
       {/* Neural Web Background */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -117,9 +118,10 @@ export const TitanCommandCenter = () => {
                 key={i}
                 initial={{ height: 0 }}
                 animate={{ height: `${i % 2 === 0 ? h : h * (1 + (Math.sin(Date.now() / 1000 + i) * 0.1))}%` }}
-                className={`flex-1 ${entropyData.entropy > 50 ? 'bg-amber-500/40' : 'bg-primary/30'} rounded-t-sm transition-colors duration-500`}
+                className={`flex-1 ${entropyData.entropy > 50 ? 'bg-amber-500/60 shadow-[0_0_15px_rgba(245,158,11,0.3)]' : 'bg-primary/50 shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]'} rounded-t-lg transition-all duration-700`}
               />
             ))}
+
           </div>
         </div>
 
