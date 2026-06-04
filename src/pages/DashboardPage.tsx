@@ -206,8 +206,9 @@ const DashboardPage = () => {
             <StatsCard title="Concursos" value={draws.length} icon={BarChart3} />
           </m.div>
           <m.div variants={item} className="lg:col-span-1">
-            <StatsCard title="Saturação" value={`${analytics.saturationScore.toFixed(1)}%`} icon={ActivitySquare} />
+            <StatsCard title="Saturação" value={`${analytics.saturationScore.toFixed(1)}%`} icon={Activity} />
           </m.div>
+
           <m.div variants={item} className="lg:col-span-1">
             <StatsCard title="Volatilidade" value={`${analytics.volatilityIndex.toFixed(1)}%`} icon={TrendingUp} />
           </m.div>
