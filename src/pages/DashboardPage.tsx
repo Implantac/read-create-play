@@ -19,12 +19,10 @@ import { TitanCommandCenter } from "@/components/TitanCommandCenter";
 import { TechnicalIndicators } from "@/components/TechnicalIndicators";
 import { AlphaMomentumSignal } from "@/components/AlphaMomentumSignal";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, Search, ActivitySquare, ShieldCheck, Activity } from "lucide-react";
+import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, Search, ActivitySquare, ShieldCheck, Activity as LucideActivity } from "lucide-react";
 
 // FIX: ensure Activity symbol is never referenced globally in runtime.
-// Some build outputs may accidentally emit an `Activity` identifier reference;
-// we explicitly define it here to prevent a blank screen.
-const Activity = ActivitySquare;
+const Activity = LucideActivity;
 
 import { Badge } from "@/components/ui/badge";
 import { NeuralSynergyCore } from "@/components/NeuralSynergyCore";
