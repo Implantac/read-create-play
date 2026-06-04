@@ -35,7 +35,7 @@ const item = {
 };
 
 const EstatisticasPage = () => {
-  const { config, draws, syncing, syncDraws, syncAllLotteries } = useLotteryContext();
+  const { config, draws, syncing, syncDraws, syncAllLotteries, hotNumbers, coldNumbers } = useLotteryContext();
   const [period, setPeriod] = useState(0);
 
   const filteredDraws = useMemo(() => {
@@ -47,8 +47,8 @@ const EstatisticasPage = () => {
   const sumData = useMemo(() => computeSumDistribution(filteredDraws), [filteredDraws]);
 
   const derivedStats = useMemo(() => {
-    const hotNumbers = stats.filter(s => s.status === "hot").length;
-    const coldNumbers = stats.filter(s => s.status === "cold").length;
+    const hotCount = hotNumbers.length;
+    const coldCount = coldNumbers.length;
     const avgDelay = stats.length > 0 ? Math.round(stats.reduce((a, s) => a + s.lastSeen, 0) / stats.length) : 0;
     const avgFreq = stats.length > 0 ? Math.round(stats.reduce((a, s) => a + s.frequency, 0) / stats.length) : 0;
     const maxDelay = stats.length > 0 ? Math.max(...stats.map(s => s.lastSeen)) : 0;
