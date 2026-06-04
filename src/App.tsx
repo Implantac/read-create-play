@@ -36,6 +36,7 @@ const FechamentosPage = lazy(() => import("@/pages/FechamentosPage"));
 const StrategyLabPage = lazy(() => import("@/pages/StrategyLabPage"));
 const MatrizAnalisePage = lazy(() => import("@/pages/MatrizAnalisePage"));
 const PlanilhasMatrizPage = lazy(() => import("@/pages/PlanilhasMatrizPage"));
+const FarolEstatisticoPage = lazy(() => import("@/pages/FarolEstatisticoPage.tsx"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const AffiliatePage = lazy(() => import("./pages/AffiliatePage"));
 const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage"));
@@ -110,6 +111,7 @@ const AppContent = () => {
           <Route path="/ai-analyst" element={<AIAnalystPage />} />
           <Route path="/ai-chat" element={<AIChatPage />} />
           <Route path="/estatisticas" element={<EstatisticasPage />} />
+          <Route path="/farol" element={<FarolEstatisticoPage />} />
           <Route path="/matriz" element={<MatrizAnalisePage />} />
           <Route path="/planilhas-matriz" element={<PlanilhasMatrizPage />} />
           <Route path="/fechamentos" element={<FechamentosPage />} />
