@@ -26,7 +26,6 @@ interface LotteryContextType {
   farol: FarolStats[];
   cycle: CycleStats | null;
 }
-}
 
 const LotteryContext = createContext<LotteryContextType | null>(null);
 
