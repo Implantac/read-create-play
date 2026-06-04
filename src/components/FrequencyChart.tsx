@@ -1,13 +1,32 @@
 import { NumberStats } from "@/engine/stats/statistics";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { CHART_TOOLTIP_STYLE, CHART_AXIS_TICK, CHART_COLORS } from "@/lib/chart-theme";
-import { BarChart3 } from "lucide-react";
+import { BarChart3, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Props {
   stats: NumberStats[];
+  loading?: boolean;
 }
 
-export function FrequencyChart({ stats }: Props) {
+export function FrequencyChart({ stats, loading }: Props) {
+  if (loading) {
+    return (
+      <div className="rounded-xl glass-card p-5 space-y-4 animate-pulse">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center" />
+          <div className="space-y-2">
+            <div className="h-4 w-32 bg-muted rounded" />
+            <div className="h-3 w-48 bg-muted rounded" />
+          </div>
+        </div>
+        <div className="h-64 bg-muted/50 rounded-lg flex items-center justify-center text-muted-foreground">
+          <Loader2 className="w-6 h-6 animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
   const data = stats.map(s => ({
     name: String(s.number).padStart(2, "0"),
     freq: s.frequency,
