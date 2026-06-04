@@ -371,7 +371,7 @@ export default function AdminPage() {
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                 <div>
                   <CardTitle className="text-base">Usuários</CardTitle>
-                  <CardDescription>{filtered.length} de {profiles.length}</CardDescription>
+                  <CardDescription>{formatNumber(filtered.length)} de {formatNumber(profiles.length)}</CardDescription>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="relative w-52">
