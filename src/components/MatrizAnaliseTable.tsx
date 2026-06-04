@@ -134,20 +134,20 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
   }, []);
 
   const filters: { label: string; value: FilterMode; count: number }[] = [
-    { label: "Todas", value: "all", count: data.length },
-    { label: "🟢 Top", value: "top", count: data.filter(r => r.signal === "green").length },
-    { label: "⏳ Atrasadas", value: "delayed", count: data.filter(r => r.currentDelay >= r.avgDelay).length },
-    { label: "🔥 Quentes", value: "hot", count: data.filter(r => r.trend === "up").length },
+    { label: t("matrix.filters.all"), value: "all", count: data.length },
+    { label: `🟢 ${t("matrix.filters.top")}`, value: "top", count: data.filter(r => r.signal === "green").length },
+    { label: `⏳ ${t("matrix.filters.delayed")}`, value: "delayed", count: data.filter(r => r.currentDelay >= r.avgDelay).length },
+    { label: `🔥 ${t("matrix.filters.hot")}`, value: "hot", count: data.filter(r => r.trend === "up").length },
   ];
 
   const columns: [SortKey, string][] = [
-    ["rank", "#"],
-    ["number", "Dezena"],
-    ["score", "Score"],
-    ["freqTotal", "Freq. Total"],
-    ["freqRecent30", "Freq. 30"],
-    ["currentDelay", "Atraso"],
-    ["trend", "Tendência"],
+    ["rank", t("matrix.columns.rank")],
+    ["number", t("matrix.columns.number")],
+    ["score", t("matrix.columns.score")],
+    ["freqTotal", t("matrix.columns.freqTotal")],
+    ["freqRecent30", t("matrix.columns.freqRecent30")],
+    ["currentDelay", t("matrix.columns.currentDelay")],
+    ["trend", t("matrix.columns.trend")],
   ];
 
   return (
