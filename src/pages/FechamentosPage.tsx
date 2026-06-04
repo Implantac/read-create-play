@@ -344,36 +344,48 @@ export default function FechamentosPage() {
                   </div>
                 )}
 
-                <div className="flex gap-2">
-                  <Button
-                    onClick={generateGames}
-                    disabled={!canGenerate}
-                    className="flex-1 gap-2"
-                  >
-                    <Grid3X3 className="w-4 h-4" />
-                    Gerar {currentMatrix.games.length} Jogos
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={autoSelectNumbers}
-                    className="gap-1.5"
-                    title="Selecionar automaticamente as melhores dezenas com base em frequência, atraso e tendência"
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    Auto-Seleção
-                  </Button>
-                  {baseNumbers.length > 0 && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setBaseNumbers([]);
-                        setGeneratedGames(null);
-                      }}
+                <div className="flex flex-col gap-4">
+                  {recommendation && (
+                    <motion.div 
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="p-4 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-between"
                     >
-                      Limpar
-                    </Button>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                          <Brain className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black uppercase tracking-widest text-primary">Recomendação IA</p>
+                          <h4 className="text-sm font-bold uppercase">{recommendation.name}</h4>
+                          <p className="text-[10px] text-muted-foreground">Eficiência: {recommendation.efficiency} • Risco: {recommendation.risk}</p>
+                        </div>
+                      </div>
+                      <Button size="sm" onClick={() => setSelectedMatrix(recommendation.id as any)} className="gradient-brand h-8 px-4 text-[10px] font-black uppercase">
+                        Aplicar
+                      </Button>
+                    </motion.div>
                   )}
+
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={generateGames}
+                      disabled={!canGenerate}
+                      className="flex-1 gap-2 gradient-brand h-12 uppercase font-black tracking-widest text-xs"
+                    >
+                      <Grid3X3 className="w-4 h-4" />
+                      Gerar {currentMatrix.games.length} Jogos
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      onClick={autoSelectNumbers}
+                      className="gap-1.5 h-12 px-6"
+                      title="Auto-seleção Farol"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      Auto
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
