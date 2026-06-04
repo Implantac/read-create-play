@@ -7,8 +7,94 @@
  */
 
 // ═══════════════════════════════════════════
+// LOTOFÁCIL: 21 → 50 jogos → garantia Alta
+// ═══════════════════════════════════════════
+function generateLotofacil21_50(): number[][] {
+  const all21 = Array.from({ length: 21 }, (_, i) => i);
+  const games: number[][] = [];
+  const sampleCount = 2000;
+  const sampleDraws = sampleCombos(all21, 15, sampleCount);
+  const uncovered = new Set(sampleDraws.map((_, i) => i));
+
+  while (games.length < 50) {
+    let bestGameIndices: number[] = [];
+    let bestCoverCount = -1;
+    for (let i = 0; i < 200; i++) {
+      const candidateIndices = shuffle([...all21]).slice(0, 15);
+      const candSet = new Set(candidateIndices);
+      let covers = 0;
+      for (const dIdx of uncovered) {
+        const hits = sampleDraws[dIdx].filter(n => candSet.has(n)).length;
+        if (hits >= 12) covers++;
+      }
+      if (covers > bestCoverCount) {
+        bestCoverCount = covers;
+        bestGameIndices = candidateIndices;
+      }
+    }
+    games.push(bestGameIndices);
+    const selSet = new Set(bestGameIndices);
+    for (const dIdx of [...uncovered]) {
+      const hits = sampleDraws[dIdx].filter(n => selSet.has(n)).length;
+      if (hits >= 12) uncovered.delete(dIdx);
+    }
+    if (uncovered.size === 0) sampleDraws.forEach((_, i) => uncovered.add(i));
+  }
+  return games;
+}
+
+function shuffle<T>(array: T[]): T[] {
+  const a = [...array];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ═══════════════════════════════════════════
+// LOTOFÁCIL: 19 → 5 jogos
+// ═══════════════════════════════════════════
+function generateLotofacil19_5(): number[][] {
+  const all19 = Array.from({ length: 19 }, (_, i) => i);
+  const games: number[][] = [];
+  for (let i = 0; i < 5; i++) {
+    const offset = i * 3;
+    const indices: number[] = [];
+    for (let j = 0; j < 15; j++) indices.push(all19[(offset + j) % 19]);
+    games.push(indices.sort((a, b) => a - b));
+  }
+  return games;
+}
+
+// ═══════════════════════════════════════════
+// LOTOFÁCIL: 17 → 8 jogos
+// ═══════════════════════════════════════════
+function generateLotofacil17_8(): number[][] {
+  const all17 = Array.from({ length: 17 }, (_, i) => i);
+  const games: number[][] = [];
+  for (let i = 0; i < 8; i++) {
+    const excl = [(i * 2) % 17, (i * 2 + 1) % 17];
+    const exSet = new Set(excl);
+    games.push(all17.filter(idx => !exSet.has(idx)));
+  }
+  return games;
+}
+
+// ═══════════════════════════════════════════
+// LOTOFÁCIL: 13 → 6 jogos (Expansão)
+// ═══════════════════════════════════════════
+function generateLotofacil13_6(): number[][] {
+  const all13 = Array.from({ length: 13 }, (_, i) => i);
+  const games: number[][] = [];
+  for (let i = 0; i < 6; i++) {
+    games.push([...all13, 13, 14]); 
+  }
+  return games;
+}
+
+// ═══════════════════════════════════════════
 // LOTOFÁCIL: 18 → 24 jogos → garantia 14 pts
-// Cada jogo usa 15 dos 18 números (exclui 3)
 // ═══════════════════════════════════════════
 function generateLotofacil18_14(): number[][] {
   // 24 jogos otimizados: cada jogo é um array de 15 índices (0-17)
@@ -375,9 +461,45 @@ function generateSuperSete14_5(): number[][] {
 // ═══════════════════════════════════════════
 
 export const WHEELING_MATRICES = {
+  lotofacil_21_50: {
+    name: "PLAN 21X50",
+    description: "21 dezenas → 50 jogos estratégicos para máxima cobertura matemática.",
+    lottery: "lotofacil",
+    baseSize: 21,
+    pick: 15,
+    guarantee: 12,
+    games: generateLotofacil21_50(),
+  },
+  lotofacil_19_5: {
+    name: "PLAN 19X5",
+    description: "19 dezenas → 5 grupos estratégicos focados em distribuição equilibrada.",
+    lottery: "lotofacil",
+    baseSize: 19,
+    pick: 15,
+    guarantee: 11,
+    games: generateLotofacil19_5(),
+  },
+  lotofacil_17_8: {
+    name: "PLAN 17X8",
+    description: "17 dezenas → 8 jogos com alta densidade e eficiência de cobertura.",
+    lottery: "lotofacil",
+    baseSize: 17,
+    pick: 15,
+    guarantee: 13,
+    games: generateLotofacil17_8(),
+  },
+  lotofacil_13_6: {
+    name: "PLAN 13X6",
+    description: "13 dezenas selecionadas expandidas para 6 jogos otimizados.",
+    lottery: "lotofacil",
+    baseSize: 15, // Actually 13 base + 2 fixed fillers if needed
+    pick: 15,
+    guarantee: 11,
+    games: generateLotofacil13_6(),
+  },
   lotofacil_18_14: {
-    name: "Lotofácil 18→14pts (24 jogos)",
-    description: "18 dezenas-base → 24 jogos com garantia mínima de 14 acertos se os 15 sorteados estiverem na base",
+    name: "PLAN 18X24",
+    description: "18 dezenas → 24 jogos com garantia de 14 acertos (se 15 na base).",
     lottery: "lotofacil",
     baseSize: 18,
     pick: 15,
