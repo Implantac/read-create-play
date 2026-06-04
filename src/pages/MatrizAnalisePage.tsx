@@ -33,17 +33,19 @@ interface SummaryCardProps {
 }
 
 const SummaryCard = ({ icon, label, value, subtitle, color }: SummaryCardProps) => (
-  <div className={`rounded-xl glass-card p-4 border border-border/50 flex items-start gap-3 group hover:scale-[1.02] transition-transform`}>
-    <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center shrink-0`}>
+  <div className="rounded-2xl glass-card p-5 border border-border/40 flex items-start gap-4 group hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 hover:-translate-y-1 relative overflow-hidden">
+    <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+    <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center shrink-0 shadow-lg group-hover:rotate-12 transition-transform duration-500`}>
       {icon}
     </div>
-    <div className="min-w-0">
-      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">{label}</p>
-      <p className="text-lg font-bold font-mono text-foreground leading-tight">{value}</p>
-      {subtitle && <p className="text-[10px] text-muted-foreground mt-0.5">{subtitle}</p>}
+    <div className="min-w-0 relative z-10">
+      <p className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground opacity-60 mb-1">{label}</p>
+      <p className="text-2xl font-black font-mono text-foreground tracking-tighter italic">{value}</p>
+      {subtitle && <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-40">{subtitle}</p>}
     </div>
   </div>
 );
+
 
 const MatrizAnalisePage = () => {
   const { config, draws, syncing, syncDraws, syncAllLotteries, selectedLottery } = useLotteryContext();
@@ -127,19 +129,33 @@ const MatrizAnalisePage = () => {
         )}
 
         {/* Score methodology */}
-        <div className="rounded-xl glass-card p-4 flex items-start gap-3 text-xs text-muted-foreground border border-border/30">
-          <BarChart3 className="w-4 h-4 shrink-0 mt-0.5 text-primary" />
-          <div>
-            <p className="font-semibold text-foreground mb-1">Fórmula do Score (5 Pilares)</p>
-            <div className="flex flex-wrap gap-x-4 gap-y-1">
-              <span><strong className="text-emerald-400">30%</strong> Frequência Total</span>
-              <span><strong className="text-blue-400">25%</strong> Frequência Recente</span>
-              <span><strong className="text-amber-400">20%</strong> Baixo Atraso</span>
-              <span><strong className="text-purple-400">15%</strong> Tendência</span>
-              <span><strong className="text-pink-400">10%</strong> Consistência</span>
+        <div className="rounded-2xl glass-card p-6 flex flex-col md:flex-row items-center gap-6 border border-primary/20 relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent pointer-events-none" />
+          <div className="flex items-center gap-4 relative z-10 shrink-0">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+              <BarChart3 className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <p className="font-black text-foreground uppercase tracking-widest text-xs italic">Algoritmo de Scoring</p>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-60 mt-0.5">Distribuição Ponderada (5 Pilares)</p>
             </div>
           </div>
+          <div className="flex flex-wrap gap-4 relative z-10">
+            {[
+              { label: "Frequência Total", val: "30%", color: "text-emerald-400" },
+              { label: "Ciclos Recentes", val: "25%", color: "text-blue-400" },
+              { label: "Variação Atraso", val: "20%", color: "text-amber-400" },
+              { label: "Momentum", val: "15%", color: "text-purple-400" },
+              { label: "Entropia", val: "10%", color: "text-pink-400" },
+            ].map((item, idx) => (
+              <div key={idx} className="flex flex-col border-l border-border/40 pl-4">
+                <span className={`text-base font-black font-mono italic ${item.color}`}>{item.val}</span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-50">{item.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
+
 
         {/* Farol */}
         <FarolDezenas
