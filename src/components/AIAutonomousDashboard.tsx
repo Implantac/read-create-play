@@ -358,59 +358,77 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                         </td>
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-3 justify-center">
-                            <Progress value={r.compositeScore} className="h-1.5 w-16 bg-muted/40" />
-                            <span className="font-mono font-bold w-7 text-right text-primary">{r.compositeScore}</span>
+                            <div className="w-20 h-1.5 rounded-full bg-secondary/50 border border-white/5 overflow-hidden">
+                              <div className="h-full bg-primary shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]" style={{ width: `${r.compositeScore}%` }} />
+                            </div>
+                            <span className="text-xs font-black font-mono italic group-hover/row:text-primary transition-colors w-7 text-right">{r.compositeScore}</span>
                           </div>
                         </td>
-                        <td className="py-3 px-3 text-center font-mono text-muted-foreground">{r.frequencyScore}</td>
-                        <td className="py-3 px-3 text-center font-mono text-muted-foreground">{r.markovScore}</td>
-                        <td className="py-3 px-3 text-center font-mono text-muted-foreground">{r.entropyScore}</td>
-                        <td className="py-3 px-3 text-center font-mono text-muted-foreground">{r.cooccurrenceScore}</td>
-                        <td className="py-3 px-3 text-center">
-                          <Badge variant={r.classification === "forte" ? "default" : r.classification === "moderado" ? "secondary" : "outline"} className="text-[9px] font-black uppercase tracking-widest">
+                        <td className="py-4 px-6 text-center font-mono text-[10px] opacity-60 group-hover/row:opacity-100 transition-opacity">{r.frequencyScore}</td>
+                        <td className="py-4 px-6 text-center font-mono text-[10px] opacity-60 group-hover/row:opacity-100 transition-opacity">{r.markovScore}</td>
+                        <td className="py-4 px-6 text-center">
+                          <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-widest ${
+                            r.classification === "forte" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : 
+                            r.classification === "normal" ? "bg-primary/5 text-primary border-primary/20" : 
+                            "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                          }`}>
                             {r.classification}
                           </Badge>
                         </td>
-                        <td className="py-3 px-3 text-center">
-                          {r.trend === "subindo" ? <ArrowUp className="h-3.5 w-3.5 text-emerald-500 mx-auto" /> :
-                           r.trend === "descendo" ? <ArrowDown className="h-3.5 w-3.5 text-destructive mx-auto" /> :
-                           <Minus className="h-3.5 w-3.5 text-muted-foreground/50 mx-auto" />}
+                        <td className="py-4 px-6 text-center">
+                          <div className="flex items-center justify-center gap-1.5">
+                            {r.trend === "subindo" ? <ArrowUp className="h-3 w-3 text-emerald-400" /> : 
+                             r.trend === "descendo" ? <ArrowDown className="h-3 w-3 text-rose-400" /> : 
+                             <Minus className="h-3 w-3 text-muted-foreground opacity-30" />}
+                            <span className={`text-[9px] font-black uppercase tracking-widest ${
+                              r.trend === "subindo" ? "text-emerald-400" : r.trend === "descendo" ? "text-rose-400" : "text-muted-foreground opacity-40"
+                            }`}>
+                              {r.trend}
+                            </span>
+                          </div>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* Entropy Tab */}
-        <TabsContent value="entropy" className="space-y-4">
+        <TabsContent value="entropy" className="space-y-6 outline-none">
             <div className="grid md:grid-cols-3 gap-6">
-              <Card className="glass-card border-border/40 bg-background/50 hover:border-primary/40 transition-colors">
-                <CardContent className="pt-6">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60 mb-2">Entropia Global</p>
-                  <p className="text-4xl font-black font-mono italic text-foreground">{report.entropyAnalysis.globalEntropy.toFixed(3)}</p>
-                  <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-50">bits (max: {report.entropyAnalysis.maxEntropy.toFixed(3)})</p>
+              <Card className="glass-card border-white/10 shadow-xl rounded-[2rem] overflow-hidden group/entropy-card active:scale-[0.98] transition-all">
+                <CardContent className="p-8">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60 mb-4 group-hover/entropy-card:text-foreground transition-colors leading-none italic">Incerteza Global (Shannon)</p>
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-5xl font-black font-mono tracking-tighter italic text-foreground leading-none">{report.entropyAnalysis.globalEntropy.toFixed(3)}</p>
+                    <span className="text-[10px] font-black text-muted-foreground uppercase opacity-40">bits</span>
+                  </div>
+                  <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest mt-4 opacity-40">Theoretical Max: {report.entropyAnalysis.maxEntropy.toFixed(3)}</p>
                 </CardContent>
               </Card>
-              <Card className="glass-card border-border/40 bg-background/50 hover:border-primary/40 transition-colors">
-                <CardContent className="pt-6">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60 mb-2">Entropia Normalizada</p>
-                  <p className="text-4xl font-black font-mono italic text-primary">{report.entropyAnalysis.normalizedEntropy.toFixed(4)}</p>
-                  <Progress value={report.entropyAnalysis.normalizedEntropy * 100} className="h-2 mt-3 bg-secondary/50" />
-                  <p className="text-[10px] font-bold text-foreground mt-2 uppercase tracking-widest italic">
-                    {report.entropyAnalysis.normalizedEntropy > 0.95 ? "Estocástico" : "Enviesado"}
-                  </p>
+              
+              <Card className="glass-card border-primary/20 shadow-xl rounded-[2rem] overflow-hidden group/entropy-card active:scale-[0.98] transition-all bg-primary/[0.02]">
+                <CardContent className="p-8">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-4 opacity-60 group-hover/entropy-card:opacity-100 transition-opacity leading-none italic">Normalização Proporcional</p>
+                  <p className="text-5xl font-black font-mono tracking-tighter italic text-primary leading-none">{report.entropyAnalysis.normalizedEntropy.toFixed(4)}</p>
+                  <div className="h-1.5 w-full bg-primary/10 rounded-full mt-6 overflow-hidden">
+                    <Progress value={report.entropyAnalysis.normalizedEntropy * 100} className="h-full bg-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" />
+                  </div>
+                  <div className="flex items-center gap-2 mt-4">
+                    <div className="w-1 h-1 rounded-full bg-primary animate-pulse" />
+                    <p className="text-[9px] font-black text-foreground uppercase tracking-widest italic">{report.entropyAnalysis.normalizedEntropy > 0.95 ? "Status: Pure Chaos (Stable)" : "Status: Structured Bias"}</p>
+                  </div>
                 </CardContent>
               </Card>
-              <Card className="glass-card border-border/40 bg-background/50 hover:border-primary/40 transition-colors">
-                <CardContent className="pt-6">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60 mb-2">Dezenas Anômalas</p>
-                  <p className="text-4xl font-black font-mono italic text-destructive">{report.entropyAnalysis.numberEntropy.filter(e => e.isAnomaly).length}</p>
-                  <p className="text-[10px] font-bold text-muted-foreground mt-2 uppercase tracking-widest italic">Alta Variabilidade</p>
+
+              <Card className="glass-card border-rose-500/20 shadow-xl rounded-[2rem] overflow-hidden group/entropy-card active:scale-[0.98] transition-all bg-rose-500/[0.02]">
+                <CardContent className="p-8">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-rose-400 mb-4 opacity-60 group-hover/entropy-card:opacity-100 transition-opacity leading-none italic">Vetor de Anomalias</p>
+                  <p className="text-5xl font-black font-mono tracking-tighter italic text-rose-400 leading-none">{report.entropyAnalysis.numberEntropy.filter(e => e.isAnomaly).length}</p>
+                  <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest mt-6 opacity-40 italic">Detecções de Alta Variabilidade</p>
                 </CardContent>
               </Card>
             </div>
