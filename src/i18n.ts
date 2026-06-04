@@ -89,16 +89,16 @@ const resources = {
         "how_it_works": {
           "title": "Como Funciona o Titan Loterias",
           "step1": {
-            "title": "Coleta de Big Data",
-            "desc": "Nossos servidores monitoram resultados de todas as loterias oficiais em tempo real."
+            "title": "Análise de Big Data",
+            "desc": "Monitoramos todos os resultados oficiais das loterias brasileiras para alimentar nossa base de dados estatísticos."
           },
           "step2": {
-            "title": "Processamento Neural",
-            "desc": "A IA processa mais de 1 milhão de combinações para cada sorteio buscando anomalias."
+            "title": "Cálculo de Tendências",
+            "desc": "Nossa inteligência artificial analisa milhões de combinações em busca de padrões e anomalias estatísticas recorrentes."
           },
           "step3": {
-            "title": "Geração de Estratégias",
-            "desc": "Algoritmos genéticos criam matrizes de jogos com o maior equilíbrio estatístico possível."
+            "title": "Apostas Otimizadas",
+            "desc": "Você recebe sugestões de jogos baseadas em modelos matemáticos de alta performance para aumentar suas chances."
           },
           "status_label": "Status do Sistema",
           "status_value": "Operando em Alta Fidelidade"
