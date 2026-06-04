@@ -5,19 +5,24 @@ import { useSavedBets } from "@/hooks/useSavedBets";
 import { useGenerationHistory } from "@/hooks/useGenerationHistory";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { evaluateBetQuality } from "@/engine/stats/bet-quality";
-import { m } from "framer-motion";
-import { Sparkles, Bot, Target, Zap, BarChart3, ChevronRight, Grid3X3, User, History, Brain, Snowflake, TrendingUp, Smartphone, RefreshCw, Crown, Terminal as TerminalIcon, Activity, Shield, Layers } from "lucide-react";
+import { m, AnimatePresence } from "framer-motion";
+import { Sparkles, Bot, Target, Zap, BarChart3, ChevronRight, Grid3X3, User, History, Brain, Snowflake, TrendingUp, Smartphone, RefreshCw, Crown, Terminal as TerminalIcon, Activity, Shield, Layers, X, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { TitanHealthGauge } from "@/components/TitanHealthGauge";
+import { AIAnalystBriefing } from "@/components/lottery/AIAnalystBriefing";
+import { TitanCommandCenter } from "@/components/TitanCommandCenter";
+
 
 const DashboardPage = () => {
   const { config, stats, draws, selectedLottery, viewMode } = useLotteryContext();
   const { saveGeneration } = useGenerationHistory(selectedLottery);
   const [luckyGame, setLuckyGame] = useState<any | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [showBriefing, setShowBriefing] = useState(false);
+
 
   const generateGame = useCallback(() => {
     if (stats.length === 0 || draws.length === 0) return;
@@ -32,8 +37,10 @@ const DashboardPage = () => {
           score: quality.overall, 
           strategy: "Equilíbrio Neural",
           description: "Geração equilibrada baseada em padrões de alta frequência.",
+          reasons: quality.strengths.length > 0 ? quality.strengths : ["Equilíbrio estrutural", "Frequência ideal", "Dispersão técnica"],
           pipeline: { filters: [], score: quality.overall }
         };
+
         setLuckyGame(gameData);
         await saveGeneration(gameData);
       }
@@ -122,9 +129,11 @@ const DashboardPage = () => {
                       <Button asChild variant="outline" className="h-12 rounded-xl border-border/40 font-bold uppercase tracking-widest text-[9px]">
                         <Link to="/fechamentos">Ver Fechamentos</Link>
                       </Button>
-                      <Button variant="ghost" className="h-12 rounded-xl bg-white/5 border border-white/5 font-bold uppercase tracking-widest text-[9px] hover:bg-white/10">
+                      <Button variant="ghost" onClick={() => setShowBriefing(true)} className="h-12 rounded-xl bg-white/5 border border-white/5 font-bold uppercase tracking-widest text-[9px] hover:bg-white/10 flex items-center gap-2">
+                        <Info className="w-3 h-3 text-primary" />
                         Ver Explicação
                       </Button>
+
                     </div>
                   </div>
                 </div>
@@ -153,6 +162,32 @@ const DashboardPage = () => {
           </CardContent>
         </Card>
       </section>
+
+      {/* Briefing Modal */}
+      <AnimatePresence>
+        {showBriefing && luckyGame && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <div className="relative w-full max-w-2xl">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setShowBriefing(false)}
+                className="absolute top-4 right-4 z-[60] text-white hover:bg-white/10"
+              >
+                <X className="w-6 h-6" />
+              </Button>
+              <AIAnalystBriefing 
+                game={luckyGame.numbers}
+                score={luckyGame.score}
+                strategy={luckyGame.strategy}
+                reasons={luckyGame.reasons || ["Distribuição equilibrada", "Alta probabilidade estatística", "Tendência positiva"]}
+                lotteryName={config.name}
+              />
+            </div>
+          </div>
+        )}
+      </AnimatePresence>
+
 
       {/* Primary Actions Grid - Quick Access */}
       <section className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -221,13 +256,17 @@ const DashboardPage = () => {
         </div>
 
         {/* Sidebar Status */}
-        <div className="lg:col-span-4 space-y-6">
-          <div className="flex items-center gap-2 px-1">
-            <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60 flex items-center gap-2">
-              <Activity className="w-4 h-4 text-primary" />
-              Consoles de Diagnóstico
-            </h2>
-          </div>
+        <div className="lg:col-span-4 space-y-8">
+          <TitanCommandCenter />
+          
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 px-1">
+              <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60 flex items-center gap-2">
+                <Activity className="w-4 h-4 text-primary" />
+                Saúde do Sistema
+              </h2>
+            </div>
+
           
           <div className="space-y-4">
             <TitanHealthGauge 
