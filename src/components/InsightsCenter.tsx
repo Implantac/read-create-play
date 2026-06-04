@@ -33,10 +33,11 @@ export function InsightsCenter() {
   };
 
   return (
-    <Card className="glass-card border-primary/20 h-full">
+    <Card className="glass-card border-primary/20 h-full relative overflow-hidden group">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none opacity-50" />
       <CardHeader className="pb-3">
         <CardTitle className="text-xs font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-          <Zap className="w-4 h-4 text-primary" /> Central de Insights IA
+          <Zap className="w-4 h-4 text-primary group-hover:animate-bounce" /> Central de Insights Alpha
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
