@@ -3,6 +3,8 @@ import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthContext, type AuthContextType, type PlanType, type Profile } from "./AuthContext";
 import { isFullAccessEmail } from "@/core/fullAccess";
+import { AuthService } from "@/services/auth/auth.service";
+
 
 const asFullAccessProfile = (profile: Profile): Profile => ({
   ...profile,
@@ -19,18 +21,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userRole, setUserRole] = useState<string>("user");
 
   const fetchProfile = async (userId: string, email?: string | null) => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .single();
-
-    if (data) {
-      setProfile(
-        isFullAccessEmail(email)
-          ? asFullAccessProfile(data as Profile)
-          : (data as Profile)
-      );
+    try {
+      const data = await AuthService.getProfile(userId);
+      if (data) {
+        setProfile(
+          isFullAccessEmail(email)
+            ? asFullAccessProfile(data as Profile)
+            : (data as Profile)
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching profile:", error);
     }
   };
 
@@ -148,7 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await AuthService.signOut();
     setSession(null);
     setProfile(null);
   };
