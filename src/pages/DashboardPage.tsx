@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { DrawResult } from "@/data/lotteries";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { StatsCard } from "@/components/StatsCard";
 import { FrequencyChart } from "@/components/FrequencyChart";
@@ -113,6 +114,7 @@ const DashboardPage = () => {
     strategy: string;
     description: string;
     pipeline: { step: string; detail: string; count: number }[];
+    created_at: string;
   } | null>(null);
   const { history, saveGeneration } = useGenerationHistory(selectedLottery);
 

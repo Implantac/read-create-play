@@ -166,8 +166,8 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
       const { generateSimulationAnalysis } = await import("@/engine/native-analysis");
       const analysis = generateSimulationAnalysis(
         {
-          bets: simulation.bets.map(b => ({
-            bet: b.bet,
+          bets: (simulation.bets as any).map((b: any) => ({
+            bet: b.bet.numbers,
             bestHit: b.bestHit,
             avgHits: b.avgHits,
             hitDistribution: b.hitDistribution,

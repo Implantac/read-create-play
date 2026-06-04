@@ -46,7 +46,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
     setAiLoading(true);
     try {
       await new Promise(r => setTimeout(r, 300));
-      const analysis = generateAutonomousAnalysis(report, config);
+      const analysis = generateAutonomousAnalysis(report as any, config);
       setAiAnalysis(analysis);
       toast({ title: "IA Nativa", description: "Análise concluída com sucesso!" });
     } catch (err: any) {
