@@ -2,15 +2,16 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/contexts/AuthProvider";
 import { LotteryProvider } from "@/contexts/LotteryContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminGuard } from "@/components/AdminGuard";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { ReferralSystem } from "@/lib/referral-system";
 
 const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
 const GeradorPage = lazy(() => import("@/pages/GeradorPage"));
@@ -58,8 +59,6 @@ const queryClient = new QueryClient({
   },
 });
 
-
-
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-[60vh] animate-in fade-in duration-500">
     <div className="flex flex-col items-center gap-4">
@@ -77,6 +76,58 @@ const PageLoader = () => (
   </div>
 );
 
+const AppContent = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const ref = params.get("ref");
+    if (ref) {
+      ReferralSystem.trackReferral(ref);
+    }
+  }, [location]);
+
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        {/* Public */}
+        <Route path="/landing" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/planos" element={<PlanosPage />} />
+        <Route path="/suporte" element={<SuportePage />} />
+        <Route path="/payment-success" element={<PaymentSuccessPage />} />
+        <Route path="/install" element={<InstallPage />} />
+        {/* Protected */}
+        <Route element={<ProtectedRoute><LotteryProvider><AppLayout /></LotteryProvider></ProtectedRoute>}>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/gerador" element={<GeradorPage />} />
+          <Route path="/estrategias" element={<EstrategiasPage />} />
+          <Route path="/simulacoes" element={<SimulacoesPage />} />
+          <Route path="/ia-autonoma" element={<IAAutonomaPage />} />
+          <Route path="/ai-analyst" element={<AIAnalystPage />} />
+          <Route path="/ai-chat" element={<AIChatPage />} />
+          <Route path="/estatisticas" element={<EstatisticasPage />} />
+          <Route path="/matriz" element={<MatrizAnalisePage />} />
+          <Route path="/planilhas-matriz" element={<PlanilhasMatrizPage />} />
+          <Route path="/fechamentos" element={<FechamentosPage />} />
+          <Route path="/historico" element={<HistoricoPage />} />
+          <Route path="/roi" element={<ROIDashboardPage />} />
+          <Route path="/minhas-apostas" element={<HistoricoApostasPage />} />
+          <Route path="/jogos-salvos" element={<JogosSalvosPage />} />
+          <Route path="/perfil" element={<PerfilPage />} />
+          <Route path="/laboratorio" element={<StrategyLabPage />} />
+          <Route path="/afiliados" element={<AffiliatePage />} />
+          <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
+  );
+};
+
 function App() {
   return (
   <QueryClientProvider client={queryClient}>
@@ -86,43 +137,7 @@ function App() {
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              {/* Public */}
-              <Route path="/landing" element={<LandingPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignupPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/reset-password" element={<ResetPasswordPage />} />
-              <Route path="/planos" element={<PlanosPage />} />
-              <Route path="/suporte" element={<SuportePage />} />
-              <Route path="/payment-success" element={<PaymentSuccessPage />} />
-              <Route path="/install" element={<InstallPage />} />
-              {/* Protected */}
-              <Route element={<ProtectedRoute><LotteryProvider><AppLayout /></LotteryProvider></ProtectedRoute>}>
-                <Route path="/" element={<DashboardPage />} />
-                <Route path="/gerador" element={<GeradorPage />} />
-                <Route path="/estrategias" element={<EstrategiasPage />} />
-                <Route path="/simulacoes" element={<SimulacoesPage />} />
-                <Route path="/ia-autonoma" element={<IAAutonomaPage />} />
-                <Route path="/ai-analyst" element={<AIAnalystPage />} />
-                <Route path="/ai-chat" element={<AIChatPage />} />
-                <Route path="/estatisticas" element={<EstatisticasPage />} />
-                <Route path="/matriz" element={<MatrizAnalisePage />} />
-                <Route path="/planilhas-matriz" element={<PlanilhasMatrizPage />} />
-                <Route path="/fechamentos" element={<FechamentosPage />} />
-                <Route path="/historico" element={<HistoricoPage />} />
-                <Route path="/roi" element={<ROIDashboardPage />} />
-                <Route path="/minhas-apostas" element={<HistoricoApostasPage />} />
-                <Route path="/jogos-salvos" element={<JogosSalvosPage />} />
-                <Route path="/perfil" element={<PerfilPage />} />
-                <Route path="/laboratorio" element={<StrategyLabPage />} />
-                <Route path="/afiliados" element={<AffiliatePage />} />
-                <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
-              </Route>
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
+          <AppContent />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
