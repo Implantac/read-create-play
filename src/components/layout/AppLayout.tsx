@@ -1,9 +1,11 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { LotterySelector } from "@/components/LotterySelector";
 import { Button } from "@/components/ui/button";
 import { Database, Loader2, LogOut, User, RefreshCw } from "lucide-react";
+import { m, AnimatePresence } from "framer-motion";
+
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -26,6 +28,8 @@ export function AppLayout() {
   const { selectedLottery, setSelectedLottery, loading, count, syncing, syncDraws } = useLotteryContext();
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
 
   return (
     <SidebarProvider>
@@ -120,8 +124,19 @@ export function AppLayout() {
           {/* Content */}
           <main className="flex-1 container mx-auto px-4 py-6 md:px-6 lg:px-8 space-y-6">
             <DrawNotificationChecker />
-            <Outlet />
+            <AnimatePresence mode="wait">
+              <m.div
+                key={location.pathname}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Outlet />
+              </m.div>
+            </AnimatePresence>
           </main>
+
 
           {/* Footer */}
           <footer className="border-t border-border/30 py-4">
