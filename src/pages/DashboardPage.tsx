@@ -211,22 +211,36 @@ const DashboardPage = () => {
         </section>
       )}
 
-      {/* Navegação Rápida */}
-      <section>
-        <h2 className="text-sm font-black uppercase tracking-widest mb-4">Acesso Rápido</h2>
+      {/* Navegação Rápida - Modern Hub */}
+      <section className="space-y-4">
+        <div className="flex items-center gap-2 px-1">
+          <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60 flex items-center gap-2">
+            <Grid3X3 className="w-3.5 h-3.5 text-primary" />
+            Navegação Global
+          </h2>
+        </div>
+        
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: "Análise", icon: BarChart3, url: "/analise" },
-            { label: "Fechamentos", icon: Grid3X3, url: "/fechamentos" },
-            { label: "Histórico", icon: History, url: "/historico" },
-            { label: "Perfil", icon: User, url: "/perfil" },
-          ].map(item => (
-            <Link key={item.label} to={item.url} className="group flex items-center justify-between p-4 rounded-xl glass-card border border-border/40 hover:border-primary/40 transition-all">
-              <div className="flex items-center gap-3">
-                <item.icon className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                <span className="font-bold">{item.label}</span>
+            { label: "Análise Central", icon: BarChart3, url: "/analise", desc: "Big Data & Filtros", color: "text-emerald-400" },
+            { label: "Fechamentos", icon: Grid3X3, url: "/fechamentos", desc: "Matemática Aplicada", color: "text-primary" },
+            { label: "IA Autônoma", icon: Brain, url: "/ia-autonoma", desc: "Fluxos de Predição", color: "text-amber-400" },
+            { label: "Instalar App", icon: Smartphone, url: "/install", desc: "Acesso no Mobile", color: "text-blue-400" },
+          ].map((item, idx) => (
+            <Link key={item.label} to={item.url} className="group p-6 rounded-3xl glass-card border-border/40 hover:border-primary/40 hover:bg-primary/5 transition-all duration-500 relative overflow-hidden active:scale-95">
+              <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                <item.icon className="w-12 h-12" />
               </div>
-              <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
+              
+              <div className="space-y-4 relative z-10">
+                <div className={`w-10 h-10 rounded-xl bg-background/60 border border-white/5 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform ${item.color}`}>
+                  <item.icon className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-sm font-black uppercase tracking-tight italic block leading-none">{item.label}</span>
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-2 block opacity-40 group-hover:opacity-100 transition-opacity leading-none">{item.desc}</span>
+                </div>
+              </div>
             </Link>
           ))}
         </div>
