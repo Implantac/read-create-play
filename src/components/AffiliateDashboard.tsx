@@ -13,25 +13,42 @@ export function AffiliateDashboard() {
   const { user } = useAuth();
   const [copied, setCopied] = useState(false);
   
-  const { data: affiliate } = useQuery({
+  const { data: affiliate, isLoading } = useQuery({
     queryKey: ["affiliate_program", user?.id],
     queryFn: async () => {
       if (!user) return null;
+      
+      // Try to find existing affiliate record
       const { data, error } = await supabase
         .from("affiliate_program")
         .select("*")
         .eq("user_id", user.id)
         .maybeSingle();
         
-      if (error) return null;
+      if (error && error.code !== "PGRST116") {
+        console.error("Error fetching affiliate:", error);
+        return null;
+      }
+      
       if (!data) {
-        // Create initial affiliate record
-        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-        const { data: newData } = await supabase
+        // Create initial affiliate record with unique code
+        const code = `TITAN-${user.id.substring(0, 4)}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+        const { data: newData, error: insertError } = await supabase
           .from("affiliate_program")
-          .insert({ user_id: user.id, referral_code: code })
+          .insert({ 
+            user_id: user.id, 
+            referral_code: code,
+            total_referrals: 0,
+            total_earned: 0,
+            balance_available: 0
+          })
           .select()
           .single();
+          
+        if (insertError) {
+          console.error("Error creating affiliate record:", insertError);
+          return null;
+        }
         return newData;
       }
       return data;

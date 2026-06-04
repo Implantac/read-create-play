@@ -17,6 +17,15 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const { toast } = useToast();
+  
+  // Get referral code from URL
+  const searchParams = new URLSearchParams(window.location.search);
+  const refCode = searchParams.get("ref") || localStorage.getItem("titan_ref_code") || "";
+
+  // Save ref code to localStorage if present in URL
+  if (searchParams.get("ref")) {
+    localStorage.setItem("titan_ref_code", searchParams.get("ref") || "");
+  }
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +54,11 @@ export default function SignupPage() {
       email,
       password,
       options: {
-        data: { full_name: fullName, phone_number: cleanPhone },
+        data: { 
+          full_name: fullName, 
+          phone_number: cleanPhone,
+          referral_code: refCode 
+        },
         emailRedirectTo: window.location.origin,
       },
     });
