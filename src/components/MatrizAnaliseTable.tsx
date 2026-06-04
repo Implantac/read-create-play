@@ -210,8 +210,8 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
                     </span>
                   </TableHead>
                 ))}
-                <TableHead className="whitespace-nowrap font-black text-[10px] uppercase tracking-widest text-muted-foreground py-4 px-4">Momento (30)</TableHead>
-                <TableHead className="font-black text-[10px] uppercase tracking-widest text-muted-foreground py-4 px-4">Status</TableHead>
+                <TableHead className="whitespace-nowrap font-black text-[10px] uppercase tracking-widest text-muted-foreground py-4 px-4">{t("matrix.columns.moment")}</TableHead>
+                <TableHead className="font-black text-[10px] uppercase tracking-widest text-muted-foreground py-4 px-4">{t("matrix.columns.status")}</TableHead>
               </TableRow>
             </TableHeader>
 
