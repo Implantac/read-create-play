@@ -114,25 +114,15 @@ export default function AdminPage() {
     } as any);
   };
 
-  const isSelfLockRisk = (targetUserId: string, newRole?: string): boolean => {
-    if (targetUserId !== user?.id) return false;
-    if (newRole && newRole !== "super_admin" && newRole !== "admin") return true;
-    return false;
-  };
-
   const countSuperAdmins = (): number => {
-    const fullAccessCount = profiles.some(isFullAccessProfile) ? 1 : 0;
+    const fullAccessCount = profiles.some(p => isFullAccessEmail(p.email)) ? 1 : 0;
     const roleCount = roles.filter(r => r.role === "super_admin").length;
     return Math.max(fullAccessCount, roleCount);
   };
 
-  const isFullAccessProfile = (profile?: Profile | null): boolean => {
-    return isFullAccessEmail(profile?.email);
-  };
-
   const updatePlan = async (userId: string, newPlan: string) => {
     const profile = profiles.find(p => p.id === userId);
-    if (isFullAccessProfile(profile) && newPlan !== "lifetime") {
+    if (isFullAccessEmail(profile?.email) && newPlan !== "lifetime") {
       toast({
         title: "Ação Bloqueada",
         description: "A conta de acesso total é vitalícia e não pode ser rebaixada.",
@@ -142,17 +132,15 @@ export default function AdminPage() {
     }
 
     setUpdating(userId);
-    const { error } = await supabase
-      .from("profiles")
-      .update({ plan: newPlan, updated_at: new Date().toISOString() } as any)
-      .eq("id", userId);
-    setUpdating(null);
-    if (error) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
-    } else {
+    try {
+      await adminService.updateUserPlan(userId, newPlan);
       await logAction("plan_changed", userId, { old_plan: profile?.plan, new_plan: newPlan });
       setProfiles(prev => prev.map(p => p.id === userId ? { ...p, plan: newPlan } : p));
       toast({ title: "Plano atualizado", description: `Plano alterado para ${PLAN_LABELS[newPlan]}.` });
+    } catch (error: any) {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } finally {
+      setUpdating(null);
     }
   };
 
@@ -160,7 +148,7 @@ export default function AdminPage() {
     const currentRole = getUserRole(userId);
     const profile = profiles.find(p => p.id === userId);
 
-    if (isFullAccessProfile(profile) && newRole !== "super_admin") {
+    if (isFullAccessEmail(profile?.email) && newRole !== "super_admin") {
       toast({
         title: "Ação Bloqueada",
         description: "A conta de acesso total deve permanecer como Super Admin.",
@@ -169,8 +157,7 @@ export default function AdminPage() {
       return;
     }
 
-    // Self-lock protection
-    if (isSelfLockRisk(userId, newRole)) {
+    if (userId === user?.id && newRole !== "super_admin" && newRole !== "admin") {
       setConfirmDialog({
         open: true,
         title: "⚠️ Ação Perigosa",
@@ -180,7 +167,6 @@ export default function AdminPage() {
       return;
     }
 
-    // Last super_admin protection
     if (currentRole === "super_admin" && newRole !== "super_admin" && countSuperAdmins() <= 1) {
       toast({
         title: "Ação Bloqueada",
@@ -197,50 +183,50 @@ export default function AdminPage() {
     setUpdating(userId);
     setConfirmDialog(prev => ({ ...prev, open: false }));
 
-    const existingRole = roles.find(r => r.user_id === userId);
-
-    let error;
-    if (newRole === "user") {
-      // Remove role entry (defaults to user)
-      if (existingRole) {
-        const res = await supabase.from("user_roles").delete().eq("user_id", userId);
+    try {
+      const existingRole = roles.find(r => r.user_id === userId);
+      let error;
+      
+      if (newRole === "user") {
+        if (existingRole) {
+          const res = await supabase.from("user_roles").delete().eq("user_id", userId);
+          error = res.error;
+        }
+      } else if (existingRole) {
+        const res = await supabase.from("user_roles").update({ role: newRole as any }).eq("user_id", userId);
+        error = res.error;
+      } else {
+        const res = await supabase.from("user_roles").insert({ user_id: userId, role: newRole as any });
         error = res.error;
       }
-    } else if (existingRole) {
-      const res = await supabase.from("user_roles").update({ role: newRole } as any).eq("user_id", userId);
-      error = res.error;
-    } else {
-      const res = await supabase.from("user_roles").insert({ user_id: userId, role: newRole } as any);
-      error = res.error;
-    }
 
-    setUpdating(null);
-    if (error) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
-    } else {
+      if (error) throw error;
+
       await logAction("role_changed", userId, { old_role: oldRole, new_role: newRole });
-      // Update local state
+      
       if (newRole === "user") {
         setRoles(prev => prev.filter(r => r.user_id !== userId));
       } else if (existingRole) {
-        setRoles(prev => prev.map(r => r.user_id === userId ? { ...r, role: newRole } : r));
+        setRoles(prev => prev.map(r => (r.user_id === userId ? { ...r, role: newRole as any } : r)));
       } else {
-        setRoles(prev => [...prev, { user_id: userId, role: newRole }]);
+        setRoles(prev => [...prev, { id: crypto.randomUUID(), user_id: userId, role: newRole as any }]);
       }
       toast({ title: "Papel atualizado", description: `Papel alterado para ${ROLE_LABELS[newRole]}.` });
+    } catch (error: any) {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } finally {
+      setUpdating(null);
     }
   };
 
   const toggleBlock = async (userId: string, currentBlocked: boolean) => {
     const profile = profiles.find(p => p.id === userId);
-    if (isFullAccessProfile(profile)) {
+    if (isFullAccessEmail(profile?.email)) {
       toast({ title: "Ação Bloqueada", description: "A conta de acesso total não pode ser bloqueada.", variant: "destructive" });
       return;
     }
 
-    // Prevent blocking super_admin
-    const role = getUserRole(userId);
-    if (role === "super_admin") {
+    if (getUserRole(userId) === "super_admin") {
       toast({ title: "Ação Bloqueada", description: "Não é possível bloquear um Super Admin.", variant: "destructive" });
       return;
     }
@@ -251,27 +237,25 @@ export default function AdminPage() {
     }
 
     setUpdating(userId);
-    const { error } = await supabase
-      .from("profiles")
-      .update({ blocked: !currentBlocked, updated_at: new Date().toISOString() } as any)
-      .eq("id", userId);
-    setUpdating(null);
-    if (error) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
-    } else {
+    try {
+      await adminService.setUserBlockStatus(userId, !currentBlocked);
       await logAction(currentBlocked ? "user_unblocked" : "user_blocked", userId);
       setProfiles(prev => prev.map(p => p.id === userId ? { ...p, blocked: !currentBlocked } : p));
       toast({
         title: !currentBlocked ? "Usuário bloqueado" : "Usuário desbloqueado",
         description: !currentBlocked ? "O usuário não poderá mais acessar o sistema." : "O acesso do usuário foi restaurado.",
       });
+    } catch (error: any) {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } finally {
+      setUpdating(null);
     }
   };
 
-  // Filters
   const filtered = profiles.filter(p => {
-    const effectivePlan = isFullAccessProfile(p) ? "lifetime" : p.plan;
-    const effectiveBlocked = isFullAccessProfile(p) ? false : p.blocked;
+    const isFullAccess = isFullAccessEmail(p.email);
+    const effectivePlan = isFullAccess ? "lifetime" : p.plan;
+    const effectiveBlocked = isFullAccess ? false : p.blocked;
     const matchesSearch = (p.email?.toLowerCase() || "").includes(search.toLowerCase()) ||
       (p.full_name?.toLowerCase() || "").includes(search.toLowerCase());
     const matchesPlan = filterPlan === "all" || effectivePlan === filterPlan;
@@ -283,10 +267,11 @@ export default function AdminPage() {
   });
 
   const planCounts = profiles.reduce((acc, p) => {
-    const effectivePlan = isFullAccessProfile(p) ? "lifetime" : p.plan;
+    const effectivePlan = isFullAccessEmail(p.email) ? "lifetime" : p.plan;
     acc[effectivePlan] = (acc[effectivePlan] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
+
 
   const stats = [
     { label: "Total Usuários", value: profiles.length, icon: Users, color: "text-primary" },
