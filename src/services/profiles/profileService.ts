@@ -37,6 +37,6 @@ export const profileService = {
       .order("created_at", { ascending: false });
     
     if (error) throw error;
-    return data as UserWithRole[];
+    return (data as any) as UserWithRole[];
   }
 };
