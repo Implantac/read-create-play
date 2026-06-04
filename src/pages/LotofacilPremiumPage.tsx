@@ -61,6 +61,7 @@ const IntelligentGeneratorPanel = lazy(() => import("@/components/IntelligentGen
 const EvolutiveGeneratorPanel = lazy(() => import("@/components/EvolutiveGeneratorPanel").then(m => ({ default: m.EvolutiveGeneratorPanel })));
 const AIPredictionPanel = lazy(() => import("@/components/AIPredictionPanel").then(m => ({ default: m.AIPredictionPanel })));
 const ProfessionalGeneratorPanel = lazy(() => import("@/components/ProfessionalGeneratorPanel").then(m => ({ default: m.ProfessionalGeneratorPanel })));
+import { TitanHealthGauge } from "@/components/TitanHealthGauge";
 
 const LazyFallback = () => (
   <div className="flex items-center justify-center py-12 text-muted-foreground bg-secondary/5 rounded-2xl border border-dashed border-border/40">
@@ -370,6 +371,21 @@ export default function LotofacilPremiumPage() {
               </Card>
 
               <HeatmapIntensity />
+              
+              <div className="grid grid-cols-2 gap-4">
+                <TitanHealthGauge 
+                  value={88.4} 
+                  label="Convergência" 
+                  sublabel="Sincronia Global" 
+                  color="hsl(var(--primary))" 
+                />
+                <TitanHealthGauge 
+                  value={92.1} 
+                  label="Estabilidade" 
+                  sublabel="Fluxo Preditivo" 
+                  color="hsl(var(--accent))" 
+                />
+              </div>
             </div>
 
             <div className="space-y-6">
