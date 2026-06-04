@@ -55,7 +55,7 @@ export function AnimatedCounter({ value, label, index }: AnimatedCounterProps) {
         if (decimals > 0) {
           setDisplay(number.toFixed(decimals));
         } else {
-          setDisplay(number.toLocaleString("pt-BR"));
+          setDisplay(formatNumber(number));
         }
       }
     }, stepTime);
