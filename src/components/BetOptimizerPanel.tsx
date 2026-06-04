@@ -192,7 +192,7 @@ export function BetOptimizerPanel({ stats, config, draws }: Props) {
                   <span className={`text-lg font-black font-mono ${GRADE_COLORS[optResult.best.quality.grade]}`}>
                     {optResult.best.quality.grade}
                   </span>
-                  <span className="text-sm font-mono text-foreground">{optResult.best.quality.overall}/100</span>
+                  <span className="text-sm font-mono text-foreground">{formatNumber(optResult.best.quality.overall)}/100</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5 mb-2">
                   {optResult.best.numbers.map(n => (
