@@ -152,13 +152,13 @@
 
 @layer utilities {
   .glow-green {
-    box-shadow: 0 0 20px hsl(145 72% 42% / 0.15), 0 0 60px hsl(145 72% 42% / 0.05);
+    box-shadow: 0 0 20px hsl(145 72% 42% / 0.15), 0 0 40px hsl(145 72% 42% / 0.05);
   }
   .glow-blue {
-    box-shadow: 0 0 20px hsl(195 95% 48% / 0.15), 0 0 60px hsl(195 95% 48% / 0.05);
+    box-shadow: 0 0 20px hsl(195 95% 48% / 0.15), 0 0 40px hsl(195 95% 48% / 0.05);
   }
   .glow-amber {
-    box-shadow: 0 0 20px hsl(48 100% 52% / 0.15), 0 0 60px hsl(48 100% 52% / 0.05);
+    box-shadow: 0 0 20px hsl(48 100% 52% / 0.15), 0 0 40px hsl(48 100% 52% / 0.05);
   }
   .text-glow-green {
     text-shadow: 0 0 10px hsl(145 72% 42% / 0.5);
@@ -187,9 +187,10 @@
     border: 1px solid hsl(var(--border) / 0.5);
   }
   .glass-card {
-    background: hsl(var(--card) / 0.7);
+    background: linear-gradient(135deg, hsl(var(--card) / 0.8) 0%, hsl(var(--card) / 0.6) 100%);
     backdrop-filter: blur(12px) saturate(1.1);
-    border: 1px solid hsl(var(--border) / 0.4);
+    border: 1px solid hsl(var(--border) / 0.3);
+    box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.5);
   }
   .lottery-ball {
     @apply w-10 h-10 rounded-sm flex items-center justify-center text-sm font-bold font-mono transition-all duration-200;
