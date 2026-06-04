@@ -61,28 +61,46 @@ function parseApiResult(raw: CaixaApiResult): LatestDrawResult {
   };
 }
 
+async function fetchWithRetry(url: string, options: RequestInit = {}, retries = 2, backoff = 500): Promise<Response> {
+  try {
+    const res = await fetch(url, options);
+    if (res.ok) return res;
+    if (retries > 0) {
+      await new Promise(r => setTimeout(r, backoff));
+      return fetchWithRetry(url, options, retries - 1, backoff * 2);
+    }
+    return res;
+  } catch (e) {
+    if (retries > 0) {
+      await new Promise(r => setTimeout(r, backoff));
+      return fetchWithRetry(url, options, retries - 1, backoff * 2);
+    }
+    throw e;
+  }
+}
+
 export async function fetchLatestDraw(lotteryId: string): Promise<LatestDrawResult | null> {
   const apiName = API_NAMES[lotteryId];
   if (!apiName) return null;
 
   try {
-    const res = await fetch(`${API_PRIMARY}/${apiName}/latest`);
+    const res = await fetchWithRetry(`${API_PRIMARY}/${apiName}/latest`);
     if (res.ok) {
       const data = await res.json();
       return parseApiResult(data);
     }
-  } catch {
-    // fallback
+  } catch (e) {
+    console.warn(`Primary API failed for ${lotteryId}:`, e);
   }
 
   try {
-    const res = await fetch(`${API_FALLBACK}/${apiName}/ultimo`);
+    const res = await fetchWithRetry(`${API_FALLBACK}/${apiName}/ultimo`);
     if (res.ok) {
       const data = await res.json();
       return parseApiResult(data);
     }
-  } catch {
-    // ignore
+  } catch (e) {
+    console.warn(`Fallback API failed for ${lotteryId}:`, e);
   }
 
   return null;
