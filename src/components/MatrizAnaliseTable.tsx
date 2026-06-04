@@ -21,10 +21,11 @@ const TrendIcon = ({ trend }: { trend: "up" | "stable" | "down" }) => {
 };
 
 const SignalBadge = ({ signal }: { signal: "green" | "yellow" | "red" }) => {
+  const { t } = useTranslation();
   const config = {
-    green: { label: "Alta", className: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25 hover:bg-emerald-500/20" },
-    yellow: { label: "Neutra", className: "bg-amber-500/15 text-amber-400 border-amber-500/25 hover:bg-amber-500/20" },
-    red: { label: "Baixa", className: "bg-red-500/15 text-red-400 border-red-500/25 hover:bg-red-500/20" },
+    green: { label: t("matrix.signals.green"), className: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25 hover:bg-emerald-500/20" },
+    yellow: { label: t("matrix.signals.yellow"), className: "bg-amber-500/15 text-amber-400 border-amber-500/25 hover:bg-amber-500/20" },
+    red: { label: t("matrix.signals.red"), className: "bg-red-500/15 text-red-400 border-red-500/25 hover:bg-red-500/20" },
   };
   const c = config[signal];
   return <Badge variant="outline" className={`text-[10px] px-1.5 py-0 font-mono ${c.className}`}>{c.label}</Badge>;
