@@ -1,7 +1,7 @@
 import {
   BarChart3, Sparkles, FlaskConical, History, Zap, Grid3X3,
   Brain, ShieldCheck, Crown, PieChart, TrendingUp, ClipboardCheck, Bot, Lock,
-  Smartphone, MessageCircle, Star, Search, User, FileSpreadsheet,
+  Smartphone, MessageCircle, Star, Search, User, FileSpreadsheet, Share2
 } from "lucide-react";
 import { NavLink } from "@/components/layout/NavLink";
 import { usePlanAccess, type Feature } from "@/hooks/usePlanAccess";
