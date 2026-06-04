@@ -64,7 +64,7 @@ export function BetCard({
     >
       <div 
         onClick={() => setExpanded(!expanded)}
-        className="p-5 rounded-2xl glass-card border border-border/40 hover:border-primary/40 transition-all duration-500 space-y-4 relative overflow-hidden cursor-pointer"
+        className="p-5 rounded-2xl glass-card border border-border/40 hover:border-primary/40 transition-all duration-500 space-y-4 relative overflow-hidden cursor-pointer active:scale-[0.98]"
       >
         <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
         <div className="flex items-center justify-between relative z-10">
@@ -100,14 +100,15 @@ export function BetCard({
             const isHot = hotNumbers.includes(n);
             const isCold = coldNumbers.includes(n);
             return (
-              <span
+              <motion.span
                 key={n}
-                className={`lottery-ball text-xs w-9 h-9 font-black italic shadow-lg transition-all group-hover:scale-110 ${
+                whileHover={{ scale: 1.15, rotate: 5 }}
+                className={`lottery-ball text-xs w-9 h-9 font-black italic shadow-lg transition-all ${
                   isHot ? "lottery-ball-hot" : isCold ? "lottery-ball-cold" : ""
                 }`}
               >
                 {String(n).padStart(2, "0")}
-              </span>
+              </motion.span>
             );
           })}
         </div>
