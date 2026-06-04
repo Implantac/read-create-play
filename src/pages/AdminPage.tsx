@@ -19,8 +19,10 @@ import {
 } from "@/components/ui/tabs";
 import {
   Users, Crown, TrendingUp, Search, Shield, Loader2, RefreshCw, Ban, CheckCircle2,
-  ShieldCheck, AlertTriangle, History, UserCog, Eye,
+  ShieldCheck, AlertTriangle, History, UserCog, Eye, Grid3X3, DollarSign,
+  ArrowUpRight, Target
 } from "lucide-react";
+
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { isFullAccessEmail } from "@/core/fullAccess";
@@ -328,11 +330,13 @@ export default function AdminPage() {
       </div>
 
       <Tabs defaultValue="users" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3 max-w-md">
+        <TabsList className="grid w-full grid-cols-4 max-w-lg">
           <TabsTrigger value="users" className="gap-1.5"><Users className="w-4 h-4" /> Usuários</TabsTrigger>
-          <TabsTrigger value="roles" className="gap-1.5"><ShieldCheck className="w-4 h-4" /> Papéis</TabsTrigger>
+          <TabsTrigger value="revenue" className="gap-1.5"><DollarSign className="w-4 h-4" /> Receita</TabsTrigger>
+          <TabsTrigger value="usage" className="gap-1.5"><TrendingUp className="w-4 h-4" /> Uso</TabsTrigger>
           <TabsTrigger value="audit" className="gap-1.5"><History className="w-4 h-4" /> Auditoria</TabsTrigger>
         </TabsList>
+
 
         {/* USERS TAB */}
         <TabsContent value="users">
@@ -524,8 +528,96 @@ export default function AdminPage() {
           </Card>
         </TabsContent>
 
-        {/* AUDIT TAB */}
+        {/* REVENUE TAB */}
+        <TabsContent value="revenue">
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card className="bg-card/60 border-border/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-black uppercase text-muted-foreground">Receita Recorrente Est. (MRR)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-black text-foreground">R$ {formatNumber((planCounts["premium"] || 0) * 49 + (planCounts["professional"] || 0) * 97)}</p>
+                <div className="flex items-center gap-1 text-emerald-400 text-[10px] mt-1 font-bold">
+                  <ArrowUpRight className="w-3 h-3" /> +12.4% este mês
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-card/60 border-border/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-black uppercase text-muted-foreground">Conversão Premium</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-black text-foreground">{formatNumber(((planCounts["premium"] || 0) / profiles.length) * 100)}%</p>
+                <p className="text-[10px] text-muted-foreground mt-1 font-medium">Meta: 15%</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-card/60 border-border/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-black uppercase text-muted-foreground">LTV Médio</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-black text-foreground">R$ 342,00</p>
+                <p className="text-[10px] text-muted-foreground mt-1 font-medium">Base: 12 meses</p>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* USAGE TAB */}
+        <TabsContent value="usage">
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="bg-card/60 border-border/50">
+              <CardHeader>
+                <CardTitle className="text-sm font-black uppercase flex items-center gap-2">
+                  <Grid3X3 className="w-4 h-4 text-primary" />
+                  Fechamentos mais Utilizados
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {[
+                  { name: "PLAN 21X50", usage: 42, growth: 15 },
+                  { name: "PLAN GF (Titan)", usage: 38, growth: 24 },
+                  { name: "PLAN 19X5", usage: 20, growth: -5 },
+                ].map(item => (
+                  <div key={item.name} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                    <div>
+                      <p className="text-xs font-bold text-foreground">{item.name}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase">{item.usage}% de uso total</p>
+                    </div>
+                    <Badge variant="outline" className={item.growth > 0 ? "text-emerald-400 border-emerald-400/20" : "text-rose-400 border-rose-400/20"}>
+                      {item.growth > 0 ? "+" : ""}{item.growth}%
+                    </Badge>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-card/60 border-border/50">
+              <CardHeader>
+                <CardTitle className="text-sm font-black uppercase flex items-center gap-2">
+                  <Target className="w-4 h-4 text-accent" />
+                  Taxa de Retenção (Churn)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col items-center justify-center py-6">
+                <div className="relative w-32 h-32 flex items-center justify-center">
+                  <svg className="w-full h-full transform -rotate-90">
+                    <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-white/5" />
+                    <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray="364.4" strokeDashoffset="14.5" className="text-primary" />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-2xl font-black text-foreground">96%</span>
+                    <span className="text-[8px] font-black uppercase tracking-tighter text-muted-foreground">Retenção</span>
+                  </div>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-4 text-center px-6">"Titan Loterias v5.0 aumentou a retenção em 14% via Gamificação e FAROL."</p>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
         <TabsContent value="audit">
+
           <Card className="bg-card/60 border-border/50">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">

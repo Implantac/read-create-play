@@ -8,8 +8,9 @@ import { Progress } from "@/components/ui/progress";
 import { 
   BarChart3, Flame, Snowflake, TrendingUp, Clock, 
   Target, Filter, Brain, Zap, Shield, Info,
-  Search, ArrowUpRight, ArrowDownRight, Activity
+  Search, ArrowUpRight, ArrowDownRight, Activity, Crown
 } from "lucide-react";
+
 import { m, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { 
@@ -30,11 +31,21 @@ const PERIOD_OPTIONS = [
   { label: "Últimos 100", value: 100 },
 ] as const;
 
+const FILTER_MODES = [
+  { label: "Elite", value: "elite", icon: Crown },
+  { label: "Atraso", value: "delay", icon: Clock },
+  { label: "Tendência", value: "trend", icon: TrendingUp },
+  { label: "Frequência", value: "freq", icon: BarChart3 },
+] as const;
+
+
 export default function FarolEstatisticoPage() {
   const { config, stats, farol, cycle, draws } = useLotteryContext();
   const [period, setPeriod] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("scores");
+  const [filterMode, setFilterMode] = useState<string>("elite");
+
 
   const aiInsight = useMemo(() => {
     if (!farol) return "";
@@ -50,8 +61,16 @@ export default function FarolEstatisticoPage() {
     if (searchTerm) {
       result = result.filter(s => s.number.toString().includes(searchTerm));
     }
-    return result.sort((a, b) => b.titanScore - a.titanScore);
-  }, [farol, searchTerm]);
+    
+    switch (filterMode) {
+      case "elite": return [...result].sort((a, b) => b.titanScore - a.titanScore);
+      case "delay": return [...result].sort((a, b) => b.currentDelay - a.currentDelay);
+      case "trend": return [...result].sort((a, b) => b.trend - a.trend);
+      case "freq": return [...result].sort((a, b) => b.frequency - a.frequency);
+      default: return result.sort((a, b) => b.titanScore - a.titanScore);
+    }
+  }, [farol, searchTerm, filterMode]);
+
 
   const container = {
     hidden: { opacity: 0 },
@@ -196,20 +215,22 @@ export default function FarolEstatisticoPage() {
 
       {/* Filtros e Busca */}
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1">
+        <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 scrollbar-hide">
           <Filter className="w-4 h-4 text-muted-foreground shrink-0" />
-          {PERIOD_OPTIONS.map(opt => (
+          {FILTER_MODES.map(opt => (
             <Button 
               key={opt.value} 
               size="sm" 
-              variant={period === opt.value ? "default" : "outline"} 
-              onClick={() => setPeriod(opt.value)} 
-              className="h-8 text-[10px] font-black uppercase px-4 rounded-xl shrink-0"
+              variant={filterMode === opt.value ? "default" : "outline"} 
+              onClick={() => setFilterMode(opt.value)} 
+              className="h-8 text-[10px] font-black uppercase px-4 rounded-xl shrink-0 gap-1.5"
             >
+              <opt.icon className="w-3 h-3" />
               {opt.label}
             </Button>
           ))}
         </div>
+
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input 
