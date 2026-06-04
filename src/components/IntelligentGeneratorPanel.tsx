@@ -24,12 +24,10 @@ interface Props {
 export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: Props) {
   const { hotNumbers, coldNumbers } = useLotteryContext();
   const [bets, setBets] = useState<IntelligentBet[]>([]);
-  const [summary, setSummary] = useState<GenerationSummary | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [totalBets, setTotalBets] = useState(300);
   const [topResults, setTopResults] = useState(20);
   const [simulateHistory, setSimulateHistory] = useState(true);
-  const [selectedBet, setSelectedBet] = useState<IntelligentBet | null>(null);
 
   const handleGenerate = () => {
     setIsGenerating(true);
@@ -42,8 +40,6 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
         minScore: 30,
       });
       setBets(results);
-      setSummary(computeGenerationSummary(results, config));
-      setSelectedBet(results[0] || null);
       setIsGenerating(false);
       toast.success(`${results.length} apostas otimizadas geradas!`);
     }, 100);
