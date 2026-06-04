@@ -159,8 +159,8 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
             <TableProperties className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h3 className="text-sm font-black text-foreground uppercase tracking-widest italic">Ranking Probabilístico</h3>
-            <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase tracking-widest opacity-60">Matriz de Performance Individual</p>
+            <h3 className="text-sm font-black text-foreground uppercase tracking-widest italic">{t("matrix.title")}</h3>
+            <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase tracking-widest opacity-60">{t("matrix.subtitle")}</p>
           </div>
         </div>
       </div>
