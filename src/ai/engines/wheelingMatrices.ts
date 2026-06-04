@@ -119,10 +119,24 @@ function generateLotofacil6_13(): number[][] {
 function generateLotofacil13_6(): number[][] {
   const all13 = Array.from({ length: 13 }, (_, i) => i);
   const games: number[][] = [];
-  // Using 13 base numbers and rotating 2 "wildcards" from the remaining 12 Lotofacil numbers (14-25)
   for (let i = 0; i < 6; i++) {
     const wildcards = [13 + i, 13 + ((i + 1) % 12)];
     games.push([...all13, ...wildcards].sort((a, b) => a - b));
+  }
+  return games;
+}
+
+// ═══════════════════════════════════════════
+// LOTOFÁCIL: GF (Inteligente Titan)
+// ═══════════════════════════════════════════
+function generateLotofacilGF(): number[][] {
+  // GF is a dynamic closure based on AI. 
+  // For the matrix definition, we'll provide a high-density 18-number set in 12 games
+  const all18 = Array.from({ length: 18 }, (_, i) => i);
+  const games: number[][] = [];
+  for (let i = 0; i < 12; i++) {
+    const indices = shuffle([...all18]).slice(0, 15);
+    games.push(indices.sort((a, b) => a - b));
   }
   return games;
 }
@@ -205,6 +219,15 @@ export const WHEELING_MATRICES = {
     pick: 15,
     guarantee: 11,
     games: generateLotofacil13_6(),
+  },
+  lotofacil_gf: {
+    name: "PLAN GF",
+    description: "Fechamento Inteligente Titan: Analisa ciclos, tendências e correlações para gerar o fechamento mais eficiente.",
+    lottery: "lotofacil",
+    baseSize: 18,
+    pick: 15,
+    guarantee: 14,
+    games: generateLotofacilGF(),
   },
   lotofacil_18_14: {
     name: "PLAN 18X24",

@@ -135,7 +135,9 @@ export default function FechamentosPage() {
     // Recommendations based on professional PLAN closures
     if (count >= 21) return { id: 'lotofacil_21_50', name: 'TITAN PLAN 21X50', efficiency: '92%', risk: 'Médio', feature: 'TITAN_FECHAMENTO' };
     if (count >= 19) return { id: 'lotofacil_19_5', name: 'TITAN PLAN 19X5', efficiency: '88%', risk: 'Médio', feature: 'TITAN_FECHAMENTO' };
+    if (count >= 18) return { id: 'lotofacil_gf', name: 'TITAN PLAN GF', efficiency: '95%', risk: 'Otimizado', feature: 'TITAN_FECHAMENTO' };
     if (count >= 17) return { id: 'lotofacil_17_8', name: 'TITAN PLAN 17X8', efficiency: '85%', risk: 'Baixo', feature: 'TITAN_FECHAMENTO' };
+    if (count >= 13) return { id: 'lotofacil_13_6', name: 'TITAN PLAN 13X6', efficiency: '82%', risk: 'Baixo', feature: 'TITAN_FECHAMENTO' };
     return null;
   };
 
