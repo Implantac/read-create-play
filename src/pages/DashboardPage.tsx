@@ -266,32 +266,33 @@ const DashboardPage = () => {
                 Saúde do Sistema
               </h2>
             </div>
-
-          
-          <div className="space-y-4">
-            <TitanHealthGauge 
-              value={94.8} 
-              label="Neural Core" 
-              sublabel="Processamento Ativo" 
-              color="hsl(var(--primary))" 
-            />
-            <div className="p-6 rounded-3xl bg-background/40 border border-border/40 space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Segurança de Dados</span>
-                <Shield className="w-4 h-4 text-emerald-400" />
+            
+            <div className="space-y-4">
+              <TitanHealthGauge 
+                value={94.8} 
+                label="Neural Core" 
+                sublabel="Processamento Ativo" 
+                color="hsl(var(--primary))" 
+              />
+              <div className="p-6 rounded-3xl bg-background/40 border border-border/40 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Segurança de Dados</span>
+                  <Shield className="w-4 h-4 text-emerald-400" />
+                </div>
+                <div className="h-1.5 w-full bg-secondary/40 rounded-full overflow-hidden">
+                  <m.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: "98%" }}
+                    className="h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                  />
+                </div>
+                <p className="text-[10px] font-bold text-muted-foreground text-center italic">Monitoramento Biométrico Ativo</p>
               </div>
-              <div className="h-1.5 w-full bg-secondary/40 rounded-full overflow-hidden">
-                <m.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: "98%" }}
-                  className="h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
-                />
-              </div>
-              <p className="text-[10px] font-bold text-muted-foreground text-center italic">Monitoramento Biométrico Ativo</p>
             </div>
           </div>
         </div>
       </div>
+
 
 
 
