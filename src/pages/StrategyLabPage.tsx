@@ -297,25 +297,29 @@ export default function StrategyLabPage() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
             >
-              <Card className="relative overflow-hidden border-primary/30 bg-gradient-to-r from-primary/8 via-primary/4 to-transparent">
-                <div className="absolute top-0 left-0 w-1.5 h-full bg-primary rounded-l-lg" />
-                <CardContent className="p-5 md:p-6">
-                  <div className="flex flex-col md:flex-row md:items-center gap-4">
-                    <div className="flex items-center gap-4 flex-1">
-                      <div className="w-16 h-16 rounded-2xl bg-primary/15 flex items-center justify-center text-3xl ring-2 ring-primary/20">
+              <Card className="relative overflow-hidden border-primary/30 bg-primary/[0.02] rounded-[2.5rem] shadow-2xl group active:scale-[0.99] transition-all">
+                <div className="absolute top-0 left-0 w-2 h-full bg-primary" />
+                <CardContent className="p-10 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-10 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity pointer-events-none">
+                    <Trophy className="w-40 h-40" />
+                  </div>
+                  
+                  <div className="flex flex-col md:flex-row md:items-center gap-10 relative z-10">
+                    <div className="flex items-center gap-8 flex-1">
+                      <div className="w-24 h-24 rounded-[2rem] gradient-brand flex items-center justify-center text-5xl shadow-2xl group-hover:scale-110 transition-transform duration-500">
                         🏆
                       </div>
-                      <div>
-                        <p className="text-[10px] uppercase tracking-widest text-primary font-bold">Campeã do Lab</p>
-                        <h2 className="text-lg font-black text-foreground">{result.bestStrategy.strategyName}</h2>
-                        <p className="text-xs text-muted-foreground mt-0.5">{result.bestStrategy.explanation}</p>
+                      <div className="space-y-2">
+                        <p className="text-[10px] uppercase tracking-[0.4em] text-primary font-black italic opacity-60 leading-none">Alpha Winner v5.3</p>
+                        <h2 className="text-3xl font-black text-foreground uppercase tracking-tighter italic leading-none">{result.bestStrategy.strategyName}</h2>
+                        <p className="text-xs text-muted-foreground font-medium italic opacity-60 leading-relaxed max-w-md">{result.bestStrategy.explanation}</p>
                       </div>
                     </div>
-                    <div className="grid grid-cols-4 gap-3 md:gap-4">
-                      <MetricBox label="Score" value={formatNumber(result.bestStrategy.metrics.globalScore)} accent />
-                      <MetricBox label="Média" value={formatNumber(result.bestStrategy.metrics.avgHits)} />
-                      <MetricBox label="Melhor" value={`${formatNumber(result.bestStrategy.metrics.bestHits)}/${formatNumber(config.pick)}`} />
-                      <MetricBox label="Consist." value={`${formatNumber(Math.round(result.bestStrategy.metrics.consistency * 100))}%`} />
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full md:w-auto">
+                      <MetricBox label="Alpha Score" value={formatNumber(result.bestStrategy.metrics.globalScore)} accent />
+                      <MetricBox label="Média Hits" value={formatNumber(result.bestStrategy.metrics.avgHits)} />
+                      <MetricBox label="Recorde" value={`${formatNumber(result.bestStrategy.metrics.bestHits)}/${formatNumber(config.pick)}`} />
+                      <MetricBox label="Dataset SYNC" value={`${formatNumber(Math.round(result.bestStrategy.metrics.consistency * 100))}%`} />
                     </div>
                   </div>
                 </CardContent>
