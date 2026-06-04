@@ -305,45 +305,47 @@ export function ComparativeSimulatorPanel({ stats, config, draws }: Props) {
               </div>
               <div className="divide-y divide-border">
                 {results.map((r, i) => (
-                  <div key={r.game.id} className={`px-3 py-2.5 flex items-center gap-3 ${i === 0 ? "bg-primary/[0.03]" : ""}`}>
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${
-                      i === 0 ? "bg-yellow-500/20 text-yellow-500" :
-                      i === 1 ? "bg-gray-400/20 text-gray-400" :
-                      i === 2 ? "bg-amber-700/20 text-amber-700" :
-                      "bg-muted text-muted-foreground"
-                    }`}>
-                      {i + 1}º
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1 mb-0.5">
-                        <span className="text-xs font-semibold text-foreground">{r.game.label}</span>
-                        <span className="text-[10px] text-muted-foreground">
-                          ({r.game.numbers.map(n => String(n).padStart(2, "0")).join(", ")})
-                        </span>
+                  <div key={r.game.id} className={`${i === 0 ? "bg-primary/[0.03]" : ""}`}>
+                    <div className="px-3 py-2.5 flex items-center gap-3">
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${
+                        i === 0 ? "bg-yellow-500/20 text-yellow-500" :
+                        i === 1 ? "bg-gray-400/20 text-gray-400" :
+                        i === 2 ? "bg-amber-700/20 text-amber-700" :
+                        "bg-muted text-muted-foreground"
+                      }`}>
+                        {i + 1}º
                       </div>
-                      <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
-                        <span>Média: <strong className="text-foreground">{r.avgHits}</strong></span>
-                        <span>Melhor: <strong className="text-foreground">{r.bestHit}</strong></span>
-                        <span>Consist.: <strong className="text-foreground">{r.consistency}%</strong></span>
-                        {r.totalPrizes > 0 && (
-                          <Badge variant="outline" className="text-[9px] text-green-500 border-green-500/30 px-1.5 py-0">
-                            R$ {r.totalPrizes.toLocaleString()}
-                          </Badge>
-                        )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1 mb-0.5">
+                          <span className="text-xs font-semibold text-foreground">{r.game.label}</span>
+                          <span className="text-[10px] text-muted-foreground">
+                            ({r.game.numbers.map(n => String(n).padStart(2, "0")).join(", ")})
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+                          <span>Média: <strong className="text-foreground">{r.avgHits}</strong></span>
+                          <span>Melhor: <strong className="text-foreground">{r.bestHit}</strong></span>
+                          <span>Consist.: <strong className="text-foreground">{r.consistency}%</strong></span>
+                          {r.totalPrizes > 0 && (
+                            <Badge variant="outline" className="text-[9px] text-green-500 border-green-500/30 px-1.5 py-0">
+                              R$ {r.totalPrizes.toLocaleString()}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
+                    {r.aiEvaluation && (
+                      <div className="px-3 pb-3 ml-9">
+                        <AIAnalystBriefing 
+                          confidence={r.aiEvaluation.confidence} 
+                          reasons={r.aiEvaluation.reasons} 
+                        />
+                      </div>
+                    )}
                   </div>
-                  {r.aiEvaluation && (
-                    <div className="px-3 pb-3 ml-9">
-                      <AIAnalystBriefing 
-                        confidence={r.aiEvaluation.confidence} 
-                        reasons={r.aiEvaluation.reasons} 
-                      />
-                    </div>
-                  )}
-                </div>
-
+                ))}
               </div>
+
             </div>
 
             {/* Chart toggle */}
