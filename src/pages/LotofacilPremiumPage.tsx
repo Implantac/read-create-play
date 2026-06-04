@@ -716,6 +716,7 @@ export default function LotofacilPremiumPage() {
           </div>
         </TabsContent>
 
+        {/* --- HISTORY TAB --- */}
         <TabsContent value="history" className="space-y-6">
           <RecentDraws draws={drawsWithPrizes} />
         </TabsContent>
