@@ -274,9 +274,10 @@ export default function LandingPage() {
               <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center space-y-4">
                 <Brain className="w-20 h-20 text-primary animate-bounce" />
                 <div className="space-y-2">
-                  <p className="font-mono text-primary text-xs uppercase tracking-[0.3em]">Status do Sistema</p>
-                  <p className="text-2xl font-black italic uppercase">Operando em Alta Fidelidade</p>
+                  <p className="font-mono text-primary text-xs uppercase tracking-[0.3em]">{t("landing.how_it_works.status_label")}</p>
+                  <p className="text-2xl font-black italic uppercase">{t("landing.how_it_works.status_value")}</p>
                 </div>
+
               </div>
             </motion.div>
           </div>
