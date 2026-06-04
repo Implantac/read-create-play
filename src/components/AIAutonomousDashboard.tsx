@@ -291,27 +291,43 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
         </TabsList>
 
         {/* Ranking Tab */}
-        <TabsContent value="ranking" className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Ranking Probabilístico — Top 20 (com Entropia & Markov)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={350}>
-                <BarChart data={rankingChartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                  <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "hsl(var(--foreground))" }} />
-                  <Legend />
-                  <Bar dataKey="score" name="Score" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="freq" name="Frequência" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="markov" name="Markov" fill="hsl(142, 76%, 36%)" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="entropy" name="Entropia" fill="hsl(280, 70%, 50%)" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+        <TabsContent value="ranking" className="space-y-6 outline-none">
+          <div className="grid lg:grid-cols-1 gap-6">
+            <Card className="glass-card border-white/10 shadow-xl rounded-[2rem] overflow-hidden">
+              <CardHeader className="pb-8 p-8 border-b border-white/5 bg-white/[0.02]">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-lg font-black uppercase tracking-tight italic">Top 20 Neural Ranking</CardTitle>
+                    <CardDescription className="text-[10px] font-black uppercase tracking-widest opacity-40 mt-1">Weighted Consensus across 6 Prediction Models</CardDescription>
+                  </div>
+                  <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 font-black italic">Consensus Model v5.3</Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="p-8">
+                <div className="h-[400px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={rankingChartData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                          <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} opacity={0.3} />
+                      <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} fontVariant="mono" axisLine={false} tickLine={false} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} fontVariant="mono" axisLine={false} tickLine={false} />
+                      <Tooltip 
+                        cursor={{ fill: 'hsl(var(--primary) / 0.05)' }}
+                        contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border) / 0.5)", borderRadius: 16, color: "hsl(var(--foreground))", boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)' }} 
+                      />
+                      <Legend iconType="circle" wrapperStyle={{ paddingTop: 30, fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }} />
+                      <Bar dataKey="score" name="Neural Score" fill="url(#barGradient)" radius={[6, 6, 0, 0]} barSize={24} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
           <Card>
             <CardHeader className="pb-3">
