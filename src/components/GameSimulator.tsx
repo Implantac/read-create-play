@@ -92,7 +92,7 @@ export function GameSimulator({ stats, config, draws }: Props) {
   }, [simResults]);
 
   return (
-    <div className="rounded-xl bg-card border border-border p-5">
+    <div className="rounded-2xl glass-card border border-primary/20 p-6 relative overflow-hidden group">
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
           <Gamepad2 className="w-4 h-4 text-neon-green" />
@@ -152,17 +152,17 @@ export function GameSimulator({ stats, config, draws }: Props) {
       {summary && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <div className="grid grid-cols-3 gap-3 mb-4">
-            <div className="rounded-lg bg-secondary/50 border border-border p-3 text-center">
-              <p className="text-xs text-muted-foreground">Melhor resultado</p>
-              <p className="text-xl font-bold font-mono text-neon-green">{summary.best} acertos</p>
+            <div className="rounded-xl bg-secondary/30 border border-border/40 p-4 text-center group hover:border-primary/40 transition-all active:scale-[0.98]">
+              <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-1 opacity-60">Melhor resultado</p>
+              <p className="text-2xl font-black font-mono text-emerald-400 italic">{summary.best} acertos</p>
             </div>
-            <div className="rounded-lg bg-secondary/50 border border-border p-3 text-center">
-              <p className="text-xs text-muted-foreground">Média de acertos</p>
-              <p className="text-xl font-bold font-mono text-foreground">{summary.avg}</p>
+            <div className="rounded-xl bg-secondary/30 border border-border/40 p-4 text-center group hover:border-primary/40 transition-all active:scale-[0.98]">
+              <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-1 opacity-60">Média de acertos</p>
+              <p className="text-2xl font-black font-mono text-foreground italic">{summary.avg}</p>
             </div>
-            <div className="rounded-lg bg-secondary/50 border border-border p-3 text-center">
-              <p className="text-xs text-muted-foreground">Jogos simulados</p>
-              <p className="text-xl font-bold font-mono text-neon-blue">{rounds}</p>
+            <div className="rounded-xl bg-secondary/30 border border-border/40 p-4 text-center group hover:border-primary/40 transition-all active:scale-[0.98]">
+              <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-1 opacity-60">Simulações</p>
+              <p className="text-2xl font-black font-mono text-primary italic">{rounds}</p>
             </div>
           </div>
 
