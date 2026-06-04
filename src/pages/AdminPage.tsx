@@ -539,31 +539,13 @@ export default function AdminPage() {
               {auditLogs.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">Nenhum registro de auditoria encontrado.</p>
               ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Data</TableHead>
-                        <TableHead>Admin</TableHead>
-                        <TableHead>Ação</TableHead>
-                        <TableHead>Alvo</TableHead>
-                        <TableHead>Detalhes</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {auditLogs.map(log => (
-                        <TableRow key={log.id}>
-                          <TableCell className="text-xs font-mono text-muted-foreground">
-                            {new Date(log.created_at).toLocaleString("pt-BR")}
-                          </TableCell>
-                          <TableCell className="text-xs">
-                            {getAdminEmail(log.admin_id)}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="text-[10px]">
-                              {log.action}
-                            </Badge>
-                          </TableCell>
+                <AuditLogTable
+                  logs={auditLogs}
+                  getAdminEmail={getAdminEmail}
+                  getTargetEmail={getTargetEmail}
+                />
+              )}
+            </CardContent>
                           <TableCell className="text-xs text-muted-foreground">
                             {getTargetEmail(log.target_user_id)}
                           </TableCell>
