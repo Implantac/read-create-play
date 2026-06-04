@@ -804,6 +804,10 @@ export type Database = {
       is_blocked: { Args: { _user_id: string }; Returns: boolean }
       is_full_access_email: { Args: { _email: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      track_user_action: {
+        Args: { _action: string; _user_id: string }
+        Returns: undefined
+      }
       update_mission_progress: {
         Args: { _increment?: number; _type: string; _user_id: string }
         Returns: undefined
