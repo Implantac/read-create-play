@@ -9,7 +9,8 @@ import {
   Search, Crown, History, Activity, Sparkles, LayoutGrid,
   Filter, Award, Database, RefreshCw, Layers, Loader2,
   TrendingDown, Shield, FileText, Share2 as Share, Play,
-  Cpu, Terminal as TerminalIcon, AlertCircle, CheckCircle2
+  Cpu, Terminal as TerminalIcon, AlertCircle, CheckCircle2,
+  Table2, Save, FileSpreadsheet
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -28,6 +29,13 @@ import { computeMatrixAnalysis } from "@/engine/matrix-analysis";
 import { MatrizAnaliseTable } from "@/components/MatrizAnaliseTable";
 import { FarolDezenas } from "@/components/FarolDezenas";
 import { useSavedBets } from "@/hooks/useSavedBets";
+import {
+  analyzeWorksheetGames,
+  generateWorksheetMatrixGames,
+  getPresetInputSize,
+  LOTOFACIL_WORKSHEET_PRESETS,
+  selectTopLotofacilNumbers,
+} from "@/engine/worksheet-matrices";
 
 const IntelligentGeneratorPanel = lazy(() => import("@/components/IntelligentGeneratorPanel").then(m => ({ default: m.IntelligentGeneratorPanel })));
 const EvolutiveGeneratorPanel = lazy(() => import("@/components/EvolutiveGeneratorPanel").then(m => ({ default: m.EvolutiveGeneratorPanel })));
@@ -45,6 +53,10 @@ export default function LotofacilPremiumPage() {
   const { config, draws, drawsWithPrizes, stats, farol, cycle, loading, syncing, lastSyncAt, syncDraws, selectedLottery } = useLotteryContext();
   const { saveBet } = useSavedBets(selectedLottery);
   const [activeTab, setActiveTab] = useState("overview");
+  const [presetId, setPresetId] = useState(LOTOFACIL_WORKSHEET_PRESETS[0].id);
+  const [worksheetNumbers, setWorksheetNumbers] = useState<number[]>([]);
+  const [worksheetDrawConcurso, setWorksheetDrawConcurso] = useState<string>("latest");
+  const [worksheetSaving, setWorksheetSaving] = useState(false);
 
   const handleSaveBet = (numbers: number[], strategy?: string, score?: number, grade?: string) => {
     saveBet({ numbers, strategy, score, grade });
@@ -59,6 +71,62 @@ export default function LotofacilPremiumPage() {
     () => computeMatrixAnalysis(draws, config.numbers),
     [draws, config.numbers]
   );
+
+  const rankedNumbers = useMemo(() => matrixData.map((row) => row.number), [matrixData]);
+  const preset = LOTOFACIL_WORKSHEET_PRESETS.find((item) => item.id === presetId) ?? LOTOFACIL_WORKSHEET_PRESETS[0];
+  const worksheetInputSize = getPresetInputSize(preset);
+
+  const worksheetSelectedDraw = useMemo(() => {
+    if (worksheetDrawConcurso === "latest") return draws[0] ?? null;
+    return draws.find((draw) => String(draw.concurso) === worksheetDrawConcurso) ?? draws[0] ?? null;
+  }, [draws, worksheetDrawConcurso]);
+
+  const worksheetPreviousDraw = useMemo(() => {
+    if (!worksheetSelectedDraw) return null;
+    const idx = draws.findIndex((draw) => draw.concurso === worksheetSelectedDraw.concurso);
+    return idx >= 0 ? draws[idx + 1] ?? null : null;
+  }, [draws, worksheetSelectedDraw]);
+
+  const generatedWorksheetGames = useMemo(
+    () => generateWorksheetMatrixGames(preset, worksheetNumbers),
+    [preset, worksheetNumbers],
+  );
+
+  const worksheetAnalysis = useMemo(
+    () => analyzeWorksheetGames(generatedWorksheetGames, worksheetSelectedDraw, worksheetPreviousDraw),
+    [generatedWorksheetGames, worksheetSelectedDraw, worksheetPreviousDraw],
+  );
+
+  const canGenerateWorksheet = worksheetNumbers.length >= worksheetInputSize && generatedWorksheetGames.length > 0;
+
+  const autoSelectWorksheet = () => {
+    const numbers = selectTopLotofacilNumbers(rankedNumbers, worksheetInputSize);
+    setWorksheetNumbers(numbers);
+  };
+
+  const toggleWorksheetNumber = (number: number) => {
+    setWorksheetNumbers((prev) => {
+      if (prev.includes(number)) return prev.filter((item) => item !== number);
+      if (prev.length >= worksheetInputSize) return prev;
+      return [...prev, number].sort((a, b) => a - b);
+    });
+  };
+
+  const saveAllWorksheetGames = async () => {
+    if (!canGenerateWorksheet) return;
+    setWorksheetSaving(true);
+    let saved = 0;
+    for (const game of generatedWorksheetGames) {
+      const ok = await saveBet({
+        numbers: game,
+        strategy: `Planilha Matriz: ${preset.label}`,
+        label: `${preset.sheetName} J${saved + 1}`,
+      });
+      if (ok) saved++;
+    }
+    setWorksheetSaving(false);
+    if (saved > 0) toast.success(`${saved} jogos salvos.`);
+  };
 
   if (selectedLottery !== "lotofacil") {
     return (
@@ -138,6 +206,9 @@ export default function LotofacilPremiumPage() {
             </TabsTrigger>
             <TabsTrigger value="generation" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
               Geração Elite
+            </TabsTrigger>
+            <TabsTrigger value="spreadsheets" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
+              Planilhas
             </TabsTrigger>
             <TabsTrigger value="history" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
               Sorteios
@@ -400,7 +471,232 @@ export default function LotofacilPremiumPage() {
           </div>
         </TabsContent>
 
-        {/* --- HISTORY TAB --- */}
+        {/* --- SPREADSHEETS TAB --- */}
+        <TabsContent value="spreadsheets" className="space-y-6">
+          <div className="grid xl:grid-cols-[0.8fr_1.2fr] gap-6">
+            <Card className="glass-card border-border/60 bg-card/40">
+              <CardHeader>
+                <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
+                  <FileSpreadsheet className="w-5 h-5 text-primary" />
+                  Modelos de Planilha (Farol)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Modelo Selecionado</span>
+                    <Select
+                      value={preset.id}
+                      onValueChange={(value) => {
+                        setPresetId(value);
+                        setWorksheetNumbers([]);
+                      }}
+                    >
+                      <SelectTrigger className="h-11 rounded-xl bg-background/50 border-border/40">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {LOTOFACIL_WORKSHEET_PRESETS.map((item) => (
+                          <SelectItem key={item.id} value={item.id}>
+                            {item.label} - {item.gameCount} jogos
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-[10px] text-muted-foreground leading-relaxed italic">{preset.description}</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Conferir contra Concurso</span>
+                    <Select value={worksheetDrawConcurso} onValueChange={setWorksheetDrawConcurso}>
+                      <SelectTrigger className="h-11 rounded-xl bg-background/50 border-border/40">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="latest">Último concurso ({draws[0]?.concurso})</SelectItem>
+                        {draws.slice(0, 30).map((draw) => (
+                          <SelectItem key={draw.concurso} value={String(draw.concurso)}>
+                            #{draw.concurso} - {new Date(draw.date).toLocaleDateString("pt-BR")}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="p-3 rounded-xl bg-background/40 border border-border/40 text-center">
+                    <p className="text-[9px] font-black uppercase text-muted-foreground opacity-60">Escolher</p>
+                    <p className="text-xl font-black text-foreground">{worksheetInputSize}</p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-background/40 border border-border/40 text-center">
+                    <p className="text-[9px] font-black uppercase text-muted-foreground opacity-60">Jogos</p>
+                    <p className="text-xl font-black text-foreground">{preset.gameCount}</p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-background/40 border border-border/40 text-center">
+                    <p className="text-[9px] font-black uppercase text-muted-foreground opacity-60">Custo</p>
+                    <p className="text-sm font-black text-accent">R$ {(preset.gameCount * 3).toFixed(2)}</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button onClick={autoSelectWorksheet} className="gap-2 flex-1 rounded-xl h-11 gradient-brand font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20">
+                    <Sparkles className="w-4 h-4" />
+                    Auto-seleção Neural
+                  </Button>
+                  <Button variant="outline" className="rounded-xl h-11 px-5 border-border/40 text-[10px] font-black uppercase tracking-widest" onClick={() => setWorksheetNumbers([])}>
+                    Limpar
+                  </Button>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-secondary/10 border border-border/40">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Seletor de Dezenas</span>
+                    <Badge variant={worksheetNumbers.length === worksheetInputSize ? "default" : "outline"} className="font-mono h-5">
+                      {worksheetNumbers.length}/{worksheetInputSize}
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-5 gap-2">
+                    {Array.from({ length: 25 }, (_, i) => i + 1).map((number) => {
+                      const selected = worksheetNumbers.includes(number);
+                      const disabled = !selected && worksheetNumbers.length >= worksheetInputSize;
+                      return (
+                        <button
+                          key={number}
+                          type="button"
+                          disabled={disabled}
+                          onClick={() => toggleWorksheetNumber(number)}
+                          className={`aspect-square rounded-xl border-2 text-xs font-black font-mono transition-all duration-300 ${
+                            selected
+                              ? "bg-primary border-primary text-primary-foreground shadow-lg shadow-primary/30 scale-105"
+                              : disabled
+                                ? "bg-muted/20 text-muted-foreground/20 border-transparent cursor-not-allowed"
+                                : "bg-background/50 border-border/40 text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                          }`}
+                        >
+                          {String(number).padStart(2, "0")}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="space-y-6">
+              <Card className="glass-card border-border/60 bg-card/40 overflow-hidden">
+                <CardHeader className="border-b border-border/10 bg-secondary/5">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                      Auditoria de Matriz
+                    </CardTitle>
+                    <Button size="sm" onClick={saveAllWorksheetGames} disabled={!canGenerateWorksheet || worksheetSaving} className="h-9 px-6 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-[9px] shadow-lg shadow-primary/20 gap-2">
+                      <Save className="w-3.5 h-3.5" />
+                      {worksheetSaving ? "Salvando..." : "Salvar todos os jogos"}
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {!canGenerateWorksheet ? (
+                    <div className="p-20 text-center space-y-4">
+                      <div className="w-16 h-16 rounded-2xl bg-muted/20 border border-dashed border-border/40 flex items-center justify-center mx-auto opacity-40">
+                        <Target className="w-8 h-8 text-muted-foreground" />
+                      </div>
+                      <p className="text-xs font-medium text-muted-foreground max-w-xs mx-auto leading-relaxed">
+                        Configure o modelo e selecione as dezenas para processar a auditoria em tempo real.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="bg-secondary/20 hover:bg-secondary/20 border-b border-border/40">
+                            <TableHead className="w-12 py-4 px-4 font-black text-[9px] uppercase tracking-widest">ID</TableHead>
+                            <TableHead className="py-4 px-4 font-black text-[9px] uppercase tracking-widest">Matriz Combinatória</TableHead>
+                            <TableHead className="text-center py-4 px-4 font-black text-[9px] uppercase tracking-widest">Hits</TableHead>
+                            <TableHead className="text-center py-4 px-4 font-black text-[9px] uppercase tracking-widest hidden md:table-cell">Soma</TableHead>
+                            <TableHead className="text-center py-4 px-4 font-black text-[9px] uppercase tracking-widest hidden md:table-cell">P/I</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {worksheetAnalysis.games.map((game) => (
+                            <TableRow key={game.index} className="hover:bg-primary/5 transition-colors border-b border-border/20 group">
+                              <TableCell className="font-black text-[10px] text-muted-foreground px-4 italic opacity-40">
+                                J{String(game.index).padStart(2, "0")}
+                              </TableCell>
+                              <TableCell className="px-4 py-3">
+                                <div className="flex flex-wrap gap-1">
+                                  {game.numbers.map((number) => {
+                                    const hit = worksheetSelectedDraw?.numbers.includes(number);
+                                    return (
+                                      <span
+                                        key={number}
+                                        className={`w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-black font-mono transition-all group-hover:scale-105 ${
+                                          hit 
+                                            ? "bg-primary border border-primary/50 text-primary-foreground shadow-sm shadow-primary/20" 
+                                            : "bg-muted/40 border border-border/20 text-muted-foreground opacity-80"
+                                        }`}
+                                      >
+                                        {String(number).padStart(2, "0")}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-center px-4">
+                                <Badge className={`font-black font-mono text-[11px] h-6 px-2 italic ${
+                                  game.hits >= 13 ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30" :
+                                  game.hits >= 11 ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" :
+                                  "bg-muted/30 text-muted-foreground border border-border/40"
+                                }`}>
+                                  {game.hits}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-center font-mono text-[10px] font-black text-muted-foreground px-4 hidden md:table-cell opacity-60">
+                                {game.sum}
+                              </TableCell>
+                              <TableCell className="text-center font-mono text-[10px] font-black text-muted-foreground px-4 hidden md:table-cell opacity-60">
+                                {game.even}/{game.odd}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {canGenerateWorksheet && (
+                <div className="p-5 rounded-2xl bg-accent/5 border border-accent/20 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center">
+                      <Table2 className="w-5 h-5 text-accent" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Distribuição Neural</p>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {Object.entries(worksheetAnalysis.hitDistribution)
+                          .sort(([a], [b]) => Number(b) - Number(a))
+                          .map(([hits, count]) => (
+                            <Badge key={hits} variant="outline" className="text-[9px] font-black border-accent/30 text-accent bg-accent/5 px-2">
+                              {hits} acertos: {count}x
+                            </Badge>
+                          ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[9px] font-black uppercase text-muted-foreground opacity-60">Melhor Resultado</p>
+                    <p className="text-2xl font-black text-accent italic">{worksheetAnalysis.bestHits} acertos</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </TabsContent>
+
         <TabsContent value="history" className="space-y-6">
           <RecentDraws draws={drawsWithPrizes} />
         </TabsContent>
