@@ -27,33 +27,48 @@ const HistoricoUnificadoPage = () => {
   const [activeTab, setActiveTab] = useState("resultados");
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-700 pb-10">
-      <PageHeader
-        title="Histórico e Registros"
-        description="Acompanhe resultados, suas apostas e performance acumulada"
-        icon={History}
-        badge="CENTRAL DE REGISTROS"
-      />
-      
-      <LotteryContextBanner />
+    <div className="space-y-10 animate-in fade-in duration-700 pb-20 max-w-7xl mx-auto">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-4">
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Records Center v6.0</span>
+            </div>
+          </div>
+          <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
+            Histórico e <span className="gradient-brand-text">Registros</span>
+          </h1>
+          <p className="text-sm text-muted-foreground font-medium max-w-lg leading-relaxed">
+            Auditoria completa e gestão de ativos. Monitore sua performance e os resultados oficiais em tempo real.
+          </p>
+        </div>
+      </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <div className="overflow-x-auto scrollbar-hide mb-6 p-1 bg-muted/30 rounded-2xl border border-border/40">
-          <TabsList className="bg-transparent h-auto p-0 flex gap-1">
-            <TabsTrigger value="resultados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3 px-6 text-xs font-black uppercase tracking-widest transition-all gap-2 shrink-0">
-              <Calendar className="w-3.5 h-3.5" />
+      
+      <div className="relative group">
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-[2rem] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-1000 pointer-events-none" />
+        <LotteryContextBanner />
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-8">
+        <div className="flex items-center justify-between gap-4 overflow-x-auto pb-6 scrollbar-hide sticky top-20 z-30 bg-background/40 backdrop-blur-xl px-1 -mx-1 pt-2">
+          <TabsList>
+            <TabsTrigger value="resultados" className="gap-2.5">
+              <Calendar className="w-4 h-4" />
               Sorteios Oficiais
             </TabsTrigger>
-            <TabsTrigger value="apostas" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3 px-6 text-xs font-black uppercase tracking-widest transition-all gap-2 shrink-0">
-              <ClipboardCheck className="w-3.5 h-3.5" />
-              Conferidor / Auditoria
+            <TabsTrigger value="apostas" className="gap-2.5">
+              <ClipboardCheck className="w-4 h-4" />
+              Conferidor
             </TabsTrigger>
-            <TabsTrigger value="salvos" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3 px-6 text-xs font-black uppercase tracking-widest transition-all gap-2 shrink-0">
-              <Star className="w-3.5 h-3.5" />
-              Ativos / Jogos Salvos
+            <TabsTrigger value="salvos" className="gap-2.5">
+              <Star className="w-4 h-4" />
+              Jogos Salvos
             </TabsTrigger>
           </TabsList>
         </div>
+
 
         <div className="mt-6">
           <AnimatePresence mode="wait">
