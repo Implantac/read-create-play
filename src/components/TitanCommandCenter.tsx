@@ -2,11 +2,14 @@ import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Terminal, Activity, Zap, ShieldCheck, Cpu, Database, Network, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useLotteryContext } from "@/contexts/LotteryContext";
+import { useLotteryContextSafe } from "@/contexts/LotteryContext";
 import { calculatePredictiveEntropy } from "@/engine/ai/predictive-entropy";
 
 export const TitanCommandCenter = () => {
-  const { draws, stats, selectedLottery } = useLotteryContext();
+  const ctx = useLotteryContextSafe();
+  const draws = ctx?.draws ?? [];
+  const stats = ctx?.stats ?? [];
+  const selectedLottery = ctx?.selectedLottery ?? "lotofacil";
   const [uptime, setUptime] = React.useState(0);
   const [logs, setLogs] = React.useState<string[]>([
     "Initializating Neural Core...",
