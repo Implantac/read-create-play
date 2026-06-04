@@ -196,7 +196,7 @@ export function HPEnginePanel({ stats, config, draws }: Props) {
             ? "Processando..."
             : mode === "benchmark"
             ? "Executar Benchmark"
-            : `Executar ${formatNumber(iterations)} iterações`}
+            : `Executar ${fmtN(iterations)} iterações`}
         </Button>
 
         {running && <Progress value={progress} className="h-2" />}
