@@ -217,21 +217,17 @@ export default function LotofacilPremiumPage() {
   return (
     <div className="space-y-6 pb-20 animate-in fade-in duration-700">
       {/* HEADER PREMIUM */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="space-y-1">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-4 px-1">
+        <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <div className="px-2 py-0.5 rounded bg-primary/10 border border-primary/20 text-[9px] font-black text-primary uppercase tracking-widest">
-              Titan Neural Core v5.3
-            </div>
-            <div className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-[9px] font-black text-amber-500 uppercase tracking-widest">
-              Top Tier Optimization
-            </div>
+            <span className="px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Titan Neural Core v5.3 Alpha</span>
+            <span className="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[10px] font-black text-amber-500 uppercase tracking-[0.2em] italic">Top Tier Strategy</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tighter italic uppercase flex items-baseline gap-2">
-            Lotofácil <span className="text-primary text-xl md:text-2xl not-italic">Premium</span>
+          <h1 className="text-5xl md:text-6xl font-black text-foreground tracking-tighter italic uppercase leading-none">
+            Lotofácil <span className="gradient-brand-text not-italic">Premium</span>
           </h1>
-          <p className="text-sm text-muted-foreground font-medium max-w-2xl">
-            Ambiente unificado de inteligência preditiva, fechamentos matemáticos e análise de fluxo neural para máxima performance.
+          <p className="text-sm text-muted-foreground font-medium max-w-2xl leading-relaxed">
+            Ambiente unificado de inteligência preditiva, fechamentos matemáticos e análise de fluxo neural para máxima performance estatística.
           </p>
         </div>
 
@@ -241,17 +237,17 @@ export default function LotofacilPremiumPage() {
             size="sm" 
             onClick={() => syncDraws()}
             disabled={syncing}
-            className="h-11 px-5 rounded-xl border-primary/20 bg-primary/5 text-xs font-black uppercase tracking-widest gap-2"
+            className="h-12 px-6 rounded-xl border-border/60 bg-secondary/20 text-[10px] font-black uppercase tracking-widest gap-2 hover:bg-secondary/40 transition-all shadow-sm"
           >
-            {syncing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-            {syncing ? "Sincronizando" : "Sincronizar"}
+            {syncing ? <RefreshCw className="w-4 h-4 animate-spin text-primary" /> : <RefreshCw className="w-4 h-4 opacity-60" />}
+            {syncing ? "Sincronizando Core..." : "Sincronizar Data"}
           </Button>
           <Button 
             onClick={exportBI}
-            className="h-11 px-8 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 gap-2"
+            className="h-12 px-8 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20 gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all"
           >
             <Download className="w-4 h-4" />
-            Exportar BI
+            Exportar BI Alpha
           </Button>
         </div>
       </div>
