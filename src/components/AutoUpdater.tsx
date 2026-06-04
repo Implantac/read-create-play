@@ -22,7 +22,7 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso, syncDraws }:
   const [loading, setLoading] = useState(false);
   const [lastCheck, setLastCheck] = useState<Date | null>(null);
   const [isOnline, setIsOnline] = useState(true);
-  const [autoEnabled, setAutoEnabled] = useState(false);
+  const [autoEnabled, setAutoEnabled] = useState(true);
   const [latestFromApi, setLatestFromApi] = useState<LatestDrawResult | null>(null);
 
   const checkForUpdates = useCallback(async () => {
