@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useMemo, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useMemo, useCallback, ReactNode, useEffect } from "react";
 import { LOTTERIES, DrawResult } from "@/data/lotteries";
 import { computeFrequencyStats, computeSumDistribution, NumberStats } from "@/engine/stats/statistics";
 import { useLotteryDraws, DrawResultWithPrizes } from "@/hooks/useLotteryDraws";
