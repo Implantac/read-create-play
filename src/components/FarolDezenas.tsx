@@ -95,13 +95,14 @@ export const FarolDezenas = memo(function FarolDezenas({ data, totalNumbers, pic
   }, [selected, data]);
 
   return (
-    <div className="rounded-xl glass-card p-5 space-y-4">
+    <div className="rounded-2xl glass-card border border-primary/20 p-6 space-y-6 relative overflow-hidden group">
+      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-transparent pointer-events-none opacity-50" />
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/20 flex items-center justify-center">
           <Lightbulb className="w-4 h-4 text-amber-400" />
         </div>
         <div className="flex-1">
-          <h3 className="text-sm font-semibold text-foreground">Farol de Dezenas</h3>
+          <h3 className="text-sm font-black text-foreground uppercase tracking-widest italic">Farol de Dezenas Elite</h3>
           <p className="text-[10px] text-muted-foreground mt-0.5">
             {interactive ? `Toque nas dezenas para montar sua aposta (${pickSize} números)` : "Classificação visual por score inteligente"}
           </p>
@@ -142,7 +143,7 @@ export const FarolDezenas = memo(function FarolDezenas({ data, totalNumbers, pic
 
       {/* Selection toolbar */}
       {interactive && (
-        <div className="flex flex-wrap items-center gap-2 p-3 rounded-lg bg-muted/20 border border-border/40">
+        <div className="flex flex-wrap items-center gap-3 p-4 rounded-2xl bg-secondary/10 border border-border/40 relative z-10">
           <div className="flex items-center gap-2 mr-auto">
             <span className="text-xs text-muted-foreground">Selecionadas:</span>
             <span className={`text-sm font-bold font-mono ${
@@ -156,28 +157,28 @@ export const FarolDezenas = memo(function FarolDezenas({ data, totalNumbers, pic
               </span>
             )}
           </div>
-          <Button size="sm" variant="outline" className="h-7 text-xs gap-1.5" onClick={fillTopScore}>
-            <Sparkles className="w-3 h-3" />
+          <Button size="sm" variant="outline" className="h-8 px-4 rounded-xl font-black uppercase tracking-widest text-[9px] border-border/60 bg-background/50 hover:bg-primary/10 text-muted-foreground transition-all" onClick={fillTopScore}>
+            <Sparkles className="w-3 h-3 mr-1.5" />
             Top {pickSize}
           </Button>
           <Button
             size="sm"
             variant="outline"
-            className="h-7 text-xs gap-1.5"
+            className="h-8 px-4 rounded-xl font-black uppercase tracking-widest text-[9px] border-border/60 bg-background/50 hover:bg-red-500/10 text-muted-foreground transition-all"
             onClick={clearSelection}
             disabled={selected.size === 0}
           >
-            <X className="w-3 h-3" />
+            <X className="w-3 h-3 mr-1.5" />
             Limpar
           </Button>
           <Button
             size="sm"
-            className="h-7 text-xs gap-1.5"
+            className="h-8 px-6 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-[9px] shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
             onClick={handleSave}
             disabled={selected.size !== pickSize}
           >
-            <Save className="w-3 h-3" />
-            Salvar Aposta
+            <Save className="w-3 h-3 mr-1.5" />
+            Salvar Matriz
           </Button>
         </div>
       )}
@@ -194,10 +195,10 @@ export const FarolDezenas = memo(function FarolDezenas({ data, totalNumbers, pic
                     type="button"
                     onClick={() => toggleNumber(r.number)}
                     disabled={!interactive}
-                    className={`relative aspect-square rounded-xl border flex flex-col items-center justify-center transition-all duration-200 hover:scale-110 hover:z-10 hover:shadow-lg hover:ring-2 ${s.bg} ${s.ring} ${
-                      interactive ? "cursor-pointer" : "cursor-default"
+                    className={`relative aspect-square rounded-xl border flex flex-col items-center justify-center transition-all duration-300 hover:scale-110 hover:z-20 hover:shadow-2xl hover:shadow-black/40 hover:ring-2 ${s.bg} ${s.ring} ${
+                      interactive ? "cursor-pointer active:scale-90" : "cursor-default"
                     } ${
-                      isSelected ? "ring-2 ring-primary ring-offset-2 ring-offset-background scale-105 shadow-lg shadow-primary/30" : ""
+                      isSelected ? "ring-2 ring-primary ring-offset-2 ring-offset-background scale-110 shadow-2xl shadow-primary/40 z-10" : "shadow-sm shadow-black/20"
                     }`}
                   >
                     {isSelected && (
