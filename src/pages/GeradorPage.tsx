@@ -93,11 +93,13 @@ const GeradorPage = () => {
             </Suspense>
           </PlanGate>
 
-          <PlanGate feature="gerador_avancado" fallbackMessage="Gerador Inteligente com análise multi-critério">
-            <Suspense fallback={<LazyFallback />}>
-              <IntelligentGeneratorPanel stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
-            </Suspense>
-          </PlanGate>
+          {selectedLottery === "lotofacil" && (
+            <PlanGate feature="gerador_avancado" fallbackMessage="Gerador Inteligente com análise multi-critério">
+              <Suspense fallback={<LazyFallback />}>
+                <IntelligentGeneratorPanel stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
+              </Suspense>
+            </PlanGate>
+          )}
 
           <PlanGate feature="gerador_avancado" fallbackMessage="Gerador Evolutivo com algoritmo genético">
             <Suspense fallback={<LazyFallback />}>
