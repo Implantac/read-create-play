@@ -26,6 +26,12 @@ import { SystemAuditStatus } from "@/components/SystemAuditStatus";
 
 const workflowGroups: { label: string; items: { title: string; url: string; icon: any; requiredFeature?: Feature; tooltip: string }[] }[] = [
   {
+    label: "Experiência Premium",
+    items: [
+      { title: "Lotofácil Premium", url: "/lotofacil-premium", icon: Crown, tooltip: "Interface unificada de alta performance exclusiva para Lotofácil." },
+    ],
+  },
+  {
     label: "Inteligência de Dados",
     items: [
       { title: "Terminal", url: "/", icon: BarChart3, tooltip: "Terminal central de inteligência e resumo de fluxos históricos." },

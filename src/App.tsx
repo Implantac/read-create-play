@@ -37,6 +37,7 @@ const StrategyLabPage = lazy(() => import("@/pages/StrategyLabPage"));
 const MatrizAnalisePage = lazy(() => import("@/pages/MatrizAnalisePage"));
 const PlanilhasMatrizPage = lazy(() => import("@/pages/PlanilhasMatrizPage"));
 const FarolEstatisticoPage = lazy(() => import("@/pages/FarolEstatisticoPage.tsx"));
+const LotofacilPremiumPage = lazy(() => import("@/pages/LotofacilPremiumPage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const AffiliatePage = lazy(() => import("./pages/AffiliatePage"));
 const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage"));
@@ -114,6 +115,7 @@ const AppContent = () => {
           <Route path="/farol" element={<FarolEstatisticoPage />} />
           <Route path="/matriz" element={<MatrizAnalisePage />} />
           <Route path="/planilhas-matriz" element={<PlanilhasMatrizPage />} />
+          <Route path="/lotofacil-premium" element={<LotofacilPremiumPage />} />
           <Route path="/fechamentos" element={<FechamentosPage />} />
           <Route path="/historico" element={<HistoricoPage />} />
           <Route path="/roi" element={<ROIDashboardPage />} />
