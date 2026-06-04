@@ -401,7 +401,7 @@ export default function FechamentosPage() {
                   <span>
                     <Coins className="w-3 h-3 inline mr-1" />
                     Custo total: <strong className="text-accent">
-                      R$ {(generatedGames.length * betPrice).toFixed(2)}
+                      {formatCurrency(generatedGames.length * betPrice)}
                     </strong>
                   </span>
                   <span>
