@@ -139,7 +139,30 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden antialiased">
+      <Helmet>
+        <title>Titan Loterias | Inteligência Artificial para Mega-Sena e Lotofácil</title>
+        <meta name="description" content="Aumente suas chances na Mega-Sena e Lotofácil com inteligência artificial e análise estatística avançada. O gerador de apostas mais completo do Brasil." />
+        <meta property="og:title" content="Titan Loterias | Tecnologia Neural para Apostadores" />
+        <meta property="og:description" content="Pare de apostar no escuro. Use matemática e IA para otimizar seus jogos na Mega-Sena, Lotofácil e outras." />
+        <meta property="og:type" content="website" />
+        <meta name="keywords" content="Mega-Sena, Lotofácil, Quina, Inteligência Artificial, Loterias, Gerador de Apostas, Probabilidade, Estatística" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [1, 2, 3, 4, 5, 6].map((i) => ({
+              "@type": "Question",
+              "name": t(`landing.faq.q${i}` as any),
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": t(`landing.faq.a${i}` as any)
+              }
+            }))
+          })}
+        </script>
+      </Helmet>
       <FloatingCTA />
+
       
       <nav className="fixed top-0 inset-x-0 z-50 glass-panel border-b border-border/40 h-20 flex items-center">
         <div className="container mx-auto px-6 flex items-center justify-between">
