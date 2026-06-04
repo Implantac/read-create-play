@@ -729,6 +729,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_games_generated: {
+        Args: { _user_id: string }
+        Returns: undefined
+      }
       is_blocked: { Args: { _user_id: string }; Returns: boolean }
       is_full_access_email: { Args: { _email: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
