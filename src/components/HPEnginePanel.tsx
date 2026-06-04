@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatCurrency, formatNumber, formatPercent } from "@/utils/formatters";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -132,11 +133,8 @@ export function HPEnginePanel({ stats, config, draws }: Props) {
       }))
     : [];
 
-  const formatNumber = (n: number) => {
-    if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B`;
-    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
-    return String(n);
+  const fmtN = (n: number) => {
+    return formatNumber(n);
   };
 
   return (
@@ -198,7 +196,7 @@ export function HPEnginePanel({ stats, config, draws }: Props) {
             ? "Processando..."
             : mode === "benchmark"
             ? "Executar Benchmark"
-            : `Executar ${formatNumber(iterations)} iterações`}
+            : `Executar ${fmtN(iterations)} iterações`}
         </Button>
 
         {running && <Progress value={progress} className="h-2" />}
@@ -210,9 +208,9 @@ export function HPEnginePanel({ stats, config, draws }: Props) {
               {/* Performance metrics */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[
-                  { label: "Iterações", value: formatNumber(simResult.iterationsCompleted), icon: Cpu },
+                  { label: "Iterações", value: fmtN(simResult.iterationsCompleted), icon: Cpu },
                   { label: "Tempo", value: `${simResult.elapsedMs}ms`, icon: Timer },
-                  { label: "Ops/seg", value: formatNumber(simResult.opsPerSecond), icon: Gauge },
+                  { label: "Ops/seg", value: fmtN(simResult.opsPerSecond), icon: Gauge },
                   { label: "Melhor", value: `${simResult.bestHit} acertos`, icon: Trophy },
                 ].map(m => (
                   <div key={m.label} className="p-2.5 rounded-lg bg-muted/20 border border-border text-center">
@@ -225,7 +223,7 @@ export function HPEnginePanel({ stats, config, draws }: Props) {
 
               <div className="p-2 rounded bg-primary/5 border border-primary/20 text-center">
                 <p className="text-xs text-muted-foreground">Média de acertos</p>
-                <p className="text-2xl font-black font-mono text-primary">{simResult.avgHits}</p>
+                <p className="text-2xl font-black font-mono text-primary">{formatNumber(simResult.avgHits)}</p>
               </div>
 
               {/* Hit distribution chart */}
@@ -248,8 +246,8 @@ export function HPEnginePanel({ stats, config, draws }: Props) {
                             fontSize: 12,
                           }}
                           formatter={(val: number, name: string) => {
-                            if (name === "pct") return [`${val}%`, "Percentual"];
-                            return [val.toLocaleString(), "Contagem"];
+                            if (name === "pct") return [`${formatNumber(val)}%`, "Percentual"];
+                            return [formatNumber(val), "Contagem"];
                           }}
                         />
                         <Bar dataKey="pct" radius={[4, 4, 0, 0]}>
@@ -270,13 +268,13 @@ export function HPEnginePanel({ stats, config, draws }: Props) {
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
                 <Timer className="w-3.5 h-3.5" />
-                {optResult.elapsedMs}ms • Score: {optResult.bestScore}/100
+                {formatNumber(optResult.elapsedMs)}ms • Score: {formatNumber(optResult.bestScore)}/100
               </div>
 
               <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
                 <div className="flex items-center gap-2 mb-2">
                   <Badge variant="default">Aposta Ótima</Badge>
-                  <span className="text-sm font-mono font-bold text-primary">{optResult.bestScore}/100</span>
+                  <span className="text-sm font-mono font-bold text-primary">{formatNumber(optResult.bestScore)}/100</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {Array.from(optResult.bestBet).map(n => (
@@ -316,9 +314,9 @@ export function HPEnginePanel({ stats, config, draws }: Props) {
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: "Geração de Sorteios", value: `${formatNumber(benchmark.drawGenOpsPerSec)} ops/s` },
-                  { label: "Verificação de Acertos", value: `${formatNumber(benchmark.hitCheckOpsPerSec)} ops/s` },
-                  { label: "Monte Carlo Completo", value: `${formatNumber(benchmark.monteCarloOpsPerSec)} ops/s` },
+                  { label: "Geração de Sorteios", value: `${fmtN(benchmark.drawGenOpsPerSec)} ops/s` },
+                  { label: "Verificação de Acertos", value: `${fmtN(benchmark.hitCheckOpsPerSec)} ops/s` },
+                  { label: "Monte Carlo Completo", value: `${fmtN(benchmark.monteCarloOpsPerSec)} ops/s` },
                   { label: "Tempo Total", value: `${benchmark.totalMs}ms` },
                 ].map(m => (
                   <div key={m.label} className="p-3 rounded-lg bg-muted/20 border border-border">

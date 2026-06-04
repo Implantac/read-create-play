@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { formatNumber } from "@/utils/formatters";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
@@ -274,10 +275,10 @@ export default function AdminPage() {
 
 
   const stats = [
-    { label: "Total Usuários", value: profiles.length, icon: Users, color: "text-primary" },
-    { label: "Premium", value: planCounts["premium"] || 0, icon: Crown, color: "text-primary" },
-    { label: "Profissional", value: planCounts["professional"] || 0, icon: Shield, color: "text-accent" },
-    { label: "Sorteios no BD", value: drawCount, icon: TrendingUp, color: "text-primary" },
+    { label: "Total Usuários", value: formatNumber(profiles.length), icon: Users, color: "text-primary" },
+    { label: "Premium", value: formatNumber(planCounts["premium"] || 0), icon: Crown, color: "text-primary" },
+    { label: "Profissional", value: formatNumber(planCounts["professional"] || 0), icon: Shield, color: "text-accent" },
+    { label: "Sorteios no BD", value: formatNumber(drawCount), icon: TrendingUp, color: "text-primary" },
   ];
 
   const getAdminEmail = (adminId: string) => {
@@ -356,7 +357,7 @@ export default function AdminPage() {
                       }`}
                       style={{ width: `${pct}%` }}
                     >
-                      {pct > 10 ? `${PLAN_LABELS[plan]} ${Math.round(pct)}%` : ""}
+                      {pct > 10 ? `${PLAN_LABELS[plan]} ${formatNumber(Math.round(pct))}%` : ""}
                     </div>
                   );
                 })}
@@ -370,7 +371,7 @@ export default function AdminPage() {
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                 <div>
                   <CardTitle className="text-base">Usuários</CardTitle>
-                  <CardDescription>{filtered.length} de {profiles.length}</CardDescription>
+                  <CardDescription>{formatNumber(filtered.length)} de {formatNumber(profiles.length)}</CardDescription>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="relative w-52">

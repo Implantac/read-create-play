@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
+import { formatCurrency, formatNumber, formatPercent } from "@/utils/formatters";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
@@ -189,7 +190,7 @@ const AIAnalystPage = () => {
                             <div key={gi} className="flex items-center gap-2 bg-background/50 rounded-lg p-2">
                               <Badge variant="outline" className="shrink-0">{g.grade}</Badge>
                               <span className="text-xs font-mono">{g.numbers.join("-")}</span>
-                              <span className="text-xs text-muted-foreground ml-auto">{g.totalScore}pts</span>
+                              <span className="text-xs text-muted-foreground ml-auto">{formatNumber(g.totalScore)}pts</span>
                             </div>
                           ))}
                         </div>
@@ -205,7 +206,7 @@ const AIAnalystPage = () => {
                     </div>
                     {msg.response?.metadata && (
                       <p className="text-[10px] text-muted-foreground mt-1">
-                        {msg.response.metadata.processingTimeMs}ms • {msg.response.metadata.enginesUsed.join(", ")}
+                        {formatNumber(msg.response.metadata.processingTimeMs)}ms • {msg.response.metadata.enginesUsed.join(", ")}
                       </p>
                     )}
                   </div>
@@ -258,7 +259,7 @@ const AIAnalystPage = () => {
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Quantidade: {genCount}</label>
+                  <label className="text-sm font-medium mb-2 block">Quantidade: {formatNumber(genCount)}</label>
                   <Slider value={[genCount]} onValueChange={v => setGenCount(v[0])}
                     min={1} max={50} step={1} />
                 </div>
@@ -277,9 +278,9 @@ const AIAnalystPage = () => {
               {genResult?.games && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-sm">{genResult.games.length} jogos gerados</h3>
+                    <h3 className="font-semibold text-sm">{formatNumber(genResult.games.length)} jogos gerados</h3>
                     <Badge variant="outline" className="text-xs">
-                      {genResult.metadata?.processingTimeMs}ms
+                      {formatNumber(genResult.metadata?.processingTimeMs)}ms
                     </Badge>
                   </div>
                   <div className="grid gap-2">
@@ -310,7 +311,7 @@ const AIAnalystPage = () => {
             <CardContent className="space-y-6">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Dezenas Base: {wheelBase}</label>
+                  <label className="text-sm font-medium mb-2 block">Dezenas Base: {formatNumber(wheelBase)}</label>
                   <Slider value={[wheelBase]} onValueChange={v => setWheelBase(v[0])}
                     min={rules.pick + 1} max={Math.min(rules.totalNumbers, 22)} step={1} />
                 </div>
@@ -327,7 +328,7 @@ const AIAnalystPage = () => {
                   {wheelOptions.map(opt => (
                     <Button key={opt.base} variant={wheelBase === opt.base ? "default" : "outline"} size="sm"
                       onClick={() => setWheelBase(opt.base)} className="text-xs">
-                      {opt.base} dez → ~{opt.estimatedGames} jogos
+                      {formatNumber(opt.base)} dez → ~{formatNumber(opt.estimatedGames)} jogos
                     </Button>
                   ))}
                 </div>
@@ -336,12 +337,12 @@ const AIAnalystPage = () => {
               {wheelResult?.wheeling && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <StatBox icon={Target} label="Jogos" value={wheelResult.wheeling.totalGames} />
-                    <StatBox icon={Shield} label="Garantia" value={`${wheelResult.wheeling.guarantee} pts`} />
+                    <StatBox icon={Target} label="Jogos" value={formatNumber(wheelResult.wheeling.totalGames)} />
+                    <StatBox icon={Shield} label="Garantia" value={`${formatNumber(wheelResult.wheeling.guarantee)} pts`} />
                     <StatBox icon={TrendingUp} label="Cobertura"
-                      value={`${wheelResult.wheeling.coverageValidation.coveragePercent.toFixed(0)}%`} />
+                      value={`${formatNumber(Math.round(wheelResult.wheeling.coverageValidation.coveragePercent))}%`} />
                     <StatBox icon={Trophy} label="Custo"
-                      value={`R$ ${wheelResult.wheeling.estimatedCost.toFixed(2)}`} />
+                      value={formatCurrency(wheelResult.wheeling.estimatedCost)} />
                   </div>
 
                   <div className="bg-muted/50 rounded-lg p-3 text-xs">
@@ -381,7 +382,7 @@ const AIAnalystPage = () => {
             <CardContent className="space-y-6">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Simulações: {simCount.toLocaleString()}</label>
+                  <label className="text-sm font-medium mb-2 block">Simulações: {formatNumber(simCount)}</label>
                   <div className="flex gap-2">
                     {[1000, 10000, 50000, 100000].map(n => (
                       <Button key={n} variant={simCount === n ? "default" : "outline"} size="sm"
@@ -402,10 +403,10 @@ const AIAnalystPage = () => {
               {simResult?.simulation && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <StatBox icon={BarChart3} label="Total" value={simResult.simulation.totalSimulations.toLocaleString()} />
-                    <StatBox icon={TrendingUp} label="Média Acertos" value={simResult.simulation.avgHits.toFixed(2)} />
-                    <StatBox icon={Trophy} label="Melhor" value={simResult.simulation.bestGame.avgHits.toFixed(2)} />
-                    <StatBox icon={Target} label="Jogos" value={simResult.simulation.games.length} />
+                    <StatBox icon={BarChart3} label="Total" value={formatNumber(simResult.simulation.totalSimulations)} />
+                    <StatBox icon={TrendingUp} label="Média Acertos" value={formatNumber(simResult.simulation.avgHits)} />
+                    <StatBox icon={Trophy} label="Melhor" value={formatNumber(simResult.simulation.bestGame.avgHits)} />
+                    <StatBox icon={Target} label="Jogos" value={formatNumber(simResult.simulation.games.length)} />
                   </div>
 
                   <div className="space-y-2">
@@ -416,9 +417,9 @@ const AIAnalystPage = () => {
                         .slice(0, 8)
                         .map(([hits, count]) => (
                           <div key={hits} className="bg-muted/50 rounded-lg p-2 text-center">
-                            <p className="text-lg font-bold text-primary">{hits}</p>
+                            <p className="text-lg font-bold text-primary">{formatNumber(Number(hits))}</p>
                             <p className="text-[10px] text-muted-foreground">acertos</p>
-                            <p className="text-xs font-mono">{((count / simResult.simulation!.totalSimulations) * 100).toFixed(2)}%</p>
+                            <p className="text-xs font-mono">{formatPercent(count / simResult.simulation!.totalSimulations)}</p>
                           </div>
                         ))}
                     </div>
@@ -432,8 +433,8 @@ const AIAnalystPage = () => {
                           {i + 1}
                         </Badge>
                         <span className="font-mono">{g.numbers.join("-")}</span>
-                        <span className="ml-auto text-muted-foreground">avg: {g.avgHits.toFixed(2)}</span>
-                        <Badge variant="outline" className="text-[10px]">estabilidade: {g.stabilityScore}</Badge>
+                        <span className="ml-auto text-muted-foreground">avg: {formatNumber(g.avgHits)}</span>
+                        <Badge variant="outline" className="text-[10px]">estabilidade: {formatNumber(g.stabilityScore)}</Badge>
                       </div>
                     ))}
                   </div>
@@ -473,7 +474,7 @@ function GameCard({ game, index, copiedIdx, onCopy, onSave, expanded, onToggle }
       <div className="flex items-center gap-2">
         <Badge className={`${gradeColor} shrink-0 font-bold`}>{game.grade}</Badge>
         <span className="font-mono text-sm flex-1">{game.numbers.join(" - ")}</span>
-        <span className="text-sm font-semibold text-primary">{game.totalScore}pts</span>
+        <span className="text-sm font-semibold text-primary">{formatNumber(game.totalScore)}pts</span>
         <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={onCopy}>
           {copiedIdx === index ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
         </Button>
@@ -485,12 +486,12 @@ function GameCard({ game, index, copiedIdx, onCopy, onSave, expanded, onToggle }
       {expanded && (
         <div className="mt-3 pt-3 border-t space-y-2 text-xs">
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-            <ScoreItem label="Estatístico" value={game.scores.statistical} />
-            <ScoreItem label="Estrutural" value={game.scores.structural} />
-            <ScoreItem label="Cobertura" value={game.scores.coverage} />
-            <ScoreItem label="Diversidade" value={game.scores.diversity} />
-            <ScoreItem label="Estratégia" value={game.scores.strategyFit} />
-            <ScoreItem label="Probabilidade" value={game.scores.probability} />
+            <ScoreItem label="Estatístico" value={formatNumber(game.scores.statistical)} />
+            <ScoreItem label="Estrutural" value={formatNumber(game.scores.structural)} />
+            <ScoreItem label="Cobertura" value={formatNumber(game.scores.coverage)} />
+            <ScoreItem label="Diversidade" value={formatNumber(game.scores.diversity)} />
+            <ScoreItem label="Estratégia" value={formatNumber(game.scores.strategyFit)} />
+            <ScoreItem label="Probabilidade" value={formatNumber(game.scores.probability)} />
           </div>
           <div className="space-y-1 text-muted-foreground">
             {game.explanation.map((line, i) => <p key={i}>{line}</p>)}
@@ -501,8 +502,9 @@ function GameCard({ game, index, copiedIdx, onCopy, onSave, expanded, onToggle }
   );
 }
 
-function ScoreItem({ label, value }: { label: string; value: number }) {
-  const color = value >= 70 ? "text-green-500" : value >= 40 ? "text-amber-500" : "text-red-500";
+function ScoreItem({ label, value }: { label: string; value: string | number }) {
+  const numValue = typeof value === 'string' ? parseFloat(value.replace(',', '.')) : value;
+  const color = numValue >= 70 ? "text-green-500" : numValue >= 40 ? "text-amber-500" : "text-red-500";
   return (
     <div className="text-center">
       <p className={`font-bold ${color}`}>{value}</p>
@@ -549,7 +551,7 @@ function AnalysisTab({ draws, lotteryId, stats, config }: any) {
       <CardContent className="space-y-6">
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium mb-2 block">Janela: {window} concursos</label>
+            <label className="text-sm font-medium mb-2 block">Janela: {formatNumber(window)} concursos</label>
             <Slider value={[window]} onValueChange={v => setWindow(v[0])} min={10} max={500} step={10} />
           </div>
           <div className="flex items-end">
@@ -578,9 +580,9 @@ function AnalysisTab({ draws, lotteryId, stats, config }: any) {
             </div>
 
             <div className="grid sm:grid-cols-3 gap-3">
-              <StatBox icon={TrendingUp} label="Soma Média" value={result.analysis.avgSum} />
-              <StatBox icon={BarChart3} label="Pares Médio" value={result.analysis.avgEven} />
-              <StatBox icon={Target} label="Repetição Média" value={result.analysis.avgRepeat} />
+              <StatBox icon={TrendingUp} label="Soma Média" value={formatNumber(result.analysis.avgSum)} />
+              <StatBox icon={BarChart3} label="Pares Médio" value={formatNumber(result.analysis.avgEven)} />
+              <StatBox icon={Target} label="Repetição Média" value={formatNumber(result.analysis.avgRepeat)} />
             </div>
 
             <div className="bg-muted/50 rounded-lg p-4 text-sm space-y-2">

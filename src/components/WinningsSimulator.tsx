@@ -9,6 +9,7 @@ import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { formatCurrency, formatNumber, formatPercent } from "@/utils/formatters";
 import {
   Calculator, TrendingUp, History, Sparkles, Plus, X, Trophy,
   Coins, ChartLine, Bot, User as UserIcon, AlertTriangle
@@ -89,7 +90,7 @@ function matchHits(bet: number[], draw: number[], lotteryId: string): number {
 }
 
 function fmtBRL(v: number): string {
-  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+  return formatCurrency(v);
 }
 
 export function WinningsSimulator({ lotteryId, pick, maxNumbers, draws, drawsWithPrizes }: Props) {
@@ -334,7 +335,7 @@ export function WinningsSimulator({ lotteryId, pick, maxNumbers, draws, drawsWit
               />
               <StatBox
                 label="ROI"
-                value={`${sim.roi >= 0 ? "+" : ""}${sim.roi.toFixed(1)}%`}
+                value={`${sim.roi >= 0 ? "+" : ""}${formatNumber(sim.roi)}%`}
                 tone={sim.roi >= 0 ? "positive" : "negative"}
                 icon={<TrendingUp className="w-3 h-3" />}
               />
@@ -350,7 +351,7 @@ export function WinningsSimulator({ lotteryId, pick, maxNumbers, draws, drawsWit
                 .map(([hits, info]) => (
                   <div key={hits} className="flex items-center gap-3 p-2 rounded-md bg-card border border-border/30 text-xs">
                     <Badge variant="outline" className="text-[10px]">{info.label}</Badge>
-                    <span className="text-muted-foreground">{info.count}× acertos</span>
+                    <span className="text-muted-foreground">{formatNumber(info.count)}× acertos</span>
                     <span className="ml-auto font-bold text-foreground tabular-nums">{fmtBRL(info.total)}</span>
                   </div>
                 ))}
@@ -376,9 +377,9 @@ export function WinningsSimulator({ lotteryId, pick, maxNumbers, draws, drawsWit
             <div className="space-y-3 p-4 rounded-lg border border-primary/20 bg-primary/5">
               <div className="flex items-center justify-between">
                 <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                  <ChartLine className="w-3.5 h-3.5 text-primary" /> Projeção para os próximos {futureDraws} sorteios
+                  <ChartLine className="w-3.5 h-3.5 text-primary" /> Projeção para os próximos {formatNumber(futureDraws)} sorteios
                 </h4>
-                <Badge variant="outline" className="text-[10px]">Confiança: {projection.confidence}%</Badge>
+                <Badge variant="outline" className="text-[10px]">Confiança: {formatNumber(projection.confidence)}%</Badge>
               </div>
               <Progress value={projection.confidence} className="h-1" />
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">

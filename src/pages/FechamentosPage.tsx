@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PageHeader } from "@/components/PageHeader";
 import { PlanGate } from "@/components/PlanGate";
+import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -123,7 +124,7 @@ export default function FechamentosPage() {
     if (!generatedGames || !currentMatrix) return;
     exportToPdf({
       title: `Fechamento — ${currentMatrix.name}`,
-      subtitle: `${generatedGames.length} jogos · Garantia ${currentMatrix.guarantee}+ acertos · Custo R$ ${(generatedGames.length * betPrice).toFixed(2)}`,
+      subtitle: `${formatNumber(generatedGames.length)} jogos · Garantia ${currentMatrix.guarantee}+ acertos · Custo ${formatCurrency(generatedGames.length * betPrice)}`,
       config,
       bets: generatedGames.map((g, i) => ({
         numbers: g,
@@ -216,14 +217,14 @@ export default function FechamentosPage() {
                         </span>
                         <span className="flex items-center gap-1">
                           <Coins className="w-3 h-3" />
-                          Custo: <strong className="text-accent">R$ {cost.toFixed(2)}</strong>
+                          Custo: <strong className="text-accent">{formatCurrency(cost)}</strong>
                         </span>
                       </div>
                     </div>
 
                     <div className="text-right shrink-0">
                       <div className="text-2xl font-black font-mono text-primary">
-                        {Math.round(v.coveragePercent)}%
+                        {formatNumber(Math.round(v.coveragePercent))}%
                       </div>
                       <p className="text-[10px] text-muted-foreground">cobertura</p>
                     </div>
@@ -233,8 +234,8 @@ export default function FechamentosPage() {
                   <div className="mt-3">
                     <Progress value={v.coveragePercent} className="h-1.5" />
                     <div className="flex justify-between mt-1 text-[10px] text-muted-foreground">
-                      <span>{v.coveredDraws.toLocaleString()} de {v.totalDraws.toLocaleString()} sorteios cobertos</span>
-                      <span>Pior caso: {v.worstCaseHits} acertos</span>
+                      <span>{formatNumber(v.coveredDraws)} de {formatNumber(v.totalDraws)} sorteios cobertos</span>
+                      <span>Pior caso: {formatNumber(v.worstCaseHits)} acertos</span>
                     </div>
                   </div>
                 </button>
@@ -400,7 +401,7 @@ export default function FechamentosPage() {
                   <span>
                     <Coins className="w-3 h-3 inline mr-1" />
                     Custo total: <strong className="text-accent">
-                      R$ {(generatedGames.length * betPrice).toFixed(2)}
+                      {formatCurrency(generatedGames.length * betPrice)}
                     </strong>
                   </span>
                   <span>

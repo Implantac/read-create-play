@@ -2,13 +2,10 @@ import { useState } from "react";
 import { DrawResultWithPrizes } from "@/hooks/useLotteryDraws";
 import { motion, AnimatePresence } from "framer-motion";
 import { History, ChevronDown, ChevronUp, Trophy, Users, DollarSign, TrendingUp } from "lucide-react";
+import { formatCurrency, formatNumber } from "@/utils/formatters";
 
 interface Props {
   draws: DrawResultWithPrizes[];
-}
-
-function formatCurrency(value: number): string {
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
 export function RecentDraws({ draws }: Props) {
@@ -126,7 +123,7 @@ export function RecentDraws({ draws }: Props) {
                                   <span className={`font-bold ${
                                     tier.ganhadores > 0 ? "text-primary" : "text-muted-foreground"
                                   }`}>
-                                    {tier.ganhadores.toLocaleString("pt-BR")}
+                                    {formatNumber(tier.ganhadores)}
                                   </span>
                                 </td>
                                 <td className="px-2 py-1.5 text-right font-mono">

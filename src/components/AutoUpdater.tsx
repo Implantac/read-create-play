@@ -6,16 +6,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, Wifi, WifiOff, Clock, CheckCircle2, Trophy, Users, DollarSign, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { formatCurrency, formatNumber, formatTime } from "@/utils/formatters";
 
 interface Props {
   lotteryId: string;
   onNewDraw: (draw: DrawResult) => void;
   latestConcurso: number;
   syncDraws?: (isSilent?: boolean) => Promise<{ success: boolean; result?: any; error?: string }>;
-}
-
-function formatCurrency(value: number): string {
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
 export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso, syncDraws }: Props) {
@@ -101,7 +98,7 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso, syncDraws }:
             {lastCheck && (
               <p className="text-[10px] text-muted-foreground flex items-center gap-1.5 mt-1 font-bold uppercase tracking-widest opacity-60">
                 <Clock className="w-3 h-3" />
-                Checked: {lastCheck.toLocaleTimeString("pt-BR")}
+                Checked: {formatTime(lastCheck)}
               </p>
             )}
           </div>
@@ -223,7 +220,7 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso, syncDraws }:
                             <span className={`font-bold ${
                               tier.ganhadores > 0 ? "text-primary" : "text-muted-foreground"
                             }`}>
-                              {tier.ganhadores.toLocaleString("pt-BR")}
+                              {formatNumber(tier.ganhadores)}
                             </span>
                           </td>
                           <td className="px-3 py-2 text-right font-mono">

@@ -6,6 +6,7 @@
 import type { ScoredGame, WheelingResult, SimulationResult, HistoricalAnalysis } from "../core/aiTypes";
 import { AI_POLICIES } from "../core/aiPolicies";
 import { getLotteryRules } from "../knowledge/lotteriesKnowledge";
+import { formatCurrency, formatNumber } from "../../utils/formatters";
 
 export function explainGame(game: ScoredGame, lotteryId: string): string {
   const rules = getLotteryRules(lotteryId);
@@ -32,14 +33,14 @@ export function explainGame(game: ScoredGame, lotteryId: string): string {
 export function explainWheeling(result: WheelingResult): string {
   const lines = [
     `🔒 **Fechamento Matemático**`,
-    `📋 Base: ${result.baseNumbers.length} dezenas → ${result.totalGames} jogos`,
-    `🎯 Garantia: ${result.guarantee} pontos mínimos`,
-    `💰 Custo estimado: R$ ${result.estimatedCost.toFixed(2)}`,
+    `📋 Base: ${formatNumber(result.baseNumbers.length)} dezenas → ${formatNumber(result.totalGames)} jogos`,
+    `🎯 Garantia: ${formatNumber(result.guarantee)} pontos mínimos`,
+    `💰 Custo estimado: ${formatCurrency(result.estimatedCost)}`,
     "",
     `**Validação de cobertura:**`,
-    `• Cobertura: ${result.coverageValidation.coveragePercent.toFixed(1)}%`,
-    `• Pior caso: ${result.coverageValidation.worstCase} acertos`,
-    `• Combinações testadas: ${result.coverageValidation.testedCombinations}`,
+    `• Cobertura: ${formatNumber(result.coverageValidation.coveragePercent)}%`,
+    `• Pior caso: ${formatNumber(result.coverageValidation.worstCase)} acertos`,
+    `• Combinações testadas: ${formatNumber(result.coverageValidation.testedCombinations)}`,
     "",
     result.explanation,
     "",
@@ -52,11 +53,11 @@ export function explainSimulation(result: SimulationResult, lotteryId: string): 
   const rules = getLotteryRules(lotteryId);
   const lines = [
     `🎲 **Resultado da Simulação**`,
-    `📊 ${result.totalSimulations.toLocaleString()} simulações realizadas`,
-    `📈 Média geral de acertos: ${result.avgHits.toFixed(2)}`,
+    `📊 ${formatNumber(result.totalSimulations)} simulações realizadas`,
+    `📈 Média geral de acertos: ${formatNumber(result.avgHits)}`,
     "",
     `**Melhor jogo:**`,
-    `${result.bestGame.numbers.join(" - ")} (média: ${result.bestGame.avgHits.toFixed(2)})`,
+    `${result.bestGame.numbers.join(" - ")} (média: ${formatNumber(result.bestGame.avgHits)})`,
     "",
     `**Distribuição de acertos:**`,
   ];
@@ -64,8 +65,8 @@ export function explainSimulation(result: SimulationResult, lotteryId: string): 
   const sortedHits = Object.entries(result.hitDistribution)
     .sort(([a], [b]) => Number(b) - Number(a));
   for (const [hits, count] of sortedHits) {
-    const pct = (count / result.totalSimulations * 100).toFixed(2);
-    lines.push(`• ${hits} acertos: ${count.toLocaleString()} vezes (${pct}%)`);
+    const pct = formatNumber(count / result.totalSimulations * 100);
+    lines.push(`• ${hits} acertos: ${formatNumber(count)} vezes (${pct}%)`);
   }
 
   lines.push("", `⚠️ ${AI_POLICIES.disclaimers.simulation}`);

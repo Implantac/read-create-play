@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowUpDown, ArrowUp, ArrowDown, TrendingUp, TrendingDown, Minus, Filter, TableProperties, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useTranslation } from "react-i18next";
+import { formatNumber } from "@/utils/formatters";
 
 interface Props {
   data: MatrixRow[];
@@ -253,13 +254,13 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
                     <TableCell>
                       <ScoreBar score={row.score} />
                     </TableCell>
-                    <TableCell className="text-xs font-mono">{row.freqTotal}</TableCell>
-                    <TableCell className="text-xs font-mono">{row.freqRecent30}</TableCell>
+                    <TableCell className="text-xs font-mono">{formatNumber(row.freqTotal)}</TableCell>
+                    <TableCell className="text-xs font-mono">{formatNumber(row.freqRecent30)}</TableCell>
                     <TableCell>
                       <span className={`text-xs font-mono ${
                         row.currentDelay >= row.avgDelay ? "text-red-400" : "text-muted-foreground"
                       }`}>
-                        {row.currentDelay}
+                        {formatNumber(row.currentDelay)}
                         {row.currentDelay >= row.avgDelay && (
                           <span className="text-[9px] ml-1 text-red-400/70">⚠</span>
                         )}
@@ -312,9 +313,9 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
           <div className="flex items-center gap-1 mx-2">
             <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t("common.page")}</span>
             <span className="px-3 py-1 rounded-lg bg-primary/10 border border-primary/20 text-xs font-black text-primary font-mono">
-              {currentPage + 1}
+              {formatNumber(currentPage + 1)}
             </span>
-            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t("common.of")} {totalPages}</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t("common.of")} {formatNumber(totalPages)}</span>
           </div>
 
           <Button

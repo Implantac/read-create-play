@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PlanGate } from "@/components/PlanGate";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
+import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -153,7 +154,7 @@ export default function StrategyLabPage() {
           }, ...prev].slice(0, 10));
         }
 
-        toast.success(`${res.rankings.length} estratégias testadas em ${res.elapsedMs}ms`);
+        toast.success(`${formatNumber(res.rankings.length)} estratégias testadas em ${formatNumber(res.elapsedMs)}ms`);
         setActiveTab("bestgames");
       } catch (err) {
         console.error(err);
@@ -237,7 +238,7 @@ export default function StrategyLabPage() {
       recommendations.push({ icon: "🔄", text: `${bestStrategy.strategyName} é confiável — priorize para apostas recorrentes`, priority: "high" });
     }
     if (scoreDiff > 30) {
-      recommendations.push({ icon: "⚠️", text: `Grande variação entre estratégias (${scoreDiff.toFixed(0)} pts) — foque nas top 3`, priority: "medium" });
+      recommendations.push({ icon: "⚠️", text: `Grande variação entre estratégias (${formatNumber(scoreDiff)} pts) — foque nas top 3`, priority: "medium" });
     }
     if (consistentCount < result.rankings.length * 0.3) {
       recommendations.push({ icon: "📊", text: "Poucas estratégias consistentes — aumente o volume de jogos para estabilizar", priority: "medium" });
@@ -275,16 +276,16 @@ export default function StrategyLabPage() {
                 <>
                   <Badge variant="secondary" className="text-xs gap-1.5 py-1.5 px-3">
                     <Activity className="w-3 h-3" />
-                    {result.rankings.length} testadas
+                    {formatNumber(result.rankings.length)} testadas
                   </Badge>
                   <Badge className="text-xs gap-1.5 py-1.5 px-3 bg-primary/10 text-primary border-primary/20">
                     <Dices className="w-3 h-3" />
-                    {totalGamesGenerated} jogos
+                    {formatNumber(totalGamesGenerated)} jogos
                   </Badge>
                   {bestGamesCount > 0 && (
                     <Badge className="text-xs gap-1.5 py-1.5 px-3 bg-green-500/10 text-green-500 border-green-500/20">
                       <Star className="w-3 h-3" />
-                      {bestGamesCount} nota A+
+                      {formatNumber(bestGamesCount)} nota A+
                     </Badge>
                   )}
                 </>
@@ -319,10 +320,10 @@ export default function StrategyLabPage() {
                       </div>
                     </div>
                     <div className="grid grid-cols-4 gap-3 md:gap-4">
-                      <MetricBox label="Score" value={result.bestStrategy.metrics.globalScore.toFixed(1)} accent />
-                      <MetricBox label="Média" value={result.bestStrategy.metrics.avgHits.toFixed(2)} />
-                      <MetricBox label="Melhor" value={`${result.bestStrategy.metrics.bestHits}/${config.pick}`} />
-                      <MetricBox label="Consist." value={`${(result.bestStrategy.metrics.consistency * 100).toFixed(0)}%`} />
+                      <MetricBox label="Score" value={formatNumber(result.bestStrategy.metrics.globalScore)} accent />
+                      <MetricBox label="Média" value={formatNumber(result.bestStrategy.metrics.avgHits)} />
+                      <MetricBox label="Melhor" value={`${formatNumber(result.bestStrategy.metrics.bestHits)}/${formatNumber(config.pick)}`} />
+                      <MetricBox label="Consist." value={`${formatNumber(Math.round(result.bestStrategy.metrics.consistency * 100))}%`} />
                     </div>
                   </div>
                 </CardContent>
@@ -344,7 +345,7 @@ export default function StrategyLabPage() {
                   <div className="flex items-center gap-2">
                     {!configOpen && selectedStrategies.length > 0 && (
                       <span className="text-[10px] text-muted-foreground">
-                        {selectedStrategies.length} estratégias • {gamesPerStrategy} jogos • {PROFILE_INFO[profile].label}
+                        {formatNumber(selectedStrategies.length)} estratégias • {formatNumber(gamesPerStrategy)} jogos • {PROFILE_INFO[profile].label}
                       </span>
                     )}
                     <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${configOpen ? "rotate-180" : ""}`} />

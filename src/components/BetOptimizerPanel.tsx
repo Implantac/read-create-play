@@ -10,6 +10,7 @@ import { runCombinatorialOptimization, OptimizationResult } from "@/engine/math/
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Gem, Shield, AlertTriangle, CheckCircle2, Cpu } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { formatNumber } from "@/utils/formatters";
 
 interface Props {
   stats: NumberStats[];
@@ -181,7 +182,7 @@ export function BetOptimizerPanel({ stats, config, draws }: Props) {
               className="space-y-4"
             >
               <div className="text-xs text-muted-foreground">
-                {optResult.iterations.toLocaleString()} gerações em {optResult.elapsedMs}ms
+                {formatNumber(optResult.iterations)} gerações em {formatNumber(optResult.elapsedMs)}ms
               </div>
 
               {/* Best bet */}
@@ -191,7 +192,7 @@ export function BetOptimizerPanel({ stats, config, draws }: Props) {
                   <span className={`text-lg font-black font-mono ${GRADE_COLORS[optResult.best.quality.grade]}`}>
                     {optResult.best.quality.grade}
                   </span>
-                  <span className="text-sm font-mono text-foreground">{optResult.best.quality.overall}/100</span>
+                  <span className="text-sm font-mono text-foreground">{formatNumber(optResult.best.quality.overall)}/100</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5 mb-2">
                   {optResult.best.numbers.map(n => (
