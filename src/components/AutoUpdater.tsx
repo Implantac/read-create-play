@@ -11,22 +11,41 @@ interface Props {
   lotteryId: string;
   onNewDraw: (draw: DrawResult) => void;
   latestConcurso: number;
+  syncDraws?: (isSilent?: boolean) => Promise<{ success: boolean; result?: any; error?: string }>;
 }
 
 function formatCurrency(value: number): string {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso }: Props) {
+export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso, syncDraws }: Props) {
   const [loading, setLoading] = useState(false);
   const [lastCheck, setLastCheck] = useState<Date | null>(null);
   const [isOnline, setIsOnline] = useState(true);
-  const [autoEnabled, setAutoEnabled] = useState(false);
+  const [autoEnabled, setAutoEnabled] = useState(true);
   const [latestFromApi, setLatestFromApi] = useState<LatestDrawResult | null>(null);
 
   const checkForUpdates = useCallback(async () => {
     setLoading(true);
     try {
+      // First check with the database sync if available
+      if (syncDraws) {
+        const syncResult = await syncDraws(true);
+        if (syncResult.success) {
+          setLastCheck(new Date());
+          setIsOnline(true);
+          
+          if (syncResult.result?.inserted > 0) {
+            // Data was already updated and onNewDraw will be triggered by the context update
+            // but we can also fetch the latest result here for the UI
+          }
+        } else {
+          setIsOnline(false);
+          // Don't show toast error here as syncDraws might have already shown one or we want it silent
+        }
+      }
+
+      // Always fetch latest for the UI display regardless of sync success
       const result = await fetchLatestDraw(lotteryId);
       setLastCheck(new Date());
 
@@ -35,21 +54,22 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso }: Props) {
         if (result.concurso > latestConcurso) {
           onNewDraw(result);
           toast.success(`Novo resultado! Concurso #${result.concurso}`);
-        } else {
+        } else if (!syncDraws) {
           toast.info("Nenhum resultado novo disponível");
         }
         setIsOnline(true);
-      } else {
+      } else if (!syncDraws) {
         setIsOnline(false);
         toast.error("Não foi possível conectar à API da Caixa");
       }
-    } catch {
+    } catch (e) {
+      console.error("Check for updates error:", e);
       setIsOnline(false);
-      toast.error("Erro ao buscar resultados");
+      if (!syncDraws) toast.error("Erro ao buscar resultados");
     } finally {
       setLoading(false);
     }
-  }, [lotteryId, latestConcurso, onNewDraw]);
+  }, [lotteryId, latestConcurso, onNewDraw, syncDraws]);
 
   // Auto-fetch on mount and when lottery changes
   useEffect(() => {

@@ -66,7 +66,7 @@ export function AppLayout() {
                     <Button
                       size="icon"
                       variant="ghost"
-                      onClick={syncDraws}
+                      onClick={() => syncDraws()}
                       disabled={syncing}
                       className="h-8 w-8 text-muted-foreground hover:text-primary transition-colors"
                     >

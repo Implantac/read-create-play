@@ -19,7 +19,7 @@ import { TitanCommandCenter } from "@/components/TitanCommandCenter";
 import { TechnicalIndicators } from "@/components/TechnicalIndicators";
 import { AlphaMomentumSignal } from "@/components/AlphaMomentumSignal";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, Search, ActivitySquare, ShieldCheck, Activity as LucideActivity } from "lucide-react";
+import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, RefreshCw, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, Search, ActivitySquare, ShieldCheck, Activity as LucideActivity } from "lucide-react";
 
 // FIX: ensure Activity symbol is never referenced globally in runtime.
 const Activity = LucideActivity;
@@ -95,7 +95,7 @@ const quickLinks = [
 
 const DashboardPage = () => {
   useHideLovableBadge();
-  const { config, draws, drawsWithPrizes, loading, syncing, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery, hotNumbers, coldNumbers } = useLotteryContext();
+  const { config, draws, drawsWithPrizes, loading, syncing, lastSyncAt, syncError, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery, hotNumbers, coldNumbers } = useLotteryContext();
   const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
   const { currentPlan } = usePlanAccess();
   const { profile, trialDaysLeft, isTrialExpired, isAdmin, isSuperAdmin } = useAuth();
@@ -164,6 +164,36 @@ const DashboardPage = () => {
       />
       
       <LotteryContextBanner />
+
+      <AnimatePresence>
+        {syncError && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 mb-6 flex items-center justify-between gap-4"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-destructive/20 flex items-center justify-center">
+                <ShieldCheck className="w-5 h-5 text-destructive" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-destructive">Falha na Sincronização Automática</p>
+                <p className="text-xs text-destructive/80">{syncError}</p>
+              </div>
+            </div>
+            <Button 
+              size="sm" 
+              variant="destructive" 
+              onClick={() => syncDraws()}
+              className="gap-2"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              Tentar Novamente
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {draws.length > 0 && (
         <div className="grid xl:grid-cols-[1.1fr_0.9fr] gap-6">
@@ -311,7 +341,7 @@ const DashboardPage = () => {
 
       {draws.length > 0 && (
         <>
-          <AutoUpdater lotteryId={selectedLottery} onNewDraw={handleNewDraw} latestConcurso={draws[0]?.concurso || 0} />
+          <AutoUpdater lotteryId={selectedLottery} onNewDraw={handleNewDraw} latestConcurso={draws[0]?.concurso || 0} syncDraws={syncDraws} />
 
           {/* 🍀 GERAR JOGO DA SORTE */}
           <motion.div variants={item} className="relative">

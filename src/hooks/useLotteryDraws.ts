@@ -15,6 +15,8 @@ export function useLotteryDraws(lotteryId: string) {
   const [drawsWithPrizes, setDrawsWithPrizes] = useState<DrawResultWithPrizes[]>([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const [lastSyncAt, setLastSyncAt] = useState<Date | null>(null);
+  const [syncError, setSyncError] = useState<string | null>(null);
   const [count, setCount] = useState(0);
 
   const fetchDraws = useCallback(async (limitCount = 2000) => {
@@ -32,25 +34,33 @@ export function useLotteryDraws(lotteryId: string) {
     }
   }, [lotteryId]);
 
-  const syncDraws = useCallback(async () => {
+  const syncDraws = useCallback(async (isSilent = false) => {
     setSyncing(true);
+    setSyncError(null);
     try {
       const data = await LotteryService.syncLottery(lotteryId);
       const result = data?.results?.[0];
+      setLastSyncAt(new Date());
+      
       if (result) {
         if (result.inserted > 0) {
-          toast.success(`${result.inserted} novos concursos importados para ${lotteryId}`);
+          if (!isSilent) toast.success(`${result.inserted} novos concursos importados para ${lotteryId}`);
         } else {
-          toast.info("Banco de dados já está atualizado");
+          if (!isSilent) toast.info("Banco de dados já está atualizado");
         }
         if (result.errors > 0) {
-          toast.warning(`${result.errors} erros durante a importação`);
+          console.warn(`${result.errors} erros durante a importação para ${lotteryId}`);
+          if (!isSilent) toast.warning(`${result.errors} erros durante a importação`);
         }
       }
       await fetchDraws();
+      return { success: true, result };
     } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : "Erro desconhecido";
       console.error("Sync error:", e);
-      toast.error("Erro ao sincronizar: " + (e instanceof Error ? e.message : "Erro desconhecido"));
+      setSyncError(errorMessage);
+      if (!isSilent) toast.error("Erro ao sincronizar: " + errorMessage);
+      return { success: false, error: errorMessage };
     } finally {
       setSyncing(false);
     }
@@ -100,6 +110,8 @@ export function useLotteryDraws(lotteryId: string) {
     drawsWithPrizes,
     loading,
     syncing,
+    lastSyncAt,
+    syncError,
     count,
     syncDraws,
     syncAllLotteries,

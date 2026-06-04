@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 interface Props {
   title?: string;
   description?: string;
-  onImport?: () => void;
+  onImport?: (isSilent?: boolean) => void;
   onImportAll?: () => void;
   lotteryName?: string;
   syncing?: boolean;
@@ -29,7 +29,7 @@ export function EmptyState({ title = "Banco de dados vazio", description, onImpo
       </div>
       {onImport && (
         <div className="flex gap-2 justify-center pt-2">
-          <Button onClick={onImport} disabled={syncing} className="gap-2 gradient-brand text-primary-foreground shadow-lg shadow-primary/20">
+          <Button onClick={() => onImport()} disabled={syncing} className="gap-2 gradient-brand text-primary-foreground shadow-lg shadow-primary/20">
             {syncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Database className="w-4 h-4" />}
             Importar {lotteryName}
           </Button>

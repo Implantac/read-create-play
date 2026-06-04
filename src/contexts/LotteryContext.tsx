@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useMemo, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useMemo, useCallback, ReactNode, useEffect } from "react";
 import { LOTTERIES, DrawResult } from "@/data/lotteries";
 import { computeFrequencyStats, computeSumDistribution, NumberStats } from "@/engine/stats/statistics";
 import { useLotteryDraws, DrawResultWithPrizes } from "@/hooks/useLotteryDraws";
@@ -12,8 +12,10 @@ interface LotteryContextType {
   drawsWithPrizes: DrawResultWithPrizes[];
   loading: boolean;
   syncing: boolean;
+  lastSyncAt: Date | null;
+  syncError: string | null;
   count: number;
-  syncDraws: () => void;
+  syncDraws: (isSilent?: boolean) => Promise<{ success: boolean; result?: any; error?: string }>;
   syncAllLotteries: () => void;
   addDraw: (draw: DrawResult) => void;
   stats: NumberStats[];
@@ -27,8 +29,21 @@ const LotteryContext = createContext<LotteryContextType | null>(null);
 export function LotteryProvider({ children }: { children: ReactNode }) {
   const [selectedLottery, setSelectedLottery] = useState("megasena");
   const config = LOTTERIES.find(l => l.id === selectedLottery)!;
-  const { draws, drawsWithPrizes, loading, syncing, count, syncDraws, syncAllLotteries, addDraw } = useLotteryDraws(selectedLottery);
+  const { draws, drawsWithPrizes, loading, syncing, lastSyncAt, syncError, count, syncDraws, syncAllLotteries, addDraw } = useLotteryDraws(selectedLottery);
   
+  // Implement periodic sync (every 10 minutes)
+  useEffect(() => {
+    // Only auto-sync if we have data and it's not the first load
+    if (draws.length === 0 || loading) return;
+
+    const intervalId = setInterval(() => {
+      console.log(`[AutoSync] Triggering background sync for ${selectedLottery}`);
+      syncDraws(true);
+    }, 10 * 60 * 1000); // 10 minutes
+
+    return () => clearInterval(intervalId);
+  }, [selectedLottery, syncDraws, draws.length, loading]);
+
   const { stats, sumData, hotNumbers, coldNumbers } = useLotteryStats(draws, config);
 
   return (
@@ -40,8 +55,11 @@ export function LotteryProvider({ children }: { children: ReactNode }) {
       drawsWithPrizes, 
       loading, 
       syncing, 
+      lastSyncAt,
+      syncError,
       count, 
       syncDraws, 
+
       syncAllLotteries, 
       addDraw, 
       stats, 
