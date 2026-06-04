@@ -184,7 +184,7 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
             <span className="ml-1.5 opacity-60">[{f.count}]</span>
           </Button>
         ))}
-        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-auto opacity-40 italic">{filtered.length} Ativos Encontrados</span>
+        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-auto opacity-40 italic">{t("matrix.active_found", { count: filtered.length })}</span>
       </div>
 
 
