@@ -77,14 +77,18 @@ const resources = {
         },
         "faq": {
           "title": "Dúvidas sobre o Titan Loterias",
-          "q1": "Como a IA ajuda nas apostas?",
-          "a1": "Nossa IA analisa padrões históricos complexos que o olho humano não consegue detectar, identificando tendências e probabilidades estatísticas.",
-          "q2": "O acesso vitalício é realmente único?",
-          "a2": "Sim, você paga uma única vez e tem acesso a todas as atualizações futuras e novas ferramentas sem mensalidades.",
-          "q3": "Quais loterias são suportadas?",
-          "a3": "Suportamos as principais loterias da Caixa, incluindo Mega-Sena, Lotofácil, Quina, e muito mais.",
-          "q4": "É garantido que vou ganhar?",
-          "a4": "Não. Loterias são jogos de azar. Nossa ferramenta aumenta suas probabilidades matemáticas e estatísticas, mas não garante prêmios."
+          "q1": "O Titan Loterias funciona para Mega-Sena e Lotofácil?",
+          "a1": "Sim! Nossa plataforma oferece análise estatística completa para as principais loterias da Caixa, incluindo Mega-Sena, Lotofácil, Quina, Lotomania e muito mais.",
+          "q2": "Como a Inteligência Artificial melhora minhas chances?",
+          "a2": "Nossa IA processa milhares de sorteios históricos para identificar padrões e tendências que algoritmos comuns ignoram, otimizando seu gerador de apostas com base em dados reais.",
+          "q3": "O que é o simulador de resultados e backtest?",
+          "a3": "O simulador permite que você teste sua estratégia contra resultados passados (backtest). Assim, você descobre se sua combinação teria ganho prêmios em sorteios anteriores da Lotofácil ou Mega-Sena.",
+          "q4": "O acesso vitalício inclui atualizações?",
+          "a4": "Com certeza. Ao adquirir o acesso vitalício, você garante todas as futuras ferramentas de análise, novos algoritmos de IA e atualizações de segurança sem pagar mensalidades.",
+          "q5": "A plataforma é atualizada com resultados oficiais?",
+          "a5": "Sim, sincronizamos nossos dados diretamente com os resultados oficiais da Caixa Econômica Federal em tempo real, garantindo precisão total nas estatísticas.",
+          "q6": "O gerador de apostas garante o prêmio acumulado?",
+          "a6": "Não. Loterias envolvem sorte. O Titan Loterias é uma ferramenta de apoio que utiliza matemática e estatística para aumentar suas probabilidades, mas não prometemos ganhos garantidos."
         },
         "how_it_works": {
           "title": "Como Funciona o Titan Loterias",
