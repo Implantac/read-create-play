@@ -427,131 +427,42 @@ export default function AdminPage() {
               ) : (
                 <div className="overflow-x-auto">
                   <Table>
+                  <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Nome</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Papel</TableHead>
+                        <TableHead>Usuário</TableHead>
                         <TableHead>Plano</TableHead>
+                        <TableHead>Papel</TableHead>
                         <TableHead>Status</TableHead>
-                        <TableHead>Cadastro</TableHead>
-                        <TableHead>Ações</TableHead>
+                        <TableHead className="text-right">Ações</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filtered.map(p => {
-                        const role = getUserRole(p.id);
-                        const isSelf = p.id === user?.id;
-                        const isFullAccess = isFullAccessEmail(p.email);
-                        const displayPlan = isFullAccess ? "lifetime" : p.plan;
-                        const displayBlocked = isFullAccess ? false : p.blocked;
-                        return (
-                          <TableRow key={p.id} className={displayBlocked ? "opacity-60" : ""}>
-                            <TableCell className="font-medium text-foreground">
-                              <div className="flex items-center gap-1.5">
-                                {p.full_name || "—"}
-                                {isSelf && <Badge variant="outline" className="text-[9px] px-1 py-0">Você</Badge>}
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-muted-foreground text-sm">
-                              {p.email || "—"}
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline" className={`text-[10px] ${ROLE_COLORS[role] || ROLE_COLORS.user}`}>
-                                {ROLE_LABELS[role] || role}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Badge className={PLAN_COLORS[displayPlan] || ""}>
-                                {PLAN_LABELS[displayPlan] || displayPlan}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              {displayBlocked ? (
-                                <Badge variant="destructive" className="gap-1">
-                                  <Ban className="w-3 h-3" /> Bloqueado
-                                </Badge>
-                              ) : (
-                                <Badge variant="outline" className="gap-1 text-green-500 border-green-500/30">
-                                  <CheckCircle2 className="w-3 h-3" /> Ativo
-                                </Badge>
-                              )}
-                            </TableCell>
-                            <TableCell className="text-muted-foreground text-sm font-mono">
-                              {new Date(p.created_at).toLocaleDateString("pt-BR")}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                {/* Role selector - only super_admin can change roles */}
-                                {isSuperAdmin && (
-                                  <Select
-                                    value={role}
-                                    onValueChange={(v) => updateRole(p.id, v)}
-                                    disabled={updating === p.id || isFullAccess}
-                                  >
-                                    <SelectTrigger className="w-[130px] h-8 text-xs">
-                                      {updating === p.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <SelectValue />}
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="super_admin">Super Admin</SelectItem>
-                                      <SelectItem value="admin">Admin</SelectItem>
-                                      <SelectItem value="moderator">Moderador</SelectItem>
-                                      <SelectItem value="user">Usuário</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                )}
-                                {/* Plan selector */}
-                                <Select
-                                  value={displayPlan}
-                                  onValueChange={(v) => updatePlan(p.id, v)}
-                                  disabled={updating === p.id || isFullAccess}
-                                >
-                                  <SelectTrigger className="w-[130px] h-8 text-xs">
-                                    {updating === p.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <SelectValue />}
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="free">Gratuito</SelectItem>
-                                    <SelectItem value="premium">Premium</SelectItem>
-                                    <SelectItem value="professional">Profissional</SelectItem>
-                                    <SelectItem value="lifetime">Vitalício</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                {/* Block/unblock */}
-                                <Button
-                                  variant={displayBlocked ? "outline" : "destructive"}
-                                  size="sm"
-                                  className="h-8 text-xs gap-1"
-                                  onClick={() => toggleBlock(p.id, displayBlocked)}
-                                  disabled={updating === p.id || role === "super_admin" || isFullAccess}
-                                >
-                                  {displayBlocked ? (
-                                    <><CheckCircle2 className="w-3 h-3" /> Desbloquear</>
-                                  ) : (
-                                    <><Ban className="w-3 h-3" /> Bloquear</>
-                                  )}
-                                </Button>
-                                {/* Detail */}
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-8 w-8 p-0"
-                                  onClick={() => setDetailUser(p)}
-                                >
-                                  <Eye className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
+                      {filtered.map(p => (
+                        <UserRow
+                          key={p.id}
+                          profile={p}
+                          role={getUserRole(p.id)}
+                          isUpdating={updating === p.id}
+                          onUpdatePlan={updatePlan}
+                          onUpdateRole={updateRole}
+                          onToggleBlock={toggleBlock}
+                          onViewDetails={setDetailUser}
+                          planLabels={PLAN_LABELS}
+                          planColors={PLAN_COLORS}
+                          roleLabels={ROLE_LABELS}
+                          roleColors={ROLE_COLORS}
+                        />
+                      ))}
                       {filtered.length === 0 && (
                         <TableRow>
-                          <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                          <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                             Nenhum usuário encontrado.
                           </TableCell>
                         </TableRow>
                       )}
                     </TableBody>
+                  </Table>
                   </Table>
                 </div>
               )}
