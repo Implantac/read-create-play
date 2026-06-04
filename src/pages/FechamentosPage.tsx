@@ -200,28 +200,33 @@ const FechamentosPage = () => {
           )}
 
           {step === 2 && currentMatrix && (
-            <Card className="glass-panel border-primary/20 p-8 space-y-8">
-              <div className="text-center space-y-2">
-                <h3 className="text-xl font-black uppercase tracking-tighter">Selecione {currentMatrix.baseSize} Dezenas</h3>
-                <p className="text-muted-foreground">Atualmente você selecionou {baseNumbers.length} de {currentMatrix.baseSize}.</p>
+            <div className="space-y-10">
+              <div className="text-center space-y-3">
+                <h3 className="text-2xl font-black uppercase tracking-tighter italic">Seleção de <span className="gradient-brand-text">Dataset Alpha</span></h3>
+                <p className="text-sm text-muted-foreground font-medium italic opacity-60">Selecione <span className="text-primary font-black">{currentMatrix.baseSize}</span> dezenas para o deploy da matriz.</p>
               </div>
 
-              <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
-                {Array.from({ length: config.numbers }, (_, i) => i + 1).map((n) => {
-                  const isSelected = baseNumbers.includes(n);
-                  return (
-                    <button
-                      key={n}
-                      onClick={() => toggleNumber(n)}
-                      className={`h-10 w-10 rounded-lg flex items-center justify-center font-bold text-sm transition-all ${
-                        isSelected ? "bg-primary text-primary-foreground shadow-lg" : "bg-muted hover:bg-muted/80 text-muted-foreground"
-                      }`}
-                    >
-                      {String(n).padStart(2, '0')}
-                    </button>
-                  );
-                })}
-              </div>
+              <Card className="glass-card border-primary/20 p-10 rounded-[2.5rem] relative overflow-hidden shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent pointer-events-none" />
+                
+                <div className="flex flex-wrap justify-center gap-2.5 relative z-10 max-w-4xl mx-auto">
+                  {Array.from({ length: config.numbers }, (_, i) => i + 1).map((n) => {
+                    const isSelected = baseNumbers.includes(n);
+                    return (
+                      <button
+                        key={n}
+                        onClick={() => toggleNumber(n)}
+                        className={`h-11 w-11 rounded-xl flex items-center justify-center font-black font-mono text-sm transition-all duration-300 border italic active:scale-90 ${
+                          isSelected 
+                            ? "bg-primary text-primary-foreground border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)] scale-110 z-10" 
+                            : "bg-background/60 hover:bg-muted/80 text-muted-foreground border-white/5 opacity-60 hover:opacity-100"
+                        }`}
+                      >
+                        {String(n).padStart(2, '0')}
+                      </button>
+                    );
+                  })}
+                </div>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6 border-t border-border/20">
                 <Button variant="outline" onClick={autoSelectNumbers} className="rounded-xl px-8 font-bold gap-2">
