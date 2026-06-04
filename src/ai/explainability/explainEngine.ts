@@ -57,7 +57,7 @@ export function explainSimulation(result: SimulationResult, lotteryId: string): 
     `📈 Média geral de acertos: ${formatNumber(result.avgHits)}`,
     "",
     `**Melhor jogo:**`,
-    `${result.bestGame.numbers.join(" - ")} (média: ${result.bestGame.avgHits.toFixed(2)})`,
+    `${result.bestGame.numbers.join(" - ")} (média: ${formatNumber(result.bestGame.avgHits)})`,
     "",
     `**Distribuição de acertos:**`,
   ];
