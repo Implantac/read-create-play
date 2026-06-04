@@ -99,7 +99,7 @@ export default function AdminPage() {
 
   const getUserRole = (userId: string): string => {
     const profile = profiles.find(p => p.id === userId);
-    if (isFullAccessProfile(profile)) return "super_admin";
+    if (isFullAccessEmail(profile?.email)) return "super_admin";
     const r = roles.find(r => r.user_id === userId);
     return r?.role || "user";
   };
@@ -442,7 +442,7 @@ export default function AdminPage() {
                       {filtered.map(p => {
                         const role = getUserRole(p.id);
                         const isSelf = p.id === user?.id;
-                        const isFullAccess = isFullAccessProfile(p);
+                        const isFullAccess = isFullAccessEmail(p.email);
                         const displayPlan = isFullAccess ? "lifetime" : p.plan;
                         const displayBlocked = isFullAccess ? false : p.blocked;
                         return (
