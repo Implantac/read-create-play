@@ -9,10 +9,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Brain, Sparkles, Trophy, Target, Lightbulb, BarChart3, Zap } from "lucide-react";
+import { Brain, Sparkles, Trophy, Target, Lightbulb, BarChart3, Zap, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { BetCard } from "@/components/lottery/BetCard";
+import { AIAnalystBriefing } from "@/components/lottery/AIAnalystBriefing";
 import { useLotteryContext } from "@/contexts/LotteryContext";
+import { m, AnimatePresence } from "framer-motion";
+
 
 interface Props {
   stats: NumberStats[];
@@ -28,6 +31,8 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
   const [totalBets, setTotalBets] = useState(300);
   const [topResults, setTopResults] = useState(20);
   const [simulateHistory, setSimulateHistory] = useState(true);
+  const [expandedBet, setExpandedBet] = useState<number | null>(null);
+
 
   const handleGenerate = () => {
     setIsGenerating(true);
@@ -77,19 +82,42 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
         {bets.length > 0 && (
           <div className="grid gap-4">
             {bets.map((bet) => (
-              <BetCard
-                key={bet.rank}
-                rank={bet.rank}
-                numbers={bet.numbers}
-                score={bet.score}
-                grade={bet.quality.grade}
-                strategyLabel={bet.strategyLabel}
-                insights={bet.analysis.insights}
-                hotNumbers={hotNumbers}
-                coldNumbers={coldNumbers}
-                onSave={onSaveBet ? () => onSaveBet(bet.numbers, `IA-${bet.strategyLabel}`, bet.score, bet.quality.grade) : undefined}
-              />
+              <div key={bet.rank} className="space-y-2">
+                <div onClick={() => setExpandedBet(expandedBet === bet.rank ? null : (bet.rank ?? null))} className="cursor-pointer relative">
+                  <BetCard
+                    rank={bet.rank}
+                    numbers={bet.numbers}
+                    score={bet.score}
+                    grade={bet.quality.grade}
+                    strategyLabel={bet.strategyLabel}
+                    insights={bet.analysis.insights.slice(0, 2)}
+                    hotNumbers={hotNumbers}
+                    coldNumbers={coldNumbers}
+                    onSave={onSaveBet ? () => onSaveBet(bet.numbers, `IA-${bet.strategyLabel}`, bet.score, bet.quality.grade) : undefined}
+                  />
+                  <div className="absolute top-4 right-4 text-muted-foreground opacity-40">
+                    {expandedBet === bet.rank ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </div>
+                </div>
+                
+                <AnimatePresence>
+                  {expandedBet === bet.rank && (
+                    <m.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <AIAnalystBriefing 
+                        confidence={Math.round(bet.score * 0.95 + 5)} 
+                        reasons={bet.analysis.insights} 
+                      />
+                    </m.div>
+                  )}
+                </AnimatePresence>
+              </div>
             ))}
+
           </div>
         )}
       </CardContent>
