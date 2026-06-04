@@ -118,15 +118,15 @@ export function AppLayout() {
                 {/* User menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="gap-3 hover:bg-primary/5 px-2 rounded-xl transition-all border border-transparent hover:border-primary/20">
-                      <div className="w-9 h-9 rounded-xl gradient-brand flex items-center justify-center shadow-lg shadow-primary/20 border border-white/10 group-hover:scale-105 transition-all">
+                    <Button variant="ghost" size="sm" className="gap-2.5 hover:bg-primary/5 px-1.5 md:px-3 rounded-xl transition-all border border-transparent hover:border-primary/20 active:scale-[0.98]">
+                      <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl gradient-brand flex items-center justify-center shadow-lg shadow-primary/20 border border-white/10 transition-all">
                         <User className="w-4 h-4 text-primary-foreground" />
                       </div>
                       <div className="hidden md:flex flex-col items-start text-left shrink-0">
-                        <span className="text-xs font-black text-foreground tracking-tight uppercase italic">
+                        <span className="text-xs font-black text-foreground tracking-tight uppercase italic leading-none">
                           {profile?.full_name || user?.email?.split("@")[0] || "Usuário"}
                         </span>
-                        <span className="text-[9px] text-muted-foreground font-bold tracking-widest uppercase opacity-60">ID Session • Connected</span>
+                        <span className="text-[8px] text-muted-foreground font-black tracking-widest uppercase opacity-60 mt-1">Status • Online</span>
                       </div>
                     </Button>
                   </DropdownMenuTrigger>
