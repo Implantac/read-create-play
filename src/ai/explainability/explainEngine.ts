@@ -6,6 +6,7 @@
 import type { ScoredGame, WheelingResult, SimulationResult, HistoricalAnalysis } from "../core/aiTypes";
 import { AI_POLICIES } from "../core/aiPolicies";
 import { getLotteryRules } from "../knowledge/lotteriesKnowledge";
+import { formatCurrency, formatNumber } from "../../utils/formatters";
 
 export function explainGame(game: ScoredGame, lotteryId: string): string {
   const rules = getLotteryRules(lotteryId);
