@@ -59,9 +59,9 @@ export function StrategyBriefingPanel({ config, stats, draws, compact = false }:
         </div>
       </CardHeader>
 
-
-      <CardContent className="space-y-5">
-        <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+      <CardContent className="space-y-6 relative">
+        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="space-y-5">
             <div className="p-4 rounded-2xl bg-secondary/20 border border-border/40 group/headline transition-all hover:border-primary/20">
               <p className="text-xl font-black text-foreground tracking-tight italic group-hover:text-primary transition-colors">{briefing.headline}</p>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed font-medium">{briefing.summary}</p>
@@ -96,18 +96,17 @@ export function StrategyBriefingPanel({ config, stats, draws, compact = false }:
             <p className="mb-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-60">
               Mix Recomendado
             </p>
-
-            <div className="space-y-3">
+            <div className="space-y-4">
               {briefing.strategyMix.map((item) => (
-                <div key={item.label} className="space-y-1.5">
+                <div key={item.label} className="space-y-2">
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-xs font-medium text-foreground">{item.label}</span>
-                    <span className="text-xs font-mono text-primary">{item.weight}%</span>
+                    <span className="text-[11px] font-black uppercase tracking-wider text-foreground">{item.label}</span>
+                    <span className="text-[11px] font-black font-mono text-primary">{item.weight}%</span>
                   </div>
-                  <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                    <div className="h-full rounded-full bg-primary" style={{ width: `${item.weight}%` }} />
+                  <div className="h-2 rounded-full bg-muted overflow-hidden border border-border/40">
+                    <div className="h-full rounded-full bg-primary shadow-[0_0_10px_rgba(var(--primary),0.3)] transition-all duration-1000" style={{ width: `${item.weight}%` }} />
                   </div>
-                  {!compact && <p className="text-[10px] text-muted-foreground leading-relaxed">{item.reason}</p>}
+                  {!compact && <p className="text-[10px] text-muted-foreground leading-relaxed font-medium">{item.reason}</p>}
                 </div>
               ))}
             </div>
@@ -115,15 +114,16 @@ export function StrategyBriefingPanel({ config, stats, draws, compact = false }:
         </div>
 
         {!compact && (
-          <div className="rounded-lg border border-primary/15 bg-primary/[0.04] p-4">
-            <p className="mb-2 text-xs font-bold uppercase tracking-widest text-primary">Plano de execucao</p>
-            <div className="grid gap-2 md:grid-cols-3">
+          <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(var(--primary),0.05),transparent)] pointer-events-none" />
+            <p className="mb-4 text-[10px] font-black uppercase tracking-[0.2em] text-primary relative">Plano de Execução Neural</p>
+            <div className="grid gap-4 md:grid-cols-3 relative">
               {briefing.operatingPlan.map((step, index) => (
-                <div key={step} className="flex gap-2 text-xs text-muted-foreground leading-relaxed">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-primary/10 text-[10px] font-bold text-primary">
+                <div key={step} className="flex gap-3 text-xs text-muted-foreground leading-relaxed font-medium group/step">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-primary/10 border border-primary/20 text-[10px] font-black text-primary transition-all group-hover/step:scale-110">
                     {index + 1}
                   </span>
-                  <span>{step}</span>
+                  <span className="group-hover/step:text-foreground transition-colors">{step}</span>
                 </div>
               ))}
             </div>
@@ -150,7 +150,6 @@ export function StrategyBriefingPanel({ config, stats, draws, compact = false }:
             </Button>
           </div>
         </div>
-
       </CardContent>
     </Card>
   );
