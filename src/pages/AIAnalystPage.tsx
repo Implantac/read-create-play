@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
+import { formatCurrency, formatNumber, formatPercent } from "@/utils/formatters";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PlanGate } from "@/components/PlanGate";
 import { PageHeader } from "@/components/PageHeader";
