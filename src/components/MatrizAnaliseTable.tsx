@@ -337,6 +337,3 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
     </div>
   );
 });
-    </div>
-  );
-});
