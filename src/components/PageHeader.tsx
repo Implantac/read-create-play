@@ -14,31 +14,35 @@ export function PageHeader({ title, description, icon: Icon, badge, children }: 
     <motion.div
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
-      className="flex flex-col sm:flex-row sm:items-center justify-between gap-8 mb-12 pb-10 border-b border-border/40 relative z-20 group/header"
+      className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 pb-10 border-b border-border/40 relative z-20 group/header"
     >
-      <div className="absolute -bottom-px left-0 w-64 h-0.5 bg-gradient-to-r from-primary via-primary/50 to-transparent" />
+      <div className="absolute -bottom-px left-0 w-80 h-0.5 bg-gradient-to-r from-primary via-primary/50 to-transparent" />
       <div className="absolute -bottom-px left-0 w-full h-px bg-border/20" />
       
-      <div className="flex items-center gap-6">
-        <div className="w-16 h-16 rounded-[2rem] bg-gradient-to-br from-primary/20 via-primary/10 to-transparent border border-primary/30 flex items-center justify-center shrink-0 shadow-2xl shadow-primary/10 group-hover/header:rotate-12 transition-all duration-700 relative overflow-hidden active:scale-95">
+      <div className="flex items-center gap-8">
+        <div className="w-20 h-20 rounded-[2.5rem] bg-gradient-to-br from-primary/20 via-primary/10 to-transparent border border-primary/30 flex items-center justify-center shrink-0 shadow-premium shadow-primary/10 group-hover/header:rotate-12 transition-all duration-700 relative overflow-hidden active:scale-95">
           <div className="absolute inset-0 bg-primary/5 group-hover/header:bg-primary/20 transition-colors" />
-          <Icon className="w-8 h-8 text-primary group-hover/header:scale-110 transition-transform duration-500 relative z-10" />
+          <Icon className="w-10 h-10 text-primary group-hover/header:scale-110 transition-transform duration-500 relative z-10" />
         </div>
-        <div className="min-w-0 space-y-2">
+        <div className="min-w-0 space-y-3">
           <div className="flex items-center gap-4 flex-wrap">
-            <h1 className="text-4xl font-black text-foreground tracking-tighter uppercase italic leading-none">{title}</h1>
+            <h1 className="text-4xl md:text-6xl font-black text-foreground tracking-tighter uppercase italic leading-none">{title}</h1>
             {badge && (
-              <span className="text-[9px] font-black uppercase tracking-[0.3em] px-4 py-1.5 rounded-xl bg-accent/10 text-accent border border-accent/20 shadow-lg shadow-accent/5 italic animate-pulse">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] px-5 py-2 rounded-2xl bg-accent/10 text-accent border border-accent/20 shadow-premium shadow-accent/10 italic animate-pulse">
                 {badge}
               </span>
             )}
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
-            <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.3em] opacity-60 group-hover/header:opacity-100 transition-opacity">{description}</p>
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Engineering Hub v6.0</span>
+            </div>
+            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-widest opacity-60 group-hover/header:opacity-100 transition-opacity italic">{description}</p>
           </div>
         </div>
       </div>
+
 
       
       {/* Platform Metadata or Children */}
