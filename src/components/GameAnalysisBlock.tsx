@@ -85,11 +85,11 @@ export function GameAnalysisBlock({ numbers, stats, config, draws, defaultOpen =
     <div className="mt-1">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 text-[10px] text-primary/70 hover:text-primary transition-colors"
+        className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-primary/50 hover:text-primary transition-all py-1.5 px-3 rounded-lg hover:bg-primary/5"
       >
-        <BarChart3 className="w-3 h-3" />
-        <span>Análise da IA</span>
-        {open ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+        <BarChart3 className="w-3.5 h-3.5" />
+        <span>Explorar Diagnóstico IA</span>
+        {open ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
       </button>
 
       <AnimatePresence>
@@ -101,9 +101,9 @@ export function GameAnalysisBlock({ numbers, stats, config, draws, defaultOpen =
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="mt-2 p-3 rounded-lg bg-muted/30 border border-border/40 space-y-2">
-              <p className="text-[10px] font-semibold text-foreground flex items-center gap-1.5">
-                📊 Análise da IA para este jogo
+            <div className="mt-3 p-4 rounded-xl bg-background/60 border border-border/40 space-y-4 shadow-inner">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2 opacity-60">
+                <Target className="w-3.5 h-3.5 text-primary" /> Matrix Analysis (Neural Data)
               </p>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -198,12 +198,12 @@ function MetricCard({ label, value, icon, color, subtitle }: {
   subtitle?: string;
 }) {
   return (
-    <div className="flex items-start gap-1.5 p-1.5 rounded bg-background/50">
-      <div className={`mt-0.5 ${color}`}>{icon}</div>
-      <div>
-        <p className="text-[9px] text-muted-foreground leading-tight">{label}</p>
-        <p className={`text-[11px] font-bold ${color}`}>{value}</p>
-        {subtitle && <p className="text-[8px] text-muted-foreground">{subtitle}</p>}
+    <div className="flex items-start gap-2 p-2.5 rounded-lg bg-secondary/20 border border-white/5 group/metric hover:border-primary/20 transition-all">
+      <div className={`mt-0.5 p-1.5 rounded-md bg-background/50 border border-white/5 group-hover/metric:scale-110 transition-transform ${color}`}>{icon}</div>
+      <div className="min-w-0">
+        <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground leading-tight opacity-60">{label}</p>
+        <p className={`text-xs font-black font-mono truncate mt-0.5 ${color}`}>{value}</p>
+        {subtitle && <p className="text-[7px] font-bold uppercase text-muted-foreground/40 mt-0.5 leading-none">{subtitle}</p>}
       </div>
     </div>
   );

@@ -10,7 +10,10 @@ interface AIAnalystBriefingProps {
 
 export function AIAnalystBriefing({ confidence, reasons }: AIAnalystBriefingProps) {
   return (
-    <div className="p-4 rounded-2xl bg-secondary/30 border border-border/40 space-y-4 animate-in fade-in slide-in-from-bottom-2">
+    <div className="p-5 rounded-2xl bg-primary/5 border border-primary/20 space-y-5 animate-in fade-in slide-in-from-bottom-2 shadow-inner relative overflow-hidden">
+      <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+        <Brain className="w-20 h-20 text-primary" />
+      </div>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Brain className="w-4 h-4 text-primary animate-pulse" />
@@ -53,10 +56,10 @@ export function AIAnalystBriefing({ confidence, reasons }: AIAnalystBriefingProp
         </div>
       </div>
 
-      <div className="pt-2 border-t border-white/5">
-        <p className="text-[9px] text-muted-foreground leading-relaxed italic flex items-start gap-2">
-          <Zap className="w-3 h-3 text-primary shrink-0 mt-0.5" />
-          "O motor Titan validou esta combinação contra 2.5M de cenários. A estrutura atual maximiza a probabilidade de prêmios intermediários."
+      <div className="pt-3 border-t border-primary/10">
+        <p className="text-[10px] text-muted-foreground leading-relaxed italic flex items-start gap-3 bg-background/40 p-3 rounded-xl border border-white/5">
+          <Zap className="w-4 h-4 text-primary shrink-0 mt-0.5 animate-pulse" />
+          "Validação Alpha concluída: esta configuração otimiza o fluxo de entropia recente, alinhando-se aos clusters de coocorrência mais estáveis dos últimos 50 ciclos."
         </p>
       </div>
     </div>
