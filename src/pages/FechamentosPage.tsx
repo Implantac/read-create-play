@@ -18,7 +18,7 @@ import {
 import { exportToPdf } from "@/engine/pdf-export";
 import {
   Grid3X3, Shield, Trophy, Coins, FileDown, ChevronRight,
-  CheckCircle2, AlertTriangle, Target, Hash, Layers, Sparkles, Save,
+  CheckCircle2, AlertTriangle, Target, Hash, Layers, Sparkles, Save, Brain
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MatrixComparisonPanel } from "@/components/MatrixComparisonPanel";
