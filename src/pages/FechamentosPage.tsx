@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PageHeader } from "@/components/PageHeader";
 import { PlanGate } from "@/components/PlanGate";
+import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
