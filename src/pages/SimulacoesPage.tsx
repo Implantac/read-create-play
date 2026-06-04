@@ -78,9 +78,10 @@ const SimulacoesPage = () => {
                 <BacktestPanel stats={stats} config={config} draws={draws} />
               </Suspense>
             </div>
-          </>
+          </div>
         </PlanGate>
       )}
+
     </div>
   );
 };
