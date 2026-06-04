@@ -187,7 +187,9 @@ export function AppLayout() {
 
         </div>
         <WhatsAppButton />
+        <GuidedOnboarding />
       </div>
     </SidebarProvider>
+
   );
 }
