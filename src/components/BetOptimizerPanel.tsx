@@ -10,6 +10,7 @@ import { runCombinatorialOptimization, OptimizationResult } from "@/engine/math/
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Gem, Shield, AlertTriangle, CheckCircle2, Cpu } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { formatNumber } from "@/utils/formatters";
 
 interface Props {
   stats: NumberStats[];
