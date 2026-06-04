@@ -417,9 +417,9 @@ const AIAnalystPage = () => {
                         .slice(0, 8)
                         .map(([hits, count]) => (
                           <div key={hits} className="bg-muted/50 rounded-lg p-2 text-center">
-                            <p className="text-lg font-bold text-primary">{hits}</p>
+                            <p className="text-lg font-bold text-primary">{formatNumber(Number(hits))}</p>
                             <p className="text-[10px] text-muted-foreground">acertos</p>
-                            <p className="text-xs font-mono">{((count / simResult.simulation!.totalSimulations) * 100).toFixed(2)}%</p>
+                            <p className="text-xs font-mono">{formatPercent(count / simResult.simulation!.totalSimulations)}</p>
                           </div>
                         ))}
                     </div>
@@ -433,8 +433,8 @@ const AIAnalystPage = () => {
                           {i + 1}
                         </Badge>
                         <span className="font-mono">{g.numbers.join("-")}</span>
-                        <span className="ml-auto text-muted-foreground">avg: {g.avgHits.toFixed(2)}</span>
-                        <Badge variant="outline" className="text-[10px]">estabilidade: {g.stabilityScore}</Badge>
+                        <span className="ml-auto text-muted-foreground">avg: {formatNumber(g.avgHits)}</span>
+                        <Badge variant="outline" className="text-[10px]">estabilidade: {formatNumber(g.stabilityScore)}</Badge>
                       </div>
                     ))}
                   </div>
@@ -474,7 +474,7 @@ function GameCard({ game, index, copiedIdx, onCopy, onSave, expanded, onToggle }
       <div className="flex items-center gap-2">
         <Badge className={`${gradeColor} shrink-0 font-bold`}>{game.grade}</Badge>
         <span className="font-mono text-sm flex-1">{game.numbers.join(" - ")}</span>
-        <span className="text-sm font-semibold text-primary">{game.totalScore}pts</span>
+        <span className="text-sm font-semibold text-primary">{formatNumber(game.totalScore)}pts</span>
         <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={onCopy}>
           {copiedIdx === index ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
         </Button>
@@ -486,12 +486,12 @@ function GameCard({ game, index, copiedIdx, onCopy, onSave, expanded, onToggle }
       {expanded && (
         <div className="mt-3 pt-3 border-t space-y-2 text-xs">
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-            <ScoreItem label="Estatístico" value={game.scores.statistical} />
-            <ScoreItem label="Estrutural" value={game.scores.structural} />
-            <ScoreItem label="Cobertura" value={game.scores.coverage} />
-            <ScoreItem label="Diversidade" value={game.scores.diversity} />
-            <ScoreItem label="Estratégia" value={game.scores.strategyFit} />
-            <ScoreItem label="Probabilidade" value={game.scores.probability} />
+            <ScoreItem label="Estatístico" value={formatNumber(game.scores.statistical)} />
+            <ScoreItem label="Estrutural" value={formatNumber(game.scores.structural)} />
+            <ScoreItem label="Cobertura" value={formatNumber(game.scores.coverage)} />
+            <ScoreItem label="Diversidade" value={formatNumber(game.scores.diversity)} />
+            <ScoreItem label="Estratégia" value={formatNumber(game.scores.strategyFit)} />
+            <ScoreItem label="Probabilidade" value={formatNumber(game.scores.probability)} />
           </div>
           <div className="space-y-1 text-muted-foreground">
             {game.explanation.map((line, i) => <p key={i}>{line}</p>)}
@@ -502,8 +502,9 @@ function GameCard({ game, index, copiedIdx, onCopy, onSave, expanded, onToggle }
   );
 }
 
-function ScoreItem({ label, value }: { label: string; value: number }) {
-  const color = value >= 70 ? "text-green-500" : value >= 40 ? "text-amber-500" : "text-red-500";
+function ScoreItem({ label, value }: { label: string; value: string | number }) {
+  const numValue = typeof value === 'string' ? parseFloat(value.replace(',', '.')) : value;
+  const color = numValue >= 70 ? "text-green-500" : numValue >= 40 ? "text-amber-500" : "text-red-500";
   return (
     <div className="text-center">
       <p className={`font-bold ${color}`}>{value}</p>
@@ -550,7 +551,7 @@ function AnalysisTab({ draws, lotteryId, stats, config }: any) {
       <CardContent className="space-y-6">
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium mb-2 block">Janela: {window} concursos</label>
+            <label className="text-sm font-medium mb-2 block">Janela: {formatNumber(window)} concursos</label>
             <Slider value={[window]} onValueChange={v => setWindow(v[0])} min={10} max={500} step={10} />
           </div>
           <div className="flex items-end">
@@ -579,9 +580,9 @@ function AnalysisTab({ draws, lotteryId, stats, config }: any) {
             </div>
 
             <div className="grid sm:grid-cols-3 gap-3">
-              <StatBox icon={TrendingUp} label="Soma Média" value={result.analysis.avgSum} />
-              <StatBox icon={BarChart3} label="Pares Médio" value={result.analysis.avgEven} />
-              <StatBox icon={Target} label="Repetição Média" value={result.analysis.avgRepeat} />
+              <StatBox icon={TrendingUp} label="Soma Média" value={formatNumber(result.analysis.avgSum)} />
+              <StatBox icon={BarChart3} label="Pares Médio" value={formatNumber(result.analysis.avgEven)} />
+              <StatBox icon={Target} label="Repetição Média" value={formatNumber(result.analysis.avgRepeat)} />
             </div>
 
             <div className="bg-muted/50 rounded-lg p-4 text-sm space-y-2">
