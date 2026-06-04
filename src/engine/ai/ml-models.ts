@@ -375,8 +375,8 @@ export function runEnsembleVoting(stats: NumberStats[], config: LotteryConfig, m
     "XGBoost": 0.22,
     "Rede Neural (LSTM)": 0.18,
     "Inferência Bayesiana": 0.12,
-    "Cadeia de Markov": 0.10,
-    "Análise Quantum": 0.20,
+    "Cadeia de Markov": 0.08,
+    "Análise Quantum": 0.22,
   };
 
   const weights = modelWeights || defaultWeights;

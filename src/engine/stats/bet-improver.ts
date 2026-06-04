@@ -49,9 +49,8 @@ export function improveBet(
   const improvements: string[] = [];
 
   // Determine how many numbers to replace (1-3 based on grade)
-  let replaceCount = originalReport.grade === "S" || originalReport.grade === "A" ? 1
-    : originalReport.grade === "B" ? 2 : 3;
-  replaceCount = Math.min(replaceCount, Math.floor(bet.length * 0.3));
+  let replaceCount = originalReport.grade === "S" ? 1 : originalReport.grade === "A" ? 2 : 3;
+  replaceCount = Math.min(replaceCount, Math.floor(bet.length * 0.4));
 
   // Sort by score ascending → weakest first
   const sortedScored = [...scored].sort((a, b) => a.score - b.score);

@@ -172,7 +172,7 @@ export function evaluateBetQuality(
   if (avgMomentum > 2) strengths.push("Aceleração técnica premium detectada");
 
   // Overall score (weighted average)
-  const weights = [10, 10, 10, 10, 8, 15, 12, 11, 10, 4]; // must sum to 100
+  const weights = [12, 12, 10, 10, 8, 15, 12, 11, 6, 4]; // must sum to 100
   const overall = Math.round(
     dimensions.reduce((s, d, i) => s + (d.score * (weights[i] || 0) / 100), 0)
   );
