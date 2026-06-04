@@ -353,7 +353,7 @@ export default function LotofacilPremiumPage() {
           </div>
         </TabsContent>
 
-        {/* --- INTELLIGENCE/STATS TAB --- */}
+        {/* --- STATISTICS TAB --- */}
         <TabsContent value="intelligence" className="space-y-6">
           <div className="grid lg:grid-cols-2 gap-6">
             <CorrelationNetwork />
@@ -425,7 +425,7 @@ export default function LotofacilPremiumPage() {
           </div>
         </TabsContent>
 
-        {/* --- STRATEGY/FINANCE TAB --- */}
+        {/* --- FINANCE TAB --- */}
         <TabsContent value="strategy" className="space-y-6">
           <div className="grid lg:grid-cols-[1fr_1fr] gap-6">
             <div className="space-y-6">
@@ -439,7 +439,7 @@ export default function LotofacilPremiumPage() {
           </div>
         </TabsContent>
 
-        {/* --- MATRIX TAB --- */}
+        {/* --- HP ANALYSIS TAB --- */}
         <TabsContent value="matrix" className="space-y-6">
           <Card className="glass-card border-primary/20 overflow-hidden">
             <CardHeader className="border-b border-primary/10 bg-primary/5">
@@ -470,7 +470,7 @@ export default function LotofacilPremiumPage() {
           </Card>
         </TabsContent>
 
-        {/* --- GENERATION TAB --- */}
+        {/* --- GENERATORS TAB --- */}
         <TabsContent value="generation" className="space-y-6">
           <div className="grid lg:grid-cols-2 gap-6">
             <Suspense fallback={<LazyFallback />}>
