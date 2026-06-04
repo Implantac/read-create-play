@@ -33,15 +33,19 @@ interface SummaryCardProps {
 }
 
 const SummaryCard = ({ icon, label, value, subtitle, color }: SummaryCardProps) => (
-  <div className="rounded-2xl glass-card p-5 border border-border/40 flex items-start gap-4 group hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 hover:-translate-y-1 relative overflow-hidden">
+  <div className="rounded-[2rem] glass-card p-6 border border-border/40 flex flex-col justify-between group hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 active:scale-95 relative overflow-hidden h-full">
     <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-    <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center shrink-0 shadow-lg group-hover:rotate-12 transition-transform duration-500`}>
-      {icon}
+    
+    <div className="flex items-center justify-between mb-4">
+      <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-60 group-hover:text-foreground transition-colors leading-none italic">{label}</p>
+      <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-500`}>
+        {icon}
+      </div>
     </div>
-    <div className="min-w-0 relative z-10">
-      <p className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground opacity-60 mb-1">{label}</p>
-      <p className="text-2xl font-black font-mono text-foreground tracking-tighter italic">{value}</p>
-      {subtitle && <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-40">{subtitle}</p>}
+    
+    <div className="space-y-1 relative z-10">
+      <p className="text-3xl font-black font-mono text-foreground tracking-tighter italic leading-none">{value}</p>
+      {subtitle && <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-[0.2em] mt-2 opacity-40 group-hover:opacity-60 transition-opacity italic">{subtitle}</p>}
     </div>
   </div>
 );
