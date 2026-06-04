@@ -269,7 +269,7 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
                       <div className="flex items-center gap-1.5">
                         <TrendIcon trend={row.trend} />
                         <span className="text-[10px] text-muted-foreground">{
-                          row.trend === "up" ? "Subindo" : row.trend === "down" ? "Caindo" : "Estável"
+                          row.trend === "up" ? t("matrix.trends.up") : row.trend === "down" ? t("matrix.trends.down") : t("matrix.trends.stable")
                         }</span>
                       </div>
                     </TableCell>
