@@ -11,6 +11,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { DrawNotificationChecker } from "@/components/DrawNotificationChecker";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { GuidedOnboarding } from "@/components/GuidedOnboarding";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
