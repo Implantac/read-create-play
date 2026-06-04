@@ -157,10 +157,10 @@ const DashboardPage = () => {
       {/* Primary Actions Grid - Quick Access */}
       <section className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {[
-          { label: "Lotofácil Premium", icon: Crown, url: "/lotofacil-premium", desc: "Ambiente Elite", color: "text-amber-400", bg: "from-amber-500/10" },
-          { label: "IA Autônoma", icon: Brain, url: "/ia-autonoma", desc: "Predição Preditiva", color: "text-primary", bg: "from-primary/10" },
+          { label: "Lotofácil Elite", icon: Crown, url: "/lotofacil-premium", desc: "Ambiente Profissional", color: "text-amber-400", bg: "from-amber-500/10" },
+          { label: "IA Autônoma", icon: Brain, url: "/ia-autonoma", desc: "Rede Neural Ativa", color: "text-primary", bg: "from-primary/10" },
           { label: "Fechamentos", icon: Grid3X3, url: "/fechamentos", desc: "Matemática Aplicada", color: "text-blue-400", bg: "from-blue-500/10" },
-          { label: "Análise Central", icon: BarChart3, url: "/analise", desc: "Decisão com Dados", color: "text-emerald-400", bg: "from-emerald-500/10" },
+          { label: "Análise Central", icon: BarChart3, url: "/analise", desc: "Dados & Estatística", color: "text-emerald-400", bg: "from-emerald-500/10" },
         ].map((item, idx) => (
           <Link 
             key={item.label} 
@@ -224,8 +224,8 @@ const DashboardPage = () => {
         <div className="lg:col-span-4 space-y-6">
           <div className="flex items-center gap-2 px-1">
             <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60 flex items-center gap-2">
-              <Activity className="w-4 h-4" />
-              Status do Sistema
+              <Activity className="w-4 h-4 text-primary" />
+              Consoles de Diagnóstico
             </h2>
           </div>
           
@@ -299,9 +299,9 @@ const DashboardPage = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: "Análise Central", icon: BarChart3, url: "/analise", desc: "Big Data & Filtros", color: "text-emerald-400" },
-            { label: "Fechamentos", icon: Grid3X3, url: "/fechamentos", desc: "Matemática Aplicada", color: "text-primary" },
-            { label: "IA Autônoma", icon: Brain, url: "/ia-autonoma", desc: "Fluxos de Predição", color: "text-amber-400" },
-            { label: "Instalar App", icon: Smartphone, url: "/install", desc: "Acesso no Mobile", color: "text-blue-400" },
+            { label: "Matriz HP", icon: Grid3X3, url: "/lotofacil-premium", desc: "Estatística Avançada", color: "text-primary" },
+            { label: "IA Autônoma", icon: Brain, url: "/ia-autonoma", desc: "Fluxos Neurais", color: "text-amber-400" },
+            { label: "Fechamentos", icon: Layers, url: "/fechamentos", desc: "Matemática Pura", color: "text-blue-400" },
           ].map((item, idx) => (
             <Link key={item.label} to={item.url} className="group p-6 rounded-3xl glass-card border-border/40 hover:border-primary/40 hover:bg-primary/5 transition-all duration-500 relative overflow-hidden active:scale-95">
               <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
