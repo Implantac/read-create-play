@@ -220,7 +220,7 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso, syncDraws }:
                             <span className={`font-bold ${
                               tier.ganhadores > 0 ? "text-primary" : "text-muted-foreground"
                             }`}>
-                              {tier.ganhadores.toLocaleString("pt-BR")}
+                              {formatNumber(tier.ganhadores)}
                             </span>
                           </td>
                           <td className="px-3 py-2 text-right font-mono">
