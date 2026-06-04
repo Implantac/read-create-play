@@ -123,19 +123,22 @@ export function AppSidebar() {
           </div>
         )}
         {/* Active lottery indicator */}
-        <div className={`mx-1 mb-3 rounded-lg bg-primary/5 border border-primary/15 transition-all ${collapsed ? "p-2 flex justify-center" : "px-3 py-2"}`}>
+        <div className={`mx-2 mb-6 rounded-xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 transition-all duration-500 hover:border-primary/40 group/lottery ${collapsed ? "p-2.5 flex justify-center" : "px-4 py-3"}`}>
           {collapsed ? (
-            <span className="text-lg" title={config.name}>{config.icon}</span>
+            <span className="text-xl drop-shadow-md group-hover/lottery:scale-110 transition-transform" title={config.name}>{config.icon}</span>
           ) : (
-            <div className="flex items-center gap-2">
-              <span className="text-base">{config.icon}</span>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-background/50 border border-primary/20 flex items-center justify-center shrink-0 shadow-inner group-hover/lottery:rotate-6 transition-transform duration-500">
+                <span className="text-xl drop-shadow-sm">{config.icon}</span>
+              </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-semibold text-primary truncate">{config.name}</p>
-                <p className="text-[9px] text-muted-foreground font-mono">{config.pick}/{config.numbers}</p>
+                <p className="text-[11px] font-black text-primary uppercase tracking-wider truncate">{config.name}</p>
+                <p className="text-[9px] text-muted-foreground font-mono font-bold opacity-60 tracking-tight">{config.pick} / {config.numbers}</p>
               </div>
             </div>
           )}
         </div>
+
 
         {workflowGroups.map((group) => (
           <SidebarGroup key={group.label}>
