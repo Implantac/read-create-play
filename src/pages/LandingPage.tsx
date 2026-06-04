@@ -2,6 +2,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 
@@ -13,6 +14,8 @@ import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { SocialProofBar } from "@/components/SocialProofBar";
 import { Testimonials } from "@/components/Testimonials";
 import { FloatingLotteryBalls } from "@/components/FloatingLotteryBalls";
+import { PricingSection } from "@/components/PricingSection";
+
 
 import { burstConfetti } from "@/lib/confetti";
 import {
