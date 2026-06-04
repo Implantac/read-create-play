@@ -31,66 +31,72 @@ export function StrategyBriefingPanel({ config, stats, draws, compact = false }:
   const briefing = useMemo(() => buildStrategyBriefing(config, stats, draws), [config, stats, draws]);
 
   return (
-    <Card className="bg-card/70 border-primary/20 overflow-hidden">
-      <CardHeader className="pb-3">
-        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <ClipboardCheck className="h-5 w-5 text-primary" />
-              Briefing Estrategico
-            </CardTitle>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Traduz os dados de {config.name} em estrategia, risco e proxima acao.
-            </p>
+    <Card className="glass-card border-primary/20 overflow-hidden relative group">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
+      <CardHeader className="pb-5 relative">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 shadow-lg group-hover:rotate-6 transition-transform duration-500">
+              <ClipboardCheck className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <CardTitle className="text-sm font-black uppercase tracking-[0.2em] text-foreground italic">
+                Briefing Estratégico
+              </CardTitle>
+              <p className="mt-1 text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">
+                Análise Neural • {config.name}
+              </p>
+            </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className={toneClasses[briefing.recommendedTone]}>
+            <Badge variant="outline" className={`rounded-full px-3 py-1 font-black uppercase tracking-widest text-[9px] border-2 shadow-sm ${toneClasses[briefing.recommendedTone]}`}>
               {toneLabels[briefing.recommendedTone]}
             </Badge>
-            <Badge variant="outline" className="bg-muted/40">
+            <Badge variant="outline" className="rounded-full px-3 py-1 font-black uppercase tracking-widest text-[9px] bg-secondary/50 border-border/40 text-muted-foreground">
               {briefing.dataDepthLabel}
             </Badge>
           </div>
         </div>
       </CardHeader>
 
+
       <CardContent className="space-y-5">
         <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="space-y-3">
-            <div>
-              <p className="text-lg font-bold text-foreground">{briefing.headline}</p>
-              <p className="mt-1 text-sm text-muted-foreground leading-relaxed">{briefing.summary}</p>
+            <div className="p-4 rounded-2xl bg-secondary/20 border border-border/40 group/headline transition-all hover:border-primary/20">
+              <p className="text-xl font-black text-foreground tracking-tight italic group-hover:text-primary transition-colors">{briefing.headline}</p>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed font-medium">{briefing.summary}</p>
             </div>
 
-            <div className="grid gap-2 sm:grid-cols-3">
-              <div className="rounded-lg border border-border/50 bg-background/40 p-3">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-xl border border-border/40 bg-background/50 p-4 transition-all hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-0.5">
+                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
                   <Gauge className="h-3.5 w-3.5 text-primary" />
-                  Confianca
+                  Confiança
                 </div>
-                <p className="mt-1 text-xl font-bold font-mono text-primary">{briefing.confidenceScore}%</p>
+                <p className="text-2xl font-black font-mono text-primary italic">{briefing.confidenceScore}%</p>
               </div>
-              <div className="rounded-lg border border-border/50 bg-background/40 p-3">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <div className="rounded-xl border border-border/40 bg-background/50 p-4 transition-all hover:shadow-xl hover:shadow-amber-500/5 hover:-translate-y-0.5">
+                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
                   <ShieldCheck className="h-3.5 w-3.5 text-amber-500" />
                   Risco
                 </div>
-                <p className="mt-1 text-sm font-semibold text-foreground">{briefing.riskLabel}</p>
+                <p className="text-base font-black text-foreground uppercase tracking-tight italic">{briefing.riskLabel}</p>
               </div>
-              <div className="rounded-lg border border-border/50 bg-background/40 p-3">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <div className="rounded-xl border border-border/40 bg-background/50 p-4 transition-all hover:shadow-xl hover:shadow-accent/5 hover:-translate-y-0.5">
+                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
                   <WalletCards className="h-3.5 w-3.5 text-accent" />
-                  Operacao
+                  Operação
                 </div>
-                <p className="mt-1 text-sm font-semibold text-foreground">Banca controlada</p>
+                <p className="text-base font-black text-foreground uppercase tracking-tight italic">Controlada</p>
               </div>
             </div>
           </div>
 
-          <div className="rounded-lg border border-border/50 bg-background/40 p-4">
-            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-muted-foreground">
-              Mix recomendado
+          <div className="rounded-2xl border border-border/40 bg-background/50 p-5">
+            <p className="mb-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-60">
+              Mix Recomendado
             </p>
+
             <div className="space-y-3">
               {briefing.strategyMix.map((item) => (
                 <div key={item.label} className="space-y-1.5">
@@ -124,26 +130,27 @@ export function StrategyBriefingPanel({ config, stats, draws, compact = false }:
           </div>
         )}
 
-        <div className="flex flex-col gap-3 border-t border-border/50 pt-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-start gap-2 text-xs text-muted-foreground">
-            <BarChart3 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
-            <span>{briefing.commercialSignal}</span>
+        <div className="flex flex-col gap-5 border-t border-border/40 pt-6 md:flex-row md:items-center md:justify-between relative">
+          <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-primary/5 border border-primary/10 rounded-full px-4 py-2">
+            <BarChart3 className="h-3.5 w-3.5 text-primary" />
+            <span className="italic">{briefing.commercialSignal}</span>
           </div>
-          <div className="flex gap-2">
-            <Button asChild variant="outline" size="sm" className="gap-1.5">
+          <div className="flex gap-3">
+            <Button asChild variant="outline" size="sm" className="h-10 px-6 rounded-xl border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary font-black uppercase tracking-widest text-[10px] transition-all hover:scale-105 active:scale-95">
               <Link to="/simulacoes">
-                <FlaskConical className="h-3.5 w-3.5" />
+                <FlaskConical className="h-4 w-4 mr-2" />
                 Validar
               </Link>
             </Button>
-            <Button asChild size="sm" className="gap-1.5">
+            <Button asChild size="sm" className="h-10 px-6 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
               <Link to="/gerador">
-                <ClipboardCheck className="h-3.5 w-3.5" />
-                Gerar
+                <ClipboardCheck className="h-4 w-4 mr-2" />
+                Gerar Matrizes
               </Link>
             </Button>
           </div>
         </div>
+
       </CardContent>
     </Card>
   );
