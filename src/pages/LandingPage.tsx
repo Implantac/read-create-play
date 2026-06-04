@@ -308,7 +308,7 @@ export default function LandingPage() {
             </h2>
           </motion.div>
           <Accordion type="single" collapsible className="w-full space-y-4">
-            {[1, 2, 3, 4].map((i) => (
+            {[1, 2, 3, 4, 5, 6].map((i) => (
               <AccordionItem key={i} value={`item-${i}`} className="border border-border/40 rounded-2xl px-6 bg-card/30 overflow-hidden">
                 <AccordionTrigger className="text-left font-bold text-lg hover:no-underline py-6">
                   {t(`landing.faq.q${i}` as any)}
