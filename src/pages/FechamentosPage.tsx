@@ -122,18 +122,22 @@ const FechamentosPage = () => {
         <LotteryContextBanner />
       </div>
 
-      <div className="flex justify-between items-center mb-10 px-4">
+      <div className="flex justify-between items-center mb-16 px-4 relative max-w-2xl mx-auto">
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 w-[85%] h-[2px] bg-white/5 -z-10" />
         {[1, 2, 3].map((i) => (
-          <div key={i} className="flex flex-col items-center gap-2 relative">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black transition-all ${
-              step >= i ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "bg-muted text-muted-foreground"
+          <div key={i} className="flex flex-col items-center gap-4 relative">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black transition-all duration-500 border-2 ${
+              step >= i ? "bg-primary text-primary-foreground border-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] scale-110" : "bg-background text-muted-foreground border-white/5"
             }`}>
-              {i}
+              {i === 1 && <Layers className="w-5 h-5" />}
+              {i === 2 && <Hash className="w-5 h-5" />}
+              {i === 3 && <Target className="w-5 h-5" />}
             </div>
-            <span className={`text-[10px] font-bold uppercase tracking-widest ${step >= i ? "text-primary" : "text-muted-foreground"}`}>
-              {i === 1 ? "Modelo" : i === 2 ? "Dezenas" : "Gerar"}
-            </span>
-            {i < 3 && <div className={`absolute top-5 left-12 w-full h-[2px] hidden md:block ${step > i ? "bg-primary" : "bg-muted"}`} style={{ width: 'calc(100% + 5rem)' }} />}
+            <div className="text-center">
+              <span className={`text-[9px] font-black uppercase tracking-[0.2em] transition-colors italic ${step >= i ? "text-primary" : "text-muted-foreground opacity-40"}`}>
+                {i === 1 ? "Alpha Matrix" : i === 2 ? "Dezenas" : "Deploy"}
+              </span>
+            </div>
           </div>
         ))}
       </div>
