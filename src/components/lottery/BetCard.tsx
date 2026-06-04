@@ -6,6 +6,9 @@ import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { useState } from "react";
+import { AIAnalystBriefing } from "./AIAnalystBriefing";
+import { ChevronDown, ChevronUp } from "lucide-react";
+
 
 interface BetCardProps {
   numbers: number[];
@@ -18,7 +21,9 @@ interface BetCardProps {
   onCopy?: () => void;
   hotNumbers?: number[];
   coldNumbers?: number[];
+  reasons?: string[];
 }
+
 
 const GRADE_COLORS: Record<string, string> = {
   S: "bg-gradient-to-r from-yellow-500 to-amber-500 text-white border-yellow-500/40 shadow-yellow-500/20",
@@ -40,8 +45,12 @@ export function BetCard({
   onCopy,
   hotNumbers = [],
   coldNumbers = [],
+  reasons = [],
 }: BetCardProps) {
+
   const [copied, setCopied] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
 
   const handleCopy = () => {
     if (onCopy) {
@@ -58,8 +67,13 @@ export function BetCard({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-5 rounded-2xl glass-card border border-border/40 hover:border-primary/40 transition-all duration-500 space-y-4 group relative overflow-hidden"
+      className="rounded-2xl space-y-2 group"
     >
+      <div 
+        onClick={() => setExpanded(!expanded)}
+        className="p-5 rounded-2xl glass-card border border-border/40 hover:border-primary/40 transition-all duration-500 space-y-4 relative overflow-hidden cursor-pointer"
+      >
+
       <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
       <div className="flex items-center justify-between relative z-10">
         <div className="flex items-center gap-3">
@@ -69,7 +83,11 @@ export function BetCard({
           </div>
           <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest opacity-60 group-hover:opacity-100 transition-opacity">{strategyLabel}</span>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 shrink-0">
+          <div className="mr-2 opacity-20 group-hover:opacity-60 transition-opacity">
+            {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </div>
+
           <span className={`text-xl font-black italic tracking-tighter tabular-nums ${score >= 80 ? 'text-primary' : score >= 50 ? 'text-yellow-500' : 'text-orange-500'}`}>
             {score}
           </span>
@@ -114,18 +132,36 @@ export function BetCard({
         </div>
       )}
 
+      {/* AI Analyst Briefing Section */}
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <AIAnalystBriefing 
+              confidence={score} 
+              reasons={reasons.length > 0 ? reasons : insights} 
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="flex items-center gap-3 pt-2 relative z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-        <Button variant="ghost" size="sm" onClick={handleCopy} className="h-9 px-4 rounded-xl border border-border/40 bg-secondary/20 hover:bg-primary/10 hover:text-primary text-[10px] font-black uppercase tracking-widest transition-all">
+        <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleCopy(); }} className="h-9 px-4 rounded-xl border border-border/40 bg-secondary/20 hover:bg-primary/10 hover:text-primary text-[10px] font-black uppercase tracking-widest transition-all">
           {copied ? <Check className="w-3.5 h-3.5 mr-1.5 text-primary" /> : <Copy className="w-3.5 h-3.5 mr-1.5" />}
           Copiar Aposta
         </Button>
         {onSave && (
-          <Button variant="ghost" size="sm" onClick={onSave} className="h-9 px-4 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest transition-all">
+          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onSave(); }} className="h-9 px-4 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest transition-all">
             <Shield className="w-3.5 h-3.5 mr-1.5" />
             Salvar Aposta
           </Button>
         )}
       </div>
     </motion.div>
+
   );
 }
