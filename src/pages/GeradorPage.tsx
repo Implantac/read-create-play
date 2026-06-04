@@ -13,17 +13,28 @@ import { evaluateBetQuality } from "@/engine/stats/bet-quality";
 import { toast } from "sonner";
 
 import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 const GeradorPage = () => {
-  const { config, stats, draws, selectedLottery } = useLotteryContext();
+  const { config, stats, draws, selectedLottery, setSelectedLottery } = useLotteryContext();
   const { saveBet } = useSavedBets(selectedLottery);
   const { saveGeneration } = useGenerationHistory(selectedLottery);
   const location = useLocation();
   
-  const [step, setStep] = useState(() => {
-    return location.state?.fromOnboarding ? 2 : 1;
-  });
+  const [step, setStep] = useState(1);
   const [strategy, setStrategy] = useState<string>("balance");
+
+  useEffect(() => {
+    if (location.state?.fromOnboarding) {
+      if (location.state.lotteryId && location.state.lotteryId !== selectedLottery) {
+        setSelectedLottery(location.state.lotteryId);
+      }
+      setStep(2);
+    }
+  }, [location.state, selectedLottery, setSelectedLottery]);
+
+
+
 
   const [quantity, setQuantity] = useState(1);
   const [generating, setGenerating] = useState(false);

@@ -46,24 +46,25 @@ export function GuidedOnboarding() {
       actionLabel: "Começar Agora"
     },
     {
-      title: "Análise de Dados",
-      description: "Nossos algoritmos já processaram os últimos sorteios e identificaram padrões de alta frequência e anomalias estatísticas.",
+      title: `Análise da ${config.name}`,
+      description: `Nossos algoritmos processaram os últimos sorteios da ${config.name} e identificaram padrões de alta frequência específicos para esta modalidade.`,
       icon: Zap,
       actionLabel: "Ver Recomendação"
     },
     {
       title: "Estratégia Neural",
-      description: "Combinamos tendências quentes, dezenas atrasadas e equilíbrio estrutural para criar jogos com maior probabilidade matemática.",
+      description: `Combinamos tendências quentes e dezenas atrasadas da ${config.name} para criar jogos com maior probabilidade matemática de acerto.`,
       icon: Target,
       actionLabel: "Gerar Aposta Elite"
     },
     {
       title: "Sua Aposta Está Pronta",
-      description: "Clique abaixo para ir ao Gerador Neural e ver as sugestões que preparei especificamente para o próximo concurso.",
+      description: `Clique abaixo para ir ao Gerador Neural e ver as sugestões que preparei para o próximo concurso da ${config.name}.`,
       icon: Trophy,
       actionLabel: "Ir para o Gerador"
     }
   ];
+
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -76,8 +77,9 @@ export function GuidedOnboarding() {
   const handleComplete = () => {
     localStorage.setItem('titan_onboarding_completed', 'true');
     setIsOpen(false);
-    navigate('/gerador', { state: { fromOnboarding: true } });
+    navigate('/gerador', { state: { fromOnboarding: true, lotteryId: config.id } });
   };
+
 
 
   const handleSkip = () => {
