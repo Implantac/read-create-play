@@ -68,7 +68,7 @@ export function Testimonials() {
                   <AvatarFallback className="bg-primary/10 text-primary font-bold">{t.initials}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <h4 className="font-bold text-foreground">{t.name}</h4>
+                  <h3 className="font-bold text-foreground">{t.name}</h3>
                   <p className="text-xs text-muted-foreground font-mono uppercase tracking-widest">{t.role}</p>
                 </div>
               </div>
