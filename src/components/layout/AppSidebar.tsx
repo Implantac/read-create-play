@@ -94,11 +94,12 @@ export function AppSidebar() {
           {!collapsed && (
             <div>
               <div className="flex items-center gap-1.5">
-                <h1 className="text-base font-bold tracking-tight text-sidebar-accent-foreground">
-                  Titan<span className="gradient-brand-text ml-1">Loterias</span>
+                <h1 className="text-lg font-black tracking-tighter text-sidebar-accent-foreground uppercase italic">
+                  Titan<span className="gradient-brand-text ml-0.5">Loterias</span>
                 </h1>
                 {isAdmin && (
-                  <span className={`px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded border animate-pulse ${
+                  <span className={`px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.2em] rounded-full border animate-pulse ${
+
                     isSuperAdmin 
                       ? "bg-amber-500/20 text-amber-400 border-amber-500/30" 
                       : "bg-red-500/20 text-red-400 border-red-500/30"
@@ -107,9 +108,10 @@ export function AppSidebar() {
                   </span>
                 )}
               </div>
-              <p className="text-[10px] text-muted-foreground font-mono tracking-wider uppercase">
-                Neural Engine v5.2
+              <p className="text-[9px] text-muted-foreground font-black tracking-[0.3em] uppercase opacity-40">
+                Neural Core v5.3
               </p>
+
 
             </div>
           )}
@@ -123,19 +125,22 @@ export function AppSidebar() {
           </div>
         )}
         {/* Active lottery indicator */}
-        <div className={`mx-1 mb-3 rounded-lg bg-primary/5 border border-primary/15 transition-all ${collapsed ? "p-2 flex justify-center" : "px-3 py-2"}`}>
+        <div className={`mx-2 mb-6 rounded-xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 transition-all duration-500 hover:border-primary/40 group/lottery ${collapsed ? "p-2.5 flex justify-center" : "px-4 py-3"}`}>
           {collapsed ? (
-            <span className="text-lg" title={config.name}>{config.icon}</span>
+            <span className="text-xl drop-shadow-md group-hover/lottery:scale-110 transition-transform" title={config.name}>{config.icon}</span>
           ) : (
-            <div className="flex items-center gap-2">
-              <span className="text-base">{config.icon}</span>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-background/50 border border-primary/20 flex items-center justify-center shrink-0 shadow-inner group-hover/lottery:rotate-6 transition-transform duration-500">
+                <span className="text-xl drop-shadow-sm">{config.icon}</span>
+              </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-semibold text-primary truncate">{config.name}</p>
-                <p className="text-[9px] text-muted-foreground font-mono">{config.pick}/{config.numbers}</p>
+                <p className="text-[11px] font-black text-primary uppercase tracking-wider truncate">{config.name}</p>
+                <p className="text-[9px] text-muted-foreground font-mono font-bold opacity-60 tracking-tight">{config.pick} / {config.numbers}</p>
               </div>
             </div>
           )}
         </div>
+
 
         {workflowGroups.map((group) => (
           <SidebarGroup key={group.label}>
@@ -156,9 +161,10 @@ export function AppSidebar() {
                             <NavLink
                               to={item.url}
                               end={item.url === "/"}
-                              className={`rounded-lg px-3 py-2.5 text-sm transition-all duration-300 hover:bg-sidebar-accent/40 ${locked ? "text-muted-foreground/50" : "text-sidebar-foreground"}`}
-                              activeClassName="bg-primary/15 text-primary font-bold shadow-[0_0_20px_rgba(34,197,94,0.15)] border-l-2 border-primary"
+                              className={`rounded-xl px-4 py-3 text-sm transition-all duration-300 hover:bg-primary/10 group/item relative overflow-hidden ${locked ? "text-muted-foreground/40" : "text-sidebar-foreground/80"}`}
+                              activeClassName="bg-primary/20 text-primary font-black shadow-[0_0_25px_rgba(var(--primary),0.2)] border-l-4 border-primary ring-1 ring-primary/20"
                             >
+
                               <item.icon className="mr-3 h-4 w-4 shrink-0" />
                               {!collapsed && (
                                 <>
@@ -198,9 +204,10 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={item.url}
-                      className="rounded-lg px-3 py-2.5 text-sm transition-all duration-300 hover:bg-sidebar-accent/40 text-sidebar-foreground"
-                      activeClassName="bg-primary/15 text-primary font-bold shadow-[0_0_20px_rgba(34,197,94,0.15)] border-l-2 border-primary"
+                      className="rounded-xl px-4 py-3 text-sm transition-all duration-300 hover:bg-primary/10 text-sidebar-foreground/80 group/item"
+                      activeClassName="bg-primary/20 text-primary font-black shadow-[0_0_25px_rgba(var(--primary),0.2)] border-l-4 border-primary ring-1 ring-primary/20"
                     >
+
                       <item.icon className="mr-3 h-4 w-4 shrink-0" />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
@@ -222,9 +229,10 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink
                       to="/admin"
-                      className="rounded-lg px-3 py-2.5 text-sm transition-all duration-300 hover:bg-sidebar-accent/40 text-sidebar-foreground"
-                      activeClassName="bg-primary/15 text-primary font-bold shadow-[0_0_20px_rgba(34,197,94,0.15)] border-l-2 border-primary"
+                      className="rounded-xl px-4 py-3 text-sm transition-all duration-300 hover:bg-primary/10 text-sidebar-foreground/80 group/item"
+                      activeClassName="bg-primary/20 text-primary font-black shadow-[0_0_25px_rgba(var(--primary),0.2)] border-l-4 border-primary ring-1 ring-primary/20"
                     >
+
                       <ShieldCheck className="mr-3 h-4 w-4 shrink-0" />
                       {!collapsed && <span>Painel Admin</span>}
                     </NavLink>

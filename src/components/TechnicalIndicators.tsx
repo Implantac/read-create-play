@@ -14,42 +14,46 @@ interface IndicatorProps {
 }
 
 const Indicator = ({ label, value, suffix = "", description, trend, icon: Icon }: IndicatorProps) => (
-  <div className="flex items-center justify-between p-3 rounded-lg bg-black/20 border border-white/5 hover:border-white/10 transition-all group">
-    <div className="flex items-center gap-3">
-      <div className="p-2 rounded-md bg-white/5 text-muted-foreground group-hover:text-primary transition-colors">
-        <Icon className="w-4 h-4" />
+  <div className="flex items-center justify-between p-4 rounded-2xl bg-secondary/10 border border-border/40 hover:border-primary/30 transition-all duration-300 group/indicator relative overflow-hidden">
+    <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover/indicator:opacity-100 transition-opacity" />
+    <div className="flex items-center gap-4 relative z-10">
+      <div className="w-10 h-10 rounded-xl bg-background/50 border border-border/60 flex items-center justify-center text-muted-foreground group-hover/indicator:text-primary group-hover/indicator:border-primary/30 transition-all duration-500 shadow-inner group-hover/indicator:rotate-3">
+        <Icon className="w-5 h-5 transition-transform group-hover/indicator:scale-110" />
       </div>
       <div>
-        <div className="flex items-center gap-1.5">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</span>
+        <div className="flex items-center gap-1.5 mb-0.5">
+          <span className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground opacity-70 group-hover/indicator:opacity-100 group-hover/indicator:text-primary/80 transition-all">{label}</span>
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger>
-                <Info className="w-3 h-3 text-muted-foreground/50 hover:text-muted-foreground" />
+              <TooltipTrigger asChild>
+                <button className="focus:outline-none">
+                  <Info className="w-3 h-3 text-muted-foreground/30 hover:text-primary/50 transition-colors" />
+                </button>
               </TooltipTrigger>
-              <TooltipContent className="max-w-[200px] text-[10px]">
+              <TooltipContent className="max-w-[240px] text-[10px] font-medium leading-relaxed bg-popover/90 backdrop-blur-md border-primary/20">
                 {description}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
         <div className="flex items-baseline gap-1">
-          <span className="text-sm font-mono font-bold text-foreground">{value}</span>
-          {suffix && <span className="text-[10px] text-muted-foreground uppercase">{suffix}</span>}
+          <span className="text-base font-black font-mono text-foreground tracking-tight italic group-hover/indicator:text-primary transition-colors">{value}</span>
+          {suffix && <span className="text-[10px] font-black text-muted-foreground uppercase opacity-40">{suffix}</span>}
         </div>
       </div>
     </div>
     {trend && (
-      <div className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
-        trend === "up" ? "text-primary bg-primary/10" : 
-        trend === "down" ? "text-destructive bg-destructive/10" : 
-        "text-muted-foreground bg-white/5"
+      <div className={`relative z-10 text-[9px] font-black tracking-widest px-2 py-1 rounded-full border shadow-sm ${
+        trend === "up" ? "text-primary bg-primary/10 border-primary/20" : 
+        trend === "down" ? "text-destructive bg-destructive/10 border-destructive/20" : 
+        "text-muted-foreground bg-secondary/50 border-border/60"
       }`}>
-        {trend === "up" ? "↑ STABLE" : trend === "down" ? "↓ VOLATILE" : "• NEUTRAL"}
+        {trend === "up" ? "STABLE" : trend === "down" ? "VOLATILE" : "NEUTRAL"}
       </div>
     )}
   </div>
 );
+
 
 export const TechnicalIndicators = ({ analytics }: { analytics: AnalyticsSnapshot }) => {
   return (

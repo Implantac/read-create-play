@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,58 +7,59 @@
 @layer base {
   :root,
   .dark {
-    --background: 222 47% 4%;
-    --foreground: 213 31% 91%;
+    --background: 222 47% 2%;
+    --foreground: 213 31% 94%;
 
-    --card: 222 47% 6%;
-    --card-foreground: 213 31% 91%;
+    --card: 222 47% 4%;
+    --card-foreground: 213 31% 94%;
 
-    --popover: 222 47% 5%;
-    --popover-foreground: 213 31% 91%;
+    --popover: 222 47% 3%;
+    --popover-foreground: 213 31% 94%;
 
-    --primary: 160 84% 39%;
+    --primary: 160 84% 45%;
     --primary-foreground: 222 47% 2%;
 
-    --secondary: 222 47% 12%;
-    --secondary-foreground: 213 31% 80%;
+    --secondary: 222 47% 8%;
+    --secondary-foreground: 213 31% 85%;
 
-    --muted: 222 47% 10%;
-    --muted-foreground: 215 20% 50%;
+    --muted: 222 47% 6%;
+    --muted-foreground: 215 20% 60%;
 
-    --accent: 199 89% 48%;
+    --accent: 199 89% 55%;
     --accent-foreground: 222 47% 2%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 20% 98%;
 
-    --border: 222 47% 12%;
-    --input: 222 47% 12%;
-    --ring: 160 84% 39%;
+    --border: 222 47% 8%;
+    --input: 222 47% 8%;
+    --ring: 160 84% 45%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 222 47% 3%;
-    --sidebar-foreground: 213 31% 70%;
-    --sidebar-primary: 160 84% 39%;
+    --sidebar-background: 222 47% 1.5%;
+    --sidebar-foreground: 213 31% 80%;
+    --sidebar-primary: 160 84% 45%;
     --sidebar-primary-foreground: 222 47% 2%;
-    --sidebar-accent: 222 47% 8%;
-    --sidebar-accent-foreground: 213 31% 90%;
-    --sidebar-border: 222 47% 8%;
-    --sidebar-ring: 160 84% 39%;
+    --sidebar-accent: 222 47% 5%;
+    --sidebar-accent-foreground: 213 31% 95%;
+    --sidebar-border: 222 47% 5%;
+    --sidebar-ring: 160 84% 45%;
 
     /* Enterprise precision tokens */
-    --neon-green: 160 84% 39%;
-    --neon-blue: 199 89% 48%;
-    --neon-amber: 45 93% 47%;
+    --neon-green: 160 84% 45%;
+    --neon-blue: 199 89% 55%;
+    --neon-amber: 45 93% 55%;
     --neon-red: 0 84% 60%;
-    --neon-purple: 255 70% 60%;
-    --neon-cyan: 180 80% 45%;
-    --surface-elevated: 222 47% 8%;
-    --surface-glass: 222 47% 4%;
-    --glow-green: 0 0% 0% / 0;
+    --neon-purple: 255 70% 65%;
+    --neon-cyan: 180 80% 50%;
+    --surface-elevated: 222 47% 6%;
+    --surface-glass: 222 47% 1%;
+    --glow-green: 160 84% 45% / 0.15;
     
-    --brand-start: 160 84% 39%;
-    --brand-end: 199 89% 48%;
+    --brand-start: 160 84% 45%;
+    --brand-end: 199 89% 55%;
+
   }
 
   .light {
@@ -130,7 +131,7 @@
   }
 
   code, .font-mono {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Space Grotesk', monospace;
   }
 
   /* Custom scrollbar */
@@ -182,33 +183,36 @@
     background-clip: text;
   }
   .glass-panel {
-    background: hsl(var(--surface-glass) / 0.6);
-    backdrop-filter: blur(20px) saturate(1.2);
+    background: hsl(var(--surface-glass) / 0.7);
+    backdrop-filter: blur(24px) saturate(1.4);
     border: 1px solid hsl(var(--border) / 0.5);
   }
   .glass-card {
-    background: linear-gradient(135deg, hsl(var(--card) / 0.8) 0%, hsl(var(--card) / 0.6) 100%);
-    backdrop-filter: blur(12px) saturate(1.1);
-    border: 1px solid hsl(var(--border) / 0.3);
-    box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(135deg, hsl(var(--card) / 0.9) 0%, hsl(var(--card) / 0.7) 100%);
+    backdrop-filter: blur(16px) saturate(1.2);
+    border: 1px solid hsl(var(--border) / 0.4);
+    box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.6);
   }
   .lottery-ball {
-    @apply w-10 h-10 rounded-sm flex items-center justify-center text-sm font-bold font-mono transition-all duration-200;
-    background: hsl(var(--card));
-    border: 1px solid hsl(var(--primary) / 0.3);
+    @apply w-10 h-10 rounded-md flex items-center justify-center text-sm font-bold font-mono transition-all duration-300;
+    background: hsl(var(--secondary) / 0.5);
+    border: 1px solid hsl(var(--border));
     color: hsl(var(--foreground));
-    box-shadow: inset 0 0 10px hsl(var(--primary) / 0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
   .lottery-ball-hot {
-    border-color: hsl(var(--neon-red) / 0.5);
-    background: hsl(var(--neon-red) / 0.1);
+    border-color: hsl(var(--neon-red) / 0.6);
+    background: hsl(var(--neon-red) / 0.15);
     color: hsl(var(--neon-red));
+    box-shadow: 0 0 15px hsl(var(--neon-red) / 0.2);
   }
   .lottery-ball-cold {
-    border-color: hsl(var(--neon-blue) / 0.5);
-    background: hsl(var(--neon-blue) / 0.1);
+    border-color: hsl(var(--neon-blue) / 0.6);
+    background: hsl(var(--neon-blue) / 0.15);
     color: hsl(var(--neon-blue));
+    box-shadow: 0 0 15px hsl(var(--neon-blue) / 0.2);
   }
+
   .animate-shimmer {
     background: linear-gradient(
       110deg,

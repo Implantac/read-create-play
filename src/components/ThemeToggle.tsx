@@ -37,14 +37,17 @@ export function ThemeToggle() {
           size="icon"
           variant="ghost"
           onClick={handleToggle}
-          className="h-8 w-8 text-muted-foreground hover:text-foreground transition-colors"
+          className="h-9 w-9 rounded-xl text-muted-foreground hover:text-foreground hover:bg-primary/10 transition-all group relative overflow-hidden"
         >
-          <Sun className="h-4 w-4 rotate-0 scale-100 transition-transform dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
+          <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <Sun className="h-[1.1rem] w-[1.1rem] rotate-0 scale-100 transition-all duration-500 dark:-rotate-90 dark:scale-0 group-hover:scale-110" />
+          <Moon className="absolute h-[1.1rem] w-[1.1rem] rotate-90 scale-0 transition-all duration-500 dark:rotate-0 dark:scale-100 group-hover:scale-110" />
           <span className="sr-only">Alternar tema</span>
         </Button>
       </TooltipTrigger>
-      <TooltipContent>{theme === "dark" ? "Modo claro" : "Modo escuro"}</TooltipContent>
+      <TooltipContent side="bottom" className="font-bold uppercase tracking-widest text-[10px]">
+        {theme === "dark" ? "Visual Daylight" : "Visual Dark-Mode"}
+      </TooltipContent>
     </Tooltip>
   );
 }

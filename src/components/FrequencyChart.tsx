@@ -42,26 +42,29 @@ export function FrequencyChart({ stats, loading }: Props) {
   };
 
   return (
-    <div className="rounded-xl glass-card p-5 space-y-4">
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-          <BarChart3 className="w-4 h-4 text-primary" />
-        </div>
-        <div>
-          <h3 className="text-sm font-semibold text-foreground">Frequência de Números</h3>
-          <div className="flex items-center gap-3 mt-0.5">
-            <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-              <span className="w-2 h-2 rounded-full bg-neon-red" /> Quente
-            </span>
-            <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-              <span className="w-2 h-2 rounded-full bg-neon-blue" /> Frio
-            </span>
-            <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-              <span className="w-2 h-2 rounded-full bg-neon-green" /> Normal
-            </span>
+    <div className="rounded-2xl glass-card p-6 space-y-6 group transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform duration-500">
+            <BarChart3 className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-foreground uppercase tracking-wider italic">Frequência de Números</h3>
+            <div className="flex items-center gap-3 mt-1 opacity-70">
+              <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-muted-foreground">
+                <span className="w-2 h-2 rounded-full bg-neon-red shadow-[0_0_8px_rgba(255,0,0,0.5)]" /> Quente
+              </span>
+              <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-muted-foreground">
+                <span className="w-2 h-2 rounded-full bg-neon-blue shadow-[0_0_8px_rgba(0,180,255,0.5)]" /> Frio
+              </span>
+              <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-muted-foreground">
+                <span className="w-2 h-2 rounded-full bg-neon-green shadow-[0_0_8px_rgba(0,255,100,0.5)]" /> Normal
+              </span>
+            </div>
           </div>
         </div>
       </div>
+
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>

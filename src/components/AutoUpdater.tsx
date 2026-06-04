@@ -87,47 +87,50 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso, syncDraws }:
   const prizeTiers = latestFromApi?.prizeTiers;
 
   return (
-    <div className="rounded-xl bg-card border border-border p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className={`w-2 h-2 rounded-full ${isOnline ? "bg-primary animate-pulse" : "bg-destructive"}`} />
+    <div className="rounded-2xl glass-card p-6 relative overflow-hidden group transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5">
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent pointer-events-none" />
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative z-10">
+        <div className="flex items-center gap-4">
+          <div className={`w-12 h-12 rounded-xl border-2 flex items-center justify-center shrink-0 shadow-lg group-hover:rotate-12 transition-transform duration-500 ${isOnline ? "bg-primary/10 border-primary/30" : "bg-destructive/10 border-destructive/30"}`}>
+            {isOnline ? <Wifi className="w-6 h-6 text-primary animate-pulse" /> : <WifiOff className="w-6 h-6 text-destructive" />}
+          </div>
           <div>
-            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-              {isOnline ? <Wifi className="w-3.5 h-3.5 text-primary" /> : <WifiOff className="w-3.5 h-3.5 text-destructive" />}
-              Atualização de Resultados
+            <h3 className="text-sm font-black text-foreground uppercase tracking-widest italic flex items-center gap-2">
+              Sincronizador Neural
             </h3>
             {lastCheck && (
-              <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+              <p className="text-[10px] text-muted-foreground flex items-center gap-1.5 mt-1 font-bold uppercase tracking-widest opacity-60">
                 <Clock className="w-3 h-3" />
-                Última verificação: {lastCheck.toLocaleTimeString("pt-BR")}
+                Checked: {lastCheck.toLocaleTimeString("pt-BR")}
               </p>
             )}
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
           <button
             onClick={() => setAutoEnabled(!autoEnabled)}
-            className={`text-xs px-3 py-1.5 rounded-md border transition-all ${
+            className={`flex-1 sm:flex-initial text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2.5 rounded-xl border-2 transition-all duration-300 ${
               autoEnabled
-                ? "border-primary text-primary bg-primary/10"
-                : "border-border text-muted-foreground hover:text-foreground"
+                ? "border-primary/40 text-primary bg-primary/10 shadow-lg shadow-primary/10"
+                : "border-border/60 text-muted-foreground hover:text-foreground hover:bg-secondary/40"
             }`}
           >
-            {autoEnabled ? "Auto: ON" : "Auto: OFF"}
+            Auto-Sync: {autoEnabled ? "ENABLED" : "OFF"}
           </button>
           <Button
             size="sm"
             variant="outline"
             onClick={() => checkForUpdates()}
             disabled={loading}
-            className="border-border hover:border-primary"
+            className="flex-1 sm:flex-initial h-10 px-6 rounded-xl border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary font-black uppercase tracking-widest text-[10px] transition-all hover:scale-105 active:scale-95"
           >
-            <RefreshCw className={`w-3 h-3 mr-1 ${loading ? "animate-spin" : ""}`} />
-            {loading ? "Buscando..." : "Atualizar"}
+            <RefreshCw className={`w-3.5 h-3.5 mr-2 ${loading ? "animate-spin" : ""}`} />
+            {loading ? "SEARCHING..." : "SYNC NOW"}
           </Button>
         </div>
       </div>
+
 
       {/* Latest result from API with full prize data */}
       <AnimatePresence>
@@ -136,21 +139,26 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso, syncDraws }:
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="mt-4 rounded-lg bg-secondary/50 border border-border overflow-hidden"
+            className="mt-6 rounded-2xl bg-secondary/20 border border-border/40 overflow-hidden shadow-inner group/result"
           >
             {/* Header */}
-            <div className="p-3 border-b border-border/50">
-              <div className="flex items-center gap-2 mb-2">
-                <CheckCircle2 className="w-4 h-4 text-primary" />
-                <span className="text-sm text-foreground font-bold">
+            <div className="p-5 border-b border-border/40 bg-background/40 relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent pointer-events-none" />
+              <div className="flex items-center gap-3 mb-4 relative z-10">
+
+                <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 group-hover/result:scale-110 transition-transform">
+                  <CheckCircle2 className="w-5 h-5 text-primary" />
+                </div>
+                <span className="text-base text-foreground font-black uppercase tracking-tight italic">
                   Concurso #{latestFromApi.concurso}
                 </span>
-                <span className="text-xs text-muted-foreground ml-auto">{latestFromApi.date}</span>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-60 ml-auto">{latestFromApi.date}</span>
                 {prizeTiers?.acumulou && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-accent/20 text-accent border border-accent/30 font-bold animate-pulse">
+                  <span className="text-[9px] px-3 py-1 rounded-full bg-accent/20 text-accent border border-accent/30 font-black uppercase tracking-widest shadow-lg shadow-accent/10 animate-pulse">
                     ACUMULOU
                   </span>
                 )}
+
               </div>
               {/* Numbers */}
               <div className="flex flex-wrap gap-1.5">

@@ -14,25 +14,26 @@ export function PageHeader({ title, description, icon: Icon, badge, children }: 
     <motion.div
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
-      className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-white/5 relative"
+      className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10 pb-8 border-b border-white/5 relative"
     >
-      <div className="absolute -bottom-px left-0 w-32 h-px bg-gradient-to-r from-primary to-transparent" />
-      <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-xl bg-primary/5 border border-primary/20 flex items-center justify-center shrink-0 shadow-lg shadow-primary/5 group">
-          <Icon className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
+      <div className="absolute -bottom-px left-0 w-48 h-0.5 bg-gradient-to-r from-primary via-primary/50 to-transparent" />
+      <div className="flex items-center gap-5">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 flex items-center justify-center shrink-0 shadow-2xl shadow-primary/5 group transition-all duration-500 hover:rotate-6">
+          <Icon className="w-7 h-7 text-primary group-hover:scale-110 transition-transform duration-500" />
         </div>
         <div className="min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-2xl font-black text-foreground tracking-tighter uppercase italic">{title}</h1>
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1 className="text-3xl font-black text-foreground tracking-tighter uppercase italic">{title}</h1>
             {badge && (
-              <span className="text-[10px] font-mono font-bold uppercase tracking-widest px-2.5 py-1 rounded bg-accent/10 text-accent border border-accent/20 animate-pulse">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] px-3 py-1.5 rounded-full bg-accent/10 text-accent border border-accent/20">
                 {badge}
               </span>
             )}
           </div>
-          <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest opacity-70">{description}</p>
+          <p className="text-xs text-muted-foreground font-semibold uppercase tracking-[0.2em] opacity-60 mt-1">{description}</p>
         </div>
       </div>
+
       
       {/* Platform Metadata or Children */}
       <div className="flex items-center gap-4">
