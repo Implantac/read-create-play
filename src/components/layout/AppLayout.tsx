@@ -33,30 +33,33 @@ export function AppLayout() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-[#050505] text-slate-200 selection:bg-primary/30 selection:text-primary-foreground font-sans antialiased">
-        <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(120,119,198,0.12),rgba(255,255,255,0))] pointer-events-none" />
+      <div className="min-h-screen flex w-full bg-background text-foreground selection:bg-primary/30 selection:text-primary-foreground font-sans antialiased">
+        <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(160,84,45,0.08),rgba(255,255,255,0))] pointer-events-none" />
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
           {/* Header */}
-          <header className="border-b border-border/50 glass-panel sticky top-0 z-50">
+          <header className="border-b border-border/40 glass-panel sticky top-0 z-50 h-16 flex items-center shadow-2xl shadow-black/20">
+
             {/* Top row - brand + actions */}
-            <div className="h-14 flex items-center gap-3 px-4">
-              <SidebarTrigger className="shrink-0 text-muted-foreground hover:text-foreground" />
+            <div className="w-full flex items-center gap-4 px-6">
+              <SidebarTrigger className="shrink-0 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all rounded-xl h-10 w-10" />
               
-              <div className="w-px h-6 bg-border/50 hidden sm:block" />
+              <div className="w-px h-8 bg-border/40 hidden sm:block" />
+
 
               {/* Lottery selector - scrollable on mobile */}
               <div className="flex-1 overflow-x-auto scrollbar-hide">
                 <LotterySelector selected={selectedLottery} onSelect={setSelectedLottery} />
               </div>
 
-              <div className="flex items-center gap-1.5 shrink-0">
+              <div className="flex items-center gap-2 shrink-0">
                 {/* Draw count badge */}
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-muted/50 border border-border/30 cursor-default">
-                      <Database className="w-3 h-3 text-muted-foreground" />
-                      <span className="text-xs font-mono font-semibold text-foreground">
+                    <div className="hidden lg:flex items-center gap-2 px-3 py-2 rounded-xl bg-secondary/30 border border-border/40 cursor-default group transition-all hover:border-primary/30 shadow-inner">
+                      <Database className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
+                      <span className="text-xs font-mono font-black text-foreground/90">
+
                         {loading ? <Loader2 className="w-3 h-3 animate-spin inline" /> : count}
                       </span>
                     </div>
@@ -72,14 +75,15 @@ export function AppLayout() {
                       variant="ghost"
                       onClick={() => syncDraws()}
                       disabled={syncing}
-                      className="h-8 w-8 text-muted-foreground hover:text-primary transition-colors"
+                      className="h-10 w-10 rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all group"
                     >
                       {syncing ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
-                        <RefreshCw className="w-4 h-4" />
+                        <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
                       )}
                     </Button>
+
                   </TooltipTrigger>
                   <TooltipContent>{syncing ? "Sincronizando..." : "Sincronizar sorteios"}</TooltipContent>
                 </Tooltip>
@@ -87,20 +91,24 @@ export function AppLayout() {
                 {/* Theme toggle */}
                 <ThemeToggle />
 
-                <div className="w-px h-6 bg-border/50" />
+                <div className="w-px h-8 bg-border/40" />
 
                 {/* User menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="gap-2 hover:bg-muted/50 px-1.5">
-                      <div className="w-8 h-8 rounded-full gradient-brand flex items-center justify-center shadow-md shadow-primary/10">
+                    <Button variant="ghost" size="sm" className="gap-3 hover:bg-primary/5 px-2 rounded-xl transition-all border border-transparent hover:border-primary/20">
+                      <div className="w-9 h-9 rounded-xl gradient-brand flex items-center justify-center shadow-lg shadow-primary/20 border border-white/10 group-hover:scale-105 transition-all">
                         <User className="w-4 h-4 text-primary-foreground" />
                       </div>
-                      <span className="hidden md:inline text-xs text-muted-foreground max-w-[100px] truncate">
-                        {profile?.full_name || user?.email?.split("@")[0] || "Usuário"}
-                      </span>
+                      <div className="hidden md:flex flex-col items-start text-left shrink-0">
+                        <span className="text-xs font-black text-foreground tracking-tight uppercase italic">
+                          {profile?.full_name || user?.email?.split("@")[0] || "Usuário"}
+                        </span>
+                        <span className="text-[9px] text-muted-foreground font-bold tracking-widest uppercase opacity-60">ID Session • Connected</span>
+                      </div>
                     </Button>
                   </DropdownMenuTrigger>
+
                   <DropdownMenuContent align="end" className="w-60 glass-card">
                     <div className="px-3 py-2.5">
                       <p className="text-sm font-semibold text-foreground">{profile?.full_name || "Usuário"}</p>
