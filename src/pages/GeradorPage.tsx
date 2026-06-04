@@ -27,9 +27,9 @@ const GeradorPage = () => {
   useEffect(() => {
     if (location.state?.fromOnboarding) {
       setStep(2);
-      // Opcional: já disparar a geração se quiser ainda mais rápido
     }
   }, [location.state]);
+
 
 
   const [quantity, setQuantity] = useState(1);
