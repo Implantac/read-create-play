@@ -97,18 +97,23 @@ const GeradorPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700 pb-20 px-1">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded bg-primary/10 border border-primary/20 text-[9px] font-black text-primary uppercase tracking-[0.2em] italic">Neural Generator v5.3</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-4">
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Neural Generator v6.0</span>
+            </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic leading-none">
+          <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-tight">
             Assistente de <span className="gradient-brand-text">Geração</span>
           </h1>
-          <p className="text-sm text-muted-foreground font-medium max-w-md">Motor de inteligência sintética para geração de apostas de alta probabilidade.</p>
+          <p className="text-sm text-muted-foreground font-medium max-w-lg leading-relaxed">
+            Configure seu fluxo de predição. O motor Titan utiliza heurísticas avançadas para maximizar a convergência matemática.
+          </p>
         </div>
       </div>
+
       
       <div className="relative group">
         <div className="absolute -inset-1 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-[2rem] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-1000 pointer-events-none" />
@@ -117,18 +122,19 @@ const GeradorPage = () => {
 
       <div className="flex justify-between items-center mb-10 px-4">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="flex flex-col items-center gap-2 relative">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black transition-all ${
-              step >= i ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "bg-muted text-muted-foreground"
+          <div key={i} className="flex flex-col items-center gap-3 relative z-10">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black transition-all duration-500 ${
+              step >= i ? "bg-primary text-primary-foreground shadow-premium shadow-primary/20 scale-110" : "bg-secondary text-muted-foreground border border-border/40"
             }`}>
               {i}
             </div>
-            <span className={`text-[10px] font-bold uppercase tracking-widest ${step >= i ? "text-primary" : "text-muted-foreground"}`}>
+            <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${step >= i ? "text-primary" : "text-muted-foreground opacity-40"}`}>
               {i === 1 ? "Loteria" : i === 2 ? "Estratégia" : i === 3 ? "Volume" : "Resultado"}
             </span>
-            {i < 4 && <div className={`absolute top-5 left-12 w-full h-[2px] hidden md:block ${step > i ? "bg-primary" : "bg-muted"}`} style={{ width: 'calc(100% + 2rem)' }} />}
+            {i < 4 && <div className={`absolute top-6 left-16 w-full h-[1px] hidden md:block ${step > i ? "bg-primary" : "bg-border/40"}`} style={{ width: 'calc(100% + 1rem)' }} />}
           </div>
         ))}
+
       </div>
 
       <AnimatePresence mode="wait">
@@ -140,19 +146,20 @@ const GeradorPage = () => {
           transition={{ duration: 0.3 }}
         >
           {step === 1 && (
-            <Card className="glass-panel border-primary/20 p-8 text-center space-y-6">
-              <div className="w-20 h-20 rounded-2xl gradient-brand flex items-center justify-center mx-auto shadow-2xl">
-                <span className="text-4xl">{config.icon}</span>
+            <Card className="p-10 text-center space-y-8 max-w-2xl mx-auto border-primary/20 bg-primary/5">
+              <div className="w-24 h-24 rounded-3xl gradient-brand flex items-center justify-center mx-auto shadow-2xl shadow-primary/20 rotate-3">
+                <span className="text-5xl drop-shadow-lg">{config.icon}</span>
               </div>
-              <div className="space-y-2">
-                <h3 className="text-2xl font-black uppercase tracking-tighter">{config.name}</h3>
-                <p className="text-muted-foreground">Você selecionou {config.name}. Esta loteria exige {config.pick} números.</p>
+              <div className="space-y-3">
+                <h3 className="text-3xl font-black uppercase tracking-tighter italic">Seleção: {config.name}</h3>
+                <p className="text-muted-foreground text-base">O motor Titan está pronto para processar {config.pick} números com as melhores métricas de convergência para este concurso.</p>
               </div>
-              <Button onClick={nextStep} size="lg" className="rounded-xl px-12 font-black gap-2">
-                Confirmar e Continuar
-                <ChevronRight className="w-5 h-5" />
+              <Button onClick={nextStep} variant="premium" className="h-16 px-16 group">
+                Avançar para Estratégia
+                <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Card>
+
           )}
 
           {step === 2 && (
@@ -161,27 +168,29 @@ const GeradorPage = () => {
                 <h3 className="text-xl font-black uppercase tracking-tighter">Selecione a Estratégia</h3>
                 <p className="text-muted-foreground">O motor Titan utilizará o modelo escolhido para processar as dezenas.</p>
               </div>
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid md:grid-cols-2 gap-6">
                 {STRATEGIES.map((s) => (
                   <button
                     key={s.id}
                     onClick={() => { setStrategy(s.id); nextStep(); }}
-                    className={`p-6 rounded-2xl glass-card border transition-all text-left flex items-start gap-4 hover:border-primary/60 group ${
-                      strategy === s.id ? "border-primary bg-primary/5 ring-1 ring-primary/20" : "border-border/40"
+                    className={`p-8 rounded-[2.5rem] glass-card border transition-all text-left flex items-start gap-6 hover:border-primary/60 group relative overflow-hidden ${
+                      strategy === s.id ? "border-primary/60 bg-primary/10 ring-2 ring-primary/20 shadow-premium-hover" : "border-border/40"
                     }`}
                   >
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
-                      strategy === s.id ? "bg-primary text-primary-foreground" : "bg-muted group-hover:bg-primary/20"
+                    <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 shrink-0 relative z-10 ${
+                      strategy === s.id ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 rotate-6" : "bg-secondary group-hover:bg-primary/20 group-hover:text-primary"
                     }`}>
-                      <Settings2 className="w-6 h-6" />
+                      <Settings2 className="w-7 h-7" />
                     </div>
-                    <div>
-                      <h4 className="font-black text-lg uppercase tracking-tight">{s.name}</h4>
-                      <p className="text-sm text-muted-foreground">{s.desc}</p>
+                    <div className="relative z-10">
+                      <h4 className="font-black text-xl uppercase tracking-tight italic mb-1">{s.name}</h4>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
                     </div>
                   </button>
                 ))}
               </div>
+
               <div className="flex justify-start">
                 <Button variant="ghost" onClick={prevStep} className="gap-2">
                   <ChevronLeft className="w-4 h-4" /> Voltar
@@ -216,7 +225,9 @@ const GeradorPage = () => {
                   size="lg" 
                   onClick={handleGenerate} 
                   disabled={generating}
-                  className="rounded-xl px-16 h-14 font-black text-lg gap-3 gradient-brand hover:scale-105 transition-transform"
+                  variant="premium"
+                  className="px-16 h-16 group"
+
                 >
                   {generating ? (
                     <>
@@ -255,9 +266,10 @@ const GeradorPage = () => {
                       <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                         <div className="flex flex-wrap gap-2 justify-center">
                           {res.numbers.map((n: number) => (
-                            <div key={n} className="w-10 h-10 rounded-lg bg-primary/5 border border-primary/20 flex items-center justify-center font-black text-sm text-primary">
+                            <div key={n} className="lottery-ball">
                               {String(n).padStart(2, '0')}
                             </div>
+
                           ))}
                         </div>
                         <div className="flex items-center gap-6 shrink-0">
