@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { 
   BarChart3, Brain, Target, Zap, Clock, TrendingUp, 
   Search, Crown, History, Activity, Sparkles, LayoutGrid,
-  Filter, Award, Database, RefreshCw, Layers, Loader2
+  Filter, Award, Database, RefreshCw, Layers, Loader2,
+  TrendingDown, Shield, FileText, Share2 as Share, Play
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,6 +23,9 @@ import { RecentDraws } from "@/components/RecentDraws";
 import { cn } from "@/lib/utils";
 import { HeatmapIntensity } from "@/components/lottery/HeatmapIntensity";
 import { CorrelationNetwork } from "@/components/lottery/CorrelationNetwork";
+import { computeMatrixAnalysis } from "@/engine/matrix-analysis";
+import { MatrizAnaliseTable } from "@/components/MatrizAnaliseTable";
+import { FarolDezenas } from "@/components/FarolDezenas";
 import { useSavedBets } from "@/hooks/useSavedBets";
 
 const IntelligentGeneratorPanel = lazy(() => import("@/components/IntelligentGeneratorPanel").then(m => ({ default: m.IntelligentGeneratorPanel })));
@@ -48,6 +52,11 @@ export default function LotofacilPremiumPage() {
   const topElite = useMemo(() => 
     farol.filter(s => s.titanScore >= 85).sort((a, b) => b.titanScore - a.titanScore),
     [farol]
+  );
+
+  const matrixData = useMemo(
+    () => computeMatrixAnalysis(draws, config.numbers),
+    [draws, config.numbers]
   );
 
   if (selectedLottery !== "lotofacil") {
@@ -122,6 +131,9 @@ export default function LotofacilPremiumPage() {
             </TabsTrigger>
             <TabsTrigger value="strategy" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
               Estratégia
+            </TabsTrigger>
+            <TabsTrigger value="matrix" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
+              Matriz HP
             </TabsTrigger>
             <TabsTrigger value="generation" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
               Geração Elite
@@ -267,6 +279,37 @@ export default function LotofacilPremiumPage() {
             <StrategyBriefingPanel config={config} stats={stats} draws={draws} />
             <BettingBudgetPlanner config={config} stats={stats} draws={draws} />
           </div>
+        </TabsContent>
+
+        {/* --- MATRIX TAB --- */}
+        <TabsContent value="matrix" className="space-y-6">
+          <Card className="glass-card border-primary/20 overflow-hidden">
+            <CardHeader className="border-b border-primary/10 bg-primary/5">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
+                  <LayoutGrid className="w-5 h-5 text-primary" />
+                  Matriz de Alta Performance
+                </CardTitle>
+                <div className="flex gap-2">
+                  <Badge className="bg-primary/20 text-primary border-primary/30">SCORE V9.0</Badge>
+                  <Badge className="bg-accent/20 text-accent border-accent/30">QUANTUM STATS</Badge>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="space-y-8">
+                <FarolDezenas
+                  data={matrixData}
+                  totalNumbers={config.numbers}
+                  pickSize={config.pick}
+                  onSaveBet={(numbers, strategy, score) => handleSaveBet(numbers, strategy, score)}
+                />
+                <div className="pt-4">
+                  <MatrizAnaliseTable data={matrixData} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* --- GENERATION TAB --- */}
