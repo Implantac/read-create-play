@@ -16,6 +16,7 @@ export type Strategy =
   | "sectors"
   | "trend"
   | "cycle"
+  | "titan_pro"
   | "hybrid";
 
 export interface StrategyInfo {
