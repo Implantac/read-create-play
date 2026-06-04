@@ -77,8 +77,9 @@ export function GuidedOnboarding() {
   const handleComplete = () => {
     localStorage.setItem('titan_onboarding_completed', 'true');
     setIsOpen(false);
-    navigate('/gerador', { state: { fromOnboarding: true } });
+    navigate('/gerador', { state: { fromOnboarding: true, lotteryId: config.id } });
   };
+
 
 
   const handleSkip = () => {
