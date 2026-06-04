@@ -206,8 +206,8 @@ export default function LotofacilPremiumPage() {
       <LotteryContextBanner />
 
       <Tabs defaultValue="overview" className="space-y-6" onValueChange={setActiveTab}>
-        <div className="flex items-center justify-between gap-4 overflow-x-auto pb-2 scrollbar-hide">
-          <TabsList className="bg-secondary/20 border border-border/40 p-1 rounded-2xl">
+        <div className="flex items-center justify-between gap-4 overflow-x-auto pb-4 scrollbar-hide sticky top-0 z-30 bg-background/80 backdrop-blur-md px-1 -mx-1">
+          <TabsList className="bg-secondary/40 border border-border/40 p-1 rounded-2xl shadow-lg">
             <TabsTrigger value="overview" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
               Overview
             </TabsTrigger>

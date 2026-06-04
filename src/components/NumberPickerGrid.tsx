@@ -116,13 +116,13 @@ export function NumberPickerGrid({ config, stats, onSaveBet }: Props) {
               className={`
                 relative aspect-square rounded-xl text-xs font-black font-mono
                 flex items-center justify-center transition-all duration-300
-                border-2
+                border-2 shadow-sm shadow-black/20
                 ${isSelected
-                  ? "bg-primary text-primary-foreground border-primary shadow-xl shadow-primary/20 scale-110 z-10 italic"
+                  ? "bg-primary text-primary-foreground border-primary shadow-xl shadow-primary/30 scale-110 z-10 italic"
                   : isHot
-                    ? "bg-neon-red/10 text-neon-red border-neon-red/40 hover:bg-neon-red/20 hover:border-neon-red/60"
+                    ? "bg-neon-red/10 text-neon-red border-neon-red/40 hover:bg-neon-red/20 hover:border-neon-red/60 hover:shadow-neon-red/20"
                     : isCold
-                      ? "bg-neon-blue/10 text-neon-blue border-neon-blue/40 hover:bg-neon-blue/20 hover:border-neon-blue/60"
+                      ? "bg-neon-blue/10 text-neon-blue border-neon-blue/40 hover:bg-neon-blue/20 hover:border-neon-blue/60 hover:shadow-neon-blue/20"
                       : "bg-secondary/20 text-foreground/70 border-border/40 hover:bg-secondary/40 hover:text-foreground hover:border-border/60"
                 }
               `}

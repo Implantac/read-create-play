@@ -14,7 +14,7 @@ export function PageHeader({ title, description, icon: Icon, badge, children }: 
     <motion.div
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
-      className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10 pb-8 border-b border-white/5 relative"
+      className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10 pb-8 border-b border-white/5 relative z-20"
     >
       <div className="absolute -bottom-px left-0 w-48 h-0.5 bg-gradient-to-r from-primary via-primary/50 to-transparent" />
       <div className="flex items-center gap-5">
