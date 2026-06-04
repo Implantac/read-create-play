@@ -254,8 +254,8 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
                     <TableCell>
                       <ScoreBar score={row.score} />
                     </TableCell>
-                    <TableCell className="text-xs font-mono">{row.freqTotal}</TableCell>
-                    <TableCell className="text-xs font-mono">{row.freqRecent30}</TableCell>
+                    <TableCell className="text-xs font-mono">{formatNumber(row.freqTotal)}</TableCell>
+                    <TableCell className="text-xs font-mono">{formatNumber(row.freqRecent30)}</TableCell>
                     <TableCell>
                       <span className={`text-xs font-mono ${
                         row.currentDelay >= row.avgDelay ? "text-red-400" : "text-muted-foreground"
