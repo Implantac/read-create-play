@@ -3,7 +3,7 @@ import {
   Brain, ShieldCheck, Crown, PieChart, TrendingUp, ClipboardCheck, Bot, Lock,
   Smartphone, MessageCircle, Star, Search, User, FileSpreadsheet,
 } from "lucide-react";
-import { NavLink } from "@/components/NavLink";
+import { NavLink } from "@/components/layout/NavLink";
 import { usePlanAccess, type Feature } from "@/hooks/usePlanAccess";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLotteryContext } from "@/contexts/LotteryContext";
