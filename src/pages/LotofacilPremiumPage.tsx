@@ -332,6 +332,10 @@ export default function LotofacilPremiumPage() {
               </div>
             </div>
           </div>
+          <div className="grid lg:grid-cols-2 gap-6">
+            <HeatmapIntensity />
+            <InsightsCenter />
+          </div>
         </TabsContent>
 
         {/* --- STRATEGY TAB --- */}
