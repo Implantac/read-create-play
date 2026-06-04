@@ -29,7 +29,9 @@ const DelayChart = lazy(() => import("@/components/DelayChart").then(m => ({ def
 const AutoUpdater = lazy(() => import("@/components/AutoUpdater").then(m => ({ default: m.AutoUpdater })));
 const TitanCommandCenter = lazy(() => import("@/components/TitanCommandCenter").then(m => ({ default: m.TitanCommandCenter })));
 const NeuralSynergyCore = lazy(() => import("@/components/NeuralSynergyCore").then(m => ({ default: m.NeuralSynergyCore })));
+const NeuralMissionCenter = lazy(() => import("@/components/NeuralMissionCenter").then(m => ({ default: m.NeuralMissionCenter })));
 
+const SystemAuditStatus = lazy(() => import("@/components/SystemAuditStatus").then(m => ({ default: m.SystemAuditStatus })));
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -170,10 +172,13 @@ const DashboardPage = () => {
           <div className="space-y-6">
             <StrategyBriefingPanel config={config} stats={stats} draws={draws} />
             <div className="grid md:grid-cols-2 gap-6">
-              <GamificationCard />
+              <NeuralMissionCenter />
               <InsightsCenter />
             </div>
-            <ROIQuickView />
+            <div className="grid md:grid-cols-2 gap-6">
+              <GamificationCard />
+              <ROIQuickView />
+            </div>
             <NotificationsPanel />
           </div>
           <BettingBudgetPlanner config={config} stats={stats} draws={draws} compact />
@@ -197,16 +202,9 @@ const DashboardPage = () => {
         <Suspense fallback={<Skeleton className="h-[300px] w-full rounded-2xl" />}>
           <NeuralSynergyCore analytics={analytics} />
         </Suspense>
-        <div className="glass-card rounded-2xl border border-primary/20 p-6 bg-black/40 backdrop-blur-xl flex flex-col justify-between">
-           <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-4 flex items-center gap-2">
-             <Search className="w-4 h-4 text-primary" /> Neural Audit Log
-           </h3>
-           <div className="font-mono text-[10px] text-primary/60 space-y-2 h-32 overflow-hidden mask-fade-bottom">
-             <p>SYSTEM OK. CALIBRATING FLUX...</p>
-             <p>VERIFYING DATA INTEGRITY: {analytics.institutionalConfidence.toFixed(2)}%</p>
-             <p className="text-accent">ANOMALY DETECTION: SHIELD ACTIVE.</p>
-           </div>
-        </div>
+        <Suspense fallback={<Skeleton className="h-[200px] w-full rounded-2xl" />}>
+          <SystemAuditStatus />
+        </Suspense>
       </div>
 
       <m.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 lg:grid-cols-4 gap-3">

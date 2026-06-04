@@ -344,6 +344,39 @@ export type Database = {
         }
         Relationships: []
       }
+      missions: {
+        Row: {
+          created_at: string | null
+          description: string
+          icon: string
+          id: string
+          requirement_count: number
+          requirement_type: string
+          title: string
+          xp_reward: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          icon: string
+          id?: string
+          requirement_count: number
+          requirement_type: string
+          title: string
+          xp_reward?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          icon?: string
+          id?: string
+          requirement_count?: number
+          requirement_type?: string
+          title?: string
+          xp_reward?: number | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -665,6 +698,41 @@ export type Database = {
         }
         Relationships: []
       }
+      user_missions: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          current_progress: number | null
+          id: string
+          mission_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          current_progress?: number | null
+          id?: string
+          mission_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          current_progress?: number | null
+          id?: string
+          mission_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_missions_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roi_tracking: {
         Row: {
           amount_spent: number
@@ -736,6 +804,14 @@ export type Database = {
       is_blocked: { Args: { _user_id: string }; Returns: boolean }
       is_full_access_email: { Args: { _email: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      track_user_action: {
+        Args: { _action: string; _user_id: string }
+        Returns: undefined
+      }
+      update_mission_progress: {
+        Args: { _increment?: number; _type: string; _user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "super_admin"
