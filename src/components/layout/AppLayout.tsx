@@ -36,19 +36,19 @@ export function AppLayout() {
       <div className="min-h-screen flex w-full bg-background text-foreground selection:bg-primary/30 selection:text-primary-foreground font-sans antialiased">
         <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(160,84,45,0.08),rgba(255,255,255,0))] pointer-events-none" />
         <AppSidebar />
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Header */}
-          <header className="border-b border-border/40 glass-panel sticky top-0 z-50 h-16 flex items-center shadow-2xl shadow-black/20">
+          <header className="border-b border-border/40 glass-panel sticky top-0 z-50 h-16 flex items-center shadow-xl">
 
             {/* Top row - brand + actions */}
-            <div className="w-full flex items-center gap-4 px-6">
-              <SidebarTrigger className="shrink-0 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all rounded-xl h-10 w-10" />
+            <div className="w-full flex items-center gap-4 px-4 md:px-6">
+              <SidebarTrigger className="shrink-0 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all rounded-xl h-10 w-10 active:scale-95" />
               
-              <div className="w-px h-8 bg-border/40 hidden sm:block" />
+              <div className="w-px h-6 bg-border/40 hidden sm:block" />
 
 
               {/* Lottery selector - scrollable on mobile */}
-              <div className="flex-1 overflow-x-auto scrollbar-hide">
+              <div className="flex-1 flex items-center min-w-0 overflow-hidden">
                 <LotterySelector selected={selectedLottery} onSelect={setSelectedLottery} />
               </div>
 
@@ -118,15 +118,15 @@ export function AppLayout() {
                 {/* User menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="gap-3 hover:bg-primary/5 px-2 rounded-xl transition-all border border-transparent hover:border-primary/20">
-                      <div className="w-9 h-9 rounded-xl gradient-brand flex items-center justify-center shadow-lg shadow-primary/20 border border-white/10 group-hover:scale-105 transition-all">
+                    <Button variant="ghost" size="sm" className="gap-2.5 hover:bg-primary/5 px-1.5 md:px-3 rounded-xl transition-all border border-transparent hover:border-primary/20 active:scale-[0.98]">
+                      <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl gradient-brand flex items-center justify-center shadow-lg shadow-primary/20 border border-white/10 transition-all">
                         <User className="w-4 h-4 text-primary-foreground" />
                       </div>
                       <div className="hidden md:flex flex-col items-start text-left shrink-0">
-                        <span className="text-xs font-black text-foreground tracking-tight uppercase italic">
+                        <span className="text-xs font-black text-foreground tracking-tight uppercase italic leading-none">
                           {profile?.full_name || user?.email?.split("@")[0] || "Usuário"}
                         </span>
-                        <span className="text-[9px] text-muted-foreground font-bold tracking-widest uppercase opacity-60">ID Session • Connected</span>
+                        <span className="text-[8px] text-muted-foreground font-black tracking-widest uppercase opacity-60 mt-1">Status • Online</span>
                       </div>
                     </Button>
                   </DropdownMenuTrigger>
@@ -169,14 +169,16 @@ export function AppLayout() {
 
 
           {/* Footer */}
-          <footer className="border-t border-border/30 py-4">
-            <div className="container mx-auto px-4 flex flex-col items-center justify-center gap-2">
-              <div className="flex items-center gap-2 text-[10px] text-muted-foreground/60">
-                <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-pulse" />
-                <span className="font-mono tracking-wider uppercase">Titan Loterias — Motor v5.0 • Neural Core • Quantum Stats</span>
+          <footer className="border-t border-border/20 py-8 bg-black/20">
+            <div className="container mx-auto px-6 flex flex-col items-center justify-center gap-4">
+              <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40 italic">
+                <div className="w-2 h-2 rounded-full bg-primary/20 border border-primary/40 animate-pulse shadow-[0_0_10px_rgba(var(--primary-rgb),0.3)]" />
+                <span>Titan Loterias Alpha Core v5.3 — Next-Gen Intelligence</span>
+                <div className="w-2 h-2 rounded-full bg-primary/20 border border-primary/40 animate-pulse shadow-[0_0_10px_rgba(var(--primary-rgb),0.3)]" />
               </div>
-              <p className="text-[9px] text-muted-foreground/40 max-w-xs text-center leading-relaxed">
-                As loterias são eventos aleatórios. As análises Titan possuem caráter estritamente estatístico e não garantem premiações.
+              <div className="h-px w-16 bg-border/40" />
+              <p className="text-[9px] text-muted-foreground/30 max-w-sm text-center leading-loose font-medium uppercase tracking-widest italic">
+                As loterias são eventos aleatórios. Nossas análises utilizam heurísticas matemáticas avançadas, mas não constituem garantia de resultado financeiro. Use com responsabilidade.
               </p>
             </div>
           </footer>
