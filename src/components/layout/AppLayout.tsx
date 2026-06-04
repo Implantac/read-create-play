@@ -3,7 +3,7 @@ import { AppSidebar } from "./AppSidebar";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { LotterySelector } from "@/components/LotterySelector";
 import { Button } from "@/components/ui/button";
-import { Database, Loader2, LogOut, User, RefreshCw } from "lucide-react";
+import { Database, Loader2, LogOut, User, RefreshCw, Zap, Brain } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 
 import { useLotteryContext } from "@/contexts/LotteryContext";
@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/tooltip";
 
 export function AppLayout() {
-  const { selectedLottery, setSelectedLottery, loading, count, syncing, syncDraws } = useLotteryContext();
+  const { selectedLottery, setSelectedLottery, loading, count, syncing, syncDraws, viewMode, setViewMode } = useLotteryContext();
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -86,6 +86,28 @@ export function AppLayout() {
 
                   </TooltipTrigger>
                   <TooltipContent>{syncing ? "Sincronizando..." : "Sincronizar sorteios"}</TooltipContent>
+                </Tooltip>
+
+                {/* View Mode Toggle */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setViewMode(viewMode === "simple" ? "advanced" : "simple")}
+                      className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl border border-border/40 hover:bg-primary/5 hover:border-primary/20 transition-all group"
+                    >
+                      {viewMode === "simple" ? (
+                        <Zap className="w-3.5 h-3.5 text-amber-400 group-hover:animate-pulse" />
+                      ) : (
+                        <Brain className="w-3.5 h-3.5 text-primary group-hover:animate-pulse" />
+                      )}
+                      <span className="text-[10px] font-black uppercase tracking-widest hidden lg:block">
+                        {viewMode === "simple" ? "Modo Simples" : "Modo Avançado"}
+                      </span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Mudar para modo {viewMode === "simple" ? "Avançado" : "Simples"}</TooltipContent>
                 </Tooltip>
 
                 {/* Theme toggle */}
