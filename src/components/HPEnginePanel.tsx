@@ -268,7 +268,7 @@ export function HPEnginePanel({ stats, config, draws }: Props) {
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
                 <Timer className="w-3.5 h-3.5" />
-                {optResult.elapsedMs}ms • Score: {optResult.bestScore}/100
+                {formatNumber(optResult.elapsedMs)}ms • Score: {formatNumber(optResult.bestScore)}/100
               </div>
 
               <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
