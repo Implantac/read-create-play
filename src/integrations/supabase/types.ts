@@ -41,6 +41,87 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliate_commissions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          from_user_id: string | null
+          id: string
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          from_user_id?: string | null
+          id?: string
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          from_user_id?: string | null
+          id?: string
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      affiliate_program: {
+        Row: {
+          active_subscriptions: number | null
+          balance_available: number | null
+          created_at: string | null
+          referral_code: string
+          total_earned: number | null
+          total_referrals: number | null
+          user_id: string
+        }
+        Insert: {
+          active_subscriptions?: number | null
+          balance_available?: number | null
+          created_at?: string | null
+          referral_code: string
+          total_earned?: number | null
+          total_referrals?: number | null
+          user_id: string
+        }
+        Update: {
+          active_subscriptions?: number | null
+          balance_available?: number | null
+          created_at?: string | null
+          referral_code?: string
+          total_earned?: number | null
+          total_referrals?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      affiliate_referrals: {
+        Row: {
+          created_at: string | null
+          id: string
+          referred_id: string
+          referrer_id: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          referred_id: string
+          referrer_id: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          referred_id?: string
+          referrer_id?: string
+          status?: string | null
+        }
+        Relationships: []
+      }
       ai_analysis_cache: {
         Row: {
           cache_key: string
@@ -194,6 +275,45 @@ export type Database = {
         }
         Relationships: []
       }
+      investment_simulations: {
+        Row: {
+          created_at: string | null
+          duration_months: number
+          estimated_return: number | null
+          id: string
+          lottery_id: string
+          monthly_budget: number
+          recommended_strategy_id: string | null
+          risk_level: string
+          simulation_data: Json | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          duration_months: number
+          estimated_return?: number | null
+          id?: string
+          lottery_id: string
+          monthly_budget: number
+          recommended_strategy_id?: string | null
+          risk_level: string
+          simulation_data?: Json | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          duration_months?: number
+          estimated_return?: number | null
+          id?: string
+          lottery_id?: string
+          monthly_budget?: number
+          recommended_strategy_id?: string | null
+          risk_level?: string
+          simulation_data?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       lottery_draws: {
         Row: {
           concurso: number
@@ -221,6 +341,39 @@ export type Database = {
           lottery_id?: string
           numbers?: number[]
           prize_tiers?: Json | null
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          metadata: Json | null
+          read: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          metadata?: Json | null
+          read?: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          metadata?: Json | null
+          read?: boolean | null
+          title?: string
+          type?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -386,6 +539,162 @@ export type Database = {
           subject?: string
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      system_insights: {
+        Row: {
+          content: string
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          insight_type: string
+          lottery_id: string
+          score: number | null
+          title: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          insight_type: string
+          lottery_id: string
+          score?: number | null
+          title: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          insight_type?: string
+          lottery_id?: string
+          score?: number | null
+          title?: string
+        }
+        Relationships: []
+      }
+      user_achievements: {
+        Row: {
+          achievement_type: string
+          id: string
+          metadata: Json | null
+          unlocked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          achievement_type: string
+          id?: string
+          metadata?: Json | null
+          unlocked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          achievement_type?: string
+          id?: string
+          metadata?: Json | null
+          unlocked_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_favorites: {
+        Row: {
+          created_at: string | null
+          id: string
+          item_id: string
+          item_type: string
+          metadata: Json | null
+          title: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          item_id: string
+          item_type: string
+          metadata?: Json | null
+          title?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          item_id?: string
+          item_type?: string
+          metadata?: Json | null
+          title?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_gamification: {
+        Row: {
+          created_at: string | null
+          level: number | null
+          rank_position: number | null
+          total_games_generated: number | null
+          total_games_won: number | null
+          total_points: number | null
+          updated_at: string | null
+          user_id: string
+          xp: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          level?: number | null
+          rank_position?: number | null
+          total_games_generated?: number | null
+          total_games_won?: number | null
+          total_points?: number | null
+          updated_at?: string | null
+          user_id: string
+          xp?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          level?: number | null
+          rank_position?: number | null
+          total_games_generated?: number | null
+          total_games_won?: number | null
+          total_points?: number | null
+          updated_at?: string | null
+          user_id?: string
+          xp?: number | null
+        }
+        Relationships: []
+      }
+      user_roi_tracking: {
+        Row: {
+          amount_spent: number
+          amount_won: number | null
+          bet_date: string
+          created_at: string | null
+          game_ids: string[] | null
+          id: string
+          lottery_id: string
+          user_id: string
+        }
+        Insert: {
+          amount_spent: number
+          amount_won?: number | null
+          bet_date: string
+          created_at?: string | null
+          game_ids?: string[] | null
+          id?: string
+          lottery_id: string
+          user_id: string
+        }
+        Update: {
+          amount_spent?: number
+          amount_won?: number | null
+          bet_date?: string
+          created_at?: string | null
+          game_ids?: string[] | null
+          id?: string
+          lottery_id?: string
+          user_id?: string
         }
         Relationships: []
       }
