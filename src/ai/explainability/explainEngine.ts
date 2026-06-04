@@ -33,9 +33,9 @@ export function explainGame(game: ScoredGame, lotteryId: string): string {
 export function explainWheeling(result: WheelingResult): string {
   const lines = [
     `🔒 **Fechamento Matemático**`,
-    `📋 Base: ${result.baseNumbers.length} dezenas → ${result.totalGames} jogos`,
-    `🎯 Garantia: ${result.guarantee} pontos mínimos`,
-    `💰 Custo estimado: R$ ${result.estimatedCost.toFixed(2)}`,
+    `📋 Base: ${formatNumber(result.baseNumbers.length)} dezenas → ${formatNumber(result.totalGames)} jogos`,
+    `🎯 Garantia: ${formatNumber(result.guarantee)} pontos mínimos`,
+    `💰 Custo estimado: ${formatCurrency(result.estimatedCost)}`,
     "",
     `**Validação de cobertura:**`,
     `• Cobertura: ${result.coverageValidation.coveragePercent.toFixed(1)}%`,
