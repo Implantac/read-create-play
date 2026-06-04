@@ -1,8 +1,9 @@
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bookmark, Trash2, Copy, Check, Loader2, Download, FileSpreadsheet, FileText } from "lucide-react";
+import { Bookmark, Trash2, Copy, Check, Loader2, Download, FileSpreadsheet, FileText, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -14,7 +15,8 @@ import { exportToCsv, exportToExcel } from "@/utils/export";
 import { exportToPdf } from "@/engine/pdf-export";
 
 import { toast } from "sonner";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+
 
 
 export function SavedBetsPanel() {
@@ -34,6 +36,27 @@ export function SavedBetsPanel() {
     const aGrade = savedBets.filter(b => b.grade === 'A').length;
     return { total, sGrade, aGrade };
   }, [savedBets]);
+
+  const qualityAlert = useMemo(() => {
+    const lowQualityCount = savedBets.filter(b => b.grade && ['C', 'D', 'F'].includes(b.grade)).length;
+    if (lowQualityCount > 0) {
+      return {
+        count: lowQualityCount,
+        message: `${lowQualityCount} aposta(s) no seu portfolio estão com qualidade abaixo do nível TITAN recomendado.`
+      };
+    }
+    return null;
+  }, [savedBets]);
+
+  useEffect(() => {
+    if (qualityAlert) {
+      toast.warning("Alerta de Qualidade", {
+        description: qualityAlert.message,
+        duration: 5000,
+      });
+    }
+  }, [qualityAlert?.count]);
+
 
 
   const copyBet = (bet: number[], id: string) => {
@@ -161,6 +184,28 @@ export function SavedBetsPanel() {
         )}
 
       </div>
+
+      <AnimatePresence>
+        {qualityAlert && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="relative z-10"
+          >
+            <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 flex items-start gap-3">
+              <AlertTriangle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <p className="text-[10px] font-black uppercase text-destructive tracking-widest">Alerta de Robustez</p>
+                <p className="text-[10px] text-muted-foreground leading-tight">
+                  {qualityAlert.message} Recomenda-se otimizar ou substituir por matrizes de Rank S/A.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
 
 
       <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide relative z-10 border-b border-white/5">
