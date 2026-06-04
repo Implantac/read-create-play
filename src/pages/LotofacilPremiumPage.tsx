@@ -29,6 +29,22 @@ import { computeMatrixAnalysis } from "@/engine/matrix-analysis";
 import { MatrizAnaliseTable } from "@/components/MatrizAnaliseTable";
 import { FarolDezenas } from "@/components/FarolDezenas";
 import { useSavedBets } from "@/hooks/useSavedBets";
+import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   analyzeWorksheetGames,
   generateWorksheetMatrixGames,
