@@ -7,7 +7,8 @@ import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { ComplianceDisclaimer } from "@/components/ComplianceDisclaimer";
 import { ComparativeSimulatorPanel } from "@/components/ComparativeSimulatorPanel";
 import { StrategyBriefingPanel } from "@/components/StrategyBriefingPanel";
-import { FlaskConical, Loader2 } from "lucide-react";
+import { FlaskConical, Loader2, Calculator } from "lucide-react";
+import { InvestmentSimulator } from "@/components/InvestmentSimulator";
 
 const HistoricalSimulatorPanel = lazy(() => import("@/components/HistoricalSimulatorPanel").then(m => ({ default: m.HistoricalSimulatorPanel })));
 const MassiveSimulationDashboard = lazy(() => import("@/components/MassiveSimulationDashboard").then(m => ({ default: m.MassiveSimulationDashboard })));
@@ -47,6 +48,7 @@ const SimulacoesPage = () => {
             </div>
 
             <StrategyBriefingPanel config={config} stats={stats} draws={draws} compact />
+            <InvestmentSimulator />
 
             <ComparativeSimulatorPanel stats={stats} config={config} draws={draws} />
 

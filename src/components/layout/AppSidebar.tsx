@@ -68,6 +68,7 @@ const accountItems = [
   { title: "Planos", url: "/planos", icon: Crown },
   { title: "Suporte", url: "/suporte", icon: MessageCircle },
   { title: "Instalar App", url: "/install", icon: Smartphone },
+  { title: "Indique e Ganhe", url: "/afiliados", icon: Share2 },
 ];
 
 const PLAN_LABELS: Record<string, string> = {

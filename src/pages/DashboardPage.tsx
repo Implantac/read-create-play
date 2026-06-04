@@ -46,6 +46,7 @@ import { StrategyBriefingPanel } from "@/components/StrategyBriefingPanel";
 import { BettingBudgetPlanner } from "@/components/BettingBudgetPlanner";
 import { GamificationCard } from "@/components/GamificationCard";
 import { InsightsCenter } from "@/components/InsightsCenter";
+import { ROIQuickView } from "@/components/ROIQuickView";
 import { supabase } from "@/integrations/supabase/client";
 
 const container = {
@@ -171,6 +172,7 @@ const DashboardPage = () => {
               <GamificationCard />
               <InsightsCenter />
             </div>
+            <ROIQuickView />
           </div>
           <BettingBudgetPlanner config={config} stats={stats} draws={draws} compact />
         </div>

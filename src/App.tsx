@@ -36,6 +36,7 @@ const StrategyLabPage = lazy(() => import("@/pages/StrategyLabPage"));
 const MatrizAnalisePage = lazy(() => import("@/pages/MatrizAnalisePage"));
 const PlanilhasMatrizPage = lazy(() => import("@/pages/PlanilhasMatrizPage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
+const AffiliatePage = lazy(() => import("./pages/AffiliatePage"));
 const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage"));
 const SuportePage = lazy(() => import("./pages/SuportePage"));
 const InstallPage = lazy(() => import("./pages/InstallPage"));
@@ -116,6 +117,7 @@ function App() {
                 <Route path="/jogos-salvos" element={<JogosSalvosPage />} />
                 <Route path="/perfil" element={<PerfilPage />} />
                 <Route path="/laboratorio" element={<StrategyLabPage />} />
+                <Route path="/afiliados" element={<AffiliatePage />} />
                 <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
               </Route>
               <Route path="*" element={<NotFound />} />
