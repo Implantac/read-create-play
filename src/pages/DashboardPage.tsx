@@ -172,7 +172,7 @@ const DashboardPage = () => {
           <Button
             size="sm"
             variant="outline"
-            onClick={() => syncDraws()}
+              onClick={() => syncDraws()}
             disabled={syncing}
             className="border-primary/20 hover:border-primary/50 bg-primary/5 gap-2"
           >
