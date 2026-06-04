@@ -14,8 +14,9 @@ import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { NumberStats } from "@/engine/stats/statistics";
 import {
   SimulationBet, SimulationOutput, BetSimulationResult,
-  runSimulation, parseBetsFromText, generateRandomBets, getMinPrizeHits,
+  runSimulation, parseBetsFromText, generateRandomBets,
 } from "@/engine/simulators/intelligent-simulator";
+import { getMinPrizeHits } from "@/engine/simulators/lib/simulation-utils";
 
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,

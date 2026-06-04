@@ -98,12 +98,7 @@ export function runMassiveBatch(
 
   for (let i = 0; i < iterations; i++) {
     // Generate bet using strategy
-    const bet = strategy === "smart" || strategy === "hot" || strategy === "cold" || strategy === "balanced"
-      || strategy === "fibonacci" || strategy === "primes" || strategy === "golden"
-      || strategy === "pattern" || strategy === "lowDelay" || strategy === "sectors"
-      || strategy === "trend" || strategy === "cycle" || strategy === "hybrid" || strategy === "ml"
-      ? generateByStrategy(strategy, stats, config)
-      : generateByStrategy("smart", stats, config);
+    const bet = generateByStrategy(strategy, stats, config);
 
     // Generate random draw to test against
     const draw = draws.length > 0
@@ -183,10 +178,7 @@ export function runMassiveSimulation(
     const hitValues = Object.entries(batch.hitDist).flatMap(([h, c]) =>
       Array(c).fill(Number(h))
     );
-    const mean = avgHits;
-    const variance = hitValues.reduce((s, v) => s + (v - mean) ** 2, 0) / hitValues.length;
-    const stdDev = Math.sqrt(variance);
-    const consistency = mean > 0 ? Math.max(0, 1 - stdDev / mean) : 0;
+    const consistency = calculateConsistency(hitValues, avgHits, config.pick);
 
     performances.push({
       strategy,
@@ -199,7 +191,7 @@ export function runMassiveSimulation(
       hitRate5Plus: Math.round(hitRate5Plus * 10000) / 100,
       hitRateFull: Math.round(hitRateFull * 1000000) / 10000,
       expectedValue: Math.round(ev * 100) / 100,
-      consistency: Math.round(consistency * 1000) / 1000,
+      consistency: Math.round(consistency) / 100, // consistency is 0-100 from util, target is 0-1
     });
   }
 
