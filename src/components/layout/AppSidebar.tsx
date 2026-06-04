@@ -94,11 +94,12 @@ export function AppSidebar() {
           {!collapsed && (
             <div>
               <div className="flex items-center gap-1.5">
-                <h1 className="text-base font-bold tracking-tight text-sidebar-accent-foreground">
-                  Titan<span className="gradient-brand-text ml-1">Loterias</span>
+                <h1 className="text-lg font-black tracking-tighter text-sidebar-accent-foreground uppercase italic">
+                  Titan<span className="gradient-brand-text ml-0.5">Loterias</span>
                 </h1>
                 {isAdmin && (
-                  <span className={`px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded border animate-pulse ${
+                  <span className={`px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.2em] rounded-full border animate-pulse ${
+
                     isSuperAdmin 
                       ? "bg-amber-500/20 text-amber-400 border-amber-500/30" 
                       : "bg-red-500/20 text-red-400 border-red-500/30"
@@ -107,9 +108,10 @@ export function AppSidebar() {
                   </span>
                 )}
               </div>
-              <p className="text-[10px] text-muted-foreground font-mono tracking-wider uppercase">
-                Neural Engine v5.2
+              <p className="text-[9px] text-muted-foreground font-black tracking-[0.3em] uppercase opacity-40">
+                Neural Core v5.3
               </p>
+
 
             </div>
           )}
