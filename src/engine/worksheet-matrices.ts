@@ -38,6 +38,15 @@ export interface WorksheetMatrixResult {
   totalCost: number;
 }
 
+export interface WorksheetBacktestResult {
+  totalDraws: number;
+  avgHits: number;
+  totalPrizes: number;
+  prizeRate: number;
+  hitsDistribution: Record<number, number>;
+  bestHitsInPeriod: number;
+}
+
 export const LOTOFACIL_WORKSHEET_PRESETS: WorksheetMatrixPreset[] = [
   {
     id: "plan21x50",
@@ -184,6 +193,40 @@ export function analyzeWorksheetGames(
     bestHits: analyzed.reduce((best, game) => Math.max(best, game.hits), 0),
     hitDistribution,
     totalCost: games.length * LOTOFACIL_PRICE,
+  };
+}
+
+export function runWorksheetBacktest(
+  games: number[][],
+  draws: DrawResult[],
+  period: number = 100
+): WorksheetBacktestResult {
+  const periodDraws = draws.slice(0, Math.min(period, draws.length));
+  let totalHits = 0;
+  let totalPrizes = 0;
+  const hitsDistribution: Record<number, number> = {};
+  let bestHitsInPeriod = 0;
+
+  periodDraws.forEach(draw => {
+    const drawSet = new Set(draw.numbers);
+    games.forEach(game => {
+      const hits = game.filter(n => drawSet.has(n)).length;
+      totalHits += hits;
+      if (hits >= 11) totalPrizes++;
+      hitsDistribution[hits] = (hitsDistribution[hits] || 0) + 1;
+      if (hits > bestHitsInPeriod) bestHitsInPeriod = hits;
+    });
+  });
+
+  const totalGamesChecked = games.length * periodDraws.length;
+
+  return {
+    totalDraws: periodDraws.length,
+    avgHits: totalGamesChecked > 0 ? parseFloat((totalHits / totalGamesChecked).toFixed(2)) : 0,
+    totalPrizes,
+    prizeRate: totalGamesChecked > 0 ? parseFloat(((totalPrizes / totalGamesChecked) * 100).toFixed(2)) : 0,
+    hitsDistribution,
+    bestHitsInPeriod
   };
 }
 
