@@ -159,9 +159,10 @@ export function AppSidebar() {
                             <NavLink
                               to={item.url}
                               end={item.url === "/"}
-                              className={`rounded-lg px-3 py-2.5 text-sm transition-all duration-300 hover:bg-sidebar-accent/40 ${locked ? "text-muted-foreground/50" : "text-sidebar-foreground"}`}
-                              activeClassName="bg-primary/15 text-primary font-bold shadow-[0_0_20px_rgba(34,197,94,0.15)] border-l-2 border-primary"
+                              className={`rounded-xl px-4 py-3 text-sm transition-all duration-300 hover:bg-primary/10 group/item relative overflow-hidden ${locked ? "text-muted-foreground/40" : "text-sidebar-foreground/80"}`}
+                              activeClassName="bg-primary/20 text-primary font-black shadow-[0_0_25px_rgba(var(--primary),0.2)] border-l-4 border-primary ring-1 ring-primary/20"
                             >
+
                               <item.icon className="mr-3 h-4 w-4 shrink-0" />
                               {!collapsed && (
                                 <>
@@ -201,9 +202,10 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={item.url}
-                      className="rounded-lg px-3 py-2.5 text-sm transition-all duration-300 hover:bg-sidebar-accent/40 text-sidebar-foreground"
-                      activeClassName="bg-primary/15 text-primary font-bold shadow-[0_0_20px_rgba(34,197,94,0.15)] border-l-2 border-primary"
+                      className="rounded-xl px-4 py-3 text-sm transition-all duration-300 hover:bg-primary/10 text-sidebar-foreground/80 group/item"
+                      activeClassName="bg-primary/20 text-primary font-black shadow-[0_0_25px_rgba(var(--primary),0.2)] border-l-4 border-primary ring-1 ring-primary/20"
                     >
+
                       <item.icon className="mr-3 h-4 w-4 shrink-0" />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
@@ -225,9 +227,10 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink
                       to="/admin"
-                      className="rounded-lg px-3 py-2.5 text-sm transition-all duration-300 hover:bg-sidebar-accent/40 text-sidebar-foreground"
-                      activeClassName="bg-primary/15 text-primary font-bold shadow-[0_0_20px_rgba(34,197,94,0.15)] border-l-2 border-primary"
+                      className="rounded-xl px-4 py-3 text-sm transition-all duration-300 hover:bg-primary/10 text-sidebar-foreground/80 group/item"
+                      activeClassName="bg-primary/20 text-primary font-black shadow-[0_0_25px_rgba(var(--primary),0.2)] border-l-4 border-primary ring-1 ring-primary/20"
                     >
+
                       <ShieldCheck className="mr-3 h-4 w-4 shrink-0" />
                       {!collapsed && <span>Painel Admin</span>}
                     </NavLink>
