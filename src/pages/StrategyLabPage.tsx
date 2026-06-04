@@ -276,7 +276,7 @@ export default function StrategyLabPage() {
                 <>
                   <Badge variant="secondary" className="text-xs gap-1.5 py-1.5 px-3">
                     <Activity className="w-3 h-3" />
-                    {result.rankings.length} testadas
+                    {formatNumber(result.rankings.length)} testadas
                   </Badge>
                   <Badge className="text-xs gap-1.5 py-1.5 px-3 bg-primary/10 text-primary border-primary/20">
                     <Dices className="w-3 h-3" />
