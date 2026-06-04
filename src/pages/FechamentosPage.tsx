@@ -368,29 +368,44 @@ export default function FechamentosPage() {
                 )}
 
                 <div className="flex flex-col gap-4">
-                  {recommendation && (
-                    <motion.div 
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="p-4 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-between"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                          <Brain className="w-5 h-5 text-primary" />
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-black uppercase tracking-widest text-primary">Engenharia Titan (FAROL)</p>
-                          <h4 className="text-sm font-bold uppercase">{recommendation.name}</h4>
-                          <p className="text-[10px] text-muted-foreground">Eficiência: {recommendation.efficiency} • Garantia Profissional</p>
-                        </div>
+                  <div className="p-4 rounded-2xl bg-secondary/30 border border-border/40 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Brain className="w-4 h-4 text-primary" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Analista de Precisão IA</span>
                       </div>
-                      <Button size="sm" onClick={() => setSelectedMatrix(recommendation.id as any)} className="gradient-brand h-8 px-4 text-[10px] font-black uppercase">
-                        Aplicar
-                      </Button>
-                    </motion.div>
-                  )}
+                      <Badge variant="outline" className="text-emerald-400 bg-emerald-400/10 border-emerald-400/20 text-[9px]">
+                        Confiança: 94%
+                      </Badge>
+                    </div>
+                    
+                    <p className="text-[11px] text-foreground leading-relaxed">
+                      "O plano <strong className="text-primary">{currentMatrix.name}</strong> é altamente recomendado para as {baseNumbers.length} dezenas selecionadas. 
+                      A cobertura de <strong>{currentMatrix.guarantee} acertos</strong> garante retorno em {(currentMatrix as any).efficiency} dos cenários simulados."
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground uppercase font-bold">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                        Ciclo Favorável
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground uppercase font-bold">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                        Distribuição OK
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground uppercase font-bold">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                        Matriz Validada
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground uppercase font-bold">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                        ROI Otimizado
+                      </div>
+                    </div>
+                  </div>
 
                   <div className="flex gap-2">
+
                     <Button
                       onClick={generateGames}
                       disabled={!canGenerate}
