@@ -96,7 +96,7 @@ const quickLinks = [
 
 const DashboardPage = () => {
   useHideLovableBadge();
-  const { config, draws, drawsWithPrizes, loading, syncing, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery } = useLotteryContext();
+  const { config, draws, drawsWithPrizes, loading, syncing, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery, hotNumbers, coldNumbers } = useLotteryContext();
   const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
   const { currentPlan } = usePlanAccess();
   const { profile, trialDaysLeft, isTrialExpired, isAdmin, isSuperAdmin } = useAuth();
@@ -119,9 +119,8 @@ const DashboardPage = () => {
   const { history, saveGeneration } = useGenerationHistory(selectedLottery);
 
   const analytics = useMemo(() => calculateAnalyticsSnapshot(stats, draws), [stats, draws]);
-  const { volatilityIndex, saturationScore, complexityScore } = analytics;
   const heatingCount = useMemo(() => stats.filter(s => s.trend > 15).length, [stats]);
-  const isSaturated = saturationScore > 75;
+  const isSaturated = analytics.saturationScore > 75;
 
   const handleNewDraw = useCallback((draw: DrawResult) => addDraw(draw), [addDraw]);
 
