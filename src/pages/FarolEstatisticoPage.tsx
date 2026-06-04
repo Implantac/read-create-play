@@ -273,13 +273,13 @@ export default function FarolEstatisticoPage() {
                 <div className="pt-2 border-t border-border/20">
                   <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-2 flex items-center gap-1.5">
                     <Activity className="w-3 h-3 text-primary" />
-                    Principais Correlações
+                    Correlação (Ao sair o {s.number}...)
                   </p>
                   <div className="flex flex-wrap gap-1.5">
-                    {s.correlations.slice(0, 3).map((c) => (
+                    {s.correlations.slice(0, 4).map((c) => (
                       <div key={c.number} className="flex items-center gap-1 bg-muted/30 px-2 py-1 rounded-lg border border-border/20">
-                        <span className="text-[9px] font-mono font-bold">{String(c.number).padStart(2, "0")}</span>
-                        <span className="text-[8px] text-muted-foreground">{Math.round(c.percentage)}%</span>
+                        <span className="text-[9px] font-mono font-bold text-primary">{String(c.number).padStart(2, "0")}</span>
+                        <span className="text-[8px] text-muted-foreground font-black">{Math.round(c.percentage)}%</span>
                       </div>
                     ))}
                   </div>
