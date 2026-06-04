@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, memo } from "react";
 import { DrawResult } from "@/data/lotteries";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { StatsCard } from "@/components/common/StatsCard";
@@ -13,12 +13,13 @@ import { DelayChart } from "@/components/DelayChart";
 import { AutoUpdater } from "@/components/AutoUpdater";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/common/EmptyState";
+import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { TitanCommandCenter } from "@/components/TitanCommandCenter";
 import { TechnicalIndicators } from "@/components/TechnicalIndicators";
 import { AlphaMomentumSignal } from "@/components/AlphaMomentumSignal";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, Search, ActivitySquare, ShieldCheck } from "lucide-react";
+import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, Search, ActivitySquare, ShieldCheck, Activity } from "lucide-react";
 
 // FIX: ensure Activity symbol is never referenced globally in runtime.
 // Some build outputs may accidentally emit an `Activity` identifier reference;
@@ -285,13 +286,15 @@ const DashboardPage = () => {
       {loading && (
         <div className="space-y-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map(i => (
-              <Skeleton key={i} className="h-28 rounded-xl bg-muted/10 border border-white/5" />
-            ))}
+            <LoadingSkeleton variant="card" count={4} />
           </div>
           <div className="grid lg:grid-cols-3 gap-6">
-            <Skeleton className="h-64 lg:col-span-2 rounded-xl bg-muted/10 border border-white/5" />
-            <Skeleton className="h-64 rounded-xl bg-muted/10 border border-white/5" />
+            <div className="lg:col-span-2">
+              <LoadingSkeleton variant="chart" count={1} />
+            </div>
+            <div>
+              <LoadingSkeleton variant="list" count={1} />
+            </div>
           </div>
         </div>
       )}
