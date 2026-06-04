@@ -82,3 +82,7 @@ export function useLotteryContext() {
   if (!ctx) throw new Error("useLotteryContext must be within LotteryProvider");
   return ctx;
 }
+
+export function useLotteryContextSafe() {
+  return useContext(LotteryContext);
+}
