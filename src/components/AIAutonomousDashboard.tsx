@@ -492,110 +492,62 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
           </Card>
         </TabsContent>
 
-        {/* Chi-Square Tab */}
-        <TabsContent value="chisquare" className="space-y-4">
-          <div className="grid md:grid-cols-3 gap-4">
-            <Card>
-              <CardContent className="pt-4 pb-3">
-                <p className="text-xs text-muted-foreground mb-1">Estatística χ²</p>
-                <p className="text-2xl font-bold">{report.chiSquareResult.chiSquare.toFixed(2)}</p>
-                <p className="text-[10px] text-muted-foreground">GL = {report.chiSquareResult.degreesOfFreedom}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-4 pb-3">
-                <p className="text-xs text-muted-foreground mb-1">p-valor</p>
-                <p className={`text-2xl font-bold ${report.chiSquareResult.isUniform ? "text-green-500" : "text-destructive"}`}>
-                  {report.chiSquareResult.pValue.toFixed(4)}
-                </p>
-                <p className="text-[10px] text-muted-foreground">{report.chiSquareResult.significanceLevel}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-4 pb-3">
-                <p className="text-xs text-muted-foreground mb-1">Distribuição</p>
-                <div className="flex items-center gap-2">
-                  {report.chiSquareResult.isUniform ? (
-                    <>
-                      <CheckCircle className="h-5 w-5 text-green-500" />
-                      <span className="text-sm font-semibold text-green-500">Uniforme</span>
-                    </>
-                  ) : (
-                    <>
-                      <TriangleAlert className="h-5 w-5 text-destructive" />
-                      <span className="text-sm font-semibold text-destructive">Não uniforme</span>
-                    </>
-                  )}
+        {/* Chi-square Tab */}
+        <TabsContent value="chisquare" className="space-y-6 outline-none">
+          <div className="grid lg:grid-cols-2 gap-6">
+            <Card className="glass-card border-white/10 shadow-xl rounded-[2rem] overflow-hidden group/chisq-card">
+              <CardHeader className="p-8">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 group-hover/chisq-card:scale-110 transition-transform">
+                    <FlaskConical className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-black uppercase tracking-tight italic leading-none">Teste χ² de Pearson</CardTitle>
+                    <CardDescription className="text-[10px] font-black uppercase tracking-widest opacity-40 mt-1">Validação de Aleatoriedade e Uniformidade</CardDescription>
+                  </div>
                 </div>
-                <p className="text-[10px] text-muted-foreground mt-1">
-                  {report.chiSquareResult.isUniform ? "Sem viés estatístico significativo" : "Viés detectado — explorável para apostas"}
-                </p>
+              </CardHeader>
+              <CardContent className="px-8 pb-8 space-y-6">
+                <div className="p-8 rounded-[2rem] bg-secondary/20 border border-white/5 shadow-inner group/val-box relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover/val-box:opacity-100 transition-opacity duration-700" />
+                  <div className="flex justify-between items-center mb-8 relative z-10">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Probabilidade Nula (P-Valor)</span>
+                    <Badge variant="outline" className={`text-[9px] font-black uppercase tracking-widest italic ${report.chiSquareResult.pValue > 0.05 ? "text-emerald-400 border-emerald-400/20 bg-emerald-500/5" : "text-rose-400 border-rose-400/20 bg-rose-500/5"}`}>
+                      {report.chiSquareResult.pValue > 0.05 ? "Pure Random" : "Structured Bias Detected"}
+                    </Badge>
+                  </div>
+                  <p className={`text-7xl font-black font-mono tracking-tighter italic leading-none relative z-10 ${report.chiSquareResult.pValue > 0.05 ? "text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]" : "text-primary drop-shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]"}`}>{report.chiSquareResult.pValue.toFixed(4)}</p>
+                  <div className="h-1 w-full bg-white/5 rounded-full mt-10 overflow-hidden relative z-10">
+                    <Progress value={report.chiSquareResult.pValue * 100} className="h-full bg-primary" />
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-8 leading-relaxed italic opacity-60 relative z-10">
+                    "H0: Os sorteios seguem uma distribuição uniforme. Um p-valor {report.chiSquareResult.pValue > 0.05 ? "superior a 0.05 indica que os dados não divergem significativamente da aleatoriedade." : "inferior a 0.05 sugere anomalias estruturais aproveitáveis por modelos preditivos."}"
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="glass-card border-white/10 shadow-xl rounded-[2rem] overflow-hidden group/res-card">
+              <CardHeader className="p-8 border-b border-white/5 bg-white/[0.01]">
+                <CardTitle className="text-sm font-black uppercase tracking-[0.2em] italic">Desvios Residuais Críticos</CardTitle>
+              </CardHeader>
+              <CardContent className="p-8">
+                <div className="h-[320px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chiDeviationData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} opacity={0.3} />
+                      <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} fontVariant="mono" axisLine={false} tickLine={false} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} fontVariant="mono" axisLine={false} tickLine={false} />
+                      <Tooltip 
+                        contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border) / 0.5)", borderRadius: 16, color: "hsl(var(--foreground))", boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)' }} 
+                      />
+                      <Bar dataKey="residual" name="Desvio Residual" radius={[4, 4, 0, 0]} barSize={20} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               </CardContent>
             </Card>
           </div>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <FlaskConical className="h-4 w-4 text-primary" />
-                Resíduos Padronizados (Top Desvios)
-              </CardTitle>
-              <CardDescription>Positivo = acima do esperado | Negativo = abaixo do esperado</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={chiDeviationData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                  <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "hsl(var(--foreground))" }} />
-                  <Bar dataKey="residual" name="Resíduo">
-                    {chiDeviationData.map((entry, i) => (
-                      <Cell key={i} fill={entry.fill} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Tabela de Desvios</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="max-h-[300px] overflow-y-auto">
-                <table className="w-full text-xs">
-                  <thead className="sticky top-0 bg-card z-10">
-                    <tr className="border-b border-border">
-                      <th className="text-left py-2 px-2">Nº</th>
-                      <th className="text-center py-2 px-2">Observado</th>
-                      <th className="text-center py-2 px-2">Esperado</th>
-                      <th className="text-center py-2 px-2">Resíduo</th>
-                      <th className="text-center py-2 px-2">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {report.chiSquareResult.topDeviations.map(d => (
-                      <tr key={d.number} className="border-b border-border/50 hover:bg-muted/30">
-                        <td className="py-1.5 px-2 font-bold">{String(d.number).padStart(2, "0")}</td>
-                        <td className="py-1.5 px-2 text-center font-mono">{d.observed}</td>
-                        <td className="py-1.5 px-2 text-center font-mono">{d.expected}</td>
-                        <td className={`py-1.5 px-2 text-center font-mono font-bold ${d.residual > 0 ? "text-green-500" : "text-destructive"}`}>
-                          {d.residual > 0 ? "+" : ""}{d.residual}
-                        </td>
-                        <td className="py-1.5 px-2 text-center">
-                          <Badge variant={Math.abs(d.residual) > 2 ? "destructive" : Math.abs(d.residual) > 1 ? "secondary" : "outline"} className="text-[10px] px-1">
-                            {Math.abs(d.residual) > 2 ? "⚠️ Anormal" : Math.abs(d.residual) > 1 ? "Desvio" : "Normal"}
-                          </Badge>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
 
         {/* Markov Tab */}
