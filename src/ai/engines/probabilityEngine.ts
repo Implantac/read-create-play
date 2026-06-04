@@ -4,7 +4,7 @@
  */
 
 import { DrawResult } from "@/data/lotteries";
-import { NumberStats, computeFrequencyStats } from "@/engine/statistics";
+import { NumberStats, computeFrequencyStats } from "@/engine/stats/statistics";
 import { getLotteryRules } from "../knowledge/lotteriesKnowledge";
 
 /** Fast PRNG (xorshift32) */

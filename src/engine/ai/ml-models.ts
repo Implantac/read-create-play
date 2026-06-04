@@ -1,4 +1,4 @@
-import { NumberStats } from "@/features/statistics/engine";
+import { NumberStats } from "@/engine/stats/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 
 export interface ScoreBreakdown {

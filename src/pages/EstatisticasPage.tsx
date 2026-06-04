@@ -11,7 +11,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { StatsCard } from "@/components/StatsCard";
-import { computeFrequencyStats, computeSumDistribution } from "@/engine/statistics";
+import { computeFrequencyStats, computeSumDistribution } from "@/engine/stats/statistics";
 import { motion } from "framer-motion";
 import { PieChart, Flame, Snowflake, TrendingUp, BarChart3, Clock, Target, Sigma, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NumberStats, runMonteCarloSimulation } from "@/engine/statistics";
+import { NumberStats, runMonteCarloSimulation } from "@/engine/stats/statistics";
 import { LotteryConfig } from "@/data/lotteries";
 import { motion } from "framer-motion";
 import { Cpu, Play } from "lucide-react";

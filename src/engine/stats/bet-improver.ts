@@ -1,6 +1,6 @@
-import { NumberStats } from "./statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { evaluateBetQuality, BetQualityReport } from "./bet-quality";
+import { evaluateBetQuality, BetQualityReport } from "@/engine/stats/bet-quality";
 
 /**
  * Bet Improver — replaces weakest numbers with better candidates

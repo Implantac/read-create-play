@@ -10,7 +10,7 @@ import {
   computeConditionalProbabilities,
   detectLastDrawConditions,
   getCommonConditionPresets,
-} from "@/engine/conditional-probability";
+} from "@/engine/math/conditional-probability";
 import { motion, AnimatePresence } from "framer-motion";
 import { Brain, Zap, Target, TrendingUp, Filter } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";

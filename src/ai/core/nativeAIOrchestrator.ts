@@ -4,7 +4,7 @@
  */
 
 import { DrawResult } from "@/data/lotteries";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import type { AIRequest, AIResponse, AIIntent, ParsedIntent, ResponseMetadata } from "../core/aiTypes";
 import { detectIntent } from "../intent/detectIntent";
 import { isAIRequest, isWheelingResult } from "../core/aiTypes";

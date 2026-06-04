@@ -1,7 +1,8 @@
-import { NumberStats } from "./statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { evaluateBetQuality, BetQualityReport } from "./bet-quality";
-import { Strategy, STRATEGIES, generateByStrategy } from "./strategies";
+import { evaluateBetQuality, BetQualityReport } from "@/engine/stats/bet-quality";
+import { STRATEGIES, generateByStrategy } from "@/engine/strategies";
+import type { Strategy } from "@/engine/strategies";
 
 // ═══════════════════════════════════════════════════════
 // Score de Robustez — avalia apostas em 6 dimensões
@@ -50,32 +51,32 @@ export function computeRobustness(
   const axes: RobustnessAxis[] = [
     {
       axis: "Equilíbrio",
-      value: avg(dimMap.get("Equilíbrio Par/Ímpar") ?? 50, dimMap.get("Equilíbrio Alto/Baixo") ?? 50),
+      value: avg((dimMap.get("Equilíbrio Par/Ímpar") as number) ?? 50, (dimMap.get("Equilíbrio Alto/Baixo") as number) ?? 50),
       label: "Paridade + Faixa",
     },
     {
       axis: "Cobertura",
-      value: avg(dimMap.get("Cobertura de Faixa") ?? 50, dimMap.get("Distribuição por Setores") ?? 50),
+      value: avg((dimMap.get("Cobertura de Faixa") as number) ?? 50, (dimMap.get("Distribuição por Setores") as number) ?? 50),
       label: "Espalhamento + Setores",
     },
     {
       axis: "Tendência",
-      value: dimMap.get("Alinhamento de Tendência") ?? 50,
+      value: (dimMap.get("Alinhamento de Tendência") as number) ?? 50,
       label: "Momentum recente",
     },
     {
       axis: "Soma",
-      value: dimMap.get("Soma dos Números") ?? 50,
+      value: (dimMap.get("Soma dos Números") as number) ?? 50,
       label: "Aderência à média histórica",
     },
     {
       axis: "Originalidade",
-      value: dimMap.get("Originalidade") ?? 50,
+      value: (dimMap.get("Originalidade") as number) ?? 50,
       label: "Não repetir resultados",
     },
     {
       axis: "Mix Q/F",
-      value: dimMap.get("Mix Quente/Frio") ?? 50,
+      value: (dimMap.get("Mix Quente/Frio") as number) ?? 50,
       label: "Proporção quentes/frios",
     },
   ];

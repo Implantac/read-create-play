@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AlertTriangle, Calculator, FlaskConical, Gauge, PiggyBank, Target, WalletCards } from "lucide-react";
 import type { DrawResult, LotteryConfig } from "@/data/lotteries";
-import type { NumberStats } from "@/engine/statistics";
+import type { NumberStats } from "@/engine/stats/statistics";
 import { buildBettingBudgetPlan, type BudgetRiskProfile } from "@/engine/betting-budget";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

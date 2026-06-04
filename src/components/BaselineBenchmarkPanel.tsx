@@ -11,10 +11,10 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
 } from "recharts";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { generateGames } from "@/ai/generators/universalGameGenerator";
-import { buildBenchmarkReport, BenchmarkReport } from "@/engine/baseline-benchmark";
+import { buildBenchmarkReport, BenchmarkReport } from "@/engine/stats/baseline-benchmark";
 import type { RiskProfile } from "@/ai/core/aiTypes";
 
 interface Props {

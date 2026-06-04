@@ -15,6 +15,8 @@ export interface NumberStats {
   momentum: number; // acceleration of frequency change
   consecutivePairs: number; // how often appears with neighbor ±1
   cycleScore: number; // how "due" the number is based on its cycle
+  expectedAppearance: number; // calculated next expected concurso (relative)
+  hotStreak: number; // current consecutive appearances
 }
 
 export function computeFrequencyStats(draws: DrawResult[], totalNumbers: number): NumberStats[] {
@@ -103,6 +105,8 @@ export function computeFrequencyStats(draws: DrawResult[], totalNumbers: number)
       momentum: momentum * 100,
       consecutivePairs: consecutivePairCount[n],
       cycleScore,
+      expectedAppearance: Math.round(avgGap - lastSeen[n]),
+      hotStreak: draws.slice(0, 5).filter(d => d.numbers.includes(n)).length,
     });
   }
 

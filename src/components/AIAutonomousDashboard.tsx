@@ -5,9 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { NumberStats } from "@/engine/statistics";
-import { runAutonomousAnalysis, AutonomousAIReport } from "@/engine/autonomous-ai";
-import { generateAutonomousAnalysis } from "@/engine/native-analysis";
+import { NumberStats } from "@/engine/stats/statistics";
+import { runAutonomousAnalysis, AutonomousAIReport } from "@/engine/ai/autonomous-ai";
+import { generateAutonomousAnalysis } from "@/engine/ai/native-analysis";
 import { useToast } from "@/hooks/use-toast";
 import {
   Brain, TrendingUp, TrendingDown, Zap, Target, RefreshCw, Sparkles,

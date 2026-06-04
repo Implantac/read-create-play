@@ -1,5 +1,5 @@
 import type { DrawResult, LotteryConfig } from "@/data/lotteries";
-import type { NumberStats } from "@/engine/statistics";
+import type { NumberStats } from "@/engine/stats/statistics";
 import { buildStrategyBriefing, type StrategyBriefingTone } from "@/engine/strategy-briefing";
 
 export type BudgetRiskProfile = "low" | "medium" | "high";

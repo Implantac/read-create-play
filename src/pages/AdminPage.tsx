@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,30 +23,13 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { isFullAccessEmail } from "@/core/fullAccess";
+import { Profile, AuditLog, UserRole, UserWithRole } from "@/types/database";
+import { profileService } from "@/services/profiles/profileService";
+import { adminService } from "@/services/admin/adminService";
+import { UserRow } from "@/components/admin/UserRow";
+import { AuditLogTable } from "@/components/admin/AuditLogTable";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-interface Profile {
-  id: string;
-  email: string | null;
-  full_name: string | null;
-  plan: string;
-  created_at: string;
-  blocked: boolean;
-  phone_number: string | null;
-}
-
-interface UserRole {
-  user_id: string;
-  role: string;
-}
-
-interface AuditLog {
-  id: string;
-  admin_id: string;
-  action: string;
-  target_user_id: string | null;
-  details: any;
-  created_at: string;
-}
 
 const PLAN_COLORS: Record<string, string> = {
   free: "bg-muted text-muted-foreground",
@@ -116,7 +99,7 @@ export default function AdminPage() {
 
   const getUserRole = (userId: string): string => {
     const profile = profiles.find(p => p.id === userId);
-    if (isFullAccessProfile(profile)) return "super_admin";
+    if (isFullAccessEmail(profile?.email)) return "super_admin";
     const r = roles.find(r => r.user_id === userId);
     return r?.role || "user";
   };
@@ -131,25 +114,15 @@ export default function AdminPage() {
     } as any);
   };
 
-  const isSelfLockRisk = (targetUserId: string, newRole?: string): boolean => {
-    if (targetUserId !== user?.id) return false;
-    if (newRole && newRole !== "super_admin" && newRole !== "admin") return true;
-    return false;
-  };
-
   const countSuperAdmins = (): number => {
-    const fullAccessCount = profiles.some(isFullAccessProfile) ? 1 : 0;
+    const fullAccessCount = profiles.some(p => isFullAccessEmail(p.email)) ? 1 : 0;
     const roleCount = roles.filter(r => r.role === "super_admin").length;
     return Math.max(fullAccessCount, roleCount);
   };
 
-  const isFullAccessProfile = (profile?: Profile | null): boolean => {
-    return isFullAccessEmail(profile?.email);
-  };
-
   const updatePlan = async (userId: string, newPlan: string) => {
     const profile = profiles.find(p => p.id === userId);
-    if (isFullAccessProfile(profile) && newPlan !== "lifetime") {
+    if (isFullAccessEmail(profile?.email) && newPlan !== "lifetime") {
       toast({
         title: "Ação Bloqueada",
         description: "A conta de acesso total é vitalícia e não pode ser rebaixada.",
@@ -159,17 +132,15 @@ export default function AdminPage() {
     }
 
     setUpdating(userId);
-    const { error } = await supabase
-      .from("profiles")
-      .update({ plan: newPlan, updated_at: new Date().toISOString() } as any)
-      .eq("id", userId);
-    setUpdating(null);
-    if (error) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
-    } else {
+    try {
+      await adminService.updateUserPlan(userId, newPlan);
       await logAction("plan_changed", userId, { old_plan: profile?.plan, new_plan: newPlan });
       setProfiles(prev => prev.map(p => p.id === userId ? { ...p, plan: newPlan } : p));
       toast({ title: "Plano atualizado", description: `Plano alterado para ${PLAN_LABELS[newPlan]}.` });
+    } catch (error: any) {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } finally {
+      setUpdating(null);
     }
   };
 
@@ -177,7 +148,7 @@ export default function AdminPage() {
     const currentRole = getUserRole(userId);
     const profile = profiles.find(p => p.id === userId);
 
-    if (isFullAccessProfile(profile) && newRole !== "super_admin") {
+    if (isFullAccessEmail(profile?.email) && newRole !== "super_admin") {
       toast({
         title: "Ação Bloqueada",
         description: "A conta de acesso total deve permanecer como Super Admin.",
@@ -186,8 +157,7 @@ export default function AdminPage() {
       return;
     }
 
-    // Self-lock protection
-    if (isSelfLockRisk(userId, newRole)) {
+    if (userId === user?.id && newRole !== "super_admin" && newRole !== "admin") {
       setConfirmDialog({
         open: true,
         title: "⚠️ Ação Perigosa",
@@ -197,7 +167,6 @@ export default function AdminPage() {
       return;
     }
 
-    // Last super_admin protection
     if (currentRole === "super_admin" && newRole !== "super_admin" && countSuperAdmins() <= 1) {
       toast({
         title: "Ação Bloqueada",
@@ -214,50 +183,50 @@ export default function AdminPage() {
     setUpdating(userId);
     setConfirmDialog(prev => ({ ...prev, open: false }));
 
-    const existingRole = roles.find(r => r.user_id === userId);
-
-    let error;
-    if (newRole === "user") {
-      // Remove role entry (defaults to user)
-      if (existingRole) {
-        const res = await supabase.from("user_roles").delete().eq("user_id", userId);
+    try {
+      const existingRole = roles.find(r => r.user_id === userId);
+      let error;
+      
+      if (newRole === "user") {
+        if (existingRole) {
+          const res = await supabase.from("user_roles").delete().eq("user_id", userId);
+          error = res.error;
+        }
+      } else if (existingRole) {
+        const res = await supabase.from("user_roles").update({ role: newRole as any }).eq("user_id", userId);
+        error = res.error;
+      } else {
+        const res = await supabase.from("user_roles").insert({ user_id: userId, role: newRole as any });
         error = res.error;
       }
-    } else if (existingRole) {
-      const res = await supabase.from("user_roles").update({ role: newRole } as any).eq("user_id", userId);
-      error = res.error;
-    } else {
-      const res = await supabase.from("user_roles").insert({ user_id: userId, role: newRole } as any);
-      error = res.error;
-    }
 
-    setUpdating(null);
-    if (error) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
-    } else {
+      if (error) throw error;
+
       await logAction("role_changed", userId, { old_role: oldRole, new_role: newRole });
-      // Update local state
+      
       if (newRole === "user") {
         setRoles(prev => prev.filter(r => r.user_id !== userId));
       } else if (existingRole) {
-        setRoles(prev => prev.map(r => r.user_id === userId ? { ...r, role: newRole } : r));
+        setRoles(prev => prev.map(r => (r.user_id === userId ? { ...r, role: newRole as any } : r)));
       } else {
-        setRoles(prev => [...prev, { user_id: userId, role: newRole }]);
+        setRoles(prev => [...prev, { id: crypto.randomUUID(), user_id: userId, role: newRole as any }]);
       }
       toast({ title: "Papel atualizado", description: `Papel alterado para ${ROLE_LABELS[newRole]}.` });
+    } catch (error: any) {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } finally {
+      setUpdating(null);
     }
   };
 
   const toggleBlock = async (userId: string, currentBlocked: boolean) => {
     const profile = profiles.find(p => p.id === userId);
-    if (isFullAccessProfile(profile)) {
+    if (isFullAccessEmail(profile?.email)) {
       toast({ title: "Ação Bloqueada", description: "A conta de acesso total não pode ser bloqueada.", variant: "destructive" });
       return;
     }
 
-    // Prevent blocking super_admin
-    const role = getUserRole(userId);
-    if (role === "super_admin") {
+    if (getUserRole(userId) === "super_admin") {
       toast({ title: "Ação Bloqueada", description: "Não é possível bloquear um Super Admin.", variant: "destructive" });
       return;
     }
@@ -268,27 +237,25 @@ export default function AdminPage() {
     }
 
     setUpdating(userId);
-    const { error } = await supabase
-      .from("profiles")
-      .update({ blocked: !currentBlocked, updated_at: new Date().toISOString() } as any)
-      .eq("id", userId);
-    setUpdating(null);
-    if (error) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
-    } else {
+    try {
+      await adminService.setUserBlockStatus(userId, !currentBlocked);
       await logAction(currentBlocked ? "user_unblocked" : "user_blocked", userId);
       setProfiles(prev => prev.map(p => p.id === userId ? { ...p, blocked: !currentBlocked } : p));
       toast({
         title: !currentBlocked ? "Usuário bloqueado" : "Usuário desbloqueado",
         description: !currentBlocked ? "O usuário não poderá mais acessar o sistema." : "O acesso do usuário foi restaurado.",
       });
+    } catch (error: any) {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } finally {
+      setUpdating(null);
     }
   };
 
-  // Filters
   const filtered = profiles.filter(p => {
-    const effectivePlan = isFullAccessProfile(p) ? "lifetime" : p.plan;
-    const effectiveBlocked = isFullAccessProfile(p) ? false : p.blocked;
+    const isFullAccess = isFullAccessEmail(p.email);
+    const effectivePlan = isFullAccess ? "lifetime" : p.plan;
+    const effectiveBlocked = isFullAccess ? false : p.blocked;
     const matchesSearch = (p.email?.toLowerCase() || "").includes(search.toLowerCase()) ||
       (p.full_name?.toLowerCase() || "").includes(search.toLowerCase());
     const matchesPlan = filterPlan === "all" || effectivePlan === filterPlan;
@@ -300,10 +267,11 @@ export default function AdminPage() {
   });
 
   const planCounts = profiles.reduce((acc, p) => {
-    const effectivePlan = isFullAccessProfile(p) ? "lifetime" : p.plan;
+    const effectivePlan = isFullAccessEmail(p.email) ? "lifetime" : p.plan;
     acc[effectivePlan] = (acc[effectivePlan] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
+
 
   const stats = [
     { label: "Total Usuários", value: profiles.length, icon: Users, color: "text-primary" },
@@ -461,124 +429,33 @@ export default function AdminPage() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Nome</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Papel</TableHead>
+                        <TableHead>Usuário</TableHead>
                         <TableHead>Plano</TableHead>
+                        <TableHead>Papel</TableHead>
                         <TableHead>Status</TableHead>
-                        <TableHead>Cadastro</TableHead>
-                        <TableHead>Ações</TableHead>
+                        <TableHead className="text-right">Ações</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filtered.map(p => {
-                        const role = getUserRole(p.id);
-                        const isSelf = p.id === user?.id;
-                        const isFullAccess = isFullAccessProfile(p);
-                        const displayPlan = isFullAccess ? "lifetime" : p.plan;
-                        const displayBlocked = isFullAccess ? false : p.blocked;
-                        return (
-                          <TableRow key={p.id} className={displayBlocked ? "opacity-60" : ""}>
-                            <TableCell className="font-medium text-foreground">
-                              <div className="flex items-center gap-1.5">
-                                {p.full_name || "—"}
-                                {isSelf && <Badge variant="outline" className="text-[9px] px-1 py-0">Você</Badge>}
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-muted-foreground text-sm">
-                              {p.email || "—"}
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline" className={`text-[10px] ${ROLE_COLORS[role] || ROLE_COLORS.user}`}>
-                                {ROLE_LABELS[role] || role}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Badge className={PLAN_COLORS[displayPlan] || ""}>
-                                {PLAN_LABELS[displayPlan] || displayPlan}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              {displayBlocked ? (
-                                <Badge variant="destructive" className="gap-1">
-                                  <Ban className="w-3 h-3" /> Bloqueado
-                                </Badge>
-                              ) : (
-                                <Badge variant="outline" className="gap-1 text-green-500 border-green-500/30">
-                                  <CheckCircle2 className="w-3 h-3" /> Ativo
-                                </Badge>
-                              )}
-                            </TableCell>
-                            <TableCell className="text-muted-foreground text-sm font-mono">
-                              {new Date(p.created_at).toLocaleDateString("pt-BR")}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                {/* Role selector - only super_admin can change roles */}
-                                {isSuperAdmin && (
-                                  <Select
-                                    value={role}
-                                    onValueChange={(v) => updateRole(p.id, v)}
-                                    disabled={updating === p.id || isFullAccess}
-                                  >
-                                    <SelectTrigger className="w-[130px] h-8 text-xs">
-                                      {updating === p.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <SelectValue />}
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="super_admin">Super Admin</SelectItem>
-                                      <SelectItem value="admin">Admin</SelectItem>
-                                      <SelectItem value="moderator">Moderador</SelectItem>
-                                      <SelectItem value="user">Usuário</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                )}
-                                {/* Plan selector */}
-                                <Select
-                                  value={displayPlan}
-                                  onValueChange={(v) => updatePlan(p.id, v)}
-                                  disabled={updating === p.id || isFullAccess}
-                                >
-                                  <SelectTrigger className="w-[130px] h-8 text-xs">
-                                    {updating === p.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <SelectValue />}
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="free">Gratuito</SelectItem>
-                                    <SelectItem value="premium">Premium</SelectItem>
-                                    <SelectItem value="professional">Profissional</SelectItem>
-                                    <SelectItem value="lifetime">Vitalício</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                {/* Block/unblock */}
-                                <Button
-                                  variant={displayBlocked ? "outline" : "destructive"}
-                                  size="sm"
-                                  className="h-8 text-xs gap-1"
-                                  onClick={() => toggleBlock(p.id, displayBlocked)}
-                                  disabled={updating === p.id || role === "super_admin" || isFullAccess}
-                                >
-                                  {displayBlocked ? (
-                                    <><CheckCircle2 className="w-3 h-3" /> Desbloquear</>
-                                  ) : (
-                                    <><Ban className="w-3 h-3" /> Bloquear</>
-                                  )}
-                                </Button>
-                                {/* Detail */}
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-8 w-8 p-0"
-                                  onClick={() => setDetailUser(p)}
-                                >
-                                  <Eye className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
+                      {filtered.map(p => (
+                        <UserRow
+                          key={p.id}
+                          profile={p}
+                          role={getUserRole(p.id)}
+                          isUpdating={updating === p.id}
+                          onUpdatePlan={updatePlan}
+                          onUpdateRole={updateRole}
+                          onToggleBlock={toggleBlock}
+                          onViewDetails={setDetailUser}
+                          planLabels={PLAN_LABELS}
+                          planColors={PLAN_COLORS}
+                          roleLabels={ROLE_LABELS}
+                          roleColors={ROLE_COLORS}
+                        />
+                      ))}
                       {filtered.length === 0 && (
                         <TableRow>
-                          <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                          <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                             Nenhum usuário encontrado.
                           </TableCell>
                         </TableRow>
@@ -660,42 +537,11 @@ export default function AdminPage() {
               {auditLogs.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">Nenhum registro de auditoria encontrado.</p>
               ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Data</TableHead>
-                        <TableHead>Admin</TableHead>
-                        <TableHead>Ação</TableHead>
-                        <TableHead>Alvo</TableHead>
-                        <TableHead>Detalhes</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {auditLogs.map(log => (
-                        <TableRow key={log.id}>
-                          <TableCell className="text-xs font-mono text-muted-foreground">
-                            {new Date(log.created_at).toLocaleString("pt-BR")}
-                          </TableCell>
-                          <TableCell className="text-xs">
-                            {getAdminEmail(log.admin_id)}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="text-[10px]">
-                              {log.action}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-xs text-muted-foreground">
-                            {getTargetEmail(log.target_user_id)}
-                          </TableCell>
-                          <TableCell className="text-xs text-muted-foreground font-mono max-w-[200px] truncate">
-                            {log.details ? JSON.stringify(log.details) : "—"}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                <AuditLogTable
+                  logs={auditLogs}
+                  getAdminEmail={getAdminEmail}
+                  getTargetEmail={getTargetEmail}
+                />
               )}
             </CardContent>
           </Card>
@@ -752,17 +598,17 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Plano</p>
-                  <Badge className={PLAN_COLORS[isFullAccessProfile(detailUser) ? "lifetime" : detailUser.plan]}>
-                    {PLAN_LABELS[isFullAccessProfile(detailUser) ? "lifetime" : detailUser.plan]}
+                  <Badge className={PLAN_COLORS[isFullAccessEmail(detailUser.email) ? "lifetime" : detailUser.plan]}>
+                    {PLAN_LABELS[isFullAccessEmail(detailUser.email) ? "lifetime" : detailUser.plan]}
                   </Badge>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Status</p>
                   <Badge
-                    variant={!isFullAccessProfile(detailUser) && detailUser.blocked ? "destructive" : "outline"}
-                    className={!isFullAccessProfile(detailUser) && detailUser.blocked ? "" : "text-green-500 border-green-500/30"}
+                    variant={!isFullAccessEmail(detailUser.email) && detailUser.blocked ? "destructive" : "outline"}
+                    className={!isFullAccessEmail(detailUser.email) && detailUser.blocked ? "" : "text-green-500 border-green-500/30"}
                   >
-                    {!isFullAccessProfile(detailUser) && detailUser.blocked ? "Bloqueado" : "Ativo"}
+                    {!isFullAccessEmail(detailUser.email) && detailUser.blocked ? "Bloqueado" : "Ativo"}
                   </Badge>
                 </div>
                 <div>

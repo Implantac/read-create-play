@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import {
   runLogisticRegression,
@@ -12,7 +12,7 @@ import {
   CorrelationPair,
   ClusterInfo,
   IntegratedScore,
-} from "@/engine/advanced-analytics";
+} from "@/engine/stats/advanced-analytics";
 import { motion, AnimatePresence } from "framer-motion";
 import { Brain, Play, TrendingUp, GitBranch, Layers, BarChart3, Microscope } from "lucide-react";
 import { Button } from "@/components/ui/button";

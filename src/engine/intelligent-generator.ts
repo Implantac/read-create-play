@@ -1,7 +1,7 @@
-import { NumberStats, computeFrequencyStats, generateSmartBet } from "./statistics";
+import { NumberStats, computeFrequencyStats, generateSmartBet } from "@/engine/stats/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { evaluateBetQuality, BetQualityReport } from "./bet-quality";
-import { generateByStrategy, Strategy } from "./strategies";
+import { evaluateBetQuality, BetQualityReport } from "@/engine/stats/bet-quality";
+import { generateByStrategy, Strategy } from "@/engine/strategies";
 
 // ═══════════════════════════════════════════════════════
 // GERADOR INTELIGENTE DE APOSTAS v2.0

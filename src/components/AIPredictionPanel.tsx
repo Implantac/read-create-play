@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import { motion, AnimatePresence } from "framer-motion";
 import { Brain, Loader2, Copy, Check, Star, Sparkles, RefreshCw, AlertTriangle } from "lucide-react";
 import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { generateNativeBets } from "@/engine/native-analysis";
+import { generateNativeBets } from "@/engine/ai/native-analysis";
 
 interface Props {
   config: LotteryConfig;

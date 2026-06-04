@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { BarChart3, ClipboardCheck, FlaskConical, Gauge, ShieldCheck, WalletCards } from "lucide-react";
 import type { DrawResult, LotteryConfig } from "@/data/lotteries";
-import type { NumberStats } from "@/engine/statistics";
+import type { NumberStats } from "@/engine/stats/statistics";
 import { buildStrategyBriefing } from "@/engine/strategy-briefing";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

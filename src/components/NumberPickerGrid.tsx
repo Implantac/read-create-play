@@ -1,10 +1,10 @@
 import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import { LotteryConfig } from "@/data/lotteries";
 import { Grid3X3, RotateCcw, Sparkles, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { generateSmartBet } from "@/engine/statistics";
+import { generateSmartBet } from "@/engine/stats/statistics";
 import { toast } from "sonner";
 
 interface Props {

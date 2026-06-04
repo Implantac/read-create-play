@@ -1,5 +1,5 @@
 import { ExtremeBet } from "@/engine/extreme-generator";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import { LotteryConfig } from "@/data/lotteries";
 import { Flame, Snowflake, Trophy, TrendingUp, X } from "lucide-react";
 import { Button } from "@/components/ui/button";

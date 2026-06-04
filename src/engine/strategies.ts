@@ -1,6 +1,6 @@
-import { NumberStats, generateSmartBet } from "./statistics";
+import { NumberStats, generateSmartBet } from "@/engine/stats/statistics";
 import { LotteryConfig } from "@/data/lotteries";
-import { getConsensusRanking, runAllModels } from "./ml-models";
+import { getConsensusRanking, runAllModels } from "@/engine/ai/ml-models";
 
 export type Strategy =
   | "smart"
@@ -319,7 +319,7 @@ export function generateByStrategy(
       const weighted = stats.map(s => ({
         ...s,
         weight: Math.max(0.1,
-          (consensusMap.get(s.number) || 0) * 0.4 +
+          ((consensusMap.get(s.number) as number) || 0) * 0.4 +
           (s.trend > 0 ? s.trend * 3 : 0) +
           s.cycleScore * 5 +
           (s.momentum > 0 ? s.momentum * 1.5 : 0) +

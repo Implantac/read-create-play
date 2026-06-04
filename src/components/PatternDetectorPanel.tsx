@@ -12,9 +12,9 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { NumberStats } from "@/engine/statistics";
-import { detectPatterns, PatternReport } from "@/engine/pattern-detector";
-import { generatePatternAnalysis } from "@/engine/native-analysis";
+import { NumberStats } from "@/engine/stats/statistics";
+import { detectPatterns, PatternReport } from "@/engine/ai/pattern-detector";
+import { generatePatternAnalysis } from "@/engine/ai/native-analysis";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,

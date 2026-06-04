@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Terminal, Activity, Zap, ShieldCheck, Cpu, Database, Network, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useLotteryContext } from "@/contexts/LotteryContext";
-import { calculatePredictiveEntropy } from "@/engine/predictive-entropy";
+import { calculatePredictiveEntropy } from "@/engine/ai/predictive-entropy";
 
 export const TitanCommandCenter = () => {
   const { draws, stats, selectedLottery } = useLotteryContext();

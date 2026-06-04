@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
-import { NumberStats, computeFrequencyStats } from "@/engine/statistics";
+import { NumberStats, computeFrequencyStats } from "@/engine/stats/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { runAllModels, getConsensusRanking, ModelResult, MLPrediction, ScoreBreakdown } from "@/engine/ml-models";
+import { runAllModels, getConsensusRanking, ModelResult, MLPrediction, ScoreBreakdown } from "@/engine/ai/ml-models";
 import { motion, AnimatePresence } from "framer-motion";
 import { Brain, Play, Trophy, Target, Percent, Info, BarChart2, Beaker } from "lucide-react";
 import { Button } from "@/components/ui/button";

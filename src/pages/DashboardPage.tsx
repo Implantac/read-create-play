@@ -71,10 +71,10 @@ import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { usePlanAccess } from "@/hooks/usePlanAccess";
 import { useGenerationHistory } from "@/hooks/useGenerationHistory";
-import { calculateAnalyticsSnapshot, getComplianceNotice } from "@/engine/analytics-core";
+import { calculateAnalyticsSnapshot, getComplianceNotice } from "@/engine/stats/analytics-core";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TitanScoreBadge } from "@/components/TitanScoreBadge";
-import { evaluateBetQuality } from "@/engine/bet-quality";
+import { evaluateBetQuality } from "@/engine/stats/bet-quality";
 import { StrategyBriefingPanel } from "@/components/StrategyBriefingPanel";
 import { BettingBudgetPlanner } from "@/components/BettingBudgetPlanner";
 
