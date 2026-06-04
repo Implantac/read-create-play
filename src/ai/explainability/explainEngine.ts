@@ -65,8 +65,8 @@ export function explainSimulation(result: SimulationResult, lotteryId: string): 
   const sortedHits = Object.entries(result.hitDistribution)
     .sort(([a], [b]) => Number(b) - Number(a));
   for (const [hits, count] of sortedHits) {
-    const pct = (count / result.totalSimulations * 100).toFixed(2);
-    lines.push(`• ${hits} acertos: ${count.toLocaleString()} vezes (${pct}%)`);
+    const pct = formatNumber(count / result.totalSimulations * 100);
+    lines.push(`• ${hits} acertos: ${formatNumber(count)} vezes (${pct}%)`);
   }
 
   lines.push("", `⚠️ ${AI_POLICIES.disclaimers.simulation}`);
