@@ -215,19 +215,19 @@ export default function LotofacilPremiumPage() {
   }
 
   return (
-    <div className="space-y-6 pb-20 animate-in fade-in duration-700">
-      {/* HEADER PREMIUM */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-4 px-1">
-        <div className="space-y-3">
+    <div className="space-y-10 pb-20 animate-in fade-in duration-700 max-w-7xl mx-auto px-4 sm:px-6">
+      {/* HEADER PREMIUM - REFACTORED FOR UX */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-4">
+        <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Titan Neural Core v5.3 Alpha</span>
-            <span className="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[10px] font-black text-amber-500 uppercase tracking-[0.2em] italic">Top Tier Strategy</span>
+            <span className="px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Intelligence Suite v6.0</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
           </div>
-          <h1 className="text-5xl md:text-6xl font-black text-foreground tracking-tighter italic uppercase leading-none">
-            Lotofácil <span className="gradient-brand-text not-italic">Premium</span>
+          <h1 className="text-4xl md:text-6xl font-black text-foreground tracking-tighter italic uppercase leading-tight">
+            Lotofácil <span className="gradient-brand-text not-italic">Elite</span>
           </h1>
           <p className="text-sm text-muted-foreground font-medium max-w-2xl leading-relaxed">
-            Ambiente unificado de inteligência preditiva, fechamentos matemáticos e análise de fluxo neural para máxima performance estatística.
+            Seu ambiente profissional de alta performance. Sincronizado com os últimos sorteios e processado por nossa IA proprietária.
           </p>
         </div>
 
@@ -237,96 +237,110 @@ export default function LotofacilPremiumPage() {
             size="sm" 
             onClick={() => syncDraws()}
             disabled={syncing}
-            className="h-12 px-6 rounded-xl border-border/60 bg-secondary/20 text-[10px] font-black uppercase tracking-widest gap-2 hover:bg-secondary/40 transition-all shadow-sm"
+            className="h-12 px-6 rounded-xl border-border/40 bg-background/40 backdrop-blur-sm text-[10px] font-black uppercase tracking-widest gap-2 hover:bg-secondary/20 transition-all shadow-sm"
           >
             {syncing ? <RefreshCw className="w-4 h-4 animate-spin text-primary" /> : <RefreshCw className="w-4 h-4 opacity-60" />}
-            {syncing ? "Sincronizando Core..." : "Sincronizar Data"}
+            {syncing ? "Sincronizando..." : "Sincronizar"}
           </Button>
           <Button 
             onClick={exportBI}
             className="h-12 px-8 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20 gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all"
           >
             <Download className="w-4 h-4" />
-            Exportar BI Alpha
+            Relatório BI
           </Button>
         </div>
       </div>
 
       <LotteryContextBanner />
 
-      <Tabs defaultValue="overview" className="space-y-6" onValueChange={setActiveTab}>
-        <div className="flex items-center justify-between gap-4 overflow-x-auto pb-4 scrollbar-hide sticky top-0 z-30 bg-background/80 backdrop-blur-md px-1 -mx-1">
-          <TabsList className="bg-secondary/40 border border-border/40 p-1 rounded-2xl shadow-lg">
-            <TabsTrigger value="overview" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="intelligence" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
-              Estatísticas
-            </TabsTrigger>
-            <TabsTrigger value="strategy" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
-              Finanças
-            </TabsTrigger>
-            <TabsTrigger value="matrix" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
-              Análise HP
-            </TabsTrigger>
-            <TabsTrigger value="generation" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
-              Geradores
-            </TabsTrigger>
-            <TabsTrigger value="spreadsheets" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
-              Planilhas
-            </TabsTrigger>
-            <TabsTrigger value="history" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
-              Sorteios
-            </TabsTrigger>
+      <Tabs defaultValue="overview" className="space-y-8" onValueChange={setActiveTab}>
+        <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/40 -mx-6 px-6 py-4">
+          <TabsList className="bg-secondary/20 border border-border/20 p-1.5 rounded-2xl w-full sm:w-auto overflow-x-auto justify-start flex-nowrap scrollbar-hide">
+            {[
+              { value: "overview", label: "Dashboard", icon: LayoutGrid },
+              { value: "intelligence", label: "Análises", icon: Brain },
+              { value: "strategy", label: "Finanças", icon: TrendingUp },
+              { value: "matrix", label: "Matriz HP", icon: Table2 },
+              { value: "generation", label: "Geradores", icon: Sparkles },
+              { value: "spreadsheets", label: "Fechamentos", icon: Layers },
+              { value: "history", label: "Sorteios", icon: History },
+            ].map((tab) => (
+              <TabsTrigger 
+                key={tab.value}
+                value={tab.value} 
+                className="rounded-xl px-5 py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-[10px] font-black uppercase tracking-widest transition-all gap-2"
+              >
+                <tab.icon className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{tab.label}</span>
+              </TabsTrigger>
+            ))}
           </TabsList>
         </div>
 
         {/* --- OVERVIEW TAB --- */}
-        <TabsContent value="overview" className="space-y-6">
+        <TabsContent value="overview" className="space-y-8 mt-0 outline-none">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatsCard title="Score Elite" value={topElite.length} icon={Crown} />
-            <StatsCard title="Ciclo Atual" value={`#${cycle?.currentCycle || 0}`} icon={Clock} />
-            <StatsCard title="Prob. Fechamento" value={`${(100 - (cycle?.missingNumbers.length || 0) * 4).toFixed(0)}%`} icon={Target} />
-            <StatsCard title="Estabilidade" value="98.2%" icon={Shield} />
+            {[
+              { title: "Score Elite", value: topElite.length, icon: Crown, color: "text-amber-400" },
+              { title: "Ciclo Atual", value: `#${cycle?.currentCycle || 0}`, icon: Clock, color: "text-primary" },
+              { title: "Prob. Fechamento", value: `${(100 - (cycle?.missingNumbers.length || 0) * 4).toFixed(0)}%`, icon: Target, color: "text-emerald-400" },
+              { title: "Sinal de Hoje", value: "ALTÍSSIMO", icon: Zap, color: "text-rose-500" },
+            ].map((stat) => (
+              <Card key={stat.title} className="glass-card border-border/40 bg-background/40 rounded-2xl p-6 hover:border-primary/40 transition-all group overflow-hidden relative">
+                <div className="absolute -right-4 -top-4 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity">
+                  <stat.icon className="w-24 h-24 rotate-12" />
+                </div>
+                <div className="flex flex-col gap-2 relative z-10">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">{stat.title}</p>
+                    <stat.icon className={`w-4 h-4 ${stat.color}`} />
+                  </div>
+                  <p className="text-3xl font-black tracking-tighter italic uppercase">{stat.value}</p>
+                </div>
+              </Card>
+            ))}
           </div>
 
-          <div className="grid xl:grid-cols-3 gap-6">
-            <div className="xl:col-span-2 space-y-6">
-              {/* TITAN COMMAND CENTER (COMPACT) */}
-              <Card className="glass-card border-primary/20 overflow-hidden relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
-                <CardHeader className="pb-2 border-b border-primary/10">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2 text-primary">
-                      <TerminalIcon className="w-4 h-4" />
-                      Titan Command Center (Neural Feed)
-                    </CardTitle>
-                    <Badge variant="outline" className="animate-pulse border-emerald-500/50 text-emerald-400 bg-emerald-500/5 text-[8px] font-black uppercase">
-                      SYSTEM ACTIVE
-                    </Badge>
+          <div className="grid xl:grid-cols-3 gap-8">
+            <div className="xl:col-span-2 space-y-8">
+              {/* TITAN COMMAND CENTER (REFACTORED) */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between px-1">
+                  <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60 flex items-center gap-2">
+                    <TerminalIcon className="w-4 h-4" />
+                    Neural Feed System
+                  </h2>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[8px] font-black uppercase text-emerald-500 tracking-widest">Active Core</span>
                   </div>
-                </CardHeader>
-                <CardContent className="p-4">
-                  <div className="space-y-3">
-                    {[
-                      { icon: Zap, text: "Sincronização global concluída. 3.142 sorteios indexados.", type: "success" },
-                      { icon: Brain, text: "Rede neural detectou desvio de 12% na frequência das dezenas moldura.", type: "info" },
-                      { icon: Target, text: "Ciclo #512 em estágio final. 4 dezenas restantes para fechamento.", type: "warning" },
-                      { icon: Activity, text: "Titan Score recalibrado para o concurso #3121.", type: "info" },
-                    ].map((feed, i) => (
-                      <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-secondary/10 border border-border/40 group hover:border-primary/40 hover:bg-secondary/20 transition-all cursor-default">
-                        <div className={`p-1.5 rounded-lg bg-background/50 border border-border/40 shrink-0 group-hover:scale-110 group-hover:shadow-[0_0_10px_rgba(var(--primary-rgb),0.2)] transition-all`}>
-                          <feed.icon className={`w-3.5 h-3.5 ${feed.type === 'success' ? 'text-emerald-400' : feed.type === 'warning' ? 'text-amber-400' : 'text-primary'}`} />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    { icon: Zap, text: "Sincronização global concluída. 3.142 sorteios indexados.", type: "success", time: "10:42" },
+                    { icon: Brain, text: "Rede neural detectou desvio no quadrante moldura.", type: "info", time: "10:38" },
+                    { icon: Target, text: "Ciclo #512 em estágio final. 4 dezenas restantes.", type: "warning", time: "10:35" },
+                    { icon: Activity, text: "Recalibrando Titan Score para o próximo concurso.", type: "info", time: "10:30" },
+                  ].map((feed, i) => (
+                    <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-secondary/10 border border-border/40 group hover:border-primary/40 hover:bg-secondary/20 transition-all cursor-default relative overflow-hidden">
+                      <div className={`p-2 rounded-xl bg-background/60 border border-border/40 shrink-0 group-hover:scale-110 group-hover:shadow-[0_0_10px_rgba(var(--primary-rgb),0.2)] transition-all`}>
+                        <feed.icon className={`w-4 h-4 ${feed.type === 'success' ? 'text-emerald-400' : feed.type === 'warning' ? 'text-amber-400' : 'text-primary'}`} />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest opacity-40">{feed.time}</span>
                         </div>
-                        <p className="text-[11px] font-medium text-muted-foreground leading-relaxed">
-                          <span className="text-foreground/80 font-black uppercase tracking-widest text-[8px] mr-2 opacity-50">[{new Date().toLocaleTimeString()}]</span>
+                        <p className="text-[10px] font-bold text-foreground/80 leading-tight">
                           {feed.text}
                         </p>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
 
               {/* FAROL SUMMARY */}
               <Card className="glass-card border-primary/20 bg-primary/5 overflow-hidden">
