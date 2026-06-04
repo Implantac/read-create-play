@@ -188,8 +188,11 @@ export default function FarolEstatisticoPage() {
         </Card>
       </div>
 
-      {/* Mapa de Calor */}
-      <HeatmapIntensity />
+      {/* Visualização de Inteligência */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <HeatmapIntensity />
+        <CorrelationNetwork />
+      </div>
 
       {/* Filtros e Busca */}
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
