@@ -212,16 +212,16 @@ export default function LotofacilPremiumPage() {
               Overview
             </TabsTrigger>
             <TabsTrigger value="intelligence" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
-              Inteligência
+              Estatísticas
             </TabsTrigger>
             <TabsTrigger value="strategy" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
-              Estratégia
+              Finanças
             </TabsTrigger>
             <TabsTrigger value="matrix" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
-              Matriz HP
+              Análise HP
             </TabsTrigger>
             <TabsTrigger value="generation" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
-              Geração Elite
+              Geradores
             </TabsTrigger>
             <TabsTrigger value="spreadsheets" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
               Planilhas
@@ -353,7 +353,7 @@ export default function LotofacilPremiumPage() {
           </div>
         </TabsContent>
 
-        {/* --- INTELLIGENCE TAB --- */}
+        {/* --- INTELLIGENCE/STATS TAB --- */}
         <TabsContent value="intelligence" className="space-y-6">
           <div className="grid lg:grid-cols-2 gap-6">
             <CorrelationNetwork />
@@ -425,12 +425,15 @@ export default function LotofacilPremiumPage() {
           </div>
         </TabsContent>
 
-        {/* --- STRATEGY TAB --- */}
+        {/* --- STRATEGY/FINANCE TAB --- */}
         <TabsContent value="strategy" className="space-y-6">
           <div className="grid lg:grid-cols-[1fr_1fr] gap-6">
-            <StrategyBriefingPanel config={config} stats={stats} draws={draws} />
             <div className="space-y-6">
               <BettingBudgetPlanner config={config} stats={stats} draws={draws} />
+              <ROIQuickView />
+            </div>
+            <div className="space-y-6">
+              <StrategyBriefingPanel config={config} stats={stats} draws={draws} />
               <NotificationsPanel />
             </div>
           </div>
