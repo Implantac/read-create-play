@@ -1,9 +1,18 @@
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bookmark, Trash2, Copy, Check, Loader2 } from "lucide-react";
+import { Bookmark, Trash2, Copy, Check, Loader2, Download, FileSpreadsheet, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 import { ShareBetButton } from "@/components/ShareBetButton";
+import { exportToCsv, exportToExcel } from "@/utils/export";
+import { exportToPdf } from "@/engine/pdf-export";
+
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -26,6 +35,41 @@ export function SavedBetsPanel() {
     navigator.clipboard.writeText(text);
     toast.success("Todas as apostas copiadas!");
   };
+
+  const handleExportPdf = () => {
+    if (savedBets.length === 0) return;
+    exportToPdf({
+      title: `Portfolio Titan - ${config.name}`,
+      subtitle: `${savedBets.length} apostas salvas • ${new Date().toLocaleDateString()}`,
+      config,
+      bets: savedBets.map(b => ({
+        numbers: b.numbers,
+        strategy: b.strategy || "Manual",
+        score: b.score || 0,
+        grade: b.grade || "C"
+      })),
+      type: "gerador"
+    });
+    toast.success("PDF exportado com sucesso!");
+  };
+
+  const handleExportCsv = () => {
+    if (savedBets.length === 0) return;
+    const data = savedBets.map((b, i) => [`Ativo ${i + 1}`, ...b.numbers, b.strategy || "", b.score || ""]);
+    exportToCsv(`Portfolio_Titan_${config.id}`, data);
+    toast.success("CSV exportado!");
+  };
+
+  const handleExportExcel = () => {
+    if (savedBets.length === 0) return;
+    const data = [
+      ["ID", "Dezenas", "Estratégia", "Titan Score"],
+      ...savedBets.map((b, i) => [`#${i + 1}`, b.numbers.join("-"), b.strategy || "", b.score || ""])
+    ];
+    exportToExcel(`Portfolio_Titan_${config.id}`, data);
+    toast.success("Excel exportado!");
+  };
+
 
   if (loading) {
     return (
@@ -54,10 +98,35 @@ export function SavedBetsPanel() {
           </div>
         </div>
         {savedBets.length > 0 && (
-          <Button size="sm" variant="outline" onClick={copyAll} className="h-9 px-4 rounded-xl border-border/40 bg-secondary/20 hover:bg-secondary/40 text-muted-foreground font-black uppercase tracking-widest text-[9px] transition-all">
-            <Copy className="w-3.5 h-3.5 mr-2" /> Copiar Portfolio
-          </Button>
+          <div className="flex gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" variant="outline" className="h-9 px-4 rounded-xl border-border/40 bg-secondary/20 hover:bg-secondary/40 text-muted-foreground font-black uppercase tracking-widest text-[9px] transition-all">
+                  <Download className="w-3.5 h-3.5 mr-2" /> Exportar Portfolio
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="glass-panel">
+                <DropdownMenuItem onClick={handleExportPdf} className="gap-2 cursor-pointer">
+                  <FileText className="w-4 h-4 text-rose-500" />
+                  PDF (Relatório Profissional)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportCsv} className="gap-2 cursor-pointer">
+                  <FileSpreadsheet className="w-4 h-4 text-emerald-500" />
+                  CSV (Dados Puros)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportExcel} className="gap-2 cursor-pointer">
+                  <FileSpreadsheet className="w-4 h-4 text-blue-500" />
+                  Excel (Otimizado)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Button size="sm" variant="outline" onClick={copyAll} className="h-9 px-4 rounded-xl border-border/40 bg-secondary/20 hover:bg-secondary/40 text-muted-foreground font-black uppercase tracking-widest text-[9px] transition-all">
+              <Copy className="w-3.5 h-3.5 mr-2" /> Copiar Tudo
+            </Button>
+          </div>
         )}
+
       </div>
 
 
