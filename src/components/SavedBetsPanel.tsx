@@ -48,8 +48,9 @@ export function SavedBetsPanel() {
         score: b.score || 0,
         grade: b.grade || "C"
       })),
-      type: "gerador"
+      type: "apostas"
     });
+
     toast.success("PDF exportado com sucesso!");
   };
 
