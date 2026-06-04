@@ -37,6 +37,7 @@ export interface StrategyPerformance {
   totalTests: number;
   trend: "melhorando" | "estável" | "piorando";
   consistency?: number;
+  numbers: number[];
 }
 
 export interface StatisticalShift {
