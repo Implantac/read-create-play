@@ -76,8 +76,9 @@ export function GuidedOnboarding() {
   const handleComplete = () => {
     localStorage.setItem('titan_onboarding_completed', 'true');
     setIsOpen(false);
-    navigate('/gerador');
+    navigate('/gerador', { state: { fromOnboarding: true } });
   };
+
 
   const handleSkip = () => {
     localStorage.setItem('titan_onboarding_completed', 'true');
