@@ -19,7 +19,7 @@ import { TitanCommandCenter } from "@/components/TitanCommandCenter";
 import { TechnicalIndicators } from "@/components/TechnicalIndicators";
 import { AlphaMomentumSignal } from "@/components/AlphaMomentumSignal";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, RefreshCw, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, Search, ActivitySquare, ShieldCheck, Activity as LucideActivity } from "lucide-react";
+import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, RefreshCw, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, Search, ActivitySquare, ShieldCheck, CheckCircle2, Activity as LucideActivity } from "lucide-react";
 
 // FIX: ensure Activity symbol is never referenced globally in runtime.
 const Activity = LucideActivity;
@@ -96,6 +96,7 @@ const quickLinks = [
 const DashboardPage = () => {
   useHideLovableBadge();
   const { config, draws, drawsWithPrizes, loading, syncing, lastSyncAt, syncError, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery, hotNumbers, coldNumbers } = useLotteryContext();
+  const [syncStatus, setSyncStatus] = useState<"idle" | "success" | "error">("idle");
   const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
   const { currentPlan } = usePlanAccess();
   const { profile, trialDaysLeft, isTrialExpired, isAdmin, isSuperAdmin } = useAuth();
@@ -123,6 +124,18 @@ const DashboardPage = () => {
   const isSaturated = saturationScore > 75;
 
   const handleNewDraw = useCallback((draw: DrawResult) => addDraw(draw), [addDraw]);
+
+  const handleSyncManual = useCallback(async () => {
+    setSyncStatus("idle");
+    const result = await syncDraws();
+    if (result && result.success) {
+      setSyncStatus("success");
+      setTimeout(() => setSyncStatus("idle"), 3000);
+    } else {
+      setSyncStatus("error");
+      setTimeout(() => setSyncStatus("idle"), 5000);
+    }
+  }, [syncDraws]);
 
   const generateLuckyGame = useCallback(() => {
     if (stats.length === 0 || draws.length === 0) return;
@@ -172,12 +185,35 @@ const DashboardPage = () => {
           <Button
             size="sm"
             variant="outline"
-            onClick={() => syncDraws()}
+            onClick={handleSyncManual}
             disabled={syncing}
-            className="border-primary/20 hover:border-primary/50 bg-primary/5 gap-2"
+            className={`transition-all duration-300 gap-2 ${
+              syncStatus === "success" 
+                ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-500" 
+                : syncStatus === "error"
+                ? "border-destructive/50 bg-destructive/10 text-destructive"
+                : "border-primary/20 hover:border-primary/50 bg-primary/5"
+            }`}
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin text-primary" : ""}`} />
-            <span className="hidden sm:inline">{syncing ? "Sincronizando..." : "Atualizar Dados"}</span>
+            {syncing ? (
+              <RefreshCw className="w-3.5 h-3.5 animate-spin text-primary" />
+            ) : syncStatus === "success" ? (
+              <CheckCircle2 className="w-3.5 h-3.5" />
+            ) : syncStatus === "error" ? (
+              <X className="w-3.5 h-3.5" />
+            ) : (
+              <RefreshCw className="w-3.5 h-3.5" />
+            )}
+            
+            <span className="hidden sm:inline">
+              {syncing 
+                ? "Sincronizando..." 
+                : syncStatus === "success" 
+                ? "Atualizado!" 
+                : syncStatus === "error" 
+                ? "Erro ao Atualizar" 
+                : "Atualizar Dados"}
+            </span>
           </Button>
         </div>
       </PageHeader>
