@@ -57,7 +57,7 @@ export default function LoginPage() {
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="w-full max-w-md relative z-10"
       >
-        <Card className="glass-card shadow-2xl shadow-primary/5">
+        <Card className="glass-card shadow-premium p-4 rounded-[2.5rem]">
           <CardHeader className="text-center space-y-4 pb-2">
             <motion.div
               initial={{ scale: 0.8 }}
@@ -119,7 +119,7 @@ export default function LoginPage() {
             </CardContent>
 
             <CardFooter className="flex flex-col gap-3 pt-2">
-              <Button type="submit" className="w-full h-11 gradient-brand text-primary-foreground font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-shadow" disabled={loading}>
+              <Button type="submit" variant="premium" className="w-full h-14 text-sm" disabled={loading}>
                 {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                 Entrar
                 {!loading && <ArrowRight className="w-4 h-4 ml-2" />}

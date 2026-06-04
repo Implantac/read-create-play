@@ -72,17 +72,22 @@ const EstatisticasPage = () => {
 
   return (
     <div className="space-y-10 animate-in fade-in duration-700 pb-20 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded bg-primary/10 border border-primary/20 text-[9px] font-black text-primary uppercase tracking-[0.2em] italic">Data Engineering v5.3</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-4">
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Engineering Hub v6.0</span>
+            </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic leading-none">
+          <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
             Estatísticas <span className="gradient-brand-text">Avançadas</span>
           </h1>
-          <p className="text-sm text-muted-foreground font-medium max-w-md">Análise profunda de tendências, distribuição de somas e comportamento neural.</p>
+          <p className="text-sm text-muted-foreground font-medium max-w-lg leading-relaxed">
+            Exploração dimensional profunda. Analise ciclos, tendências e anomalias com precisão matemática institucional.
+          </p>
         </div>
+
         
         <div className="flex items-center gap-1.5 p-1 bg-secondary/40 border border-border/40 rounded-2xl shadow-lg h-auto overflow-x-auto scrollbar-hide">
           <div className="flex items-center gap-2 px-3 border-r border-white/5 mr-1">
