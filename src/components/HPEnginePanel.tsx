@@ -210,7 +210,7 @@ export function HPEnginePanel({ stats, config, draws }: Props) {
                 {[
                   { label: "Iterações", value: fmtN(simResult.iterationsCompleted), icon: Cpu },
                   { label: "Tempo", value: `${simResult.elapsedMs}ms`, icon: Timer },
-                  { label: "Ops/seg", value: formatNumber(simResult.opsPerSecond), icon: Gauge },
+                  { label: "Ops/seg", value: fmtN(simResult.opsPerSecond), icon: Gauge },
                   { label: "Melhor", value: `${simResult.bestHit} acertos`, icon: Trophy },
                 ].map(m => (
                   <div key={m.label} className="p-2.5 rounded-lg bg-muted/20 border border-border text-center">
