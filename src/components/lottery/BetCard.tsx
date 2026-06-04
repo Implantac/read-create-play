@@ -21,12 +21,12 @@ interface BetCardProps {
 }
 
 const GRADE_COLORS: Record<string, string> = {
-  S: "bg-gradient-to-r from-yellow-500 to-amber-500 text-white",
-  A: "bg-emerald-500/90 text-white",
-  B: "bg-blue-500/90 text-white",
-  C: "bg-yellow-500/90 text-white",
-  D: "bg-orange-500/90 text-white",
-  F: "bg-red-500/90 text-white",
+  S: "bg-gradient-to-r from-yellow-500 to-amber-500 text-white border-yellow-500/40 shadow-yellow-500/20",
+  A: "bg-emerald-500/90 text-white border-emerald-500/40 shadow-emerald-500/20",
+  B: "bg-blue-500/90 text-white border-blue-500/40 shadow-blue-500/20",
+  C: "bg-yellow-500/90 text-white border-yellow-500/40 shadow-yellow-500/20",
+  D: "bg-orange-500/90 text-white border-orange-500/40 shadow-orange-500/20",
+  F: "bg-red-500/90 text-white border-red-500/40 shadow-red-500/20",
 };
 
 export function BetCard({
@@ -77,7 +77,6 @@ export function BetCard({
         </div>
       </div>
 
-
       <div className="h-1.5 w-full bg-secondary/50 rounded-full overflow-hidden border border-border/40 relative z-10">
         <motion.div 
           initial={{ width: 0 }}
@@ -86,7 +85,6 @@ export function BetCard({
           className="h-full bg-primary/60 shadow-[0_0_10px_rgba(var(--primary),0.3)]"
         />
       </div>
-
 
       <div className="flex flex-wrap gap-2 relative z-10">
         {numbers.map((n) => {
@@ -105,27 +103,26 @@ export function BetCard({
         })}
       </div>
 
-
       {insights.length > 0 && (
-        <div className="space-y-1 pt-1 border-t border-border/30">
+        <div className="space-y-1.5 pt-3 border-t border-border/30 relative z-10">
           {insights.map((insight, j) => (
-            <p key={j} className="text-[10px] text-muted-foreground flex items-start gap-1.5">
-              <TrendingUp className="w-3 h-3 mt-0.5 text-primary/60" />
+            <p key={j} className="text-[10px] text-muted-foreground flex items-start gap-2 font-medium">
+              <TrendingUp className="w-3 h-3 mt-0.5 text-primary opacity-60" />
               {insight}
             </p>
           ))}
         </div>
       )}
 
-      <div className="flex items-center gap-2 pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <Button variant="ghost" size="sm" onClick={handleCopy} className="h-7 text-[10px] gap-1.5 px-2">
-          {copied ? <Check className="w-3 h-3 text-primary" /> : <Copy className="w-3 h-3" />}
-          Copiar
+      <div className="flex items-center gap-3 pt-2 relative z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+        <Button variant="ghost" size="sm" onClick={handleCopy} className="h-9 px-4 rounded-xl border border-border/40 bg-secondary/20 hover:bg-primary/10 hover:text-primary text-[10px] font-black uppercase tracking-widest transition-all">
+          {copied ? <Check className="w-3.5 h-3.5 mr-1.5 text-primary" /> : <Copy className="w-3.5 h-3.5 mr-1.5" />}
+          Copiar Matriz
         </Button>
         {onSave && (
-          <Button variant="ghost" size="sm" onClick={onSave} className="h-7 text-[10px] gap-1.5 px-2">
-            <Shield className="w-3 h-3" />
-            Salvar
+          <Button variant="ghost" size="sm" onClick={onSave} className="h-9 px-4 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest transition-all">
+            <Shield className="w-3.5 h-3.5 mr-1.5" />
+            Salvar Node
           </Button>
         )}
       </div>
