@@ -14,12 +14,27 @@ import { exportToCsv, exportToExcel } from "@/utils/export";
 import { exportToPdf } from "@/engine/pdf-export";
 
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+
 
 export function SavedBetsPanel() {
   const { selectedLottery, config, stats } = useLotteryContext();
   const { savedBets, loading, deleteBet } = useSavedBets(selectedLottery);
   const [copied, setCopied] = useState<string | null>(null);
+  const [filter, setFilter] = useState("all");
+
+  const filteredBets = useMemo(() => {
+    if (filter === "all") return savedBets;
+    return savedBets.filter(b => b.grade === filter);
+  }, [savedBets, filter]);
+
+  const statsSummary = useMemo(() => {
+    const total = savedBets.length;
+    const sGrade = savedBets.filter(b => b.grade === 'S').length;
+    const aGrade = savedBets.filter(b => b.grade === 'A').length;
+    return { total, sGrade, aGrade };
+  }, [savedBets]);
+
 
   const copyBet = (bet: number[], id: string) => {
     navigator.clipboard.writeText(bet.join(" - "));
@@ -131,9 +146,27 @@ export function SavedBetsPanel() {
       </div>
 
 
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide relative z-10 border-b border-white/5">
+        <span className="text-[8px] font-black uppercase text-muted-foreground shrink-0 mr-2">Filtrar por Qualidade:</span>
+        {['all', 'S', 'A', 'B', 'C'].map(g => (
+          <button
+            key={g}
+            onClick={() => setFilter(g)}
+            className={`px-3 py-1 rounded-full text-[9px] font-black uppercase transition-all shrink-0 border ${
+              filter === g 
+                ? "bg-primary/20 border-primary text-primary" 
+                : "bg-white/5 border-white/5 text-muted-foreground hover:border-white/20"
+            }`}
+          >
+            {g === 'all' ? 'Ver Tudo' : `Rank ${g}`}
+          </button>
+        ))}
+      </div>
+
       <AnimatePresence mode="popLayout">
         <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar relative z-10">
-          {savedBets.map((bet, i) => (
+          {filteredBets.map((bet, i) => (
+
             <motion.div
               key={bet.id}
               layout
