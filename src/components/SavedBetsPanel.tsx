@@ -37,49 +37,56 @@ export function SavedBetsPanel() {
   }
 
   return (
-    <div className="rounded-xl glass-card p-5 space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-            <Bookmark className="w-4 h-4 text-primary" />
+    <div className="rounded-2xl glass-card p-6 space-y-6 relative overflow-hidden group">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 shadow-lg group-hover:rotate-6 transition-transform duration-500">
+            <Bookmark className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-foreground">Apostas Salvas</h3>
-            <p className="text-[10px] text-muted-foreground mt-0.5">
-              {savedBets.length} aposta{savedBets.length !== 1 ? "s" : ""} salva{savedBets.length !== 1 ? "s" : ""} para {config.name}
+            <h3 className="text-sm font-black text-foreground uppercase tracking-widest italic flex items-center gap-2">
+              Portfolio de Ativos
+            </h3>
+            <p className="text-[10px] text-muted-foreground mt-1 font-bold uppercase tracking-widest opacity-60">
+              {savedBets.length} Matrizes Salvas • {config.name}
             </p>
           </div>
         </div>
         {savedBets.length > 0 && (
-          <Button size="sm" variant="outline" onClick={copyAll} className="text-xs border-border/50">
-            <Copy className="w-3 h-3 mr-1" /> Copiar todas
+          <Button size="sm" variant="outline" onClick={copyAll} className="h-9 px-4 rounded-xl border-border/40 bg-secondary/20 hover:bg-secondary/40 text-muted-foreground font-black uppercase tracking-widest text-[9px] transition-all">
+            <Copy className="w-3.5 h-3.5 mr-2" /> Copiar Portfolio
           </Button>
         )}
       </div>
 
+
       <AnimatePresence mode="popLayout">
-        <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1">
+        <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar relative z-10">
           {savedBets.map((bet, i) => (
             <motion.div
               key={bet.id}
               layout
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20, height: 0 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
               transition={{ delay: i * 0.03 }}
-              className="flex items-center gap-2 p-3 rounded-lg bg-secondary/30 border border-border/30 hover:border-border/60 transition-colors group"
+              className="flex items-center gap-3 p-4 rounded-xl bg-secondary/20 border border-border/40 hover:border-primary/40 transition-all duration-300 group/item relative overflow-hidden"
             >
-              <div className="shrink-0 w-12">
+              <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover/item:opacity-100 transition-opacity" />
+
+              <div className="shrink-0 w-10 relative z-10">
                 {bet.grade && (
-                  <span className={`text-xs font-bold px-1.5 py-0.5 rounded border ${
-                    bet.grade === "S" ? "text-yellow-400 bg-yellow-400/10 border-yellow-400/30" :
-                    bet.grade === "A" ? "text-emerald-400 bg-emerald-400/10 border-emerald-400/30" :
-                    "text-blue-400 bg-blue-400/10 border-blue-400/30"
+                  <span className={`text-[10px] font-black italic px-2 py-0.5 rounded-lg border-2 shadow-sm ${
+                    bet.grade === "S" ? "text-yellow-400 bg-yellow-400/10 border-yellow-400/40 shadow-yellow-400/10" :
+                    bet.grade === "A" ? "text-emerald-400 bg-emerald-400/10 border-emerald-400/40 shadow-emerald-400/10" :
+                    "text-blue-400 bg-blue-400/10 border-blue-400/40 shadow-blue-400/10"
                   }`}>
                     {bet.grade}
                   </span>
                 )}
               </div>
+
 
               <div className="flex flex-wrap gap-1 flex-1">
                 {bet.numbers.map(n => {
@@ -121,12 +128,12 @@ export function SavedBetsPanel() {
       </AnimatePresence>
 
       {savedBets.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground text-sm border border-dashed border-border/30 rounded-lg">
-          <Bookmark className="w-6 h-6 mx-auto mb-2 opacity-30" />
-          Nenhuma aposta salva para {config.name}
-          <br />
-          <span className="text-[10px]">Use o botão ⭐ nos geradores para salvar</span>
+        <div className="text-center py-12 text-muted-foreground text-sm border-2 border-dashed border-border/20 rounded-2xl bg-secondary/10 relative z-10">
+          <Bookmark className="w-10 h-10 mx-auto mb-4 opacity-20 group-hover:scale-110 transition-transform duration-500" />
+          <p className="font-black uppercase tracking-widest text-[10px] opacity-40">Portfolio Vazio</p>
+          <p className="text-xs mt-1 px-8 opacity-60">Utilize os geradores de elite para salvar suas matrizes favoritas.</p>
         </div>
+
       )}
     </div>
   );
