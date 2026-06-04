@@ -6,6 +6,7 @@ import { useUserLearning } from "@/hooks/useUserLearning";
 import { MessageCircle, Send, Trash2, Sparkles, Bot, User, StopCircle, Copy, Check, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
