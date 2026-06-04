@@ -244,13 +244,13 @@ export default function LandingPage() {
               className="space-y-8"
             >
               <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
-                Como <span className="gradient-brand-text">Funciona?</span>
+                {t("landing.how_it_works.title").split(" ").map((word, i) => i === 1 ? <span key={i} className="gradient-brand-text">{word} </span> : word + " ")}
               </h2>
               <div className="space-y-6">
                 {[
-                  { step: "01", title: "Coleta de Big Data", desc: "Nossos servidores monitoram resultados de todas as loterias oficiais em tempo real." },
-                  { step: "02", title: "Processamento Neural", desc: "A IA processa mais de 1 milhão de combinações para cada sorteio buscando anomalias." },
-                  { step: "03", title: "Geração de Estratégias", desc: "Algoritmos genéticos criam matrizes de jogos com o maior equilíbrio estatístico possível." }
+                  { step: "01", title: t("landing.how_it_works.step1.title"), desc: t("landing.how_it_works.step1.desc") },
+                  { step: "02", title: t("landing.how_it_works.step2.title"), desc: t("landing.how_it_works.step2.desc") },
+                  { step: "03", title: t("landing.how_it_works.step3.title"), desc: t("landing.how_it_works.step3.desc") }
                 ].map((item, i) => (
                   <div key={i} className="flex gap-6 items-start group">
                     <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">{item.step}</span>
@@ -261,6 +261,7 @@ export default function LandingPage() {
                   </div>
                 ))}
               </div>
+
             </motion.div>
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
