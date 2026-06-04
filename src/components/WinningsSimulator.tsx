@@ -377,7 +377,7 @@ export function WinningsSimulator({ lotteryId, pick, maxNumbers, draws, drawsWit
             <div className="space-y-3 p-4 rounded-lg border border-primary/20 bg-primary/5">
               <div className="flex items-center justify-between">
                 <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                  <ChartLine className="w-3.5 h-3.5 text-primary" /> Projeção para os próximos {futureDraws} sorteios
+                  <ChartLine className="w-3.5 h-3.5 text-primary" /> Projeção para os próximos {formatNumber(futureDraws)} sorteios
                 </h4>
                 <Badge variant="outline" className="text-[10px]">Confiança: {projection.confidence}%</Badge>
               </div>
