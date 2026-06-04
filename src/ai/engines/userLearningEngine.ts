@@ -73,7 +73,7 @@ export async function upsertUserMemory(
   };
   const { error } = await supabase
     .from("ai_user_memory")
-    .upsert(record, { onConflict: "user_id,lottery_id,memory_type,key" });
+    .upsert([record] as any, { onConflict: "user_id,lottery_id,memory_type,key" });
 
   if (error) console.error("[UserLearning] upsert memory error:", error.message);
 }

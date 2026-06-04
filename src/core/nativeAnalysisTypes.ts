@@ -33,6 +33,7 @@ export type SimulationBetSummary = {
 export type SimulationData = {
   bets?: SimulationBetSummary[];
   totalDraws?: number;
+  ranking?: number[];
 };
 
 export type MassiveTopGame = {
