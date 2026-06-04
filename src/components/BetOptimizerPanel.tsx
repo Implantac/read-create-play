@@ -182,7 +182,7 @@ export function BetOptimizerPanel({ stats, config, draws }: Props) {
               className="space-y-4"
             >
               <div className="text-xs text-muted-foreground">
-                {optResult.iterations.toLocaleString()} gerações em {optResult.elapsedMs}ms
+                {formatNumber(optResult.iterations)} gerações em {formatNumber(optResult.elapsedMs)}ms
               </div>
 
               {/* Best bet */}
