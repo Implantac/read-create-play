@@ -40,20 +40,20 @@ const resources = {
           "cta_secondary": "Login de Membro"
         },
         "features": {
-          "title": "Armas de Alta Precisão",
-          "subtitle": "Arsenal completo usado por analistas quantitativos e jogadores profissionais.",
+          "title": "Recursos da Plataforma Titan",
+          "subtitle": "A mais completa análise de loterias com inteligência artificial e estatísticas profissionais.",
           "items": {
             "xray": {
-              "title": "Raio-X dos Sorteios",
-              "description": "Analise dezenas quentes, frias e atrasadas com visualização técnica avançada."
+              "title": "Análise Estatística de Loterias",
+              "description": "Visualize tendências, números mais sorteados e atrasos com ferramentas profissionais de estatística."
             },
             "ia": {
-              "title": "IA Preditiva",
-              "description": "Redes neurais processam tendências invisíveis em +10.000 sorteios oficiais."
+              "title": "Inteligência Artificial para Loterias",
+              "description": "Nossa IA processa milhares de resultados da Mega-Sena, Lotofácil e outras para prever tendências."
             },
             "optimizer": {
-              "title": "Otimizador Elite",
-              "description": "Algoritmos genéticos criam matrizes de alta cobertura matemática."
+              "title": "Gerador de Apostas Inteligente",
+              "description": "Crie jogos otimizados matematicamente para aumentar suas chances de ganhar na loteria."
             },
             "backtest": {
               "title": "Backtest Brutal",
@@ -76,7 +76,7 @@ const resources = {
           "uptime": "Uptime"
         },
         "faq": {
-          "title": "Perguntas Frequentes",
+          "title": "Dúvidas sobre o Titan Loterias",
           "q1": "Como a IA ajuda nas apostas?",
           "a1": "Nossa IA analisa padrões históricos complexos que o olho humano não consegue detectar, identificando tendências e probabilidades estatísticas.",
           "q2": "O acesso vitalício é realmente único?",
@@ -87,7 +87,7 @@ const resources = {
           "a4": "Não. Loterias são jogos de azar. Nossa ferramenta aumenta suas probabilidades matemáticas e estatísticas, mas não garante prêmios."
         },
         "how_it_works": {
-          "title": "Como Funciona?",
+          "title": "Como Funciona o Titan Loterias",
           "step1": {
             "title": "Coleta de Big Data",
             "desc": "Nossos servidores monitoram resultados de todas as loterias oficiais em tempo real."
@@ -104,7 +104,7 @@ const resources = {
           "status_value": "Operando em Alta Fidelidade"
         },
         "testimonials": {
-          "title": "Quem usa, Aprova",
+          "title": "Depoimentos de Usuários Reais",
           "subtitle": "Junte-se a milhares de jogadores que já profissionalizaram suas estratégias.",
           "items": {
             "t1": {
