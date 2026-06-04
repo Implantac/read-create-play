@@ -1,4 +1,5 @@
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
+import { getMinPrizeHits } from "./lib/simulation-utils";
 
 export interface SimulationBet {
   id: number;
@@ -51,14 +52,6 @@ function popcount32(x: number): number {
 function intersectionCount(a: Uint32Array, b: Uint32Array): number {
   return popcount32(a[0] & b[0]) + popcount32(a[1] & b[1]) +
          popcount32(a[2] & b[2]) + popcount32(a[3] & b[3]);
-}
-
-export function getMinPrizeHits(lotteryId: string): number {
-  const map: Record<string, number> = {
-    megasena: 4, lotofacil: 11, quina: 2, lotomania: 15,
-    duplasena: 3, timemania: 3, diadesorte: 4, supersete: 3,
-  };
-  return map[lotteryId] || 3;
 }
 
 export function runSimulation(

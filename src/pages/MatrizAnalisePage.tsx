@@ -1,4 +1,4 @@
-import { useMemo, lazy, Suspense } from "react";
+import { useState, useMemo } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { SelectedBetsProvider } from "@/contexts/SelectedBetsContext";
 import { computeMatrixAnalysis } from "@/engine/matrix-analysis";
@@ -11,6 +11,7 @@ import { ComplianceDisclaimer } from "@/components/ComplianceDisclaimer";
 import { PlanGate } from "@/components/PlanGate";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { Grid3X3, Loader2, TrendingUp, TrendingDown, Clock, BarChart3, Zap } from "lucide-react";
+import { lazy, Suspense } from "react";
 
 const SmartUnfoldingGenerator = lazy(() =>
   import("@/components/SmartUnfoldingGenerator").then(m => ({ default: m.SmartUnfoldingGenerator }))

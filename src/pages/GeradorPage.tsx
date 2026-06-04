@@ -59,7 +59,7 @@ const GeradorPage = () => {
           <BettingBudgetPlanner config={config} stats={stats} draws={draws} />
 
           {/* FREE: Basic generator + number picker + saved bets + bet checker */}
-          <BetGenerator stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
+          <BetGenerator stats={stats} config={config} onSaveBet={handleSaveBet} />
 
           <div className="grid lg:grid-cols-2 gap-6">
             <NumberPickerGrid

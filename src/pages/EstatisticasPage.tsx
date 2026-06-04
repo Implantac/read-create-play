@@ -47,18 +47,18 @@ const EstatisticasPage = () => {
   const sumData = useMemo(() => computeSumDistribution(filteredDraws), [filteredDraws]);
 
   const derivedStats = useMemo(() => {
-    const hotNumbers = stats.filter(s => s.status === "hot").length;
-    const coldNumbers = stats.filter(s => s.status === "cold").length;
+    const hotCount = stats.filter(s => s.status === "hot").length;
+    const coldCount = stats.filter(s => s.status === "cold").length;
     const avgDelay = stats.length > 0 ? Math.round(stats.reduce((a, s) => a + s.lastSeen, 0) / stats.length) : 0;
     const avgFreq = stats.length > 0 ? Math.round(stats.reduce((a, s) => a + s.frequency, 0) / stats.length) : 0;
     const maxDelay = stats.length > 0 ? Math.max(...stats.map(s => s.lastSeen)) : 0;
     const mostFrequent = stats.length > 0 ? stats.reduce((a, s) => s.frequency > a.frequency ? s : a, stats[0]) : null;
     const leastFrequent = stats.length > 0 ? stats.reduce((a, s) => s.frequency < a.frequency ? s : a, stats[0]) : null;
     const avgSum = sumData.length > 0 ? Math.round(sumData.reduce((a, s) => a + s.sum, 0) / sumData.length) : 0;
-    return { hotNumbers, coldNumbers, avgDelay, avgFreq, maxDelay, mostFrequent, leastFrequent, avgSum };
+    return { hotCount, coldCount, avgDelay, avgFreq, maxDelay, mostFrequent, leastFrequent, avgSum };
   }, [stats, sumData]);
 
-  const { hotNumbers, coldNumbers, avgDelay, avgFreq, maxDelay, mostFrequent, leastFrequent, avgSum } = derivedStats;
+  const { hotCount, coldCount, avgDelay, avgFreq, maxDelay, mostFrequent, leastFrequent, avgSum } = derivedStats;
 
   if (draws.length === 0) {
     return (
@@ -111,8 +111,8 @@ const EstatisticasPage = () => {
 
       {/* Overview Cards */}
       <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <motion.div variants={item}><StatsCard title="Números Quentes" value={hotNumbers} icon={Flame} color="red" subtitle={`Mais sorteados que a média`} /></motion.div>
-        <motion.div variants={item}><StatsCard title="Números Frios" value={coldNumbers} icon={Snowflake} color="blue" subtitle={`Menos sorteados que a média`} /></motion.div>
+        <motion.div variants={item}><StatsCard title="Números Quentes" value={hotCount} icon={Flame} color="red" subtitle={`Mais sorteados que a média`} /></motion.div>
+        <motion.div variants={item}><StatsCard title="Números Frios" value={coldCount} icon={Snowflake} color="blue" subtitle={`Menos sorteados que a média`} /></motion.div>
         <motion.div variants={item}><StatsCard title="Atraso Médio" value={`${avgDelay}`} icon={Clock} color="amber" subtitle="Concursos sem aparecer" /></motion.div>
         <motion.div variants={item}><StatsCard title="Maior Atraso" value={`${maxDelay}`} icon={TrendingUp} color="red" subtitle={`Nº mais atrasado`} /></motion.div>
       </motion.div>

@@ -1,6 +1,7 @@
 import { NumberStats } from "@/engine/stats/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { generateByStrategy, Strategy, STRATEGIES } from "@/engine/strategies";
+import { calculateConsistency, calculateWinRate, PRIZE_MAP } from "./lib/simulation-utils";
 
 // ═══════════════════════════════════════════════════════
 // Simulador Massivo de Monte Carlo
@@ -73,39 +74,7 @@ function countHits(bet: number[], draw: number[]): number {
  * Prize multipliers by lottery type (approximate relative to bet cost)
  */
 function getPrizeMultipliers(lotteryId: string, pick: number): Record<number, number> {
-  const base: Record<number, number> = {};
-  for (let i = 0; i <= pick; i++) base[i] = 0;
-
-  switch (lotteryId) {
-    case "megasena":
-      base[4] = 50; base[5] = 5000; base[6] = 500000;
-      break;
-    case "lotofacil":
-      base[11] = 5; base[12] = 10; base[13] = 25; base[14] = 1500; base[15] = 100000;
-      break;
-    case "quina":
-      base[2] = 1; base[3] = 5; base[4] = 200; base[5] = 50000;
-      break;
-    case "lotomania":
-      base[0] = 5; base[15] = 10; base[16] = 25; base[17] = 100;
-      base[18] = 1000; base[19] = 20000; base[20] = 500000;
-      break;
-    case "duplasena":
-      base[3] = 3; base[4] = 50; base[5] = 5000; base[6] = 300000;
-      break;
-    case "timemania":
-      base[3] = 2; base[4] = 10; base[5] = 50; base[6] = 500; base[7] = 50000;
-      break;
-    case "diadesorte":
-      base[4] = 10; base[5] = 50; base[6] = 2000; base[7] = 200000;
-      break;
-    case "supersete":
-      base[3] = 5; base[4] = 20; base[5] = 200; base[6] = 10000; base[7] = 500000;
-      break;
-    default:
-      base[pick - 2] = 10; base[pick - 1] = 1000; base[pick] = 100000;
-  }
-  return base;
+  return PRIZE_MAP[lotteryId] || { [pick - 2]: 10, [pick - 1]: 1000, [pick]: 100000 };
 }
 
 /**
@@ -129,12 +98,7 @@ export function runMassiveBatch(
 
   for (let i = 0; i < iterations; i++) {
     // Generate bet using strategy
-    const bet = strategy === "smart" || strategy === "hot" || strategy === "cold" || strategy === "balanced"
-      || strategy === "fibonacci" || strategy === "primes" || strategy === "golden"
-      || strategy === "pattern" || strategy === "lowDelay" || strategy === "sectors"
-      || strategy === "trend" || strategy === "cycle" || strategy === "hybrid" || strategy === "ml"
-      ? generateByStrategy(strategy, stats, config)
-      : generateByStrategy("smart", stats, config);
+    const bet = generateByStrategy(strategy, stats, config);
 
     // Generate random draw to test against
     const draw = draws.length > 0
@@ -214,10 +178,7 @@ export function runMassiveSimulation(
     const hitValues = Object.entries(batch.hitDist).flatMap(([h, c]) =>
       Array(c).fill(Number(h))
     );
-    const mean = avgHits;
-    const variance = hitValues.reduce((s, v) => s + (v - mean) ** 2, 0) / hitValues.length;
-    const stdDev = Math.sqrt(variance);
-    const consistency = mean > 0 ? Math.max(0, 1 - stdDev / mean) : 0;
+    const consistency = calculateConsistency(hitValues, avgHits, config.pick);
 
     performances.push({
       strategy,
@@ -230,7 +191,7 @@ export function runMassiveSimulation(
       hitRate5Plus: Math.round(hitRate5Plus * 10000) / 100,
       hitRateFull: Math.round(hitRateFull * 1000000) / 10000,
       expectedValue: Math.round(ev * 100) / 100,
-      consistency: Math.round(consistency * 1000) / 1000,
+      consistency: Math.round(consistency) / 100, // consistency is 0-100 from util, target is 0-1
     });
   }
 
