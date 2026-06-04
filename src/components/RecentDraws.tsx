@@ -16,18 +16,21 @@ export function RecentDraws({ draws }: Props) {
   const [expandedDraw, setExpandedDraw] = useState<number | null>(firstWithPrizes?.concurso ?? null);
 
   return (
-    <div className="rounded-xl glass-card p-5 space-y-4">
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-lg bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center">
-          <History className="w-4 h-4 text-neon-purple" />
-        </div>
-        <div>
-          <h3 className="text-sm font-semibold text-foreground">Últimos Concursos</h3>
-          <p className="text-[10px] text-muted-foreground mt-0.5">Resultados e premiações</p>
+    <div className="rounded-2xl glass-card p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="w-11 h-11 rounded-xl bg-neon-purple/10 border border-neon-purple/20 flex items-center justify-center shadow-lg shadow-neon-purple/5">
+            <History className="w-5 h-5 text-neon-purple" />
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-foreground uppercase tracking-wider italic">Últimos Concursos</h3>
+            <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase tracking-widest opacity-60">Database Sincronizada</p>
+          </div>
         </div>
       </div>
-      <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+      <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1 custom-scrollbar">
         {draws.slice(0, 20).map((draw, i) => {
+
           const isExpanded = expandedDraw === draw.concurso;
           const hasPrizes = draw.prizeTiers?.premiacoes && draw.prizeTiers.premiacoes.length > 0;
 
@@ -37,8 +40,9 @@ export function RecentDraws({ draws }: Props) {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.03 }}
-              className="rounded-lg bg-secondary/30 border border-border/30 hover:border-border/60 transition-colors overflow-hidden"
+              className="rounded-xl bg-secondary/20 border border-border/40 hover:border-primary/30 transition-all duration-300 overflow-hidden group/item"
             >
+
               <div
                 className={`flex items-center gap-3 p-2.5 ${hasPrizes ? "cursor-pointer" : ""}`}
                 onClick={() => hasPrizes && setExpandedDraw(isExpanded ? null : draw.concurso)}
