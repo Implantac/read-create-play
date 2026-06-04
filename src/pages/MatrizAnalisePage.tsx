@@ -5,7 +5,7 @@ import { computeMatrixAnalysis } from "@/engine/matrix-analysis";
 import { MatrizAnaliseTable } from "@/components/MatrizAnaliseTable";
 import { FarolDezenas } from "@/components/FarolDezenas";
 import { PageHeader } from "@/components/PageHeader";
-import { EmptyState } from "@/components/EmptyState";
+import { EmptyState } from "@/components/common/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { ComplianceDisclaimer } from "@/components/ComplianceDisclaimer";
 import { PlanGate } from "@/components/PlanGate";

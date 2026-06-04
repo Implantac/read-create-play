@@ -8,7 +8,7 @@ import { AuthProvider } from "@/contexts/AuthProvider";
 import { LotteryProvider } from "@/contexts/LotteryContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminGuard } from "@/components/AdminGuard";
-import { AppLayout } from "@/components/AppLayout";
+import { AppLayout } from "@/components/layout/AppLayout";
 import { lazy, Suspense } from "react";
 import { Loader2 } from "lucide-react";
 

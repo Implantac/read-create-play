@@ -1,7 +1,7 @@
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { AIAutonomousDashboard } from "@/components/AIAutonomousDashboard";
 import { PageHeader } from "@/components/PageHeader";
-import { EmptyState } from "@/components/EmptyState";
+import { EmptyState } from "@/components/common/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { PlanGate } from "@/components/PlanGate";
 import { Brain } from "lucide-react";

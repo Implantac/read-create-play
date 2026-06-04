@@ -3,7 +3,7 @@ import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { PageHeader } from "@/components/PageHeader";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
-import { EmptyState } from "@/components/EmptyState";
+import { EmptyState } from "@/components/common/EmptyState";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

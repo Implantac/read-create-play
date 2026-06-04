@@ -8,9 +8,9 @@ import { ConsecutiveChart } from "@/components/ConsecutiveChart";
 import { RangeDistribution } from "@/components/RangeDistribution";
 import { DelayChart } from "@/components/DelayChart";
 import { PageHeader } from "@/components/PageHeader";
-import { EmptyState } from "@/components/EmptyState";
+import { EmptyState } from "@/components/common/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
-import { StatsCard } from "@/components/StatsCard";
+import { StatsCard } from "@/components/common/StatsCard";
 import { computeFrequencyStats, computeSumDistribution } from "@/engine/stats/statistics";
 import { motion } from "framer-motion";
 import { PieChart, Flame, Snowflake, TrendingUp, BarChart3, Clock, Target, Sigma, Filter } from "lucide-react";
@@ -111,17 +111,17 @@ const EstatisticasPage = () => {
 
       {/* Overview Cards */}
       <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <motion.div variants={item}><StatsCard title="Números Quentes" value={hotCount} icon={Flame} color="red" subtitle={`Mais sorteados que a média`} /></motion.div>
-        <motion.div variants={item}><StatsCard title="Números Frios" value={coldCount} icon={Snowflake} color="blue" subtitle={`Menos sorteados que a média`} /></motion.div>
-        <motion.div variants={item}><StatsCard title="Atraso Médio" value={`${avgDelay}`} icon={Clock} color="amber" subtitle="Concursos sem aparecer" /></motion.div>
-        <motion.div variants={item}><StatsCard title="Maior Atraso" value={`${maxDelay}`} icon={TrendingUp} color="red" subtitle={`Nº mais atrasado`} /></motion.div>
+        <motion.div variants={item}><StatsCard title="Números Quentes" value={hotCount} icon={Flame} description={`Mais sorteados que a média`} /></motion.div>
+        <motion.div variants={item}><StatsCard title="Números Frios" value={coldCount} icon={Snowflake} description={`Menos sorteados que a média`} /></motion.div>
+        <motion.div variants={item}><StatsCard title="Atraso Médio" value={`${avgDelay}`} icon={Clock} description="Concursos sem aparecer" /></motion.div>
+        <motion.div variants={item}><StatsCard title="Maior Atraso" value={`${maxDelay}`} icon={TrendingUp} description={`Nº mais atrasado`} /></motion.div>
       </motion.div>
 
       <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <motion.div variants={item}><StatsCard title="Frequência Média" value={avgFreq} icon={BarChart3} color="green" subtitle="Aparições por número" /></motion.div>
-        <motion.div variants={item}><StatsCard title="Mais Sorteado" value={mostFrequent ? `${String(mostFrequent.number).padStart(2,'0')} (${mostFrequent.frequency}x)` : '-'} icon={Target} color="green" subtitle="Número campeão" /></motion.div>
-        <motion.div variants={item}><StatsCard title="Menos Sorteado" value={leastFrequent ? `${String(leastFrequent.number).padStart(2,'0')} (${leastFrequent.frequency}x)` : '-'} icon={Snowflake} color="blue" subtitle="Número mais raro" /></motion.div>
-        <motion.div variants={item}><StatsCard title="Soma Média" value={avgSum} icon={Sigma} color="amber" subtitle="Soma das dezenas" /></motion.div>
+        <motion.div variants={item}><StatsCard title="Frequência Média" value={avgFreq} icon={BarChart3} description="Aparições por número" /></motion.div>
+        <motion.div variants={item}><StatsCard title="Mais Sorteado" value={mostFrequent ? `${String(mostFrequent.number).padStart(2,'0')} (${mostFrequent.frequency}x)` : '-'} icon={Target} description="Número campeão" /></motion.div>
+        <motion.div variants={item}><StatsCard title="Menos Sorteado" value={leastFrequent ? `${String(leastFrequent.number).padStart(2,'0')} (${leastFrequent.frequency}x)` : '-'} icon={Snowflake} description="Número mais raro" /></motion.div>
+        <motion.div variants={item}><StatsCard title="Soma Média" value={avgSum} icon={Sigma} description="Soma das dezenas" /></motion.div>
       </motion.div>
 
       {/* Frequency + Heatmap */}

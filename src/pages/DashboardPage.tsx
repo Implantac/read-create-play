@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, memo } from "react";
 import { DrawResult } from "@/data/lotteries";
 import { useLotteryContext } from "@/contexts/LotteryContext";
-import { StatsCard } from "@/components/StatsCard";
+import { StatsCard } from "@/components/common/StatsCard";
 import { FrequencyChart } from "@/components/FrequencyChart";
 import { HeatmapGrid } from "@/components/HeatmapGrid";
 import { RecentDraws } from "@/components/RecentDraws";
@@ -12,18 +12,17 @@ import { RangeDistribution } from "@/components/RangeDistribution";
 import { DelayChart } from "@/components/DelayChart";
 import { AutoUpdater } from "@/components/AutoUpdater";
 import { PageHeader } from "@/components/PageHeader";
-import { EmptyState } from "@/components/EmptyState";
+import { EmptyState } from "@/components/common/EmptyState";
+import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { TitanCommandCenter } from "@/components/TitanCommandCenter";
 import { TechnicalIndicators } from "@/components/TechnicalIndicators";
 import { AlphaMomentumSignal } from "@/components/AlphaMomentumSignal";
 import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, Search, ActivitySquare, ShieldCheck } from "lucide-react";
+import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, Search, ActivitySquare, ShieldCheck, Activity as LucideActivity } from "lucide-react";
 
 // FIX: ensure Activity symbol is never referenced globally in runtime.
-// Some build outputs may accidentally emit an `Activity` identifier reference;
-// we explicitly define it here to prevent a blank screen.
-const Activity = ActivitySquare;
+const Activity = LucideActivity;
 
 import { Badge } from "@/components/ui/badge";
 import { NeuralSynergyCore } from "@/components/NeuralSynergyCore";
@@ -285,13 +284,15 @@ const DashboardPage = () => {
       {loading && (
         <div className="space-y-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map(i => (
-              <Skeleton key={i} className="h-28 rounded-xl bg-muted/10 border border-white/5" />
-            ))}
+            <LoadingSkeleton variant="card" count={4} />
           </div>
           <div className="grid lg:grid-cols-3 gap-6">
-            <Skeleton className="h-64 lg:col-span-2 rounded-xl bg-muted/10 border border-white/5" />
-            <Skeleton className="h-64 rounded-xl bg-muted/10 border border-white/5" />
+            <div className="lg:col-span-2">
+              <LoadingSkeleton variant="chart" count={1} />
+            </div>
+            <div>
+              <LoadingSkeleton variant="list" count={1} />
+            </div>
           </div>
         </div>
       )}
@@ -611,9 +612,8 @@ const DashboardPage = () => {
                 title="Total Concursos" 
                 value={draws.length} 
                 icon={BarChart3} 
-                color="green" 
-                trend={1.2}
-                subtitle="Volume histórico processado" 
+                trend={{ value: 1.2, isPositive: true }}
+                description="Volume histórico processado" 
               />
             </motion.div>
             <motion.div variants={item} className="lg:col-span-1">
@@ -621,19 +621,17 @@ const DashboardPage = () => {
                 title="Tendência Alta" 
                 value={heatingCount} 
                 icon={Zap} 
-                color="amber" 
-                trend={5.4}
-                subtitle="Dezenas com aceleração" 
+                trend={{ value: 5.4, isPositive: true }}
+                description="Dezenas com aceleração" 
               />
             </motion.div>
             <motion.div variants={item} className="lg:col-span-1">
               <StatsCard 
                 title="Saturação" 
                 value={`${analytics.saturationScore.toFixed(1)}%`} 
-icon={ActivitySquare}
-                color={analytics.saturationScore > 75 ? "red" : "green"} 
-                trend={analytics.saturationScore > 50 ? 2.1 : -1.2}
-                subtitle="Risco de reversão estocástica" 
+                icon={Activity} 
+                trend={{ value: 2.1, isPositive: analytics.saturationScore > 50 }}
+                description="Risco de reversão estocástica" 
               />
             </motion.div>
             <motion.div variants={item} className="lg:col-span-1">
@@ -641,9 +639,8 @@ icon={ActivitySquare}
                 title="Volatilidade" 
                 value={`${analytics.volatilityIndex.toFixed(1)}%`} 
                 icon={TrendingUp} 
-                color={analytics.volatilityIndex > 20 ? "amber" : "blue"} 
-                trend={analytics.volatilityIndex > 15 ? 0.8 : -2.5}
-                subtitle="Desvio padrão normalizado" 
+                trend={{ value: 0.8, isPositive: analytics.volatilityIndex > 15 }}
+                description="Desvio padrão normalizado" 
               />
             </motion.div>
             <motion.div variants={item} className="lg:col-span-1 hidden xl:block">
@@ -651,9 +648,8 @@ icon={ActivitySquare}
                 title="Complexidade" 
                 value={`${analytics.complexityScore.toFixed(0)}%`} 
                 icon={Brain} 
-                color="blue" 
-                trend={-0.5}
-                subtitle="Entropia de distribuição" 
+                trend={{ value: 0.5, isPositive: false }}
+                description="Entropia de distribuição" 
               />
             </motion.div>
             <motion.div variants={item} className="lg:col-span-1 hidden xl:block">
@@ -661,9 +657,8 @@ icon={ActivitySquare}
                 title="Momentum IA" 
                 value={analytics.momentumIndex.toFixed(1)} 
                 icon={TrendingUp} 
-                color="green" 
-                trend={3.2}
-                subtitle="Taxa de aceleração técnica" 
+                trend={{ value: 3.2, isPositive: true }}
+                description="Taxa de aceleração técnica" 
               />
             </motion.div>
           </motion.div>
