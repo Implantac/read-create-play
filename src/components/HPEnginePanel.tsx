@@ -274,7 +274,7 @@ export function HPEnginePanel({ stats, config, draws }: Props) {
               <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
                 <div className="flex items-center gap-2 mb-2">
                   <Badge variant="default">Aposta Ótima</Badge>
-                  <span className="text-sm font-mono font-bold text-primary">{optResult.bestScore}/100</span>
+                  <span className="text-sm font-mono font-bold text-primary">{formatNumber(optResult.bestScore)}/100</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {Array.from(optResult.bestBet).map(n => (
