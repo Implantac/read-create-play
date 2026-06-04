@@ -1,7 +1,7 @@
 import { DrawResult } from "@/data/lotteries";
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import { LotteryService, DrawResultWithPrizes, DrawPrizeData } from "@/services/lottery/lottery.service";
+import { LotteryService, DrawResultWithPrizes, DrawPrizeData, PrizeTierInfo } from "@/services/lottery/lottery.service";
 
 export type { PrizeTierInfo, DrawPrizeData, DrawResultWithPrizes };
 
@@ -9,6 +9,7 @@ export type { PrizeTierInfo, DrawPrizeData, DrawResultWithPrizes };
  * Hook to load lottery draws from Supabase database using LotteryService
  */
 export function useLotteryDraws(lotteryId: string) {
+
 
   const [draws, setDraws] = useState<DrawResult[]>([]);
   const [drawsWithPrizes, setDrawsWithPrizes] = useState<DrawResultWithPrizes[]>([]);
