@@ -65,10 +65,11 @@ const item = {
 
 const quickLinks = [
   { title: "Gerador", description: "Jogos inteligentes", icon: Sparkles, url: "/gerador", color: "text-primary" },
-  { title: "Simulações", description: "Testar histórico", icon: FlaskConical, url: "/simulacoes", color: "text-neon-blue" },
+  { title: "Fechamentos", description: "Otimização combinatória", icon: Grid3X3, url: "/fechamentos", color: "text-emerald-400" },
   { title: "Estatísticas", description: "Análise consolidada", icon: PieChart, url: "/estatisticas", color: "text-accent" },
   { title: "Estratégias IA", description: "Machine Learning", icon: Brain, url: "/estrategias", color: "text-neon-purple" },
 ];
+
 
 const DashboardPage = () => {
   const { config, draws, loading, syncing, lastSyncAt, syncError, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery, farol, cycle } = useLotteryContext();
