@@ -36,18 +36,23 @@ const AnaliseCentralPage = () => {
 
   return (
     <div className="space-y-10 animate-in fade-in duration-700 pb-20 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded bg-primary/10 border border-primary/20 text-[9px] font-black text-primary uppercase tracking-[0.2em] italic">Intelligence Hub v5.3</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-4">
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Intelligence Hub v6.0</span>
+            </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic leading-none">
+          <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-tight">
             Central de <span className="gradient-brand-text">Análise</span>
           </h1>
-          <p className="text-sm text-muted-foreground font-medium max-w-md">Engenharia de Big Data e visão neural completa para detecção de anomalias estatísticas.</p>
+          <p className="text-sm text-muted-foreground font-medium max-w-lg leading-relaxed">
+            Exploração dimensional profunda. Analise ciclos, tendências e anomalias com precisão matemática institutional.
+          </p>
         </div>
       </div>
+
       
       <div className="relative group">
         <div className="absolute -inset-1 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-[2rem] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-1000 pointer-events-none" />
@@ -55,26 +60,27 @@ const AnaliseCentralPage = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-8">
-        <div className="flex items-center justify-between gap-4 overflow-x-auto pb-4 scrollbar-hide sticky top-0 z-30 bg-background/80 backdrop-blur-md px-1 -mx-1 pt-1">
-          <TabsList className="bg-secondary/40 border border-border/40 p-1 rounded-2xl shadow-lg h-auto flex gap-1">
-            <TabsTrigger value="farol" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3.5 px-6 text-[10px] font-black uppercase tracking-[0.15em] transition-all gap-2.5 shrink-0 active:scale-95 italic">
+        <div className="flex items-center justify-between gap-4 overflow-x-auto pb-6 scrollbar-hide sticky top-20 z-30 bg-background/40 backdrop-blur-xl px-1 -mx-1 pt-2">
+          <TabsList>
+            <TabsTrigger value="farol" className="gap-2.5">
               <Zap className="w-4 h-4" />
               Farol Neural
             </TabsTrigger>
-            <TabsTrigger value="estatisticas" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3.5 px-6 text-[10px] font-black uppercase tracking-[0.15em] transition-all gap-2.5 shrink-0 active:scale-95 italic">
+            <TabsTrigger value="estatisticas" className="gap-2.5">
               <PieChart className="w-4 h-4" />
               Estatísticas
             </TabsTrigger>
-            <TabsTrigger value="matriz" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3.5 px-6 text-[10px] font-black uppercase tracking-[0.15em] transition-all gap-2.5 shrink-0 active:scale-95 italic">
+            <TabsTrigger value="matriz" className="gap-2.5">
               <Grid3X3 className="w-4 h-4" />
               Matriz HP
             </TabsTrigger>
-            <TabsTrigger value="ia" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3.5 px-6 text-[10px] font-black uppercase tracking-[0.15em] transition-all gap-2.5 shrink-0 active:scale-95 italic">
+            <TabsTrigger value="ia" className="gap-2.5">
               <Bot className="w-4 h-4" />
               Sinais IA
             </TabsTrigger>
           </TabsList>
         </div>
+
 
         <div className="mt-6">
           <AnimatePresence mode="wait">
