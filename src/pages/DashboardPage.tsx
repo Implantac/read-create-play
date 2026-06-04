@@ -1,31 +1,38 @@
-import { useCallback, useEffect, useMemo, useState, memo } from "react";
+import { useCallback, useEffect, useMemo, useState, memo, lazy, Suspense } from "react";
 import { DrawResult } from "@/data/lotteries";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { StatsCard } from "@/components/common/StatsCard";
-import { FrequencyChart } from "@/components/FrequencyChart";
-import { HeatmapGrid } from "@/components/HeatmapGrid";
-import { RecentDraws } from "@/components/RecentDraws";
-import { SumChart } from "@/components/SumChart";
-import { ParityChart } from "@/components/ParityChart";
-import { ConsecutiveChart } from "@/components/ConsecutiveChart";
-import { RangeDistribution } from "@/components/RangeDistribution";
-import { DelayChart } from "@/components/DelayChart";
-import { AutoUpdater } from "@/components/AutoUpdater";
 import { PageHeader } from "@/components/PageHeader";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
-import { TitanCommandCenter } from "@/components/TitanCommandCenter";
 import { TechnicalIndicators } from "@/components/TechnicalIndicators";
 import { AlphaMomentumSignal } from "@/components/AlphaMomentumSignal";
-import { motion, AnimatePresence } from "framer-motion";
-import { BarChart3, Flame, Snowflake, TrendingUp, Loader2, RefreshCw, Sparkles, FlaskConical, PieChart, Brain, Clover, X, Save, Crown, History, Info, Terminal, Zap, Search, ActivitySquare, ShieldCheck, CheckCircle2, Activity as LucideActivity } from "lucide-react";
+import { m, AnimatePresence } from "framer-motion";
+import { 
+  BarChart3, Loader2, RefreshCw, Sparkles, FlaskConical, PieChart, 
+  Brain, Clover, X, Crown, History, Info, Terminal, Zap, Search, 
+  ShieldCheck, CheckCircle2, Activity as LucideActivity 
+} from "lucide-react";
+
+// Lazy loaded components for performance
+const FrequencyChart = lazy(() => import("@/components/FrequencyChart").then(m => ({ default: m.FrequencyChart })));
+const HeatmapGrid = lazy(() => import("@/components/HeatmapGrid").then(m => ({ default: m.HeatmapGrid })));
+const RecentDraws = lazy(() => import("@/components/RecentDraws").then(m => ({ default: m.RecentDraws })));
+const SumChart = lazy(() => import("@/components/SumChart").then(m => ({ default: m.SumChart })));
+const ParityChart = lazy(() => import("@/components/ParityChart").then(m => ({ default: m.ParityChart })));
+const ConsecutiveChart = lazy(() => import("@/components/ConsecutiveChart").then(m => ({ default: m.ConsecutiveChart })));
+const RangeDistribution = lazy(() => import("@/components/RangeDistribution").then(m => ({ default: m.RangeDistribution })));
+const DelayChart = lazy(() => import("@/components/DelayChart").then(m => ({ default: m.DelayChart })));
+const AutoUpdater = lazy(() => import("@/components/AutoUpdater").then(m => ({ default: m.AutoUpdater })));
+const TitanCommandCenter = lazy(() => import("@/components/TitanCommandCenter").then(m => ({ default: m.TitanCommandCenter })));
+const NeuralSynergyCore = lazy(() => import("@/components/NeuralSynergyCore").then(m => ({ default: m.NeuralSynergyCore })));
 
 // FIX: ensure Activity symbol is never referenced globally in runtime.
 const Activity = LucideActivity;
 
 import { Badge } from "@/components/ui/badge";
-import { NeuralSynergyCore } from "@/components/NeuralSynergyCore";
+
 
 // FIX: Hide Lovable edit badge injected by the host (id: `lovable-badge-cta`).
 // Do it after mount to avoid server/SSR issues.
@@ -79,10 +86,10 @@ import { BettingBudgetPlanner } from "@/components/BettingBudgetPlanner";
 
 const container = {
   hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.06 } },
+  show: { opacity: 1, transition: { staggerChildren: 0.04 } },
 };
 const item = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0, y: 12 },
   show: { opacity: 1, y: 0 },
 };
 
@@ -220,12 +227,13 @@ const DashboardPage = () => {
       
       <LotteryContextBanner />
 
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {syncError && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
+
             className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 mb-6 flex items-center justify-between gap-4"
           >
             <div className="flex items-center gap-3">
@@ -257,7 +265,10 @@ const DashboardPage = () => {
         </div>
       )}
       
-      <TitanCommandCenter />
+      <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-2xl" />}>
+        <TitanCommandCenter />
+      </Suspense>
+
       
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-3">
@@ -283,7 +294,10 @@ const DashboardPage = () => {
       </div>
       
       <div className="grid lg:grid-cols-2 gap-6">
-        <NeuralSynergyCore analytics={analytics} />
+        <Suspense fallback={<Skeleton className="h-[300px] w-full rounded-2xl" />}>
+          <NeuralSynergyCore analytics={analytics} />
+        </Suspense>
+
         
         <div className="glass-card rounded-2xl border border-primary/20 p-6 bg-black/40 backdrop-blur-xl relative overflow-hidden flex flex-col justify-between">
            <div className="flex items-center justify-between mb-4">
@@ -318,9 +332,10 @@ const DashboardPage = () => {
 
       {/* Trial countdown banner */}
       {profile?.plan === "free" && !isTrialExpired && !isAdmin && !isSuperAdmin && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
+
           className="relative overflow-hidden rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-accent/10 p-4"
         >
           <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -356,9 +371,10 @@ const DashboardPage = () => {
 
           {/* Progress bar */}
           <div className="mt-3 h-1.5 rounded-full bg-muted/50 overflow-hidden">
-            <motion.div
+            <m.div
               initial={{ width: 0 }}
               animate={{ width: `${((7 - trialDaysLeft) / 7) * 100}%` }}
+
               transition={{ duration: 1, ease: "easeOut" }}
               className="h-full rounded-full bg-gradient-to-r from-primary to-accent"
             />
@@ -376,8 +392,11 @@ const DashboardPage = () => {
           </div>
           <div className="grid lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              <FrequencyChart stats={[]} loading />
+              <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
+                <FrequencyChart stats={[]} loading />
+              </Suspense>
             </div>
+
             <div>
               <LoadingSkeleton variant="list" count={1} />
             </div>
@@ -396,11 +415,14 @@ const DashboardPage = () => {
 
       {draws.length > 0 && (
         <>
-          <AutoUpdater lotteryId={selectedLottery} onNewDraw={handleNewDraw} latestConcurso={draws[0]?.concurso || 0} syncDraws={syncDraws} />
+          <Suspense fallback={null}>
+            <AutoUpdater lotteryId={selectedLottery} onNewDraw={handleNewDraw} latestConcurso={draws[0]?.concurso || 0} syncDraws={syncDraws} />
+          </Suspense>
 
           {/* 🍀 GERAR JOGO DA SORTE */}
-          <motion.div variants={item} className="relative">
+          <m.div variants={item} className="relative">
             <div className="glass-card rounded-xl border border-primary/20 p-5 flex flex-col sm:flex-row items-center gap-4">
+
               <div className="flex-1 text-center sm:text-left">
                 <h3 className="text-lg font-bold text-foreground flex items-center gap-2 justify-center sm:justify-start">
                   <Clover className="w-5 h-5 text-primary" />
@@ -426,9 +448,10 @@ const DashboardPage = () => {
 
             <AnimatePresence>
               {luckyGame && (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
+
                   exit={{ opacity: 0, height: 0 }}
                   className="mt-4 overflow-hidden"
                 >
@@ -452,10 +475,11 @@ const DashboardPage = () => {
                           <h4 className="text-xs font-bold uppercase tracking-widest text-accent mb-3">Matriz Gerada</h4>
                           <div className="flex flex-wrap gap-3">
                             {luckyGame.numbers.map(n => (
-                              <motion.div 
+                              <m.div 
                                 key={n}
                                 initial={{ scale: 0.8, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
+
                                 className="w-12 h-12 rounded-lg bg-background border-2 border-primary/40 flex items-center justify-center text-lg font-mono font-bold text-primary shadow-glow-sm"
                               >
                                 {String(n).padStart(2, "0")}
@@ -470,9 +494,10 @@ const DashboardPage = () => {
                             <TitanScoreBadge score={luckyGame.score} />
                           </div>
                           <div className="h-2 w-full bg-muted/30 rounded-full overflow-hidden">
-                            <motion.div 
+                            <m.div 
                               initial={{ width: 0 }}
                               animate={{ width: `${luckyGame.score}%` }}
+
                               transition={{ duration: 1.2, ease: "easeOut" }}
                               className="h-full bg-gradient-to-r from-primary via-accent to-primary animate-shimmer"
                               style={{ backgroundSize: '200% 100%' }}
@@ -488,10 +513,11 @@ const DashboardPage = () => {
                           <span className="uppercase tracking-tighter">Engine Process Log</span>
                         </div>
                         {luckyGame.pipeline.map((step, idx) => (
-                          <motion.div 
+                          <m.div 
                             key={idx}
                             initial={{ opacity: 0, x: -5 }}
                             animate={{ opacity: 1, x: 0 }}
+
                             transition={{ delay: idx * 0.1 }}
                             className="flex justify-between items-start gap-4"
                           >
@@ -513,7 +539,7 @@ const DashboardPage = () => {
           
           {/* Recent Generations History */}
           {history.length > 0 && (
-            <motion.div variants={item} className="space-y-3">
+            <m.div variants={item} className="space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                   <History className="w-4 h-4 text-primary" />
@@ -522,10 +548,11 @@ const DashboardPage = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {history.map((record) => (
-                  <motion.button
+                  <m.button
                     key={record.id}
                     onClick={() => setSelectedHistoryItem(record)}
                     whileHover={{ scale: 1.02 }}
+
                     className="flex flex-col gap-2 p-3 rounded-xl glass-card border border-border/50 hover:border-primary/40 text-left transition-all relative group"
                   >
                     <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -560,9 +587,10 @@ const DashboardPage = () => {
           <AnimatePresence>
             {selectedHistoryItem && (
               <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
+
                   exit={{ opacity: 0, scale: 0.95 }}
                   className="w-full max-w-3xl glass-card border border-primary/30 bg-card rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
                 >
