@@ -314,10 +314,15 @@ export default function LandingPage() {
       
       <section className="py-24 bg-card/30 border-y border-border/40">
         <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-12">
-            {stats.map((s, i) => (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+            {[
+              { value: "50k+", label: "Usuários Ativos" },
+              { value: "1.2M", label: "Jogos Gerados" },
+              { value: "450k", label: "Análises Realizadas" },
+              { value: "R$ 15M", label: "Prêmios Rastreados" }
+            ].map((s, i) => (
               <div key={i} className="text-center space-y-2">
-                <p className="text-5xl font-black tracking-tighter italic text-primary">{s.value}</p>
+                <p className="text-4xl md:text-5xl font-black tracking-tighter italic text-primary">{s.value}</p>
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-60">{s.label}</p>
               </div>
             ))}

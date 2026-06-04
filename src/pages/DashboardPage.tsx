@@ -44,6 +44,11 @@ import { TitanScoreBadge } from "@/components/TitanScoreBadge";
 import { evaluateBetQuality } from "@/engine/stats/bet-quality";
 import { StrategyBriefingPanel } from "@/components/StrategyBriefingPanel";
 import { BettingBudgetPlanner } from "@/components/BettingBudgetPlanner";
+import { GamificationCard } from "@/components/GamificationCard";
+import { InsightsCenter } from "@/components/InsightsCenter";
+import { ROIQuickView } from "@/components/ROIQuickView";
+import { NotificationsPanel } from "@/components/NotificationsPanel";
+import { supabase } from "@/integrations/supabase/client";
 
 const container = {
   hidden: { opacity: 0 },
@@ -66,7 +71,7 @@ const DashboardPage = () => {
   const [syncStatus, setSyncStatus] = useState<"idle" | "success" | "error">("idle");
   const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
   const { currentPlan } = usePlanAccess();
-  const { profile, trialDaysLeft, isTrialExpired, isAdmin, isSuperAdmin } = useAuth();
+  const { user, profile, trialDaysLeft, isTrialExpired, isAdmin, isSuperAdmin } = useAuth();
   const [luckyGame, setLuckyGame] = useState<any | null>(null);
   const [generatingLucky, setGeneratingLucky] = useState(false);
   const { history, saveGeneration } = useGenerationHistory(selectedLottery);
@@ -97,13 +102,25 @@ const DashboardPage = () => {
       if (result.games.length > 0) {
         const bet = result.games[0];
         const qualityReport = evaluateBetQuality(bet, stats, config, draws);
-        const gameData = { numbers: bet, score: qualityReport.overall, strategy: result.strategy.name, description: result.strategy.description, pipeline: result.pipeline };
+        const gameData = { 
+          numbers: bet, 
+          score: qualityReport.overall, 
+          strategy: result.strategy.name, 
+          description: result.strategy.description, 
+          pipeline: result.pipeline 
+        };
         setLuckyGame(gameData);
         await saveGeneration(gameData);
+        
+        // Update gamification
+        if (user) {
+          await supabase.rpc('increment_games_generated', { _user_id: user.id });
+        }
       }
       setGeneratingLucky(false);
     }, 1500);
-  }, [stats, draws, selectedLottery, saveGeneration, config]);
+  }, [stats, draws, selectedLottery, saveGeneration, config, user]);
+
 
   return (
     <div className="space-y-6 pb-12 relative animate-in fade-in duration-500">
@@ -150,7 +167,15 @@ const DashboardPage = () => {
 
       {draws.length > 0 && (
         <div className="grid xl:grid-cols-[1.1fr_0.9fr] gap-6">
-          <StrategyBriefingPanel config={config} stats={stats} draws={draws} />
+          <div className="space-y-6">
+            <StrategyBriefingPanel config={config} stats={stats} draws={draws} />
+            <div className="grid md:grid-cols-2 gap-6">
+              <GamificationCard />
+              <InsightsCenter />
+            </div>
+            <ROIQuickView />
+            <NotificationsPanel />
+          </div>
           <BettingBudgetPlanner config={config} stats={stats} draws={draws} compact />
         </div>
       )}
