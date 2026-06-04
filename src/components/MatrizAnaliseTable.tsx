@@ -315,7 +315,7 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
             <span className="px-3 py-1 rounded-lg bg-primary/10 border border-primary/20 text-xs font-black text-primary font-mono">
               {formatNumber(currentPage + 1)}
             </span>
-            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t("common.of")} {totalPages}</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t("common.of")} {formatNumber(totalPages)}</span>
           </div>
 
           <Button
