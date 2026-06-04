@@ -234,7 +234,7 @@ export default function FechamentosPage() {
                   <div className="mt-3">
                     <Progress value={v.coveragePercent} className="h-1.5" />
                     <div className="flex justify-between mt-1 text-[10px] text-muted-foreground">
-                      <span>{v.coveredDraws.toLocaleString()} de {v.totalDraws.toLocaleString()} sorteios cobertos</span>
+                      <span>{formatNumber(v.coveredDraws)} de {formatNumber(v.totalDraws)} sorteios cobertos</span>
                       <span>Pior caso: {v.worstCaseHits} acertos</span>
                     </div>
                   </div>
