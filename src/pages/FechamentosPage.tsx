@@ -243,8 +243,9 @@ const FechamentosPage = () => {
                 <Button variant="ghost" onClick={() => setStep(1)} className="gap-2">
                   <ChevronLeft className="w-4 h-4" /> Mudar Modelo
                 </Button>
-              </div>
-            </Card>
+                </div>
+              </Card>
+            </div>
           )}
 
           {step === 3 && currentMatrix && generatedGames && (
