@@ -75,7 +75,7 @@ const GeradorPage = () => {
           </div>
 
           {/* PREMIUM: Advanced generators */}
-          <PlanGate feature="gerador_avancado" fallbackMessage="Análise de Robustez e Score">
+          <PlanGate feature="gerador_avancado" fallbackMessage="Titan Score e Análise de Robustez">
             <Suspense fallback={<LazyFallback />}>
               <RobustnessRadarPanel stats={stats} config={config} draws={draws} lotteryId={selectedLottery} />
             </Suspense>
