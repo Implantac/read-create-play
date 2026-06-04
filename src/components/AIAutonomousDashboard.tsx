@@ -938,22 +938,28 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
         </TabsContent>
 
         {/* AI Analysis Tab */}
-        <TabsContent value="ai" className="space-y-4">
-          <Card className="border-primary/20">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
-                Análise da IA Autônoma
-              </CardTitle>
-              <CardDescription>
-                Análise profunda com Entropia, χ², Markov, Trios, Coocorrência, Gaps + 10 Jogos Otimizados
-              </CardDescription>
+        <TabsContent value="ai" className="space-y-6 outline-none">
+          <Card className="glass-card border-primary/30 shadow-2xl rounded-[2.5rem] overflow-hidden group/ai-card">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50 pointer-events-none" />
+            <CardHeader className="p-8 border-b border-white/5 bg-white/[0.01]">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 group-hover/ai-card:rotate-12 transition-transform">
+                    <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl font-black uppercase tracking-tight italic">Relatório Neural Profundo</CardTitle>
+                    <CardDescription className="text-[10px] font-black uppercase tracking-widest opacity-40">Síntese de Redes Neurais e Probabilidade Bayesiana</CardDescription>
+                  </div>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-8">
               {aiAnalysis ? (
-                <div className="space-y-4">
-                  <div className="prose prose-sm dark:prose-invert max-w-none">
-                    <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                <div className="space-y-8">
+                  <div className="p-8 rounded-[2rem] bg-secondary/20 border border-white/5 shadow-inner relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-1.5 h-full bg-primary" />
+                    <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90 italic font-medium relative z-10">
                       {aiAnalysis}
                     </div>
                   </div>
