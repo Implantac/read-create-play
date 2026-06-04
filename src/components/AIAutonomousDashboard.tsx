@@ -369,7 +369,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                         <td className="py-4 px-6 text-center">
                           <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-widest ${
                             r.classification === "forte" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : 
-                            r.classification === "normal" ? "bg-primary/5 text-primary border-primary/20" : 
+                            r.classification === "moderado" ? "bg-primary/5 text-primary border-primary/20" : 
                             "bg-rose-500/10 text-rose-400 border-rose-500/20"
                           }`}>
                             {r.classification}
