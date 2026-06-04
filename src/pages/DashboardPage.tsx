@@ -12,7 +12,7 @@ import { m, AnimatePresence } from "framer-motion";
 import { 
   BarChart3, Loader2, RefreshCw, Sparkles, FlaskConical, PieChart, 
   Brain, Clover, X, Crown, History, Info, Terminal, Zap, Search, 
-  ShieldCheck, CheckCircle2, Activity as LucideActivity 
+  ShieldCheck, CheckCircle2, TrendingUp, ActivitySquare, Activity as LucideActivity 
 } from "lucide-react";
 
 // Lazy loaded components for performance
@@ -28,48 +28,8 @@ const AutoUpdater = lazy(() => import("@/components/AutoUpdater").then(m => ({ d
 const TitanCommandCenter = lazy(() => import("@/components/TitanCommandCenter").then(m => ({ default: m.TitanCommandCenter })));
 const NeuralSynergyCore = lazy(() => import("@/components/NeuralSynergyCore").then(m => ({ default: m.NeuralSynergyCore })));
 
-// FIX: ensure Activity symbol is never referenced globally in runtime.
 const Activity = LucideActivity;
-
 import { Badge } from "@/components/ui/badge";
-
-
-// FIX: Hide Lovable edit badge injected by the host (id: `lovable-badge-cta`).
-// Do it after mount to avoid server/SSR issues.
-const useHideLovableBadge = () => {
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-
-    // Hide as early as possible (avoid flicker)
-    if (!document.getElementById("lovable-hide-badge-style")) {
-      const s = document.createElement("style");
-      s.id = "lovable-hide-badge-style";
-      s.textContent = "#lovable-badge-cta{display:none !important;}";
-      document.head.appendChild(s);
-    }
-
-    const ensureHidden = () => {
-      const el = document.getElementById("lovable-badge-cta");
-      if (el) el.remove();
-
-      // Some hosts may attach wrappers; double-check by attribute too
-      const maybe = document.querySelector('[aria-label="Edit with Lovable"], [id="lovable-badge-cta"]');
-      if (maybe && (maybe as HTMLElement).id === "lovable-badge-cta") {
-        (maybe as HTMLElement).remove();
-      }
-    };
-
-    ensureHidden();
-
-    // Fallback: some hosts inject it slightly after mount
-    const t = window.setInterval(ensureHidden, 150);
-    window.setTimeout(() => window.clearInterval(t), 3000);
-
-    return () => window.clearInterval(t);
-  }, []);
-};
-
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -101,34 +61,18 @@ const quickLinks = [
 ];
 
 const DashboardPage = () => {
-  useHideLovableBadge();
-  const { config, draws, drawsWithPrizes, loading, syncing, lastSyncAt, syncError, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery, hotNumbers, coldNumbers } = useLotteryContext();
+  const { config, draws, drawsWithPrizes, loading, syncing, lastSyncAt, syncError, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery } = useLotteryContext();
   const [syncStatus, setSyncStatus] = useState<"idle" | "success" | "error">("idle");
   const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
   const { currentPlan } = usePlanAccess();
   const { profile, trialDaysLeft, isTrialExpired, isAdmin, isSuperAdmin } = useAuth();
-  const [luckyGame, setLuckyGame] = useState<{ 
-    numbers: number[]; 
-    score: number; 
-    strategy: string;
-    description: string;
-    pipeline: { step: string; detail: string; count: number }[];
-  } | null>(null);
+  const [luckyGame, setLuckyGame] = useState<any | null>(null);
   const [generatingLucky, setGeneratingLucky] = useState(false);
-  const [selectedHistoryItem, setSelectedHistoryItem] = useState<{
-    numbers: number[];
-    score: number;
-    strategy: string;
-    description: string;
-    pipeline: { step: string; detail: string; count: number }[];
-    created_at: string;
-  } | null>(null);
+  const [selectedHistoryItem, setSelectedHistoryItem] = useState<any | null>(null);
   const { history, saveGeneration } = useGenerationHistory(selectedLottery);
 
   const analytics = useMemo(() => calculateAnalyticsSnapshot(stats, draws), [stats, draws]);
-  const { volatilityIndex, saturationScore, complexityScore } = analytics;
   const heatingCount = useMemo(() => stats.filter(s => s.trend > 15).length, [stats]);
-  const isSaturated = saturationScore > 75;
 
   const handleNewDraw = useCallback((draw: DrawResult) => addDraw(draw), [addDraw]);
 
@@ -148,31 +92,20 @@ const DashboardPage = () => {
     if (stats.length === 0 || draws.length === 0) return;
     setGeneratingLucky(true);
     setLuckyGame(null);
-    
     setTimeout(async () => {
       const strategies = ["frequency", "balance", "coverage", "dispersion", "delay", "anti_pattern"];
       const randomStrategy = strategies[Math.floor(Math.random() * strategies.length)];
       const result = runIntelligentPipeline(stats, draws, selectedLottery, randomStrategy, 1);
-      
       if (result.games.length > 0) {
         const bet = result.games[0];
         const qualityReport = evaluateBetQuality(bet, stats, config, draws);
-        
-        const gameData = {
-          numbers: bet,
-          score: qualityReport.overall,
-          strategy: result.strategy.name,
-          description: result.strategy.description,
-          pipeline: result.pipeline,
-        };
+        const gameData = { numbers: bet, score: qualityReport.overall, strategy: result.strategy.name, description: result.strategy.description, pipeline: result.pipeline };
         setLuckyGame(gameData);
         await saveGeneration(gameData);
       }
       setGeneratingLucky(false);
     }, 1500);
   }, [stats, draws, selectedLottery, saveGeneration, config]);
-
-
 
   return (
     <div className="space-y-6 pb-12 relative">
@@ -194,33 +127,10 @@ const DashboardPage = () => {
             variant="outline"
             onClick={handleSyncManual}
             disabled={syncing}
-            className={`transition-all duration-300 gap-2 ${
-              syncStatus === "success" 
-                ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-500" 
-                : syncStatus === "error"
-                ? "border-destructive/50 bg-destructive/10 text-destructive"
-                : "border-primary/20 hover:border-primary/50 bg-primary/5"
-            }`}
+            className="transition-all duration-300 gap-2"
           >
-            {syncing ? (
-              <RefreshCw className="w-3.5 h-3.5 animate-spin text-primary" />
-            ) : syncStatus === "success" ? (
-              <CheckCircle2 className="w-3.5 h-3.5" />
-            ) : syncStatus === "error" ? (
-              <X className="w-3.5 h-3.5" />
-            ) : (
-              <RefreshCw className="w-3.5 h-3.5" />
-            )}
-            
-            <span className="hidden sm:inline">
-              {syncing 
-                ? "Sincronizando..." 
-                : syncStatus === "success" 
-                ? "Atualizado!" 
-                : syncStatus === "error" 
-                ? "Erro ao Atualizar" 
-                : "Atualizar Dados"}
-            </span>
+            {syncing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+            <span className="hidden sm:inline">{syncing ? "Sincronizando..." : "Atualizar Dados"}</span>
           </Button>
         </div>
       </PageHeader>
@@ -229,32 +139,17 @@ const DashboardPage = () => {
 
       <AnimatePresence mode="wait">
         {syncError && (
-          <m.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-
-            className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 mb-6 flex items-center justify-between gap-4"
-          >
+          <m.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 mb-6 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-destructive/20 flex items-center justify-center">
                 <ShieldCheck className="w-5 h-5 text-destructive" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-destructive">Falha na Sincronização Automática</p>
+                <p className="text-sm font-semibold text-destructive">Falha na Sincronização</p>
                 <p className="text-xs text-destructive/80">{syncError}</p>
               </div>
             </div>
-            <Button 
-              size="sm" 
-              variant="destructive" 
-              onClick={() => syncDraws()}
-              className="gap-2"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              Tentar Novamente
-            </Button>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -269,26 +164,17 @@ const DashboardPage = () => {
         <TitanCommandCenter />
       </Suspense>
 
-      
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-              <Terminal className="w-3 h-3 text-primary" />
-              Indicadores Técnicos de Precisão
-            </h3>
-            <Badge variant="outline" className="text-[9px] bg-primary/5 border-primary/20 font-mono">LIVE FEED</Badge>
-          </div>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+            <Terminal className="w-3 h-3 text-primary" /> Indicadores Técnicos
+          </h3>
           <TechnicalIndicators analytics={analytics} />
         </div>
-        
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-              <Zap className="w-3 h-3 text-accent" />
-              Alpha Momentum Signal
-            </h3>
-          </div>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+            <Zap className="w-3 h-3 text-accent" /> Alpha Momentum Signal
+          </h3>
           <AlphaMomentumSignal analytics={analytics} />
         </div>
       </div>
@@ -297,557 +183,38 @@ const DashboardPage = () => {
         <Suspense fallback={<Skeleton className="h-[300px] w-full rounded-2xl" />}>
           <NeuralSynergyCore analytics={analytics} />
         </Suspense>
-
-        
-        <div className="glass-card rounded-2xl border border-primary/20 p-6 bg-black/40 backdrop-blur-xl relative overflow-hidden flex flex-col justify-between">
-           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-              <Search className="w-4 h-4 text-primary" />
-              Neural Audit Log
-            </h3>
-            <Badge variant="outline" className="text-[9px] bg-primary/5 border-primary/20 font-mono">ENCRYPTED</Badge>
-          </div>
-          <div className="font-mono text-[10px] text-primary/60 space-y-2 h-32 overflow-hidden mask-fade-bottom">
-            <p className="flex items-center gap-2">
-              <span className="text-primary/40">[{new Date().toLocaleTimeString()}]</span>
-              CALIBRATING QUANTUM FLUX TENSORS...
-            </p>
-            <p className="flex items-center gap-2">
-              <span className="text-primary/40">[{new Date().toLocaleTimeString()}]</span>
-              VERIFYING INSTITUTIONAL DATA INTEGRITY: {analytics.institutionalConfidence.toFixed(2)}%
-            </p>
-            <p className="flex items-center gap-2">
-              <span className="text-primary/40">[{new Date().toLocaleTimeString()}]</span>
-              SYNERGY PROTOCOL v5.3 INITIALIZED.
-            </p>
-            <p className="flex items-center gap-2 text-accent">
-              <span className="text-accent/40">[{new Date().toLocaleTimeString()}]</span>
-              ANOMALY DETECTION: SHIELD ACTIVE.
-            </p>
-          </div>
+        <div className="glass-card rounded-2xl border border-primary/20 p-6 bg-black/40 backdrop-blur-xl">
+           <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-4">Neural Audit Log</h3>
+           <div className="font-mono text-[10px] text-primary/60 space-y-2">
+             <p>SYSTEM OK. SYNERGY PROTOCOL v5.3 INITIALIZED.</p>
+             <p className="text-accent">ANOMALY DETECTION: SHIELD ACTIVE.</p>
+           </div>
         </div>
       </div>
 
-
-
-      {/* Trial countdown banner */}
-      {profile?.plan === "free" && !isTrialExpired && !isAdmin && !isSuperAdmin && (
-        <m.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-
-          className="relative overflow-hidden rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-accent/10 p-4"
-        >
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/15">
-                <Crown className="w-5 h-5 text-primary" />
-              </div>
+      <m.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {quickLinks.map(link => (
+          <m.div key={link.url} variants={item}>
+            <Link to={link.url} className="flex items-center gap-3 rounded-xl glass-card p-4 border border-white/5 hover:border-primary/40 transition-all">
+              <link.icon className={`w-5 h-5 ${link.color}`} />
               <div>
-                <p className="text-sm font-semibold text-foreground">
-                  {trialDaysLeft === 1
-                    ? "⏱ Último dia do período de teste!"
-                    : `⏱ ${trialDaysLeft} dias restantes no período de teste`}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Faça upgrade para desbloquear todas as funcionalidades
-                </p>
+                <p className="text-sm font-bold text-foreground">{link.title}</p>
+                <p className="text-[10px] text-muted-foreground">{link.description}</p>
               </div>
-            </div>
-            <div className="flex items-center gap-3">
-              {analytics.saturationScore > 75 && (
-                <Badge variant="outline" className="hidden sm:flex bg-amber-500/10 text-amber-500 border-amber-500/20 text-[10px] animate-pulse">
-                  ALTA SATURAÇÃO DETECTADA
-                </Badge>
-              )}
-              <Link to="/planos">
-                <Button size="sm" className="gradient-brand text-primary-foreground gap-1.5 shadow-lg shadow-primary/20">
-                  <Crown className="w-3.5 h-3.5" />
-                  Ver Planos
-                </Button>
-              </Link>
-            </div>
-          </div>
-
-          {/* Progress bar */}
-          <div className="mt-3 h-1.5 rounded-full bg-muted/50 overflow-hidden">
-            <m.div
-              initial={{ width: 0 }}
-              animate={{ width: `${((7 - trialDaysLeft) / 7) * 100}%` }}
-
-              transition={{ duration: 1, ease: "easeOut" }}
-              className="h-full rounded-full bg-gradient-to-r from-primary to-accent"
-            />
-          </div>
-        </motion.div>
-      )}
-
-      {loading && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatsCard title="Total de Sorteios" value="..." loading />
-            <StatsCard title="Última Atualização" value="..." loading />
-            <StatsCard title="Tendência Geral" value="..." loading />
-            <StatsCard title="Confidence Index" value="..." loading />
-          </div>
-          <div className="grid lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <Suspense fallback={<Skeleton className="h-[300px] w-full" />}>
-                <FrequencyChart stats={[]} loading />
-              </Suspense>
-            </div>
-
-            <div>
-              <LoadingSkeleton variant="list" count={1} />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {!loading && draws.length === 0 && (
-        <EmptyState
-          onImport={syncDraws}
-          onImportAll={syncAllLotteries}
-          lotteryName={config.name}
-          syncing={syncing}
-        />
-      )}
+            </Link>
+          </m.div>
+        ))}
+      </m.div>
 
       {draws.length > 0 && (
-        <>
-          <Suspense fallback={null}>
-            <AutoUpdater lotteryId={selectedLottery} onNewDraw={handleNewDraw} latestConcurso={draws[0]?.concurso || 0} syncDraws={syncDraws} />
-          </Suspense>
-
-          {/* 🍀 GERAR JOGO DA SORTE */}
-          <m.div variants={item} className="relative">
-            <div className="glass-card rounded-xl border border-primary/20 p-5 flex flex-col sm:flex-row items-center gap-4">
-
-              <div className="flex-1 text-center sm:text-left">
-                <h3 className="text-lg font-bold text-foreground flex items-center gap-2 justify-center sm:justify-start">
-                  <Clover className="w-5 h-5 text-primary" />
-                  Engine de Probabilidade
-                </h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                  IA processa matrizes de alta confiança para {config.name}
-                </p>
-              </div>
-              <Button
-                onClick={generateLuckyGame}
-                disabled={generatingLucky || stats.length === 0}
-                className="bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all"
-                size="lg"
-              >
-                {generatingLucky ? (
-                  <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Gerando...</>
-                ) : (
-                  <><Sparkles className="w-4 h-4 mr-2" /> EXECUTAR ENGINE PROBABILITY</>
-                )}
-              </Button>
-            </div>
-
-            <AnimatePresence>
-              {luckyGame && (
-                <m.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mt-4 overflow-hidden"
-                >
-                  <div className="glass-card rounded-xl border border-primary/30 bg-primary/5 p-6 relative">
-                    <button 
-                      onClick={() => setLuckyGame(null)} 
-                      className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-
-                    <div className="grid md:grid-cols-2 gap-8">
-                      <div className="space-y-6">
-                        <div>
-                          <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-1">Estratégia Aplicada</h4>
-                          <h3 className="text-xl font-bold text-foreground">{luckyGame.strategy}</h3>
-                          <p className="text-sm text-muted-foreground mt-1">{luckyGame.description}</p>
-                        </div>
-
-                        <div>
-                          <h4 className="text-xs font-bold uppercase tracking-widest text-accent mb-3">Matriz Gerada</h4>
-                          <div className="flex flex-wrap gap-3">
-                            {luckyGame.numbers.map(n => (
-                              <m.div 
-                                key={n}
-                                initial={{ scale: 0.8, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-
-                                className="w-12 h-12 rounded-lg bg-background border-2 border-primary/40 flex items-center justify-center text-lg font-mono font-bold text-primary shadow-glow-sm"
-                              >
-                                {String(n).padStart(2, "0")}
-                              </motion.div>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="pt-4 border-t border-primary/10">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-foreground">Score de Confiança Analítica</span>
-                            <TitanScoreBadge score={luckyGame.score} />
-                          </div>
-                          <div className="h-2 w-full bg-muted/30 rounded-full overflow-hidden">
-                            <m.div 
-                              initial={{ width: 0 }}
-                              animate={{ width: `${luckyGame.score}%` }}
-
-                              transition={{ duration: 1.2, ease: "easeOut" }}
-                              className="h-full bg-gradient-to-r from-primary via-accent to-primary animate-shimmer"
-                              style={{ backgroundSize: '200% 100%' }}
-                            />
-                          </div>
-                        </div>
-
-                      </div>
-
-                      <div className="bg-black/40 rounded-lg p-4 border border-white/5 font-mono text-[11px] space-y-2">
-                        <div className="flex items-center gap-2 text-primary/70 mb-3 border-b border-white/5 pb-2">
-                          <Loader2 className="w-3 h-3 animate-pulse" />
-                          <span className="uppercase tracking-tighter">Engine Process Log</span>
-                        </div>
-                        {luckyGame.pipeline.map((step, idx) => (
-                          <m.div 
-                            key={idx}
-                            initial={{ opacity: 0, x: -5 }}
-                            animate={{ opacity: 1, x: 0 }}
-
-                            transition={{ delay: idx * 0.1 }}
-                            className="flex justify-between items-start gap-4"
-                          >
-                            <span className="text-primary whitespace-nowrap">[{step.step.toUpperCase()}]</span>
-                            <span className="text-muted-foreground flex-1 text-right">{step.detail}</span>
-                            <span className="text-accent min-w-[30px] text-right">{step.count}</span>
-                          </motion.div>
-                        ))}
-                        <div className="pt-4 text-[10px] text-primary/50 italic border-t border-white/5 mt-4">
-                          * Algoritmo de inteligência estatística validado com sucesso.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-          
-          {/* Recent Generations History */}
-          {history.length > 0 && (
-            <m.div variants={item} className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                  <History className="w-4 h-4 text-primary" />
-                  Últimas Simulações
-                </h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {history.map((record) => (
-                  <m.button
-                    key={record.id}
-                    onClick={() => setSelectedHistoryItem(record)}
-                    whileHover={{ scale: 1.02 }}
-
-                    className="flex flex-col gap-2 p-3 rounded-xl glass-card border border-border/50 hover:border-primary/40 text-left transition-all relative group"
-                  >
-                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Info className="w-3 h-3 text-primary" />
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-bold text-primary uppercase">{record.strategy}</span>
-                      <span className="text-[10px] text-muted-foreground font-mono">
-                        {new Date(record.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                      </span>
-                    </div>
-
-                    <div className="flex gap-1">
-                      {record.numbers.slice(0, 6).map((n, i) => (
-                        <span key={i} className="w-6 h-6 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
-                          {String(n).padStart(2, "0")}
-                        </span>
-                      ))}
-                      {record.numbers.length > 6 && <span className="text-[10px] text-muted-foreground self-center">...</span>}
-                    </div>
-                    <div className="flex justify-between items-center mt-auto pt-2 border-t border-white/5">
-                      <TitanScoreBadge score={record.score} label="Titan" />
-                      <span className="text-[9px] font-mono text-muted-foreground">ID: {record.id.slice(0, 8)}</span>
-                    </div>
-                  </motion.button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* Detailed History Modal */}
-          <AnimatePresence>
-            {selectedHistoryItem && (
-              <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-                <m.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="w-full max-w-3xl glass-card border border-primary/30 bg-card rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
-                >
-                  <div className="p-4 border-b border-border/50 flex items-center justify-between bg-primary/5">
-                    <div className="flex items-center gap-2">
-                      <Terminal className="w-4 h-4 text-primary" />
-                      <h3 className="font-bold text-foreground">Relatório Detalhado de Simulação</h3>
-                    </div>
-                    <button 
-                      onClick={() => setSelectedHistoryItem(null)}
-                      className="p-1 rounded-full hover:bg-muted/50 transition-colors"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  </div>
-
-                  <div className="flex-1 overflow-y-auto p-6 space-y-8">
-                    <div className="grid md:grid-cols-2 gap-8">
-                      <div className="space-y-6">
-                        <div>
-                          <h4 className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">Estratégia Utilizada</h4>
-                          <h3 className="text-xl font-bold text-foreground">{selectedHistoryItem.strategy}</h3>
-                          <p className="text-sm text-muted-foreground mt-1">{selectedHistoryItem.description}</p>
-                        </div>
-
-                        <div>
-                          <h4 className="text-[10px] font-bold uppercase tracking-widest text-accent mb-3">Matriz Gerada</h4>
-                          <div className="flex flex-wrap gap-2">
-                            {selectedHistoryItem.numbers.map((n: number) => (
-                              <div 
-                                key={n}
-                                className="w-10 h-10 rounded-lg bg-background border border-primary/30 flex items-center justify-center text-sm font-mono font-bold text-primary shadow-glow-sm"
-                              >
-                                {String(n).padStart(2, "0")}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="pt-4 border-t border-white/5">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-foreground">Score de Confiança</span>
-                            <TitanScoreBadge score={selectedHistoryItem.score} />
-                          </div>
-                          <div className="h-1.5 w-full bg-muted/30 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-gradient-to-r from-primary via-accent to-primary animate-shimmer"
-                              style={{ width: `${selectedHistoryItem.score}%`, backgroundSize: '200% 100%' }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="bg-black/60 rounded-xl p-4 border border-white/5 font-mono text-[11px] space-y-2">
-                        <div className="flex items-center gap-2 text-primary/70 mb-3 border-b border-white/5 pb-2">
-                          <Terminal className="w-3 h-3" />
-                          <span className="uppercase tracking-tighter">Execution Pipeline Log</span>
-                        </div>
-                        {selectedHistoryItem.pipeline.map((step, idx) => (
-                          <div 
-                            key={idx}
-                            className="flex justify-between items-start gap-4 border-b border-white/5 py-1 last:border-0"
-                          >
-                            <span className="text-primary/80 shrink-0">[{step.step.toUpperCase()}]</span>
-                            <span className="text-muted-foreground flex-1 text-right truncate">{step.detail}</span>
-                            <span className="text-accent min-w-[30px] text-right">{step.count}</span>
-                          </div>
-                        ))}
-                        <div className="pt-4 text-[10px] text-primary/40 italic mt-2">
-                          Timestamp: {new Date(selectedHistoryItem.created_at).toLocaleString()}
-                        </div>
-                      </div>
-                    </div>
-                        {/* Analysis Grid */}
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
-                            <span className="text-[10px] text-muted-foreground uppercase">Volatilidade</span>
-                            <p className={`text-sm font-bold ${analytics.volatilityIndex > 20 ? 'text-neon-red' : 'text-primary'}`}>
-                              {analytics.volatilityIndex.toFixed(1)}%
-                            </p>
-                          </div>
-                          <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
-                            <span className="text-[10px] text-muted-foreground uppercase">Saturação</span>
-                            <p className={`text-sm font-bold ${analytics.saturationScore > 75 ? 'text-neon-amber' : 'text-primary'}`}>
-                              {analytics.saturationScore.toFixed(1)}%
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
-<ShieldCheck className="w-4 h-4 text-primary" />
-                          <p className="text-[10px] text-muted-foreground leading-tight">
-                            {getComplianceNotice()}
-                          </p>
-                        </div>
-                      </div>
-
-                </motion.div>
-              </div>
-            )}
-          </AnimatePresence>
-
-
-
-          <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {quickLinks.map(link => (
-              <motion.div key={link.url} variants={item}>
-                <Link
-                  to={link.url}
-                  className="flex items-center gap-3 rounded-xl glass-card p-4 border border-white/5 hover:border-primary/40 transition-all duration-300 hover:translate-y-[-4px] group hover:shadow-lg hover:shadow-primary/5 active:scale-95"
-                >
-                  <div className="w-11 h-11 rounded-lg bg-primary/5 border border-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-all group-hover:rotate-3">
-                    <link.icon className={`w-5 h-5 ${link.color} group-hover:scale-110 transition-transform`} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{link.title}</p>
-                    <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">{link.description}</p>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          <motion.div
-            key={selectedLottery}
-            variants={container}
-            initial="hidden"
-            animate="show"
-            className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4"
-          >
-            <motion.div variants={item} className="lg:col-span-1">
-              <StatsCard 
-                title="Total Concursos" 
-                value={draws.length} 
-                icon={BarChart3} 
-                trend={{ value: 1.2, isPositive: true }}
-                description="Volume histórico processado" 
-              />
-            </motion.div>
-            <motion.div variants={item} className="lg:col-span-1">
-              <StatsCard 
-                title="Tendência Alta" 
-                value={heatingCount} 
-                icon={Zap} 
-                trend={{ value: 5.4, isPositive: true }}
-                description="Dezenas com aceleração" 
-              />
-            </motion.div>
-            <motion.div variants={item} className="lg:col-span-1">
-              <StatsCard 
-                title="Saturação" 
-                value={`${analytics.saturationScore.toFixed(1)}%`} 
-                icon={Activity} 
-                trend={{ value: 2.1, isPositive: analytics.saturationScore > 50 }}
-                description="Risco de reversão estocástica" 
-              />
-            </motion.div>
-            <motion.div variants={item} className="lg:col-span-1">
-              <StatsCard 
-                title="Volatilidade" 
-                value={`${analytics.volatilityIndex.toFixed(1)}%`} 
-                icon={TrendingUp} 
-                trend={{ value: 0.8, isPositive: analytics.volatilityIndex > 15 }}
-                description="Desvio padrão normalizado" 
-              />
-            </motion.div>
-            <motion.div variants={item} className="lg:col-span-1 hidden xl:block">
-              <StatsCard 
-                title="Complexidade" 
-                value={`${analytics.complexityScore.toFixed(0)}%`} 
-                icon={Brain} 
-                trend={{ value: 0.5, isPositive: false }}
-                description="Entropia de distribuição" 
-              />
-            </motion.div>
-            <motion.div variants={item} className="lg:col-span-1 hidden xl:block">
-              <StatsCard 
-                title="Momentum IA" 
-                value={analytics.momentumIndex.toFixed(1)} 
-                icon={TrendingUp} 
-                trend={{ value: 3.2, isPositive: true }}
-                description="Taxa de aceleração técnica" 
-              />
-            </motion.div>
-          </motion.div>
-
-
-          {/* Saved bets limit card */}
-          {limit !== Infinity && (
-            <motion.div variants={item} className="glass-card rounded-xl border border-border/50 p-5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center">
-                    <Save className="w-5 h-5 text-accent" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-foreground">Apostas Salvas — {config.name}</h3>
-                    <p className="text-xs text-muted-foreground">
-                      Plano {currentPlan === "free" ? "Gratuito" : currentPlan} • Limite de {limit} jogos por loteria
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <span className={`text-2xl font-bold font-mono ${isAtLimit ? "text-destructive" : "text-primary"}`}>
-                      {savedBets.length}/{limit}
-                    </span>
-                    <p className="text-[10px] text-muted-foreground">
-                      {isAtLimit ? "Limite atingido" : `${remaining} restante${remaining !== 1 ? "s" : ""}`}
-                    </p>
-                  </div>
-                  {isAtLimit && (
-                    <Link to="/planos">
-                      <Button size="sm" variant="outline" className="gap-1.5 border-accent/20 text-accent hover:bg-accent/5">
-                        <Crown className="w-3.5 h-3.5" />
-                        Upgrade
-                      </Button>
-                    </Link>
-                  )}
-                </div>
-              </div>
-              {/* Progress bar */}
-              <div className="mt-3 h-1.5 rounded-full bg-muted/50 overflow-hidden">
-                <div
-                  className={`h-full rounded-full transition-all duration-500 ${isAtLimit ? "bg-destructive" : "bg-primary"}`}
-                  style={{ width: `${Math.min((savedBets.length / limit) * 100, 100)}%` }}
-                />
-              </div>
-            </motion.div>
-          )}
-
-          <motion.div variants={container} initial="hidden" animate="show" className="grid lg:grid-cols-2 gap-6">
-            <motion.div variants={item}><FrequencyChart stats={stats} /></motion.div>
-            <motion.div variants={item}><HeatmapGrid stats={stats} totalNumbers={config.numbers} /></motion.div>
-          </motion.div>
-
-          <div className="grid lg:grid-cols-2 gap-6">
-            <ParityChart draws={draws} />
-            <ConsecutiveChart draws={draws} />
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-6">
-            <RangeDistribution draws={draws} config={config} />
-            <DelayChart stats={stats} />
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-6">
-            <SumChart data={sumData} />
-            <RecentDraws draws={drawsWithPrizes} />
-          </div>
-          <p className="text-[10px] text-muted-foreground/50 text-center max-w-md mx-auto">
-            {getComplianceNotice()}
-          </p>
-        </>
+        <m.div variants={container} initial="hidden" animate="show" className="grid lg:grid-cols-2 gap-6">
+          <m.div variants={item}><Suspense fallback={<Skeleton className="h-[300px] w-full" />}><FrequencyChart stats={stats} /></Suspense></m.div>
+          <m.div variants={item}><Suspense fallback={<Skeleton className="h-[300px] w-full" />}><HeatmapGrid stats={stats} totalNumbers={config.numbers} /></Suspense></m.div>
+          <m.div variants={item}><Suspense fallback={<Skeleton className="h-[300px] w-full" />}><SumChart data={sumData} /></Suspense></m.div>
+          <m.div variants={item}><Suspense fallback={<Skeleton className="h-[300px] w-full" />}><ParityChart draws={draws} /></Suspense></m.div>
+        </m.div>
       )}
     </div>
   );
 };
-
-export default DashboardPage;
+export default memo(DashboardPage);
