@@ -19,7 +19,9 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { HeatmapIntensity } from "@/components/lottery/HeatmapIntensity";
+import { CorrelationNetwork } from "@/components/lottery/CorrelationNetwork";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 
 
 const PERIOD_OPTIONS = [
