@@ -154,32 +154,105 @@ const DashboardPage = () => {
       </section>
 
       {/* Primary Actions Grid - Quick Access */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {[
-          { label: "Análise Central", icon: BarChart3, url: "/analise", desc: "Decisão Baseada em Dados", color: "text-emerald-400" },
-          { label: "Fechamentos", icon: Grid3X3, url: "/fechamentos", desc: "Matemática Aplicada", color: "text-primary" },
-          { label: "IA Autônoma", icon: Brain, url: "/ia-autonoma", desc: "Predição Preditiva", color: "text-amber-400" },
-          { label: "Atividade", icon: History, url: "/historico", desc: "Histórico de Performance", color: "text-blue-400" },
+          { label: "Lotofácil Premium", icon: Crown, url: "/lotofacil-premium", desc: "Ambiente Elite", color: "text-amber-400", bg: "from-amber-500/10" },
+          { label: "IA Autônoma", icon: Brain, url: "/ia-autonoma", desc: "Predição Preditiva", color: "text-primary", bg: "from-primary/10" },
+          { label: "Fechamentos", icon: Grid3X3, url: "/fechamentos", desc: "Matemática Aplicada", color: "text-blue-400", bg: "from-blue-500/10" },
+          { label: "Análise Central", icon: BarChart3, url: "/analise", desc: "Decisão com Dados", color: "text-emerald-400", bg: "from-emerald-500/10" },
         ].map((item, idx) => (
-          <Link key={item.label} to={item.url} className="group p-6 rounded-[2rem] glass-card border-border/40 hover:border-primary/40 hover:bg-primary/5 transition-all duration-500 relative overflow-hidden active:scale-95 shadow-lg">
-            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-              <item.icon className="w-12 h-12" />
+          <Link 
+            key={item.label} 
+            to={item.url} 
+            className="group p-8 rounded-[2.5rem] glass-card border-border/40 hover:border-primary/40 hover:bg-gradient-to-br transition-all duration-700 relative overflow-hidden active:scale-95 shadow-xl bg-background/40"
+          >
+            <div className={`absolute inset-0 bg-gradient-to-br ${item.bg} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
+            
+            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+              <item.icon className="w-16 h-16" />
             </div>
             
-            <div className="space-y-4 relative z-10">
-              <div className={`w-12 h-12 rounded-2xl bg-background/60 border border-white/5 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform ${item.color}`}>
-                <item.icon className="w-6 h-6" />
+            <div className="space-y-6 relative z-10">
+              <div className={`w-14 h-14 rounded-2xl bg-background/60 border border-white/5 flex items-center justify-center shadow-lg group-hover:scale-110 transition-all duration-500 ${item.color}`}>
+                <item.icon className="w-7 h-7" />
               </div>
-              <div>
-                <span className="text-sm font-black uppercase tracking-tight italic block leading-none">{item.label}</span>
-                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-2 block opacity-40 group-hover:opacity-100 transition-opacity leading-none">{item.desc}</span>
+              <div className="space-y-1">
+                <span className="text-base font-black uppercase tracking-tight italic block leading-none">{item.label}</span>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-2 block opacity-40 group-hover:opacity-100 transition-opacity leading-none">{item.desc}</span>
               </div>
             </div>
           </Link>
         ))}
       </section>
 
-      <LotteryContextBanner />
+      <div className="grid lg:grid-cols-12 gap-8">
+        {/* Terminal Section */}
+        <div className="lg:col-span-8 space-y-6">
+           <div className="flex items-center justify-between px-1">
+            <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60 flex items-center gap-2">
+              <TerminalIcon className="w-4 h-4" />
+              Terminal de Inteligência
+            </h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+             {[
+              { icon: Zap, text: "Sincronização global concluída. 3.142 sorteios indexados.", type: "success", time: "10:42" },
+              { icon: Brain, text: "Rede neural detectou desvio no quadrante moldura.", type: "info", time: "10:38" },
+              { icon: Target, text: "Ciclo #512 em estágio final. 4 dezenas restantes.", type: "warning", time: "10:35" },
+              { icon: Activity, text: "Recalibrando Titan Score para o próximo concurso.", type: "info", time: "10:30" },
+            ].map((feed, i) => (
+              <div key={i} className="flex items-center gap-4 p-5 rounded-3xl bg-secondary/10 border border-border/40 group hover:border-primary/40 hover:bg-secondary/20 transition-all cursor-default relative overflow-hidden">
+                <div className={`p-2.5 rounded-2xl bg-background/60 border border-white/5 shrink-0 group-hover:scale-110 group-hover:shadow-[0_0_10px_rgba(var(--primary-rgb),0.2)] transition-all`}>
+                  <feed.icon className={`w-4 h-4 ${feed.type === 'success' ? 'text-emerald-400' : feed.type === 'warning' ? 'text-amber-400' : 'text-primary'}`} />
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest opacity-40">{feed.time}</span>
+                  </div>
+                  <p className="text-[11px] font-bold text-foreground/80 leading-tight">
+                    {feed.text}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Sidebar Status */}
+        <div className="lg:col-span-4 space-y-6">
+          <div className="flex items-center gap-2 px-1">
+            <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60 flex items-center gap-2">
+              <Activity className="w-4 h-4" />
+              Status do Sistema
+            </h2>
+          </div>
+          
+          <div className="space-y-4">
+            <TitanHealthGauge 
+              value={94.8} 
+              label="Neural Core" 
+              sublabel="Processamento Ativo" 
+              color="hsl(var(--primary))" 
+            />
+            <div className="p-6 rounded-3xl bg-background/40 border border-border/40 space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Segurança de Dados</span>
+                <Shield className="w-4 h-4 text-emerald-400" />
+              </div>
+              <div className="h-1.5 w-full bg-secondary/40 rounded-full overflow-hidden">
+                <m.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: "98%" }}
+                  className="h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                />
+              </div>
+              <p className="text-[10px] font-bold text-muted-foreground text-center italic">Monitoramento Biométrico Ativo</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
 
 
       {/* Advanced Details - Only in Advanced Mode */}
