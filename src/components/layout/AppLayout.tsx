@@ -12,6 +12,8 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { DrawNotificationChecker } from "@/components/DrawNotificationChecker";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { GuidedOnboarding } from "@/components/GuidedOnboarding";
+import { NoiseBackground } from "@/components/common/NoiseBackground";
+
 
 import {
   DropdownMenu,
@@ -35,16 +37,18 @@ export function AppLayout() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background text-foreground selection:bg-primary/30 selection:text-primary-foreground font-sans antialiased">
-        <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(160,84,45,0.08),rgba(255,255,255,0))] pointer-events-none" />
+      <div className="min-h-screen flex w-full bg-background text-foreground selection:bg-primary/30 selection:text-primary-foreground font-sans antialiased relative">
+        <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(var(--primary-rgb),0.08),rgba(255,255,255,0))] pointer-events-none z-0" />
+        <NoiseBackground />
         <AppSidebar />
+
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Header */}
-          <header className="border-b border-border/40 glass-panel sticky top-0 z-50 h-16 flex items-center shadow-xl">
+          <header className="border-b border-border/40 glass-panel sticky top-0 z-50 h-20 flex items-center shadow-2xl">
 
             {/* Top row - brand + actions */}
             <div className="w-full flex items-center gap-4 px-4 md:px-6">
-              <SidebarTrigger className="shrink-0 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all rounded-xl h-10 w-10 active:scale-95" />
+              <SidebarTrigger className="shrink-0 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all rounded-2xl h-11 w-11 active:scale-90" />
               
               <div className="w-px h-6 bg-border/40 hidden sm:block" />
 
@@ -77,8 +81,9 @@ export function AppLayout() {
                       variant="ghost"
                       onClick={() => syncDraws()}
                       disabled={syncing}
-                      className="h-10 w-10 rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all group"
+                      className="h-11 w-11 rounded-2xl text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all group border border-transparent hover:border-primary/20 shadow-sm"
                     >
+
                       {syncing ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
@@ -120,10 +125,11 @@ export function AppLayout() {
                 {/* User menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="gap-2.5 hover:bg-primary/5 px-1.5 md:px-3 rounded-xl transition-all border border-transparent hover:border-primary/20 active:scale-[0.98]">
-                      <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl gradient-brand flex items-center justify-center shadow-lg shadow-primary/20 border border-white/10 transition-all">
-                        <User className="w-4 h-4 text-primary-foreground" />
+                    <Button variant="ghost" size="sm" className="gap-3 hover:bg-primary/5 px-2 md:px-4 h-12 rounded-2xl transition-all border border-transparent hover:border-primary/20 active:scale-[0.98] shadow-sm">
+                      <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl gradient-brand flex items-center justify-center shadow-lg shadow-primary/20 border border-white/10 transition-all group-hover:rotate-6">
+                        <User className="w-5 h-5 text-primary-foreground" />
                       </div>
+
                       <div className="hidden md:flex flex-col items-start text-left shrink-0">
                         <span className="text-xs font-black text-foreground tracking-tight uppercase italic leading-none">
                           {profile?.full_name || user?.email?.split("@")[0] || "Usuário"}
