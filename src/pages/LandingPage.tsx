@@ -326,7 +326,10 @@ export default function LandingPage() {
       </section>
 
 
+      <PricingSection />
+
       <section ref={faqRef} className="py-24 md:py-40">
+
         <div className="container mx-auto px-6 max-w-4xl">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16 space-y-4">
             <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic">
