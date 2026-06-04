@@ -85,8 +85,26 @@ const resources = {
           "a3": "Suportamos as principais loterias da Caixa, incluindo Mega-Sena, Lotofácil, Quina, e muito mais.",
           "q4": "É garantido que vou ganhar?",
           "a4": "Não. Loterias são jogos de azar. Nossa ferramenta aumenta suas probabilidades matemáticas e estatísticas, mas não garante prêmios."
+        },
+        "how_it_works": {
+          "title": "Como Funciona?",
+          "step1": {
+            "title": "Coleta de Big Data",
+            "desc": "Nossos servidores monitoram resultados de todas as loterias oficiais em tempo real."
+          },
+          "step2": {
+            "title": "Processamento Neural",
+            "desc": "A IA processa mais de 1 milhão de combinações para cada sorteio buscando anomalias."
+          },
+          "step3": {
+            "title": "Geração de Estratégias",
+            "desc": "Algoritmos genéticos criam matrizes de jogos com o maior equilíbrio estatístico possível."
+          },
+          "status_label": "Status do Sistema",
+          "status_value": "Operando em Alta Fidelidade"
         }
       },
+
       "matrix": {
         "title": "Ranking Probabilístico",
         "subtitle": "Matriz de Performance Individual",
