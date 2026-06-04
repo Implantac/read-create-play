@@ -208,7 +208,7 @@ export function HPEnginePanel({ stats, config, draws }: Props) {
               {/* Performance metrics */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[
-                  { label: "Iterações", value: formatNumber(simResult.iterationsCompleted), icon: Cpu },
+                  { label: "Iterações", value: fmtN(simResult.iterationsCompleted), icon: Cpu },
                   { label: "Tempo", value: `${simResult.elapsedMs}ms`, icon: Timer },
                   { label: "Ops/seg", value: formatNumber(simResult.opsPerSecond), icon: Gauge },
                   { label: "Melhor", value: `${simResult.bestHit} acertos`, icon: Trophy },
