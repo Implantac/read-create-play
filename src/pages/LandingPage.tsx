@@ -255,7 +255,7 @@ export default function LandingPage() {
                   <div key={i} className="flex gap-6 items-start group">
                     <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">{item.step}</span>
                     <div className="space-y-1">
-                      <h4 className="text-xl font-bold uppercase italic">{item.title}</h4>
+                      <h3 className="text-xl font-bold uppercase italic">{item.title}</h3>
                       <p className="text-muted-foreground leading-relaxed">{item.desc}</p>
                     </div>
                   </div>
