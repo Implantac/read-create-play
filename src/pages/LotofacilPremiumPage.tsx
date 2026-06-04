@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, lazy, Suspense } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PageHeader } from "@/components/PageHeader";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { 
   BarChart3, Brain, Target, Zap, Clock, TrendingUp, 
   Search, Crown, History, Activity, Sparkles, LayoutGrid,
-  Filter, Award, Database, RefreshCw, Layers
+  Filter, Award, Database, RefreshCw, Layers, Loader2
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,10 +22,28 @@ import { RecentDraws } from "@/components/RecentDraws";
 import { cn } from "@/lib/utils";
 import { HeatmapIntensity } from "@/components/lottery/HeatmapIntensity";
 import { CorrelationNetwork } from "@/components/lottery/CorrelationNetwork";
+import { useSavedBets } from "@/hooks/useSavedBets";
+
+const IntelligentGeneratorPanel = lazy(() => import("@/components/IntelligentGeneratorPanel").then(m => ({ default: m.IntelligentGeneratorPanel })));
+const EvolutiveGeneratorPanel = lazy(() => import("@/components/EvolutiveGeneratorPanel").then(m => ({ default: m.EvolutiveGeneratorPanel })));
+const AIPredictionPanel = lazy(() => import("@/components/AIPredictionPanel").then(m => ({ default: m.AIPredictionPanel })));
+const ProfessionalGeneratorPanel = lazy(() => import("@/components/ProfessionalGeneratorPanel").then(m => ({ default: m.ProfessionalGeneratorPanel })));
+
+const LazyFallback = () => (
+  <div className="flex items-center justify-center py-12 text-muted-foreground bg-secondary/5 rounded-2xl border border-dashed border-border/40">
+    <Loader2 className="h-5 w-5 animate-spin mr-2 text-primary" />
+    <span className="text-xs font-black uppercase tracking-widest italic">Iniciando Motor Neural...</span>
+  </div>
+);
 
 export default function LotofacilPremiumPage() {
   const { config, draws, drawsWithPrizes, stats, farol, cycle, loading, syncing, lastSyncAt, syncDraws, selectedLottery } = useLotteryContext();
+  const { saveBet } = useSavedBets(selectedLottery);
   const [activeTab, setActiveTab] = useState("overview");
+
+  const handleSaveBet = (numbers: number[], strategy?: string, score?: number, grade?: string) => {
+    saveBet({ numbers, strategy, score, grade });
+  };
 
   const topElite = useMemo(() => 
     farol.filter(s => s.titanScore >= 85).sort((a, b) => b.titanScore - a.titanScore),
@@ -104,6 +122,9 @@ export default function LotofacilPremiumPage() {
             </TabsTrigger>
             <TabsTrigger value="strategy" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
               Estratégia
+            </TabsTrigger>
+            <TabsTrigger value="generation" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
+              Geração Elite
             </TabsTrigger>
             <TabsTrigger value="history" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
               Sorteios
@@ -245,6 +266,26 @@ export default function LotofacilPremiumPage() {
           <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-6">
             <StrategyBriefingPanel config={config} stats={stats} draws={draws} />
             <BettingBudgetPlanner config={config} stats={stats} draws={draws} />
+          </div>
+        </TabsContent>
+
+        {/* --- GENERATION TAB --- */}
+        <TabsContent value="generation" className="space-y-6">
+          <div className="grid lg:grid-cols-2 gap-6">
+            <Suspense fallback={<LazyFallback />}>
+              <IntelligentGeneratorPanel stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
+            </Suspense>
+            <Suspense fallback={<LazyFallback />}>
+              <AIPredictionPanel config={config} stats={stats} draws={draws} onSaveBet={handleSaveBet} />
+            </Suspense>
+          </div>
+          <div className="grid lg:grid-cols-2 gap-6">
+            <Suspense fallback={<LazyFallback />}>
+              <EvolutiveGeneratorPanel stats={stats} config={config} draws={draws} lotteryId={selectedLottery} />
+            </Suspense>
+            <Suspense fallback={<LazyFallback />}>
+              <ProfessionalGeneratorPanel stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
+            </Suspense>
           </div>
         </TabsContent>
 
