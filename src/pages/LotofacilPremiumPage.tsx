@@ -119,12 +119,25 @@ export default function LotofacilPremiumPage() {
 
   const canGenerateWorksheet = worksheetNumbers.length >= worksheetInputSize && generatedWorksheetGames.length > 0;
 
+  const handleRunWorksheetBacktest = () => {
+    if (!canGenerateWorksheet) return;
+    setWorksheetBacktesting(true);
+    setTimeout(() => {
+      const result = runWorksheetBacktest(generatedWorksheetGames, draws, 100);
+      setWorksheetBacktest(result);
+      setWorksheetBacktesting(false);
+      toast.success("Simulação de matriz concluída!");
+    }, 400);
+  };
+
   const autoSelectWorksheet = () => {
     const numbers = selectTopLotofacilNumbers(rankedNumbers, worksheetInputSize);
     setWorksheetNumbers(numbers);
+    setWorksheetBacktest(null);
   };
 
   const toggleWorksheetNumber = (number: number) => {
+    setWorksheetBacktest(null);
     setWorksheetNumbers((prev) => {
       if (prev.includes(number)) return prev.filter((item) => item !== number);
       if (prev.length >= worksheetInputSize) return prev;
