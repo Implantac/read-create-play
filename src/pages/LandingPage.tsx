@@ -263,15 +263,6 @@ export default function LandingPage() {
           </motion.div>
         </motion.div>
       </section>
-              <Link to="/login">
-                <Button size="lg" variant="outline" className="h-16 px-10 text-lg font-black uppercase tracking-widest border-white/10 bg-white/5 hover:bg-white/10 transition-all rounded-2xl border-2">
-                  {t("landing.hero.cta_secondary")}
-                </Button>
-              </Link>
-            </motion.div>
-          </motion.div>
-        </motion.div>
-      </section>
 
       <LotteryLogosCarousel />
       <SocialProofBar />
