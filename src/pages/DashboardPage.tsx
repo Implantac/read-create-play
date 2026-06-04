@@ -33,8 +33,10 @@ const NeuralMissionCenter = lazy(() => import("@/components/NeuralMissionCenter"
 
 const SystemAuditStatus = lazy(() => import("@/components/SystemAuditStatus").then(m => ({ default: m.SystemAuditStatus })));
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+
 import { useAuth } from "@/contexts/AuthContext";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { useSavedBets } from "@/hooks/useSavedBets";
@@ -69,7 +71,7 @@ const quickLinks = [
 ];
 
 const DashboardPage = () => {
-  const { config, draws, loading, syncing, lastSyncAt, syncError, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery } = useLotteryContext();
+  const { config, draws, loading, syncing, lastSyncAt, syncError, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery, farol, cycle } = useLotteryContext();
   const [syncStatus, setSyncStatus] = useState<"idle" | "success" | "error">("idle");
   const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
   const { currentPlan } = usePlanAccess();
