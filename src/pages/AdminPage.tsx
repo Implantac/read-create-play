@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { formatNumber } from "@/utils/formatters";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
