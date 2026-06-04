@@ -336,9 +336,12 @@ export default function LotofacilPremiumPage() {
 
         {/* --- STRATEGY TAB --- */}
         <TabsContent value="strategy" className="space-y-6">
-          <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-6">
+          <div className="grid lg:grid-cols-[1fr_1fr] gap-6">
             <StrategyBriefingPanel config={config} stats={stats} draws={draws} />
-            <BettingBudgetPlanner config={config} stats={stats} draws={draws} />
+            <div className="space-y-6">
+              <BettingBudgetPlanner config={config} stats={stats} draws={draws} />
+              <NotificationsPanel />
+            </div>
           </div>
         </TabsContent>
 
