@@ -6,24 +6,24 @@ import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function HeatmapIntensity() {
-  const { config, stats } = useLotteryContext();
+  const { config, farol } = useLotteryContext();
 
   const heatmapData = useMemo(() => {
-    if (!stats || stats.length === 0) return [];
+    if (!farol || farol.length === 0) return [];
     
     // Normalize frequency to 0-1 range
-    const maxFreq = Math.max(...stats.map(s => s.frequency));
-    const minFreq = Math.min(...stats.map(s => s.frequency));
+    const maxFreq = Math.max(...farol.map(s => s.frequency));
+    const minFreq = Math.min(...farol.map(s => s.frequency));
     const range = maxFreq - minFreq || 1;
 
-    return stats.map(s => ({
+    return farol.map(s => ({
       number: s.number,
       intensity: (s.frequency - minFreq) / range,
       frequency: s.frequency,
       delay: s.currentDelay,
       score: s.titanScore
     })).sort((a, b) => a.number - b.number);
-  }, [stats]);
+  }, [farol]);
 
   const getIntensityColor = (intensity: number) => {
     if (intensity >= 0.8) return "bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]";
