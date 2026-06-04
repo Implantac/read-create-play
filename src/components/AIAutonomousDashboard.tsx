@@ -185,96 +185,88 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
         </CardHeader>
       </Card>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-        <Card className="glass-card border-primary/20 hover:border-primary/40 transition-all duration-500 group/stat">
-          <CardContent className="pt-5 pb-4 px-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover/stat:text-primary transition-colors">Dezenas Fortes</span>
-              <Target className="h-4 w-4 text-primary group-hover/stat:scale-110 transition-transform" />
+      {/* Quick Stats - Modular Bento Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 relative z-10">
+        {[
+          { label: "Dezenas Elite", value: report.rankings.filter(r => r.classification === "forte").length, icon: Target, color: "text-primary", bg: "bg-primary/5", border: "hover:border-primary/40", desc: "Top Performance" },
+          { label: "Tendência Alpha", value: report.rankings.filter(r => r.trend === "subindo").length, icon: TrendingUp, color: "text-accent", bg: "bg-accent/5", border: "hover:border-accent/40", desc: "Momentum Up" },
+          { label: "Anomalias Matrix", value: report.shifts.length, icon: TriangleAlert, color: "text-rose-400", bg: "bg-rose-500/5", border: "hover:border-rose-500/40", desc: "Shift Detected" },
+          { label: "Entropia Flux", value: report.entropyAnalysis.normalizedEntropy.toFixed(2), icon: Dice1, color: "text-emerald-400", bg: "bg-emerald-500/5", border: "hover:border-emerald-500/40", desc: "Stability Index" },
+          { label: "χ² Verificado", value: report.chiSquareResult.pValue.toFixed(3), icon: FlaskConical, color: "text-yellow-400", bg: "bg-yellow-500/5", border: "hover:border-yellow-500/40", desc: "P-Value Pure" },
+          { label: "Titan Confiança", value: `${report.confidenceScore}%`, icon: Gauge, color: "text-purple-400", bg: "bg-purple-500/5", border: "hover:border-purple-500/40", desc: "Neural Weight" },
+        ].map((item, idx) => (
+          <m.div 
+            key={item.label}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.05 }}
+            className={`flex flex-col justify-between p-5 rounded-[2rem] glass-card border-border/40 ${item.border} ${item.bg} group/stat relative overflow-hidden active:scale-95`}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-[9px] uppercase font-black text-muted-foreground tracking-widest opacity-60 group-hover/stat:text-foreground transition-colors leading-none">{item.label}</p>
+              <item.icon className={`h-4 w-4 ${item.color} opacity-40 group-hover/stat:opacity-100 group-hover/stat:scale-110 transition-all`} />
             </div>
-            <p className="text-2xl font-black font-mono text-foreground italic">{report.rankings.filter(r => r.classification === "forte").length}</p>
-          </CardContent>
-        </Card>
-        <Card className="glass-card border-accent/20 hover:border-accent/40 transition-all duration-500 group/stat">
-          <CardContent className="pt-5 pb-4 px-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover/stat:text-accent transition-colors">Trend: Up</span>
-              <TrendingUp className="h-4 w-4 text-accent group-hover/stat:scale-110 transition-transform" />
+            <div className="space-y-1">
+              <p className={`text-2xl font-black font-mono tracking-tighter italic ${item.color} leading-none truncate`}>{item.value}</p>
+              <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest opacity-30 group-hover/stat:opacity-60 transition-opacity leading-none">{item.desc}</p>
             </div>
-            <p className="text-2xl font-black font-mono text-foreground italic">{report.rankings.filter(r => r.trend === "subindo").length}</p>
-          </CardContent>
-        </Card>
-        <Card className="glass-card border-destructive/20 hover:border-destructive/40 transition-all duration-500 group/stat">
-          <CardContent className="pt-5 pb-4 px-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover/stat:text-destructive transition-colors">Shift Matrix</span>
-              <AlertTriangle className="h-4 w-4 text-destructive group-hover/stat:scale-110 transition-transform" />
-            </div>
-            <p className="text-2xl font-black font-mono text-foreground italic">{report.shifts.length}</p>
-          </CardContent>
-        </Card>
-        <Card className="glass-card border-green-500/20 hover:border-green-500/40 transition-all duration-500 group/stat">
-          <CardContent className="pt-5 pb-4 px-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover/stat:text-green-500 transition-colors">Entropia</span>
-              <Dice1 className="h-4 w-4 text-green-500 group-hover/stat:scale-110 transition-transform" />
-            </div>
-            <p className="text-2xl font-black font-mono text-foreground italic">{report.entropyAnalysis.normalizedEntropy.toFixed(2)}</p>
-          </CardContent>
-        </Card>
-        <Card className="glass-card border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-500 group/stat">
-          <CardContent className="pt-5 pb-4 px-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover/stat:text-yellow-500 transition-colors">χ² P-Valor</span>
-              <FlaskConical className="h-4 w-4 text-yellow-500 group-hover/stat:scale-110 transition-transform" />
-            </div>
-            <p className="text-2xl font-black font-mono text-foreground italic">{report.chiSquareResult.pValue.toFixed(3)}</p>
-          </CardContent>
-        </Card>
-        <Card className="glass-card border-purple-500/20 hover:border-purple-500/40 transition-all duration-500 group/stat">
-          <CardContent className="pt-5 pb-4 px-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover/stat:text-purple-500 transition-colors">Confiança</span>
-              <Gauge className="h-4 w-4 text-purple-500 group-hover/stat:scale-110 transition-transform" />
-            </div>
-            <p className="text-2xl font-black font-mono text-foreground italic">{report.confidenceScore}%</p>
-          </CardContent>
-        </Card>
-
+          </m.div>
+        ))}
       </div>
 
-      {/* Suggested Numbers */}
-      <Card className="glass-card border-primary/30 relative overflow-hidden group/sugg">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_100%,rgba(var(--primary),0.05),transparent)] pointer-events-none" />
-        <CardHeader className="pb-5 relative z-10">
-          <CardTitle className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-3 italic">
-            <div className="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center border border-primary/30 group-hover/sugg:rotate-6 transition-transform">
-              <Zap className="h-5 w-5 text-primary animate-pulse" />
-            </div>
-            Matriz Sugerida pela IA
-            <Badge variant="outline" className="ml-2 text-[9px] font-black uppercase tracking-widest border-primary/40 text-primary bg-primary/5">Neural Hybrid Engine</Badge>
-          </CardTitle>
+      {/* Suggested Numbers - High Impact Visualization */}
+      <Card className="glass-card border-primary/30 relative overflow-hidden group/sugg shadow-2xl rounded-[2.5rem]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_100%,rgba(var(--primary),0.1),transparent)] pointer-events-none opacity-50" />
+        <CardHeader className="pb-8 relative z-10 p-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <CardTitle className="text-xl font-black uppercase tracking-[0.2em] flex items-center gap-4 italic leading-none">
+              <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center border border-primary/30 group-hover/sugg:rotate-6 transition-all duration-500 shadow-lg shadow-primary/10">
+                <Zap className="h-6 w-6 text-primary animate-pulse" />
+              </div>
+              <div>
+                <span>Configuração Neural Alpha</span>
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-40 mt-2">Aposta Sugerida para Ciclo #{report.drawsAnalyzed + 1}</p>
+              </div>
+            </CardTitle>
+            <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest border-primary/40 text-primary bg-primary/5 px-4 py-1.5 rounded-full shadow-lg shadow-primary/5 backdrop-blur-sm italic">
+              Elite Probability Node
+            </Badge>
+          </div>
         </CardHeader>
-        <CardContent className="relative z-10">
-          <div className="flex flex-wrap gap-3 mb-4">
-            {report.suggestedNumbers.map(n => (
-              <span key={n} className="w-12 h-12 rounded-xl bg-primary/15 text-primary font-black font-mono text-lg border-2 border-primary/40 flex items-center justify-center shadow-lg shadow-primary/10 transition-all hover:scale-110 hover:-rotate-3 active:scale-95 cursor-default group/ball">
-                {String(n).padStart(2, "0")}
-              </span>
+        <CardContent className="relative z-10 px-8 pb-8">
+          <div className="flex flex-wrap gap-4 mb-8 justify-center md:justify-start">
+            {report.suggestedNumbers.map((n, i) => (
+              <m.div 
+                key={n} 
+                initial={{ scale: 0.5, opacity: 0, rotate: -20 }}
+                animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                transition={{ type: "spring", stiffness: 260, damping: 20, delay: i * 0.05 }}
+                whileHover={{ y: -8, scale: 1.1, rotate: 5 }}
+                className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary font-black font-mono text-2xl border-2 border-primary/40 flex items-center justify-center shadow-xl shadow-primary/5 transition-all cursor-pointer group/ball relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/ball:opacity-100 transition-opacity" />
+                <span className="relative z-10 drop-shadow-[0_0_8px_rgba(var(--primary),0.3)] italic">{String(n).padStart(2, "0")}</span>
+              </m.div>
             ))}
           </div>
 
           {report.avoidNumbers.length > 0 && (
-            <div className="mt-3 pt-3 border-t border-border">
-              <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
-                <AlertTriangle className="h-3 w-3" /> Dezenas para evitar:
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {report.avoidNumbers.map(n => (
-                  <span key={n} className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-destructive/10 text-destructive font-mono text-xs border border-destructive/20">
+            <div className="p-6 rounded-[2rem] bg-rose-500/5 border border-rose-500/10 backdrop-blur-sm shadow-inner group-hover/sugg:border-rose-500/20 transition-all duration-700">
+              <div className="flex items-center gap-2 mb-4 px-1">
+                <TriangleAlert className="h-4 w-4 text-rose-400 group-hover/sugg:animate-bounce" />
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-400/80">Filtro de Exclusão Crítica (High Bias)</p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {report.avoidNumbers.map((n, i) => (
+                  <m.span 
+                    key={n} 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 + (i * 0.05) }}
+                    className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-background/40 text-muted-foreground font-black font-mono text-sm border border-white/5 hover:border-rose-500/30 hover:text-rose-400 transition-all cursor-default shadow-sm italic"
+                  >
                     {String(n).padStart(2, "0")}
-                  </span>
+                  </m.span>
                 ))}
               </div>
             </div>
