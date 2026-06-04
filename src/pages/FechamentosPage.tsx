@@ -425,10 +425,29 @@ export default function FechamentosPage() {
                     {generatedGames.length} Jogos Gerados
                   </CardTitle>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={handleExportPdf} className="gap-1.5">
-                      <FileDown className="w-3.5 h-3.5" />
-                      Exportar PDF
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className="gap-1.5">
+                          <Download className="w-3.5 h-3.5" />
+                          Exportar
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="glass-panel">
+                        <DropdownMenuItem onClick={handleExportPdf} className="gap-2 cursor-pointer">
+                          <FileText className="w-4 h-4 text-rose-500" />
+                          Exportar PDF (Profissional)
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleExportCsv} className="gap-2 cursor-pointer">
+                          <FileSpreadsheet className="w-4 h-4 text-emerald-500" />
+                          Exportar CSV
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleExportExcel} className="gap-2 cursor-pointer">
+                          <FileSpreadsheet className="w-4 h-4 text-blue-500" />
+                          Exportar Excel
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
                     <Button
                       variant="outline"
                       size="sm"
