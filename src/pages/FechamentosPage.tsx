@@ -151,31 +151,46 @@ const FechamentosPage = () => {
           transition={{ duration: 0.3 }}
         >
           {step === 1 && (
-            <div className="space-y-6">
-              <div className="text-center space-y-2 mb-8">
-                <h3 className="text-xl font-black uppercase tracking-tighter">Escolha o Modelo de Fechamento</h3>
-                <p className="text-muted-foreground">Cada matriz possui uma garantia matemática diferente baseada no volume de jogos.</p>
+            <div className="space-y-10">
+              <div className="text-center space-y-3">
+                <h3 className="text-2xl font-black uppercase tracking-tighter italic">Arquitetura de <span className="gradient-brand-text">Fechamento</span></h3>
+                <p className="text-sm text-muted-foreground font-medium max-w-lg mx-auto italic opacity-60">Matrizes Alpha-Core com garantias matemáticas de integridade combinatória.</p>
               </div>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {availableMatrices.map((m) => (
                   <button
                     key={m.id}
                     onClick={() => { setSelectedMatrix(m.id); setStep(2); }}
-                    className={`p-6 rounded-2xl glass-card border transition-all text-left flex flex-col gap-4 hover:border-primary/60 group ${
-                      selectedMatrix === m.id ? "border-primary bg-primary/5" : "border-border/40"
+                    className={`p-8 rounded-[2rem] glass-card border transition-all text-left flex flex-col gap-6 group relative overflow-hidden active:scale-95 ${
+                      selectedMatrix === m.id ? "border-primary bg-primary/[0.03] shadow-2xl" : "border-white/5 bg-white/[0.01] hover:border-primary/40"
                     }`}
                   >
-                    <div className="flex justify-between items-start">
-                      <h4 className="font-black text-lg uppercase tracking-tight">{m.name}</h4>
-                      <Badge variant="outline" className="text-[10px] uppercase font-black">{m.guarantee}+ Acertos</Badge>
+                    <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity pointer-events-none">
+                      <Grid3X3 className="w-20 h-20" />
                     </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>Dezenas: <strong>{m.baseSize}</strong></span>
-                        <span>Jogos: <strong>{m.games.length}</strong></span>
+
+                    <div className="flex justify-between items-start relative z-10">
+                      <h4 className="font-black text-xl uppercase tracking-tighter italic leading-none group-hover:text-primary transition-colors">{m.name}</h4>
+                      <Badge className="bg-primary/10 text-primary font-black uppercase tracking-widest text-[9px] border-primary/20 px-3 py-1 rounded-lg">
+                        {m.guarantee}+ SYNC
+                      </Badge>
+                    </div>
+                    
+                    <div className="space-y-4 pt-4 border-t border-white/5 relative z-10">
+                      <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-40">
+                        <span>Base Alpha: <strong className="text-foreground italic">{m.baseSize}</strong></span>
+                        <span>Dataset: <strong className="text-foreground italic">{m.games.length}</strong></span>
                       </div>
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>Custo: <strong className="text-accent">{formatCurrency(m.games.length * betPrice)}</strong></span>
+                      <div className="flex justify-between items-end">
+                        <div className="space-y-1">
+                          <p className="text-[9px] font-black uppercase text-muted-foreground opacity-30 italic">Custo Operacional</p>
+                          <p className="text-2xl font-black font-mono tracking-tighter italic text-accent leading-none">
+                            {formatCurrency(m.games.length * betPrice)}
+                          </p>
+                        </div>
+                        <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-inner">
+                          <ChevronRight className="w-5 h-5" />
+                        </div>
                       </div>
                     </div>
                   </button>
