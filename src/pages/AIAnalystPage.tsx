@@ -328,7 +328,7 @@ const AIAnalystPage = () => {
                   {wheelOptions.map(opt => (
                     <Button key={opt.base} variant={wheelBase === opt.base ? "default" : "outline"} size="sm"
                       onClick={() => setWheelBase(opt.base)} className="text-xs">
-                      {opt.base} dez → ~{opt.estimatedGames} jogos
+                      {formatNumber(opt.base)} dez → ~{formatNumber(opt.estimatedGames)} jogos
                     </Button>
                   ))}
                 </div>
