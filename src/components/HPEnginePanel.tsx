@@ -247,7 +247,7 @@ export function HPEnginePanel({ stats, config, draws }: Props) {
                           }}
                           formatter={(val: number, name: string) => {
                             if (name === "pct") return [`${formatNumber(val)}%`, "Percentual"];
-                            return [val.toLocaleString(), "Contagem"];
+                            return [formatNumber(val), "Contagem"];
                           }}
                         />
                         <Bar dataKey="pct" radius={[4, 4, 0, 0]}>
