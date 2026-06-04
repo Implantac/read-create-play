@@ -24,7 +24,7 @@ const ICON_MAP: Record<Strategy, any> = {
   smart: Sparkles, hot: Flame, cold: Snowflake, balanced: Shuffle,
   trend: TrendingUp, fibonacci: Sigma, primes: Hash, golden: Ratio,
   sectors: Grid3X3, lowDelay: Clock, pattern: BarChart3, cycle: Repeat,
-  ml: Brain, hybrid: Layers,
+  ml: Brain, hybrid: Layers, titan_pro: Zap,
 };
 
 const CATEGORY_LABELS = { basic: "Básicas", math: "Matemáticas", ai: "Inteligência Artificial" };
