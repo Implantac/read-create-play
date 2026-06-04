@@ -345,8 +345,8 @@ export function ComparativeSimulatorPanel({ stats, config, draws }: Props) {
                   </div>
                 ))}
               </div>
-
             </div>
+
 
             {/* Chart toggle */}
             <button
