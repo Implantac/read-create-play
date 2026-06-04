@@ -275,10 +275,10 @@ export default function AdminPage() {
 
 
   const stats = [
-    { label: "Total Usuários", value: profiles.length, icon: Users, color: "text-primary" },
-    { label: "Premium", value: planCounts["premium"] || 0, icon: Crown, color: "text-primary" },
-    { label: "Profissional", value: planCounts["professional"] || 0, icon: Shield, color: "text-accent" },
-    { label: "Sorteios no BD", value: drawCount, icon: TrendingUp, color: "text-primary" },
+    { label: "Total Usuários", value: formatNumber(profiles.length), icon: Users, color: "text-primary" },
+    { label: "Premium", value: formatNumber(planCounts["premium"] || 0), icon: Crown, color: "text-primary" },
+    { label: "Profissional", value: formatNumber(planCounts["professional"] || 0), icon: Shield, color: "text-accent" },
+    { label: "Sorteios no BD", value: formatNumber(drawCount), icon: TrendingUp, color: "text-primary" },
   ];
 
   const getAdminEmail = (adminId: string) => {
