@@ -20,8 +20,9 @@ import { exportToCsv, exportToExcel } from "@/utils/export";
 import {
   Grid3X3, Shield, Trophy, Coins, FileDown, ChevronRight,
   CheckCircle2, AlertTriangle, Target, Hash, Layers, Sparkles, Save, Brain, Flame,
-  FileSpreadsheet, FileText, Download
+  FileSpreadsheet, FileText, Download, Calculator, TrendingUp
 } from "lucide-react";
+
 import { motion, AnimatePresence } from "framer-motion";
 
 import { MatrixComparisonPanel } from "@/components/MatrixComparisonPanel";
