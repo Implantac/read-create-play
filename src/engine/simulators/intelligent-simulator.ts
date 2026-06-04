@@ -1,33 +1,11 @@
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
+import { getMinPrizeHits } from "./lib/simulation-utils";
 
 export interface SimulationBet {
   id: number;
   numbers: number[];
 }
-
-export interface BetResult {
-  concurso: number;
-  date: string;
-  hits: number;
-  matchedNumbers: number[];
-}
-
-export interface TimelinePoint {
-  concurso: number;
-  hits: number;
-}
-
-export interface BetSimulationResult {
-  bet: SimulationBet;
-  results: BetResult[];
-  bestHit: number;
-  avgHits: number;
-  hitDistribution: Record<number, number>;
-  prizeCount: number;
-  stability: number;
-  timeline: TimelinePoint[];
-}
-
+...
 export interface SimulationOutput {
   bets: BetSimulationResult[];
   totalDraws: number;
