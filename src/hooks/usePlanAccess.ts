@@ -2,9 +2,10 @@ import { useAuth, PlanType } from "@/contexts/AuthContext";
 
 const PLAN_HIERARCHY: Record<PlanType, number> = {
   free: 0,
+  lifetime: 1,
+  // Keep others for backward compatibility if needed, but treat as lifetime
   premium: 1,
-  professional: 2,
-  lifetime: 3,
+  professional: 1,
 };
 
 export type Feature =
