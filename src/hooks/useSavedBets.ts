@@ -81,7 +81,7 @@ export function useSavedBets(lotteryId: string) {
     onError: () => toast.error("Erro ao remover aposta")
   });
 
-  const saveBet = useCallback(async (bet: any) => {
+  const saveBet = useCallback(async (bet: any): Promise<boolean> => {
     try {
       await saveMutation.mutateAsync(bet);
       return true;
@@ -90,7 +90,7 @@ export function useSavedBets(lotteryId: string) {
     }
   }, [saveMutation]);
 
-  const deleteBet = useCallback(async (id: string) => {
+  const deleteBet = useCallback(async (id: string): Promise<boolean> => {
     try {
       await deleteMutation.mutateAsync(id);
       return true;
@@ -98,6 +98,7 @@ export function useSavedBets(lotteryId: string) {
       return false;
     }
   }, [deleteMutation]);
+
 
 
   const remaining = Math.max(0, limit - savedBets.length);
