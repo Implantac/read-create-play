@@ -33,15 +33,19 @@ interface SummaryCardProps {
 }
 
 const SummaryCard = ({ icon, label, value, subtitle, color }: SummaryCardProps) => (
-  <div className="rounded-2xl glass-card p-5 border border-border/40 flex items-start gap-4 group hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 hover:-translate-y-1 relative overflow-hidden">
+  <div className="rounded-[2rem] glass-card p-6 border border-border/40 flex flex-col justify-between group hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 active:scale-95 relative overflow-hidden h-full">
     <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-    <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center shrink-0 shadow-lg group-hover:rotate-12 transition-transform duration-500`}>
-      {icon}
+    
+    <div className="flex items-center justify-between mb-4">
+      <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-60 group-hover:text-foreground transition-colors leading-none italic">{label}</p>
+      <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-500`}>
+        {icon}
+      </div>
     </div>
-    <div className="min-w-0 relative z-10">
-      <p className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground opacity-60 mb-1">{label}</p>
-      <p className="text-2xl font-black font-mono text-foreground tracking-tighter italic">{value}</p>
-      {subtitle && <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-40">{subtitle}</p>}
+    
+    <div className="space-y-1 relative z-10">
+      <p className="text-3xl font-black font-mono text-foreground tracking-tighter italic leading-none">{value}</p>
+      {subtitle && <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-[0.2em] mt-2 opacity-40 group-hover:opacity-60 transition-opacity italic">{subtitle}</p>}
     </div>
   </div>
 );
@@ -85,13 +89,23 @@ const MatrizAnalisePage = () => {
   return (
     <SelectedBetsProvider>
       <div className="space-y-6">
-        <PageHeader
-          title="Matriz de Análise"
-          description={`Score inteligente e ranking completo — ${config.name}`}
-          icon={Grid3X3}
-          badge={`${draws.length} sorteios`}
-        />
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded bg-primary/10 border border-primary/20 text-[9px] font-black text-primary uppercase tracking-[0.2em] italic">Intelligence Matrix v5.3</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic leading-none">
+            Matriz de <span className="gradient-brand-text">Análise</span>
+          </h1>
+          <p className="text-sm text-muted-foreground font-medium max-w-md">Score inteligente e ranking combinatório completo para detecção de anomalias.</p>
+        </div>
+      </div>
+      
+      <div className="relative group">
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-[2rem] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-1000 pointer-events-none" />
         <LotteryContextBanner />
+      </div>
         <ComplianceDisclaimer />
 
         {/* Summary Cards */}
@@ -129,28 +143,28 @@ const MatrizAnalisePage = () => {
         )}
 
         {/* Score methodology */}
-        <div className="rounded-2xl glass-card p-6 flex flex-col md:flex-row items-center gap-6 border border-primary/20 relative overflow-hidden group">
+        <div className="rounded-[2.5rem] glass-card p-8 flex flex-col lg:flex-row items-center gap-10 border border-primary/20 relative overflow-hidden group shadow-2xl">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent pointer-events-none" />
-          <div className="flex items-center gap-4 relative z-10 shrink-0">
-            <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-              <BarChart3 className="w-6 h-6 text-primary" />
+          <div className="flex items-center gap-6 relative z-10 shrink-0">
+            <div className="w-16 h-16 rounded-[1.25rem] bg-primary/10 border border-primary/20 flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500">
+              <BarChart3 className="w-8 h-8 text-primary" />
             </div>
             <div>
-              <p className="font-black text-foreground uppercase tracking-widest text-xs italic">Algoritmo de Scoring</p>
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-60 mt-0.5">Distribuição Ponderada (5 Pilares)</p>
+              <p className="font-black text-foreground uppercase tracking-[0.3em] text-xs italic leading-none">Algoritmo Scoring v5.3</p>
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] opacity-40 mt-3 leading-none italic">Distribuição Ponderada (Alpha-Net)</p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-4 relative z-10">
+          <div className="flex flex-wrap gap-x-8 gap-y-6 relative z-10 w-full lg:w-auto">
             {[
-              { label: "Frequência Total", val: "30%", color: "text-emerald-400" },
+              { label: "Frequência Alpha", val: "30%", color: "text-emerald-400" },
               { label: "Ciclos Recentes", val: "25%", color: "text-blue-400" },
-              { label: "Variação Atraso", val: "20%", color: "text-amber-400" },
-              { label: "Momentum", val: "15%", color: "text-purple-400" },
-              { label: "Entropia", val: "10%", color: "text-pink-400" },
+              { label: "Variação Delta", val: "20%", color: "text-amber-400" },
+              { label: "Momentum Hype", val: "15%", color: "text-purple-400" },
+              { label: "Entropia Local", val: "10%", color: "text-pink-400" },
             ].map((item, idx) => (
-              <div key={idx} className="flex flex-col border-l border-border/40 pl-4">
-                <span className={`text-base font-black font-mono italic ${item.color}`}>{item.val}</span>
-                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-50">{item.label}</span>
+              <div key={idx} className="flex flex-col border-l border-white/5 pl-6 group/item hover:border-primary/40 transition-colors">
+                <span className={`text-2xl font-black font-mono italic ${item.color} leading-none tracking-tighter`}>{item.val}</span>
+                <span className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground opacity-30 mt-3 group-hover/item:opacity-60 transition-opacity italic">{item.label}</span>
               </div>
             ))}
           </div>

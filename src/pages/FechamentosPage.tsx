@@ -21,6 +21,7 @@ import {
 import { m, AnimatePresence } from "framer-motion";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 const BET_PRICES: Record<string, number> = {
   lotofacil: 3.0,
@@ -103,28 +104,41 @@ const FechamentosPage = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-700 pb-20">
-      <PageHeader
-        title="Fechamentos Matemáticos"
-        description="Otimização combinatória com garantia mínima de acertos"
-        icon={Grid3X3}
-        badge="PRECISION"
-      />
+    <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700 pb-20 px-1">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded bg-primary/10 border border-primary/20 text-[9px] font-black text-primary uppercase tracking-[0.2em] italic">Combinatorial Engine v5.3</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic leading-none">
+            Fechamentos <span className="gradient-brand-text">Matemáticos</span>
+          </h1>
+          <p className="text-sm text-muted-foreground font-medium max-w-md">Otimização combinatória de alta performance com garantia mínima de acertos.</p>
+        </div>
+      </div>
+      
+      <div className="relative group">
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-[2rem] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-1000 pointer-events-none" />
+        <LotteryContextBanner />
+      </div>
 
-      <LotteryContextBanner />
-
-      <div className="flex justify-between items-center mb-10 px-4">
+      <div className="flex justify-between items-center mb-16 px-4 relative max-w-2xl mx-auto">
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 w-[85%] h-[2px] bg-white/5 -z-10" />
         {[1, 2, 3].map((i) => (
-          <div key={i} className="flex flex-col items-center gap-2 relative">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black transition-all ${
-              step >= i ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "bg-muted text-muted-foreground"
+          <div key={i} className="flex flex-col items-center gap-4 relative">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black transition-all duration-500 border-2 ${
+              step >= i ? "bg-primary text-primary-foreground border-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] scale-110" : "bg-background text-muted-foreground border-white/5"
             }`}>
-              {i}
+              {i === 1 && <Layers className="w-5 h-5" />}
+              {i === 2 && <Hash className="w-5 h-5" />}
+              {i === 3 && <Target className="w-5 h-5" />}
             </div>
-            <span className={`text-[10px] font-bold uppercase tracking-widest ${step >= i ? "text-primary" : "text-muted-foreground"}`}>
-              {i === 1 ? "Modelo" : i === 2 ? "Dezenas" : "Gerar"}
-            </span>
-            {i < 3 && <div className={`absolute top-5 left-12 w-full h-[2px] hidden md:block ${step > i ? "bg-primary" : "bg-muted"}`} style={{ width: 'calc(100% + 5rem)' }} />}
+            <div className="text-center">
+              <span className={`text-[9px] font-black uppercase tracking-[0.2em] transition-colors italic ${step >= i ? "text-primary" : "text-muted-foreground opacity-40"}`}>
+                {i === 1 ? "Alpha Matrix" : i === 2 ? "Dezenas" : "Deploy"}
+              </span>
+            </div>
           </div>
         ))}
       </div>
@@ -138,31 +152,46 @@ const FechamentosPage = () => {
           transition={{ duration: 0.3 }}
         >
           {step === 1 && (
-            <div className="space-y-6">
-              <div className="text-center space-y-2 mb-8">
-                <h3 className="text-xl font-black uppercase tracking-tighter">Escolha o Modelo de Fechamento</h3>
-                <p className="text-muted-foreground">Cada matriz possui uma garantia matemática diferente baseada no volume de jogos.</p>
+            <div className="space-y-10">
+              <div className="text-center space-y-3">
+                <h3 className="text-2xl font-black uppercase tracking-tighter italic">Arquitetura de <span className="gradient-brand-text">Fechamento</span></h3>
+                <p className="text-sm text-muted-foreground font-medium max-w-lg mx-auto italic opacity-60">Matrizes Alpha-Core com garantias matemáticas de integridade combinatória.</p>
               </div>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {availableMatrices.map((m) => (
                   <button
                     key={m.id}
                     onClick={() => { setSelectedMatrix(m.id); setStep(2); }}
-                    className={`p-6 rounded-2xl glass-card border transition-all text-left flex flex-col gap-4 hover:border-primary/60 group ${
-                      selectedMatrix === m.id ? "border-primary bg-primary/5" : "border-border/40"
+                    className={`p-8 rounded-[2rem] glass-card border transition-all text-left flex flex-col gap-6 group relative overflow-hidden active:scale-95 ${
+                      selectedMatrix === m.id ? "border-primary bg-primary/[0.03] shadow-2xl" : "border-white/5 bg-white/[0.01] hover:border-primary/40"
                     }`}
                   >
-                    <div className="flex justify-between items-start">
-                      <h4 className="font-black text-lg uppercase tracking-tight">{m.name}</h4>
-                      <Badge variant="outline" className="text-[10px] uppercase font-black">{m.guarantee}+ Acertos</Badge>
+                    <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity pointer-events-none">
+                      <Grid3X3 className="w-20 h-20" />
                     </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>Dezenas: <strong>{m.baseSize}</strong></span>
-                        <span>Jogos: <strong>{m.games.length}</strong></span>
+
+                    <div className="flex justify-between items-start relative z-10">
+                      <h4 className="font-black text-xl uppercase tracking-tighter italic leading-none group-hover:text-primary transition-colors">{m.name}</h4>
+                      <Badge className="bg-primary/10 text-primary font-black uppercase tracking-widest text-[9px] border-primary/20 px-3 py-1 rounded-lg">
+                        {m.guarantee}+ SYNC
+                      </Badge>
+                    </div>
+                    
+                    <div className="space-y-4 pt-4 border-t border-white/5 relative z-10">
+                      <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-40">
+                        <span>Base Alpha: <strong className="text-foreground italic">{m.baseSize}</strong></span>
+                        <span>Dataset: <strong className="text-foreground italic">{m.games.length}</strong></span>
                       </div>
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>Custo: <strong className="text-accent">{formatCurrency(m.games.length * betPrice)}</strong></span>
+                      <div className="flex justify-between items-end">
+                        <div className="space-y-1">
+                          <p className="text-[9px] font-black uppercase text-muted-foreground opacity-30 italic">Custo Operacional</p>
+                          <p className="text-2xl font-black font-mono tracking-tighter italic text-accent leading-none">
+                            {formatCurrency(m.games.length * betPrice)}
+                          </p>
+                        </div>
+                        <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-inner">
+                          <ChevronRight className="w-5 h-5" />
+                        </div>
                       </div>
                     </div>
                   </button>
@@ -172,80 +201,86 @@ const FechamentosPage = () => {
           )}
 
           {step === 2 && currentMatrix && (
-            <Card className="glass-panel border-primary/20 p-8 space-y-8">
-              <div className="text-center space-y-2">
-                <h3 className="text-xl font-black uppercase tracking-tighter">Selecione {currentMatrix.baseSize} Dezenas</h3>
-                <p className="text-muted-foreground">Atualmente você selecionou {baseNumbers.length} de {currentMatrix.baseSize}.</p>
+            <div className="space-y-10">
+              <div className="text-center space-y-3">
+                <h3 className="text-2xl font-black uppercase tracking-tighter italic">Seleção de <span className="gradient-brand-text">Dataset Alpha</span></h3>
+                <p className="text-sm text-muted-foreground font-medium italic opacity-60">Selecione <span className="text-primary font-black">{currentMatrix.baseSize}</span> dezenas para o deploy da matriz.</p>
               </div>
 
-              <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
-                {Array.from({ length: config.numbers }, (_, i) => i + 1).map((n) => {
-                  const isSelected = baseNumbers.includes(n);
-                  return (
-                    <button
-                      key={n}
-                      onClick={() => toggleNumber(n)}
-                      className={`h-10 w-10 rounded-lg flex items-center justify-center font-bold text-sm transition-all ${
-                        isSelected ? "bg-primary text-primary-foreground shadow-lg" : "bg-muted hover:bg-muted/80 text-muted-foreground"
-                      }`}
-                    >
-                      {String(n).padStart(2, '0')}
-                    </button>
-                  );
-                })}
-              </div>
+              <Card className="glass-card border-primary/20 p-10 rounded-[2.5rem] relative overflow-hidden shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent pointer-events-none" />
+                
+                <div className="flex flex-wrap justify-center gap-2.5 relative z-10 max-w-4xl mx-auto">
+                  {Array.from({ length: config.numbers }, (_, i) => i + 1).map((n) => {
+                    const isSelected = baseNumbers.includes(n);
+                    return (
+                      <button
+                        key={n}
+                        onClick={() => toggleNumber(n)}
+                        className={`h-11 w-11 rounded-xl flex items-center justify-center font-black font-mono text-sm transition-all duration-300 border italic active:scale-90 ${
+                          isSelected 
+                            ? "bg-primary text-primary-foreground border-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.4)] scale-110 z-10" 
+                            : "bg-background/60 hover:bg-muted/80 text-muted-foreground border-white/5 opacity-60 hover:opacity-100"
+                        }`}
+                      >
+                        {String(n).padStart(2, '0')}
+                      </button>
+                    );
+                  })}
+                </div>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6 border-t border-border/20">
-                <Button variant="outline" onClick={autoSelectNumbers} className="rounded-xl px-8 font-bold gap-2">
-                  <Brain className="w-4 h-4" /> Escolha Inteligente
-                </Button>
-                <Button 
-                  onClick={handleGenerate} 
-                  disabled={baseNumbers.length !== currentMatrix.baseSize || generating}
-                  className="rounded-xl px-12 h-12 font-black gap-2"
-                >
-                  {generating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Play className="w-5 h-5 fill-current" />}
-                  Gerar {currentMatrix.games.length} Jogos
-                </Button>
-                <Button variant="ghost" onClick={() => setStep(1)} className="gap-2">
-                  <ChevronLeft className="w-4 h-4" /> Mudar Modelo
-                </Button>
-              </div>
-            </Card>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-10 border-t border-white/5 mt-10 relative z-10">
+                  <Button variant="outline" onClick={autoSelectNumbers} className="rounded-xl px-8 h-12 font-black gap-2 border-white/10 hover:bg-white/5 italic">
+                    <Brain className="w-4 h-4" /> Escolha Inteligente
+                  </Button>
+                  <Button 
+                    onClick={handleGenerate} 
+                    disabled={baseNumbers.length !== currentMatrix.baseSize || generating}
+                    className="rounded-xl px-12 h-14 font-black gap-3 shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all italic"
+                  >
+                    {generating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Play className="w-5 h-5 fill-current" />}
+                    Deploy {currentMatrix.games.length} Jogos
+                  </Button>
+                  <Button variant="ghost" onClick={() => setStep(1)} className="gap-2 font-black opacity-40 hover:opacity-100 italic transition-opacity">
+                    <ChevronLeft className="w-4 h-4" /> Mudar Modelo
+                  </Button>
+                </div>
+              </Card>
+            </div>
           )}
 
           {step === 3 && currentMatrix && generatedGames && (
-            <div className="space-y-8">
-              <div className="text-center space-y-2">
-                <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto border border-primary/40 mb-4">
-                  <Shield className="w-8 h-8 text-primary" />
+            <div className="space-y-10">
+              <div className="text-center space-y-3">
+                <div className="w-20 h-20 rounded-[1.5rem] gradient-brand flex items-center justify-center mx-auto shadow-2xl shadow-primary/30 mb-6 group active:scale-95 transition-transform">
+                  <Shield className="w-10 h-10 text-primary-foreground group-hover:rotate-12 transition-transform" />
                 </div>
-                <h3 className="text-2xl font-black uppercase tracking-tighter">Fechamento Concluído</h3>
-                <p className="text-muted-foreground">{generatedGames.length} jogos gerados com {currentMatrix.guarantee} acertos garantidos.</p>
+                <h3 className="text-3xl font-black uppercase tracking-tighter italic">Fechamento <span className="gradient-brand-text">Concluído</span></h3>
+                <p className="text-sm text-muted-foreground font-medium italic opacity-60">Deploy de <span className="text-foreground font-black">{generatedGames.length}</span> jogos com integridade <span className="text-primary font-black">{currentMatrix.guarantee} SYNC</span>.</p>
               </div>
 
               <div className="grid md:grid-cols-3 gap-6">
-                <Card className="glass-card border-border/40 p-4 space-y-2">
-                  <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Investimento Total</p>
-                  <p className="text-2xl font-black text-accent">{formatCurrency(generatedGames.length * betPrice)}</p>
-                </Card>
-                <Card className="glass-card border-border/40 p-4 space-y-2">
-                  <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Cobertura Matemática</p>
-                  <p className="text-2xl font-black text-primary">92.4%</p>
-                </Card>
-                <Card className="glass-card border-border/40 p-4 space-y-2">
-                  <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Garantia Titan</p>
-                  <p className="text-2xl font-black text-foreground">{currentMatrix.guarantee}+ Pontos</p>
-                </Card>
+                <div className="glass-card border-white/5 bg-white/[0.01] p-8 rounded-[2rem] space-y-4 group hover:border-accent/40 transition-colors">
+                  <p className="text-[9px] uppercase font-black text-muted-foreground tracking-[0.2em] opacity-40 leading-none italic">Investimento</p>
+                  <p className="text-3xl font-black font-mono tracking-tighter italic text-accent leading-none group-hover:scale-105 transition-transform origin-left">{formatCurrency(generatedGames.length * betPrice)}</p>
+                </div>
+                <div className="glass-card border-white/5 bg-white/[0.01] p-8 rounded-[2rem] space-y-4 group hover:border-primary/40 transition-colors">
+                  <p className="text-[9px] uppercase font-black text-muted-foreground tracking-[0.2em] opacity-40 leading-none italic">Cobertura Alpha</p>
+                  <p className="text-3xl font-black font-mono tracking-tighter italic text-primary leading-none group-hover:scale-105 transition-transform origin-left">92.4%</p>
+                </div>
+                <div className="glass-card border-white/5 bg-white/[0.01] p-8 rounded-[2rem] space-y-4 group hover:border-foreground/20 transition-colors">
+                  <p className="text-[9px] uppercase font-black text-muted-foreground tracking-[0.2em] opacity-40 leading-none italic">Dataset Grade</p>
+                  <p className="text-3xl font-black font-mono tracking-tighter italic text-foreground leading-none group-hover:scale-105 transition-transform origin-left">{currentMatrix.guarantee}+ SYNC</p>
+                </div>
               </div>
 
-              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 scrollbar-hide">
+              <div className="grid grid-cols-1 gap-3 max-h-[500px] overflow-y-auto pr-4 scrollbar-hide py-2">
                 {generatedGames.map((game, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 rounded-xl glass-card border border-border/20">
-                    <span className="text-[10px] font-black text-muted-foreground w-12 shrink-0">#{i + 1}</span>
-                    <div className="flex flex-wrap gap-1 flex-1 justify-center">
+                  <div key={i} className="flex items-center justify-between p-6 rounded-3xl glass-card border border-white/5 hover:border-primary/20 transition-all group active:scale-[0.99]">
+                    <span className="text-[10px] font-black font-mono text-muted-foreground w-12 shrink-0 opacity-40 group-hover:opacity-100 italic transition-opacity">#{String(i + 1).padStart(3, '0')}</span>
+                    <div className="flex flex-wrap gap-2 flex-1 justify-center">
                       {game.map(n => (
-                        <span key={n} className="w-8 h-8 rounded-lg bg-primary/5 border border-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
+                        <span key={n} className="w-10 h-10 rounded-xl bg-background/60 border border-white/5 flex items-center justify-center text-sm font-black font-mono text-primary shadow-inner group-hover:scale-110 transition-transform italic">
                           {String(n).padStart(2, '0')}
                         </span>
                       ))}
@@ -254,15 +289,15 @@ const FechamentosPage = () => {
                 ))}
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-                <Button size="lg" className="rounded-xl px-12 font-black gap-2" onClick={handleSaveAll}>
-                  <Save className="w-5 h-5" /> Salvar Tudo
+              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-10 border-t border-white/5">
+                <Button size="lg" className="rounded-[1.25rem] px-12 h-16 text-sm font-black gap-3 shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all italic" onClick={handleSaveAll}>
+                  <Save className="w-6 h-6" /> Salvar Dataset
                 </Button>
-                <Button variant="outline" size="lg" className="rounded-xl px-12 font-black gap-2">
-                  <Download className="w-5 h-5" /> Exportar PDF
+                <Button variant="outline" size="lg" className="rounded-[1.25rem] px-12 h-16 text-sm font-black gap-3 border-white/10 hover:bg-white/5 italic">
+                  <Download className="w-6 h-6 text-primary" /> Exportar PDF
                 </Button>
-                <Button variant="ghost" size="lg" className="rounded-xl px-12 font-black" onClick={() => setStep(1)}>
-                  Novo Fechamento
+                <Button variant="ghost" size="lg" className="rounded-[1.25rem] px-12 h-16 text-sm font-black opacity-40 hover:opacity-100 italic transition-opacity" onClick={() => setStep(1)}>
+                  Novo Deploy
                 </Button>
               </div>
             </div>

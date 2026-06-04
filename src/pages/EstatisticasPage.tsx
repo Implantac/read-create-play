@@ -9,6 +9,7 @@ import { m } from "framer-motion";
 import { PieChart, Flame, Snowflake, TrendingUp, BarChart3, Clock, Target, Sigma, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 // Lazy imports for heavy components
 const FrequencyChart = lazy(() => import("@/components/FrequencyChart").then(m => ({ default: m.FrequencyChart })));
@@ -70,21 +71,44 @@ const EstatisticasPage = () => {
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <PageHeader
-        title="Estatísticas Avançadas"
-        description={`Análise — ${config.name}`}
-        icon={PieChart}
-        badge={`${filteredDraws.length} sorteios`}
-      />
+    <div className="space-y-10 animate-in fade-in duration-700 pb-20 max-w-7xl mx-auto">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded bg-primary/10 border border-primary/20 text-[9px] font-black text-primary uppercase tracking-[0.2em] italic">Data Engineering v5.3</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic leading-none">
+            Estatísticas <span className="gradient-brand-text">Avançadas</span>
+          </h1>
+          <p className="text-sm text-muted-foreground font-medium max-w-md">Análise profunda de tendências, distribuição de somas e comportamento neural.</p>
+        </div>
+        
+        <div className="flex items-center gap-1.5 p-1 bg-secondary/40 border border-border/40 rounded-2xl shadow-lg h-auto overflow-x-auto scrollbar-hide">
+          <div className="flex items-center gap-2 px-3 border-r border-white/5 mr-1">
+            <Filter className="w-3.5 h-3.5 text-primary opacity-60" />
+            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-40 italic">Janela</span>
+          </div>
+          {PERIOD_OPTIONS.map(opt => (
+            <Button 
+              key={opt.value} 
+              size="sm" 
+              variant={period === opt.value ? "default" : "ghost"} 
+              onClick={() => setPeriod(opt.value)} 
+              className={cn(
+                "h-9 text-[10px] font-black uppercase px-4 rounded-xl transition-all italic tracking-[0.1em]",
+                period === opt.value ? "shadow-lg shadow-primary/20" : "opacity-60 hover:opacity-100"
+              )}
+            >
+              {opt.label}
+            </Button>
+          ))}
+        </div>
+      </div>
       
-      <div className="flex items-center gap-2 flex-wrap">
-        <Filter className="w-4 h-4 text-muted-foreground" />
-        {PERIOD_OPTIONS.map(opt => (
-          <Button key={opt.value} size="sm" variant={period === opt.value ? "default" : "outline"} onClick={() => setPeriod(opt.value)} className="h-7 text-xs px-3">
-            {opt.label}
-          </Button>
-        ))}
+      <div className="relative group">
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-[2rem] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-1000 pointer-events-none" />
+        <LotteryContextBanner />
       </div>
 
       <m.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 lg:grid-cols-4 gap-4">

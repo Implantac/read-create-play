@@ -37,6 +37,7 @@ export interface StrategyPerformance {
   totalTests: number;
   trend: "melhorando" | "estável" | "piorando";
   consistency?: number;
+  numbers: number[];
 }
 
 export interface StatisticalShift {
@@ -734,6 +735,7 @@ function evaluateStrategies(draws: DrawResult[], config: LotteryConfig, stats: N
       totalTests: testDraws.length,
       trend,
       consistency: Math.round(consistency),
+      numbers: nums,
     };
   };
 
