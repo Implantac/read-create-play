@@ -13,42 +13,43 @@ export const AlphaMomentumSignal = ({ analytics }: AlphaMomentumSignalProps) => 
   const reliability = analytics.complexityScore.toFixed(0);
 
   return (
-    <div className="glass-card rounded-xl p-4 border border-primary/20 bg-primary/5 relative overflow-hidden group">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-[10px] font-bold text-primary uppercase flex items-center gap-1.5">
-          <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+    <div className="glass-card rounded-2xl p-5 border border-primary/20 bg-primary/5 relative overflow-hidden group transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5">
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(var(--primary),0.8)]" />
           Sinal Alpha
         </span>
-        <Badge className="bg-primary text-primary-foreground text-[9px] font-bold">ALPHA-BETA V5.2</Badge>
+        <Badge variant="outline" className="border-primary/30 text-primary text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full">ALPHA-CORE V5.3</Badge>
       </div>
       
-      <div className="flex items-baseline gap-2 mb-4 relative z-10">
-        <span className="text-3xl font-black font-mono text-foreground italic tracking-tighter">
+      <div className="flex items-baseline gap-2 mb-6 relative z-10 group-hover:translate-x-1 transition-transform duration-500">
+        <span className="text-4xl font-black font-mono text-foreground italic tracking-tighter drop-shadow-sm">
           {signalValue}
         </span>
-        <span className="text-xs text-primary font-bold">α-STR</span>
+        <span className="text-[10px] text-primary font-black uppercase tracking-widest opacity-80">α-Momentum</span>
       </div>
 
-      <div className="space-y-2 relative z-10">
-        <div className="flex justify-between text-[9px] font-bold uppercase text-muted-foreground">
+      <div className="space-y-3 relative z-10">
+        <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">
           <span>Reliability Index</span>
-          <span>{reliability}%</span>
+          <span className="font-mono text-primary">{reliability}%</span>
         </div>
-        <div className="h-1.5 w-full bg-black/40 rounded-full overflow-hidden">
+        <div className="h-2 w-full bg-black/40 rounded-full overflow-hidden border border-white/5">
           <motion.div 
             initial={{ width: 0 }}
             animate={{ width: `${reliability}%` }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="h-full bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_100%] animate-shimmer"
+            transition={{ duration: 1.5, ease: "circOut" }}
+            className="h-full bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_100%] animate-shimmer shadow-[0_0_10px_rgba(var(--primary),0.5)]"
           />
         </div>
       </div>
       
-      <div className="absolute -bottom-6 -right-6 opacity-5 group-hover:opacity-10 transition-opacity">
-        <Zap className="w-24 h-24 text-primary" />
+      <div className="absolute -bottom-8 -right-8 opacity-5 group-hover:opacity-10 group-hover:scale-110 group-hover:-rotate-12 transition-all duration-700">
+        <Zap className="w-32 h-32 text-primary" />
       </div>
       
-      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
+      <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-[80px] -mr-20 -mt-20 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
     </div>
+
   );
 };
