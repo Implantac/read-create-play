@@ -238,7 +238,7 @@ export default function StrategyLabPage() {
       recommendations.push({ icon: "🔄", text: `${bestStrategy.strategyName} é confiável — priorize para apostas recorrentes`, priority: "high" });
     }
     if (scoreDiff > 30) {
-      recommendations.push({ icon: "⚠️", text: `Grande variação entre estratégias (${scoreDiff.toFixed(0)} pts) — foque nas top 3`, priority: "medium" });
+      recommendations.push({ icon: "⚠️", text: `Grande variação entre estratégias (${formatNumber(scoreDiff)} pts) — foque nas top 3`, priority: "medium" });
     }
     if (consistentCount < result.rankings.length * 0.3) {
       recommendations.push({ icon: "📊", text: "Poucas estratégias consistentes — aumente o volume de jogos para estabilizar", priority: "medium" });
