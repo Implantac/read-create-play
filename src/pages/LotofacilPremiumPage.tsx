@@ -51,6 +51,8 @@ import {
   getPresetInputSize,
   LOTOFACIL_WORKSHEET_PRESETS,
   selectTopLotofacilNumbers,
+  runWorksheetBacktest,
+  WorksheetBacktestResult,
 } from "@/engine/worksheet-matrices";
 
 const IntelligentGeneratorPanel = lazy(() => import("@/components/IntelligentGeneratorPanel").then(m => ({ default: m.IntelligentGeneratorPanel })));
@@ -73,6 +75,8 @@ export default function LotofacilPremiumPage() {
   const [worksheetNumbers, setWorksheetNumbers] = useState<number[]>([]);
   const [worksheetDrawConcurso, setWorksheetDrawConcurso] = useState<string>("latest");
   const [worksheetSaving, setWorksheetSaving] = useState(false);
+  const [worksheetBacktest, setWorksheetBacktest] = useState<WorksheetBacktestResult | null>(null);
+  const [worksheetBacktesting, setWorksheetBacktesting] = useState(false);
 
   const handleSaveBet = (numbers: number[], strategy?: string, score?: number, grade?: string) => {
     saveBet({ numbers, strategy, score, grade });
