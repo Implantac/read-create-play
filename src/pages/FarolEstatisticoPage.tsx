@@ -185,41 +185,45 @@ export default function FarolEstatisticoPage() {
           </CardContent>
         </Card>
 
-        <Card className="glass-panel border-emerald-500/20 bg-emerald-500/5">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
-              <Target className="w-4 h-4 text-emerald-400" />
-              Score Médio Global
+        <Card className="glass-card border-emerald-500/20 bg-emerald-500/[0.02] rounded-[2rem] overflow-hidden group/score active:scale-[0.98] transition-all shadow-xl">
+          <CardHeader className="pb-2 p-6 border-b border-white/5 bg-white/[0.01]">
+            <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-2 text-emerald-400 opacity-60 group-hover/score:opacity-100 transition-opacity leading-none italic">
+              <Target className="w-3.5 h-3.5" />
+              Saturação Global
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-center py-2">
-              <div className="relative w-24 h-24 flex items-center justify-center">
+          <CardContent className="p-8">
+            <div className="flex items-center justify-center py-2 relative">
+              <div className="absolute inset-0 bg-emerald-500/5 blur-3xl rounded-full scale-50 group-hover:scale-100 transition-transform duration-1000" />
+              <div className="relative w-36 h-36 flex items-center justify-center">
                 <svg className="w-full h-full transform -rotate-90">
                   <circle
-                    cx="48"
-                    cy="48"
-                    r="40"
+                    cx="72"
+                    cy="72"
+                    r="64"
                     stroke="currentColor"
-                    strokeWidth="8"
+                    strokeWidth="10"
                     fill="transparent"
-                    className="text-emerald-500/10"
+                    className="text-white/5"
                   />
-                  <circle
-                    cx="48"
-                    cy="48"
-                    r="40"
+                  <m.circle
+                    cx="72"
+                    cy="72"
+                    r="64"
                     stroke="currentColor"
-                    strokeWidth="8"
+                    strokeWidth="10"
                     fill="transparent"
-                    strokeDasharray={251.2}
-                    strokeDashoffset={251.2 - (251.2 * 68) / 100}
-                    className="text-emerald-500"
+                    strokeDasharray={402.1}
+                    initial={{ strokeDashoffset: 402.1 }}
+                    animate={{ strokeDashoffset: 402.1 - (402.1 * 68) / 100 }}
+                    transition={{ duration: 2, ease: "easeOut" }}
+                    className="text-emerald-500 drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]"
+                    strokeLinecap="round"
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl font-black text-emerald-400">68</span>
-                  <span className="text-[8px] font-black uppercase tracking-tighter text-muted-foreground">Forte</span>
+                  <span className="text-5xl font-black font-mono tracking-tighter italic text-emerald-400 leading-none">68</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-40 mt-3">Tier Strong</span>
                 </div>
               </div>
             </div>
