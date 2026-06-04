@@ -130,18 +130,18 @@ export function AppSidebar() {
                     <SidebarMenuItem key={item.title}>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <SidebarMenuButton asChild>
+                          <SidebarMenuButton asChild className="h-auto p-0">
                             <NavLink
                               to={item.url}
                               end={item.url === "/"}
-                              className={`rounded-xl px-4 py-3 text-sm transition-all duration-300 hover:bg-primary/10 group/item relative overflow-hidden ${locked ? "text-muted-foreground/40" : "text-sidebar-foreground/80"}`}
-                              activeClassName="bg-primary/20 text-primary font-black shadow-[0_0_25px_rgba(var(--primary),0.2)] border-l-4 border-primary ring-1 ring-primary/20"
+                              className={`flex items-center w-full rounded-xl px-4 py-3.5 text-sm transition-all duration-300 hover:bg-primary/10 group/item relative overflow-hidden border border-transparent hover:border-primary/10 active:scale-[0.98] ${locked ? "text-muted-foreground/40" : "text-sidebar-foreground/80"}`}
+                              activeClassName="bg-primary/20 text-primary font-black shadow-lg shadow-primary/10 border-primary ring-1 ring-primary/30"
                             >
 
-                              <item.icon className="mr-3 h-4 w-4 shrink-0" />
+                              <item.icon className="mr-3.5 h-4.5 w-4.5 shrink-0 group-hover/item:scale-110 transition-transform duration-300" />
                               {!collapsed && (
                                 <>
-                                  <span className="flex-1">{item.title}</span>
+                                  <span className="flex-1 tracking-tight">{item.title}</span>
                                   {locked && <Lock className="h-3 w-3 text-muted-foreground/40 shrink-0 ml-1" />}
                                 </>
                               )}
