@@ -81,8 +81,24 @@ export function useSavedBets(lotteryId: string) {
     onError: () => toast.error("Erro ao remover aposta")
   });
 
-  const saveBet = useCallback((bet: any) => saveMutation.mutateAsync(bet), [saveMutation]);
-  const deleteBet = useCallback((id: string) => deleteMutation.mutateAsync(id), [deleteMutation]);
+  const saveBet = useCallback(async (bet: any) => {
+    try {
+      await saveMutation.mutateAsync(bet);
+      return true;
+    } catch {
+      return false;
+    }
+  }, [saveMutation]);
+
+  const deleteBet = useCallback(async (id: string) => {
+    try {
+      await deleteMutation.mutateAsync(id);
+      return true;
+    } catch {
+      return false;
+    }
+  }, [deleteMutation]);
+
 
   const remaining = Math.max(0, limit - savedBets.length);
   const isAtLimit = remaining === 0 && limit !== Infinity;
