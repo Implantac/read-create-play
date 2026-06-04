@@ -337,12 +337,12 @@ const AIAnalystPage = () => {
               {wheelResult?.wheeling && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <StatBox icon={Target} label="Jogos" value={wheelResult.wheeling.totalGames} />
-                    <StatBox icon={Shield} label="Garantia" value={`${wheelResult.wheeling.guarantee} pts`} />
+                    <StatBox icon={Target} label="Jogos" value={formatNumber(wheelResult.wheeling.totalGames)} />
+                    <StatBox icon={Shield} label="Garantia" value={`${formatNumber(wheelResult.wheeling.guarantee)} pts`} />
                     <StatBox icon={TrendingUp} label="Cobertura"
-                      value={`${wheelResult.wheeling.coverageValidation.coveragePercent.toFixed(0)}%`} />
+                      value={`${formatNumber(Math.round(wheelResult.wheeling.coverageValidation.coveragePercent))}%`} />
                     <StatBox icon={Trophy} label="Custo"
-                      value={`R$ ${wheelResult.wheeling.estimatedCost.toFixed(2)}`} />
+                      value={formatCurrency(wheelResult.wheeling.estimatedCost)} />
                   </div>
 
                   <div className="bg-muted/50 rounded-lg p-3 text-xs">
