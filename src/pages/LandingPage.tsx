@@ -165,30 +165,31 @@ export default function LandingPage() {
       <FloatingCTA />
 
       
-      <nav className="fixed top-0 inset-x-0 z-50 glass-panel border-b border-border/40 h-20 flex items-center">
+      <nav className="fixed top-0 inset-x-0 z-50 glass-panel border-b border-border/40 h-24 flex items-center">
         <div className="container mx-auto px-6 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-2xl shadow-primary/20 group-hover:shadow-primary/40 group-hover:scale-110 transition-all duration-500 overflow-hidden border border-white/10 bg-background/50">
-              <img src="/logo.png" alt="Titan Loterias" className="w-12 h-12 object-contain" />
+          <Link to="/" className="flex items-center gap-4 group">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl shadow-primary/20 group-hover:shadow-primary/40 group-hover:scale-110 transition-all duration-700 overflow-hidden border border-white/10 bg-background/50">
+              <img src="/logo.png" alt="Titan Loterias" className="w-14 h-14 object-contain" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-black tracking-tighter uppercase italic leading-none">
+              <span className="text-2xl font-black tracking-tighter uppercase italic leading-none">
                 Titan<span className="gradient-brand-text ml-0.5">Loterias</span>
               </span>
-              <span className="text-[9px] font-black tracking-[0.3em] uppercase opacity-40">Neural Core v5.3</span>
+              <span className="text-[10px] font-black tracking-[0.3em] uppercase opacity-40 mt-1">Neural Core v6.0 Alpha</span>
             </div>
           </Link>
-          <div className="hidden md:flex items-center gap-8">
-            <Link to="/signup" className="text-[10px] font-black uppercase tracking-widest text-neon-amber hover:text-neon-amber/80 transition-all">{t("common.vital_access")}</Link>
-            <Link to="/login" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all">{t("common.login")}</Link>
+          <div className="hidden md:flex items-center gap-10">
+            <Link to="/signup" className="text-xs font-black uppercase tracking-widest text-neon-amber hover:text-neon-amber/80 transition-all">{t("common.vital_access")}</Link>
+            <Link to="/login" className="text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all">{t("common.login")}</Link>
             <Link to="/signup">
-              <Button size="sm" className="h-10 px-8 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
-                {t("common.join_network")} <ArrowRight className="w-3.5 h-3.5 ml-2" />
+              <Button size="lg" variant="premium" className="h-12 px-10">
+                {t("common.join_network")} <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
           </div>
         </div>
       </nav>
+
 
       <section ref={heroRef} className="relative min-h-[100vh] flex items-center justify-center pt-24 pb-32 px-6 overflow-hidden">
         {/* Advanced Background effects */}
@@ -250,12 +251,14 @@ export default function LandingPage() {
           >
             <Button 
               size="lg" 
+              variant="premium"
               onClick={(e) => handleCtaClick(e, "/signup")}
-              className="w-full sm:w-auto h-20 px-16 rounded-[2.5rem] gradient-brand text-primary-foreground font-black uppercase tracking-[0.2em] text-sm shadow-[0_20px_50px_rgba(var(--primary-rgb),0.3)] hover:scale-105 active:scale-95 transition-all group"
+              className="w-full sm:w-auto h-24 px-20 text-base shadow-[0_30px_70px_rgba(var(--primary-rgb),0.4)]"
             >
               {t("landing.hero.cta_primary")}
-              <ArrowRight className="ml-4 w-6 h-6 group-hover:translate-x-2 transition-transform" />
+              <ArrowRight className="ml-4 w-7 h-7 group-hover:translate-x-2 transition-transform" />
             </Button>
+
             
             <Link to="/login" className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-primary transition-colors italic px-8">
               Já sou um Titan
@@ -281,7 +284,7 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((f, i) => (
-              <motion.div key={f.title} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} whileHover={{ y: -12, scale: 1.05 }} className={`rounded-2xl glass-card border-2 bg-gradient-to-b ${colorMap[f.color]} p-10 transition-all duration-500 hover:shadow-2xl group`}>
+              <motion.div key={f.title} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} whileHover={{ y: -12, scale: 1.05 }} className={`rounded-[2.5rem] glass-card border-2 bg-gradient-to-b ${colorMap[f.color]} p-10 transition-all duration-500 hover:shadow-premium-hover group`}>
                 <div className="w-16 h-16 rounded-2xl bg-background/50 border border-white/10 flex items-center justify-center mb-8 group-hover:rotate-12 transition-transform duration-500 shadow-inner">
                   <f.icon className="w-8 h-8" />
                 </div>
