@@ -21,26 +21,39 @@ export interface DrawResultWithPrizes extends DrawResult {
 }
 
 export class LotteryService {
-  static async fetchDraws(lotteryId: string, limitCount = 2000) {
+  static async fetchDraws(lotteryId: string, limitCount = 500) {
     let allData: any[] = [];
     let from = 0;
-    const pageSize = 1000;
+    const pageSize = Math.min(limitCount, 1000);
     let totalCount = 0;
 
-    while (allData.length < limitCount) {
-      const { data, error, count } = await supabase
+    // First fetch to get count and initial data
+    const { data, error, count } = await supabase
+      .from("lottery_draws")
+      .select("concurso, draw_date, numbers, prize_tiers", { count: "exact" })
+      .eq("lottery_id", lotteryId)
+      .order("concurso", { ascending: false })
+      .range(from, from + pageSize - 1);
+
+    if (error) throw error;
+    if (count !== null) totalCount = count;
+    if (data) allData = data;
+
+    // Continue fetching if we need more to reach limitCount
+    while (allData.length < limitCount && data && data.length === pageSize) {
+      from += pageSize;
+      const nextSize = Math.min(pageSize, limitCount - allData.length);
+      const { data: nextData, error: nextError } = await supabase
         .from("lottery_draws")
-        .select("concurso, draw_date, numbers, prize_tiers", { count: "exact" })
+        .select("concurso, draw_date, numbers, prize_tiers")
         .eq("lottery_id", lotteryId)
         .order("concurso", { ascending: false })
-        .range(from, from + pageSize - 1);
+        .range(from, from + nextSize - 1);
 
-      if (error) throw error;
-      if (count !== null) totalCount = count;
-      if (!data || data.length === 0) break;
-      allData = allData.concat(data);
-      if (data.length < pageSize) break;
-      from += pageSize;
+      if (nextError) throw nextError;
+      if (!nextData || nextData.length === 0) break;
+      allData = allData.concat(nextData);
+      if (nextData.length < nextSize) break;
     }
 
     return {

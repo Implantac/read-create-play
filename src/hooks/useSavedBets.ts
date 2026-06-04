@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { usePlanAccess, PLAN_LIMITS } from "@/hooks/usePlanAccess";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export interface SavedBet {
   id: string;
@@ -15,93 +16,93 @@ export interface SavedBet {
 }
 
 export function useSavedBets(lotteryId: string) {
-  const [savedBets, setSavedBets] = useState<SavedBet[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const { currentPlan } = usePlanAccess();
   const limit = PLAN_LIMITS[currentPlan].savedBetsPerLottery;
 
-  const fetchBets = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+  const { data: savedBets = [], isLoading: loading, refetch } = useQuery({
+    queryKey: ["saved-bets", lotteryId],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
 
-    const { data, error } = await supabase
-      .from("saved_bets")
-      .select("*")
-      .eq("user_id", user.id)
-      .eq("lottery_id", lotteryId)
-      .order("created_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("saved_bets")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("lottery_id", lotteryId)
+        .order("created_at", { ascending: false });
 
-    if (!error && data) {
-      setSavedBets(data as SavedBet[]);
+      if (error) throw error;
+      return (data as SavedBet[]) || [];
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const saveMutation = useMutation({
+    mutationFn: async (bet: any) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não autenticado");
+
+      if (savedBets.length >= limit) {
+        throw new Error(`Limite de ${limit} jogos atingido.`);
+      }
+
+      const { error } = await supabase.from("saved_bets").insert({
+        user_id: user.id,
+        lottery_id: lotteryId,
+        numbers: bet.numbers,
+        strategy: bet.strategy || null,
+        score: bet.score || null,
+        grade: bet.grade || null,
+        label: bet.label || null,
+      });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Aposta salva!");
+      queryClient.invalidateQueries({ queryKey: ["saved-bets", lotteryId] });
+    },
+    onError: (e: any) => {
+      toast.error(e.message || "Erro ao salvar aposta");
     }
-    setLoading(false);
-  }, [lotteryId]);
+  });
 
-  useEffect(() => {
-    fetchBets();
-  }, [fetchBets]);
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("saved_bets").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Aposta removida");
+      queryClient.invalidateQueries({ queryKey: ["saved-bets", lotteryId] });
+    },
+    onError: () => toast.error("Erro ao remover aposta")
+  });
 
-  const saveBet = useCallback(async (bet: {
-    numbers: number[];
-    strategy?: string;
-    score?: number;
-    grade?: string;
-    label?: string;
-  }) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast.error("Faça login para salvar apostas");
+  const saveBet = useCallback(async (bet: any): Promise<boolean> => {
+    try {
+      await saveMutation.mutateAsync(bet);
+      return true;
+    } catch {
       return false;
     }
+  }, [saveMutation]);
 
-    if (savedBets.length >= limit) {
-      toast.error(`Limite de ${limit} jogos salvos por loteria no plano gratuito. Faça upgrade para salvar mais!`);
+  const deleteBet = useCallback(async (id: string): Promise<boolean> => {
+    try {
+      await deleteMutation.mutateAsync(id);
+      return true;
+    } catch {
       return false;
     }
+  }, [deleteMutation]);
 
-    const { error } = await supabase.from("saved_bets").insert({
-      user_id: user.id,
-      lottery_id: lotteryId,
-      numbers: bet.numbers,
-      strategy: bet.strategy || null,
-      score: bet.score || null,
-      grade: bet.grade || null,
-      label: bet.label || null,
-    });
 
-    if (error) {
-      toast.error("Erro ao salvar aposta");
-      return false;
-    }
-
-    toast.success("Aposta salva!");
-    fetchBets();
-    return true;
-  }, [lotteryId, fetchBets]);
-
-  const updateBet = useCallback(async (id: string, updates: { label?: string; strategy?: string }) => {
-    const { error } = await supabase.from("saved_bets").update(updates).eq("id", id);
-    if (error) {
-      toast.error("Erro ao atualizar aposta");
-      return false;
-    }
-    toast.success("Aposta atualizada");
-    setSavedBets(prev => prev.map(b => b.id === id ? { ...b, ...updates } : b));
-    return true;
-  }, []);
-
-  const deleteBet = useCallback(async (id: string) => {
-    const { error } = await supabase.from("saved_bets").delete().eq("id", id);
-    if (error) {
-      toast.error("Erro ao remover aposta");
-      return;
-    }
-    toast.success("Aposta removida");
-    setSavedBets(prev => prev.filter(b => b.id !== id));
-  }, []);
 
   const remaining = Math.max(0, limit - savedBets.length);
   const isAtLimit = remaining === 0 && limit !== Infinity;
 
-  return { savedBets, loading, saveBet, updateBet, deleteBet, refetch: fetchBets, limit, remaining, isAtLimit };
+  return { savedBets, loading, saveBet, deleteBet, refetch, limit, remaining, isAtLimit };
 }
