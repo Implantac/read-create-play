@@ -45,9 +45,29 @@ export function useLotteryDraws(lotteryId: string) {
     onSettled: () => setSyncing(false),
   });
 
-  const syncDraws = useCallback(async (isSilent = false) => {
-    return syncMutation.mutateAsync(isSilent).then(() => ({ success: true })).catch(() => ({ success: false }));
-  }, [syncMutation]);
+  const syncAllLotteries = useCallback(async () => {
+    setSyncing(true);
+    try {
+      await LotteryService.syncLottery();
+      queryClient.invalidateQueries({ queryKey: ["lottery-draws"] });
+      toast.success("Sincronização completa iniciada");
+    } catch (e) {
+      toast.error("Erro ao sincronizar tudo");
+    } finally {
+      setSyncing(false);
+    }
+  }, [queryClient]);
+
+  const addDraw = useCallback((draw: DrawResult) => {
+    queryClient.setQueryData(["lottery-draws", lotteryId], (old: any) => {
+      if (!old) return old;
+      if (old.draws.some((d: any) => d.concurso === draw.concurso)) return old;
+      return {
+        ...old,
+        draws: [draw, ...old.draws].sort((a, b) => b.concurso - a.concurso),
+      };
+    });
+  }, [queryClient, lotteryId]);
 
   return {
     draws: data?.draws || [],
@@ -58,6 +78,8 @@ export function useLotteryDraws(lotteryId: string) {
     syncError,
     count: data?.totalCount || 0,
     syncDraws,
+    syncAllLotteries,
+    addDraw,
     refetch,
   };
 }
