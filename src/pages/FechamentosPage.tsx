@@ -263,9 +263,18 @@ export default function FechamentosPage() {
                           Garantia <strong className="text-primary">{m.guarantee}+</strong> acertos
                         </span>
                         <span className="flex items-center gap-1">
+                          <Brain className="w-3 h-3" />
+                          Eficiência: <strong className="text-foreground">{(m as any).efficiency}</strong>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Target className="w-3 h-3" />
+                          Prob: <strong className="text-foreground">{(m as any).probability}</strong>
+                        </span>
+                        <span className="flex items-center gap-1">
                           <Coins className="w-3 h-3" />
                           Custo: <strong className="text-accent">{formatCurrency(cost)}</strong>
                         </span>
+
                       </div>
                     </div>
 
