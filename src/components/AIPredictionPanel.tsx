@@ -114,7 +114,7 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
 
 
         {/* Count selector + Generate */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 bg-secondary/10 p-4 rounded-2xl border border-border/40">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 bg-secondary/10 p-4 rounded-2xl border border-border/40">
           <div className="flex items-center gap-2 bg-background/50 p-1.5 rounded-xl border border-border/40 shrink-0">
             {[1, 3, 5, 10].map(n => (
               <button
@@ -189,7 +189,7 @@ export function AIPredictionPanel({ config, stats, draws, onSaveBet }: Props) {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.08 }}
-                className="flex flex-col gap-1.5 p-3 rounded-lg bg-secondary/30 border border-primary/10 hover:border-primary/30 transition-colors group cursor-pointer"
+                className="flex flex-col gap-1.5 p-4 rounded-xl bg-secondary/30 border border-primary/10 hover:border-primary/40 hover:bg-secondary/40 hover:shadow-xl hover:shadow-black/20 transition-all group cursor-pointer active:scale-[0.99]"
                 onClick={() => setExpandedBet(expandedBet === i ? null : i)}
               >
                 <div className="flex items-center gap-2">
