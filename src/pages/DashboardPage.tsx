@@ -33,8 +33,10 @@ const NeuralMissionCenter = lazy(() => import("@/components/NeuralMissionCenter"
 
 const SystemAuditStatus = lazy(() => import("@/components/SystemAuditStatus").then(m => ({ default: m.SystemAuditStatus })));
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+
 import { useAuth } from "@/contexts/AuthContext";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { useSavedBets } from "@/hooks/useSavedBets";
@@ -69,7 +71,7 @@ const quickLinks = [
 ];
 
 const DashboardPage = () => {
-  const { config, draws, loading, syncing, lastSyncAt, syncError, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery } = useLotteryContext();
+  const { config, draws, loading, syncing, lastSyncAt, syncError, stats, sumData, syncDraws, syncAllLotteries, addDraw, selectedLottery, farol, cycle } = useLotteryContext();
   const [syncStatus, setSyncStatus] = useState<"idle" | "success" | "error">("idle");
   const { savedBets, limit, remaining, isAtLimit } = useSavedBets(selectedLottery);
   const { currentPlan } = usePlanAccess();
@@ -169,22 +171,59 @@ const DashboardPage = () => {
       </AnimatePresence>
 
       {draws.length > 0 && (
-        <div className="grid xl:grid-cols-[1.1fr_0.9fr] gap-6">
+        <div className="grid xl:grid-cols-[1fr_1fr] gap-6">
           <div className="space-y-6">
+            <Card className="glass-panel border-primary/20 bg-gradient-to-br from-primary/5 via-transparent to-transparent">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2 text-primary">
+                  <Zap className="w-4 h-4 animate-pulse" />
+                  Titan Intelligence Briefing
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase">Score Elite</p>
+                    <p className="text-xl font-black text-foreground">{farol.filter(s => s.titanScore >= 85).length}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase">Ciclo Atual</p>
+                    <p className="text-xl font-black text-foreground">#{cycle?.currentCycle || 0}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase">Faltam (Ciclo)</p>
+                    <p className="text-xl font-black text-foreground">{cycle?.missingNumbers.length || 0}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase">Saturação</p>
+                    <p className="text-xl font-black text-emerald-400">{analytics.saturationScore.toFixed(0)}%</p>
+                  </div>
+                </div>
+                <div className="p-3 rounded-xl bg-primary/5 border border-primary/10">
+                  <p className="text-[11px] leading-relaxed text-muted-foreground italic">
+                    "O motor FAROL detectou {(farol.filter(s => s.titanScore >= 90).length)} dezenas com força máxima. 
+                    Recomendado diversificar em fechamentos {config.id === 'lotofacil' ? 'PLAN 21X50' : 'otimizados'} para mitigar variância."
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
             <StrategyBriefingPanel config={config} stats={stats} draws={draws} />
             <div className="grid md:grid-cols-2 gap-6">
               <NeuralMissionCenter />
               <InsightsCenter />
             </div>
+          </div>
+          <div className="space-y-6">
+            <BettingBudgetPlanner config={config} stats={stats} draws={draws} compact />
             <div className="grid md:grid-cols-2 gap-6">
               <GamificationCard />
               <ROIQuickView />
             </div>
             <NotificationsPanel />
           </div>
-          <BettingBudgetPlanner config={config} stats={stats} draws={draws} compact />
         </div>
       )}
+
       
       <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-2xl" />}>
         <TitanCommandCenter />

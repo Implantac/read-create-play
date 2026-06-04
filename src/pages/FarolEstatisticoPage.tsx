@@ -18,6 +18,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { HeatmapIntensity } from "@/components/lottery/HeatmapIntensity";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 
 const PERIOD_OPTIONS = [
   { label: "Todos", value: 0 },
@@ -29,6 +32,16 @@ export default function FarolEstatisticoPage() {
   const { config, stats, farol, cycle, draws } = useLotteryContext();
   const [period, setPeriod] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState("scores");
+
+  const aiInsight = useMemo(() => {
+    if (!farol) return "";
+    const topScorers = farol.slice(0, 3).map(s => s.number).join(", ");
+    const highDelay = farol.sort((a, b) => b.currentDelay - a.currentDelay).slice(0, 2).map(s => s.number).join(", ");
+    
+    return `Análise Titan: Foco nas dezenas de elite [${topScorers}]. Alerta para dezenas em atraso crítico: [${highDelay}]. O ciclo ${cycle?.currentCycle} sugere fechamento iminente.`;
+  }, [farol, cycle]);
+
 
   const filteredFarol = useMemo(() => {
     let result = farol || [];
@@ -124,7 +137,7 @@ export default function FarolEstatisticoPage() {
               <Progress value={87} className="h-1.5 bg-accent/20" />
               <div className="p-2 rounded-lg bg-background/50 border border-accent/10">
                 <p className="text-[9px] leading-relaxed text-muted-foreground italic">
-                  "O ciclo atual demonstra alta probabilidade de fechamento nas próximas 2 rodadas. Recomendado foco nas dezenas com Score Elite."
+                  "{aiInsight}"
                 </p>
               </div>
             </div>
@@ -172,6 +185,9 @@ export default function FarolEstatisticoPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Mapa de Calor */}
+      <HeatmapIntensity />
 
       {/* Filtros e Busca */}
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
