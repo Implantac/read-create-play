@@ -351,7 +351,7 @@ export function WinningsSimulator({ lotteryId, pick, maxNumbers, draws, drawsWit
                 .map(([hits, info]) => (
                   <div key={hits} className="flex items-center gap-3 p-2 rounded-md bg-card border border-border/30 text-xs">
                     <Badge variant="outline" className="text-[10px]">{info.label}</Badge>
-                    <span className="text-muted-foreground">{info.count}× acertos</span>
+                    <span className="text-muted-foreground">{formatNumber(info.count)}× acertos</span>
                     <span className="ml-auto font-bold text-foreground tabular-nums">{fmtBRL(info.total)}</span>
                   </div>
                 ))}
