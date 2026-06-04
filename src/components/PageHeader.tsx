@@ -6,9 +6,10 @@ interface Props {
   description: string;
   icon: LucideIcon;
   badge?: string;
+  children?: React.ReactNode;
 }
 
-export function PageHeader({ title, description, icon: Icon, badge }: Props) {
+export function PageHeader({ title, description, icon: Icon, badge, children }: Props) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -10 }}
@@ -33,17 +34,23 @@ export function PageHeader({ title, description, icon: Icon, badge }: Props) {
         </div>
       </div>
       
-      {/* Platform Metadata - Terminal Style */}
-      <div className="hidden md:flex items-center gap-4 text-[10px] font-mono text-muted-foreground/40">
-        <div className="flex flex-col items-end">
-          <span className="uppercase">Precision Level</span>
-          <span className="text-primary font-bold">99.8%</span>
-        </div>
-        <div className="w-px h-8 bg-white/5" />
-        <div className="flex flex-col items-end">
-          <span className="uppercase">Uptime</span>
-          <span className="text-accent font-bold">99.9%</span>
-        </div>
+      {/* Platform Metadata or Children */}
+      <div className="flex items-center gap-4">
+        {children ? (
+          children
+        ) : (
+          <div className="hidden md:flex items-center gap-4 text-[10px] font-mono text-muted-foreground/40">
+            <div className="flex flex-col items-end">
+              <span className="uppercase">Precision Level</span>
+              <span className="text-primary font-bold">99.8%</span>
+            </div>
+            <div className="w-px h-8 bg-white/5" />
+            <div className="flex flex-col items-end">
+              <span className="uppercase">Uptime</span>
+              <span className="text-accent font-bold">99.9%</span>
+            </div>
+          </div>
+        )}
       </div>
     </motion.div>
   );
