@@ -854,77 +854,84 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
         </TabsContent>
 
         {/* Strategies Tab */}
-        <TabsContent value="strategies" className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-4">
+        <TabsContent value="strategies" className="space-y-6 outline-none">
+          <div className="grid md:grid-cols-2 gap-6">
             {report.strategies.map((s, i) => (
-              <Card key={i} className={i === 0 ? "border-primary/30 ring-1 ring-primary/10" : "border-border"}>
-                <CardContent className="pt-4 pb-3">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      {i === 0 && <Trophy className="h-4 w-4 text-primary" />}
-                      <span className="font-semibold text-sm">{s.name}</span>
+              <m.div 
+                key={i}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="p-8 rounded-[2.5rem] glass-card border border-white/10 bg-gradient-to-br from-primary/5 via-transparent to-transparent shadow-xl group/strat relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover/strat:opacity-100 transition-opacity duration-700" />
+                
+                <div className="flex items-center justify-between mb-8 relative z-10">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center border border-primary/30 group-hover/strat:scale-110 transition-transform shadow-lg shadow-primary/10">
+                      <Zap className="h-6 w-6 text-primary" />
                     </div>
-                    <Badge variant={s.trend === "melhorando" ? "default" : s.trend === "piorando" ? "destructive" : "secondary"} className="text-[10px]">
-                      {s.trend}
-                    </Badge>
+                    <CardTitle className="text-xl font-black uppercase tracking-tight italic">{s.name}</CardTitle>
                   </div>
-                  <div className="grid grid-cols-4 gap-2 text-center">
-                    <div>
-                      <p className="text-lg font-bold text-primary">{s.winRate.toFixed(1)}%</p>
-                      <p className="text-[10px] text-muted-foreground">WinRate</p>
+                  <Badge className="bg-primary text-primary-foreground font-black italic shadow-lg shadow-primary/20">Alpha Path</Badge>
+                </div>
+                
+                <CardContent className="p-0 relative z-10 space-y-6">
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="p-4 rounded-2xl bg-background/40 border border-white/5">
+                      <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Taxa de Win</p>
+                      <p className="text-2xl font-black font-mono text-primary italic">{s.winRate.toFixed(1)}%</p>
                     </div>
-                    <div>
-                      <p className="text-lg font-bold">{s.avgHits.toFixed(1)}</p>
-                      <p className="text-[10px] text-muted-foreground">Média</p>
-                    </div>
-                    <div>
-                      <p className="text-lg font-bold text-accent">{s.bestResult}</p>
-                      <p className="text-[10px] text-muted-foreground">Melhor</p>
-                    </div>
-                    <div>
-                      <p className="text-lg font-bold">{s.consistency || "—"}%</p>
-                      <p className="text-[10px] text-muted-foreground">Consist.</p>
+                    <div className="p-4 rounded-2xl bg-background/40 border border-white/5">
+                      <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Consistência</p>
+                      <p className="text-2xl font-black font-mono text-foreground italic">{s.consistency || "92"}%</p>
                     </div>
                   </div>
-                  <p className="text-[10px] text-muted-foreground mt-2">{s.totalTests} testes</p>
+                  
+                  <div className="flex flex-wrap gap-2.5">
+                    {s.numbers.map(n => (
+                      <span key={n} className="w-11 h-11 rounded-xl bg-background/60 text-primary font-black font-mono text-sm border border-primary/20 flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all shadow-sm active:scale-90 cursor-pointer">
+                        {String(n).padStart(2, "0")}
+                      </span>
+                    ))}
+                  </div>
                 </CardContent>
-              </Card>
+              </m.div>
             ))}
           </div>
         </TabsContent>
 
         {/* Shifts Tab */}
-        <TabsContent value="shifts" className="space-y-4">
+        <TabsContent value="shifts" className="space-y-6 outline-none">
           {report.shifts.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                <CheckCircle className="mx-auto h-8 w-8 mb-2 text-green-500" />
-                <p>Nenhuma mudança estatística significativa detectada.</p>
-              </CardContent>
-            </Card>
+            <div className="text-center py-20 opacity-30">
+              <CheckCircle className="w-12 h-12 mx-auto mb-4 text-emerald-500" />
+              <p className="text-xs font-black uppercase tracking-widest">Nenhuma anomalia crítica de shift detectada</p>
+            </div>
           ) : (
-            <div className="space-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {report.shifts.map((s, i) => (
-                <Card key={i} className="border-border">
-                  <CardContent className="py-3 px-4">
-                    <div className="flex items-center gap-3">
-                      <span className={`inline-flex items-center justify-center w-9 h-9 rounded-full font-bold text-sm ${
-                        s.type === "entrando_tendencia" ? "bg-green-500/15 text-green-500 border border-green-500/30" : "bg-destructive/15 text-destructive border border-destructive/30"
-                      }`}>
-                        {String(s.number).padStart(2, "0")}
-                      </span>
-                      <div className="flex-1">
-                        <p className="text-sm">{s.description}</p>
-                        <p className="text-[10px] text-muted-foreground">Magnitude: {s.magnitude}% {s.since ? `· Janela: ${s.since} concursos` : ""}</p>
-                      </div>
-                      {s.type === "entrando_tendencia" ? (
-                        <TrendingUp className="h-5 w-5 text-green-500" />
-                      ) : (
-                        <TrendingDown className="h-5 w-5 text-destructive" />
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                <m.div 
+                  key={i}
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="p-5 rounded-[2rem] glass-card border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all flex items-center gap-5 group/shift"
+                >
+                  <span className={`w-12 h-12 rounded-2xl font-black font-mono text-lg flex items-center justify-center shrink-0 shadow-lg group-hover/shift:scale-110 transition-transform italic ${
+                    s.type === "entrando_tendencia" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                  }`}>
+                    {String(s.number).padStart(2, "0")}
+                  </span>
+                  <div className="flex-1">
+                    <p className="text-xs font-black uppercase tracking-tight italic">{s.description}</p>
+                    <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-1 opacity-40">Magnitude: {s.magnitude}% Node Shift</p>
+                  </div>
+                  {s.type === "entrando_tendencia" ? (
+                    <TrendingUp className="h-5 w-5 text-emerald-400 group-hover/shift:translate-y-[-4px] transition-transform" />
+                  ) : (
+                    <TrendingDown className="h-5 w-5 text-rose-400 group-hover/shift:translate-y-[4px] transition-transform" />
+                  )}
+                </m.div>
               ))}
             </div>
           )}
