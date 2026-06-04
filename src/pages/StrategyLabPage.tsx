@@ -320,10 +320,10 @@ export default function StrategyLabPage() {
                       </div>
                     </div>
                     <div className="grid grid-cols-4 gap-3 md:gap-4">
-                      <MetricBox label="Score" value={result.bestStrategy.metrics.globalScore.toFixed(1)} accent />
-                      <MetricBox label="Média" value={result.bestStrategy.metrics.avgHits.toFixed(2)} />
-                      <MetricBox label="Melhor" value={`${result.bestStrategy.metrics.bestHits}/${config.pick}`} />
-                      <MetricBox label="Consist." value={`${(result.bestStrategy.metrics.consistency * 100).toFixed(0)}%`} />
+                      <MetricBox label="Score" value={formatNumber(result.bestStrategy.metrics.globalScore)} accent />
+                      <MetricBox label="Média" value={formatNumber(result.bestStrategy.metrics.avgHits)} />
+                      <MetricBox label="Melhor" value={`${formatNumber(result.bestStrategy.metrics.bestHits)}/${formatNumber(config.pick)}`} />
+                      <MetricBox label="Consist." value={`${formatNumber(Math.round(result.bestStrategy.metrics.consistency * 100))}%`} />
                     </div>
                   </div>
                 </CardContent>
