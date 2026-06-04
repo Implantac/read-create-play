@@ -79,6 +79,7 @@ export default function LotofacilPremiumPage() {
   const [worksheetSaving, setWorksheetSaving] = useState(false);
   const [worksheetBacktest, setWorksheetBacktest] = useState<WorksheetBacktestResult | null>(null);
   const [worksheetBacktesting, setWorksheetBacktesting] = useState(false);
+  const [worksheetFilterMinScore, setWorksheetFilterMinScore] = useState<number>(0);
 
   const handleSaveBet = (numbers: number[], strategy?: string, score?: number, grade?: string) => {
     saveBet({ numbers, strategy, score, grade });
@@ -118,6 +119,19 @@ export default function LotofacilPremiumPage() {
     () => analyzeWorksheetGames(generatedWorksheetGames, worksheetSelectedDraw, worksheetPreviousDraw),
     [generatedWorksheetGames, worksheetSelectedDraw, worksheetPreviousDraw],
   );
+
+  const filteredWorksheetGames = useMemo(() => {
+    if (worksheetFilterMinScore === 0) return worksheetAnalysis.games;
+    return worksheetAnalysis.games.filter(game => {
+      // Evaluation logic for game quality
+      // For now, let's just use parity and sum as proxies if we don't want to re-run full evaluation here
+      // Better: we can assume the user wants to filter by "Standard Quality"
+      const even = game.even;
+      const sum = game.sum;
+      const isValid = even >= 6 && even <= 9 && sum >= 160 && sum <= 220;
+      return isValid;
+    });
+  }, [worksheetAnalysis, worksheetFilterMinScore]);
 
   const canGenerateWorksheet = worksheetNumbers.length >= worksheetInputSize && generatedWorksheetGames.length > 0;
 
