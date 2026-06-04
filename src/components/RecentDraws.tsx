@@ -2,14 +2,7 @@ import { useState } from "react";
 import { DrawResultWithPrizes } from "@/hooks/useLotteryDraws";
 import { motion, AnimatePresence } from "framer-motion";
 import { History, ChevronDown, ChevronUp, Trophy, Users, DollarSign, TrendingUp } from "lucide-react";
-
-interface Props {
-  draws: DrawResultWithPrizes[];
-}
-
-function formatCurrency(value: number): string {
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
+import { formatCurrency, formatNumber } from "@/utils/formatters";
 
 export function RecentDraws({ draws }: Props) {
   const firstWithPrizes = draws.find(d => d.prizeTiers?.premiacoes?.length);
