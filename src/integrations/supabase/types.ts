@@ -379,30 +379,42 @@ export type Database = {
       }
       notifications: {
         Row: {
+          action_url: string | null
+          category: string | null
           created_at: string | null
+          icon_url: string | null
           id: string
           message: string
           metadata: Json | null
+          priority: string | null
           read: boolean | null
           title: string
           type: string
           user_id: string
         }
         Insert: {
+          action_url?: string | null
+          category?: string | null
           created_at?: string | null
+          icon_url?: string | null
           id?: string
           message: string
           metadata?: Json | null
+          priority?: string | null
           read?: boolean | null
           title: string
           type: string
           user_id: string
         }
         Update: {
+          action_url?: string | null
+          category?: string | null
           created_at?: string | null
+          icon_url?: string | null
           id?: string
           message?: string
           metadata?: Json | null
+          priority?: string | null
           read?: boolean | null
           title?: string
           type?: string
@@ -804,6 +816,18 @@ export type Database = {
       is_blocked: { Args: { _user_id: string }; Returns: boolean }
       is_full_access_email: { Args: { _email: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      send_notification: {
+        Args: {
+          _action_url?: string
+          _category?: string
+          _message: string
+          _priority?: string
+          _title: string
+          _type: string
+          _user_id: string
+        }
+        Returns: undefined
+      }
       track_user_action: {
         Args: { _action: string; _user_id: string }
         Returns: undefined

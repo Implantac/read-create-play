@@ -116,7 +116,8 @@ const DashboardPage = () => {
         
         // Update gamification
         if (user) {
-          await supabase.rpc('increment_games_generated', { _user_id: user.id });
+          await supabase.rpc('track_user_action', { _user_id: user.id, _action: 'save_bet' });
+          await supabase.rpc('update_mission_progress', { _user_id: user.id, _type: 'generate_games' });
         }
       }
       setGeneratingLucky(false);

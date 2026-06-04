@@ -37,6 +37,12 @@ export function NotificationsPanel() {
     }
   };
 
+  const handleAction = (url?: string) => {
+    if (url) {
+      window.location.href = url;
+    }
+  };
+
   return (
     <Card className="glass-card border-primary/20">
       <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
@@ -54,7 +60,15 @@ export function NotificationsPanel() {
           </div>
         ) : notifications && notifications.length > 0 ? (
           notifications.map((notif) => (
-            <div key={notif.id} className={`p-3 rounded-xl border transition-all ${notif.read ? 'bg-background/20 border-white/5 opacity-60' : 'bg-primary/5 border-primary/20 shadow-lg shadow-primary/5'}`}>
+            <div 
+              key={notif.id} 
+              onClick={() => handleAction(notif.action_url)}
+              className={`p-3 rounded-xl border transition-all cursor-pointer ${
+                notif.read 
+                  ? 'bg-background/20 border-white/5 opacity-60' 
+                  : 'bg-primary/5 border-primary/20 shadow-lg shadow-primary/5 hover:border-primary/40'
+              } ${notif.priority === 'high' ? 'border-l-4 border-l-primary' : ''}`}
+            >
               <div className="flex items-start gap-3">
                 <div className="mt-0.5">{getIcon(notif.type)}</div>
                 <div className="flex-1 min-w-0">
@@ -65,6 +79,12 @@ export function NotificationsPanel() {
                     </span>
                   </div>
                   <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-2">{notif.message}</p>
+                  {notif.action_url && (
+                    <div className="mt-2 flex items-center gap-1 text-[8px] font-black uppercase text-primary tracking-widest">
+                      <span>Ver detalhes</span>
+                      <TrendingUp className="w-2 h-2" />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
