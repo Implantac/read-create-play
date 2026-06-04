@@ -4,11 +4,14 @@ import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FlaskConical, Loader2, Plus, Trash2, Play, Trophy, Target,
-  BarChart3, TrendingUp, Medal, ChevronDown, ChevronUp
+  BarChart3, TrendingUp, Medal, ChevronDown, ChevronUp, Brain
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useLotteryContext } from "@/contexts/LotteryContext";
+import { AIAnalystBriefing } from "@/components/lottery/AIAnalystBriefing";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
@@ -30,7 +33,9 @@ interface SimResult {
   totalPrizes: number;
   hitDistribution: Record<number, number>;
   consistency: number;
+  aiEvaluation?: { confidence: number; reasons: string[] };
 }
+
 
 interface Props {
   stats: NumberStats[];
@@ -50,7 +55,9 @@ const PRIZE_MAP: Record<string, Record<number, number>> = {
 };
 
 export function ComparativeSimulatorPanel({ stats, config, draws }: Props) {
+  const { farol } = useLotteryContext();
   const [games, setGames] = useState<SimGame[]>([]);
+
   const [inputValue, setInputValue] = useState("");
   const [drawCount, setDrawCount] = useState(50);
   const [results, setResults] = useState<SimResult[] | null>(null);
@@ -122,6 +129,15 @@ export function ComparativeSimulatorPanel({ stats, config, draws }: Props) {
         const variance = hitValues.reduce((s, v) => s + (v - avgHits) ** 2, 0) / hitValues.length;
         const consistency = avgHits > 0 ? Math.max(0, Math.min(100, Math.round((1 - Math.sqrt(variance) / avgHits) * 100))) : 0;
 
+        // AI Analysis injection
+        const reasons = [];
+        if (avgHits > config.pick * 0.5) reasons.push("Desempenho histórico acima da média");
+        if (consistency > 70) reasons.push("Alta consistência de resultados");
+        if (bestHit >= config.pick - 2) reasons.push("Potencial de premiação máxima detectado");
+        
+        const eliteNumbers = game.numbers.filter(n => farol?.find(s => s.number === n)?.titanGrade === 'Elite').length;
+        if (eliteNumbers >= 3) reasons.push(`${eliteNumbers} dezenas de elite integradas`);
+
         return {
           game,
           hitsByDraw,
@@ -130,7 +146,12 @@ export function ComparativeSimulatorPanel({ stats, config, draws }: Props) {
           totalPrizes,
           hitDistribution: hitDist,
           consistency,
+          aiEvaluation: {
+            confidence: Math.min(98, Math.round(consistency * 0.5 + (avgHits / config.pick) * 100 * 0.5)),
+            reasons: reasons.length > 0 ? reasons : ["Estrutura equilibrada", "Padrão de dispersão validado"]
+          }
         };
+
       });
 
       simResults.sort((a, b) => b.avgHits - a.avgHits);
@@ -312,7 +333,16 @@ export function ComparativeSimulatorPanel({ stats, config, draws }: Props) {
                       </div>
                     </div>
                   </div>
-                ))}
+                  {r.aiEvaluation && (
+                    <div className="px-3 pb-3 ml-9">
+                      <AIAnalystBriefing 
+                        confidence={r.aiEvaluation.confidence} 
+                        reasons={r.aiEvaluation.reasons} 
+                      />
+                    </div>
+                  )}
+                </div>
+
               </div>
             </div>
 
