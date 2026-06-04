@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUpDown, ArrowUp, ArrowDown, TrendingUp, TrendingDown, Minus, Filter, TableProperties, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   data: MatrixRow[];
@@ -20,10 +21,11 @@ const TrendIcon = ({ trend }: { trend: "up" | "stable" | "down" }) => {
 };
 
 const SignalBadge = ({ signal }: { signal: "green" | "yellow" | "red" }) => {
+  const { t } = useTranslation();
   const config = {
-    green: { label: "Alta", className: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25 hover:bg-emerald-500/20" },
-    yellow: { label: "Neutra", className: "bg-amber-500/15 text-amber-400 border-amber-500/25 hover:bg-amber-500/20" },
-    red: { label: "Baixa", className: "bg-red-500/15 text-red-400 border-red-500/25 hover:bg-red-500/20" },
+    green: { label: t("matrix.signals.green"), className: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25 hover:bg-emerald-500/20" },
+    yellow: { label: t("matrix.signals.yellow"), className: "bg-amber-500/15 text-amber-400 border-amber-500/25 hover:bg-amber-500/20" },
+    red: { label: t("matrix.signals.red"), className: "bg-red-500/15 text-red-400 border-red-500/25 hover:bg-red-500/20" },
   };
   const c = config[signal];
   return <Badge variant="outline" className={`text-[10px] px-1.5 py-0 font-mono ${c.className}`}>{c.label}</Badge>;
@@ -79,6 +81,7 @@ const Sparkline = ({ pattern }: { pattern: boolean[] }) => {
 };
 
 export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Props) {
+  const { t } = useTranslation();
   const [sortKey, setSortKey] = useState<SortKey>("rank");
   const [sortAsc, setSortAsc] = useState(true);
   const [filter, setFilter] = useState<FilterMode>("all");
@@ -131,20 +134,20 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
   }, []);
 
   const filters: { label: string; value: FilterMode; count: number }[] = [
-    { label: "Todas", value: "all", count: data.length },
-    { label: "🟢 Top", value: "top", count: data.filter(r => r.signal === "green").length },
-    { label: "⏳ Atrasadas", value: "delayed", count: data.filter(r => r.currentDelay >= r.avgDelay).length },
-    { label: "🔥 Quentes", value: "hot", count: data.filter(r => r.trend === "up").length },
+    { label: t("matrix.filters.all"), value: "all", count: data.length },
+    { label: `🟢 ${t("matrix.filters.top")}`, value: "top", count: data.filter(r => r.signal === "green").length },
+    { label: `⏳ ${t("matrix.filters.delayed")}`, value: "delayed", count: data.filter(r => r.currentDelay >= r.avgDelay).length },
+    { label: `🔥 ${t("matrix.filters.hot")}`, value: "hot", count: data.filter(r => r.trend === "up").length },
   ];
 
   const columns: [SortKey, string][] = [
-    ["rank", "#"],
-    ["number", "Dezena"],
-    ["score", "Score"],
-    ["freqTotal", "Freq. Total"],
-    ["freqRecent30", "Freq. 30"],
-    ["currentDelay", "Atraso"],
-    ["trend", "Tendência"],
+    ["rank", t("matrix.columns.rank")],
+    ["number", t("matrix.columns.number")],
+    ["score", t("matrix.columns.score")],
+    ["freqTotal", t("matrix.columns.freqTotal")],
+    ["freqRecent30", t("matrix.columns.freqRecent30")],
+    ["currentDelay", t("matrix.columns.currentDelay")],
+    ["trend", t("matrix.columns.trend")],
   ];
 
   return (
@@ -156,8 +159,8 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
             <TableProperties className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h3 className="text-sm font-black text-foreground uppercase tracking-widest italic">Ranking Probabilístico</h3>
-            <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase tracking-widest opacity-60">Matriz de Performance Individual</p>
+            <h3 className="text-sm font-black text-foreground uppercase tracking-widest italic">{t("matrix.title")}</h3>
+            <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase tracking-widest opacity-60">{t("matrix.subtitle")}</p>
           </div>
         </div>
       </div>
@@ -181,7 +184,7 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
             <span className="ml-1.5 opacity-60">[{f.count}]</span>
           </Button>
         ))}
-        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-auto opacity-40 italic">{filtered.length} Ativos Encontrados</span>
+        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-auto opacity-40 italic">{t("matrix.active_found", { count: filtered.length })}</span>
       </div>
 
 
@@ -207,8 +210,8 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
                     </span>
                   </TableHead>
                 ))}
-                <TableHead className="whitespace-nowrap font-black text-[10px] uppercase tracking-widest text-muted-foreground py-4 px-4">Momento (30)</TableHead>
-                <TableHead className="font-black text-[10px] uppercase tracking-widest text-muted-foreground py-4 px-4">Status</TableHead>
+                <TableHead className="whitespace-nowrap font-black text-[10px] uppercase tracking-widest text-muted-foreground py-4 px-4">{t("matrix.columns.moment")}</TableHead>
+                <TableHead className="font-black text-[10px] uppercase tracking-widest text-muted-foreground py-4 px-4">{t("matrix.columns.status")}</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -266,7 +269,7 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
                       <div className="flex items-center gap-1.5">
                         <TrendIcon trend={row.trend} />
                         <span className="text-[10px] text-muted-foreground">{
-                          row.trend === "up" ? "Subindo" : row.trend === "down" ? "Caindo" : "Estável"
+                          row.trend === "up" ? t("matrix.trends.up") : row.trend === "down" ? t("matrix.trends.down") : t("matrix.trends.stable")
                         }</span>
                       </div>
                     </TableCell>
@@ -307,11 +310,11 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
           </Button>
           
           <div className="flex items-center gap-1 mx-2">
-            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Página</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t("common.page")}</span>
             <span className="px-3 py-1 rounded-lg bg-primary/10 border border-primary/20 text-xs font-black text-primary font-mono">
               {currentPage + 1}
             </span>
-            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">de {totalPages}</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t("common.of")} {totalPages}</span>
           </div>
 
           <Button
