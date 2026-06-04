@@ -720,17 +720,17 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Plano</p>
-                  <Badge className={PLAN_COLORS[isFullAccessProfile(detailUser) ? "lifetime" : detailUser.plan]}>
-                    {PLAN_LABELS[isFullAccessProfile(detailUser) ? "lifetime" : detailUser.plan]}
+                  <Badge className={PLAN_COLORS[isFullAccessEmail(detailUser) ? "lifetime" : detailUser.plan]}>
+                    {PLAN_LABELS[isFullAccessEmail(detailUser) ? "lifetime" : detailUser.plan]}
                   </Badge>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Status</p>
                   <Badge
-                    variant={!isFullAccessProfile(detailUser) && detailUser.blocked ? "destructive" : "outline"}
-                    className={!isFullAccessProfile(detailUser) && detailUser.blocked ? "" : "text-green-500 border-green-500/30"}
+                    variant={!isFullAccessEmail(detailUser) && detailUser.blocked ? "destructive" : "outline"}
+                    className={!isFullAccessEmail(detailUser) && detailUser.blocked ? "" : "text-green-500 border-green-500/30"}
                   >
-                    {!isFullAccessProfile(detailUser) && detailUser.blocked ? "Bloqueado" : "Ativo"}
+                    {!isFullAccessEmail(detailUser) && detailUser.blocked ? "Bloqueado" : "Ativo"}
                   </Badge>
                 </div>
                 <div>
