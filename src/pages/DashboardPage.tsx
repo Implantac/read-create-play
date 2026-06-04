@@ -232,24 +232,25 @@ const DashboardPage = () => {
           <Link 
             key={item.label} 
             to={item.url} 
-            className="group p-8 rounded-[2.5rem] glass-card border-border/40 hover:border-primary/40 hover:bg-gradient-to-br transition-all duration-700 relative overflow-hidden active:scale-95 shadow-xl bg-background/40"
+            className="group p-10 rounded-[3rem] glass-card border-border/40 hover:border-primary/60 hover:bg-primary/10 transition-all duration-700 relative overflow-hidden active:scale-90 shadow-2xl bg-background/40"
           >
             <div className={`absolute inset-0 bg-gradient-to-br ${item.bg} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
             
-            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-              <item.icon className="w-16 h-16" />
+            <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500">
+              <item.icon className="w-24 h-24" />
             </div>
             
-            <div className="space-y-6 relative z-10">
-              <div className={`w-14 h-14 rounded-2xl bg-background/60 border border-white/5 flex items-center justify-center shadow-lg group-hover:scale-110 transition-all duration-500 ${item.color}`}>
-                <item.icon className="w-7 h-7" />
+            <div className="space-y-8 relative z-10">
+              <div className={`w-16 h-16 rounded-3xl bg-background/60 border border-white/5 flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 ${item.color}`}>
+                <item.icon className="w-8 h-8" />
               </div>
-              <div className="space-y-1">
-                <span className="text-base font-black uppercase tracking-tight italic block leading-none">{item.label}</span>
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-2 block opacity-40 group-hover:opacity-100 transition-opacity leading-none">{item.desc}</span>
+              <div className="space-y-2">
+                <span className="text-xl font-black uppercase tracking-tighter italic block leading-none">{item.label}</span>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mt-3 block opacity-40 group-hover:opacity-100 transition-opacity leading-none italic">{item.desc}</span>
               </div>
             </div>
           </Link>
+
         ))}
       </section>
 
