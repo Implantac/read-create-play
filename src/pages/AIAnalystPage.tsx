@@ -206,7 +206,7 @@ const AIAnalystPage = () => {
                     </div>
                     {msg.response?.metadata && (
                       <p className="text-[10px] text-muted-foreground mt-1">
-                        {msg.response.metadata.processingTimeMs}ms • {msg.response.metadata.enginesUsed.join(", ")}
+                        {formatNumber(msg.response.metadata.processingTimeMs)}ms • {msg.response.metadata.enginesUsed.join(", ")}
                       </p>
                     )}
                   </div>
