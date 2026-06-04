@@ -7,7 +7,7 @@ import { GeneratorFiltersPanel } from "@/components/GeneratorFiltersPanel";
 import { HistoricalValidationBadge } from "@/components/HistoricalValidationBadge";
 import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
 import { AnimatePresence } from "framer-motion";
-import { Sparkles, RefreshCw, Flame, Snowflake, Shuffle, Hash, Sigma, Ratio, Grid3X3, Clock, BarChart3, TrendingUp, Repeat, Layers, Brain } from "lucide-react";
+import { Sparkles, RefreshCw, Flame, Snowflake, Shuffle, Hash, Sigma, Ratio, Grid3X3, Clock, BarChart3, TrendingUp, Repeat, Layers, Brain, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useLotteryContext } from "@/contexts/LotteryContext";
