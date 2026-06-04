@@ -116,8 +116,9 @@ const DashboardPage = () => {
                   </div>
                 </div>
 
-                <div className="w-full lg:w-[320px] p-8 rounded-[2rem] bg-background/40 border border-white/5 backdrop-blur-md shadow-inner text-center space-y-8">
-                  <div className="grid grid-cols-2 gap-4">
+                <div className="w-full lg:w-[320px] p-6 rounded-[2.5rem] bg-background/40 border border-white/5 backdrop-blur-md shadow-2xl text-center space-y-8 relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                  <div className="grid grid-cols-2 gap-4 relative z-10">
                     <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 space-y-1">
                       <p className="text-[9px] uppercase font-black text-primary/60 tracking-widest">IA Trust</p>
                       <p className="text-2xl font-black italic tracking-tighter tabular-nums gradient-brand-text leading-none">{luckyGame.score}%</p>
@@ -128,11 +129,11 @@ const DashboardPage = () => {
                     </div>
                   </div>
 
-
-                  <div className="space-y-3">
-                    <Button onClick={generateGame} className="w-full h-14 rounded-2xl gradient-brand font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                  <div className="space-y-3 relative z-10">
+                    <Button onClick={generateGame} variant="premium" className="w-full h-14">
                       Gerar Novo Jogo
                     </Button>
+
                     <div className="grid grid-cols-2 gap-3">
                       <Button asChild variant="outline" className="h-12 rounded-2xl font-bold uppercase tracking-widest text-[9px] border-white/10 hover:border-primary/40">
                         <Link to="/fechamentos">Ver Fechamentos</Link>
