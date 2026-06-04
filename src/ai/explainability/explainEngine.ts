@@ -53,8 +53,8 @@ export function explainSimulation(result: SimulationResult, lotteryId: string): 
   const rules = getLotteryRules(lotteryId);
   const lines = [
     `🎲 **Resultado da Simulação**`,
-    `📊 ${result.totalSimulations.toLocaleString()} simulações realizadas`,
-    `📈 Média geral de acertos: ${result.avgHits.toFixed(2)}`,
+    `📊 ${formatNumber(result.totalSimulations)} simulações realizadas`,
+    `📈 Média geral de acertos: ${formatNumber(result.avgHits)}`,
     "",
     `**Melhor jogo:**`,
     `${result.bestGame.numbers.join(" - ")} (média: ${result.bestGame.avgHits.toFixed(2)})`,
