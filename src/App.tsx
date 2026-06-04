@@ -15,34 +15,20 @@ import { ReferralSystem } from "@/lib/referral-system";
 
 const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
 const GeradorPage = lazy(() => import("@/pages/GeradorPage"));
-const EstrategiasPage = lazy(() => import("@/pages/EstrategiasPage"));
-const SimulacoesPage = lazy(() => import("@/pages/SimulacoesPage"));
-const HistoricoPage = lazy(() => import("@/pages/HistoricoPage"));
+const FechamentosPage = lazy(() => import("@/pages/FechamentosPage"));
+const AnaliseCentralPage = lazy(() => import("@/pages/AnaliseCentralPage"));
+const HistoricoUnificadoPage = lazy(() => import("@/pages/HistoricoUnificadoPage"));
+const PerfilPage = lazy(() => import("@/pages/PerfilPage"));
 const PlanosPage = lazy(() => import("@/pages/PlanosPage"));
-const AdminPage = lazy(() => import("@/pages/AdminPage"));
 const LoginPage = lazy(() => import("@/pages/LoginPage"));
 const SignupPage = lazy(() => import("@/pages/SignupPage"));
 const ForgotPasswordPage = lazy(() => import("@/pages/ForgotPasswordPage"));
 const ResetPasswordPage = lazy(() => import("@/pages/ResetPasswordPage"));
-const IAAutonomaPage = lazy(() => import("@/pages/IAAutonomaPage"));
-const AIAnalystPage = lazy(() => import("@/pages/AIAnalystPage"));
-const AIChatPage = lazy(() => import("@/pages/AIChatPage"));
-const EstatisticasPage = lazy(() => import("@/pages/EstatisticasPage"));
-const PerfilPage = lazy(() => import("@/pages/PerfilPage"));
-const ROIDashboardPage = lazy(() => import("@/pages/ROIDashboardPage"));
-const HistoricoApostasPage = lazy(() => import("@/pages/HistoricoApostasPage"));
-const JogosSalvosPage = lazy(() => import("@/pages/JogosSalvosPage"));
-const FechamentosPage = lazy(() => import("@/pages/FechamentosPage"));
-const StrategyLabPage = lazy(() => import("@/pages/StrategyLabPage"));
-const MatrizAnalisePage = lazy(() => import("@/pages/MatrizAnalisePage"));
-const PlanilhasMatrizPage = lazy(() => import("@/pages/PlanilhasMatrizPage"));
-const FarolEstatisticoPage = lazy(() => import("@/pages/FarolEstatisticoPage.tsx"));
-const LotofacilPremiumPage = lazy(() => import("@/pages/LotofacilPremiumPage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
-const AffiliatePage = lazy(() => import("./pages/AffiliatePage"));
 const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage"));
 const SuportePage = lazy(() => import("./pages/SuportePage"));
 const InstallPage = lazy(() => import("./pages/InstallPage"));
+const AdminPage = lazy(() => import("@/pages/AdminPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -106,24 +92,10 @@ const AppContent = () => {
         <Route element={<ProtectedRoute><LotteryProvider><AppLayout /></LotteryProvider></ProtectedRoute>}>
           <Route path="/" element={<DashboardPage />} />
           <Route path="/gerador" element={<GeradorPage />} />
-          <Route path="/estrategias" element={<EstrategiasPage />} />
-          <Route path="/simulacoes" element={<SimulacoesPage />} />
-          <Route path="/ia-autonoma" element={<IAAutonomaPage />} />
-          <Route path="/ai-analyst" element={<AIAnalystPage />} />
-          <Route path="/ai-chat" element={<AIChatPage />} />
-          <Route path="/estatisticas" element={<EstatisticasPage />} />
-          <Route path="/farol" element={<FarolEstatisticoPage />} />
-          <Route path="/matriz" element={<MatrizAnalisePage />} />
-          <Route path="/planilhas-matriz" element={<PlanilhasMatrizPage />} />
-          <Route path="/lotofacil-premium" element={<LotofacilPremiumPage />} />
           <Route path="/fechamentos" element={<FechamentosPage />} />
-          <Route path="/historico" element={<HistoricoPage />} />
-          <Route path="/roi" element={<ROIDashboardPage />} />
-          <Route path="/minhas-apostas" element={<HistoricoApostasPage />} />
-          <Route path="/jogos-salvos" element={<JogosSalvosPage />} />
+          <Route path="/analise" element={<AnaliseCentralPage />} />
+          <Route path="/historico" element={<HistoricoUnificadoPage />} />
           <Route path="/perfil" element={<PerfilPage />} />
-          <Route path="/laboratorio" element={<StrategyLabPage />} />
-          <Route path="/afiliados" element={<AffiliatePage />} />
           <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
         </Route>
         <Route path="*" element={<NotFound />} />

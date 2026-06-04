@@ -26,56 +26,21 @@ import { SystemAuditStatus } from "@/components/SystemAuditStatus";
 
 const workflowGroups: { label: string; items: { title: string; url: string; icon: any; requiredFeature?: Feature; tooltip: string }[] }[] = [
   {
-    label: "Experiência Premium",
+    label: "Menu Principal",
     items: [
-      { title: "Lotofácil Premium", url: "/lotofacil-premium", icon: Crown, tooltip: "Interface unificada de alta performance exclusiva para Lotofácil." },
-    ],
-  },
-  {
-    label: "Inteligência de Dados",
-    items: [
-      { title: "Terminal General", url: "/", icon: BarChart3, tooltip: "Terminal central de inteligência e resumo de fluxos históricos." },
-      { title: "FAROL Estatístico", url: "/farol", icon: Zap, tooltip: "Score Titan, Ciclos e Análise de Tendências em Tempo Real." },
-      { title: "Padrões Históricos", url: "/estatisticas", icon: PieChart, tooltip: "Frequência, desvio padrão e análise consolidada de tendências." },
-      { title: "Matriz de Precisão", url: "/matriz", icon: Grid3X3, tooltip: "Score algorítmico e farol de saturação de dezenas." },
-      { title: "Database Global", url: "/historico", icon: History, tooltip: "Acesso total à base de dados histórica sincronizada." },
-    ],
-  },
-  {
-    label: "Laboratório de Estratégias",
-    items: [
-      { title: "Engine de Simulação", url: "/simulacoes", icon: FlaskConical, requiredFeature: "simulacoes", tooltip: "Execução massiva de cenários via Monte Carlo." },
-      { title: "Modelos de ML", url: "/estrategias", icon: Brain, requiredFeature: "estrategias_basicas", tooltip: "Estratégias orientadas por Machine Learning." },
-      { title: "Analytics ROI", url: "/roi", icon: TrendingUp, requiredFeature: "roi_dashboard", tooltip: "Monitoramento de performance financeira e retorno." },
-      { title: "Strategy Lab", url: "/laboratorio", icon: Search, requiredFeature: "estrategias_ml", tooltip: "Ambiente de testes para otimização de estratégias." },
-    ],
-  },
-  {
-    label: "Otimização Combinatorial",
-    items: [
-      { title: "Otimizador de Matrizes", url: "/gerador", icon: Sparkles, tooltip: "Geração de matrizes otimizadas com algoritmos de elite." },
-      { title: "Planilhas Matriz", url: "/planilhas-matriz", icon: FileSpreadsheet, requiredFeature: "fechamentos", tooltip: "Modelos tipo planilha Farol: 21x50, 19x5, 17x8, 13x6 e conferidor." },
-      { title: "Fechamentos HP", url: "/fechamentos", icon: Grid3X3, requiredFeature: "fechamentos", tooltip: "Fechamentos de alta performance com garantia matemática." },
-      { title: "IA Autônoma v4", url: "/ia-autonoma", icon: Zap, requiredFeature: "ia_autonoma", tooltip: "Sistema neural autônomo para detecção de anomalias." },
-    ],
-  },
-  {
-    label: "Validação & Auditoria",
-    items: [
-      { title: "AI Analyst Pro", url: "/ai-analyst", icon: Bot, requiredFeature: "ai_analyst", tooltip: "Analista de precisão para auditoria de jogos e estratégias." },
-      { title: "Interface Neural", url: "/ai-chat", icon: MessageCircle, tooltip: "Prompt direto para consulta à base de conhecimento Titan." },
-      { title: "Registro de Fluxos", url: "/minhas-apostas", icon: ClipboardCheck, tooltip: "Histórico completo de auditoria das suas apostas." },
-      { title: "Portfolio de Jogos", url: "/jogos-salvos", icon: Star, tooltip: "Gerenciamento de ativos salvos e performance acumulada." },
+      { title: "Dashboard", url: "/", icon: BarChart3, tooltip: "Terminal central de inteligência e resumo de fluxos." },
+      { title: "Gerador de Jogos", url: "/gerador", icon: Sparkles, tooltip: "Geração assistida de apostas inteligentes." },
+      { title: "Fechamentos", url: "/fechamentos", icon: Grid3X3, requiredFeature: "fechamentos", tooltip: "Fechamentos matemáticos de alta performance." },
+      { title: "Central de Análise", url: "/analise", icon: PieChart, tooltip: "Estatísticas avançadas, tendências e farol neural." },
+      { title: "Histórico", url: "/historico", icon: History, tooltip: "Seus jogos, resultados e auditoria de apostas." },
     ],
   },
 ];
 
 const accountItems = [
-  { title: "Meu Perfil", url: "/perfil", icon: User },
+  { title: "Minha Conta", url: "/perfil", icon: User },
   { title: "Planos", url: "/planos", icon: Crown },
   { title: "Suporte", url: "/suporte", icon: MessageCircle },
-  { title: "Instalar App", url: "/install", icon: Smartphone },
-  { title: "Indique e Ganhe", url: "/afiliados", icon: Share2 },
 ];
 
 const PLAN_LABELS: Record<string, string> = {
