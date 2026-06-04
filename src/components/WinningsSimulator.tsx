@@ -90,7 +90,7 @@ function matchHits(bet: number[], draw: number[], lotteryId: string): number {
 }
 
 function fmtBRL(v: number): string {
-  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+  return formatCurrency(v);
 }
 
 export function WinningsSimulator({ lotteryId, pick, maxNumbers, draws, drawsWithPrizes }: Props) {
