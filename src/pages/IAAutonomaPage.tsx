@@ -33,7 +33,6 @@ const IAAutonomaPage = () => {
       )}
     </div>
   );
-  );
 };
 
 export default IAAutonomaPage;
