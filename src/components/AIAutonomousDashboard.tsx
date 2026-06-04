@@ -12,8 +12,9 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Brain, TrendingUp, TrendingDown, Zap, Target, RefreshCw, Sparkles,
   AlertTriangle, CheckCircle, ArrowUp, ArrowDown, Minus, Loader2,
-  Activity, Trophy, GitBranch, Link2, Timer, Gauge, Dice1, TriangleAlert, FlaskConical
+  Activity, Trophy, GitBranch, Link2, Timer, Gauge, Dice1, TriangleAlert, FlaskConical, Snowflake
 } from "lucide-react";
+import { m, AnimatePresence } from "framer-motion";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
