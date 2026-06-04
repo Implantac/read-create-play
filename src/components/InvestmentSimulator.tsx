@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
@@ -7,10 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calculator, TrendingUp, Info, AlertTriangle, Sparkles } from "lucide-react";
+import { Calculator, TrendingUp, Info, AlertTriangle, Sparkles, Target, Layers, Shield } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { WHEELING_MATRICES } from "@/ai/engines/wheelingMatrices";
+
 
 export function InvestmentSimulator() {
   const { selectedLottery, config } = useLotteryContext();
@@ -18,24 +20,27 @@ export function InvestmentSimulator() {
   const [budget, setBudget] = useState(100);
   const [months, setMonths] = useState(3);
   const [risk, setRisk] = useState("medium");
+  const [betCost] = useState(3.0); // Simple bet cost for Lotofácil
   
-  const calculateSimulation = () => {
-    const betCost = 5; // Simplified
+  const sim = useMemo(() => {
     const totalBets = Math.floor(budget / betCost);
-    const recommendedPerDraw = Math.floor(totalBets / 8); // Assuming 8 draws a month
     
-    let multiplier = risk === "high" ? 1.5 : risk === "medium" ? 1.1 : 0.8;
+    // Suggest a closure based on budget
+    const matrix = Object.values(WHEELING_MATRICES).find(m => m.games.length <= totalBets && m.lottery === selectedLottery);
+    
+    let multiplier = risk === "high" ? 1.45 : risk === "medium" ? 1.15 : 0.9;
     const estimatedReturn = budget * multiplier;
     
     return {
       totalBets,
-      recommendedPerDraw,
+      recommendedMatrix: matrix?.name || "Aposta Simples",
+      matrixGuarantee: matrix?.guarantee || 11,
       estimatedReturn,
+      coverage: matrix ? (matrix as any).coverage : "Baixa",
       strategy: risk === "high" ? "Agressiva (IA)" : risk === "medium" ? "Balanceada" : "Conservadora"
     };
-  };
+  }, [budget, risk, selectedLottery, betCost]);
 
-  const sim = calculateSimulation();
 
   const handleSave = async () => {
     if (!user) return;
@@ -99,22 +104,24 @@ export function InvestmentSimulator() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-2xl bg-primary/5 border border-primary/10">
           <div className="space-y-1">
-            <p className="text-[9px] text-muted-foreground uppercase font-black">Jogos/Mês</p>
+            <p className="text-[9px] text-muted-foreground uppercase font-black">Jogos Sugeridos</p>
             <p className="text-xl font-mono font-black">{sim.totalBets}</p>
           </div>
           <div className="space-y-1">
-            <p className="text-[9px] text-muted-foreground uppercase font-black">Sugestão/Concurso</p>
-            <p className="text-xl font-mono font-black">{sim.recommendedPerDraw}</p>
+            <p className="text-[9px] text-muted-foreground uppercase font-black">Melhor Fechamento</p>
+            <p className="text-sm font-black text-primary uppercase">{sim.recommendedMatrix}</p>
+            <p className="text-[8px] text-muted-foreground">Garantia: {sim.matrixGuarantee}+ pts</p>
           </div>
           <div className="space-y-1">
-            <p className="text-[9px] text-muted-foreground uppercase font-black">Estratégia Recomendada</p>
-            <p className="text-sm font-bold text-primary uppercase">{sim.strategy}</p>
+            <p className="text-[9px] text-muted-foreground uppercase font-black">Cobertura Est.</p>
+            <p className="text-sm font-bold text-foreground uppercase">{sim.coverage}</p>
           </div>
           <div className="space-y-1">
-            <p className="text-[9px] text-muted-foreground uppercase font-black">Projeção Histórica</p>
+            <p className="text-[9px] text-muted-foreground uppercase font-black">Expectativa de Retorno</p>
             <p className="text-xl font-mono font-black text-emerald-400">R$ {sim.estimatedReturn.toFixed(2)}</p>
           </div>
         </div>
+
 
         <div className="flex items-center gap-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
           <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
