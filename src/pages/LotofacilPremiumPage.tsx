@@ -10,7 +10,7 @@ import {
   Filter, Award, Database, RefreshCw, Layers, Loader2,
   TrendingDown, Shield, FileText, Share2 as Share, Play,
   Cpu, Terminal as TerminalIcon, AlertCircle, CheckCircle2,
-  Table2, Save, FileSpreadsheet, Download
+  Table2, Save, FileSpreadsheet, Download, ChevronRight
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
