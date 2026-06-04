@@ -314,9 +314,9 @@ export function HPEnginePanel({ stats, config, draws }: Props) {
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: "Geração de Sorteios", value: `${formatNumber(benchmark.drawGenOpsPerSec)} ops/s` },
-                  { label: "Verificação de Acertos", value: `${formatNumber(benchmark.hitCheckOpsPerSec)} ops/s` },
-                  { label: "Monte Carlo Completo", value: `${formatNumber(benchmark.monteCarloOpsPerSec)} ops/s` },
+                  { label: "Geração de Sorteios", value: `${fmtN(benchmark.drawGenOpsPerSec)} ops/s` },
+                  { label: "Verificação de Acertos", value: `${fmtN(benchmark.hitCheckOpsPerSec)} ops/s` },
+                  { label: "Monte Carlo Completo", value: `${fmtN(benchmark.monteCarloOpsPerSec)} ops/s` },
                   { label: "Tempo Total", value: `${benchmark.totalMs}ms` },
                 ].map(m => (
                   <div key={m.label} className="p-3 rounded-lg bg-muted/20 border border-border">
