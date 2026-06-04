@@ -15,6 +15,7 @@ import { SocialProofBar } from "@/components/SocialProofBar";
 import { Testimonials } from "@/components/Testimonials";
 import { FloatingLotteryBalls } from "@/components/FloatingLotteryBalls";
 import { PricingSection } from "@/components/PricingSection";
+import { TitanCommandCenter } from "@/components/TitanCommandCenter";
 
 
 import { burstConfetti } from "@/lib/confetti";
@@ -259,6 +260,25 @@ export default function LandingPage() {
       </section>
 
       <ScreensShowcase />
+
+      <section className="py-24 md:py-40 relative">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] bg-primary/10 text-primary border border-primary/20 mb-4">
+              Poder de Processamento Real
+            </div>
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic">
+              Neural <span className="gradient-brand-text">Command Center</span>
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto mt-4 font-medium">
+              Monitore em tempo real o processamento dos nossos algoritmos de elite.
+            </p>
+          </div>
+          <div className="max-w-5xl mx-auto">
+            <TitanCommandCenter />
+          </div>
+        </div>
+      </section>
 
       <section className="py-24 md:py-40 relative overflow-hidden">
         <div className="container mx-auto px-6">

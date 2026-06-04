@@ -2,7 +2,7 @@ import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Trophy, Star, Target, Shield, Award } from "lucide-react";
+import { Trophy, Star, Target, Shield, Award, Crown } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -96,4 +96,4 @@ export function GamificationCard() {
   );
 }
 
-import { Crown } from "lucide-react";
+

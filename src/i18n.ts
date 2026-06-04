@@ -162,6 +162,38 @@ const resources = {
           "yellow": "Neutra",
           "red": "Baixa"
         }
+      },
+      "affiliate": {
+        "title": "Programa de Afiliados",
+        "total_referrals": "Total de Indicações",
+        "total_earned": "Total Ganho",
+        "available_balance": "Saldo Disponível",
+        "invite_title": "Convide e Ganhe",
+        "invite_desc": "Ganhe 30% de comissão recorrente em cada assinatura ativa indicada.",
+        "benefits": {
+          "lifetime": "Comissão vitalícia em assinaturas",
+          "min_payout": "Pagamento mínimo R$ 100,00",
+          "dashboard": "Dashboard de acompanhamento real",
+          "material": "Material promocional exclusivo"
+        }
+      },
+      "gamification": {
+        "title": "Progresso Titan",
+        "level": "Nível {{level}}",
+        "ranks": {
+          "r1": "Iniciante",
+          "r2": "Explorador",
+          "r3": "Estrategista",
+          "r4": "Especialista",
+          "r5": "Mestre",
+          "r6": "Lenda Titan"
+        },
+        "achievements": "Conquistas & Badges",
+        "exp": "XP",
+        "stats": {
+          "generated": "Jogos Gerados",
+          "won": "Acertos"
+        }
       }
     }
   }

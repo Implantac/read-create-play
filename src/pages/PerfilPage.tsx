@@ -15,6 +15,8 @@ import { useSoundSettings } from "@/hooks/useSoundSettings";
 import { playTierPreview } from "@/lib/alert-sounds";
 import UserPreferencesPanel from "@/components/UserPreferencesPanel";
 import { usePlanAccess } from "@/hooks/usePlanAccess";
+import { GamificationCard } from "@/components/GamificationCard";
+import { AchievementDisplay } from "@/components/AchievementDisplay";
 
 export default function PerfilPage() {
   const { user, profile, session } = useAuth();
@@ -131,6 +133,18 @@ export default function PerfilPage() {
   return (
     <div className="max-w-lg mx-auto space-y-6">
       <h1 className="text-2xl font-bold text-foreground">Meu Perfil</h1>
+
+      <GamificationCard />
+
+      <Card className="glass-card">
+        <CardHeader>
+          <CardTitle className="text-lg">Conquistas & Badges</CardTitle>
+          <CardDescription>Seu progresso na plataforma Titan</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AchievementDisplay />
+        </CardContent>
+      </Card>
 
       <Card className="glass-card">
         <CardHeader>
