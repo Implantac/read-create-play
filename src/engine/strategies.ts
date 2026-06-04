@@ -16,6 +16,7 @@ export type Strategy =
   | "sectors"
   | "trend"
   | "cycle"
+  | "titan_pro"
   | "hybrid";
 
 export interface StrategyInfo {
@@ -43,6 +44,7 @@ export const STRATEGIES: StrategyInfo[] = [
   // AI
   { id: "ml", label: "IA Ensemble", desc: "Consenso de 6 modelos de Machine Learning", category: "ai" },
   { id: "hybrid", label: "IA Híbrida", desc: "Combina consenso ML + análise de tendência + ciclos", category: "ai" },
+  { id: "titan_pro", label: "Titan Pro X", desc: "Motor de elite com otimização heurística agressiva", category: "ai" },
 ];
 
 function isPrime(n: number): boolean {
@@ -100,7 +102,8 @@ function ensureBalancedSelection(selected: number[], pick: number, maxNum: numbe
 export function generateByStrategy(
   strategy: Strategy,
   stats: NumberStats[],
-  config: LotteryConfig
+  config: LotteryConfig,
+  filters?: any // Add optional filters support
 ): number[] {
   const pick = config.pick;
 
@@ -327,6 +330,30 @@ export function generateByStrategy(
           s.recentFreq * 1.2
         ),
       }));
+      const shuffled = weightedShuffle(weighted);
+      const selected = shuffled.slice(0, pick).map(s => s.number);
+      return ensureBalancedSelection(selected, pick, config.numbers);
+    }
+
+    case "titan_pro": {
+      // High-performance heuristics: top consensus + cycle urgency + trend momentum
+      const models = runAllModels(stats, config);
+      const consensus = getConsensusRanking(models);
+      const consensusMap = new Map(consensus.map(c => [c.number, c.score]));
+      
+      const weighted = stats.map(s => {
+        const cScore = (consensusMap.get(s.number) as number) || 0;
+        const cycleUrgency = s.cycleScore > 1.4 ? 40 : s.cycleScore > 1 ? 15 : 0;
+        const trendBonus = s.trend > 5 ? 20 : s.trend > 0 ? 10 : -5;
+        const momentumBonus = s.momentum > 2 ? 15 : 0;
+        const freqConsistency = (s.stdDev < s.avgGap * 0.6) ? 10 : 0;
+        
+        return {
+          ...s,
+          weight: Math.max(0.1, (cScore * 0.4) + cycleUrgency + trendBonus + momentumBonus + freqConsistency)
+        };
+      });
+      
       const shuffled = weightedShuffle(weighted);
       const selected = shuffled.slice(0, pick).map(s => s.number);
       return ensureBalancedSelection(selected, pick, config.numbers);

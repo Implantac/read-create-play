@@ -265,8 +265,8 @@ export default function LotofacilPremiumPage() {
                       { icon: Target, text: "Ciclo #512 em estágio final. 4 dezenas restantes para fechamento.", type: "warning" },
                       { icon: Activity, text: "Titan Score recalibrado para o concurso #3121.", type: "info" },
                     ].map((feed, i) => (
-                      <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-secondary/10 border border-border/40 group hover:border-primary/20 transition-all">
-                        <div className={`p-1.5 rounded-lg bg-background/50 border border-border/40 shrink-0 group-hover:scale-110 transition-transform`}>
+                      <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-secondary/10 border border-border/40 group hover:border-primary/40 hover:bg-secondary/20 transition-all cursor-default">
+                        <div className={`p-1.5 rounded-lg bg-background/50 border border-border/40 shrink-0 group-hover:scale-110 group-hover:shadow-[0_0_10px_rgba(var(--primary-rgb),0.2)] transition-all`}>
                           <feed.icon className={`w-3.5 h-3.5 ${feed.type === 'success' ? 'text-emerald-400' : feed.type === 'warning' ? 'text-amber-400' : 'text-primary'}`} />
                         </div>
                         <p className="text-[11px] font-medium text-muted-foreground leading-relaxed">

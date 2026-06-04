@@ -7,7 +7,7 @@ import { GeneratorFiltersPanel } from "@/components/GeneratorFiltersPanel";
 import { HistoricalValidationBadge } from "@/components/HistoricalValidationBadge";
 import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
 import { AnimatePresence } from "framer-motion";
-import { Sparkles, RefreshCw, Flame, Snowflake, Shuffle, Hash, Sigma, Ratio, Grid3X3, Clock, BarChart3, TrendingUp, Repeat, Layers, Brain } from "lucide-react";
+import { Sparkles, RefreshCw, Flame, Snowflake, Shuffle, Hash, Sigma, Ratio, Grid3X3, Clock, BarChart3, TrendingUp, Repeat, Layers, Brain, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useLotteryContext } from "@/contexts/LotteryContext";
@@ -24,7 +24,7 @@ const ICON_MAP: Record<Strategy, any> = {
   smart: Sparkles, hot: Flame, cold: Snowflake, balanced: Shuffle,
   trend: TrendingUp, fibonacci: Sigma, primes: Hash, golden: Ratio,
   sectors: Grid3X3, lowDelay: Clock, pattern: BarChart3, cycle: Repeat,
-  ml: Brain, hybrid: Layers,
+  ml: Brain, hybrid: Layers, titan_pro: Zap,
 };
 
 const CATEGORY_LABELS = { basic: "Básicas", math: "Matemáticas", ai: "Inteligência Artificial" };
