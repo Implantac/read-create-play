@@ -35,13 +35,13 @@ const resources = {
           "badge": "Protocolo Elite • {{count}} vagas vitalícias restantes",
           "title": "Pare de apostar no escuro.",
           "subtitle": "Jogue com Matemática.",
-          "description": "A única plataforma do Brasil que funde +10.000 sorteios, redes neurais e 14 algoritmos de elite.",
+          "description": "A plataforma de inteligência artificial para loterias mais completa do Brasil. Analise Mega-Sena, Lotofácil e Quina com probabilidade matemática avançada.",
           "cta_primary": "Desbloquear Acesso Vitalício",
           "cta_secondary": "Login de Membro"
         },
         "features": {
           "title": "Recursos da Plataforma Titan",
-          "subtitle": "A mais completa análise de loterias com inteligência artificial e estatísticas profissionais.",
+          "subtitle": "Utilize as mesmas ferramentas de análise de dados usadas por profissionais para otimizar suas apostas na Mega-Sena e outras loterias.",
           "items": {
             "xray": {
               "title": "Análise Estatística de Loterias",
@@ -56,12 +56,12 @@ const resources = {
               "description": "Crie jogos otimizados matematicamente para aumentar suas chances de ganhar na loteria."
             },
             "backtest": {
-              "title": "Backtest Brutal",
-              "description": "Valide sua estratégia contra o histórico completo antes de realizar qualquer aposta."
+              "title": "Simulador de Resultados",
+              "description": "Valide suas estratégias de jogo contra todo o histórico de sorteios reais antes de apostar seu dinheiro."
             },
             "simulation": {
-              "title": "Simulação Massiva",
-              "description": "Execute 1.000.000 de cenários Monte Carlo para enxergar probabilidades reais."
+              "title": "Probabilidade Matemática",
+              "description": "Simule milhões de cenários e combinações para descobrir as chances reais de acerto em cada modalidade."
             },
             "sync": {
               "title": "Sync Institucional",
