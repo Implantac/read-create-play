@@ -41,144 +41,146 @@ const DashboardPage = () => {
   }, [stats, draws, selectedLottery, saveGeneration, config]);
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-700 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
-        <div className="space-y-1.5">
+    <div className="space-y-12 animate-in fade-in duration-700 max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-4">
+        <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded bg-primary/10 border border-primary/20 text-[9px] font-black text-primary uppercase tracking-[0.2em] italic">System v5.3 Alpha</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Intelligence Assistant v6.0</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic flex items-baseline gap-3">
-            Olá, <span className="gradient-brand-text">Titan!</span>
+          <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-tight">
+            Sua Melhor <span className="gradient-brand-text">Oportunidade</span> Hoje
           </h1>
-          <p className="text-sm text-muted-foreground font-medium max-w-md">Seu terminal avançado de inteligência estatística para decisões de alta performance.</p>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          <Button variant="outline" className="h-12 rounded-xl border-border/60 font-bold uppercase tracking-widest text-[10px] px-6 hover:bg-secondary/40 transition-all shadow-sm">
-            <History className="w-4 h-4 mr-2 opacity-60" /> Ver Atividade
-          </Button>
-          <Button onClick={generateGame} disabled={generating} className="h-12 rounded-xl gradient-brand font-black uppercase tracking-widest text-[10px] px-8 shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
-            {generating ? (
-              <m.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}>
-                <Zap className="w-4 h-4" />
-              </m.div>
-            ) : (
-              <Sparkles className="w-4 h-4 mr-2" />
-            )}
-            {generating ? "Calibrando..." : "Gerar Aposta Master"}
-          </Button>
+          <p className="text-sm text-muted-foreground font-medium max-w-lg leading-relaxed">
+            Nossa IA já analisou milhões de combinações. Aqui está a recomendação de alta probabilidade para você.
+          </p>
         </div>
       </div>
 
-      <LotteryContextBanner />
-
-      {/* Bento Grid Core */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {/* Main Recommendation Card - Zero Scroll Focus */}
+      <section className="relative group">
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-accent/10 to-primary/20 rounded-[2.5rem] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-1000 pointer-events-none" />
         
-        {/* Recomendação IA - Main Feature */}
-        <section className="lg:col-span-8 space-y-4">
-          <div className="flex items-center gap-2 px-1">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60 flex items-center gap-2">
-              <Zap className="w-3 h-3 text-amber-500" />
-              Recomendação Alpha do Dia
-            </h2>
-          </div>
-
-          <Card className="glass-card border-primary/20 bg-gradient-to-br from-primary/5 via-transparent to-transparent overflow-hidden relative group/recommend">
-            <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover/recommend:opacity-[0.07] transition-opacity duration-700">
-              <Sparkles className="w-48 h-48 rotate-12" />
-            </div>
-            
-            <CardContent className="p-8 md:p-10 relative z-10">
-              {luckyGame ? (
-                <div className="flex flex-col md:flex-row items-center justify-between gap-10">
-                  <div className="flex-1 space-y-6">
-                    <div className="flex flex-wrap gap-2.5 justify-center md:justify-start">
-                      {luckyGame.numbers.map((n: number) => (
+        <Card className="glass-card border-primary/20 bg-black/40 overflow-hidden relative rounded-[2rem] shadow-2xl">
+          <CardContent className="p-8 md:p-12 relative z-10">
+            {luckyGame ? (
+              <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+                <div className="flex-1 space-y-10 w-full text-center lg:text-left">
+                  <div className="space-y-4">
+                    <p className="text-[11px] font-black uppercase tracking-[0.3em] text-primary/60 italic">Jogo Recomendado</p>
+                    <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
+                      {luckyGame.numbers.map((n: number, idx: number) => (
                         <m.div 
-                          key={n} 
-                          initial={{ scale: 0.8, opacity: 0 }}
+                          key={`${n}-${idx}`}
+                          initial={{ scale: 0.5, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
-                          whileHover={{ y: -5, scale: 1.1 }}
-                          className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center font-black text-xl text-primary shadow-xl shadow-primary/5 transition-all cursor-default"
+                          transition={{ delay: idx * 0.05, type: "spring" }}
+                          whileHover={{ y: -8, scale: 1.1 }}
+                          className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center font-black text-xl sm:text-2xl text-primary shadow-xl shadow-primary/5 transition-all cursor-default italic"
                         >
                           {String(n).padStart(2, '0')}
                         </m.div>
                       ))}
                     </div>
-                    
-                    <div className="flex flex-wrap items-center gap-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-80">
-                      <span className="flex items-center gap-1.5"><Bot className="w-3.5 h-3.5" /> Motor: {luckyGame.strategy}</span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-border" />
-                      <span className="flex items-center gap-1.5"><History className="w-3.5 h-3.5" /> {new Date().toLocaleDateString()}</span>
+                  </div>
+                  
+                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-40">Estratégia</span>
+                      <span className="flex items-center gap-2 text-xs font-bold text-foreground">
+                        <Bot className="w-4 h-4 text-primary" /> {luckyGame.strategy}
+                      </span>
+                    </div>
+                    <div className="w-px h-8 bg-border/40 hidden sm:block" />
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-40">Data do Sinal</span>
+                      <span className="flex items-center gap-2 text-xs font-bold text-foreground">
+                        <History className="w-4 h-4 text-muted-foreground" /> {new Date().toLocaleDateString()}
+                      </span>
                     </div>
                   </div>
+                </div>
 
-                  <div className="w-full md:w-auto p-6 md:p-8 rounded-3xl bg-background/40 border border-white/5 backdrop-blur-sm shadow-inner text-center md:text-right space-y-4">
+                <div className="w-full lg:w-[320px] p-8 rounded-[2rem] bg-background/40 border border-white/5 backdrop-blur-md shadow-inner text-center space-y-8">
+                  <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-1">
-                      <p className="text-[10px] uppercase font-black text-muted-foreground tracking-[0.2em] opacity-60">Probabilidade Titan</p>
-                      <div className="flex items-center justify-center md:justify-end gap-3">
-                        <Target className="w-6 h-6 text-emerald-400 group-hover/recommend:animate-bounce transition-all" />
-                        <span className="text-5xl font-black italic tracking-tighter tabular-nums gradient-brand-text leading-none">{luckyGame.score}%</span>
-                      </div>
+                      <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest opacity-60">IA Trust</p>
+                      <p className="text-3xl font-black italic tracking-tighter tabular-nums gradient-brand-text leading-none">{luckyGame.score}%</p>
                     </div>
-                    <Button variant="ghost" className="h-9 px-4 rounded-xl border border-primary/20 bg-primary/5 text-primary text-[9px] font-black uppercase tracking-[0.2em] hover:bg-primary/10 transition-all">
-                      Validar no Auditor
-                    </Button>
+                    <div className="space-y-1">
+                      <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest opacity-60">Tendência</p>
+                      <p className="text-3xl font-black italic tracking-tighter text-emerald-400 leading-none">Alta</p>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="text-center py-20 text-muted-foreground flex flex-col items-center gap-6">
-                  <div className="w-20 h-20 rounded-3xl bg-secondary/30 border border-border/40 flex items-center justify-center animate-pulse">
-                    <Bot className="w-10 h-10 opacity-30" />
-                  </div>
-                  <div className="space-y-2">
-                    <p className="font-bold text-foreground">Sistemas Prontos para Geração</p>
-                    <p className="text-sm opacity-60">Inicie o motor neural para obter os palpites de elite para hoje.</p>
-                  </div>
-                  <Button onClick={generateGame} className="rounded-xl font-black uppercase tracking-widest text-[10px] px-8 h-10 bg-secondary/40 border border-border/60 hover:bg-secondary/60">
-                    Ativar Neural Core
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </section>
 
-        {/* Resumo de Fluxos - Sidebar Bento */}
-        <section className="lg:col-span-4 space-y-4">
-          <div className="flex items-center gap-2 px-1">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60 flex items-center gap-2">
-              <BarChart3 className="w-3.5 h-3.5" />
-              Sinais do Terminal
-            </h2>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4 h-[calc(100%-1.5rem)]">
-            {[
-              { label: "Tendência", value: "Alta", color: "text-emerald-400", bg: "bg-emerald-500/5", border: "border-emerald-500/20", icon: TrendingUp },
-              { label: "Ciclo", value: "32", color: "text-primary", bg: "bg-primary/5", border: "border-primary/20", icon: History },
-              { label: "Quentes", value: "05, 12, 23", color: "text-rose-400", bg: "bg-rose-500/5", border: "border-rose-500/20", icon: Zap },
-              { label: "Frias", value: "01, 19, 25", color: "text-blue-400", bg: "bg-blue-500/5", border: "border-blue-500/20", icon: Snowflake },
-            ].map((item, idx) => (
-              <m.div 
-                key={item.label}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                className={`flex flex-col justify-between p-5 rounded-3xl glass-card border-border/40 hover:${item.border} ${item.bg} group/item relative overflow-hidden`}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <p className="text-[9px] uppercase font-black text-muted-foreground tracking-widest opacity-60">{item.label}</p>
-                  {item.icon && <item.icon className={`w-3.5 h-3.5 ${item.color} opacity-40 group-hover/item:opacity-100 transition-all`} />}
+                  <div className="space-y-3">
+                    <Button onClick={generateGame} className="w-full h-14 rounded-2xl gradient-brand font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                      Gerar Novo Jogo
+                    </Button>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button asChild variant="outline" className="h-12 rounded-xl border-border/40 font-bold uppercase tracking-widest text-[9px]">
+                        <Link to="/fechamentos">Ver Fechamentos</Link>
+                      </Button>
+                      <Button variant="ghost" className="h-12 rounded-xl bg-white/5 border border-white/5 font-bold uppercase tracking-widest text-[9px] hover:bg-white/10">
+                        Ver Explicação
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-                <p className={`text-xl font-black tracking-tight font-mono ${item.color} leading-none truncate`}>{item.value}</p>
-              </m.div>
-            ))}
-          </div>
-        </section>
-      </div>
+              </div>
+            ) : (
+              <div className="text-center py-24 text-muted-foreground flex flex-col items-center gap-8">
+                <div className="w-24 h-24 rounded-[2rem] bg-primary/5 border border-primary/10 flex items-center justify-center animate-pulse shadow-inner">
+                  <Bot className="w-12 h-12 text-primary opacity-40" />
+                </div>
+                <div className="space-y-3">
+                  <h2 className="text-2xl font-black text-foreground uppercase tracking-tight italic">Assistente em Standby</h2>
+                  <p className="text-sm opacity-60 max-w-xs mx-auto">Toque abaixo para que a IA analise o sorteio atual e gere sua melhor recomendação.</p>
+                </div>
+                <Button onClick={generateGame} disabled={generating} className="rounded-2xl font-black uppercase tracking-widest text-xs px-12 h-14 gradient-brand shadow-2xl shadow-primary/20 hover:scale-105 transition-all">
+                  {generating ? (
+                    <m.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}>
+                      <RefreshCw className="w-5 h-5" />
+                    </m.div>
+                  ) : (
+                    <Sparkles className="w-5 h-5 mr-3" />
+                  )}
+                  {generating ? "Calibrando Core..." : "Ativar Assistente Titan"}
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Primary Actions Grid - Quick Access */}
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: "Análise Central", icon: BarChart3, url: "/analise", desc: "Decisão Baseada em Dados", color: "text-emerald-400" },
+          { label: "Fechamentos", icon: Grid3X3, url: "/fechamentos", desc: "Matemática Aplicada", color: "text-primary" },
+          { label: "IA Autônoma", icon: Brain, url: "/ia-autonoma", desc: "Predição Preditiva", color: "text-amber-400" },
+          { label: "Atividade", icon: History, url: "/historico", desc: "Histórico de Performance", color: "text-blue-400" },
+        ].map((item, idx) => (
+          <Link key={item.label} to={item.url} className="group p-6 rounded-[2rem] glass-card border-border/40 hover:border-primary/40 hover:bg-primary/5 transition-all duration-500 relative overflow-hidden active:scale-95 shadow-lg">
+            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+              <item.icon className="w-12 h-12" />
+            </div>
+            
+            <div className="space-y-4 relative z-10">
+              <div className={`w-12 h-12 rounded-2xl bg-background/60 border border-white/5 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform ${item.color}`}>
+                <item.icon className="w-6 h-6" />
+              </div>
+              <div>
+                <span className="text-sm font-black uppercase tracking-tight italic block leading-none">{item.label}</span>
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-2 block opacity-40 group-hover:opacity-100 transition-opacity leading-none">{item.desc}</span>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </section>
+
+      <LotteryContextBanner />
+
 
       {/* Advanced Details - Only in Advanced Mode */}
       {viewMode === "advanced" && (
