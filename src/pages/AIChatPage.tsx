@@ -3,15 +3,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserLearning } from "@/hooks/useUserLearning";
-import { PageHeader } from "@/components/PageHeader";
-import { LotteryContextBanner } from "@/components/LotteryContextBanner";
-import { MessageCircle, Send, Trash2, Sparkles, Bot, User, StopCircle, Copy, Check } from "lucide-react";
+import { MessageCircle, Send, Trash2, Sparkles, Bot, User, StopCircle, Copy, Check, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { m, AnimatePresence } from "framer-motion";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -27,10 +27,7 @@ const QUICK_PROMPTS = [
   { emoji: "📊", text: "Analise os padrões recentes" },
   { emoji: "❄️", text: "Quais números estão atrasados?" },
   { emoji: "🧮", text: "Explique a estratégia de fechamento" },
-  { emoji: "🔄", text: "Como funciona a análise de ciclos?" },
-  { emoji: "💡", text: "Me dê uma estratégia conservadora" },
   { emoji: "⚡", text: "Qual a melhor abordagem para hoje?" },
-  { emoji: "❓", text: "Como usar o Titan Loterias?" },
 ];
 
 async function streamChat({
@@ -73,10 +70,6 @@ async function streamChat({
         onError("⏳ Limite de requisições atingido. Aguarde alguns instantes.");
         return;
       }
-      if (resp.status === 402) {
-        onError("💳 Créditos de IA esgotados.");
-        return;
-      }
       onError(errData.error || "Erro ao conectar com a IA.");
       return;
     }
@@ -116,23 +109,6 @@ async function streamChat({
       }
     }
 
-    // Flush remaining
-    if (textBuffer.trim()) {
-      for (let raw of textBuffer.split("\n")) {
-        if (!raw) continue;
-        if (raw.endsWith("\r")) raw = raw.slice(0, -1);
-        if (raw.startsWith(":") || raw.trim() === "") continue;
-        if (!raw.startsWith("data: ")) continue;
-        const jsonStr = raw.slice(6).trim();
-        if (jsonStr === "[DONE]") continue;
-        try {
-          const parsed = JSON.parse(jsonStr);
-          const content = parsed.choices?.[0]?.delta?.content as string | undefined;
-          if (content) onDelta(content);
-        } catch { /* ignore */ }
-      }
-    }
-
     onDone();
   } catch (err: any) {
     if (err.name === "AbortError") {
@@ -156,7 +132,6 @@ const AIChatPage = () => {
   const abortRef = useRef<AbortController | null>(null);
   const assistantBufferRef = useRef("");
 
-  // Load user learning on mount
   useEffect(() => {
     if (user?.id) refreshLearning();
   }, [user?.id, config.id]);
@@ -171,13 +146,6 @@ const AIChatPage = () => {
     abortRef.current?.abort();
     abortRef.current = null;
     setIsStreaming(false);
-  }, []);
-
-  const copyMessage = useCallback((content: string, idx: number) => {
-    navigator.clipboard.writeText(content);
-    setCopiedIdx(idx);
-    toast.success("Copiado!");
-    setTimeout(() => setCopiedIdx(null), 2000);
   }, []);
 
   const sendMessage = async (text?: string) => {
@@ -214,208 +182,150 @@ const AIChatPage = () => {
       onDone: () => setIsStreaming(false),
       onError: (err) => {
         toast.error(err);
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: `❌ ${err}`, timestamp: new Date() },
-        ]);
         setIsStreaming(false);
       },
       signal: controller.signal,
     });
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-
   return (
-    <div className="space-y-4">
-      <PageHeader
-        title="Chat com Titan IA"
-        description="Converse com a IA para análises personalizadas e estratégias inteligentes"
-        icon={MessageCircle}
-        badge="STREAMING"
-      />
-      <LotteryContextBanner />
+    <div className="flex flex-col h-[calc(100vh-120px)] max-w-5xl mx-auto pb-6 space-y-4 animate-in fade-in duration-700">
+      <div className="flex items-center justify-between px-4 pt-4">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-inner">
+            <Brain className="w-6 h-6 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-xl font-black uppercase tracking-tighter italic">Titan Concierge</h1>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">IA Especialista Online</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+            <Badge variant="outline" className="bg-secondary/40 border-border/40 text-[9px] font-black tracking-widest uppercase py-1 px-3 rounded-lg">
+                Loteria: {config.name}
+            </Badge>
+            {messages.length > 0 && (
+                <Button variant="ghost" size="icon" onClick={() => setMessages([])} className="h-9 w-9 rounded-xl hover:bg-destructive/10 hover:text-destructive">
+                    <Trash2 className="w-4 h-4" />
+                </Button>
+            )}
+        </div>
+      </div>
 
-      <div className="flex flex-col h-[calc(100vh-280px)] border border-border rounded-xl bg-card overflow-hidden shadow-lg">
-        {/* Messages */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 bg-card/40 backdrop-blur-md border border-border/40 rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
+        
+        <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-8 scroll-smooth relative z-10">
           {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-center space-y-6 animate-in fade-in duration-500">
+            <div className="flex flex-col items-center justify-center h-full text-center space-y-10 py-10">
               <div className="relative">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center border border-primary/20">
-                  <Bot className="w-10 h-10 text-primary" />
+                <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center border border-primary/20 shadow-2xl transform rotate-3">
+                  <Bot className="w-12 h-12 text-primary" />
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-green-500 border-2 border-card flex items-center justify-center">
-                  <Sparkles className="w-3 h-3 text-white" />
+                <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-lg border-4 border-card">
+                  <Sparkles className="w-4 h-4 text-primary-foreground" />
                 </div>
               </div>
-              <div>
-                <h3 className="text-xl font-bold text-foreground">Olá! Sou o Titan IA 🎯</h3>
-                <p className="text-sm text-muted-foreground mt-2 max-w-md">
-                  Seu assistente especialista em loterias brasileiras. Pergunte sobre análises,
-                  estratégias ou peça jogos personalizados.
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Loteria atual: <span className="font-medium text-primary">{config.name}</span>
+              <div className="space-y-4 max-w-md">
+                <h2 className="text-3xl font-black tracking-tighter uppercase italic leading-none">Como posso <span className="gradient-brand-text">te ajudar</span> a vencer?</h2>
+                <p className="text-sm text-muted-foreground font-medium leading-relaxed">
+                  Sou seu analista de elite. Analiso milhões de dados em segundos para te dar a vantagem matemática definitiva.
                 </p>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-xl w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-2xl px-4">
                 {QUICK_PROMPTS.map((prompt) => (
                   <button
                     key={prompt.text}
                     onClick={() => sendMessage(prompt.text)}
-                    className="text-left text-sm px-4 py-3 rounded-xl border border-border bg-background hover:bg-accent hover:text-accent-foreground hover:border-primary/30 transition-all duration-200 group"
+                    className="group flex items-center gap-4 text-left text-sm px-6 py-4 rounded-2xl border border-border/40 bg-card/50 hover:bg-primary/5 hover:border-primary/40 transition-all duration-300 shadow-sm"
                   >
-                    <span className="mr-2">{prompt.emoji}</span>
-                    <span className="group-hover:text-primary transition-colors">{prompt.text}</span>
+                    <span className="text-xl group-hover:scale-110 transition-transform">{prompt.emoji}</span>
+                    <span className="font-bold text-foreground group-hover:text-primary transition-colors">{prompt.text}</span>
                   </button>
                 ))}
               </div>
             </div>
           )}
 
-          {messages.map((msg, i) => (
-            <div
-              key={i}
-              className={cn(
-                "flex gap-3 animate-in slide-in-from-bottom-2 duration-300",
-                msg.role === "user" ? "justify-end" : "justify-start"
-              )}
-            >
-              {msg.role === "assistant" && (
-                <div className="shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center border border-primary/20 mt-1">
-                  <Bot className="w-4 h-4 text-primary" />
-                </div>
-              )}
-              <div className="flex flex-col max-w-[80%] sm:max-w-[70%]">
-                <div
-                  className={cn(
-                    "rounded-2xl px-4 py-3 text-sm",
-                    msg.role === "user"
-                      ? "bg-primary text-primary-foreground rounded-br-md"
-                      : "bg-muted text-foreground rounded-bl-md"
-                  )}
-                >
-                  {msg.role === "assistant" ? (
-                    <div className={cn(
-                      "prose prose-sm dark:prose-invert max-w-none",
-                      // Headings
-                      "[&>h2]:text-sm [&>h2]:font-bold [&>h2]:mt-4 [&>h2]:mb-2 [&>h2]:text-primary [&>h2]:border-b [&>h2]:border-primary/20 [&>h2]:pb-1",
-                      "[&>h3]:text-sm [&>h3]:font-semibold [&>h3]:mt-3 [&>h3]:mb-1.5 [&>h3]:text-foreground",
-                      // Paragraphs & lists
-                      "[&>p]:mb-2 [&>p]:leading-relaxed",
-                      "[&>ul]:mb-2 [&>ul]:space-y-1 [&>ol]:mb-2 [&>ol]:space-y-1",
-                      "[&_li]:leading-relaxed",
-                      // Tables
-                      "[&>table]:text-xs [&>table]:w-full [&>table]:my-3 [&>table]:border-collapse",
-                      "[&_th]:bg-primary/10 [&_th]:text-primary [&_th]:font-semibold [&_th]:px-3 [&_th]:py-1.5 [&_th]:text-left [&_th]:border [&_th]:border-border",
-                      "[&_td]:px-3 [&_td]:py-1.5 [&_td]:border [&_td]:border-border [&_td]:text-foreground",
-                      "[&_tr:nth-child(even)]:bg-muted/30",
-                      // Blockquotes
-                      "[&>blockquote]:border-l-4 [&>blockquote]:border-primary/40 [&>blockquote]:bg-primary/5 [&>blockquote]:pl-4 [&>blockquote]:py-2 [&>blockquote]:my-3 [&>blockquote]:rounded-r-lg [&>blockquote]:text-muted-foreground [&>blockquote]:italic",
-                      // Horizontal rules
-                      "[&>hr]:my-4 [&>hr]:border-border/50",
-                      // Code
-                      "[&_code]:bg-muted [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-xs [&_code]:text-primary",
-                      // Strong
-                      "[&_strong]:text-foreground [&_strong]:font-semibold",
-                    )}>
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
-                    </div>
-                  ) : (
-                    <p className="whitespace-pre-wrap">{msg.content}</p>
-                  )}
-                </div>
-                {msg.role === "assistant" && !isStreaming && (
-                  <div className="flex items-center gap-1 mt-1 ml-1">
-                    <button
-                      onClick={() => copyMessage(msg.content, i)}
-                      className="text-muted-foreground hover:text-muted-foreground transition-colors p-1 rounded"
-                      title="Copiar resposta"
-                    >
-                      {copiedIdx === i ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
-                    </button>
-                    <span className="text-[10px] text-muted-foreground">
-                      {msg.timestamp.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-                    </span>
-                  </div>
+          <AnimatePresence>
+            {messages.map((msg, i) => (
+              <m.div
+                key={i}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={cn(
+                  "flex gap-4",
+                  msg.role === "user" ? "flex-row-reverse" : "flex-row"
                 )}
-              </div>
-              {msg.role === "user" && (
-                <div className="shrink-0 w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mt-1">
-                  <User className="w-4 h-4 text-primary" />
+              >
+                <div className={cn(
+                    "shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center border shadow-inner",
+                    msg.role === "assistant" ? "bg-primary/10 border-primary/20" : "bg-secondary/40 border-border/40"
+                )}>
+                    {msg.role === "assistant" ? <Bot className="w-5 h-5 text-primary" /> : <User className="w-5 h-5 text-foreground" />}
                 </div>
-              )}
-            </div>
-          ))}
+                <div className={cn(
+                    "flex flex-col max-w-[85%] sm:max-w-[75%] space-y-2",
+                    msg.role === "user" ? "items-end" : "items-start"
+                )}>
+                    <div className={cn(
+                        "rounded-[2rem] px-6 py-4 text-sm shadow-sm leading-relaxed",
+                        msg.role === "user"
+                            ? "bg-primary text-primary-foreground rounded-tr-sm"
+                            : "bg-card border border-border/40 rounded-tl-sm text-foreground"
+                    )}>
+                        {msg.role === "assistant" ? (
+                            <div className="prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-secondary/20 prose-pre:border prose-pre:border-border/10 prose-th:bg-primary/5 prose-th:text-primary">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                            </div>
+                        ) : (
+                            <p className="font-medium">{msg.content}</p>
+                        )}
+                    </div>
+                </div>
+              </m.div>
+            ))}
+          </AnimatePresence>
 
           {isStreaming && messages[messages.length - 1]?.role !== "assistant" && (
-            <div className="flex gap-3 justify-start animate-in fade-in">
-              <div className="shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center border border-primary/20 mt-1">
-                <Bot className="w-4 h-4 text-primary animate-pulse" />
+            <div className="flex gap-4 animate-in fade-in">
+              <div className="shrink-0 w-10 h-10 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                <Bot className="w-5 h-5 text-primary animate-pulse" />
               </div>
-              <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-1.5">
-                <span className="w-2 h-2 bg-primary/60 rounded-full animate-bounce [animation-delay:0ms]" />
-                <span className="w-2 h-2 bg-primary/60 rounded-full animate-bounce [animation-delay:150ms]" />
-                <span className="w-2 h-2 bg-primary/60 rounded-full animate-bounce [animation-delay:300ms]" />
+              <div className="bg-card border border-border/40 rounded-[2rem] rounded-tl-sm px-6 py-4 flex items-center gap-1.5 shadow-sm">
+                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0ms]" />
+                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:150ms]" />
+                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:300ms]" />
               </div>
             </div>
           )}
         </div>
 
-        {/* Input bar */}
-        <div className="border-t border-border p-3 bg-background/80 backdrop-blur-sm">
-          <div className="flex items-end gap-2">
-            {messages.length > 0 && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => { setMessages([]); stopStreaming(); }}
-                className="shrink-0 text-muted-foreground hover:text-destructive"
-                title="Limpar conversa"
-                disabled={isStreaming}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            )}
+        <div className="p-6 bg-secondary/20 border-t border-border/10 backdrop-blur-xl relative z-20">
+          <div className="max-w-4xl mx-auto relative flex items-end gap-3">
             <Textarea
-              ref={textareaRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={isStreaming ? "Aguardando resposta..." : "Digite sua pergunta..."}
-              className="min-h-[44px] max-h-[120px] resize-none"
-              rows={1}
+              onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), sendMessage())}
+              placeholder={isStreaming ? "Aguardando resposta..." : "Digite sua diretriz para a IA..."}
+              className="min-h-[60px] max-h-[180px] rounded-3xl border-border/40 bg-background/80 backdrop-blur-sm px-6 py-4 shadow-inner resize-none focus-visible:ring-primary/20"
               disabled={isStreaming}
             />
             {isStreaming ? (
-              <Button
-                onClick={stopStreaming}
-                size="icon"
-                variant="destructive"
-                className="shrink-0"
-                title="Parar geração"
-              >
-                <StopCircle className="w-4 h-4" />
+              <Button onClick={stopStreaming} size="icon" variant="destructive" className="h-[60px] w-[60px] rounded-3xl shrink-0 shadow-lg">
+                <StopCircle className="w-6 h-6" />
               </Button>
             ) : (
-              <Button
-                onClick={() => sendMessage()}
-                disabled={!input.trim()}
-                size="icon"
-                className="shrink-0"
-              >
-                <Send className="w-4 h-4" />
+              <Button onClick={() => sendMessage()} disabled={!input.trim()} className="h-[60px] w-[60px] rounded-3xl shrink-0 gradient-brand shadow-xl">
+                <Send className="w-6 h-6" />
               </Button>
             )}
           </div>
-          <p className="text-[10px] text-muted-foreground text-center mt-2">
-            Titan IA pode cometer erros. Loterias são jogos de azar — jogue com responsabilidade.
+          <p className="text-[9px] text-muted-foreground text-center mt-4 font-black uppercase tracking-widest opacity-40 italic">
+            Tecnologia Titan IA • Precisão Matemática v7.5
           </p>
         </div>
       </div>
