@@ -280,7 +280,7 @@ export default function StrategyLabPage() {
                   </Badge>
                   <Badge className="text-xs gap-1.5 py-1.5 px-3 bg-primary/10 text-primary border-primary/20">
                     <Dices className="w-3 h-3" />
-                    {totalGamesGenerated} jogos
+                    {formatNumber(totalGamesGenerated)} jogos
                   </Badge>
                   {bestGamesCount > 0 && (
                     <Badge className="text-xs gap-1.5 py-1.5 px-3 bg-green-500/10 text-green-500 border-green-500/20">
