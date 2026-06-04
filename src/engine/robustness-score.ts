@@ -1,7 +1,8 @@
 import { NumberStats } from "@/engine/stats/statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { evaluateBetQuality, BetQualityReport } from "@/engine/stats/bet-quality";
-import { Strategy, STRATEGIES, generateByStrategy } from "@/engine/strategies";
+import { STRATEGIES, generateByStrategy } from "@/engine/strategies";
+import type { Strategy } from "@/engine/strategies";
 
 // ═══════════════════════════════════════════════════════
 // Score de Robustez — avalia apostas em 6 dimensões
