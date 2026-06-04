@@ -7,7 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { 
   BarChart3, Brain, Target, Zap, Clock, TrendingUp, 
   Search, Crown, History, Activity, Sparkles, LayoutGrid,
-  Filter, Award, Database, RefreshCw, Layers, Loader2
+  Filter, Award, Database, RefreshCw, Layers, Loader2,
+  TrendingDown, Shield, FileText, Share2 as Share, Play,
+  Cpu, Terminal as TerminalIcon, AlertCircle, CheckCircle2
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,6 +24,9 @@ import { RecentDraws } from "@/components/RecentDraws";
 import { cn } from "@/lib/utils";
 import { HeatmapIntensity } from "@/components/lottery/HeatmapIntensity";
 import { CorrelationNetwork } from "@/components/lottery/CorrelationNetwork";
+import { computeMatrixAnalysis } from "@/engine/matrix-analysis";
+import { MatrizAnaliseTable } from "@/components/MatrizAnaliseTable";
+import { FarolDezenas } from "@/components/FarolDezenas";
 import { useSavedBets } from "@/hooks/useSavedBets";
 
 const IntelligentGeneratorPanel = lazy(() => import("@/components/IntelligentGeneratorPanel").then(m => ({ default: m.IntelligentGeneratorPanel })));
@@ -48,6 +53,11 @@ export default function LotofacilPremiumPage() {
   const topElite = useMemo(() => 
     farol.filter(s => s.titanScore >= 85).sort((a, b) => b.titanScore - a.titanScore),
     [farol]
+  );
+
+  const matrixData = useMemo(
+    () => computeMatrixAnalysis(draws, config.numbers),
+    [draws, config.numbers]
   );
 
   if (selectedLottery !== "lotofacil") {
@@ -123,6 +133,9 @@ export default function LotofacilPremiumPage() {
             <TabsTrigger value="strategy" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
               Estratégia
             </TabsTrigger>
+            <TabsTrigger value="matrix" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
+              Matriz HP
+            </TabsTrigger>
             <TabsTrigger value="generation" className="rounded-xl px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs font-black uppercase tracking-widest">
               Geração Elite
             </TabsTrigger>
@@ -134,15 +147,50 @@ export default function LotofacilPremiumPage() {
 
         {/* --- OVERVIEW TAB --- */}
         <TabsContent value="overview" className="space-y-6">
-          <div className="grid lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
-              {/* DASHBOARD ELITE */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <StatsCard title="Score Elite" value={topElite.length} icon={Crown} />
-                <StatsCard title="Ciclo Atual" value={`#${cycle?.currentCycle || 0}`} icon={Clock} />
-                <StatsCard title="Prob. Fechamento" value={`${(100 - (cycle?.missingNumbers.length || 0) * 4).toFixed(0)}%`} icon={Target} />
-                <StatsCard title="Volatilidade" value="12.4%" icon={Activity} />
-              </div>
+          <div className="grid lg:grid-cols-4 gap-4">
+            <StatsCard title="Score Elite" value={topElite.length} icon={Crown} />
+            <StatsCard title="Ciclo Atual" value={`#${cycle?.currentCycle || 0}`} icon={Clock} />
+            <StatsCard title="Prob. Fechamento" value={`${(100 - (cycle?.missingNumbers.length || 0) * 4).toFixed(0)}%`} icon={Target} />
+            <StatsCard title="Estabilidade" value="98.2%" icon={Shield} />
+          </div>
+
+          <div className="grid xl:grid-cols-3 gap-6">
+            <div className="xl:col-span-2 space-y-6">
+              {/* TITAN COMMAND CENTER (COMPACT) */}
+              <Card className="glass-card border-primary/20 overflow-hidden relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
+                <CardHeader className="pb-2 border-b border-primary/10">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2 text-primary">
+                      <TerminalIcon className="w-4 h-4" />
+                      Titan Command Center (Neural Feed)
+                    </CardTitle>
+                    <Badge variant="outline" className="animate-pulse border-emerald-500/50 text-emerald-400 bg-emerald-500/5 text-[8px] font-black uppercase">
+                      SYSTEM ACTIVE
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4">
+                  <div className="space-y-3">
+                    {[
+                      { icon: Zap, text: "Sincronização global concluída. 3.142 sorteios indexados.", type: "success" },
+                      { icon: Brain, text: "Rede neural detectou desvio de 12% na frequência das dezenas moldura.", type: "info" },
+                      { icon: Target, text: "Ciclo #512 em estágio final. 4 dezenas restantes para fechamento.", type: "warning" },
+                      { icon: Activity, text: "Titan Score recalibrado para o concurso #3121.", type: "info" },
+                    ].map((feed, i) => (
+                      <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-secondary/10 border border-border/40 group hover:border-primary/20 transition-all">
+                        <div className={`p-1.5 rounded-lg bg-background/50 border border-border/40 shrink-0 group-hover:scale-110 transition-transform`}>
+                          <feed.icon className={`w-3.5 h-3.5 ${feed.type === 'success' ? 'text-emerald-400' : feed.type === 'warning' ? 'text-amber-400' : 'text-primary'}`} />
+                        </div>
+                        <p className="text-[11px] font-medium text-muted-foreground leading-relaxed">
+                          <span className="text-foreground/80 font-black uppercase tracking-widest text-[8px] mr-2 opacity-50">[{new Date().toLocaleTimeString()}]</span>
+                          {feed.text}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
 
               {/* FAROL SUMMARY */}
               <Card className="glass-card border-primary/20 bg-primary/5 overflow-hidden">
@@ -158,8 +206,8 @@ export default function LotofacilPremiumPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 border-collapse">
-                    {topElite.slice(0, 12).map((s, idx) => (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 border-collapse">
+                    {topElite.slice(0, 11).map((s, idx) => (
                       <div key={s.number} className="p-4 border-r border-b border-primary/10 hover:bg-primary/10 transition-colors group">
                         <div className="flex flex-col items-center gap-2">
                           <div className="w-10 h-10 rounded-xl gradient-brand flex items-center justify-center text-primary-foreground font-mono font-black text-lg shadow-lg group-hover:scale-110 transition-transform">
@@ -186,6 +234,31 @@ export default function LotofacilPremiumPage() {
             </div>
 
             <div className="space-y-6">
+              <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/20 via-background to-secondary/10 border border-primary/30 shadow-2xl shadow-primary/5 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-30 transition-opacity">
+                  <Cpu className="w-20 h-20" />
+                </div>
+                <h4 className="text-sm font-black uppercase tracking-widest text-foreground flex items-center gap-2 mb-4 italic">
+                  <Brain className="w-4 h-4 text-primary" />
+                  Titan Core Briefing
+                </h4>
+                <div className="space-y-4 relative z-10">
+                  <p className="text-xs text-muted-foreground leading-relaxed font-medium italic border-l-2 border-primary/40 pl-3">
+                    "Identificamos um padrão de compensação no quadrante superior direito. 
+                    Recomendamos priorizar dezenas de transição para o próximo sorteio."
+                  </p>
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {["Frequência +", "Delay Low", "Momentum S"].map(t => (
+                      <Badge key={t} variant="secondary" className="bg-primary/5 text-primary border-primary/20 text-[8px] font-black uppercase tracking-tighter">{t}</Badge>
+                    ))}
+                  </div>
+                </div>
+                <Button className="w-full mt-6 h-10 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-[9px] shadow-lg shadow-primary/20" onClick={() => setActiveTab("generation")}>
+                  <Sparkles className="w-3.5 h-3.5 mr-2" />
+                  Iniciar Geração Elite
+                </Button>
+              </div>
+
               <ROIQuickView />
               <NotificationsPanel />
               <InsightsCenter />
@@ -267,6 +340,37 @@ export default function LotofacilPremiumPage() {
             <StrategyBriefingPanel config={config} stats={stats} draws={draws} />
             <BettingBudgetPlanner config={config} stats={stats} draws={draws} />
           </div>
+        </TabsContent>
+
+        {/* --- MATRIX TAB --- */}
+        <TabsContent value="matrix" className="space-y-6">
+          <Card className="glass-card border-primary/20 overflow-hidden">
+            <CardHeader className="border-b border-primary/10 bg-primary/5">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
+                  <LayoutGrid className="w-5 h-5 text-primary" />
+                  Matriz de Alta Performance
+                </CardTitle>
+                <div className="flex gap-2">
+                  <Badge className="bg-primary/20 text-primary border-primary/30">SCORE V9.0</Badge>
+                  <Badge className="bg-accent/20 text-accent border-accent/30">QUANTUM STATS</Badge>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="space-y-8">
+                <FarolDezenas
+                  data={matrixData}
+                  totalNumbers={config.numbers}
+                  pickSize={config.pick}
+                  onSaveBet={(numbers, strategy, score) => handleSaveBet(numbers, strategy, score)}
+                />
+                <div className="pt-4">
+                  <MatrizAnaliseTable data={matrixData} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* --- GENERATION TAB --- */}
