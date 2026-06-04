@@ -132,9 +132,10 @@ export default function FechamentosPage() {
   const getRecommendation = () => {
     if (config.id !== 'lotofacil' || baseNumbers.length === 0) return null;
     const count = baseNumbers.length;
-    if (count >= 21) return { id: 'lotofacil_21_50', name: 'PLAN 21X50', efficiency: '92%', risk: 'Médio' };
-    if (count >= 19) return { id: 'lotofacil_19_5', name: 'PLAN 19X5', efficiency: '88%', risk: 'Médio' };
-    if (count >= 17) return { id: 'lotofacil_17_8', name: 'PLAN 17X8', efficiency: '85%', risk: 'Baixo' };
+    // Recommendations based on professional PLAN closures
+    if (count >= 21) return { id: 'lotofacil_21_50', name: 'TITAN PLAN 21X50', efficiency: '92%', risk: 'Médio', feature: 'TITAN_FECHAMENTO' };
+    if (count >= 19) return { id: 'lotofacil_19_5', name: 'TITAN PLAN 19X5', efficiency: '88%', risk: 'Médio', feature: 'TITAN_FECHAMENTO' };
+    if (count >= 17) return { id: 'lotofacil_17_8', name: 'TITAN PLAN 17X8', efficiency: '85%', risk: 'Baixo', feature: 'TITAN_FECHAMENTO' };
     return null;
   };
 
@@ -336,9 +337,9 @@ export default function FechamentosPage() {
                           <Brain className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                          <p className="text-[10px] font-black uppercase tracking-widest text-primary">Recomendação IA</p>
+                          <p className="text-[10px] font-black uppercase tracking-widest text-primary">Engenharia Titan (FAROL)</p>
                           <h4 className="text-sm font-bold uppercase">{recommendation.name}</h4>
-                          <p className="text-[10px] text-muted-foreground">Eficiência: {recommendation.efficiency} • Risco: {recommendation.risk}</p>
+                          <p className="text-[10px] text-muted-foreground">Eficiência: {recommendation.efficiency} • Garantia Profissional</p>
                         </div>
                       </div>
                       <Button size="sm" onClick={() => setSelectedMatrix(recommendation.id as any)} className="gradient-brand h-8 px-4 text-[10px] font-black uppercase">
@@ -360,10 +361,10 @@ export default function FechamentosPage() {
                       variant="secondary"
                       onClick={autoSelectNumbers}
                       className="gap-1.5 h-12 px-6"
-                      title="Auto-seleção Farol"
+                      title="Auto-seleção Farol (Titan Score)"
                     >
                       <Sparkles className="w-4 h-4" />
-                      Auto
+                      Titan Score
                     </Button>
                   </div>
                 </div>

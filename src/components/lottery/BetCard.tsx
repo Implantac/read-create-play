@@ -73,7 +73,7 @@ export function BetCard({
           <span className={`text-xl font-black italic tracking-tighter tabular-nums ${score >= 80 ? 'text-primary' : score >= 50 ? 'text-yellow-500' : 'text-orange-500'}`}>
             {score}
           </span>
-          <span className="text-[10px] font-black text-muted-foreground opacity-40 uppercase tracking-widest">Score</span>
+          <span className="text-[10px] font-black text-muted-foreground opacity-40 uppercase tracking-widest">Titan Score</span>
         </div>
       </div>
 
@@ -117,12 +117,12 @@ export function BetCard({
       <div className="flex items-center gap-3 pt-2 relative z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
         <Button variant="ghost" size="sm" onClick={handleCopy} className="h-9 px-4 rounded-xl border border-border/40 bg-secondary/20 hover:bg-primary/10 hover:text-primary text-[10px] font-black uppercase tracking-widest transition-all">
           {copied ? <Check className="w-3.5 h-3.5 mr-1.5 text-primary" /> : <Copy className="w-3.5 h-3.5 mr-1.5" />}
-          Copiar Matriz
+          Copiar Aposta
         </Button>
         {onSave && (
           <Button variant="ghost" size="sm" onClick={onSave} className="h-9 px-4 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest transition-all">
             <Shield className="w-3.5 h-3.5 mr-1.5" />
-            Salvar Node
+            Salvar Aposta
           </Button>
         )}
       </div>

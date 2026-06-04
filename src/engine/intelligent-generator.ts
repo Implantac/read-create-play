@@ -11,7 +11,7 @@ import { generateByStrategy, Strategy } from "@/engine/strategies";
 
 export interface IntelligentBet {
   numbers: number[];
-  score: number;           // 0-100 composite score
+  score: number;           // 0-100 Titan Score (FAROL)
   quality: BetQualityReport;
   analysis: BetAnalysis;
   strategy: string;

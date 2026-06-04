@@ -75,43 +75,45 @@ const GeradorPage = () => {
           </div>
 
           {/* PREMIUM: Advanced generators */}
-          <PlanGate feature="gerador_avancado" fallbackMessage="Análise de Robustez e Score">
+          <PlanGate feature="gerador_avancado" fallbackMessage="Titan Score e Análise de Robustez">
             <Suspense fallback={<LazyFallback />}>
               <RobustnessRadarPanel stats={stats} config={config} draws={draws} lotteryId={selectedLottery} />
             </Suspense>
           </PlanGate>
 
-          <PlanGate feature="gerador_avancado" fallbackMessage="Gerador Extremo com filtros avançados">
-            <Suspense fallback={<LazyFallback />}>
-              <ExtremeGeneratorPanel stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
-            </Suspense>
-          </PlanGate>
-
-          <PlanGate feature="gerador_avancado" fallbackMessage="Predição com IA avançada">
-            <Suspense fallback={<LazyFallback />}>
-              <AIPredictionPanel config={config} stats={stats} draws={draws} onSaveBet={handleSaveBet} />
-            </Suspense>
-          </PlanGate>
-
           {selectedLottery === "lotofacil" && (
-            <PlanGate feature="gerador_avancado" fallbackMessage="Gerador Inteligente com análise multi-critério">
-              <Suspense fallback={<LazyFallback />}>
-                <IntelligentGeneratorPanel stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
-              </Suspense>
-            </PlanGate>
+            <>
+              <PlanGate feature="gerador_avancado" fallbackMessage="Gerador Extremo com filtros avançados">
+                <Suspense fallback={<LazyFallback />}>
+                  <ExtremeGeneratorPanel stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
+                </Suspense>
+              </PlanGate>
+
+              <PlanGate feature="gerador_avancado" fallbackMessage="Predição com IA avançada">
+                <Suspense fallback={<LazyFallback />}>
+                  <AIPredictionPanel config={config} stats={stats} draws={draws} onSaveBet={handleSaveBet} />
+                </Suspense>
+              </PlanGate>
+
+              <PlanGate feature="gerador_avancado" fallbackMessage="Gerador Inteligente com análise multi-critério">
+                <Suspense fallback={<LazyFallback />}>
+                  <IntelligentGeneratorPanel stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
+                </Suspense>
+              </PlanGate>
+
+              <PlanGate feature="gerador_avancado" fallbackMessage="Gerador Evolutivo com algoritmo genético">
+                <Suspense fallback={<LazyFallback />}>
+                  <EvolutiveGeneratorPanel stats={stats} config={config} draws={draws} lotteryId={selectedLottery} />
+                </Suspense>
+              </PlanGate>
+
+              <PlanGate feature="gerador_profissional" fallbackMessage="Gerador Profissional com filtros avançados">
+                <Suspense fallback={<LazyFallback />}>
+                  <ProfessionalGeneratorPanel stats={stats} config={config} draws={draws} />
+                </Suspense>
+              </PlanGate>
+            </>
           )}
-
-          <PlanGate feature="gerador_avancado" fallbackMessage="Gerador Evolutivo com algoritmo genético">
-            <Suspense fallback={<LazyFallback />}>
-              <EvolutiveGeneratorPanel stats={stats} config={config} draws={draws} lotteryId={selectedLottery} />
-            </Suspense>
-          </PlanGate>
-
-          <PlanGate feature="gerador_profissional" fallbackMessage="Gerador Profissional com filtros avançados">
-            <Suspense fallback={<LazyFallback />}>
-              <ProfessionalGeneratorPanel stats={stats} config={config} draws={draws} />
-            </Suspense>
-          </PlanGate>
 
           <PlanGate feature="gerador_avancado" fallbackMessage="Gerador Aprimorado e Monte Carlo">
             <div className="grid lg:grid-cols-2 gap-6">

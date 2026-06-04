@@ -50,8 +50,8 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-primary">
           <Brain className="h-6 w-6" />
-          Gerador Inteligente
-          <Badge variant="outline" className="ml-2 font-mono">v5.2</Badge>
+          Gerador Titan (FAROL)
+          <Badge variant="outline" className="ml-2 font-mono">v7.0 PRO</Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -70,8 +70,8 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
           </div>
         </div>
 
-        <Button onClick={handleGenerate} disabled={isGenerating || draws.length === 0} className="w-full" size="lg">
-          {isGenerating ? <><Zap className="h-4 w-4 animate-spin mr-2" /> Gerando...</> : <><Sparkles className="h-4 w-4 mr-2" /> Gerar Apostas Inteligentes</>}
+        <Button onClick={handleGenerate} disabled={isGenerating || draws.length === 0} className="w-full gradient-brand h-12 uppercase font-black tracking-widest text-xs" size="lg">
+          {isGenerating ? <><Zap className="h-4 w-4 animate-spin mr-2" /> Calculando Matrizes...</> : <><Sparkles className="h-4 w-4 mr-2" /> Gerar Apostas Titan (FAROL)</>}
         </Button>
 
         {bets.length > 0 && (
