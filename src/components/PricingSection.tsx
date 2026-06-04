@@ -1,6 +1,6 @@
 import { Crown, CheckCircle2, Loader2, ShieldCheck, Gem } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthProvider";
+import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
