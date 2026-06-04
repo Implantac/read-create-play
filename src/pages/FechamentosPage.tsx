@@ -18,10 +18,12 @@ import {
 import { exportToPdf } from "@/engine/pdf-export";
 import {
   Grid3X3, Shield, Trophy, Coins, FileDown, ChevronRight,
-  CheckCircle2, AlertTriangle, Target, Hash, Layers, Sparkles, Save, Brain
+  CheckCircle2, AlertTriangle, Target, Hash, Layers, Sparkles, Save, Brain, Flame
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MatrixComparisonPanel } from "@/components/MatrixComparisonPanel";
+import { HeatmapIntensity } from "@/components/lottery/HeatmapIntensity";
+
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { toast } from "sonner";
 
@@ -138,6 +140,8 @@ export default function FechamentosPage() {
     if (count >= 18) return { id: 'lotofacil_gf', name: 'TITAN PLAN GF', efficiency: '95%', risk: 'Otimizado', feature: 'TITAN_FECHAMENTO' };
     if (count >= 17) return { id: 'lotofacil_17_8', name: 'TITAN PLAN 17X8', efficiency: '85%', risk: 'Baixo', feature: 'TITAN_FECHAMENTO' };
     if (count >= 13) return { id: 'lotofacil_13_6', name: 'TITAN PLAN 13X6', efficiency: '82%', risk: 'Baixo', feature: 'TITAN_FECHAMENTO' };
+    if (count >= 6) return { id: 'lotofacil_6_13', name: 'TITAN PLAN 6X13', efficiency: '80%', risk: 'Variável', feature: 'TITAN_FECHAMENTO' };
+
     return null;
   };
 
@@ -171,6 +175,9 @@ export default function FechamentosPage() {
         badge="PRO"
       />
       <LotteryContextBanner />
+
+      {/* Mapa de Calor para auxílio na escolha */}
+      <HeatmapIntensity />
 
       <PlanGate feature="fechamentos" fallbackMessage="Fechamentos Matemáticos — matrizes otimizadas com garantia de acertos">
       {/* Available matrices for current lottery */}
