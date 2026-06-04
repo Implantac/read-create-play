@@ -98,17 +98,17 @@ export function AppSidebar() {
           </div>
         )}
         {/* Active lottery indicator */}
-        <div className={`mx-2 mb-6 rounded-xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 transition-all duration-500 hover:border-primary/40 group/lottery ${collapsed ? "p-2.5 flex justify-center" : "px-4 py-3"}`}>
+        <div className={`mx-3 mb-6 rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 transition-all duration-500 hover:border-primary/40 group/lottery ${collapsed ? "p-2.5 flex justify-center" : "px-4 py-4 shadow-lg shadow-black/20"}`}>
           {collapsed ? (
-            <span className="text-xl drop-shadow-md group-hover/lottery:scale-110 transition-transform" title={config?.name || "Loto"}>{config?.icon || "🍀"}</span>
+            <span className="text-xl drop-shadow-md group-hover/lottery:scale-110 transition-transform cursor-pointer" title={config?.name || "Loto"}>{config?.icon || "🍀"}</span>
           ) : (
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-background/50 border border-primary/20 flex items-center justify-center shrink-0 shadow-inner group-hover/lottery:rotate-6 transition-transform duration-500">
-                <span className="text-xl drop-shadow-sm">{config?.icon || "🍀"}</span>
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-xl bg-background/50 border border-primary/20 flex items-center justify-center shrink-0 shadow-inner group-hover/lottery:rotate-6 transition-all duration-500 ring-1 ring-primary/10">
+                <span className="text-xl drop-shadow-sm group-hover/lottery:scale-110 transition-transform">{config?.icon || "🍀"}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-black text-primary uppercase tracking-wider truncate">{config?.name || "Loteria"}</p>
-                <p className="text-[9px] text-muted-foreground font-mono font-bold opacity-60 tracking-tight">{config?.pick || 0} / {config?.numbers || 0}</p>
+                <p className="text-xs font-black text-primary uppercase tracking-[0.1em] truncate leading-tight">{config?.name || "Loteria"}</p>
+                <p className="text-[9px] text-muted-foreground font-mono font-black opacity-50 tracking-widest mt-1 uppercase italic">{config?.pick || 0} de {config?.numbers || 0}</p>
               </div>
             </div>
           )}
