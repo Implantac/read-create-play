@@ -183,34 +183,47 @@
     background-clip: text;
   }
   .glass-panel {
-    background: hsl(var(--surface-glass) / 0.7);
-    backdrop-filter: blur(24px) saturate(1.4);
+    background: hsl(var(--surface-glass) / 0.85);
+    backdrop-filter: blur(24px) saturate(1.6);
     border: 1px solid hsl(var(--border) / 0.5);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   }
   .glass-card {
-    background: linear-gradient(135deg, hsl(var(--card) / 0.9) 0%, hsl(var(--card) / 0.7) 100%);
-    backdrop-filter: blur(16px) saturate(1.2);
-    border: 1px solid hsl(var(--border) / 0.4);
-    box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.6);
+    background: linear-gradient(135deg, hsl(var(--card) / 0.95) 0%, hsl(var(--card) / 0.8) 100%);
+    backdrop-filter: blur(16px) saturate(1.4);
+    border: 1px solid hsl(var(--border) / 0.6);
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .glass-card:hover {
+    border-color: hsl(var(--primary) / 0.3);
+    box-shadow: 0 15px 50px -12px rgba(0, 0, 0, 0.6);
   }
   .lottery-ball {
-    @apply w-10 h-10 rounded-md flex items-center justify-center text-sm font-bold font-mono transition-all duration-300;
-    background: hsl(var(--secondary) / 0.5);
+    @apply w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black font-mono transition-all duration-300;
+    background: hsl(var(--secondary) / 0.6);
     border: 1px solid hsl(var(--border));
     color: hsl(var(--foreground));
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  .lottery-ball:hover {
+    @apply scale-110 -translate-y-1;
+    border-color: hsl(var(--primary) / 0.5);
+    box-shadow: 0 8px 20px rgba(var(--primary-rgb) / 0.2);
   }
   .lottery-ball-hot {
-    border-color: hsl(var(--neon-red) / 0.6);
-    background: hsl(var(--neon-red) / 0.15);
+    border-color: hsl(var(--neon-red) / 0.8);
+    background: linear-gradient(135deg, hsl(var(--neon-red) / 0.2) 0%, hsl(var(--neon-red) / 0.05) 100%);
     color: hsl(var(--neon-red));
-    box-shadow: 0 0 15px hsl(var(--neon-red) / 0.2);
+    box-shadow: 0 0 20px hsl(var(--neon-red) / 0.25);
+    text-shadow: 0 0 8px hsl(var(--neon-red) / 0.4);
   }
   .lottery-ball-cold {
-    border-color: hsl(var(--neon-blue) / 0.6);
-    background: hsl(var(--neon-blue) / 0.15);
+    border-color: hsl(var(--neon-blue) / 0.8);
+    background: linear-gradient(135deg, hsl(var(--neon-blue) / 0.2) 0%, hsl(var(--neon-blue) / 0.05) 100%);
     color: hsl(var(--neon-blue));
-    box-shadow: 0 0 15px hsl(var(--neon-blue) / 0.2);
+    box-shadow: 0 0 20px hsl(var(--neon-blue) / 0.25);
+    text-shadow: 0 0 8px hsl(var(--neon-blue) / 0.4);
   }
 
   .animate-shimmer {
