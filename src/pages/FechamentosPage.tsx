@@ -16,7 +16,7 @@ import {
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { 
   Grid3X3, Layers, Target, ChevronRight, ChevronLeft, 
-  CheckCircle2, Hash, Shield, Coins, Brain, Play, Save, Download
+  CheckCircle2, Hash, Shield, Coins, Brain, Play, Save, Download, Loader2
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { useSavedBets } from "@/hooks/useSavedBets";
