@@ -60,12 +60,18 @@ const queryClient = new QueryClient({
 
 
 const PageLoader = () => (
-  <div className="flex items-center justify-center min-h-[60vh]">
+  <div className="flex items-center justify-center min-h-[60vh] animate-in fade-in duration-500">
     <div className="flex flex-col items-center gap-4">
-      <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-primary animate-spin" />
+      <div className="relative w-16 h-16">
+        <div className="absolute inset-0 rounded-xl bg-primary/20 blur-xl animate-pulse" />
+        <div className="relative w-16 h-16 rounded-xl bg-background border border-primary/20 flex items-center justify-center shadow-2xl">
+          <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        </div>
       </div>
-      <p className="text-xs font-mono text-muted-foreground animate-pulse uppercase tracking-widest">Iniciando Terminal...</p>
+      <div className="space-y-1 text-center">
+        <p className="text-xs font-mono text-primary uppercase tracking-[0.3em] animate-pulse">Titan OS</p>
+        <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-widest opacity-50">Iniciando Neural Core...</p>
+      </div>
     </div>
   </div>
 );
