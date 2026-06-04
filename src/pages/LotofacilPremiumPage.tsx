@@ -10,7 +10,7 @@ import {
   Filter, Award, Database, RefreshCw, Layers, Loader2,
   TrendingDown, Shield, FileText, Share2 as Share, Play,
   Cpu, Terminal as TerminalIcon, AlertCircle, CheckCircle2,
-  Table2, Save, FileSpreadsheet
+  Table2, Save, FileSpreadsheet, Download
 } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -54,6 +54,8 @@ import {
   runWorksheetBacktest,
   WorksheetBacktestResult,
 } from "@/engine/worksheet-matrices";
+
+import { downloadCSV } from "@/utils/export-utils";
 
 const IntelligentGeneratorPanel = lazy(() => import("@/components/IntelligentGeneratorPanel").then(m => ({ default: m.IntelligentGeneratorPanel })));
 const EvolutiveGeneratorPanel = lazy(() => import("@/components/EvolutiveGeneratorPanel").then(m => ({ default: m.EvolutiveGeneratorPanel })));
@@ -161,6 +163,21 @@ export default function LotofacilPremiumPage() {
     if (saved > 0) toast.success(`${saved} jogos salvos.`);
   };
 
+  const exportBI = () => {
+    const exportData = matrixData.map(row => ({
+      numero: row.number,
+      score: row.score,
+      rank: row.rank,
+      frequencia_total: row.freqTotal,
+      frequencia_recente: row.freqRecent30,
+      atraso: row.currentDelay,
+      tendencia: row.trend,
+      sinal: row.signal
+    }));
+    downloadCSV(exportData, `titan-bi-lotofacil-${new Date().toISOString().split('T')[0]}.csv`);
+    toast.success("Dados de BI exportados com sucesso!");
+  };
+
   if (selectedLottery !== "lotofacil") {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6">
@@ -214,7 +231,11 @@ export default function LotofacilPremiumPage() {
             {syncing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
             {syncing ? "Sincronizando" : "Sincronizar"}
           </Button>
-          <Button className="h-11 px-8 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20">
+          <Button 
+            onClick={exportBI}
+            className="h-11 px-8 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 gap-2"
+          >
+            <Download className="w-4 h-4" />
             Exportar BI
           </Button>
         </div>
