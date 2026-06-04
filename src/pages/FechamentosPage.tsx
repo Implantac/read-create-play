@@ -69,9 +69,9 @@ export default function FechamentosPage() {
     }
   };
 
-  // Filter matrices relevant to current lottery
-  const availableMatrices = MATRIX_LIST.filter((m) => m.lottery === config.id);
-  const allMatrices = MATRIX_LIST;
+  // Filter matrices relevant to current lottery (Only Lotofácil)
+  const availableMatrices = config.id === 'lotofacil' ? MATRIX_LIST.filter((m) => m.lottery === 'lotofacil') : [];
+  const allMatrices = MATRIX_LIST.filter(m => m.lottery === 'lotofacil');
 
   const currentMatrix = selectedMatrix ? WHEELING_MATRICES[selectedMatrix] : null;
   const betPrice = BET_PRICES[config.id] || 3.0;
@@ -263,26 +263,6 @@ export default function FechamentosPage() {
             })
           )}
 
-          {/* Other lotteries matrices (collapsed) */}
-          {availableMatrices.length < allMatrices.length && (
-            <details className="mt-4">
-              <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
-                Ver matrizes de outras loterias ({allMatrices.length - availableMatrices.length})
-              </summary>
-              <div className="mt-2 space-y-2 opacity-60">
-                {allMatrices
-                  .filter((m) => m.lottery !== config.id)
-                  .map((m) => (
-                    <div key={m.id} className="p-3 rounded-lg border border-border bg-muted/5 text-sm">
-                      <span className="font-semibold text-foreground">{m.name}</span>
-                      <span className="text-xs text-muted-foreground ml-2">
-                        ({m.games.length} jogos · garantia {m.guarantee}+)
-                      </span>
-                    </div>
-                  ))}
-              </div>
-            </details>
-          )}
         </CardContent>
       </Card>
 
