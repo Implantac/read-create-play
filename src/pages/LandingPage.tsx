@@ -190,42 +190,76 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      <section ref={heroRef} className="relative pt-32 pb-20 md:pt-48 md:pb-32 gradient-mesh overflow-hidden">
+      <section ref={heroRef} className="relative min-h-[100vh] flex items-center justify-center pt-24 pb-32 px-6 overflow-hidden">
+        {/* Advanced Background effects */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] bg-primary/10 rounded-full blur-[160px] opacity-20 animate-pulse" />
+          <div className="absolute bottom-1/4 left-1/4 w-[800px] h-[800px] bg-accent/10 rounded-full blur-[140px] opacity-10" />
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
+        </div>
+
         <FloatingLotteryBalls />
-        <motion.div className="absolute inset-0 opacity-[0.05]" style={{
-          y: gridY,
-          backgroundImage: "linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-        }} />
 
-        <motion.div className="container mx-auto px-4 relative" style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}>
-          <motion.div initial="hidden" animate="visible" className="max-w-4xl mx-auto text-center space-y-8">
-            <motion.div custom={0} variants={fadeUp} className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-neon-amber/10 border-2 border-neon-amber/30 text-neon-amber text-[10px] font-black tracking-[0.2em] uppercase shadow-lg shadow-neon-amber/5 backdrop-blur-md">
-              <div className="w-2 h-2 rounded-full bg-neon-amber animate-pulse shadow-[0_0_8px_rgba(var(--neon-amber),1)]" />
-              {t("landing.hero.badge", { count: LAUNCH_SPOTS })}
-            </motion.div>
+        <motion.div 
+          style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
+          className="container max-w-7xl mx-auto relative z-10 text-center space-y-12"
+        >
+          <motion.div 
+            initial="hidden"
+            animate="visible"
+            custom={0}
+            variants={fadeUp}
+            className="inline-flex items-center gap-3 px-6 py-2.5 rounded-2xl bg-primary/5 border border-primary/20 backdrop-blur-md shadow-2xl mb-4"
+          >
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+            </span>
+            <span className="text-[11px] font-black uppercase tracking-[0.3em] text-primary italic">Engine v6.0 Alpha Live</span>
+          </motion.div>
 
-            <motion.h1 custom={1} variants={fadeUp} className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.9] uppercase italic">
-              {t("landing.hero.title")}{" "}
-              <span className="gradient-brand-text block mt-4">{t("landing.hero.subtitle")}</span>
+          <div className="space-y-10">
+            <motion.h1 
+              initial="hidden"
+              animate="visible"
+              custom={1}
+              variants={fadeUp}
+              className="text-6xl md:text-9xl font-black tracking-tighter uppercase italic leading-[0.85] lg:leading-[0.8]"
+            >
+              Domine a <br />
+              <span className="gradient-brand-text not-italic">Sorte.</span>
             </motion.h1>
-
-            <motion.p custom={2} variants={fadeUp} className="text-lg md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-medium opacity-80">
+            
+            <motion.p 
+              initial="hidden"
+              animate="visible"
+              custom={2}
+              variants={fadeUp}
+              className="text-xl md:text-3xl text-muted-foreground max-w-4xl mx-auto font-medium leading-relaxed italic opacity-80"
+            >
               {t("landing.hero.description")}
             </motion.p>
+          </div>
 
-            <motion.div custom={3} variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} className="rounded-2xl overflow-hidden shadow-2xl shadow-primary/30">
-                <Button size="lg" onClick={(e) => handleCtaClick(e, "/signup")} className="gradient-brand text-primary-foreground h-16 px-10 text-lg font-black uppercase tracking-widest gap-3">
-                  {t("landing.hero.cta_primary")} <ChevronRight className="w-5 h-5" />
-                </Button>
-              </motion.div>
-              <Link to="/login">
-                <Button size="lg" variant="outline" className="h-16 px-10 text-lg font-black uppercase tracking-widest border-white/10 bg-white/5 hover:bg-white/10 transition-all rounded-2xl border-2">
-                  {t("landing.hero.cta_secondary")}
-                </Button>
-              </Link>
-            </motion.div>
+          <motion.div 
+            initial="hidden"
+            animate="visible"
+            custom={3}
+            variants={fadeUp}
+            className="flex flex-col sm:flex-row items-center justify-center gap-8 pt-8"
+          >
+            <Button 
+              size="lg" 
+              onClick={(e) => handleCtaClick(e, "/signup")}
+              className="w-full sm:w-auto h-20 px-16 rounded-[2.5rem] gradient-brand text-primary-foreground font-black uppercase tracking-[0.2em] text-sm shadow-[0_20px_50px_rgba(var(--primary-rgb),0.3)] hover:scale-105 active:scale-95 transition-all group"
+            >
+              {t("landing.hero.cta_primary")}
+              <ArrowRight className="ml-4 w-6 h-6 group-hover:translate-x-2 transition-transform" />
+            </Button>
+            
+            <Link to="/login" className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-primary transition-colors italic px-8">
+              Já sou um Titan
+            </Link>
           </motion.div>
         </motion.div>
       </section>
