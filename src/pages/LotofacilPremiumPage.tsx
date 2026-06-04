@@ -616,6 +616,43 @@ export default function LotofacilPremiumPage() {
                     })}
                   </div>
                 </div>
+
+                {canGenerateWorksheet && (
+                  <Button 
+                    variant="outline" 
+                    onClick={handleRunWorksheetBacktest}
+                    disabled={worksheetBacktesting}
+                    className="w-full h-11 rounded-xl border-accent/20 bg-accent/5 text-accent font-black uppercase tracking-widest text-[10px] hover:bg-accent/10"
+                  >
+                    {worksheetBacktesting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <TrendingUp className="w-4 h-4 mr-2" />}
+                    Simular Performance Histórica (100)
+                  </Button>
+                )}
+
+                {worksheetBacktest && (
+                  <div className="p-4 rounded-2xl bg-accent/5 border border-accent/20 space-y-3 animate-in fade-in slide-in-from-top-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-accent">Resultado Backtest Matrix</span>
+                      <Badge className="bg-accent/20 text-accent border-accent/30 text-[10px] font-black italic">
+                        SCORE: {Math.round(worksheetBacktest.prizeRate * 5)}pts
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <p className="text-[8px] text-muted-foreground uppercase font-black">Prêmios (11-15)</p>
+                        <p className="text-sm font-mono font-black text-foreground">{worksheetBacktest.totalPrizes}</p>
+                      </div>
+                      <div className="space-y-1 text-right">
+                        <p className="text-[8px] text-muted-foreground uppercase font-black">Taxa de Win</p>
+                        <p className="text-sm font-mono font-black text-emerald-400">{worksheetBacktest.prizeRate}%</p>
+                      </div>
+                    </div>
+                    <div className="pt-2 border-t border-accent/10 flex justify-between items-center">
+                      <span className="text-[8px] font-black uppercase text-muted-foreground">Melhor Hit</span>
+                      <span className="text-xs font-black text-foreground">{worksheetBacktest.bestHitsInPeriod} de 15</span>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
