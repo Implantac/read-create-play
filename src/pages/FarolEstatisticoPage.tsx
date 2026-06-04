@@ -116,37 +116,39 @@ export default function FarolEstatisticoPage() {
       </div>
 
       {/* Resumo de Ciclo e Tendência */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="glass-panel border-primary/20 bg-primary/5">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
-              <Clock className="w-4 h-4 text-primary" />
-              Ciclo Atual
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+        <Card className="glass-card border-primary/20 bg-primary/[0.02] rounded-[2rem] overflow-hidden group/cycle active:scale-[0.98] transition-all shadow-xl">
+          <CardHeader className="pb-2 p-6 border-b border-white/5 bg-white/[0.01]">
+            <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-2 text-primary opacity-60 group-hover/cycle:opacity-100 transition-opacity leading-none italic">
+              <Clock className="w-3.5 h-3.5" />
+              Ciclo Alpha v5.3
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-8">
             <div className="flex items-end justify-between">
               <div>
-                <p className="text-3xl font-black text-foreground">{cycle?.currentCycle || 0}</p>
-                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Ciclo nº</p>
+                <p className="text-5xl font-black font-mono tracking-tighter italic text-foreground leading-none">{cycle?.currentCycle || 0}</p>
+                <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest mt-4 opacity-40 leading-none">Ciclo Operacional nº</p>
               </div>
-              <div className="text-right">
-                <p className="text-sm font-bold text-primary">{cycle?.drawsInCurrentCycle || 0} concursos</p>
-                <p className="text-[10px] text-muted-foreground">no ciclo atual</p>
+              <div className="text-right space-y-1">
+                <Badge className="bg-primary text-primary-foreground font-black italic shadow-lg shadow-primary/20 px-3 py-1 rounded-lg">
+                  {cycle?.drawsInCurrentCycle || 0} Sorteios
+                </Badge>
+                <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter opacity-40 leading-none">Janela de Ciclo</p>
               </div>
             </div>
-            <div className="mt-4">
-              <div className="flex justify-between text-[10px] font-bold uppercase mb-1">
-                <span>Faltam {cycle?.missingNumbers.length || 0} dezenas</span>
-                <span>Média: {cycle?.avgDrawsToClose.toFixed(1) || 0}</span>
+            <div className="mt-8 pt-6 border-t border-white/5 space-y-4">
+              <div className="flex justify-between text-[9px] font-black uppercase tracking-widest opacity-60">
+                <span>Déficit: {cycle?.missingNumbers.length || 0} dezenas</span>
+                <span>Fluxo: {cycle?.avgDrawsToClose.toFixed(1) || 0}</span>
               </div>
-              <div className="flex flex-wrap gap-1">
-                {cycle?.missingNumbers.slice(0, 8).map(n => (
-                  <span key={n} className="w-5 h-5 flex items-center justify-center rounded bg-primary/20 text-[10px] font-mono font-bold border border-primary/30">
-                    {n}
+              <div className="flex flex-wrap gap-2">
+                {cycle?.missingNumbers.slice(0, 10).map(n => (
+                  <span key={n} className="w-8 h-8 flex items-center justify-center rounded-xl bg-background/60 text-[11px] font-black font-mono border border-white/5 shadow-inner group-hover/cycle:border-primary/30 transition-colors italic">
+                    {String(n).padStart(2, '0')}
                   </span>
                 ))}
-                {(cycle?.missingNumbers.length || 0) > 8 && <span className="text-[10px] text-muted-foreground self-center">...</span>}
+                {(cycle?.missingNumbers.length || 0) > 10 && <span className="text-[9px] font-black text-muted-foreground self-center ml-1 italic opacity-40">+{cycle!.missingNumbers.length - 10}</span>}
               </div>
             </div>
           </CardContent>
