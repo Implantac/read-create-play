@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import type {
   MassiveSimResult, MassiveSimProgress, GenerationMode,
   SimulatedGame,
-} from "@/engine/massive-simulation-engine";
+} from "@/engine/simulators/massive-simulation-engine";
 import MassiveSimWorker from "@/workers/massive-sim.worker?worker";
 import { isWorkerMessage, isWorkerProgress, isWorkerResult } from "@/core/workerContracts";
 
@@ -177,7 +177,7 @@ export function MassiveSimulationDashboard({ stats, config, draws }: Props) {
     setAiLoading(true);
     try {
       await new Promise(r => setTimeout(r, 200));
-      const { generateMassiveSimAnalysis } = await import("@/engine/native-analysis");
+      const { generateMassiveSimAnalysis } = await import("@/engine/ai/native-analysis");
       const analysis = generateMassiveSimAnalysis(
         result.topGames.slice(0, 15),
         toNativePatternInsights(result.patternInsights),

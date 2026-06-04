@@ -11,11 +11,11 @@ import { Brain, Play, Plus, Trash2, Trophy, BarChart3, Sparkles, Loader2, Target
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { toast } from "sonner";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import {
   SimulationBet, SimulationOutput, BetSimulationResult,
   runSimulation, parseBetsFromText, generateRandomBets, getMinPrizeHits,
-} from "@/engine/intelligent-simulator";
+} from "@/engine/simulators/intelligent-simulator";
 
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -163,7 +163,7 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
     setLoadingAi(true);
     try {
       await new Promise(r => setTimeout(r, 200));
-      const { generateSimulationAnalysis } = await import("@/engine/native-analysis");
+      const { generateSimulationAnalysis } = await import("@/engine/ai/native-analysis");
       const analysis = generateSimulationAnalysis(
         {
           bets: (simulation.bets as any).map((b: any) => ({

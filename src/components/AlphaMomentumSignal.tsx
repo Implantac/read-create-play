@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { AnalyticsSnapshot } from "@/engine/analytics-core";
+import { AnalyticsSnapshot } from "@/engine/stats/analytics-core";
 
 interface AlphaMomentumSignalProps {
   analytics: AnalyticsSnapshot;

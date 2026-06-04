@@ -1,6 +1,6 @@
 import type { DrawResult, LotteryConfig } from "@/data/lotteries";
-import type { NumberStats } from "@/engine/statistics";
-import { calculateAnalyticsSnapshot } from "@/engine/analytics-core";
+import type { NumberStats } from "@/engine/stats/statistics";
+import { calculateAnalyticsSnapshot } from "@/engine/stats/analytics-core";
 
 export type StrategyBriefingTone = "conservative" | "balanced" | "aggressive";
 

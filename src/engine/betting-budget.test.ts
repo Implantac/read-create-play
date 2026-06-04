@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { LotteryConfig } from "@/data/lotteries";
-import type { NumberStats } from "@/engine/statistics";
+import type { NumberStats } from "@/engine/stats/statistics";
 import { buildBettingBudgetPlan } from "@/engine/betting-budget";
 
 const config: LotteryConfig = {

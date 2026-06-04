@@ -4,7 +4,7 @@
  */
 
 import { DrawResult } from "@/data/lotteries";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import { getLotteryRules } from "../knowledge/lotteriesKnowledge";
 import { getStrategy } from "../knowledge/strategiesKnowledge";
 import { computePatternProfile } from "../engines/patternEngine";

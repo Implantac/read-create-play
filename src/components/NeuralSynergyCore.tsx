@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Share2, Zap, Shield, Cpu, Activity } from "lucide-react";
-import { AnalyticsSnapshot } from "@/engine/analytics-core";
+import { AnalyticsSnapshot } from "@/engine/stats/analytics-core";
 import { Badge } from "@/components/ui/badge";
 
 interface NeuralSynergyCoreProps {

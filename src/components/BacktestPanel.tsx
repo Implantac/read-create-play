@@ -3,10 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { STRATEGIES, Strategy } from "@/engine/strategies";
-import { runBacktest, BacktestResult } from "@/engine/backtesting";
+import { runBacktest, BacktestResult } from "@/engine/simulators/backtesting";
 import { motion, AnimatePresence } from "framer-motion";
 import { FlaskConical, Play, Trophy, TrendingUp, Zap } from "lucide-react";
 import {

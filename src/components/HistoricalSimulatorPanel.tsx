@@ -1,13 +1,13 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import {
   GameEntry,
   GameResult,
   SimulationSummary,
   generateGames,
   runHistoricalSimulation,
-} from "@/engine/historical-simulator";
+} from "@/engine/simulators/historical-simulator";
 import { motion, AnimatePresence } from "framer-motion";
 import { History, Play, Trophy, BarChart3, Lightbulb, Plus, Trash2, Shuffle, FileDown, ChevronDown, ChevronUp, Eye } from "lucide-react";
 import { getPrizeTiers } from "@/services/lotteryApi";

@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import { exportToPdf } from "@/engine/pdf-export";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import {

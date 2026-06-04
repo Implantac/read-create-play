@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Activity, Zap, TrendingUp, BarChart, Target, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { AnalyticsSnapshot } from "@/engine/analytics-core";
+import { AnalyticsSnapshot } from "@/engine/stats/analytics-core";
 
 interface IndicatorProps {
   label: string;

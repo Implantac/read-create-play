@@ -13,8 +13,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { generateNativeImprovements } from "@/engine/native-analysis";
-import { computeFrequencyStats } from "@/engine/statistics";
+import { generateNativeImprovements } from "@/engine/ai/native-analysis";
+import { computeFrequencyStats } from "@/engine/stats/statistics";
 import { useSavedBets, SavedBet } from "@/hooks/useSavedBets";
 import { Progress } from "@/components/ui/progress";
 import { BetHitsChart } from "@/components/BetHitsChart";

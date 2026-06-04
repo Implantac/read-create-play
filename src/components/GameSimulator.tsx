@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from "react";
-import { NumberStats, generateSmartBet } from "@/engine/statistics";
+import { NumberStats, generateSmartBet } from "@/engine/stats/statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { getPrizeTiers } from "@/services/lotteryApi";
 import { motion, AnimatePresence } from "framer-motion";

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { STRATEGIES, Strategy, generateByStrategy } from "@/engine/strategies";
 import { GenerationFilters, DEFAULT_FILTERS, generateWithFilters, betMatchesFilters } from "@/engine/generation-filters";

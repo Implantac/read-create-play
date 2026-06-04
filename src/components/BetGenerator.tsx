@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
-import { NumberStats, generateSmartBet } from "@/engine/statistics";
+import { NumberStats, generateSmartBet } from "@/engine/stats/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { evaluateBetQuality, BetQualityReport } from "@/engine/bet-quality";
+import { evaluateBetQuality, BetQualityReport } from "@/engine/stats/bet-quality";
 import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, RefreshCw, Copy, Check, ChevronRight, TrendingUp, Shield, Zap, BarChart3 } from "lucide-react";

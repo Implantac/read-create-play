@@ -1,4 +1,4 @@
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import { motion } from "framer-motion";
 import { Grid3X3 } from "lucide-react";
 

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { NumberStats } from "@/engine/statistics";
+import { NumberStats } from "@/engine/stats/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import {
   runHPMonteCarlo,
@@ -12,7 +12,7 @@ import {
   HPSimResult,
   HPOptResult,
   BenchmarkResult,
-} from "@/engine/hp-math-engine";
+} from "@/engine/math/hp-math-engine";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Cpu, Play, Zap, Gauge, Trophy, BarChart3, Rocket, Timer,
