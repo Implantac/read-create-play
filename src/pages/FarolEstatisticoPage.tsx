@@ -154,22 +154,30 @@ export default function FarolEstatisticoPage() {
           </CardContent>
         </Card>
 
-        <Card className="glass-panel border-accent/20 bg-accent/5">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
-              <Brain className="w-4 h-4 text-accent" />
-              Inteligência Titan
+        <Card className="glass-card border-accent/20 bg-accent/[0.02] rounded-[2rem] overflow-hidden group/ai active:scale-[0.98] transition-all shadow-xl">
+          <CardHeader className="pb-2 p-6 border-b border-white/5 bg-white/[0.01]">
+            <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-2 text-accent opacity-60 group-hover/ai:opacity-100 transition-opacity leading-none italic">
+              <Brain className="w-3.5 h-3.5" />
+              Neural Briefing
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
+          <CardContent className="p-8">
+            <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase text-muted-foreground">Confiança IA</span>
-                <span className="text-xs font-black text-accent">87%</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60 italic">Confiança Alpha</span>
+                <span className="text-xs font-black font-mono text-accent italic">87.4% SYNC</span>
               </div>
-              <Progress value={87} className="h-1.5 bg-accent/20" />
-              <div className="p-2 rounded-lg bg-background/50 border border-accent/10">
-                <p className="text-[9px] leading-relaxed text-muted-foreground italic">
+              <div className="h-1.5 w-full bg-accent/10 rounded-full overflow-hidden border border-accent/20 shadow-inner">
+                <m.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: '87.4%' }}
+                  transition={{ duration: 1.5, ease: "circOut" }}
+                  className="h-full bg-accent shadow-[0_0_15px_rgba(var(--accent-rgb),0.5)]" 
+                />
+              </div>
+              <div className="p-5 rounded-3xl bg-background/40 border border-white/5 shadow-inner relative overflow-hidden group-hover/ai:border-accent/20 transition-all duration-500">
+                <div className="absolute top-0 left-0 w-1 h-full bg-accent opacity-40" />
+                <p className="text-[11px] leading-relaxed text-foreground/80 italic font-medium">
                   "{aiInsight}"
                 </p>
               </div>
