@@ -553,14 +553,14 @@ const DashboardPage = () => {
                         <div className="grid grid-cols-2 gap-4">
                           <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
                             <span className="text-[10px] text-muted-foreground uppercase">Volatilidade</span>
-                            <p className={`text-sm font-bold ${volatilityIndex > 20 ? 'text-neon-red' : 'text-primary'}`}>
-                              {volatilityIndex.toFixed(1)}%
+                            <p className={`text-sm font-bold ${analytics.volatilityIndex > 20 ? 'text-neon-red' : 'text-primary'}`}>
+                              {analytics.volatilityIndex.toFixed(1)}%
                             </p>
                           </div>
                           <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
                             <span className="text-[10px] text-muted-foreground uppercase">Saturação</span>
-                            <p className={`text-sm font-bold ${saturationScore > 75 ? 'text-neon-amber' : 'text-primary'}`}>
-                              {saturationScore.toFixed(1)}%
+                            <p className={`text-sm font-bold ${analytics.saturationScore > 75 ? 'text-neon-amber' : 'text-primary'}`}>
+                              {analytics.saturationScore.toFixed(1)}%
                             </p>
                           </div>
                         </div>
@@ -629,27 +629,27 @@ const DashboardPage = () => {
             <motion.div variants={item} className="lg:col-span-1">
               <StatsCard 
                 title="Saturação" 
-                value={`${saturationScore.toFixed(1)}%`} 
+                value={`${analytics.saturationScore.toFixed(1)}%`} 
 icon={ActivitySquare}
-                color={saturationScore > 75 ? "red" : "green"} 
-                trend={saturationScore > 50 ? 2.1 : -1.2}
+                color={analytics.saturationScore > 75 ? "red" : "green"} 
+                trend={analytics.saturationScore > 50 ? 2.1 : -1.2}
                 subtitle="Risco de reversão estocástica" 
               />
             </motion.div>
             <motion.div variants={item} className="lg:col-span-1">
               <StatsCard 
                 title="Volatilidade" 
-                value={`${volatilityIndex.toFixed(1)}%`} 
+                value={`${analytics.volatilityIndex.toFixed(1)}%`} 
                 icon={TrendingUp} 
-                color={volatilityIndex > 20 ? "amber" : "blue"} 
-                trend={volatilityIndex > 15 ? 0.8 : -2.5}
+                color={analytics.volatilityIndex > 20 ? "amber" : "blue"} 
+                trend={analytics.volatilityIndex > 15 ? 0.8 : -2.5}
                 subtitle="Desvio padrão normalizado" 
               />
             </motion.div>
             <motion.div variants={item} className="lg:col-span-1 hidden xl:block">
               <StatsCard 
                 title="Complexidade" 
-                value={`${complexityScore.toFixed(0)}%`} 
+                value={`${analytics.complexityScore.toFixed(0)}%`} 
                 icon={Brain} 
                 color="blue" 
                 trend={-0.5}
