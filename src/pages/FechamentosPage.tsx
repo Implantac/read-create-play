@@ -104,17 +104,19 @@ const FechamentosPage = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700 pb-20 px-1">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
-        <div className="space-y-1.5">
+    <div className="max-w-7xl mx-auto space-y-12 animate-in fade-in duration-700 pb-20 px-4 sm:px-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-4">
+        <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded bg-primary/10 border border-primary/20 text-[9px] font-black text-primary uppercase tracking-[0.2em] italic">Combinatorial Engine v5.3</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Combinatorial Engine v6.0</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic leading-none">
-            Fechamentos <span className="gradient-brand-text">Matemáticos</span>
+          <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-tight">
+            Fechamentos <span className="gradient-brand-text not-italic">Profissionais</span>
           </h1>
-          <p className="text-sm text-muted-foreground font-medium max-w-md">Otimização combinatória de alta performance com garantia mínima de acertos.</p>
+          <p className="text-sm text-muted-foreground font-medium max-w-2xl leading-relaxed">
+            Nossa engine combinatória garante matematicamente a cobertura de prêmios se as condições da matriz forem atendidas.
+          </p>
         </div>
       </div>
       
