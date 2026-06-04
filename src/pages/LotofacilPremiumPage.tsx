@@ -220,10 +220,10 @@ export default function LotofacilPremiumPage() {
                         </div>
                       </div>
                     ))}
-                    <div className="p-4 border-b border-primary/10 flex items-center justify-center hover:bg-primary/10 transition-colors cursor-pointer" onClick={() => setActiveTab("intelligence")}>
+                    <div className="p-4 border-b border-primary/10 flex items-center justify-center hover:bg-primary/10 transition-colors cursor-pointer" onClick={() => setActiveTab("matrix")}>
                       <div className="text-center space-y-1">
-                        <p className="text-[9px] font-black text-primary uppercase tracking-widest">Ver Todas</p>
-                        <Layers className="w-4 h-4 text-primary mx-auto" />
+                        <p className="text-[9px] font-black text-primary uppercase tracking-widest">Matriz HP</p>
+                        <LayoutGrid className="w-4 h-4 text-primary mx-auto" />
                       </div>
                     </div>
                   </div>
