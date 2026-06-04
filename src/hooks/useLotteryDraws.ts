@@ -15,7 +15,7 @@ export function useLotteryDraws(lotteryId: string) {
   const { data, isLoading: loading, refetch } = useQuery({
     queryKey: ["lottery-draws", lotteryId],
     queryFn: () => LotteryService.fetchDraws(lotteryId, 500),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000, 
     gcTime: 30 * 60 * 1000,
   });
 
@@ -28,12 +28,10 @@ export function useLotteryDraws(lotteryId: string) {
     onSuccess: (data, isSilent) => {
       setLastSyncAt(new Date());
       const result = data?.results?.[0];
-      if (result) {
-        if (result.inserted > 0) {
-          if (!isSilent) toast.success(`${result.inserted} novos concursos importados`);
-        } else if (!isSilent) {
-          toast.info("Dados já atualizados");
-        }
+      if (result && result.inserted > 0) {
+        if (!isSilent) toast.success(`${result.inserted} novos concursos importados`);
+      } else if (!isSilent && !syncMutation.isPending) {
+        toast.info("Dados já atualizados");
       }
       queryClient.invalidateQueries({ queryKey: ["lottery-draws", lotteryId] });
     },
@@ -45,12 +43,21 @@ export function useLotteryDraws(lotteryId: string) {
     onSettled: () => setSyncing(false),
   });
 
+  const syncDraws = useCallback(async (isSilent = false) => {
+    try {
+      const result = await syncMutation.mutateAsync(isSilent);
+      return { success: true, result };
+    } catch (error) {
+      return { success: false, error: error instanceof Error ? error.message : "Erro" };
+    }
+  }, [syncMutation]);
+
   const syncAllLotteries = useCallback(async () => {
     setSyncing(true);
     try {
       await LotteryService.syncLottery();
       queryClient.invalidateQueries({ queryKey: ["lottery-draws"] });
-      toast.success("Sincronização completa iniciada");
+      toast.success("Sincronização iniciada");
     } catch (e) {
       toast.error("Erro ao sincronizar tudo");
     } finally {
