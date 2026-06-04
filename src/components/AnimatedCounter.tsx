@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
+import { formatNumber } from "@/utils/formatters";
 
 interface AnimatedCounterProps {
   value: string;
