@@ -612,9 +612,8 @@ const DashboardPage = () => {
                 title="Total Concursos" 
                 value={draws.length} 
                 icon={BarChart3} 
-                color="green" 
-                trend={1.2}
-                subtitle="Volume histórico processado" 
+                trend={{ value: 1.2, isPositive: true }}
+                description="Volume histórico processado" 
               />
             </motion.div>
             <motion.div variants={item} className="lg:col-span-1">
@@ -622,19 +621,17 @@ const DashboardPage = () => {
                 title="Tendência Alta" 
                 value={heatingCount} 
                 icon={Zap} 
-                color="amber" 
-                trend={5.4}
-                subtitle="Dezenas com aceleração" 
+                trend={{ value: 5.4, isPositive: true }}
+                description="Dezenas com aceleração" 
               />
             </motion.div>
             <motion.div variants={item} className="lg:col-span-1">
               <StatsCard 
                 title="Saturação" 
                 value={`${analytics.saturationScore.toFixed(1)}%`} 
-icon={ActivitySquare}
-                color={analytics.saturationScore > 75 ? "red" : "green"} 
-                trend={analytics.saturationScore > 50 ? 2.1 : -1.2}
-                subtitle="Risco de reversão estocástica" 
+                icon={Activity} 
+                trend={{ value: 2.1, isPositive: analytics.saturationScore > 50 }}
+                description="Risco de reversão estocástica" 
               />
             </motion.div>
             <motion.div variants={item} className="lg:col-span-1">
@@ -642,9 +639,8 @@ icon={ActivitySquare}
                 title="Volatilidade" 
                 value={`${analytics.volatilityIndex.toFixed(1)}%`} 
                 icon={TrendingUp} 
-                color={analytics.volatilityIndex > 20 ? "amber" : "blue"} 
-                trend={analytics.volatilityIndex > 15 ? 0.8 : -2.5}
-                subtitle="Desvio padrão normalizado" 
+                trend={{ value: 0.8, isPositive: analytics.volatilityIndex > 15 }}
+                description="Desvio padrão normalizado" 
               />
             </motion.div>
             <motion.div variants={item} className="lg:col-span-1 hidden xl:block">
@@ -652,9 +648,8 @@ icon={ActivitySquare}
                 title="Complexidade" 
                 value={`${analytics.complexityScore.toFixed(0)}%`} 
                 icon={Brain} 
-                color="blue" 
-                trend={-0.5}
-                subtitle="Entropia de distribuição" 
+                trend={{ value: 0.5, isPositive: false }}
+                description="Entropia de distribuição" 
               />
             </motion.div>
             <motion.div variants={item} className="lg:col-span-1 hidden xl:block">
@@ -662,9 +657,8 @@ icon={ActivitySquare}
                 title="Momentum IA" 
                 value={analytics.momentumIndex.toFixed(1)} 
                 icon={TrendingUp} 
-                color="green" 
-                trend={3.2}
-                subtitle="Taxa de aceleração técnica" 
+                trend={{ value: 3.2, isPositive: true }}
+                description="Taxa de aceleração técnica" 
               />
             </motion.div>
           </motion.div>
