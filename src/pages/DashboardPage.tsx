@@ -254,7 +254,7 @@ const DashboardPage = () => {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              {isSaturated && (
+              {analytics.saturationScore > 75 && (
                 <Badge variant="outline" className="hidden sm:flex bg-amber-500/10 text-amber-500 border-amber-500/20 text-[10px] animate-pulse">
                   ALTA SATURAÇÃO DETECTADA
                 </Badge>
