@@ -694,15 +694,33 @@ export default function LotofacilPremiumPage() {
             <div className="space-y-6">
               <Card className="glass-card border-border/60 bg-card/40 overflow-hidden">
                 <CardHeader className="border-b border-border/10 bg-secondary/5">
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
+                  <div className="flex flex-col xl:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
                       <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                      Auditoria de Matriz
-                    </CardTitle>
-                    <Button size="sm" onClick={saveAllWorksheetGames} disabled={!canGenerateWorksheet || worksheetSaving} className="h-9 px-6 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-[9px] shadow-lg shadow-primary/20 gap-2">
-                      <Save className="w-3.5 h-3.5" />
-                      {worksheetSaving ? "Salvando..." : "Salvar todos os jogos"}
-                    </Button>
+                      <div>
+                        <CardTitle className="text-sm font-black uppercase tracking-widest">Auditoria de Matriz</CardTitle>
+                        <p className="text-[9px] text-muted-foreground uppercase font-black opacity-60">Resultados em tempo real</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 w-full xl:w-auto">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setWorksheetFilterMinScore(worksheetFilterMinScore === 0 ? 1 : 0)}
+                        className={`h-9 px-4 rounded-xl border-border/40 text-[9px] font-black uppercase tracking-widest transition-all ${
+                          worksheetFilterMinScore > 0 ? "bg-primary/20 text-primary border-primary/40" : "bg-background/50"
+                        }`}
+                      >
+                        <Filter className="w-3.5 h-3.5 mr-1.5" />
+                        Filtro Titan {worksheetFilterMinScore > 0 ? "ON" : "OFF"}
+                      </Button>
+                      
+                      <Button size="sm" onClick={saveAllWorksheetGames} disabled={!canGenerateWorksheet || worksheetSaving} className="h-9 px-6 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-[9px] shadow-lg shadow-primary/20 gap-2 flex-1 xl:flex-initial">
+                        <Save className="w-3.5 h-3.5" />
+                        {worksheetSaving ? "Salvando..." : "Exportar"}
+                      </Button>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="p-0">
@@ -728,7 +746,7 @@ export default function LotofacilPremiumPage() {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {worksheetAnalysis.games.map((game) => (
+                          {filteredWorksheetGames.map((game) => (
                             <TableRow key={game.index} className="hover:bg-primary/5 transition-colors border-b border-border/20 group">
                               <TableCell className="font-black text-[10px] text-muted-foreground px-4 italic opacity-40">
                                 J{String(game.index).padStart(2, "0")}
