@@ -214,15 +214,6 @@ export const WHEELING_MATRICES = {
     pick: 15,
     guarantee: 14,
     games: generateLotofacil18_14(),
-  },
-  megasena_10_5: {
-    name: "Mega-Sena 10→Quina",
-    description: "10 dezenas-base → 36 jogos com garantia de 5 acertos (Quina) se os 6 sorteados estiverem na base",
-    lottery: "megasena",
-    baseSize: 10,
-    pick: 6,
-    guarantee: 5,
-    games: generateMegaSena10_5(),
   }
 };
 
