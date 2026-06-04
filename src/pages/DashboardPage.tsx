@@ -46,6 +46,7 @@ import { StrategyBriefingPanel } from "@/components/StrategyBriefingPanel";
 import { BettingBudgetPlanner } from "@/components/BettingBudgetPlanner";
 import { GamificationCard } from "@/components/GamificationCard";
 import { InsightsCenter } from "@/components/InsightsCenter";
+import { supabase } from "@/integrations/supabase/client";
 
 const container = {
   hidden: { opacity: 0 },
