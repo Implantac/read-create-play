@@ -12,13 +12,19 @@ import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { evaluateBetQuality } from "@/engine/stats/bet-quality";
 import { toast } from "sonner";
 
+import { useLocation } from "react-router-dom";
+
 const GeradorPage = () => {
   const { config, stats, draws, selectedLottery } = useLotteryContext();
   const { saveBet } = useSavedBets(selectedLottery);
   const { saveGeneration } = useGenerationHistory(selectedLottery);
+  const location = useLocation();
   
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(() => {
+    return location.state?.fromOnboarding ? 2 : 1;
+  });
   const [strategy, setStrategy] = useState<string>("balance");
+
   const [quantity, setQuantity] = useState(1);
   const [generating, setGenerating] = useState(false);
   const [results, setResults] = useState<any[]>([]);
