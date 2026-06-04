@@ -41,19 +41,23 @@ const GeradorPage = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10 animate-in fade-in duration-700">
       <PageHeader
-        title="Gerador de Apostas"
-        description="Gere combinações inteligentes com algoritmos estatísticos e IA"
+        title="Otimizador de Matrizes"
+        description="Gere combinações de alta cobertura combinatorial utilizando redes neurais e algoritmos genéticos."
         icon={Sparkles}
+        badge="PRECISION ENGINE"
       />
-      <LotteryContextBanner />
-      <ComplianceDisclaimer />
-
+      
       {draws.length === 0 ? (
-        <EmptyState description="Importe os sorteios primeiro no Dashboard para usar o gerador." />
+        <EmptyState title="Motor Desconectado" description="Sincronize a base de dados histórica no terminal principal para ativar os geradores de elite." />
       ) : (
         <>
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-primary/10 via-transparent to-primary/10 rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-1000" />
+            <LotteryContextBanner />
+          </div>
+
           <StrategyBriefingPanel config={config} stats={stats} draws={draws} compact />
 
           <BettingBudgetPlanner config={config} stats={stats} draws={draws} />
