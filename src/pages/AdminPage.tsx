@@ -546,19 +546,6 @@ export default function AdminPage() {
                 />
               )}
             </CardContent>
-                          <TableCell className="text-xs text-muted-foreground">
-                            {getTargetEmail(log.target_user_id)}
-                          </TableCell>
-                          <TableCell className="text-xs text-muted-foreground font-mono max-w-[200px] truncate">
-                            {log.details ? JSON.stringify(log.details) : "—"}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
