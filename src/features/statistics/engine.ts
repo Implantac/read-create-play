@@ -105,6 +105,8 @@ export function computeFrequencyStats(draws: DrawResult[], totalNumbers: number)
       momentum: momentum * 100,
       consecutivePairs: consecutivePairCount[n],
       cycleScore,
+      expectedAppearance: Math.round(avgGap - lastSeen[n]),
+      hotStreak: draws.slice(0, 5).filter(d => d.numbers.includes(n)).length,
     });
   }
 
