@@ -40,11 +40,18 @@ export function computeFrequencyStats(draws: DrawResult[], totalNumbers: number)
   const streak = new Array(totalNumbers + 1).fill(0);
   let lastDrawNumbers = draws[0]?.numbers || [];
   
-  draws.filter(d => d && Array.isArray(d.numbers)).forEach((draw, i) => {
-
+  const filterDraws = draws.filter(d => d && Array.isArray(d.numbers));
+  const filterCount = filterDraws.length;
+  
+  for (let i = 0; i < filterCount; i++) {
+    const draw = filterDraws[i];
     const numSet = new Set(draw.numbers);
-    draw.numbers.forEach(n => {
-      if (n < 1 || n > totalNumbers || !appearances[n]) return;
+    const drawNumbers = draw.numbers;
+    const drawNumbersLen = drawNumbers.length;
+    
+    for (let j = 0; j < drawNumbersLen; j++) {
+      const n = drawNumbers[j];
+      if (n < 1 || n > totalNumbers) continue;
       freq[n]++;
       if (i < lastSeen[n]) lastSeen[n] = i;
       if (i < recent) recentFreq[n]++;
@@ -54,12 +61,11 @@ export function computeFrequencyStats(draws: DrawResult[], totalNumbers: number)
       else if (i < 30) window2Freq[n]++;
       else if (i < 60) window3Freq[n]++;
 
-      // Check consecutive neighbors
       if (numSet.has(n - 1) || numSet.has(n + 1)) {
         consecutivePairCount[n]++;
       }
-    });
-  });
+    }
+  }
 
   const total = draws.length;
   const avgFreq = total > 0 ? draws[0].numbers.length / totalNumbers : 0;
