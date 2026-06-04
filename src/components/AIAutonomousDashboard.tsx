@@ -139,109 +139,117 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="border-primary/30 bg-gradient-to-r from-primary/5 via-background to-accent/5">
-        <CardHeader>
-          <div className="flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
-                <Brain className="h-6 w-6 text-primary" />
+      <Card className="glass-card border-primary/30 relative overflow-hidden group">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(var(--primary),0.1),transparent)] pointer-events-none" />
+        <CardHeader className="relative z-10 pb-6">
+          <div className="flex items-center justify-between flex-wrap gap-6">
+            <div className="flex items-center gap-5">
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 shadow-2xl group-hover:rotate-12 transition-transform duration-500">
+                <Brain className="h-8 w-8 text-primary animate-pulse" />
               </div>
               <div>
-                <CardTitle className="text-xl">IA Autônoma — {config.name}</CardTitle>
-                <CardDescription>
-                  {report.drawsAnalyzed} concursos · Confiança: {report.confidenceScore}/100 · {new Date(report.lastUpdated).toLocaleString("pt-BR")}
+                <CardTitle className="text-2xl font-black uppercase tracking-tighter italic">Engine IA Autônoma</CardTitle>
+                <CardDescription className="font-bold uppercase tracking-widest text-[10px] opacity-60 mt-1">
+                  {report.drawsAnalyzed} Sorteios Processados · Confiança: <span className="text-primary font-black">{report.confidenceScore}/100</span>
                 </CardDescription>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={refreshAnalysis} disabled={loading}>
+
+            <div className="flex gap-3 relative z-10">
+              <Button variant="outline" size="sm" onClick={refreshAnalysis} disabled={loading} className="h-10 px-5 rounded-xl border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary font-black uppercase tracking-widest text-[10px] transition-all">
                 <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-                Recalcular
+                Recalibrar
               </Button>
-              <Button size="sm" onClick={runAIAnalysis} disabled={aiLoading} className="gap-2">
-                {aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                Análise IA Profunda
+              <Button size="sm" onClick={runAIAnalysis} disabled={aiLoading} className="h-10 px-6 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
+                {aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
+                Deep Analysis
               </Button>
             </div>
+
           </div>
         </CardHeader>
       </Card>
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-        <Card className="border-primary/15">
-          <CardContent className="pt-3 pb-2 px-3">
-            <div className="flex items-center gap-2 mb-1">
-              <Target className="h-3.5 w-3.5 text-primary" />
-              <span className="text-[10px] text-muted-foreground">Fortes</span>
+        <Card className="glass-card border-primary/20 hover:border-primary/40 transition-all duration-500 group/stat">
+          <CardContent className="pt-5 pb-4 px-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover/stat:text-primary transition-colors">Dezenas Fortes</span>
+              <Target className="h-4 w-4 text-primary group-hover/stat:scale-110 transition-transform" />
             </div>
-            <p className="text-xl font-bold text-primary">{report.rankings.filter(r => r.classification === "forte").length}</p>
+            <p className="text-2xl font-black font-mono text-foreground italic">{report.rankings.filter(r => r.classification === "forte").length}</p>
           </CardContent>
         </Card>
-        <Card className="border-accent/15">
-          <CardContent className="pt-3 pb-2 px-3">
-            <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="h-3.5 w-3.5 text-accent" />
-              <span className="text-[10px] text-muted-foreground">Subindo</span>
+        <Card className="glass-card border-accent/20 hover:border-accent/40 transition-all duration-500 group/stat">
+          <CardContent className="pt-5 pb-4 px-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover/stat:text-accent transition-colors">Trend: Up</span>
+              <TrendingUp className="h-4 w-4 text-accent group-hover/stat:scale-110 transition-transform" />
             </div>
-            <p className="text-xl font-bold text-accent">{report.rankings.filter(r => r.trend === "subindo").length}</p>
+            <p className="text-2xl font-black font-mono text-foreground italic">{report.rankings.filter(r => r.trend === "subindo").length}</p>
           </CardContent>
         </Card>
-        <Card className="border-destructive/15">
-          <CardContent className="pt-3 pb-2 px-3">
-            <div className="flex items-center gap-2 mb-1">
-              <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
-              <span className="text-[10px] text-muted-foreground">Mudanças</span>
+        <Card className="glass-card border-destructive/20 hover:border-destructive/40 transition-all duration-500 group/stat">
+          <CardContent className="pt-5 pb-4 px-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover/stat:text-destructive transition-colors">Shift Matrix</span>
+              <AlertTriangle className="h-4 w-4 text-destructive group-hover/stat:scale-110 transition-transform" />
             </div>
-            <p className="text-xl font-bold text-destructive">{report.shifts.length}</p>
+            <p className="text-2xl font-black font-mono text-foreground italic">{report.shifts.length}</p>
           </CardContent>
         </Card>
-        <Card className="border-green-500/15">
-          <CardContent className="pt-3 pb-2 px-3">
-            <div className="flex items-center gap-2 mb-1">
-              <Dice1 className="h-3.5 w-3.5 text-green-500" />
-              <span className="text-[10px] text-muted-foreground">Entropia</span>
+        <Card className="glass-card border-green-500/20 hover:border-green-500/40 transition-all duration-500 group/stat">
+          <CardContent className="pt-5 pb-4 px-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover/stat:text-green-500 transition-colors">Entropia</span>
+              <Dice1 className="h-4 w-4 text-green-500 group-hover/stat:scale-110 transition-transform" />
             </div>
-            <p className="text-xl font-bold text-green-500">{report.entropyAnalysis.normalizedEntropy.toFixed(2)}</p>
+            <p className="text-2xl font-black font-mono text-foreground italic">{report.entropyAnalysis.normalizedEntropy.toFixed(2)}</p>
           </CardContent>
         </Card>
-        <Card className="border-yellow-500/15">
-          <CardContent className="pt-3 pb-2 px-3">
-            <div className="flex items-center gap-2 mb-1">
-              <FlaskConical className="h-3.5 w-3.5 text-yellow-500" />
-              <span className="text-[10px] text-muted-foreground">χ² p-valor</span>
+        <Card className="glass-card border-yellow-500/20 hover:border-yellow-500/40 transition-all duration-500 group/stat">
+          <CardContent className="pt-5 pb-4 px-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover/stat:text-yellow-500 transition-colors">χ² P-Valor</span>
+              <FlaskConical className="h-4 w-4 text-yellow-500 group-hover/stat:scale-110 transition-transform" />
             </div>
-            <p className="text-xl font-bold text-yellow-500">{report.chiSquareResult.pValue.toFixed(3)}</p>
+            <p className="text-2xl font-black font-mono text-foreground italic">{report.chiSquareResult.pValue.toFixed(3)}</p>
           </CardContent>
         </Card>
-        <Card className="border-purple-500/15">
-          <CardContent className="pt-3 pb-2 px-3">
-            <div className="flex items-center gap-2 mb-1">
-              <Gauge className="h-3.5 w-3.5 text-purple-500" />
-              <span className="text-[10px] text-muted-foreground">Confiança</span>
+        <Card className="glass-card border-purple-500/20 hover:border-purple-500/40 transition-all duration-500 group/stat">
+          <CardContent className="pt-5 pb-4 px-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover/stat:text-purple-500 transition-colors">Confiança</span>
+              <Gauge className="h-4 w-4 text-purple-500 group-hover/stat:scale-110 transition-transform" />
             </div>
-            <p className="text-xl font-bold text-purple-500">{report.confidenceScore}%</p>
+            <p className="text-2xl font-black font-mono text-foreground italic">{report.confidenceScore}%</p>
           </CardContent>
         </Card>
+
       </div>
 
       {/* Suggested Numbers */}
-      <Card className="border-primary/20">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Zap className="h-5 w-5 text-primary" />
-            Jogo Sugerido pela IA ({config.pick} dezenas)
-            <Badge variant="secondary" className="text-[10px]">Multi-critério + Entropia + χ²</Badge>
+      <Card className="glass-card border-primary/30 relative overflow-hidden group/sugg">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_100%,rgba(var(--primary),0.05),transparent)] pointer-events-none" />
+        <CardHeader className="pb-5 relative z-10">
+          <CardTitle className="text-sm font-black uppercase tracking-[0.2em] flex items-center gap-3 italic">
+            <div className="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center border border-primary/30 group-hover/sugg:rotate-6 transition-transform">
+              <Zap className="h-5 w-5 text-primary animate-pulse" />
+            </div>
+            Matriz Sugerida pela IA
+            <Badge variant="outline" className="ml-2 text-[9px] font-black uppercase tracking-widest border-primary/40 text-primary bg-primary/5">Neural Hybrid Engine</Badge>
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2 mb-3">
+        <CardContent className="relative z-10">
+          <div className="flex flex-wrap gap-3 mb-4">
             {report.suggestedNumbers.map(n => (
-              <span key={n} className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/15 text-primary font-bold text-sm border border-primary/30">
+              <span key={n} className="w-12 h-12 rounded-xl bg-primary/15 text-primary font-black font-mono text-lg border-2 border-primary/40 flex items-center justify-center shadow-lg shadow-primary/10 transition-all hover:scale-110 hover:-rotate-3 active:scale-95 cursor-default group/ball">
                 {String(n).padStart(2, "0")}
               </span>
             ))}
           </div>
+
           {report.avoidNumbers.length > 0 && (
             <div className="mt-3 pt-3 border-t border-border">
               <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">

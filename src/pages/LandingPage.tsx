@@ -329,13 +329,16 @@ export default function LandingPage() {
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeUp}
-                whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.2 } }}
-                className={`rounded-xl bg-gradient-to-b ${colorMap[f.color]} border p-6 transition-shadow duration-300 hover:shadow-lg`}
+                whileHover={{ y: -12, scale: 1.05, transition: { duration: 0.3 } }}
+                className={`rounded-2xl glass-card border-2 bg-gradient-to-b ${colorMap[f.color]} p-8 transition-all duration-500 hover:shadow-2xl group`}
               >
-                <f.icon className="w-8 h-8 mb-4" />
-                <h3 className="text-lg font-semibold text-foreground mb-2">{f.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{f.description}</p>
+                <div className="w-14 h-14 rounded-2xl bg-background/50 border border-white/10 flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+                  <f.icon className="w-7 h-7" />
+                </div>
+                <h3 className="text-xl font-black text-foreground uppercase tracking-tight italic mb-3">{f.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed font-medium opacity-80">{f.description}</p>
               </motion.div>
+
             ))}
           </div>
         </motion.div>
