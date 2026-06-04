@@ -166,6 +166,20 @@ export default function FechamentosPage() {
     });
   };
 
+  const handleExportCsv = () => {
+    if (!generatedGames || !currentMatrix) return;
+    const data = generatedGames.map((g, i) => [`Jogo ${i + 1}`, ...g]);
+    exportToCsv(`Fechamento_${currentMatrix.name}`, data);
+    toast.success("CSV exportado com sucesso!");
+  };
+
+  const handleExportExcel = () => {
+    if (!generatedGames || !currentMatrix) return;
+    const data = [["Identificador", "Dezenas"], ...generatedGames.map((g, i) => [`Jogo ${i + 1}`, g.join("-")])];
+    exportToExcel(`Fechamento_${currentMatrix.name}`, data);
+    toast.success("Excel exportado com sucesso!");
+  };
+
   const canGenerate =
     selectedMatrix && currentMatrix && baseNumbers.length >= currentMatrix.baseSize;
 
