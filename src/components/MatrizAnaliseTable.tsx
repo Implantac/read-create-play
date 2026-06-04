@@ -82,6 +82,10 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
   const [sortKey, setSortKey] = useState<SortKey>("rank");
   const [sortAsc, setSortAsc] = useState(true);
   const [filter, setFilter] = useState<FilterMode>("all");
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 50;
+
+  const parentRef = useRef<HTMLDivElement>(null);
 
   const filtered = useMemo(() => {
     let rows = [...data];
@@ -102,10 +106,29 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
     return rows;
   }, [data, sortKey, sortAsc, filter]);
 
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const paginatedData = useMemo(() => {
+    return filtered.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+  }, [filtered, currentPage, itemsPerPage]);
+
+  const rowVirtualizer = useVirtualizer({
+    count: paginatedData.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 64, // Approximate row height
+    overscan: 5,
+  });
+
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) setSortAsc(!sortAsc);
     else { setSortKey(key); setSortAsc(key === "rank"); }
   };
+
+  const handlePageChange = useCallback((newPage: number) => {
+    setCurrentPage(newPage);
+    if (parentRef.current) {
+      parentRef.current.scrollTop = 0;
+    }
+  }, []);
 
   const filters: { label: string; value: FilterMode; count: number }[] = [
     { label: "Todas", value: "all", count: data.length },
