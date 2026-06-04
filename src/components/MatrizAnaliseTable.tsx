@@ -260,7 +260,7 @@ export const MatrizAnaliseTable = memo(function MatrizAnaliseTable({ data }: Pro
                       <span className={`text-xs font-mono ${
                         row.currentDelay >= row.avgDelay ? "text-red-400" : "text-muted-foreground"
                       }`}>
-                        {row.currentDelay}
+                        {formatNumber(row.currentDelay)}
                         {row.currentDelay >= row.avgDelay && (
                           <span className="text-[9px] ml-1 text-red-400/70">⚠</span>
                         )}
