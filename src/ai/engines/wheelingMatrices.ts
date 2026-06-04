@@ -116,6 +116,20 @@ function generateLotofacil18_14(): number[][] {
 }
 
 // ═══════════════════════════════════════════
+// LOTOFÁCIL: 6 base → 13 jogos (Fixas)
+// ═══════════════════════════════════════════
+function generateLotofacil6_13(): number[][] {
+  const all6 = Array.from({ length: 6 }, (_, i) => i);
+  const remaining = Array.from({ length: 19 }, (_, i) => i + 6);
+  const games: number[][] = [];
+  for (let i = 0; i < 13; i++) {
+    const group = shuffle([...remaining]).slice(0, 9);
+    games.push([...all6, ...group].sort((a, b) => a - b));
+  }
+  return games;
+}
+
+// ═══════════════════════════════════════════
 // MEGA-SENA: 10 → 36 jogos → garantia 5 pts (Quina)
 // C(10,6) = 210 possíveis sorteios
 // ═══════════════════════════════════════════
@@ -505,6 +519,15 @@ export const WHEELING_MATRICES = {
     pick: 15,
     guarantee: 14,
     games: generateLotofacil18_14(),
+  },
+  lotofacil_6_13: {
+    name: "PLAN 6X13",
+    description: "6 dezenas fixas expandidas para 13 combinações otimizadas.",
+    lottery: "lotofacil",
+    baseSize: 25, // uses entire pool but keeps 6 fixed
+    pick: 15,
+    guarantee: 11,
+    games: generateLotofacil6_13(),
   },
   megasena_10_5: {
     name: "Mega-Sena 10→Quina (36 jogos)",
