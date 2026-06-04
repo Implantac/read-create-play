@@ -311,7 +311,7 @@ const AIAnalystPage = () => {
             <CardContent className="space-y-6">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Dezenas Base: {wheelBase}</label>
+                  <label className="text-sm font-medium mb-2 block">Dezenas Base: {formatNumber(wheelBase)}</label>
                   <Slider value={[wheelBase]} onValueChange={v => setWheelBase(v[0])}
                     min={rules.pick + 1} max={Math.min(rules.totalNumbers, 22)} step={1} />
                 </div>
