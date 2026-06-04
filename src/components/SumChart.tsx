@@ -8,16 +8,19 @@ interface Props {
 
 export function SumChart({ data }: Props) {
   return (
-    <div className="rounded-xl glass-card p-5 space-y-4">
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-lg bg-neon-amber/10 border border-neon-amber/20 flex items-center justify-center">
-          <TrendingUp className="w-4 h-4 text-neon-amber" />
-        </div>
-        <div>
-          <h3 className="text-sm font-semibold text-foreground">Soma das Dezenas</h3>
-          <p className="text-[10px] text-muted-foreground mt-0.5">Últimos 50 concursos</p>
+    <div className="rounded-2xl glass-card p-6 space-y-6 group transition-all duration-500 hover:shadow-2xl hover:shadow-amber-500/5">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="w-11 h-11 rounded-xl bg-neon-amber/10 border border-neon-amber/20 flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform duration-500">
+            <TrendingUp className="w-5 h-5 text-neon-amber" />
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-foreground uppercase tracking-wider italic">Soma das Dezenas</h3>
+            <p className="text-[10px] text-muted-foreground mt-1 font-bold uppercase tracking-widest opacity-60">Histórico de Variação</p>
+          </div>
         </div>
       </div>
+
       <div className="h-48">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={[...data].reverse()} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>

@@ -11,16 +11,19 @@ export function HeatmapGrid({ stats, totalNumbers }: Props) {
   const maxFreq = Math.max(...stats.map(s => s.frequency));
 
   return (
-    <div className="rounded-xl glass-card p-5 space-y-4">
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-lg bg-neon-cyan/10 border border-neon-cyan/20 flex items-center justify-center">
-          <Grid3X3 className="w-4 h-4 text-neon-cyan" />
-        </div>
-        <div>
-          <h3 className="text-sm font-semibold text-foreground">Heatmap de Dezenas</h3>
-          <p className="text-[10px] text-muted-foreground mt-0.5">Intensidade por frequência de aparição</p>
+    <div className="rounded-2xl glass-card p-6 space-y-6 group transition-all duration-500 hover:shadow-2xl hover:shadow-cyan-500/5">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="w-11 h-11 rounded-xl bg-neon-cyan/10 border border-neon-cyan/20 flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform duration-500">
+            <Grid3X3 className="w-5 h-5 text-neon-cyan" />
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-foreground uppercase tracking-wider italic">Heatmap de Dezenas</h3>
+            <p className="text-[10px] text-muted-foreground mt-1 font-bold uppercase tracking-widest opacity-60">Matriz de Intensidade</p>
+          </div>
         </div>
       </div>
+
       <div className="grid gap-1.5 sm:gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(totalNumbers, 10)}, 1fr)` }}>
         {stats.map((s, i) => {
           const intensity = maxFreq > 0 ? s.frequency / maxFreq : 0;
