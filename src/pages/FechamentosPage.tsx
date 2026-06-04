@@ -27,8 +27,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MatrixComparisonPanel } from "@/components/MatrixComparisonPanel";
 import { HeatmapIntensity } from "@/components/lottery/HeatmapIntensity";
 
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { toast } from "sonner";
+
 
 // Bet prices per lottery (approximate, single game)
 const BET_PRICES: Record<string, number> = {
