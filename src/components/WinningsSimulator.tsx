@@ -335,7 +335,7 @@ export function WinningsSimulator({ lotteryId, pick, maxNumbers, draws, drawsWit
               />
               <StatBox
                 label="ROI"
-                value={`${sim.roi >= 0 ? "+" : ""}${sim.roi.toFixed(1)}%`}
+                value={`${sim.roi >= 0 ? "+" : ""}${formatNumber(sim.roi)}%`}
                 tone={sim.roi >= 0 ? "positive" : "negative"}
                 icon={<TrendingUp className="w-3 h-3" />}
               />
