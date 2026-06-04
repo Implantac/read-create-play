@@ -76,11 +76,11 @@ export function BacktestPanel({ stats, config, draws }: Props) {
   })) ?? [];
 
   return (
-    <Card className="bg-card/80 backdrop-blur border-border">
+    <Card className="glass-card border-primary/20 overflow-hidden relative group">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-foreground">
-          <FlaskConical className="w-5 h-5 text-primary" />
-          Backtesting Automático
+          <FlaskConical className="w-5 h-5 text-primary group-hover:rotate-12 transition-transform" />
+          Backtesting Elite v5.3
         </CardTitle>
         <p className="text-xs text-muted-foreground">
           Teste cada estratégia contra {draws.length} resultados históricos reais e compare desempenho
@@ -136,7 +136,7 @@ export function BacktestPanel({ stats, config, draws }: Props) {
           </div>
         </div>
 
-        <Button onClick={run} disabled={running || selectedStrategies.length === 0} className="w-full gap-2">
+        <Button onClick={run} disabled={running || selectedStrategies.length === 0} className="w-full h-11 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
           {running ? <Zap className="w-4 h-4 animate-pulse" /> : <Play className="w-4 h-4" />}
           {running ? "Executando backtesting..." : `Testar ${selectedStrategies.length} estratégias × ${testWindow} sorteios`}
         </Button>
@@ -152,12 +152,12 @@ export function BacktestPanel({ stats, config, draws }: Props) {
               {/* Ranking */}
               <div className="space-y-2">
                 {results.map((r, idx) => (
-                  <div key={r.strategy} className="flex items-center gap-3 p-3 rounded-lg bg-muted/20 border border-border">
-                    <span className="text-lg font-bold font-mono text-primary w-7 text-right">#{idx + 1}</span>
+                  <div key={r.strategy} className="flex items-center gap-3 p-3 rounded-lg bg-muted/20 border border-border group/row hover:border-primary/40 hover:bg-muted/30 transition-all cursor-default">
+                    <span className="text-lg font-black font-mono text-primary/40 group-hover/row:text-primary transition-colors w-7 text-right">#{idx + 1}</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-semibold text-foreground">{r.label}</span>
-                        {idx === 0 && <Badge variant="default" className="text-[10px]"><Trophy className="w-2.5 h-2.5 mr-0.5" />Melhor</Badge>}
+                        {idx === 0 && <Badge variant="default" className="text-[10px] bg-primary text-primary-foreground font-black tracking-widest"><Trophy className="w-2.5 h-2.5 mr-0.5" />Melhor</Badge>}
                       </div>
                       <div className="flex gap-3 mt-1 text-[11px] text-muted-foreground flex-wrap">
                         <span>Média: <strong className="text-foreground">{r.avgHits}</strong></span>
