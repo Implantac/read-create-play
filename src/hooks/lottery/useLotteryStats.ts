@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { NumberStats, computeFrequencyStats, computeSumDistribution } from "@/engine/stats/statistics";
+import { computeFarolStats, FarolStats, CycleStats } from "@/engine/stats/farol-engine";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 
 export function useLotteryStats(draws: DrawResult[], config: LotteryConfig) {
@@ -23,10 +24,17 @@ export function useLotteryStats(draws: DrawResult[], config: LotteryConfig) {
     [stats]
   );
 
+  const farolData = useMemo(() => 
+    computeFarolStats(draws, config, stats),
+    [draws, config, stats]
+  );
+
   return {
     stats,
     sumData,
     hotNumbers,
-    coldNumbers
+    coldNumbers,
+    farol: farolData.farol,
+    cycle: farolData.cycle
   };
 }

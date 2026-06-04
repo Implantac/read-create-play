@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useMemo, useCallback, ReactNode, useEffect } from "react";
 import { LOTTERIES, DrawResult } from "@/data/lotteries";
 import { computeFrequencyStats, computeSumDistribution, NumberStats } from "@/engine/stats/statistics";
+import { FarolStats, CycleStats } from "@/engine/stats/farol-engine";
 import { useLotteryDraws, DrawResultWithPrizes } from "@/hooks/useLotteryDraws";
 import { useLotteryStats } from "@/hooks/lottery/useLotteryStats";
 
@@ -22,6 +23,8 @@ interface LotteryContextType {
   sumData: ReturnType<typeof computeSumDistribution>;
   hotNumbers: number[];
   coldNumbers: number[];
+  farol: FarolStats[];
+  cycle: CycleStats | null;
 }
 
 const LotteryContext = createContext<LotteryContextType | null>(null);
@@ -44,7 +47,7 @@ export function LotteryProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(intervalId);
   }, [selectedLottery, syncDraws, draws.length, loading]);
 
-  const { stats, sumData, hotNumbers, coldNumbers } = useLotteryStats(draws, config);
+  const { stats, sumData, hotNumbers, coldNumbers, farol, cycle } = useLotteryStats(draws, config);
 
   return (
     <LotteryContext.Provider value={{
@@ -65,7 +68,9 @@ export function LotteryProvider({ children }: { children: ReactNode }) {
       stats, 
       sumData,
       hotNumbers,
-      coldNumbers
+      coldNumbers,
+      farol,
+      cycle
     }}>
       {children}
     </LotteryContext.Provider>

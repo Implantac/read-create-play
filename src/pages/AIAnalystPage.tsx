@@ -26,6 +26,8 @@ import {
 import { toast } from "sonner";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { NeuralMapVisualization } from "@/components/NeuralMapVisualization";
+import { FarolEstatistico } from "@/components/FarolEstatistico";
+import { HeatmapInteligente } from "@/components/HeatmapInteligente";
 
 const AIAnalystPage = () => {
   const { config, draws, stats, selectedLottery } = useLotteryContext();
@@ -144,7 +146,8 @@ const AIAnalystPage = () => {
           <TabsTrigger value="generator" className="gap-1.5"><Sparkles className="h-3.5 w-3.5" />Gerador</TabsTrigger>
           <TabsTrigger value="wheeling" className="gap-1.5"><Shield className="h-3.5 w-3.5" />Fechamento</TabsTrigger>
           <TabsTrigger value="simulation" className="gap-1.5"><FlaskConical className="h-3.5 w-3.5" />Simulação</TabsTrigger>
-          <TabsTrigger value="analysis" className="gap-1.5"><BarChart3 className="h-3.5 w-3.5" />Análise</TabsTrigger>
+          <TabsTrigger value="analysis" className="gap-1.5"><BarChart3 className="h-3.5 w-3.5" />Análise IA</TabsTrigger>
+          <TabsTrigger value="farol" className="gap-1.5"><Zap className="h-3.5 w-3.5" />FAROL</TabsTrigger>
         </TabsList>
 
         {/* ═══ CHAT TAB ═══ */}
@@ -447,7 +450,15 @@ const AIAnalystPage = () => {
 
         {/* ═══ ANALYSIS TAB ═══ */}
         <TabsContent value="analysis">
-          <AnalysisTab draws={draws} lotteryId={selectedLottery} stats={stats} config={config} />
+          <div className="space-y-6">
+            <HeatmapInteligente />
+            <AnalysisTab draws={draws} lotteryId={selectedLottery} stats={stats} config={config} />
+          </div>
+        </TabsContent>
+
+        {/* ═══ FAROL TAB ═══ */}
+        <TabsContent value="farol">
+          <FarolEstatistico />
         </TabsContent>
       </Tabs>
       </PlanGate>
