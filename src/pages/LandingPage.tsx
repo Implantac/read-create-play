@@ -233,6 +233,56 @@ export default function LandingPage() {
       </section>
 
       <ScreensShowcase />
+
+      <section className="py-24 md:py-40 relative overflow-hidden">
+        <div className="container mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-20 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="space-y-8"
+            >
+              <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
+                Como <span className="gradient-brand-text">Funciona?</span>
+              </h2>
+              <div className="space-y-6">
+                {[
+                  { step: "01", title: "Coleta de Big Data", desc: "Nossos servidores monitoram resultados de todas as loterias oficiais em tempo real." },
+                  { step: "02", title: "Processamento Neural", desc: "A IA processa mais de 1 milhão de combinações para cada sorteio buscando anomalias." },
+                  { step: "03", title: "Geração de Estratégias", desc: "Algoritmos genéticos criam matrizes de jogos com o maior equilíbrio estatístico possível." }
+                ].map((item, i) => (
+                  <div key={i} className="flex gap-6 items-start group">
+                    <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">{item.step}</span>
+                    <div className="space-y-1">
+                      <h4 className="text-xl font-bold uppercase italic">{item.title}</h4>
+                      <p className="text-muted-foreground leading-relaxed">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="relative aspect-square glass-panel rounded-3xl border border-primary/20 p-8 flex items-center justify-center overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-primary/5 animate-pulse" />
+              <Terminal className="w-full h-full text-primary/10" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center space-y-4">
+                <Brain className="w-20 h-20 text-primary animate-bounce" />
+                <div className="space-y-2">
+                  <p className="font-mono text-primary text-xs uppercase tracking-[0.3em]">Status do Sistema</p>
+                  <p className="text-2xl font-black italic uppercase">Operando em Alta Fidelidade</p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      <Testimonials />
       
       <section className="py-24 bg-card/30 border-y border-border/40">
         <div className="container mx-auto px-6">
@@ -246,6 +296,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
 
       <section ref={faqRef} className="py-24 md:py-40">
         <div className="container mx-auto px-6 max-w-4xl">
