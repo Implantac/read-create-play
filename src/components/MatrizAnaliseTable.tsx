@@ -1,9 +1,10 @@
-import { memo, useMemo, useState } from "react";
+import { memo, useMemo, useState, useRef, useCallback } from "react";
 import { MatrixRow } from "@/engine/matrix-analysis";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUpDown, ArrowUp, ArrowDown, TrendingUp, TrendingDown, Minus, Filter, TableProperties } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, TrendingUp, TrendingDown, Minus, Filter, TableProperties, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 interface Props {
   data: MatrixRow[];
