@@ -224,7 +224,7 @@ export default function FechamentosPage() {
 
                     <div className="text-right shrink-0">
                       <div className="text-2xl font-black font-mono text-primary">
-                        {Math.round(v.coveragePercent)}%
+                        {formatNumber(Math.round(v.coveragePercent))}%
                       </div>
                       <p className="text-[10px] text-muted-foreground">cobertura</p>
                     </div>
