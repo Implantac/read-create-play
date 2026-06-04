@@ -36,19 +36,19 @@ export function AppLayout() {
       <div className="min-h-screen flex w-full bg-background text-foreground selection:bg-primary/30 selection:text-primary-foreground font-sans antialiased">
         <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(160,84,45,0.08),rgba(255,255,255,0))] pointer-events-none" />
         <AppSidebar />
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Header */}
-          <header className="border-b border-border/40 glass-panel sticky top-0 z-50 h-16 flex items-center shadow-2xl shadow-black/20">
+          <header className="border-b border-border/40 glass-panel sticky top-0 z-50 h-16 flex items-center shadow-xl">
 
             {/* Top row - brand + actions */}
-            <div className="w-full flex items-center gap-4 px-6">
-              <SidebarTrigger className="shrink-0 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all rounded-xl h-10 w-10" />
+            <div className="w-full flex items-center gap-4 px-4 md:px-6">
+              <SidebarTrigger className="shrink-0 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all rounded-xl h-10 w-10 active:scale-95" />
               
-              <div className="w-px h-8 bg-border/40 hidden sm:block" />
+              <div className="w-px h-6 bg-border/40 hidden sm:block" />
 
 
               {/* Lottery selector - scrollable on mobile */}
-              <div className="flex-1 overflow-x-auto scrollbar-hide">
+              <div className="flex-1 flex items-center min-w-0 overflow-hidden">
                 <LotterySelector selected={selectedLottery} onSelect={setSelectedLottery} />
               </div>
 
