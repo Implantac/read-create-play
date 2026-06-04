@@ -329,33 +329,35 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
             </Card>
           </div>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Ranking Completo</CardTitle>
+          <Card className="glass-card border-white/10 shadow-xl rounded-[2rem] overflow-hidden">
+            <CardHeader className="pb-6 p-8 border-b border-white/5">
+              <CardTitle className="text-sm font-black uppercase tracking-[0.2em] italic">Full Ranking Matrix</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="max-h-[500px] overflow-y-auto custom-scrollbar">
-                <table className="w-full text-xs">
-                  <thead className="sticky top-0 bg-background/95 backdrop-blur z-20">
-                    <tr className="border-b border-border/40">
-                      <th className="text-left py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Rank</th>
-                      <th className="text-left py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Dez</th>
-                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Score</th>
-                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Freq</th>
-                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Markov</th>
-                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Entrop.</th>
-                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Cooc.</th>
-                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Class.</th>
-                      <th className="text-center py-3 px-3 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Trend</th>
+            <CardContent className="p-0">
+              <div className="max-h-[600px] overflow-y-auto scrollbar-hide">
+                <table className="w-full">
+                  <thead className="sticky top-0 bg-background/95 backdrop-blur z-20 shadow-sm">
+                    <tr className="border-b border-white/5">
+                      <th className="text-left py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">#</th>
+                      <th className="text-left py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Neural Node</th>
+                      <th className="text-center py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Composite</th>
+                      <th className="text-center py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Freq</th>
+                      <th className="text-center py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Markov</th>
+                      <th className="text-center py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Class.</th>
+                      <th className="text-center py-4 px-6 font-black text-[9px] uppercase tracking-widest text-muted-foreground">Trend</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {report.rankings.slice(0, 40).map(r => (
-                      <tr key={r.number} className="border-b border-border/20 hover:bg-primary/5 transition-colors group">
-                        <td className="py-3 px-3 font-mono text-muted-foreground group-hover:text-primary transition-colors">{r.rank}</td>
-                        <td className="py-3 px-3 font-black text-foreground italic">{String(r.number).padStart(2, "0")}</td>
-                        <td className="py-3 px-3">
-                          <div className="flex items-center gap-2">
+                    {report.rankings.slice(0, 40).map((r, i) => (
+                      <tr key={r.number} className="border-b border-white/[0.02] hover:bg-primary/5 transition-all duration-300 group/row cursor-default">
+                        <td className="py-4 px-6 font-mono text-[10px] text-muted-foreground group-hover/row:text-primary transition-colors italic">{r.rank}</td>
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3">
+                            <span className="w-9 h-9 rounded-xl bg-background/60 border border-white/5 flex items-center justify-center font-black font-mono text-xs group-hover/row:scale-110 transition-transform italic shadow-sm group-hover/row:shadow-primary/20">{String(r.number).padStart(2, "0")}</span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3 justify-center">
                             <Progress value={r.compositeScore} className="h-1.5 w-16 bg-muted/40" />
                             <span className="font-mono font-bold w-7 text-right text-primary">{r.compositeScore}</span>
                           </div>
