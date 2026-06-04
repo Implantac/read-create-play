@@ -342,86 +342,97 @@ export default function LotofacilPremiumPage() {
               </div>
 
 
-              {/* FAROL SUMMARY */}
-              <Card className="glass-card border-primary/20 bg-primary/5 overflow-hidden">
-                <CardHeader className="pb-2 border-b border-primary/10">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2 text-primary">
-                      <Zap className="w-4 h-4 animate-pulse" />
-                      Dezenas de Elite (Titan Score ≥ 85)
-                    </CardTitle>
-                    <Badge variant="outline" className="border-primary/30 text-primary bg-primary/5 text-[9px] font-black uppercase">
-                      Alpha Signal
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 border-collapse">
-                    {topElite.slice(0, 11).map((s, idx) => (
-                      <div key={s.number} className="p-4 border-r border-b border-primary/10 hover:bg-primary/10 transition-colors group">
-                        <div className="flex flex-col items-center gap-2">
-                          <div className="w-10 h-10 rounded-xl gradient-brand flex items-center justify-center text-primary-foreground font-mono font-black text-lg shadow-lg group-hover:scale-110 transition-transform">
-                            {String(s.number).padStart(2, "0")}
-                          </div>
-                          <div className="text-center">
-                            <p className="text-[10px] font-black text-foreground tracking-tighter">{s.titanScore} pts</p>
-                            <p className="text-[8px] font-bold text-muted-foreground uppercase">{s.titanGrade}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                    <div className="p-4 border-b border-primary/10 flex items-center justify-center hover:bg-primary/10 transition-colors cursor-pointer" onClick={() => setActiveTab("matrix")}>
-                      <div className="text-center space-y-1">
-                        <p className="text-[9px] font-black text-primary uppercase tracking-widest">Matriz HP</p>
-                        <LayoutGrid className="w-4 h-4 text-primary mx-auto" />
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              {/* FAROL SUMMARY (REFACTORED) */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between px-1">
+                  <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60 flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-amber-500" />
+                    Dezenas de Elite
+                  </h2>
+                  <Button variant="ghost" size="sm" onClick={() => setActiveTab("matrix")} className="text-[9px] font-black text-primary uppercase tracking-widest hover:bg-primary/5">
+                    Ver Matriz Completa <ChevronRight className="w-3 h-3 ml-1" />
+                  </Button>
+                </div>
 
-              <HeatmapIntensity />
-              
-              <div className="grid grid-cols-2 gap-4">
-                <TitanHealthGauge 
-                  value={88.4} 
-                  label="Convergência" 
-                  sublabel="Sincronia Global" 
-                  color="hsl(var(--primary))" 
-                />
-                <TitanHealthGauge 
-                  value={92.1} 
-                  label="Estabilidade" 
-                  sublabel="Fluxo Preditivo" 
-                  color="hsl(var(--accent))" 
-                />
+                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3">
+                  {topElite.slice(0, 16).map((s, idx) => (
+                    <m.div 
+                      key={s.number}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: idx * 0.03 }}
+                      className="aspect-square rounded-2xl bg-background/40 border border-border/40 flex flex-col items-center justify-center gap-1 hover:border-primary/40 hover:bg-primary/5 transition-all group cursor-default shadow-sm"
+                    >
+                      <span className="text-lg font-black italic tracking-tighter text-primary group-hover:scale-110 transition-transform">{String(s.number).padStart(2, "0")}</span>
+                      <span className="text-[8px] font-black text-muted-foreground uppercase opacity-40">{s.titanScore}</span>
+                    </m.div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <HeatmapIntensity />
+                <div className="space-y-4">
+                   <div className="flex items-center gap-2 px-1">
+                    <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60 flex items-center gap-2">
+                      <Activity className="w-4 h-4" />
+                      Métricas de Saúde
+                    </h2>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <TitanHealthGauge 
+                      value={88.4} 
+                      label="Convergência" 
+                      sublabel="Sincronia Global" 
+                      color="hsl(var(--primary))" 
+                    />
+                    <TitanHealthGauge 
+                      value={92.1} 
+                      label="Estabilidade" 
+                      sublabel="Fluxo Preditivo" 
+                      color="hsl(var(--accent))" 
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="space-y-6">
-              <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/20 via-background to-secondary/10 border border-primary/30 shadow-2xl shadow-primary/5 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-30 transition-opacity">
-                  <Cpu className="w-20 h-20" />
+            <div className="space-y-8">
+              {/* TITAN CORE BRIEFING (REFACTORED) */}
+              <div className="p-8 rounded-[2rem] bg-gradient-to-br from-primary/20 via-background to-secondary/10 border border-primary/20 shadow-2xl shadow-primary/5 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                  <Cpu className="w-24 h-24" />
                 </div>
-                <h4 className="text-sm font-black uppercase tracking-widest text-foreground flex items-center gap-2 mb-4 italic">
-                  <Brain className="w-4 h-4 text-primary" />
-                  Titan Core Briefing
-                </h4>
-                <div className="space-y-4 relative z-10">
-                  <p className="text-xs text-muted-foreground leading-relaxed font-medium italic border-l-2 border-primary/40 pl-3">
-                    "Identificamos um padrão de compensação no quadrante superior direito. 
-                    Recomendamos priorizar dezenas de transição para o próximo sorteio."
+                
+                <div className="relative z-10 space-y-6">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                        <Brain className="w-4 h-4 text-primary" />
+                      </div>
+                      <h4 className="text-xs font-black uppercase tracking-widest text-foreground italic">
+                        Core Briefing
+                      </h4>
+                    </div>
+                  </div>
+
+                  <p className="text-sm text-muted-foreground leading-relaxed font-medium italic border-l-2 border-primary/40 pl-4 py-1">
+                    "O modelo neural identificou uma saturação no quadrante 3. Recomendamos jogos com foco em equilíbrio de moldura e dezenas primas."
                   </p>
-                  <div className="flex flex-wrap gap-2 pt-2">
+
+                  <div className="flex flex-wrap gap-2">
                     {["Frequência +", "Delay Low", "Momentum S"].map(t => (
-                      <Badge key={t} variant="secondary" className="bg-primary/5 text-primary border-primary/20 text-[8px] font-black uppercase tracking-tighter">{t}</Badge>
+                      <Badge key={t} variant="secondary" className="bg-primary/5 text-primary border-primary/20 text-[9px] font-black uppercase px-2.5 py-1">
+                        {t}
+                      </Badge>
                     ))}
                   </div>
+
+                  <Button className="w-full h-14 rounded-2xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all" onClick={() => setActiveTab("generation")}>
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Iniciar Geração
+                  </Button>
                 </div>
-                <Button className="w-full mt-6 h-10 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-[9px] shadow-lg shadow-primary/20" onClick={() => setActiveTab("generation")}>
-                  <Sparkles className="w-3.5 h-3.5 mr-2" />
-                  Iniciar Geração Elite
-                </Button>
               </div>
 
               <ROIQuickView />
