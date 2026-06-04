@@ -19,6 +19,7 @@ import { InsightsCenter } from "@/components/InsightsCenter";
 import { ROIQuickView } from "@/components/ROIQuickView";
 import { NotificationsPanel } from "@/components/NotificationsPanel";
 import { RecentDraws } from "@/components/RecentDraws";
+import { cn } from "@/lib/utils";
 import { HeatmapIntensity } from "@/components/lottery/HeatmapIntensity";
 import { CorrelationNetwork } from "@/components/lottery/CorrelationNetwork";
 
