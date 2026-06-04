@@ -97,13 +97,23 @@ export default function FarolEstatisticoPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-700">
-      <PageHeader
-        title="Farol Estatístico Titan"
-        description="Engenharia de dados e Score proprietário (FAROL)"
-        icon={Zap}
-        badge="SISTEMA ELITE"
-      />
-      <LotteryContextBanner />
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded bg-primary/10 border border-primary/20 text-[9px] font-black text-primary uppercase tracking-[0.2em] italic">Titan Neural Core v5.3</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic leading-none">
+            Farol <span className="gradient-brand-text">Estatístico</span>
+          </h1>
+          <p className="text-sm text-muted-foreground font-medium max-w-md">Engenharia de dados Alpha e Score proprietário (FAROL) para detecção de tendências de elite.</p>
+        </div>
+      </div>
+      
+      <div className="relative group">
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-[2rem] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-1000 pointer-events-none" />
+        <LotteryContextBanner />
+      </div>
 
       {/* Resumo de Ciclo e Tendência */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
