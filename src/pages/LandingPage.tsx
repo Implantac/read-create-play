@@ -351,19 +351,45 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="py-12 border-t border-border/30">
-        <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-           <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="Titan" className="w-8 h-8" />
-              <span className="text-sm font-black uppercase italic tracking-widest">Titan Loterias © 2026</span>
-           </div>
-           <div className="flex gap-8 text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">
-             <Link to="/suporte" className="hover:text-primary transition-colors">{t("common.support")}</Link>
-             <Link to="/planos" className="hover:text-primary transition-colors">{t("common.network")}</Link>
-             <Link to="/login" className="hover:text-primary transition-colors">{t("common.access")}</Link>
-           </div>
+      <footer className="py-20 border-t border-border/30 bg-card/10">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
+            <div className="col-span-2 space-y-6">
+              <Link to="/" className="flex items-center gap-3">
+                <img src="/logo.png" alt="Logo Titan Loterias" className="w-10 h-10" />
+                <span className="text-xl font-black uppercase italic tracking-tighter">Titan<span className="gradient-brand-text">Loterias</span></span>
+              </Link>
+              <p className="text-muted-foreground text-sm max-w-xs leading-relaxed opacity-60 font-medium">
+                A mais avançada plataforma de inteligência artificial para análise de loterias no Brasil. Tecnologia neural a serviço do seu jogo.
+              </p>
+            </div>
+            <div className="space-y-6">
+              <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground">Plataforma</h4>
+              <ul className="space-y-4 text-xs font-black uppercase tracking-widest text-muted-foreground">
+                <li><Link to="/signup" className="hover:text-primary transition-colors">Acesso Vitalício</Link></li>
+                <li><Link to="/login" className="hover:text-primary transition-colors">Área de Membros</Link></li>
+                <li><Link to="/planos" className="hover:text-primary transition-colors">Nossos Planos</Link></li>
+              </ul>
+            </div>
+            <div className="space-y-6">
+              <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground">Suporte</h4>
+              <ul className="space-y-4 text-xs font-black uppercase tracking-widest text-muted-foreground">
+                <li><Link to="/suporte" className="hover:text-primary transition-colors">Ajuda & FAQ</Link></li>
+                <li><Link to="/suporte" className="hover:text-primary transition-colors">Contato</Link></li>
+                <li><Link to="/suporte" className="hover:text-primary transition-colors">WhatsApp</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="flex flex-col md:flex-row items-center justify-between pt-12 border-t border-white/5 gap-6">
+            <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground opacity-40">Titan Loterias © 2026 • Todos os direitos reservados</span>
+            <div className="flex gap-8 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-40">
+              <Link to="#" className="hover:text-primary transition-colors">Termos de Uso</Link>
+              <Link to="#" className="hover:text-primary transition-colors">Privacidade</Link>
+            </div>
+          </div>
         </div>
       </footer>
+
 
       <WhatsAppButton />
     </div>
