@@ -137,35 +137,50 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
   }));
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <Card className="glass-card border-primary/30 relative overflow-hidden group">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(var(--primary),0.1),transparent)] pointer-events-none" />
-        <CardHeader className="relative z-10 pb-6">
-          <div className="flex items-center justify-between flex-wrap gap-6">
-            <div className="flex items-center gap-5">
-              <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 shadow-2xl group-hover:rotate-12 transition-transform duration-500">
-                <Brain className="h-8 w-8 text-primary animate-pulse" />
+    <div className="space-y-8">
+      {/* Dynamic Background Effects */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute top-[20%] left-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-[10%] right-[-10%] w-[30%] h-[30%] bg-accent/5 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }} />
+      </div>
+
+      {/* Header - Enterprise Command Center Style */}
+      <Card className="glass-card border-primary/30 relative overflow-hidden group shadow-2xl">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(var(--primary),0.15),transparent)] pointer-events-none opacity-50" />
+        <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-1000">
+          <Brain className="w-64 h-64 rotate-12" />
+        </div>
+        
+        <CardHeader className="relative z-10 p-8 md:p-10">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
+            <div className="flex items-center gap-6">
+              <div className="w-20 h-20 rounded-[2.5rem] bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 shadow-2xl group-hover:rotate-12 transition-all duration-700 relative active:scale-95">
+                <div className="absolute inset-0 bg-primary/5 group-hover:bg-primary/20 transition-colors rounded-[2.5rem]" />
+                <Brain className="h-10 w-10 text-primary animate-pulse relative z-10" />
               </div>
-              <div>
-                <CardTitle className="text-2xl font-black uppercase tracking-tighter italic">Engine IA Autônoma</CardTitle>
-                <CardDescription className="font-bold uppercase tracking-widest text-[10px] opacity-60 mt-1">
-                  {report.drawsAnalyzed} Sorteios Processados · Confiança: <span className="text-primary font-black">{report.confidenceScore}/100</span>
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  <CardTitle className="text-3xl md:text-4xl font-black uppercase tracking-tighter italic leading-none">Alpha Core Engine</CardTitle>
+                  <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[9px] font-black uppercase tracking-widest animate-pulse">Live Tensors</Badge>
+                </div>
+                <CardDescription className="font-black uppercase tracking-[0.2em] text-[10px] opacity-60 flex items-center gap-3">
+                  <span className="flex items-center gap-1.5"><Activity className="w-3.5 h-3.5 text-primary" /> {report.drawsAnalyzed} Concursos Processados</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-border" />
+                  <span className="flex items-center gap-1.5 text-foreground"><Target className="w-3.5 h-3.5 text-accent" /> Precisão: {report.confidenceScore}% Alpha</span>
                 </CardDescription>
               </div>
             </div>
 
-            <div className="flex gap-3 relative z-10">
-              <Button variant="outline" size="sm" onClick={refreshAnalysis} disabled={loading} className="h-10 px-5 rounded-xl border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary font-black uppercase tracking-widest text-[10px] transition-all">
-                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-                Recalibrar
+            <div className="flex items-center gap-4 relative z-10 w-full lg:w-auto">
+              <Button variant="outline" size="sm" onClick={refreshAnalysis} disabled={loading} className="h-12 px-6 rounded-2xl border-border/60 bg-secondary/20 text-[10px] font-black uppercase tracking-widest gap-2 hover:bg-secondary/40 transition-all shadow-sm flex-1 lg:flex-initial">
+                <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin text-primary" : "opacity-60"}`} />
+                Recalibrar Matriz
               </Button>
-              <Button size="sm" onClick={runAIAnalysis} disabled={aiLoading} className="h-10 px-6 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
-                {aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
-                Deep Analysis
+              <Button size="sm" onClick={runAIAnalysis} disabled={aiLoading} className="h-12 px-8 rounded-2xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex-1 lg:flex-initial gap-2">
+                {aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                Deep Neural Probe
               </Button>
             </div>
-
           </div>
         </CardHeader>
       </Card>
