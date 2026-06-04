@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, Wifi, WifiOff, Clock, CheckCircle2, Trophy, Users, DollarSign, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { formatCurrency, formatNumber } from "@/utils/formatters";
+import { formatCurrency, formatNumber, formatTime } from "@/utils/formatters";
 
 interface Props {
   lotteryId: string;
