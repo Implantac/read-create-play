@@ -403,10 +403,10 @@ const AIAnalystPage = () => {
               {simResult?.simulation && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <StatBox icon={BarChart3} label="Total" value={simResult.simulation.totalSimulations.toLocaleString()} />
-                    <StatBox icon={TrendingUp} label="Média Acertos" value={simResult.simulation.avgHits.toFixed(2)} />
-                    <StatBox icon={Trophy} label="Melhor" value={simResult.simulation.bestGame.avgHits.toFixed(2)} />
-                    <StatBox icon={Target} label="Jogos" value={simResult.simulation.games.length} />
+                    <StatBox icon={BarChart3} label="Total" value={formatNumber(simResult.simulation.totalSimulations)} />
+                    <StatBox icon={TrendingUp} label="Média Acertos" value={formatNumber(simResult.simulation.avgHits)} />
+                    <StatBox icon={Trophy} label="Melhor" value={formatNumber(simResult.simulation.bestGame.avgHits)} />
+                    <StatBox icon={Target} label="Jogos" value={formatNumber(simResult.simulation.games.length)} />
                   </div>
 
                   <div className="space-y-2">
