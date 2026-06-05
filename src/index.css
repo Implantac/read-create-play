@@ -132,6 +132,23 @@
     font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
   }
 
+  /* A11y: visible keyboard focus across the app */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* A11y: skip-to-content link, visible only on focus */
+  .skip-to-content {
+    @apply sr-only;
+  }
+  .skip-to-content:focus {
+    @apply not-sr-only fixed left-4 top-4 z-[100] px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold shadow-xl;
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Space Grotesk', system-ui, sans-serif;
     letter-spacing: -0.02em;

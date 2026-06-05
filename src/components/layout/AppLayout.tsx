@@ -38,7 +38,10 @@ export function AppLayout() {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background text-foreground selection:bg-primary/30 selection:text-primary-foreground font-sans antialiased relative">
-        <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(var(--primary-rgb),0.08),rgba(255,255,255,0))] pointer-events-none z-0" />
+        <a href="#main-content" className="skip-to-content">
+          Pular para o conteúdo principal
+        </a>
+        <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(var(--primary-rgb),0.08),rgba(255,255,255,0))] pointer-events-none z-0" aria-hidden="true" />
         <NoiseBackground />
         <AppSidebar />
 
@@ -81,13 +84,14 @@ export function AppLayout() {
                       variant="ghost"
                       onClick={() => syncDraws()}
                       disabled={syncing}
+                      aria-label={syncing ? "Sincronizando sorteios" : "Sincronizar sorteios"}
                       className="h-11 w-11 rounded-2xl text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all group border border-transparent hover:border-primary/20 shadow-sm"
                     >
 
                       {syncing ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                       ) : (
-                        <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
+                        <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" aria-hidden="true" />
                       )}
                     </Button>
 
@@ -102,6 +106,7 @@ export function AppLayout() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setViewMode(viewMode === "simple" ? "advanced" : "simple")}
+                      aria-label={`Alternar para modo ${viewMode === "simple" ? "avançado" : "simples"}`}
                       className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl border border-border/40 hover:bg-primary/5 hover:border-primary/20 transition-all group"
                     >
                       {viewMode === "simple" ? (
@@ -160,7 +165,7 @@ export function AppLayout() {
           </header>
 
           {/* Content */}
-          <main className="flex-1 container mx-auto px-4 py-6 md:px-6 lg:px-8 space-y-6">
+          <main id="main-content" tabIndex={-1} aria-label="Conteúdo principal" className="flex-1 container mx-auto px-4 py-6 md:px-6 lg:px-8 space-y-6 focus:outline-none">
             <DrawNotificationChecker />
             <AnimatePresence mode="wait">
               <m.div
