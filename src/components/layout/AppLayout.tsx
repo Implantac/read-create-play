@@ -84,13 +84,14 @@ export function AppLayout() {
                       variant="ghost"
                       onClick={() => syncDraws()}
                       disabled={syncing}
+                      aria-label={syncing ? "Sincronizando sorteios" : "Sincronizar sorteios"}
                       className="h-11 w-11 rounded-2xl text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all group border border-transparent hover:border-primary/20 shadow-sm"
                     >
 
                       {syncing ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                       ) : (
-                        <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
+                        <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" aria-hidden="true" />
                       )}
                     </Button>
 
