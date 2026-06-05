@@ -38,7 +38,10 @@ export function AppLayout() {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background text-foreground selection:bg-primary/30 selection:text-primary-foreground font-sans antialiased relative">
-        <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(var(--primary-rgb),0.08),rgba(255,255,255,0))] pointer-events-none z-0" />
+        <a href="#main-content" className="skip-to-content">
+          Pular para o conteúdo principal
+        </a>
+        <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(var(--primary-rgb),0.08),rgba(255,255,255,0))] pointer-events-none z-0" aria-hidden="true" />
         <NoiseBackground />
         <AppSidebar />
 
