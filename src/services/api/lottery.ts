@@ -17,7 +17,16 @@ export interface DrawPrizeData {
 }
 
 export interface DrawResultWithPrizes extends DrawResult {
+  prize_tiers?: DrawPrizeData | null;
   prizeTiers?: DrawPrizeData | null;
+}
+
+export interface MatchResult {
+  concurso: number;
+  date: string;
+  drawnNumbers: number[];
+  matchedNumbers: number[];
+  matchCount: number;
 }
 
 /**
@@ -71,7 +80,7 @@ export const LotteryApi = {
         concurso: row.concurso,
         date: row.draw_date || "",
         numbers: row.numbers || [],
-        prize_tiers: row.prize_tiers as DrawPrizeData | null,
+        prizeTiers: row.prize_tiers as DrawPrizeData | null,
       })) as DrawResultWithPrizes[],
       totalCount: totalCount || allData.length
     };
@@ -86,6 +95,23 @@ export const LotteryApi = {
     });
     if (error) throw error;
     return data;
+  },
+
+  /**
+   * Check if a bet matches a draw result
+   */
+  checkBetAgainstDraws(bet: number[], draws: DrawResult[]): MatchResult[] {
+    return draws.map(draw => {
+      const matched = bet.filter(n => draw.numbers.includes(n));
+      return {
+        concurso: draw.concurso,
+        date: draw.date,
+        drawnNumbers: draw.numbers,
+        matchedNumbers: matched,
+        matchCount: matched.length,
+      };
+    }).filter(r => r.matchCount > 0)
+      .sort((a, b) => b.matchCount - a.matchCount);
   },
 
   /**
