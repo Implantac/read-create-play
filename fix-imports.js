@@ -98,10 +98,16 @@ walkDir('src', (filePath) => {
   
   Object.entries(mapping).forEach(([name, newPath]) => {
     // Match import { ... } from "@/components/Name"
-    // or import Name from "@/components/Name"
-    const regex = new RegExp(`from ["']@/components/${name}["']`, 'g');
-    if (regex.test(content)) {
-      content = content.replace(regex, `from "${newPath}"`);
+    const regexFrom = new RegExp(`from ["']@/components/${name}["']`, 'g');
+    if (regexFrom.test(content)) {
+      content = content.replace(regexFrom, `from "${newPath}"`);
+      changed = true;
+    }
+    
+    // Match import("@/components/Name")
+    const regexImport = new RegExp(`import\\(["']@/components/${name}["']\\)`, 'g');
+    if (regexImport.test(content)) {
+      content = content.replace(regexImport, `import("${newPath}")`);
       changed = true;
     }
   });
