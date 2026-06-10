@@ -51,10 +51,10 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             animate="visible"
             custom={1}
             variants={fadeUp}
-            className="text-6xl md:text-[8rem] lg:text-[11rem] font-black tracking-tighter uppercase italic leading-[0.8] mb-8"
+            className="text-5xl md:text-[7rem] lg:text-[10rem] font-black tracking-tighter uppercase italic leading-[0.8] mb-8"
           >
             <span className="block text-foreground drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)]">{t("landing.hero.title")}</span>
-            <span className="block gradient-brand-text not-italic">{t("landing.hero.subtitle")}</span>
+            <span className="block gradient-brand-text not-italic leading-none">{t("landing.hero.subtitle")}</span>
           </motion.h1>
           
           <motion.p 
