@@ -31,7 +31,10 @@ const DashboardPage = () => {
       <AnimatePresence>
         {showBriefing && luckyGame && (
           <AIAnalystBriefing
-            analysis={luckyGame}
+            game={luckyGame.numbers}
+            score={luckyGame.score}
+            strategy={luckyGame.strategy}
+            reasons={luckyGame.reasons}
             onClose={() => setShowBriefing(false)}
           />
         )}
