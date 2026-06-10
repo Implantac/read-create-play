@@ -134,10 +134,10 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden antialiased">
       <Helmet>
-        <title>Titan Loterias | Inteligência Artificial para Mega-Sena e Lotofácil</title>
-        <meta name="description" content="Aumente suas chances na Mega-Sena e Lotofácil com inteligência artificial e análise estatística avançada. O gerador de apostas mais completo do Brasil." />
-        <meta property="og:title" content="Titan Loterias | Tecnologia Neural para Apostadores" />
-        <meta property="og:description" content="Pare de apostar no escuro. Use matemática e IA para otimizar seus jogos na Mega-Sena, Lotofácil e outras." />
+        <title>Titan Loterias | Inteligência Artificial e Ciência de Dados</title>
+        <meta name="description" content="Aumente suas chances na Mega-Sena e Lotofácil com inteligência artificial e análise estatística profissional. Transforme sua sorte em ciência." />
+        <meta property="og:title" content="Titan Loterias | Transforme Sorte em Ciência" />
+        <meta property="og:description" content="Pare de apostar no escuro. Utilize inteligência artificial de elite para decifrar padrões e otimizar suas apostas." />
         <meta property="og:type" content="website" />
         <meta name="keywords" content="Mega-Sena, Lotofácil, Quina, Inteligência Artificial, Loterias, Gerador de Apostas, Probabilidade, Estatística" />
         <script type="application/ld+json">
