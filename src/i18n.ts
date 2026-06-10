@@ -35,7 +35,7 @@ const resources = {
           "badge": "Protocolo Elite • {{count}} vagas vitalícias restantes",
           "title": "Pare de apostar no escuro.",
           "subtitle": "Jogue com Matemática.",
-          "description": "A plataforma de inteligência artificial para loterias mais completa do Brasil. Analise Mega-Sena, Lotofácil e Quina com probabilidade matemática avançada.",
+          "description": "Pare de contar com o acaso. Utilize inteligência artificial de elite e algoritmos matemáticos avançados para decifrar padrões e transformar suas apostas em uma estratégia profissional de alta performance.",
           "cta_primary": "Desbloquear Acesso Vitalício",
           "cta_secondary": "Login de Membro"
         },
