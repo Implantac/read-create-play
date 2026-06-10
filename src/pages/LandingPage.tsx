@@ -1,46 +1,25 @@
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useScroll, useTransform } from "framer-motion";
 import { useRef, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
 
 import { LotteryLogosCarousel } from "@/components/LotteryLogosCarousel";
 import { ScreensShowcase } from "@/components/ScreensShowcase";
-import { AnimatedCounter } from "@/components/AnimatedCounter";
 import { FloatingCTA } from "@/components/FloatingCTA";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { SocialProofBar } from "@/components/SocialProofBar";
 import { Testimonials } from "@/components/Testimonials";
-import { FloatingLotteryBalls } from "@/components/FloatingLotteryBalls";
 import { PricingSection } from "@/components/PricingSection";
 import { TitanCommandCenter } from "@/components/TitanCommandCenter";
 
+import { Navbar } from "@/components/landing/Navbar";
+import { HeroSection } from "@/components/landing/HeroSection";
+import { FeaturesSection } from "@/components/landing/FeaturesSection";
+import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
+import { FAQSection } from "@/components/landing/FAQSection";
 
 import { burstConfetti } from "@/lib/confetti";
-import {
-  Zap,
-  BarChart3,
-  Brain,
-  Shield,
-  TrendingUp,
-  Target,
-  Sparkles,
-  ChevronRight,
-  ArrowRight,
-  Dices,
-  HelpCircle,
-  Star,
-  CheckCircle,
-  Users,
-  Database,
-  Quote,
-  Activity,
-  Terminal,
-  History,
-  MessageCircle,
-} from "lucide-react";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -51,25 +30,12 @@ const fadeUp = {
   }),
 };
 
-const colorMap = {
-  green: "hover:border-primary/50 group-hover:shadow-primary/10",
-  blue: "hover:border-neon-blue/50 group-hover:shadow-neon-blue/10",
-  amber: "hover:border-accent/50 group-hover:shadow-accent/10",
-  red: "hover:border-neon-red/50 group-hover:shadow-neon-red/10",
-  purple: "hover:border-neon-purple/50 group-hover:shadow-neon-purple/10",
-  cyan: "hover:border-neon-cyan/50 group-hover:shadow-neon-cyan/10",
-};
-
-const LAUNCH_SPOTS = 100;
-
 export default function LandingPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
-  const faqRef = useRef<HTMLDivElement>(null);
-  const ctaRef = useRef<HTMLDivElement>(null);
 
   const handleCtaClick = useCallback((e: React.MouseEvent, to: string) => {
     e.preventDefault();
@@ -89,47 +55,7 @@ export default function LandingPage() {
   const heroY = useTransform(heroProgress, [0, 1], [0, 150]);
   const heroOpacity = useTransform(heroProgress, [0, 0.6], [1, 0]);
   const heroScale = useTransform(heroProgress, [0, 0.6], [1, 0.92]);
-  const gridY = useTransform(heroProgress, [0, 1], [0, 80]);
   const featuresRotateX = useTransform(featuresProgress, [0, 0.5], [4, 0]);
-
-  const features = [
-    {
-      icon: BarChart3,
-      title: t("landing.features.items.xray.title"),
-      description: t("landing.features.items.xray.description"),
-      color: "green" as const,
-    },
-    {
-      icon: Brain,
-      title: t("landing.features.items.ia.title"),
-      description: t("landing.features.items.ia.description"),
-      color: "blue" as const,
-    },
-    {
-      icon: Target,
-      title: t("landing.features.items.optimizer.title"),
-      description: t("landing.features.items.optimizer.description"),
-      color: "amber" as const,
-    },
-    {
-      icon: TrendingUp,
-      title: t("landing.features.items.backtest.title"),
-      description: t("landing.features.items.backtest.description"),
-      color: "red" as const,
-    },
-    {
-      icon: Dices,
-      title: t("landing.features.items.simulation.title"),
-      description: t("landing.features.items.simulation.description"),
-      color: "purple" as const,
-    },
-    {
-      icon: Shield,
-      title: t("landing.features.items.sync.title"),
-      description: t("landing.features.items.sync.description"),
-      color: "cyan" as const,
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden antialiased">
@@ -155,159 +81,27 @@ export default function LandingPage() {
           })}
         </script>
       </Helmet>
-      <FloatingCTA />
-
       
-      <nav className="fixed top-0 inset-x-0 z-50 glass-panel border-b border-white/5 h-20 md:h-24 flex items-center">
-        <div className="container mx-auto px-6 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-4 group">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl shadow-primary/20 group-hover:shadow-primary/40 group-hover:scale-110 transition-all duration-700 overflow-hidden border border-white/10 bg-background/50">
-              <img src="/logo.png" alt="Titan Loterias" className="w-14 h-14 object-contain" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-2xl font-black tracking-tighter uppercase italic leading-none">
-                Titan<span className="gradient-brand-text ml-0.5">Loterias</span>
-              </span>
-              <span className="text-[10px] font-black tracking-[0.3em] uppercase opacity-40 mt-1">Neural Core v6.0 Alpha</span>
-            </div>
-          </Link>
-          <div className="hidden lg:flex items-center gap-10">
-            <Link to="/signup" className="text-xs font-black uppercase tracking-widest text-neon-amber hover:text-neon-amber/80 transition-all">{t("common.vital_access")}</Link>
-            <Link to="/login" className="text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all">{t("common.login")}</Link>
-            <Link to="/signup">
-              <Button size="lg" variant="premium" className="h-12 px-10">
-                {t("common.join_network")} <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <FloatingCTA />
+      <Navbar />
 
-
-      <section ref={heroRef} className="relative min-h-[100vh] flex items-center justify-center pt-24 pb-32 px-6 overflow-hidden">
-        {/* Advanced Background effects */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] bg-primary/10 rounded-full blur-[160px] opacity-20 animate-pulse" />
-          <div className="absolute bottom-1/4 left-1/4 w-[800px] h-[800px] bg-accent/10 rounded-full blur-[140px] opacity-10" />
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
-        </div>
-
-        <FloatingLotteryBalls />
-
-        <motion.div 
-          style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
-          className="container max-w-7xl mx-auto relative z-10 text-center space-y-12"
-        >
-          <motion.div 
-            initial="hidden"
-            animate="visible"
-            custom={0}
-            variants={fadeUp}
-            className="inline-flex items-center gap-3 px-6 py-2.5 rounded-2xl bg-primary/5 border border-primary/20 backdrop-blur-md shadow-2xl mb-4"
-          >
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
-            </span>
-            <span className="text-[11px] font-black uppercase tracking-[0.3em] text-primary italic">Engine v6.0 Alpha Live</span>
-          </motion.div>
-
-          <div className="space-y-8">
-            <motion.h1 
-              initial="hidden"
-              animate="visible"
-              custom={1}
-              variants={fadeUp}
-              className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase italic leading-[0.85]"
-            >
-              <span className="block text-foreground drop-shadow-[0_10px_30px_rgba(0,0,0,0.4)]">Transforme Sorte</span>
-              <span className="block gradient-brand-text not-italic">em Ciência.</span>
-            </motion.h1>
-            
-            <motion.p 
-              initial="hidden"
-              animate="visible"
-              custom={2}
-              variants={fadeUp}
-              className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed"
-            >
-              {t("landing.hero.description")}
-            </motion.p>
-          </div>
-
-          <motion.div 
-            initial="hidden"
-            animate="visible"
-            custom={3}
-            variants={fadeUp}
-            className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4"
-          >
-            <Button 
-              size="lg" 
-              variant="premium"
-              onClick={(e) => handleCtaClick(e, "/signup")}
-              className="group h-16 px-10 text-sm font-black uppercase tracking-widest rounded-2xl shadow-[0_20px_50px_-12px_hsl(var(--primary)/0.5)] hover:shadow-[0_25px_60px_-12px_hsl(var(--primary)/0.7)] transition-shadow"
-            >
-              {t("landing.hero.cta_primary")}
-              <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-
-            <Link to="/login" className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-primary transition-colors italic px-4 py-2">
-              Já sou um Titan
-            </Link>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            custom={4}
-            variants={fadeUp}
-            className="flex flex-col items-center gap-3 pt-8 opacity-70"
-          >
-            <div className="flex -space-x-3">
-              <div className="w-9 h-9 rounded-full border-2 border-background bg-gradient-to-br from-primary/40 to-primary/10" />
-              <div className="w-9 h-9 rounded-full border-2 border-background bg-gradient-to-br from-accent/40 to-accent/10" />
-              <div className="w-9 h-9 rounded-full border-2 border-background bg-gradient-to-br from-neon-blue/40 to-neon-blue/10" />
-              <div className="w-9 h-9 rounded-full border-2 border-background bg-primary/20 flex items-center justify-center text-[9px] font-black text-primary tracking-tight">
-                +2k
-              </div>
-            </div>
-            <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-muted-foreground">
-              Mais de 2.400 membros ativos na rede neural
-            </p>
-          </motion.div>
-        </motion.div>
-      </section>
+      <HeroSection 
+        heroRef={heroRef} 
+        heroY={heroY} 
+        heroOpacity={heroOpacity} 
+        heroScale={heroScale} 
+        handleCtaClick={handleCtaClick} 
+        fadeUp={fadeUp} 
+      />
 
       <LotteryLogosCarousel />
       <SocialProofBar />
 
-      <section ref={featuresRef} className="py-24 md:py-40 relative" style={{ perspective: "1200px" }}>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(160,84,45,0.05),transparent)] pointer-events-none" />
-        <motion.div style={{ rotateX: featuresRotateX }} className="container mx-auto px-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-24 space-y-4">
-            <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic">
-              {t("landing.features.title").split(" ").map((word, i) => i === 2 ? <span key={i} className="gradient-brand-text">{word} </span> : word + " ")}
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-70">
-              {t("landing.features.subtitle")}
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((f, i) => (
-              <motion.div key={f.title} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} whileHover={{ y: -12, scale: 1.02 }} className={`relative rounded-[2rem] glass-card border border-white/10 p-10 transition-all duration-500 hover:shadow-2xl ${colorMap[f.color]} group overflow-hidden`}>
-                <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
-                <div className="w-16 h-16 rounded-2xl bg-background/50 border border-white/10 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-primary/30 transition-all duration-500 shadow-inner relative z-10">
-                  <f.icon className="w-8 h-8" />
-                </div>
-                <h3 className="text-2xl font-black text-foreground uppercase tracking-tight italic mb-4">{f.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed font-medium opacity-80">{f.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </section>
+      <FeaturesSection 
+        featuresRef={featuresRef} 
+        featuresRotateX={featuresRotateX} 
+        fadeUp={fadeUp} 
+      />
 
       <ScreensShowcase />
 
@@ -330,168 +124,54 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="py-24 md:py-40 relative overflow-hidden">
-        <div className="container mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-20 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="space-y-8"
-            >
-              <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
-                {t("landing.how_it_works.title").split(" ").map((word, i) => i === 1 ? <span key={i} className="gradient-brand-text">{word} </span> : word + " ")}
-              </h2>
-              <div className="space-y-6">
-                {[
-                  { step: "01", title: t("landing.how_it_works.step1.title"), desc: t("landing.how_it_works.step1.desc") },
-                  { step: "02", title: t("landing.how_it_works.step2.title"), desc: t("landing.how_it_works.step2.desc") },
-                  { step: "03", title: t("landing.how_it_works.step3.title"), desc: t("landing.how_it_works.step3.desc") }
-                ].map((item, i) => (
-                  <div key={i} className="flex gap-6 items-start group">
-                    <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">{item.step}</span>
-                    <div className="space-y-1">
-                      <h3 className="text-xl font-bold uppercase italic">{item.title}</h3>
-                      <p className="text-muted-foreground leading-relaxed">{item.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="relative aspect-video glass-panel rounded-[2.5rem] border border-white/10 p-4 shadow-2xl group overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-primary/5 opacity-50 group-hover:opacity-70 transition-opacity" />
-              <div className="relative h-full border border-white/5 rounded-[2rem] bg-black/40 backdrop-blur-md overflow-hidden flex flex-col">
-                <div className="h-10 border-b border-white/5 bg-white/5 flex items-center px-6 gap-2">
-                  <div className="flex gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/30" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-amber-500/30" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-500/30" />
-                  </div>
-                  <div className="flex-1" />
-                  <div className="text-[9px] font-mono text-white/20 uppercase tracking-[0.2em]">Titan Neural Terminal v6.0</div>
-                </div>
-                <div className="flex-1 p-8 flex flex-col items-center justify-center text-center space-y-8">
-                  <div className="relative group/brain">
-                    <div className="absolute inset-0 bg-primary blur-[60px] opacity-20 group-hover/brain:opacity-40 transition-opacity animate-pulse" />
-                    <Brain className="w-24 h-24 text-primary relative z-10 group-hover/brain:scale-110 transition-transform duration-500" />
-                  </div>
-                  <div className="space-y-4">
-                    <p className="font-mono text-primary text-[10px] uppercase tracking-[0.4em] animate-pulse">{t("landing.how_it_works.status_label")}</p>
-                    <p className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-foreground drop-shadow-2xl">{t("landing.how_it_works.status_value")}</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      <Testimonials />
+      <HowItWorksSection />
       
-      <section className="py-32 relative overflow-hidden">
-        <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full -translate-y-1/2 opacity-20" />
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { value: "50k+", label: "Usuários Ativos", icon: Users },
-              { value: "1.2M", label: "Jogos Gerados", icon: Activity },
-              { value: "450k", label: "Análises Realizadas", icon: Database },
-              { value: "R$ 15M", label: "Prêmios Rastreados", icon: TrendingUp }
-            ].map((s, i) => (
-              <motion.div 
-                key={i} 
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="text-center space-y-4 p-8 rounded-3xl border border-white/5 bg-white/[0.02] backdrop-blur-sm group hover:border-primary/20 transition-colors"
-              >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <s.icon className="w-6 h-6 text-primary" />
-                </div>
-                <div className="space-y-1">
-                  <p className="text-4xl md:text-5xl font-black tracking-tighter italic text-foreground group-hover:text-primary transition-colors">{s.value}</p>
-                  <p className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground opacity-60">{s.label}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
+      <Testimonials />
       <PricingSection />
+      <FAQSection />
 
-      <section ref={faqRef} className="py-24 md:py-40">
-
-        <div className="container mx-auto px-6 max-w-4xl">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16 space-y-4">
-            <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic">
-              {t("landing.faq.title")}
-            </h2>
-          </motion.div>
-          <Accordion type="single" collapsible className="w-full space-y-4">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <AccordionItem key={i} value={`item-${i}`} className="border border-white/5 rounded-3xl px-8 bg-white/[0.02] backdrop-blur-sm overflow-hidden hover:border-primary/20 transition-all duration-300">
-                <AccordionTrigger className="text-left font-bold text-lg hover:no-underline py-6">
-                  {t(`landing.faq.q${i}` as any)}
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pb-6 leading-relaxed">
-                  {t(`landing.faq.a${i}` as any)}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
-      </section>
-
-      <footer className="py-32 border-t border-white/5 bg-black/20">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
+      <footer className="py-20 border-t border-white/5 bg-black/40 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-30" />
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="grid md:grid-cols-4 gap-12 mb-16">
             <div className="col-span-2 space-y-6">
-              <Link to="/" className="flex items-center gap-3">
-                <img src="/logo.png" alt="Logo Titan Loterias" className="w-10 h-10" />
-                <span className="text-xl font-black uppercase italic tracking-tighter">Titan<span className="gradient-brand-text">Loterias</span></span>
-              </Link>
-              <p className="text-muted-foreground text-sm max-w-xs leading-relaxed opacity-60 font-medium">
-                A mais avançada plataforma de inteligência artificial para análise de loterias no Brasil. Tecnologia neural a serviço do seu jogo.
+              <div className="flex items-center gap-4">
+                <img src="/logo.png" alt="Titan Loterias" className="w-12 h-12 grayscale opacity-50" />
+                <span className="text-xl font-black uppercase tracking-tighter italic">Titan<span className="text-primary/50">Loterias</span></span>
+              </div>
+              <p className="text-sm text-muted-foreground max-w-sm leading-relaxed">
+                Titan Loterias é a plataforma definitiva de inteligência analítica para apostadores profissionais. Unimos ciência de dados, IA e estatística para elevar suas chances ao próximo nível.
               </p>
             </div>
-            <div className="space-y-6">
-              <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground">Plataforma</h4>
-              <ul className="space-y-4 text-xs font-black uppercase tracking-widest text-muted-foreground">
-                <li><Link to="/signup" className="hover:text-primary transition-colors">Acesso Vitalício</Link></li>
-                <li><Link to="/login" className="hover:text-primary transition-colors">Área de Membros</Link></li>
-                <li><Link to="/planos" className="hover:text-primary transition-colors">Nossos Planos</Link></li>
+            <div>
+              <h4 className="font-bold uppercase tracking-widest text-[10px] text-primary mb-6">Plataforma</h4>
+              <ul className="space-y-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                <li><Link to="/gerador" className="hover:text-primary transition-colors">Gerador de Apostas</Link></li>
+                <li><Link to="/analise" className="hover:text-primary transition-colors">Central de Análise</Link></li>
+                <li><Link to="/fechamentos" className="hover:text-primary transition-colors">Fechamentos</Link></li>
+                <li><Link to="/planos" className="hover:text-primary transition-colors">Assinaturas</Link></li>
               </ul>
             </div>
-            <div className="space-y-6">
-              <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground">Suporte</h4>
-              <ul className="space-y-4 text-xs font-black uppercase tracking-widest text-muted-foreground">
+            <div>
+              <h4 className="font-bold uppercase tracking-widest text-[10px] text-primary mb-6">Suporte</h4>
+              <ul className="space-y-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">
                 <li><Link to="/suporte" className="hover:text-primary transition-colors">Ajuda & FAQ</Link></li>
-                <li><Link to="/suporte" className="hover:text-primary transition-colors">Contato</Link></li>
-                <li><Link to="/suporte" className="hover:text-primary transition-colors">WhatsApp</Link></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Termos de Uso</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Privacidade</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Contato</a></li>
               </ul>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row items-center justify-between pt-12 border-t border-white/5 gap-6">
-            <span className="text-[10px] font-black uppercase italic tracking-widest text-muted-foreground opacity-40">Titan Loterias © 2026 • Todos os direitos reservados</span>
-            <div className="flex gap-8 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-40">
-              <Link to="#" className="hover:text-primary transition-colors">Termos de Uso</Link>
-              <Link to="#" className="hover:text-primary transition-colors">Privacidade</Link>
+          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">
+              © {new Date().getFullYear()} Titan Loterias. Todos os direitos reservados.
+            </p>
+            <div className="flex items-center gap-6">
+              <WhatsAppButton />
             </div>
           </div>
         </div>
       </footer>
-
-
-      <WhatsAppButton />
     </div>
   );
 }
