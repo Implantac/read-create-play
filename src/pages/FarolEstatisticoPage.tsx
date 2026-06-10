@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
-import { PageHeader } from "@/components/PageHeader";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

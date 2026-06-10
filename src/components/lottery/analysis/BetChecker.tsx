@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { DrawResult } from "@/data/lotteries";
-import { checkBetAgainstDraws, MatchResult, getPrizeTiers } from "@/services/lotteryApi";
+import { checkBetAgainstDraws, MatchResult, getPrizeTiers } from "@/services/api/lottery";;
 import { DrawResultWithPrizes, DrawPrizeData } from "@/hooks/useLotteryDraws";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -17,7 +17,7 @@ import { generateNativeImprovements } from "@/engine/ai/native-analysis";
 import { computeFrequencyStats } from "@/engine/stats/statistics";
 import { useSavedBets, SavedBet } from "@/hooks/useSavedBets";
 import { Progress } from "@/components/ui/progress";
-import { BetHitsChart } from "@/components/BetHitsChart";
+import { BetHitsChart } from "@/components/lottery/charts/BetHitsChart";
 
 interface Props {
   draws: DrawResult[];

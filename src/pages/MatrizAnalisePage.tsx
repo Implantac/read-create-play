@@ -2,19 +2,19 @@ import { useState, useMemo } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { SelectedBetsProvider } from "@/contexts/SelectedBetsContext";
 import { computeMatrixAnalysis } from "@/engine/matrix-analysis";
-import { MatrizAnaliseTable } from "@/components/MatrizAnaliseTable";
-import { FarolDezenas } from "@/components/FarolDezenas";
-import { PageHeader } from "@/components/PageHeader";
+import { MatrizAnaliseTable } from "@/components/lottery/analysis/MatrizAnaliseTable";
+import { FarolDezenas } from "@/components/lottery/analysis/FarolDezenas";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
-import { ComplianceDisclaimer } from "@/components/ComplianceDisclaimer";
+import { ComplianceDisclaimer } from "@/components/common/ComplianceDisclaimer";
 import { PlanGate } from "@/components/PlanGate";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { Grid3X3, Loader2, TrendingUp, TrendingDown, Clock, BarChart3, Zap } from "lucide-react";
 import { lazy, Suspense } from "react";
 
 const SmartUnfoldingGenerator = lazy(() =>
-  import("@/components/SmartUnfoldingGenerator").then(m => ({ default: m.SmartUnfoldingGenerator }))
+  import("@/components/lottery/generators/SmartUnfoldingGenerator").then(m => ({ default: m.SmartUnfoldingGenerator }))
 );
 
 const LazyFallback = () => (

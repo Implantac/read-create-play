@@ -18,7 +18,7 @@ import type { AIResponse, ScoredGame, RiskProfile } from "@/ai/core/aiTypes";
 import { Brain, Send, Sparkles, Shield, FlaskConical, Zap, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useSavedBets } from "@/hooks/useSavedBets";
-import { FarolEstatistico } from "@/components/FarolEstatistico";
+import { FarolEstatistico } from "@/components/lottery/analysis/FarolEstatistico";
 import { EliteGameCard } from "@/components/lottery/EliteGameCard";
 
 const AIAnalystPage = () => {

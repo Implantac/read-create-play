@@ -1,6 +1,6 @@
 import { useMemo, useState, lazy, Suspense } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
-import { PageHeader } from "@/components/PageHeader";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,18 +16,18 @@ import { m, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { StatsCard } from "@/components/common/StatsCard";
-import { StrategyBriefingPanel } from "@/components/StrategyBriefingPanel";
+import { StrategyBriefingPanel } from "@/components/lottery/analysis/StrategyBriefingPanel";
 import { BettingBudgetPlanner } from "@/components/BettingBudgetPlanner";
 import { InsightsCenter } from "@/components/InsightsCenter";
 import { ROIQuickView } from "@/components/ROIQuickView";
-import { NotificationsPanel } from "@/components/NotificationsPanel";
-import { RecentDraws } from "@/components/RecentDraws";
+import { NotificationsPanel } from "@/components/common/NotificationsPanel";
+import { RecentDraws } from "@/components/lottery/RecentDraws";
 import { cn } from "@/lib/utils";
 import { HeatmapIntensity } from "@/components/lottery/HeatmapIntensity";
 import { CorrelationNetwork } from "@/components/lottery/CorrelationNetwork";
 import { computeMatrixAnalysis } from "@/engine/matrix-analysis";
-import { MatrizAnaliseTable } from "@/components/MatrizAnaliseTable";
-import { FarolDezenas } from "@/components/FarolDezenas";
+import { MatrizAnaliseTable } from "@/components/lottery/analysis/MatrizAnaliseTable";
+import { FarolDezenas } from "@/components/lottery/analysis/FarolDezenas";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { toast } from "sonner";
 import {
@@ -57,11 +57,11 @@ import {
 
 import { downloadCSV } from "@/utils/export-utils";
 
-const IntelligentGeneratorPanel = lazy(() => import("@/components/IntelligentGeneratorPanel").then(m => ({ default: m.IntelligentGeneratorPanel })));
-const EvolutiveGeneratorPanel = lazy(() => import("@/components/EvolutiveGeneratorPanel").then(m => ({ default: m.EvolutiveGeneratorPanel })));
+const IntelligentGeneratorPanel = lazy(() => import("@/components/lottery/generators/IntelligentGeneratorPanel").then(m => ({ default: m.IntelligentGeneratorPanel })));
+const EvolutiveGeneratorPanel = lazy(() => import("@/components/lottery/generators/EvolutiveGeneratorPanel").then(m => ({ default: m.EvolutiveGeneratorPanel })));
 const AIPredictionPanel = lazy(() => import("@/components/AIPredictionPanel").then(m => ({ default: m.AIPredictionPanel })));
-const ProfessionalGeneratorPanel = lazy(() => import("@/components/ProfessionalGeneratorPanel").then(m => ({ default: m.ProfessionalGeneratorPanel })));
-import { TitanHealthGauge } from "@/components/TitanHealthGauge";
+const ProfessionalGeneratorPanel = lazy(() => import("@/components/lottery/generators/ProfessionalGeneratorPanel").then(m => ({ default: m.ProfessionalGeneratorPanel })));
+import { TitanHealthGauge } from "@/components/lottery/analysis/TitanHealthGauge";
 
 const LazyFallback = () => (
   <div className="flex items-center justify-center py-12 text-muted-foreground bg-secondary/5 rounded-2xl border border-dashed border-border/40">

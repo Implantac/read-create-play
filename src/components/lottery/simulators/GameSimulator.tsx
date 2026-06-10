@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { NumberStats, generateSmartBet } from "@/engine/stats/statistics";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { getPrizeTiers } from "@/services/lotteryApi";
+import { getPrizeTiers } from "@/services/api/lottery";;
 import { motion, AnimatePresence } from "framer-motion";
 import { Gamepad2, Play, TrendingUp, TrendingDown } from "lucide-react";
 import { Button } from "@/components/ui/button";

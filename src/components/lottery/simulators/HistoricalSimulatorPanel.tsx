@@ -10,7 +10,7 @@ import {
 } from "@/engine/simulators/historical-simulator";
 import { motion, AnimatePresence } from "framer-motion";
 import { History, Play, Trophy, BarChart3, Lightbulb, Plus, Trash2, Shuffle, FileDown, ChevronDown, ChevronUp, Eye } from "lucide-react";
-import { getPrizeTiers } from "@/services/lotteryApi";
+import { getPrizeTiers } from "@/services/api/lottery";;
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

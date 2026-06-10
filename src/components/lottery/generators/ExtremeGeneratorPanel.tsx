@@ -10,10 +10,10 @@ import {
   ExtremeBet,
 } from "@/engine/extreme-generator";
 import { exportToPdf } from "@/engine/pdf-export";
-import { HistoricalValidationBadge } from "@/components/HistoricalValidationBadge";
-import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
-import { ExtremeComparisonPanel } from "@/components/ExtremeComparisonPanel";
-import { GeneratorFiltersPanel } from "@/components/GeneratorFiltersPanel";
+import { HistoricalValidationBadge } from "@/components/lottery/HistoricalValidationBadge";
+import { GameAnalysisBlock } from "@/components/lottery/analysis/GameAnalysisBlock";
+import { ExtremeComparisonPanel } from "@/components/lottery/generators/ExtremeComparisonPanel";
+import { GeneratorFiltersPanel } from "@/components/lottery/generators/GeneratorFiltersPanel";
 import { GenerationFilters, DEFAULT_FILTERS } from "@/engine/generation-filters";
 import { motion, AnimatePresence } from "framer-motion";
 import {

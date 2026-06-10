@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useSavedBets } from "@/hooks/useSavedBets";
-import { PageHeader } from "@/components/PageHeader";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { EmptyState } from "@/components/common/EmptyState";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { getPrizeTiers } from "@/services/lotteryApi";
+import { getPrizeTiers } from "@/services/api/lottery";;
 import { ClipboardCheck, Trophy, TrendingUp, BarChart3, Calendar, ArrowUpRight, ArrowDownRight, Minus, Filter } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 

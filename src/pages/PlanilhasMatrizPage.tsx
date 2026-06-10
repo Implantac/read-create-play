@@ -12,9 +12,9 @@ import {
   LOTOFACIL_WORKSHEET_PRESETS,
   selectTopLotofacilNumbers,
 } from "@/engine/worksheet-matrices";
-import { PageHeader } from "@/components/PageHeader";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
-import { ComplianceDisclaimer } from "@/components/ComplianceDisclaimer";
+import { ComplianceDisclaimer } from "@/components/common/ComplianceDisclaimer";
 import { EmptyState } from "@/components/common/EmptyState";
 import { PlanGate } from "@/components/PlanGate";
 import { Badge } from "@/components/ui/badge";

@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MessageCircle, Mail, HelpCircle, Clock, Shield, CreditCard, Zap, Users, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { WhatsAppButton } from "@/components/common/WhatsAppButton";
 import { useNavigate } from "react-router-dom";
 
 const WHATSAPP_NUMBER = "5543998581400";
