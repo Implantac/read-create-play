@@ -2,6 +2,8 @@ import { useAuth, PlanType } from "@/contexts/AuthContext";
 import { Feature, PLAN_HIERARCHY, FEATURE_MIN_PLAN, PLAN_LIMITS } from "@/features/auth/constants";
 
 export type { Feature };
+export { PLAN_LIMITS } from "@/features/auth/constants";
+
 
 export function usePlanAccess() {
   const { profile, isAdmin, isSuperAdmin } = useAuth();
