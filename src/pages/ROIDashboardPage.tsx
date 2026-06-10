@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PlanGate } from "@/components/PlanGate";
 import { useSavedBets } from "@/hooks/useSavedBets";
-import { PageHeader } from "@/components/PageHeader";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { EmptyState } from "@/components/common/EmptyState";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +12,7 @@ import { TrendingUp, TrendingDown, DollarSign, Target, Trophy, BarChart3, Calend
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, Cell } from "recharts";
 import { CHART_TOOLTIP_STYLE } from "@/lib/chart-theme";
 import { ROIFilters, ROIFilterState } from "@/components/ROIFilters";
-import { PrizeHistoryPanel } from "@/components/PrizeHistoryPanel";
+import { PrizeHistoryPanel } from "@/components/lottery/analysis/PrizeHistoryPanel";
 import { DrawResultWithPrizes } from "@/hooks/useLotteryDraws";
 
 // Custo mínimo da aposta simples por loteria

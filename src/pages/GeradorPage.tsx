@@ -1,6 +1,6 @@
 import { useState, lazy, Suspense } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
-import { PageHeader } from "@/components/PageHeader";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { m, AnimatePresence } from "framer-motion";
 import { Sparkles, Loader2, ChevronRight, ChevronLeft, Target, Settings2, Hash, Play, Save } from "lucide-react";

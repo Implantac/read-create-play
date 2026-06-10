@@ -1,6 +1,6 @@
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { AIAutonomousDashboard } from "@/components/AIAutonomousDashboard";
-import { PageHeader } from "@/components/PageHeader";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { PlanGate } from "@/components/PlanGate";

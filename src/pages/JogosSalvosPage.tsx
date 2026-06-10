@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { LOTTERIES, LotteryConfig } from "@/data/lotteries";
 import { getPrizeTiers } from "@/services/lotteryApi";
-import { PageHeader } from "@/components/PageHeader";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

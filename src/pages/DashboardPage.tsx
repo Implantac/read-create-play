@@ -3,7 +3,7 @@ import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useBetGenerator } from "@/hooks/logic/useBetGenerator";
 import { AnimatePresence } from "framer-motion";
 import { AIAnalystBriefing } from "@/components/lottery/AIAnalystBriefing";
-import { TitanCommandCenter } from "@/components/TitanCommandCenter";
+import { TitanCommandCenter } from "@/components/common/TitanCommandCenter";
 import { DashboardHeader } from "@/components/layout/dashboard/DashboardHeader";
 import { RecommendationCard } from "@/components/lottery/RecommendationCard";
 import { QuickStatsRow } from "@/components/lottery/QuickStatsRow";

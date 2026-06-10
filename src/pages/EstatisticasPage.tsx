@@ -1,6 +1,6 @@
 import { useState, useMemo, lazy, Suspense } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
-import { PageHeader } from "@/components/PageHeader";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { StatsCard } from "@/components/common/StatsCard";

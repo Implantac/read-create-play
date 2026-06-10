@@ -3,7 +3,7 @@ import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { NumberStats } from "@/engine/stats/statistics";
 import { motion, AnimatePresence } from "framer-motion";
 import { Brain, Loader2, Copy, Check, Star, Sparkles, RefreshCw, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
-import { GameAnalysisBlock } from "@/components/GameAnalysisBlock";
+import { GameAnalysisBlock } from "@/components/lottery/analysis/GameAnalysisBlock";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";

@@ -1,16 +1,16 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import { LotterySelector } from "@/components/LotterySelector";
+import { LotterySelector } from "@/components/lottery/LotterySelector";
 import { Button } from "@/components/ui/button";
 import { Database, Loader2, LogOut, User, RefreshCw, Zap, Brain } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { DrawNotificationChecker } from "@/components/DrawNotificationChecker";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { ThemeToggle } from "@/components/common/ThemeToggle";
+import { DrawNotificationChecker } from "@/components/lottery/DrawNotificationChecker";
+import { WhatsAppButton } from "@/components/common/WhatsAppButton";
 import { GuidedOnboarding } from "@/components/GuidedOnboarding";
 import { NoiseBackground } from "@/components/common/NoiseBackground";
 

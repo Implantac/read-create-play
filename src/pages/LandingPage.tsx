@@ -4,14 +4,14 @@ import { useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 
-import { LotteryLogosCarousel } from "@/components/LotteryLogosCarousel";
-import { ScreensShowcase } from "@/components/ScreensShowcase";
-import { FloatingCTA } from "@/components/FloatingCTA";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { SocialProofBar } from "@/components/SocialProofBar";
-import { Testimonials } from "@/components/Testimonials";
-import { PricingSection } from "@/components/PricingSection";
-import { TitanCommandCenter } from "@/components/TitanCommandCenter";
+import { LotteryLogosCarousel } from "@/components/lottery/LotteryLogosCarousel";
+import { ScreensShowcase } from "@/components/common/ScreensShowcase";
+import { FloatingCTA } from "@/components/common/FloatingCTA";
+import { WhatsAppButton } from "@/components/common/WhatsAppButton";
+import { SocialProofBar } from "@/components/common/SocialProofBar";
+import { Testimonials } from "@/components/common/Testimonials";
+import { PricingSection } from "@/components/common/PricingSection";
+import { TitanCommandCenter } from "@/components/common/TitanCommandCenter";
 
 import { Navbar } from "@/components/landing/Navbar";
 import { HeroSection } from "@/components/landing/HeroSection";

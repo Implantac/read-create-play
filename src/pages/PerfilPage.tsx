@@ -16,7 +16,7 @@ import { playTierPreview } from "@/lib/alert-sounds";
 import UserPreferencesPanel from "@/components/UserPreferencesPanel";
 import { usePlanAccess } from "@/hooks/usePlanAccess";
 import { GamificationCard } from "@/components/GamificationCard";
-import { AchievementDisplay } from "@/components/AchievementDisplay";
+import { AchievementDisplay } from "@/components/lottery/AchievementDisplay";
 
 export default function PerfilPage() {
   const { user, profile, session } = useAuth();

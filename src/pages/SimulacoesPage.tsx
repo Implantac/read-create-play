@@ -1,14 +1,14 @@
 import { lazy, Suspense } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PlanGate } from "@/components/PlanGate";
-import { PageHeader } from "@/components/PageHeader";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
-import { ComplianceDisclaimer } from "@/components/ComplianceDisclaimer";
-import { ComparativeSimulatorPanel } from "@/components/ComparativeSimulatorPanel";
-import { StrategyBriefingPanel } from "@/components/StrategyBriefingPanel";
+import { ComplianceDisclaimer } from "@/components/common/ComplianceDisclaimer";
+import { ComparativeSimulatorPanel } from "@/components/lottery/simulators/ComparativeSimulatorPanel";
+import { StrategyBriefingPanel } from "@/components/lottery/analysis/StrategyBriefingPanel";
 import { FlaskConical, Loader2, Calculator } from "lucide-react";
-import { InvestmentSimulator } from "@/components/InvestmentSimulator";
+import { InvestmentSimulator } from "@/components/lottery/simulators/InvestmentSimulator";
 
 const HistoricalSimulatorPanel = lazy(() => import("@/components/HistoricalSimulatorPanel").then(m => ({ default: m.HistoricalSimulatorPanel })));
 const MassiveSimulationDashboard = lazy(() => import("@/components/MassiveSimulationDashboard").then(m => ({ default: m.MassiveSimulationDashboard })));

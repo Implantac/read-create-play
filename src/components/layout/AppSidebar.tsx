@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { SystemAuditStatus } from "@/components/SystemAuditStatus";
+import { SystemAuditStatus } from "@/components/lottery/analysis/SystemAuditStatus";
 
 const workflowGroups: { label: string; items: { title: string; url: string; icon: any; requiredFeature?: Feature; tooltip: string; badge?: string }[] }[] = [
   {

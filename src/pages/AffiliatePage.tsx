@@ -1,5 +1,5 @@
 import { AffiliateDashboard } from "@/components/AffiliateDashboard";
-import { PageHeader } from "@/components/PageHeader";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { Users } from "lucide-react";
 
 export default function AffiliatePage() {
