@@ -1,33 +1,9 @@
 import { createContext, useContext } from "react";
-import { Session, User } from "@supabase/supabase-js";
+import { AuthState } from "@/features/auth/types";
 
-export type PlanType = "free" | "premium" | "professional" | "lifetime";
+export type { PlanType, Profile } from "@/features/auth/types";
 
-
-export interface Profile {
-  id: string;
-  email: string | null;
-  full_name: string | null;
-  avatar_url: string | null;
-  plan: PlanType;
-  theme_preference: string;
-  language: string;
-  timezone: string;
-  currency_format: string;
-  blocked: boolean;
-  created_at: string;
-}
-
-export interface AuthContextType {
-  session: Session | null;
-  user: User | null;
-  profile: Profile | null;
-  loading: boolean;
-  isAdmin: boolean;
-  isSuperAdmin: boolean;
-  userRole: string;
-  isTrialExpired: boolean;
-  trialDaysLeft: number;
+export interface AuthContextType extends AuthState {
   signOut: () => Promise<void>;
 }
 
@@ -38,4 +14,5 @@ export function useAuth() {
   if (!ctx) throw new Error("useAuth must be within AuthProvider");
   return ctx;
 }
+
 
