@@ -220,8 +220,8 @@ export default function LandingPage() {
               variants={fadeUp}
               className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase italic leading-[0.85]"
             >
-              <span className="block text-foreground drop-shadow-[0_10px_30px_rgba(0,0,0,0.4)]">Domine a</span>
-              <span className="block gradient-brand-text not-italic">Sorte.</span>
+              <span className="block text-foreground drop-shadow-[0_10px_30px_rgba(0,0,0,0.4)]">Transforme Sorte</span>
+              <span className="block gradient-brand-text not-italic">em Ciência.</span>
             </motion.h1>
             
             <motion.p 
