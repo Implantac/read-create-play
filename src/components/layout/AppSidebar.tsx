@@ -4,9 +4,10 @@ import {
   MessageCircle, User
 } from "lucide-react";
 import { NavLink } from "@/components/layout/NavLink";
-import { usePlanAccess, type Feature } from "@/hooks/usePlanAccess";
+import { usePlanAccess } from "@/hooks/usePlanAccess";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLotteryContext } from "@/contexts/LotteryContext";
+import { Feature } from "@/features/auth/constants";
 import {
   Sidebar,
   SidebarContent,
@@ -57,6 +58,7 @@ const PLAN_LABELS: Record<string, string> = {
   professional: "Profissional",
   lifetime: "Vitalício",
 };
+
 
 export function AppSidebar() {
   const { state } = useSidebar();
