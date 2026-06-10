@@ -1,10 +1,12 @@
-import { useEffect, useState, ReactNode } from "react";
-import { Session, User } from "@supabase/supabase-js";
+import { useEffect, useState, ReactNode, useCallback } from "react";
+import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthContext, type AuthContextType, type PlanType, type Profile } from "./AuthContext";
 import { isFullAccessEmail } from "@/core/fullAccess";
 import { AuthService } from "@/services/auth/auth.service";
+import { checkAdminStatus, syncSubscriptionPlan } from "@/features/auth/services/auth-queries";
 
+const TRIAL_DAYS = 7;
 
 const asFullAccessProfile = (profile: Profile): Profile => ({
   ...profile,
@@ -20,7 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [userRole, setUserRole] = useState<string>("user");
 
-  const fetchProfile = async (userId: string, email?: string | null) => {
+  const fetchProfile = useCallback(async (userId: string, email?: string | null) => {
     try {
       const data = await AuthService.getProfile(userId);
       if (data) {
@@ -33,9 +35,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error("Error fetching profile:", error);
     }
-  };
+  }, []);
 
-  const checkAdmin = async (userId: string, email?: string | null) => {
+  const checkAdmin = useCallback(async (userId: string, email?: string | null) => {
     if (isFullAccessEmail(email)) {
       setIsAdmin(true);
       setIsSuperAdmin(true);
@@ -43,32 +45,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Privileged status is sourced exclusively from the user_roles table.
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .in("role", ["admin", "super_admin"]);
-
-    const roles = (data || []).map((r: { role: string }) => r.role);
-
-    setIsAdmin(roles.includes("admin") || roles.includes("super_admin"));
-    setIsSuperAdmin(roles.includes("super_admin"));
-    setUserRole(
-      roles.includes("super_admin")
-        ? "super_admin"
-        : roles.includes("admin")
-          ? "admin"
-          : roles[0] || "user"
-    );
-  };
-
-  const syncSubscription = async (accessToken: string) => {
     try {
-      const { data } = await supabase.functions.invoke("check-subscription", {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
+      const { isAdmin: admin, isSuperAdmin: superAdmin, roles } = await checkAdminStatus(userId);
+      setIsAdmin(admin);
+      setIsSuperAdmin(superAdmin);
+      setUserRole(superAdmin ? "super_admin" : admin ? "admin" : roles[0] || "user");
+    } catch (error) {
+      console.error("Error checking admin status:", error);
+    }
+  }, []);
 
+  const syncSubscription = useCallback(async (accessToken: string) => {
+    try {
+      const data = await syncSubscriptionPlan(accessToken);
       if (data?.plan) {
         setProfile((prev) => {
           if (!prev) return prev;
@@ -78,22 +67,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
       }
     } catch (e) {
-      // Keep behavior (no breaking UI): log and continue.
       console.error("Error checking subscription:", e);
     }
-  };
+  }, []);
+
+  const loadUserData = useCallback(async (userId: string, accessToken?: string, email?: string | null) => {
+    await Promise.all([
+      fetchProfile(userId, email),
+      checkAdmin(userId, email),
+      ...(accessToken ? [syncSubscription(accessToken)] : []),
+    ]);
+  }, [fetchProfile, checkAdmin, syncSubscription]);
 
   useEffect(() => {
     const authStorageKey = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`;
     let initialLoad = true;
-
-    const loadUserData = async (userId: string, accessToken?: string, email?: string | null) => {
-      await Promise.all([
-        fetchProfile(userId, email),
-        checkAdmin(userId, email),
-        ...(accessToken ? [syncSubscription(accessToken)] : []),
-      ]);
-    };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, nextSession) => {
@@ -146,15 +134,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [loadUserData]);
 
   const signOut = async () => {
     await AuthService.signOut();
     setSession(null);
     setProfile(null);
   };
-
-  const TRIAL_DAYS = 7;
 
   const trialDaysLeft = (() => {
     if (!profile?.created_at || profile.plan !== "free") return TRIAL_DAYS;
@@ -186,4 +172,5 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
+
 
