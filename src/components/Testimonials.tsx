@@ -52,7 +52,7 @@ export function Testimonials() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="glass-card p-8 rounded-2xl border border-border/40 relative group hover:border-primary/30 transition-all"
+              className="glass-card p-10 rounded-3xl border border-white/5 relative group hover:border-primary/30 transition-all duration-500 bg-white/[0.02]"
             >
               <Quote className="absolute top-6 right-6 w-8 h-8 text-primary/10 group-hover:text-primary/20 transition-colors" />
               <div className="flex items-center gap-1 mb-6">
