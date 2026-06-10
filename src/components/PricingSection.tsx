@@ -108,7 +108,7 @@ export function PricingSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
-              className={`relative rounded-[2.5rem] border-2 p-1 overflow-hidden transition-all duration-500 hover:translate-y-[-8px] ${plan.popular ? 'border-primary/40 shadow-2xl shadow-primary/20 scale-105 z-10' : 'border-white/10 hover:border-primary/20 shadow-xl'}`}
+              className={`relative rounded-[3rem] border p-1 overflow-hidden transition-all duration-500 hover:translate-y-[-12px] ${plan.popular ? 'border-primary/40 shadow-2xl shadow-primary/20 scale-105 z-10' : 'border-white/5 hover:border-primary/20 shadow-xl'}`}
             >
               <div className={`relative ${plan.color} backdrop-blur-2xl rounded-[2.3rem] p-10 h-full flex flex-col`}>
                 {plan.popular && (
@@ -127,11 +127,19 @@ export function PricingSection() {
                   </div>
                 </div>
 
-                <div className="flex items-baseline gap-1 mb-8">
-                  <span className="text-5xl font-black font-mono tracking-tighter italic">{plan.price}</span>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-40 ml-1">
-                    {plan.price === "R$ 0" ? "/ sempre" : "/ pagamento único"}
-                  </span>
+                <div className="flex flex-col gap-1 mb-8">
+                  {plan.popular && (
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs line-through text-muted-foreground/60 font-bold">{ORIGINAL_PRICE}</span>
+                      <Badge variant="outline" className="text-[9px] border-primary/30 text-primary uppercase font-black tracking-widest bg-primary/5">-70% OFF</Badge>
+                    </div>
+                  )}
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-6xl font-black font-mono tracking-tighter italic">{plan.price}</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-40 ml-1">
+                      {plan.price === "R$ 0" ? "/ sempre" : "/ pagamento único"}
+                    </span>
+                  </div>
                 </div>
 
                 <ul className="space-y-4 mb-10 flex-1">

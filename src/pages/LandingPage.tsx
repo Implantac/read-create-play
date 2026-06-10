@@ -52,12 +52,12 @@ const fadeUp = {
 };
 
 const colorMap = {
-  green: "from-primary/20 to-primary/5 border-primary/20 text-primary",
-  blue: "from-neon-blue/20 to-neon-blue/5 border-neon-blue/20 text-neon-blue",
-  amber: "from-accent/20 to-accent/5 border-accent/20 text-accent",
-  red: "from-neon-red/20 to-neon-red/5 border-neon-red/20 text-neon-red",
-  purple: "from-neon-purple/20 to-neon-purple/5 border-neon-purple/20 text-neon-purple",
-  cyan: "from-neon-cyan/20 to-neon-cyan/5 border-neon-cyan/20 text-neon-cyan",
+  green: "hover:border-primary/50 group-hover:shadow-primary/10",
+  blue: "hover:border-neon-blue/50 group-hover:shadow-neon-blue/10",
+  amber: "hover:border-accent/50 group-hover:shadow-accent/10",
+  red: "hover:border-neon-red/50 group-hover:shadow-neon-red/10",
+  purple: "hover:border-neon-purple/50 group-hover:shadow-neon-purple/10",
+  cyan: "hover:border-neon-cyan/50 group-hover:shadow-neon-cyan/10",
 };
 
 const LAUNCH_SPOTS = 100;
@@ -131,13 +131,6 @@ export default function LandingPage() {
     },
   ];
 
-  const stats = [
-    { value: "10.000+", label: t("landing.stats.draws") },
-    { value: "8", label: t("landing.stats.lotteries") },
-    { value: "14+", label: t("landing.stats.algorithms") },
-    { value: "99.9%", label: t("landing.stats.uptime") },
-  ];
-
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden antialiased">
       <Helmet>
@@ -165,7 +158,7 @@ export default function LandingPage() {
       <FloatingCTA />
 
       
-      <nav className="fixed top-0 inset-x-0 z-50 glass-panel border-b border-border/40 h-24 flex items-center">
+      <nav className="fixed top-0 inset-x-0 z-50 glass-panel border-b border-white/5 h-20 md:h-24 flex items-center">
         <div className="container mx-auto px-6 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-4 group">
             <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl shadow-primary/20 group-hover:shadow-primary/40 group-hover:scale-110 transition-all duration-700 overflow-hidden border border-white/10 bg-background/50">
@@ -178,7 +171,7 @@ export default function LandingPage() {
               <span className="text-[10px] font-black tracking-[0.3em] uppercase opacity-40 mt-1">Neural Core v6.0 Alpha</span>
             </div>
           </Link>
-          <div className="hidden md:flex items-center gap-10">
+          <div className="hidden lg:flex items-center gap-10">
             <Link to="/signup" className="text-xs font-black uppercase tracking-widest text-neon-amber hover:text-neon-amber/80 transition-all">{t("common.vital_access")}</Link>
             <Link to="/login" className="text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all">{t("common.login")}</Link>
             <Link to="/signup">
@@ -303,8 +296,9 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((f, i) => (
-              <motion.div key={f.title} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} whileHover={{ y: -12, scale: 1.05 }} className={`rounded-[2.5rem] glass-card border-2 bg-gradient-to-b ${colorMap[f.color]} p-10 transition-all duration-500 hover:shadow-premium-hover group`}>
-                <div className="w-16 h-16 rounded-2xl bg-background/50 border border-white/10 flex items-center justify-center mb-8 group-hover:rotate-12 transition-transform duration-500 shadow-inner">
+              <motion.div key={f.title} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} whileHover={{ y: -12, scale: 1.02 }} className={`relative rounded-[2rem] glass-card border border-white/10 p-10 transition-all duration-500 hover:shadow-2xl ${colorMap[f.color]} group overflow-hidden`}>
+                <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
+                <div className="w-16 h-16 rounded-2xl bg-background/50 border border-white/10 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-primary/30 transition-all duration-500 shadow-inner relative z-10">
                   <f.icon className="w-8 h-8" />
                 </div>
                 <h3 className="text-2xl font-black text-foreground uppercase tracking-tight italic mb-4">{f.title}</h3>
@@ -369,17 +363,29 @@ export default function LandingPage() {
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="relative aspect-square glass-panel rounded-3xl border border-primary/20 p-8 flex items-center justify-center overflow-hidden"
+              className="relative aspect-video glass-panel rounded-[2.5rem] border border-white/10 p-4 shadow-2xl group overflow-hidden"
             >
-              <div className="absolute inset-0 bg-primary/5 animate-pulse" />
-              <Terminal className="w-full h-full text-primary/10" />
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center space-y-4">
-                <Brain className="w-20 h-20 text-primary animate-bounce" />
-                <div className="space-y-2">
-                  <p className="font-mono text-primary text-xs uppercase tracking-[0.3em]">{t("landing.how_it_works.status_label")}</p>
-                  <p className="text-2xl font-black italic uppercase">{t("landing.how_it_works.status_value")}</p>
+              <div className="absolute inset-0 bg-primary/5 opacity-50 group-hover:opacity-70 transition-opacity" />
+              <div className="relative h-full border border-white/5 rounded-[2rem] bg-black/40 backdrop-blur-md overflow-hidden flex flex-col">
+                <div className="h-10 border-b border-white/5 bg-white/5 flex items-center px-6 gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/30" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-amber-500/30" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-500/30" />
+                  </div>
+                  <div className="flex-1" />
+                  <div className="text-[9px] font-mono text-white/20 uppercase tracking-[0.2em]">Titan Neural Terminal v6.0</div>
                 </div>
-
+                <div className="flex-1 p-8 flex flex-col items-center justify-center text-center space-y-8">
+                  <div className="relative group/brain">
+                    <div className="absolute inset-0 bg-primary blur-[60px] opacity-20 group-hover/brain:opacity-40 transition-opacity animate-pulse" />
+                    <Brain className="w-24 h-24 text-primary relative z-10 group-hover/brain:scale-110 transition-transform duration-500" />
+                  </div>
+                  <div className="space-y-4">
+                    <p className="font-mono text-primary text-[10px] uppercase tracking-[0.4em] animate-pulse">{t("landing.how_it_works.status_label")}</p>
+                    <p className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-foreground drop-shadow-2xl">{t("landing.how_it_works.status_value")}</p>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -388,19 +394,32 @@ export default function LandingPage() {
 
       <Testimonials />
       
-      <section className="py-24 bg-card/30 border-y border-border/40">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+      <section className="py-32 relative overflow-hidden">
+        <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full -translate-y-1/2 opacity-20" />
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { value: "50k+", label: "Usuários Ativos" },
-              { value: "1.2M", label: "Jogos Gerados" },
-              { value: "450k", label: "Análises Realizadas" },
-              { value: "R$ 15M", label: "Prêmios Rastreados" }
+              { value: "50k+", label: "Usuários Ativos", icon: Users },
+              { value: "1.2M", label: "Jogos Gerados", icon: Activity },
+              { value: "450k", label: "Análises Realizadas", icon: Database },
+              { value: "R$ 15M", label: "Prêmios Rastreados", icon: TrendingUp }
             ].map((s, i) => (
-              <div key={i} className="text-center space-y-2">
-                <p className="text-4xl md:text-5xl font-black tracking-tighter italic text-primary">{s.value}</p>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-60">{s.label}</p>
-              </div>
+              <motion.div 
+                key={i} 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="text-center space-y-4 p-8 rounded-3xl border border-white/5 bg-white/[0.02] backdrop-blur-sm group hover:border-primary/20 transition-colors"
+              >
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                  <s.icon className="w-6 h-6 text-primary" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-4xl md:text-5xl font-black tracking-tighter italic text-foreground group-hover:text-primary transition-colors">{s.value}</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground opacity-60">{s.label}</p>
+                </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -419,7 +438,7 @@ export default function LandingPage() {
           </motion.div>
           <Accordion type="single" collapsible className="w-full space-y-4">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <AccordionItem key={i} value={`item-${i}`} className="border border-border/40 rounded-2xl px-6 bg-card/30 overflow-hidden">
+              <AccordionItem key={i} value={`item-${i}`} className="border border-white/5 rounded-3xl px-8 bg-white/[0.02] backdrop-blur-sm overflow-hidden hover:border-primary/20 transition-all duration-300">
                 <AccordionTrigger className="text-left font-bold text-lg hover:no-underline py-6">
                   {t(`landing.faq.q${i}` as any)}
                 </AccordionTrigger>
@@ -432,7 +451,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="py-20 border-t border-border/30 bg-card/10">
+      <footer className="py-32 border-t border-white/5 bg-black/20">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
             <div className="col-span-2 space-y-6">
