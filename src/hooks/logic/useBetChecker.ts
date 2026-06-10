@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { DrawResult } from "@/data/lotteries";
-import { MatchResult } from "@/services/lotteryApi";
+import { MatchResult } from "@/services/api/lottery";;
 import { DrawResultWithPrizes } from "@/hooks/useLotteryDraws";
 import { toast } from "sonner";
 import { computeFrequencyStats } from "@/engine/stats/statistics";

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { DrawResult } from "@/data/lotteries";
-import { fetchLatestDraw, LatestDrawResult } from "@/services/lotteryApi";
+import { fetchLatestDraw, LatestDrawResult } from "@/services/api/lottery";;
 import { DrawPrizeData } from "@/hooks/useLotteryDraws";
 import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, Wifi, WifiOff, Clock, CheckCircle2, Trophy, Users, DollarSign, TrendingUp } from "lucide-react";

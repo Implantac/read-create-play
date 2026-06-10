@@ -4,7 +4,7 @@ import { useSavedBets } from "@/hooks/useSavedBets";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Award, TrendingUp } from "lucide-react";
-import { getPrizeTiers } from "@/services/lotteryApi";
+import { getPrizeTiers } from "@/services/api/lottery";;
 import { DrawResultWithPrizes } from "@/hooks/useLotteryDraws";
 
 function findNextDraw(betDate: Date, sortedDraws: DrawResultWithPrizes[]): DrawResultWithPrizes | null {

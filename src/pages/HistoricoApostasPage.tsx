@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { getPrizeTiers } from "@/services/lotteryApi";
+import { getPrizeTiers } from "@/services/api/lottery";;
 import { ClipboardCheck, Trophy, TrendingUp, BarChart3, Calendar, ArrowUpRight, ArrowDownRight, Minus, Filter } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 

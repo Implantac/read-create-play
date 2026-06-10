@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { LOTTERIES, LotteryConfig } from "@/data/lotteries";
-import { getPrizeTiers } from "@/services/lotteryApi";
+import { getPrizeTiers } from "@/services/api/lottery";;
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

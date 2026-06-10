@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { DrawResult } from "@/data/lotteries";
-import { checkBetAgainstDraws, MatchResult, getPrizeTiers } from "@/services/lotteryApi";
+import { checkBetAgainstDraws, MatchResult, getPrizeTiers } from "@/services/api/lottery";;
 import { DrawResultWithPrizes, DrawPrizeData } from "@/hooks/useLotteryDraws";
 import { motion, AnimatePresence } from "framer-motion";
 import {
