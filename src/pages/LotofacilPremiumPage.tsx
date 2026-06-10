@@ -57,10 +57,10 @@ import {
 
 import { downloadCSV } from "@/utils/export-utils";
 
-const IntelligentGeneratorPanel = lazy(() => import("@/components/IntelligentGeneratorPanel").then(m => ({ default: m.IntelligentGeneratorPanel })));
-const EvolutiveGeneratorPanel = lazy(() => import("@/components/EvolutiveGeneratorPanel").then(m => ({ default: m.EvolutiveGeneratorPanel })));
+const IntelligentGeneratorPanel = lazy(() => import("@/components/lottery/generators/IntelligentGeneratorPanel").then(m => ({ default: m.IntelligentGeneratorPanel })));
+const EvolutiveGeneratorPanel = lazy(() => import("@/components/lottery/generators/EvolutiveGeneratorPanel").then(m => ({ default: m.EvolutiveGeneratorPanel })));
 const AIPredictionPanel = lazy(() => import("@/components/AIPredictionPanel").then(m => ({ default: m.AIPredictionPanel })));
-const ProfessionalGeneratorPanel = lazy(() => import("@/components/ProfessionalGeneratorPanel").then(m => ({ default: m.ProfessionalGeneratorPanel })));
+const ProfessionalGeneratorPanel = lazy(() => import("@/components/lottery/generators/ProfessionalGeneratorPanel").then(m => ({ default: m.ProfessionalGeneratorPanel })));
 import { TitanHealthGauge } from "@/components/lottery/analysis/TitanHealthGauge";
 
 const LazyFallback = () => (

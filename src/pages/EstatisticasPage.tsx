@@ -12,13 +12,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 // Lazy imports for heavy components
-const FrequencyChart = lazy(() => import("@/components/FrequencyChart").then(m => ({ default: m.FrequencyChart })));
-const HeatmapGrid = lazy(() => import("@/components/HeatmapGrid").then(m => ({ default: m.HeatmapGrid })));
-const SumChart = lazy(() => import("@/components/SumChart").then(m => ({ default: m.SumChart })));
-const ParityChart = lazy(() => import("@/components/ParityChart").then(m => ({ default: m.ParityChart })));
-const ConsecutiveChart = lazy(() => import("@/components/ConsecutiveChart").then(m => ({ default: m.ConsecutiveChart })));
-const RangeDistribution = lazy(() => import("@/components/RangeDistribution").then(m => ({ default: m.RangeDistribution })));
-const DelayChart = lazy(() => import("@/components/DelayChart").then(m => ({ default: m.DelayChart })));
+const FrequencyChart = lazy(() => import("@/components/lottery/charts/FrequencyChart").then(m => ({ default: m.FrequencyChart })));
+const HeatmapGrid = lazy(() => import("@/components/lottery/analysis/HeatmapGrid").then(m => ({ default: m.HeatmapGrid })));
+const SumChart = lazy(() => import("@/components/lottery/charts/SumChart").then(m => ({ default: m.SumChart })));
+const ParityChart = lazy(() => import("@/components/lottery/charts/ParityChart").then(m => ({ default: m.ParityChart })));
+const ConsecutiveChart = lazy(() => import("@/components/lottery/charts/ConsecutiveChart").then(m => ({ default: m.ConsecutiveChart })));
+const RangeDistribution = lazy(() => import("@/components/lottery/charts/RangeDistribution").then(m => ({ default: m.RangeDistribution })));
+const DelayChart = lazy(() => import("@/components/lottery/charts/DelayChart").then(m => ({ default: m.DelayChart })));
 
 const PERIOD_OPTIONS = [
   { label: "Todos", value: 0 },

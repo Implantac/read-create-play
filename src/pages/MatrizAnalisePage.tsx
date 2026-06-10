@@ -14,7 +14,7 @@ import { Grid3X3, Loader2, TrendingUp, TrendingDown, Clock, BarChart3, Zap } fro
 import { lazy, Suspense } from "react";
 
 const SmartUnfoldingGenerator = lazy(() =>
-  import("@/components/SmartUnfoldingGenerator").then(m => ({ default: m.SmartUnfoldingGenerator }))
+  import("@/components/lottery/generators/SmartUnfoldingGenerator").then(m => ({ default: m.SmartUnfoldingGenerator }))
 );
 
 const LazyFallback = () => (

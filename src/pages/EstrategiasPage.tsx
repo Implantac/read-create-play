@@ -6,12 +6,12 @@ import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { Brain, Loader2, Sparkles, Target, Zap } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const StrategySimulatorPanel = lazy(() => import("@/components/StrategySimulatorPanel").then(m => ({ default: m.StrategySimulatorPanel })));
-const StrategyComparatorPanel = lazy(() => import("@/components/StrategyComparatorPanel").then(m => ({ default: m.StrategyComparatorPanel })));
-const PatternDetectorPanel = lazy(() => import("@/components/PatternDetectorPanel").then(m => ({ default: m.PatternDetectorPanel })));
+const StrategySimulatorPanel = lazy(() => import("@/components/lottery/simulators/StrategySimulatorPanel").then(m => ({ default: m.StrategySimulatorPanel })));
+const StrategyComparatorPanel = lazy(() => import("@/components/lottery/simulators/StrategyComparatorPanel").then(m => ({ default: m.StrategyComparatorPanel })));
+const PatternDetectorPanel = lazy(() => import("@/components/lottery/analysis/PatternDetectorPanel").then(m => ({ default: m.PatternDetectorPanel })));
 const OptimizationPanel = lazy(() => import("@/components/OptimizationPanel").then(m => ({ default: m.OptimizationPanel })));
-const MLPanel = lazy(() => import("@/components/MLPanel").then(m => ({ default: m.MLPanel })));
-const AdvancedAnalyticsPanel = lazy(() => import("@/components/AdvancedAnalyticsPanel").then(m => ({ default: m.AdvancedAnalyticsPanel })));
+const MLPanel = lazy(() => import("@/components/lottery/analysis/MLPanel").then(m => ({ default: m.MLPanel })));
+const AdvancedAnalyticsPanel = lazy(() => import("@/components/lottery/analysis/AdvancedAnalyticsPanel").then(m => ({ default: m.AdvancedAnalyticsPanel })));
 const ConditionalProbabilityPanel = lazy(() => import("@/components/ConditionalProbabilityPanel").then(m => ({ default: m.ConditionalProbabilityPanel })));
 const HPEnginePanel = lazy(() => import("@/components/HPEnginePanel").then(m => ({ default: m.HPEnginePanel })));
 

@@ -10,11 +10,11 @@ import { StrategyBriefingPanel } from "@/components/lottery/analysis/StrategyBri
 import { FlaskConical, Loader2, Calculator } from "lucide-react";
 import { InvestmentSimulator } from "@/components/lottery/simulators/InvestmentSimulator";
 
-const HistoricalSimulatorPanel = lazy(() => import("@/components/HistoricalSimulatorPanel").then(m => ({ default: m.HistoricalSimulatorPanel })));
-const MassiveSimulationDashboard = lazy(() => import("@/components/MassiveSimulationDashboard").then(m => ({ default: m.MassiveSimulationDashboard })));
-const IntelligentSimulatorPanel = lazy(() => import("@/components/IntelligentSimulatorPanel").then(m => ({ default: m.IntelligentSimulatorPanel })));
-const MassiveSimulatorPanel = lazy(() => import("@/components/MassiveSimulatorPanel").then(m => ({ default: m.MassiveSimulatorPanel })));
-const GameSimulator = lazy(() => import("@/components/GameSimulator").then(m => ({ default: m.GameSimulator })));
+const HistoricalSimulatorPanel = lazy(() => import("@/components/lottery/simulators/HistoricalSimulatorPanel").then(m => ({ default: m.HistoricalSimulatorPanel })));
+const MassiveSimulationDashboard = lazy(() => import("@/components/lottery/simulators/MassiveSimulationDashboard").then(m => ({ default: m.MassiveSimulationDashboard })));
+const IntelligentSimulatorPanel = lazy(() => import("@/components/lottery/simulators/IntelligentSimulatorPanel").then(m => ({ default: m.IntelligentSimulatorPanel })));
+const MassiveSimulatorPanel = lazy(() => import("@/components/lottery/simulators/MassiveSimulatorPanel").then(m => ({ default: m.MassiveSimulatorPanel })));
+const GameSimulator = lazy(() => import("@/components/lottery/simulators/GameSimulator").then(m => ({ default: m.GameSimulator })));
 const BacktestPanel = lazy(() => import("@/components/BacktestPanel").then(m => ({ default: m.BacktestPanel })));
 const BaselineBenchmarkPanel = lazy(() => import("@/components/BaselineBenchmarkPanel").then(m => ({ default: m.BaselineBenchmarkPanel })));
 
