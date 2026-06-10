@@ -110,7 +110,7 @@ export function AppSidebar() {
             <span className="text-2xl drop-shadow-lg group-hover/lottery:scale-125 transition-all duration-500 cursor-pointer relative z-10" title={config?.name || "Loto"}>{config?.icon || "🍀"}</span>
           ) : (
             <div className="flex items-center gap-4 relative z-10">
-              <div className="w-14 h-14 rounded-2xl bg-background/60 border border-primary/20 flex items-center justify-center shrink-0 shadow-premium group-hover/lottery:rotate-6 group-hover/lottery:scale-110 transition-all duration-500 ring-2 ring-primary/10">
+              <div className="w-14 h-14 rounded-2xl bg-black/40 border border-primary/20 flex items-center justify-center shrink-0 shadow-lg group-hover/lottery:scale-110 transition-all duration-500">
                 <span className="text-3xl drop-shadow-md transition-transform duration-500">{config?.icon || "🍀"}</span>
               </div>
               <div className="flex-1 min-w-0">

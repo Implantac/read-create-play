@@ -183,7 +183,7 @@ const DashboardPage = () => {
         ].map((stat, i) => (
           <Card key={i} className="p-6 flex items-center gap-5 hover:border-primary/20 group overflow-hidden relative">
             <div className="absolute inset-0 bg-primary/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-            <div className={`w-14 h-14 rounded-2xl bg-background/60 border border-white/5 flex items-center justify-center shrink-0 shadow-lg group-hover:scale-110 transition-transform ${stat.color}`}>
+            <div className={`w-14 h-14 rounded-2xl bg-black/40 border border-white/5 flex items-center justify-center shrink-0 shadow-lg group-hover:scale-110 transition-transform ${stat.color}`}>
               <stat.icon className="w-7 h-7" />
             </div>
             <div className="space-y-1 relative z-10">
