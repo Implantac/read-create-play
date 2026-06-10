@@ -134,10 +134,17 @@ export function getPrizeTiers(lotteryId: string): { hits: number; label: string;
   }
 }
 
+export async function fetchLatestDraw(lotteryId: string): Promise<LatestDrawResult | null> {
+  const { drawsWithPrizes } = await fetchDraws(lotteryId, 1);
+  return drawsWithPrizes.length > 0 ? drawsWithPrizes[0] : null;
+}
+
 export const LotteryApi = {
   fetchDraws,
   syncLottery,
   checkBetAgainstDraws,
-  getPrizeTiers
+  getPrizeTiers,
+  fetchLatestDraw
 };
+
 
