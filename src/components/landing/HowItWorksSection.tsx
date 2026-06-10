@@ -1,0 +1,75 @@
+import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
+
+export function HowItWorksSection() {
+  const { t } = useTranslation();
+
+  const steps = [
+    { step: "01", title: t("landing.how_it_works.step1.title"), desc: t("landing.how_it_works.step1.desc") },
+    { step: "02", title: t("landing.how_it_works.step2.title"), desc: t("landing.how_it_works.step2.desc") },
+    { step: "03", title: t("landing.how_it_works.step3.title"), desc: t("landing.how_it_works.step3.desc") }
+  ];
+
+  return (
+    <section className="py-24 md:py-40 relative overflow-hidden">
+      <div className="container mx-auto px-6">
+        <div className="grid lg:grid-cols-2 gap-20 items-center">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="space-y-8"
+          >
+            <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
+              {t("landing.how_it_works.title").split(" ").map((word, i) => i === 1 ? <span key={i} className="gradient-brand-text">{word} </span> : word + " ")}
+            </h2>
+            <div className="space-y-6">
+              {steps.map((item, i) => (
+                <div key={i} className="flex gap-6 items-start group">
+                  <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">{item.step}</span>
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-bold uppercase italic">{item.title}</h3>
+                    <p className="text-muted-foreground leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="relative aspect-video glass-panel rounded-[2.5rem] border border-white/10 p-4 shadow-2xl group overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-primary/5 opacity-50 group-hover:opacity-70 transition-opacity" />
+            <div className="relative h-full border border-white/5 rounded-[2rem] bg-black/40 backdrop-blur-md overflow-hidden flex flex-col">
+              <div className="h-10 border-b border-white/5 bg-white/5 flex items-center px-6 gap-2">
+                <div className="flex gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/30" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-amber-500/30" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500/30" />
+                </div>
+                <div className="flex-1" />
+              </div>
+              <div className="flex-1 p-8 font-mono text-xs text-primary/40 space-y-2 overflow-hidden">
+                <p>&gt; Initializing Titan Neural Engine...</p>
+                <p>&gt; Loading historical data (5,400+ draws)...</p>
+                <p>&gt; Running Monte Carlo simulations (1.2M iterations)...</p>
+                <p>&gt; Calibrating Genetic Algorithms...</p>
+                <p>&gt; Target found: High convergence pattern detected.</p>
+                <div className="h-px w-full bg-primary/10 my-4" />
+                <div className="flex gap-2">
+                  {[12, 24, 35, 42, 58].map((n, idx) => (
+                    <div key={idx} className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold animate-pulse">
+                      {n}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
