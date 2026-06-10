@@ -1,4 +1,4 @@
-import { LotteryConfig } from "../types";
+import { LotteryConfig } from "./types";
 
 export const LOTTERIES: LotteryConfig[] = [
   { id: "megasena", name: "Mega Sena", numbers: 60, pick: 6, color: "neon-green", icon: "🍀" },

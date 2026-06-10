@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
-import { LotteryService } from "./lottery.service";
+import { LotteryService } from "@/services/lottery/lottery.service";
+
 
 export async function checkAdminStatus(userId: string) {
   const { data } = await supabase
