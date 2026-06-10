@@ -9,13 +9,13 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-95",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-lg shadow-destructive/20 hover:shadow-destructive/40 active:scale-95",
-        outline: "border border-border/60 bg-background/50 backdrop-blur-sm hover:bg-accent/10 hover:border-accent/40 hover:text-accent-foreground shadow-sm active:scale-95",
-        secondary: "bg-secondary/80 text-secondary-foreground hover:bg-secondary border border-border/40 shadow-sm active:scale-95",
-        ghost: "hover:bg-primary/10 hover:text-primary transition-all active:scale-95",
-        link: "text-primary underline-offset-4 hover:underline",
-        premium: "gradient-brand text-primary-foreground font-black uppercase tracking-widest shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] active:scale-95 transition-all duration-300 border border-white/10",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-95 transition-all duration-300",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-lg shadow-destructive/20 hover:shadow-destructive/40 active:scale-95 transition-all duration-300",
+        outline: "border border-border/40 bg-background/50 backdrop-blur-md hover:bg-accent/10 hover:border-accent/40 hover:text-accent-foreground shadow-sm active:scale-95 transition-all duration-300",
+        secondary: "bg-secondary/80 text-secondary-foreground hover:bg-secondary border border-border/20 shadow-sm active:scale-95 transition-all duration-300",
+        ghost: "hover:bg-primary/10 hover:text-primary transition-all active:scale-95 duration-300",
+        link: "text-primary underline-offset-4 hover:underline transition-all",
+        premium: "gradient-brand text-primary-foreground font-black uppercase tracking-widest shadow-[0_10px_40px_-10px_rgba(var(--primary-rgb),0.5)] hover:shadow-[0_20px_60px_-15px_rgba(var(--primary-rgb),0.7)] hover:scale-[1.02] active:scale-95 transition-all duration-500 border border-white/10",
 
       },
       size: {

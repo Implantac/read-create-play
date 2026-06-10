@@ -47,7 +47,7 @@ export function AppLayout() {
 
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Header */}
-          <header className="border-b border-border/40 glass-panel sticky top-0 z-50 h-20 flex items-center shadow-2xl">
+          <header className="border-b border-border/40 glass-panel sticky top-0 z-50 h-20 flex items-center shadow-xl">
 
             {/* Top row - brand + actions */}
             <div className="w-full flex items-center gap-4 px-4 md:px-6">

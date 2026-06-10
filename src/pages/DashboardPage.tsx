@@ -232,7 +232,7 @@ const DashboardPage = () => {
           <Link 
             key={item.label} 
             to={item.url} 
-            className="group p-10 rounded-[3rem] glass-card border-border/40 hover:border-primary/60 hover:bg-primary/10 transition-all duration-700 relative overflow-hidden active:scale-90 shadow-2xl bg-background/40"
+            className="group p-10 rounded-[3rem] glass-card border-border/40 hover:border-primary/60 hover:bg-primary/10 transition-all duration-700 relative overflow-hidden active:scale-95 shadow-xl bg-background/40"
           >
             <div className={`absolute inset-0 bg-gradient-to-br ${item.bg} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
             
