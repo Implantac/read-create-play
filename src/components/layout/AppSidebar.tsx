@@ -148,7 +148,7 @@ export function AppSidebar() {
                               activeClassName="bg-primary/15 text-primary font-black shadow-premium shadow-primary/10 border-primary/20 ring-1 ring-primary/10"
 
                             >
-                              <item.icon className="mr-3.5 h-4.5 w-4.5 shrink-0 group-hover/item:scale-110 transition-transform duration-300" />
+                              <item.icon className="mr-3.5 h-5 w-5 shrink-0 group-hover/item:scale-110 transition-transform duration-300" />
                               {!collapsed && (
                                 <>
                                   <span className="flex-1 truncate tracking-tighter">{item.title}</span>
