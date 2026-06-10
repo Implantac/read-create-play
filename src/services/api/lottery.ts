@@ -16,7 +16,12 @@ export interface DrawPrizeData {
   valorArrecadado: number;
 }
 
+export interface LatestDrawResult extends DrawResult {
+  prizeTiers?: DrawPrizeData | null;
+}
+
 export interface DrawResultWithPrizes extends DrawResult {
+
   prize_tiers?: DrawPrizeData | null;
   prizeTiers?: DrawPrizeData | null;
 }
