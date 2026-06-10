@@ -32,12 +32,12 @@ const resources = {
       },
       "landing": {
         "hero": {
-          "badge": "Protocolo Elite • {{count}} vagas vitalícias restantes",
-          "title": "Pare de apostar no escuro.",
-          "subtitle": "Jogue com Matemática.",
-          "description": "Pare de contar com o acaso. Utilize inteligência artificial de elite e algoritmos matemáticos avançados para decifrar padrões e transformar suas apostas em uma estratégia profissional de alta performance.",
-          "cta_primary": "Desbloquear Acesso Vitalício",
-          "cta_secondary": "Login de Membro"
+          "badge": "PROTOCOL TITAN • PLATAFORMA DE INTELIGÊNCIA PLM",
+          "title": "Domine a Ciência.",
+          "subtitle": "Conquiste a Sorte.",
+          "description": "Utilize a plataforma de PLM (Product Lifecycle Management) impulsionada por IA para transformar o caos estatístico em estratégias de jogo de alta performance. Onde a ciência de dados encontra o futuro das apostas.",
+          "cta_primary": "Desbloquear Neural Core",
+          "cta_secondary": "Acesso Membro"
         },
         "features": {
           "title": "Recursos da Plataforma Titan",

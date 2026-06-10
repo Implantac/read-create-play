@@ -29,7 +29,7 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
 
       <motion.div 
         style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
-        className="container max-w-7xl mx-auto relative z-10 text-center space-y-12"
+        className="container max-w-7xl mx-auto relative z-10 text-center space-y-16"
       >
         <motion.div 
           initial="hidden"
@@ -42,7 +42,7 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
           </span>
-          <span className="text-[11px] font-black uppercase tracking-[0.3em] text-primary italic">Engine v6.0 Alpha Live</span>
+          <span className="text-[11px] font-black uppercase tracking-[0.4em] text-primary italic">{t("landing.hero.badge")}</span>
         </motion.div>
 
         <div className="space-y-8">
@@ -51,10 +51,10 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             animate="visible"
             custom={1}
             variants={fadeUp}
-            className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase italic leading-[0.85]"
+            className="text-7xl md:text-[10rem] lg:text-[13rem] font-black tracking-tighter uppercase italic leading-[0.8]"
           >
-            <span className="block text-foreground drop-shadow-[0_10px_30px_rgba(0,0,0,0.4)]">Transforme Sorte</span>
-            <span className="block gradient-brand-text not-italic">em Ciência.</span>
+            <span className="block text-foreground drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)]">{t("landing.hero.title")}</span>
+            <span className="block gradient-brand-text not-italic">{t("landing.hero.subtitle")}</span>
           </motion.h1>
           
           <motion.p 
@@ -79,7 +79,7 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             size="lg" 
             variant="premium"
             onClick={(e) => handleCtaClick(e, "/signup")}
-            className="group h-16 px-10 text-sm font-black uppercase tracking-widest rounded-2xl shadow-[0_20px_50px_-12px_hsl(var(--primary)/0.5)] hover:shadow-[0_25px_60px_-12px_hsl(var(--primary)/0.7)] transition-shadow"
+            className="group h-20 px-12 text-sm font-black uppercase tracking-widest rounded-2xl shadow-[0_30px_60px_-12px_hsl(var(--primary)/0.5)] hover:shadow-[0_40px_80px_-12px_hsl(var(--primary)/0.7)] transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             {t("landing.hero.cta_primary")}
             <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" />
