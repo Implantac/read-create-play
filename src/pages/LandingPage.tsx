@@ -131,13 +131,6 @@ export default function LandingPage() {
     },
   ];
 
-  const stats = [
-    { value: "10.000+", label: t("landing.stats.draws") },
-    { value: "8", label: t("landing.stats.lotteries") },
-    { value: "14+", label: t("landing.stats.algorithms") },
-    { value: "99.9%", label: t("landing.stats.uptime") },
-  ];
-
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden antialiased">
       <Helmet>
@@ -370,17 +363,29 @@ export default function LandingPage() {
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="relative aspect-square glass-panel rounded-3xl border border-primary/20 p-8 flex items-center justify-center overflow-hidden"
+              className="relative aspect-video glass-panel rounded-[2.5rem] border border-white/10 p-4 shadow-2xl group overflow-hidden"
             >
-              <div className="absolute inset-0 bg-primary/5 animate-pulse" />
-              <Terminal className="w-full h-full text-primary/10" />
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center space-y-4">
-                <Brain className="w-20 h-20 text-primary animate-bounce" />
-                <div className="space-y-2">
-                  <p className="font-mono text-primary text-xs uppercase tracking-[0.3em]">{t("landing.how_it_works.status_label")}</p>
-                  <p className="text-2xl font-black italic uppercase">{t("landing.how_it_works.status_value")}</p>
+              <div className="absolute inset-0 bg-primary/5 opacity-50 group-hover:opacity-70 transition-opacity" />
+              <div className="relative h-full border border-white/5 rounded-[2rem] bg-black/40 backdrop-blur-md overflow-hidden flex flex-col">
+                <div className="h-10 border-b border-white/5 bg-white/5 flex items-center px-6 gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/30" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-amber-500/30" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-500/30" />
+                  </div>
+                  <div className="flex-1" />
+                  <div className="text-[9px] font-mono text-white/20 uppercase tracking-[0.2em]">Titan Neural Terminal v6.0</div>
                 </div>
-
+                <div className="flex-1 p-8 flex flex-col items-center justify-center text-center space-y-8">
+                  <div className="relative group/brain">
+                    <div className="absolute inset-0 bg-primary blur-[60px] opacity-20 group-hover/brain:opacity-40 transition-opacity animate-pulse" />
+                    <Brain className="w-24 h-24 text-primary relative z-10 group-hover/brain:scale-110 transition-transform duration-500" />
+                  </div>
+                  <div className="space-y-4">
+                    <p className="font-mono text-primary text-[10px] uppercase tracking-[0.4em] animate-pulse">{t("landing.how_it_works.status_label")}</p>
+                    <p className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter text-foreground drop-shadow-2xl">{t("landing.how_it_works.status_value")}</p>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </div>
