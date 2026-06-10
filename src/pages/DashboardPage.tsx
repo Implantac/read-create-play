@@ -183,7 +183,7 @@ const DashboardPage = () => {
         ].map((stat, i) => (
           <Card key={i} className="p-6 flex items-center gap-5 hover:border-primary/20 group overflow-hidden relative">
             <div className="absolute inset-0 bg-primary/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-            <div className={`w-14 h-14 rounded-2xl bg-background/60 border border-white/5 flex items-center justify-center shrink-0 shadow-lg group-hover:scale-110 transition-transform ${stat.color}`}>
+            <div className={`w-14 h-14 rounded-2xl bg-black/40 border border-white/5 flex items-center justify-center shrink-0 shadow-lg group-hover:scale-110 transition-transform ${stat.color}`}>
               <stat.icon className="w-7 h-7" />
             </div>
             <div className="space-y-1 relative z-10">
@@ -232,7 +232,7 @@ const DashboardPage = () => {
           <Link 
             key={item.label} 
             to={item.url} 
-            className="group p-10 rounded-[3rem] glass-card border-border/40 hover:border-primary/60 hover:bg-primary/10 transition-all duration-700 relative overflow-hidden active:scale-90 shadow-2xl bg-background/40"
+            className="group p-10 rounded-[3rem] glass-card border-border/40 hover:border-primary/60 hover:bg-primary/10 transition-all duration-700 relative overflow-hidden active:scale-95 shadow-xl bg-background/40"
           >
             <div className={`absolute inset-0 bg-gradient-to-br ${item.bg} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
             

@@ -35,7 +35,7 @@ export const AIAnalystBriefing = ({ game, score, confidence, strategy, reasons, 
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="w-full mx-auto overflow-hidden rounded-[2rem] border border-primary/20 bg-black/60 backdrop-blur-3xl shadow-2xl"
+      className="w-full mx-auto overflow-hidden rounded-[2.5rem] border border-white/10 bg-black/80 backdrop-blur-3xl shadow-2xl"
     >
       {/* Header */}
       <div className="relative p-6 pb-4">
@@ -65,7 +65,7 @@ export const AIAnalystBriefing = ({ game, score, confidence, strategy, reasons, 
       <div className="p-6 pt-2 space-y-6">
         {/* Main Stats Grid */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-2">
+          <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Confiança</span>
               <Cpu className="w-3.5 h-3.5 text-primary" />
@@ -76,7 +76,7 @@ export const AIAnalystBriefing = ({ game, score, confidence, strategy, reasons, 
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-2">
+          <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Estratégia</span>
               <Target className="w-3.5 h-3.5 text-emerald-400" />

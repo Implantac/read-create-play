@@ -57,7 +57,7 @@ export default function LoginPage() {
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="w-full max-w-md relative z-10"
       >
-        <Card className="glass-card shadow-premium p-4 rounded-[2.5rem]">
+        <Card className="glass-card shadow-premium p-4 rounded-[3rem] border-white/5">
           <CardHeader className="text-center space-y-4 pb-2">
             <motion.div
               initial={{ scale: 0.8 }}
@@ -65,7 +65,7 @@ export default function LoginPage() {
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
               className="mx-auto"
             >
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25 mx-auto overflow-hidden">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25 mx-auto overflow-hidden bg-black/20 border border-white/10">
                 <img src="/logo.png" alt="Titan Loterias" className="w-14 h-14 object-contain" />
               </div>
             </motion.div>
@@ -91,7 +91,7 @@ export default function LoginPage() {
                     placeholder="seu@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-11 bg-muted/30 border-border/50 focus:border-primary/50 focus:ring-primary/20 transition-colors"
+                    className="pl-10 h-12 rounded-xl bg-black/40 border-white/10 focus:border-primary/50 focus:ring-primary/20 transition-all"
                     required
                   />
                 </div>
@@ -111,7 +111,7 @@ export default function LoginPage() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 h-11 bg-muted/30 border-border/50 focus:border-primary/50 focus:ring-primary/20 transition-colors"
+                    className="pl-10 h-12 rounded-xl bg-black/40 border-white/10 focus:border-primary/50 focus:ring-primary/20 transition-all"
                     required
                   />
                 </div>
@@ -119,7 +119,7 @@ export default function LoginPage() {
             </CardContent>
 
             <CardFooter className="flex flex-col gap-3 pt-2">
-              <Button type="submit" variant="premium" className="w-full h-14 text-sm" disabled={loading}>
+              <Button type="submit" variant="premium" className="w-full h-14 text-xs font-black tracking-[0.2em] uppercase" disabled={loading}>
                 {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                 Entrar
                 {!loading && <ArrowRight className="w-4 h-4 ml-2" />}
@@ -134,7 +134,7 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <Button type="button" variant="outline" className="w-full h-11 border-border/50 hover:border-border hover:bg-muted/30 transition-colors" onClick={handleGoogleLogin}>
+              <Button type="button" variant="outline" className="w-full h-12 rounded-xl border-white/10 hover:border-primary/30 hover:bg-primary/5 transition-all text-xs font-bold uppercase tracking-widest" onClick={handleGoogleLogin}>
                 <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
                   <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
