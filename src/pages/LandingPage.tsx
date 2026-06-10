@@ -1,6 +1,6 @@
 import { useScroll, useTransform } from "framer-motion";
 import { useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 
