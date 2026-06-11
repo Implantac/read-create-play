@@ -226,23 +226,22 @@ const GeradorPage = () => {
                   onClick={handleGenerate} 
                   disabled={generating}
                   variant="premium"
-                  className="px-16 h-16 group"
-
+                  className="px-16 h-20 group rounded-full"
                 >
                   {generating ? (
                     <>
-                      <Loader2 className="w-6 h-6 animate-spin" />
-                      Processando...
+                      <Loader2 className="w-6 h-6 animate-spin mr-3" />
+                      Sintetizando...
                     </>
                   ) : (
                     <>
-                      <Play className="w-6 h-6 fill-current" />
-                      Gerar {quantity} Jogo{quantity > 1 ? 's' : ''}
+                      <Sparkles className="w-6 h-6 mr-3 fill-current" />
+                      Iniciar Síntese Neural
                     </>
                   )}
                 </Button>
-                <Button variant="ghost" onClick={prevStep} className="gap-2">
-                  <ChevronLeft className="w-4 h-4" /> Alterar Estratégia
+                <Button variant="ghost" onClick={prevStep} className="gap-2 text-[10px] font-black uppercase tracking-widest opacity-40 hover:opacity-100 italic">
+                  <ChevronLeft className="w-3 h-3" /> Redefinir Engine
                 </Button>
               </div>
             </Card>
