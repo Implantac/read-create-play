@@ -5,6 +5,7 @@ import * as z from "zod";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 import {
@@ -36,6 +37,7 @@ type LeadFormValues = z.infer<typeof leadSchema>;
 
 export function LeadCaptureForm() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<LeadFormValues>({
@@ -68,6 +70,7 @@ export function LeadCaptureForm() {
 
       toast.success(t("landing.leads.success_message"));
       form.reset();
+      navigate("/obrigado");
     } catch (error: any) {
       console.error("Error submitting lead:", error);
       toast.error(t("landing.leads.error_message"));
