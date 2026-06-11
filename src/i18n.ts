@@ -32,99 +32,99 @@ const resources = {
       },
       "landing": {
         "hero": {
-          "badge": "PROTOCOL TITAN • PLATAFORMA DE INTELIGÊNCIA PLM",
-          "title": "Domine a Ciência.",
-          "subtitle": "Conquiste a Sorte.",
-          "description": "Utilize a plataforma de PLM (Product Lifecycle Management) impulsionada por IA para transformar o caos estatístico em estratégias de jogo de alta performance. Onde a ciência de dados encontra o futuro das apostas.",
-          "cta_primary": "Desbloquear Neural Core",
-          "cta_secondary": "Acesso Membro"
+          "badge": "USE MODA • PROTOCOLO DE INTELIGÊNCIA PLM",
+          "title": "DOMINE A CRIAÇÃO.",
+          "subtitle": "LIDERE O MERCADO.",
+          "description": "A primeira plataforma de PLM com IA generativa e ERP nativo. Transforme o caos operacional em coleções lucrativas com inteligência preditiva e gestão 360º de ponta a ponta.",
+          "cta_primary": "Desbloquear USE AI",
+          "cta_secondary": "Agendar Demonstração"
         },
         "features": {
-          "title": "Recursos da Plataforma Titan",
-          "subtitle": "Utilize as mesmas ferramentas de análise de dados usadas por profissionais para otimizar suas apostas na Mega-Sena e outras loterias.",
+          "title": "A Inteligência por trás da Moda",
+          "subtitle": "Substitua planilhas, WhatsApp e processos manuais pela plataforma que está redefinindo o futuro do desenvolvimento de coleções.",
           "items": {
             "xray": {
-              "title": "Análise Estatística de Loterias",
-              "description": "Visualize tendências, números mais sorteados e atrasos com ferramentas profissionais de estatística."
+              "title": "PLM + ERP Nativo",
+              "description": "Uma única fonte de verdade. Do croqui ao financeiro, tudo integrado sem a necessidade de integrações complexas."
             },
             "ia": {
-              "title": "Inteligência Artificial para Loterias",
-              "description": "Nossa IA processa milhares de resultados da Mega-Sena, Lotofácil e outras para prever tendências."
+              "title": "USE AI • Copiloto Criativo",
+              "description": "Gere mood boards, paletas e mix de produtos instantaneamente com nossa IA treinada para a indústria fashion."
             },
             "optimizer": {
-              "title": "Gerador de Apostas Inteligente",
-              "description": "Crie jogos otimizados matematicamente para aumentar suas chances de ganhar na loteria."
+              "title": "Ficha Técnica Inteligente",
+              "description": "Engenharia de produto automatizada com controle de tecidos, aviamentos e custos em tempo real."
             },
             "backtest": {
-              "title": "Simulador de Resultados",
-              "description": "Valide suas estratégias de jogo contra todo o histórico de sorteios reais antes de apostar seu dinheiro."
+              "title": "BI Executivo de Luxo",
+              "description": "Monitore ROI, margens e giro de estoque com dashboards interativos e análises preditivas de demanda."
             },
             "simulation": {
-              "title": "Probabilidade Matemática",
-              "description": "Simule milhões de cenários e combinações para descobrir as chances reais de acerto em cada modalidade."
+              "title": "Digital Twin da Coleção",
+              "description": "Visualize toda a sua coleção em um ambiente digital antes mesmo da primeira peça piloto ser cortada."
             },
             "sync": {
-              "title": "Resultados em Tempo Real",
-              "description": "Acesso imediato aos resultados oficiais da Caixa Econômica Federal, sincronizados automaticamente."
+              "title": "Ecossistema Colaborativo",
+              "description": "Feed social, comentários e aprovações em tempo real para conectar Pesquisa, PCP e Vendas."
             }
           }
         },
         "stats": {
-          "draws": "Sorteios analisados",
-          "lotteries": "Loterias suportadas",
-          "algorithms": "Algoritmos de IA",
-          "uptime": "Uptime"
+          "draws": "Coleções gerenciadas",
+          "lotteries": "Marcas conectadas",
+          "algorithms": "Modelos de IA",
+          "uptime": "Disponibilidade"
         },
         "faq": {
-          "title": "Dúvidas sobre o Titan Loterias",
-          "q1": "O Titan Loterias funciona para Mega-Sena e Lotofácil?",
-          "a1": "Sim! Nossa plataforma oferece análise estatística completa para as principais loterias da Caixa, incluindo Mega-Sena, Lotofácil, Quina, Lotomania e muito mais.",
-          "q2": "Como a Inteligência Artificial melhora minhas chances?",
-          "a2": "Nossa IA processa milhares de sorteios históricos para identificar padrões e tendências que algoritmos comuns ignoram, otimizando seu gerador de apostas com base em dados reais.",
-          "q3": "O que é o simulador de resultados e backtest?",
-          "a3": "O simulador permite que você teste sua estratégia contra resultados passados (backtest). Assim, você descobre se sua combinação teria ganho prêmios em sorteios anteriores da Lotofácil ou Mega-Sena.",
-          "q4": "O acesso vitalício inclui atualizações?",
-          "a4": "Com certeza. Ao adquirir o acesso vitalício, você garante todas as futuras ferramentas de análise, novos algoritmos de IA e atualizações de segurança sem pagar mensalidades.",
-          "q5": "A plataforma é atualizada com resultados oficiais?",
-          "a5": "Sim, sincronizamos nossos dados diretamente com os resultados oficiais da Caixa Econômica Federal em tempo real, garantindo precisão total nas estatísticas.",
-          "q6": "O gerador de apostas garante o prêmio acumulado?",
-          "a6": "Não. Loterias envolvem sorte. O Titan Loterias é uma ferramenta de apoio que utiliza matemática e estatística para aumentar suas probabilidades, mas não prometemos ganhos garantidos."
+          "title": "Dúvidas sobre o USE MODA PLM AI",
+          "q1": "O USE MODA substitui meu ERP atual?",
+          "a1": "O USE MODA possui um ERP nativo focado em moda, mas também pode ser integrado aos principais ERPs de mercado via API para manter sua contabilidade e fiscal existentes.",
+          "q2": "Como a IA ajuda no desenvolvimento de coleções?",
+          "a2": "Nossa IA 'USE AI' analisa tendências de mercado e histórico de vendas para sugerir mix de produtos, paletas de cores e até criar esboços iniciais de fichas técnicas.",
+          "q3": "O que é o Digital Twin da Coleção?",
+          "a3": "É uma representação digital completa do seu mix de produtos que permite visualizar o equilíbrio da coleção, custos estimados e potencial de venda antes da produção física.",
+          "q4": "A plataforma é segura para meus designs proprietários?",
+          "a4": "Segurança é nossa prioridade. Utilizamos criptografia de nível bancário e garantimos que seus dados e designs nunca sejam usados para treinar modelos de IA públicos.",
+          "q5": "O sistema suporta integração com Adobe Illustrator?",
+          "a5": "Sim! Possuímos plugins e integrações nativas para Adobe Illustrator, Corel Draw e as principais ferramentas de CAD do mercado como Audaces e Lectra.",
+          "q6": "Qual o tempo médio de implementação?",
+          "a6": "Graças à nossa interface intuitiva e processos automatizados de importação, a maioria das empresas começa a operar 100% em menos de 30 dias."
         },
         "how_it_works": {
-          "title": "Como Funciona o Titan Loterias",
+          "title": "A Jornada USE MODA",
           "step1": {
-            "title": "Análise de Big Data",
-            "desc": "Monitoramos todos os resultados oficiais das loterias brasileiras para alimentar nossa base de dados estatísticos."
+            "title": "Pesquisa & Insight",
+            "desc": "Centralize referências no Mood Board inteligente com análise de tendências via visão computacional."
           },
           "step2": {
-            "title": "Cálculo de Tendências",
-            "desc": "Nossa inteligência artificial analisa milhões de combinações em busca de padrões e anomalias estatísticas recorrentes."
+            "title": "Engenharia de Produto",
+            "desc": "Desenvolva fichas técnicas avançadas com controle automático de insumos e workflow visual em Kanban."
           },
           "step3": {
-            "title": "Apostas Otimizadas",
-            "desc": "Você recebe sugestões de jogos baseadas em modelos matemáticos de alta performance para aumentar suas chances."
+            "title": "Produção & BI",
+            "desc": "Monitore o PCP em tempo real e analise a rentabilidade de cada peça com indicadores financeiros de elite."
           },
-          "status_label": "Status do Sistema",
-          "status_value": "Operando em Alta Fidelidade"
+          "status_label": "Rede Neural",
+          "status_value": "Processando Tendências Verão 2026"
         },
         "testimonials": {
-          "title": "Depoimentos de Usuários Reais",
-          "subtitle": "Junte-se a milhares de jogadores que já profissionalizaram suas estratégias.",
+          "title": "Líderes que Escolheram a Evolução",
+          "subtitle": "Junte-se às marcas que estão escalando com previsibilidade e design de excelência.",
           "items": {
             "t1": {
-              "name": "Ricardo Silva",
-              "role": "Analista de Dados",
-              "content": "O Titan Loterias mudou completamente minha forma de enxergar os sorteios. A precisão da IA é assustadora."
+              "name": "Valentina Rossi",
+              "role": "Diretora Criativa",
+              "content": "O USE MODA eliminou o caos de planilhas e WhatsApp. Hoje meu time cria 40% mais rápido com a ajuda da IA."
             },
             "t2": {
-              "name": "Ana Oliveira",
-              "role": "Jogadora Profissional",
-              "content": "As ferramentas de backtest me economizaram centenas de reais em apostas sem sentido. Agora só jogo com estratégia."
+              "name": "Alessandro Silva",
+              "role": "Head de Produto",
+              "content": "A ficha técnica inteligente e a integração com o ERP nativo trouxeram uma precisão de custos que nunca tivemos antes."
             },
             "t3": {
-              "name": "Marcos Santos",
-              "role": "Entusiasta de Matemática",
-              "content": "Melhor plataforma do Brasil. O otimizador de matrizes é simplesmente fantástico para quem busca cobertura real."
+              "name": "Beatriz Mendes",
+              "role": "COO de Varejo Fashion",
+              "content": "Finalmente um software que entende a linguagem da moda. O Digital Twin é um divisor de águas para nosso planejamento."
             }
           }
         }
