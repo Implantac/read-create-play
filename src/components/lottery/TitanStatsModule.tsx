@@ -30,7 +30,7 @@ export function TitanStatsModule() {
           <div className="flex items-end justify-between">
             <div className="space-y-1">
               <h3 className="text-2xl font-black uppercase tracking-tighter italic leading-none">{stat.value}</h3>
-              {('info' in stat) && <p className="text-[8px] font-black uppercase text-emerald-400 tracking-widest">{stat.info}</p>}
+              {stat.info && <p className="text-[8px] font-black uppercase text-emerald-400 tracking-widest">{stat.info}</p>}
             </div>
             <Badge variant="outline" className="text-[9px] font-black tracking-widest uppercase border-white/10 text-muted-foreground bg-white/5">
               {stat.trend}
