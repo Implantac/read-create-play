@@ -152,12 +152,11 @@ const GeradorPage = () => {
                 <span className="text-5xl drop-shadow-lg">{config.icon}</span>
               </div>
               <div className="space-y-3">
-                <Badge variant="outline" className="px-3 py-1 bg-primary/10 text-primary border-primary/20 text-[10px] font-black uppercase tracking-widest italic mb-2">Step 01: Dataset Definition</Badge>
-                <h3 className="text-3xl font-black uppercase tracking-tighter italic">Dataset: {config.name}</h3>
-                <p className="text-muted-foreground text-base max-w-md mx-auto">O motor USE AI está pronto para processar dezenas {config.name} com as melhores métricas de convergência para o próximo SKU de mercado.</p>
+                <h3 className="text-3xl font-black uppercase tracking-tighter italic">Seleção: {config.name}</h3>
+                <p className="text-muted-foreground text-base">O motor Titan está pronto para processar {config.pick} números com as melhores métricas de convergência para este concurso.</p>
               </div>
-              <Button onClick={nextStep} variant="premium" className="h-16 px-16 group rounded-full shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
-                Configurar Motor de Predição
+              <Button onClick={nextStep} variant="premium" className="h-16 px-16 group">
+                Avançar para Estratégia
                 <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Card>
