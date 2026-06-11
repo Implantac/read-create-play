@@ -40,7 +40,7 @@ const DashboardPage = () => {
               CENTRAL DE <span className="gradient-brand-text">INTELIGÊNCIA</span> TITAN
             </h1>
             <p className="text-muted-foreground font-medium max-w-lg opacity-60">
-              Análise baseada em dados históricos, estatística, probabilidade e inteligência artificial.
+              Titan Loterias é uma plataforma de inteligência aplicada às loterias brasileiras que analisa históricos oficiais, identifica padrões estatísticos e utiliza IA para gerar apostas mais estratégicas.
             </p>
           </div>
           
