@@ -79,7 +79,7 @@ const DashboardPage = () => {
           <RecommendationCard 
             luckyGame={luckyGame} 
             generating={generating} 
-            onGenerate={generateGame} 
+            onGenerate={(p) => generateGame(p)} 
             onShowBriefing={() => setShowBriefing(true)} 
           />
           
