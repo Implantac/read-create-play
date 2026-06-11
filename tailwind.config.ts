@@ -84,10 +84,11 @@ export default {
         mono: ['JetBrains Mono', 'monospace'],
       },
       boxShadow: {
-        'premium': '0 10px 40px -10px rgba(0, 0, 0, 0.5)',
-        'premium-hover': '0 20px 60px -15px rgba(0, 0, 0, 0.6)',
-        'glow-primary': '0 0 15px rgba(var(--primary-rgb), 0.3)',
-        'glow-accent': '0 0 15px rgba(var(--accent-rgb), 0.3)',
+        'premium': 'var(--shadow-premium)',
+        'premium-hover': 'var(--shadow-premium-hover)',
+        'gold': 'var(--shadow-gold)',
+        'glow-primary': '0 0 24px rgba(var(--primary-rgb), 0.25)',
+        'glow-accent': '0 0 24px rgba(var(--accent-rgb), 0.25)',
       },
       keyframes: {
         "accordion-down": {
