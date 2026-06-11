@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { requireUserAuth, corsHeaders } from "../_shared/auth.ts";
 
 interface ChatMessage {
@@ -35,24 +36,73 @@ serve(async (req) => {
       });
     }
 
-    const systemPrompt = `Você é o **Titan IA**, assistente especialista em loterias brasileiras (Mega-Sena, Lotofácil, Quina, Lotomania, Dupla Sena, Timemania, Dia de Sorte, Super Sete).
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
 
-CONTEXTO ATUAL:
-- Loteria selecionada pelo usuário: ${lotteryId}
-${userContext ? `- Perfil de aprendizado do usuário:\n${userContext}` : ""}
+    // Fetch real-time data from database
+    const [drawsResult, insightsResult, topNumbersResult] = await Promise.all([
+      supabaseClient
+        .from("lottery_draws")
+        .select("concurso, draw_date, numbers")
+        .eq("lottery_id", lotteryId)
+        .order("concurso", { ascending: false })
+        .limit(10),
+      supabaseClient
+        .from("system_insights")
+        .select("title, content, insight_type")
+        .eq("lottery_id", lotteryId)
+        .order("created_at", { ascending: false })
+        .limit(5),
+      supabaseClient
+        .rpc("get_top_numbers", { p_lottery_id: lotteryId, p_limit: 10 })
+    ]);
+
+    const drawsData = drawsResult.data || [];
+    const insightsData = insightsResult.data || [];
+    const topNumbersData = topNumbersResult.data || [];
+
+    const formattedDraws = drawsData.map(d => 
+      `Concurso ${d.concurso} (${d.draw_date}): ${d.numbers.join(", ")}`
+    ).join("\n");
+
+    const formattedInsights = insightsData.map(i => 
+      `- [${i.insight_type.toUpperCase()}] ${i.title}: ${i.content}`
+    ).join("\n");
+
+    const formattedTopNumbers = topNumbersData.map((n: any) => 
+      `Nº ${String(n.number).padStart(2, '0')} (${n.frequency}x)`
+    ).join(", ");
+
+    const systemPrompt = `Você é o **Titan IA**, o motor de inteligência central do **Titan AI Center**, a plataforma de elite do **Titan Loterias**.
+
+DADOS REAIS DA LOTERIA EM TEMPO REAL (${lotteryId}):
+
+ESTATÍSTICAS GERAIS (HISTÓRICO COMPLETO):
+- Top Dezenas Mais Frequentes: ${formattedTopNumbers || "Calculando..."}
+
+ÚLTIMOS 10 CONCURSOS:
+${formattedDraws || "Nenhum dado disponível no momento."}
+
+INSIGHTS E MÉTRICAS DA REDE NEURAL:
+${formattedInsights || "Aguardando novos sinais de rede neural..."}
+
+CONTEXTO DO USUÁRIO:
+${userContext ? `- Perfil de aprendizado:\n${userContext}` : "Usuário novo ou sem perfil específico."}
 
 DIRETRIZES DE RESPOSTA:
-- Português do Brasil. Direto ao ponto, sem rodeios nem preâmbulos.
-- **Estrutura obrigatória** quando a pergunta envolver análise:
-  1. **Diagnóstico** (1 linha)
-  2. **Evidência estatística** com números concretos (freq, atraso, χ², entropia, lift, z-score)
-  3. **Recomendação acionável**
-- Markdown rico: títulos H2/H3, **negrito** para destaques, tabelas para comparações, listas densas, \`code\` para números.
-- Quando gerar jogos: dezenas em **negrito**, 2 dígitos (ex: **02, 07, 13**), uma sugestão por linha, sempre acompanhadas de justificativa estatística.
-- Baseie tudo em estatística real (frequência, atraso, ciclos, par/ímpar, soma, faixas, primos, fechamentos, Markov, χ²).
-- Cite métricas reais; nunca invente números. Se não tiver dado, diga.
-- Evite parágrafos longos: prefira bullets densos. Nunca repita o que o usuário disse.
-- Nunca prometa vitória. Reforce: "loterias são jogos de azar — jogue com responsabilidade".`;
+- Tom: Sênior, Analítico, Luxo, Direto ao ponto.
+- OBRIGATÓRIO: Use os dados REAIS acima para fundamentar TODA resposta. Não invente concursos.
+- Se o usuário pedir números quentes, cite os do Top Dezenas ou dos últimos concursos fornecidos.
+- Estrutura de Resposta:
+  1. **Diagnóstico Alpha**: Resumo da situação.
+  2. **Análise de Dados**: Use as tabelas/números acima.
+  3. **Sugestão de Elite**: Recomendação acionável.
+- Markdown: Use tabelas para comparar dados e negrito para números.
+- Sempre reforce que são probabilidades estatísticas e não garantias.
+- Não use preâmbulos como "Entendi seu pedido". Vá direto à análise.`;
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
