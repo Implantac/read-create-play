@@ -108,7 +108,7 @@ export const TitanCommandCenter = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-              <Activity className="w-3 h-3" /> Trend Velocity
+              <Activity className="w-3 h-3" /> Core Heatmap
             </span>
             <span className="text-[10px] font-mono text-emerald-500">OPTIMAL</span>
           </div>
