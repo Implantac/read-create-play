@@ -61,7 +61,7 @@ const IntelligentGeneratorPanel = lazy(() => import("@/components/lottery/genera
 const EvolutiveGeneratorPanel = lazy(() => import("@/components/lottery/generators/EvolutiveGeneratorPanel").then(m => ({ default: m.EvolutiveGeneratorPanel })));
 const AIPredictionPanel = lazy(() => import("@/components/AIPredictionPanel").then(m => ({ default: m.AIPredictionPanel })));
 const ProfessionalGeneratorPanel = lazy(() => import("@/components/lottery/generators/ProfessionalGeneratorPanel").then(m => ({ default: m.ProfessionalGeneratorPanel })));
-import { TitanHealthGauge } from "@/components/lottery/analysis/TitanHealthGauge";
+import { NeuralHealthGauge } from "@/components/lottery/analysis/NeuralHealthGauge";
 
 const LazyFallback = () => (
   <div className="flex items-center justify-center py-12 text-muted-foreground bg-secondary/5 rounded-2xl border border-dashed border-border/40">
@@ -380,13 +380,13 @@ export default function LotofacilPremiumPage() {
                     </h2>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <TitanHealthGauge 
+                    <NeuralHealthGauge 
                       value={88.4} 
                       label="Convergência" 
                       sublabel="Sincronia Global" 
                       color="hsl(var(--primary))" 
                     />
-                    <TitanHealthGauge 
+                    <NeuralHealthGauge 
                       value={92.1} 
                       label="Estabilidade" 
                       sublabel="Fluxo Preditivo" 

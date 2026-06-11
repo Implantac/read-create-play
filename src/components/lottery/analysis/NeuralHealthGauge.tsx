@@ -7,7 +7,7 @@ interface Props {
   color?: string;
 }
 
-export function TitanHealthGauge({ value, label, sublabel, color = "var(--primary)" }: Props) {
+export function NeuralHealthGauge({ value, label, sublabel, color = "var(--primary)" }: Props) {
   const radius = 40;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (value / 100) * circumference;
