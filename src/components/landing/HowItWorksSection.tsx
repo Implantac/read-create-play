@@ -52,15 +52,15 @@ export function HowItWorksSection() {
                 <div className="flex-1" />
               </div>
               <div className="flex-1 p-8 font-mono text-xs text-primary/40 space-y-2 overflow-hidden">
-                <p>&gt; Initializing Titan Neural Engine...</p>
-                <p>&gt; Loading historical data (5,400+ draws)...</p>
-                <p>&gt; Running Monte Carlo simulations (1.2M iterations)...</p>
-                <p>&gt; Calibrating Genetic Algorithms...</p>
-                <p>&gt; Target found: High convergence pattern detected.</p>
+                <p>&gt; Initializing USE AI Fashion Engine...</p>
+                <p>&gt; Loading global market data (Milan, Paris, NY)...</p>
+                <p>&gt; Analyzing textile sustainability index...</p>
+                <p>&gt; Generating predictive mix-of-products...</p>
+                <p>&gt; Status: High-efficiency collection mapped.</p>
                 <div className="h-px w-full bg-primary/10 my-4" />
-                <div className="flex gap-2">
-                  {[12, 24, 35, 42, 58].map((n, idx) => (
-                    <div key={idx} className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold animate-pulse">
+                <div className="grid grid-cols-4 gap-2">
+                  {["ROI", "SKU", "PLM", "ERP"].map((n, idx) => (
+                    <div key={idx} className="h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-[10px] text-primary font-bold animate-pulse px-2">
                       {n}
                     </div>
                   ))}
