@@ -165,8 +165,8 @@ const GeradorPage = () => {
           {step === 2 && (
             <div className="space-y-6">
               <div className="text-center space-y-2 mb-8">
-                <h3 className="text-xl font-black uppercase tracking-tighter">Selecione a Estratégia</h3>
-                <p className="text-muted-foreground">O motor Titan utilizará o modelo escolhido para processar as dezenas.</p>
+                <h3 className="text-xl font-black uppercase tracking-tighter">Selecione o Motor de Predição</h3>
+                <p className="text-muted-foreground text-sm opacity-60">Escolha a heurística que governará a síntese da sua nova coleção de jogos.</p>
               </div>
               <div className="grid md:grid-cols-2 gap-6">
                 {STRATEGIES.map((s) => (
