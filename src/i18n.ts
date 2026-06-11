@@ -94,25 +94,24 @@ const resources = {
         },
         "disclaimer": "As análises são baseadas em dados históricos, estatística, probabilidade e inteligência artificial. O sistema não garante ganhos e deve ser usado como ferramenta de suporte à decisão."
       },
-        "testimonials": {
-          "title": "Depoimentos de Usuários Reais",
-          "subtitle": "Junte-se a milhares de jogadores que já profissionalizaram suas estratégias.",
-          "items": {
-            "t1": {
-              "name": "Ricardo Silva",
-              "role": "Analista de Dados",
-              "content": "O Titan Loterias mudou completamente minha forma de enxergar os sorteios. A precisão da IA é assustadora."
-            },
-            "t2": {
-              "name": "Ana Oliveira",
-              "role": "Jogadora Profissional",
-              "content": "As ferramentas de backtest me economizaram centenas de reais em apostas sem sentido. Agora só jogo com estratégia."
-            },
-            "t3": {
-              "name": "Marcos Santos",
-              "role": "Entusiasta de Matemática",
-              "content": "Melhor plataforma do Brasil. O otimizador de matrizes é simplesmente fantástico para quem busca cobertura real."
-            }
+      "testimonials": {
+        "title": "Depoimentos de Usuários Reais",
+        "subtitle": "Junte-se a milhares de jogadores que já profissionalizaram suas estratégias.",
+        "items": {
+          "t1": {
+            "name": "Ricardo Silva",
+            "role": "Analista de Dados",
+            "content": "O Titan Loterias mudou completamente minha forma de enxergar os sorteios. A precisão da IA é assustadora."
+          },
+          "t2": {
+            "name": "Ana Oliveira",
+            "role": "Jogadora Profissional",
+            "content": "As ferramentas de backtest me economizaram centenas de reais em apostas sem sentido. Agora só jogo com estratégia."
+          },
+          "t3": {
+            "name": "Marcos Santos",
+            "role": "Entusiasta de Matemática",
+            "content": "Melhor plataforma do Brasil. O otimizador de matrizes é simplesmente fantástico para quem busca cobertura real."
           }
         }
       },
