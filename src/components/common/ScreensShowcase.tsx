@@ -23,10 +23,10 @@ function DashboardMock() {
     <div className="p-4 space-y-3">
       <div className="grid grid-cols-4 gap-2">
         {[
-          { label: "Sorteios", val: "3.248", icon: BarChart3, c: "text-primary" },
-          { label: "Padrões", val: "152", icon: Brain, c: "text-neon-blue" },
-          { label: "Win Rate", val: "71%", icon: TrendingUp, c: "text-primary" },
-          { label: "Score", val: "A+", icon: Zap, c: "text-accent" },
+          { label: "Concursos", val: "14.502", icon: BarChart3, c: "text-primary" },
+          { label: "IA Models", val: "48", icon: Brain, c: "text-neon-blue" },
+          { label: "Predictive", val: "89%", icon: TrendingUp, c: "text-primary" },
+          { label: "Status", val: "Neural", icon: Zap, c: "text-accent" },
         ].map((s) => (
           <div key={s.label} className="rounded-lg border border-border/20 bg-card/50 p-2 text-center">
             <s.icon className={`w-3.5 h-3.5 mx-auto mb-1 ${s.c}`} />
@@ -69,7 +69,7 @@ function GeradorMock() {
             </div>
           ))}
         </div>
-        <div className="mt-3"><span className="text-[8px] font-mono text-primary bg-primary/10 border border-primary/20 rounded-full px-3 py-1">Score: 94/100 — Grau A+</span></div>
+        <div className="mt-3"><span className="text-[8px] font-mono text-primary bg-primary/10 border border-primary/20 rounded-full px-3 py-1 italic font-black">Titan Score: 94/100 — Excelente Oportunidade</span></div>
       </div>
       <div className="grid grid-cols-4 gap-2">
         {[{ l: "Padrão", v: 87 }, { l: "Neural", v: 74 }, { l: "Genético", v: 91 }, { l: "MC", v: 82 }].map((i) => (

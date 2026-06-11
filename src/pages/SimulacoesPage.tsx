@@ -31,10 +31,10 @@ const SimulacoesPage = () => {
   return (
     <div className="space-y-10 animate-in fade-in duration-700">
       <PageHeader
-        title="Engine de Simulação"
+        title="Simulador Histórico"
         description="Ambiente de validação massiva via Monte Carlo e Backtesting de alta profundidade histórica."
         icon={FlaskConical}
-        badge="SIMULATION CORE"
+        badge="SIMULATION CORE v4.0"
       />
       
       {draws.length === 0 ? (

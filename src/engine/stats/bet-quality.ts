@@ -4,6 +4,9 @@ import {
   computeParityScore, 
   computeHighLowScore, 
   computeSpreadScore,
+  computeFrameScore,
+  computeFibonacciScore,
+  computeSumScore,
   type BetQualityReport,
   type QualityDimension
 } from "./quality-metrics";
@@ -36,12 +39,28 @@ export function evaluateBetQuality(
   dimensions.push({ name: "Cobertura de Faixa", ...spread });
   if (spread.spread < config.numbers * 0.4) warnings.push("Números muito concentrados");
   if (spread.spread > config.numbers * 0.7) strengths.push("Boa cobertura do intervalo");
+  
+  // 4. Frame/Center (Specific to Lotofácil)
+  if (config.id === 'lotofacil') {
+    const frame = computeFrameScore(bet, config);
+    dimensions.push({ name: "Moldura/Centro", ...frame });
+    if (frame.score < 60) warnings.push("Desequilíbrio moldura/centro");
+  }
 
-  // Simplified weights for demonstration
-  const weights = [12, 12, 10]; 
-  const currentTotal = weights.reduce((a, b) => a + b, 0);
+  // 5. Fibonacci
+  const fibo = computeFibonacciScore(bet);
+  dimensions.push({ name: "Padrão Fibonacci", ...fibo });
+
+  // 6. Sum
+  const sumMetric = computeSumScore(bet, config);
+  dimensions.push({ name: "Soma de Dezenas", ...sumMetric });
+  if (sumMetric.score < 50) warnings.push("Soma fora da faixa ideal");
+
+  // Weights for Titan Score
+  const weights = [15, 15, 10, 20, 10, 30]; 
+  const currentTotal = dimensions.reduce((acc, _, i) => acc + (weights[i] || 10), 0);
   const overall = Math.round(
-    dimensions.reduce((s, d, i) => s + (d.score * weights[i] / currentTotal), 0)
+    dimensions.reduce((s, d, i) => s + (d.score * (weights[i] || 10) / currentTotal), 0)
   );
 
   const grade: BetQualityReport["grade"] =

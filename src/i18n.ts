@@ -32,40 +32,40 @@ const resources = {
       },
       "landing": {
         "hero": {
-          "badge": "PROTOCOL TITAN • INTELIGÊNCIA ANALÍTICA DE ELITE",
-          "title": "Domine a Ciência.",
-          "subtitle": "Conquiste a Sorte.",
-          "description": "Utilize a plataforma de inteligência artificial de elite para transformar o caos estatístico em estratégias de jogo de alta performance. Onde a ciência de dados encontra o futuro das apostas.",
-          "cta_primary": "Desbloquear Neural Core",
-          "cta_secondary": "Acesso Membro"
+          "badge": "TITAN INTEL • INTELIGÊNCIA ESTATÍSTICA APLICADA",
+          "title": "INTELIGÊNCIA ARTIFICIAL PARA",
+          "subtitle": "LOTERIAS BRASILEIRAS",
+          "description": "Analise milhares de concursos, descubra padrões ocultos e gere apostas utilizando estratégias matemáticas avançadas e IA. O Titan Loterias é a plataforma definitiva de inteligência aplicada às loterias brasileiras.",
+          "cta_primary": "Testar Gratuitamente",
+          "cta_secondary": "Conhecer Recursos"
         },
         "features": {
-          "title": "Recursos da Plataforma Titan",
-          "subtitle": "Utilize as mesmas ferramentas de análise de dados usadas por profissionais para otimizar suas apostas na Mega-Sena e outras loterias.",
+          "title": "Centro de Inteligência Titan",
+          "subtitle": "O sistema abandona qualquer aparência de simples gerador e se posiciona como um ecossistema de ciência de dados aplicado.",
           "items": {
             "xray": {
-              "title": "Análise Estatística de Loterias",
-              "description": "Visualize tendências, números mais sorteados e atrasos com ferramentas profissionais de estatística."
+              "title": "Análise Histórica Avançada",
+              "description": "Processamos milhões de dados de concursos oficiais para identificar tendências de frequência, atraso e distribuição."
             },
             "ia": {
-              "title": "Inteligência Artificial para Loterias",
-              "description": "Nossa IA processa milhares de resultados da Mega-Sena, Lotofácil e outras para prever tendências."
+              "title": "Titan AI Core",
+              "description": "Nossa rede neural aplica modelos matemáticos complexos para detectar padrões ocultos que desafiam a sorte comum."
             },
             "optimizer": {
-              "title": "Gerador de Apostas Inteligente",
-              "description": "Crie jogos otimizados matematicamente para aumentar suas chances de ganhar na loteria."
+              "title": "Motor de Probabilidade",
+              "description": "Geramos apostas otimizadas com base em estratégias de Fibonacci, Monte Carlo e Cadeias de Markov."
             },
             "backtest": {
-              "title": "Simulador de Resultados",
-              "description": "Valide suas estratégias de jogo contra todo o histórico de sorteios reais antes de apostar seu dinheiro."
+              "title": "Simulador de Performance",
+              "description": "Execute sua estratégia contra concursos passados e descubra o ROI teórico e a eficiência real antes de apostar."
             },
             "simulation": {
-              "title": "Probabilidade Matemática",
-              "description": "Simule milhões de cenários e combinações para descobrir as chances reais de acerto em cada modalidade."
+              "title": "Laboratório de Estratégias",
+              "description": "Acesse uma biblioteca profissional de fechamentos e distribuições balanceadas com score de força estatística."
             },
             "sync": {
-              "title": "Resultados em Tempo Real",
-              "description": "Acesso imediato aos resultados oficiais da Caixa Econômica Federal, sincronizados automaticamente."
+              "title": "Sincronização Oficial",
+              "description": "Dados atualizados em tempo real diretamente das fontes oficiais, garantindo 100% de precisão analítica."
             }
           }
         },
@@ -91,21 +91,29 @@ const resources = {
           "a6": "Não. Loterias envolvem sorte. O Titan Loterias é uma ferramenta de apoio que utiliza matemática e estatística para aumentar suas probabilidades, mas não prometemos ganhos garantidos."
         },
         "how_it_works": {
-          "title": "Como Funciona o Titan Loterias",
+          "title": "Arquitetura de Inteligência",
           "step1": {
-            "title": "Análise de Big Data",
-            "desc": "Monitoramos todos os resultados oficiais das loterias brasileiras para alimentar nossa base de dados estatísticos."
+            "title": "Coleta de Históricos",
+            "desc": "Consolidamos todos os concursos oficiais em uma base de Big Data de alta disponibilidade."
           },
           "step2": {
-            "title": "Cálculo de Tendências",
-            "desc": "Nossa inteligência artificial analisa milhões de combinações em busca de padrões e anomalias estatísticas recorrentes."
+            "title": "Processamento IA",
+            "desc": "O Titan AI Core processa milhares de resultados em busca de padrões estatísticos e anomalias."
           },
           "step3": {
-            "title": "Apostas Otimizadas",
-            "desc": "Você recebe sugestões de jogos baseadas em modelos matemáticos de alta performance para aumentar suas chances."
+            "title": "Detecção de Padrões",
+            "desc": "Identificamos tendências de dezenas quentes, frias e ciclos ativos através de modelos preditivos."
           },
-          "status_label": "Status do Sistema",
-          "status_value": "Operando em Alta Fidelidade"
+          "step4": {
+            "title": "Estratégia Matemática",
+            "desc": "Aplicamos filtros de dispersão e fechamentos matemáticos para otimizar a convergência."
+          },
+          "step5": {
+            "title": "Apostas Estratégicas",
+            "desc": "Geramos combinações com o Titan Score, garantindo a melhor oportunidade estatística do dia."
+          },
+          "status_label": "Infraestrutura Titan",
+          "status_value": "Operando em Neural Mode"
         },
         "testimonials": {
           "title": "Depoimentos de Usuários Reais",
