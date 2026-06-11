@@ -142,7 +142,7 @@ export default function LandingPage() {
                 </span>
               </div>
               <p className="text-sm text-muted-foreground max-w-sm leading-relaxed font-medium">
-                Titan Loterias é a plataforma definitiva de inteligência analítica para apostadores profissionais. Unimos ciência de dados, IA e estatística para elevar suas chances ao próximo nível.
+                Titan Loterias é uma plataforma de inteligência aplicada às loterias brasileiras que analisa históricos oficiais, identifica padrões estatísticos e utiliza IA para gerar apostas mais estratégicas.
               </p>
             </div>
             <div>
