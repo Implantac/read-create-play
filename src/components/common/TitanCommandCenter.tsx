@@ -12,9 +12,9 @@ export const TitanCommandCenter = () => {
   const selectedLottery = ctx?.selectedLottery ?? "lotofacil";
   const [uptime, setUptime] = React.useState(0);
   const [logs, setLogs] = React.useState<string[]>([
-    "Initializing USE AI Neural Core...",
-    "Syncing Milan & Paris trend tensors...",
-    "Digital Twin protocol established."
+    "Initializating Neural Core...",
+    "Syncing historical data tensors...",
+    "Kernel version 5.2.0 established."
   ]);
 
   React.useEffect(() => {
