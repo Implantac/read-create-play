@@ -120,21 +120,19 @@ const GeradorPage = () => {
         <LotteryContextBanner />
       </div>
 
-      <div className="flex justify-between items-center mb-10 px-4">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="flex flex-col items-center gap-3 relative z-10">
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black transition-all duration-500 ${
-              step >= i ? "bg-primary text-primary-foreground shadow-premium shadow-primary/20 scale-110" : "bg-secondary text-muted-foreground border border-border/40"
-            }`}>
-              {i}
-            </div>
-            <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${step >= i ? "text-primary" : "text-muted-foreground opacity-40"}`}>
-              {i === 1 ? "Dataset" : i === 2 ? "Engine" : i === 3 ? "Volume" : "Sponsorship"}
-            </span>
-            {i < 4 && <div className={`absolute top-6 left-16 w-full h-[1px] hidden md:block ${step > i ? "bg-primary" : "bg-border/40"}`} style={{ width: 'calc(100% + 1rem)' }} />}
-          </div>
-        ))}
-
+      <div className="mb-10 px-4 space-y-6">
+        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">
+          <span>Progresso da Síntese</span>
+          <span>{Math.round((step / 4) * 100)}%</span>
+        </div>
+        <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+          <m.div 
+            className="h-full bg-primary"
+            initial={{ width: 0 }}
+            animate={{ width: `${(step / 4) * 100}%` }}
+            transition={{ duration: 0.5 }}
+          />
+        </div>
       </div>
 
       <AnimatePresence mode="wait">
