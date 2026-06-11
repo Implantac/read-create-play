@@ -79,18 +79,15 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             size="lg" 
             variant="premium"
             onClick={(e) => handleCtaClick(e, "/signup")}
-            className="group h-24 px-16 text-xs font-black uppercase tracking-[0.3em] rounded-full shadow-[0_30px_60px_-12px_hsl(var(--primary)/0.5)] hover:shadow-[0_40px_80px_-12px_hsl(var(--primary)/0.7)] transition-all hover:scale-[1.05] active:scale-[0.95]"
+            className="group h-20 px-12 text-sm font-black uppercase tracking-widest rounded-2xl shadow-[0_30px_60px_-12px_hsl(var(--primary)/0.5)] hover:shadow-[0_40px_80px_-12px_hsl(var(--primary)/0.7)] transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             {t("landing.hero.cta_primary")}
-            <ArrowRight className="ml-4 w-6 h-6 group-hover:translate-x-2 transition-transform" />
+            <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Button>
 
-          <button 
-            onClick={(e) => handleCtaClick(e, "/login")}
-            className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground hover:text-primary transition-all italic border-b-2 border-transparent hover:border-primary pb-1"
-          >
-            {t("landing.hero.cta_secondary")}
-          </button>
+          <Link to="/login" className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-primary transition-colors italic px-4 py-2">
+            Já sou um Titan
+          </Link>
         </motion.div>
 
         <motion.div
@@ -98,18 +95,18 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
           animate="visible"
           custom={4}
           variants={fadeUp}
-          className="flex flex-col items-center gap-4 pt-16 opacity-60"
+          className="flex flex-col items-center gap-3 pt-8 opacity-70"
         >
-          <div className="flex -space-x-4">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="w-11 h-11 rounded-full border-4 border-background bg-gradient-to-br from-white/20 to-transparent backdrop-blur-sm" />
-            ))}
-            <div className="w-11 h-11 rounded-full border-4 border-background bg-primary/20 flex items-center justify-center text-[10px] font-black text-primary tracking-tighter">
-              +500
+          <div className="flex -space-x-3">
+            <div className="w-9 h-9 rounded-full border-2 border-background bg-gradient-to-br from-primary/40 to-primary/10" />
+            <div className="w-9 h-9 rounded-full border-2 border-background bg-gradient-to-br from-accent/40 to-accent/10" />
+            <div className="w-9 h-9 rounded-full border-2 border-background bg-gradient-to-br from-neon-blue/40 to-neon-blue/10" />
+            <div className="w-9 h-9 rounded-full border-2 border-background bg-primary/20 flex items-center justify-center text-[9px] font-black text-primary tracking-tight">
+              +2k
             </div>
           </div>
-          <p className="text-[9px] uppercase tracking-[0.4em] font-black text-muted-foreground">
-            Liderando a transformação digital em +500 indústrias
+          <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-muted-foreground">
+            Mais de 2.400 membros ativos na rede neural
           </p>
         </motion.div>
       </motion.div>
