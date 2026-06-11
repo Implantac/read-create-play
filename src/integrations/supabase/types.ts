@@ -835,6 +835,13 @@ export type Database = {
     }
     Functions: {
       check_phone_exists: { Args: { _phone: string }; Returns: boolean }
+      get_top_numbers: {
+        Args: { p_limit?: number; p_lottery_id: string }
+        Returns: {
+          frequency: number
+          number: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
