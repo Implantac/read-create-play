@@ -144,12 +144,12 @@ export default function LandingPage() {
               </p>
             </div>
             <div>
-              <h4 className="font-black uppercase tracking-[0.3em] text-[10px] text-primary mb-8 italic">Ecossistema</h4>
+              <h4 className="font-black uppercase tracking-[0.3em] text-[10px] text-primary mb-8 italic">Plataforma</h4>
               <ul className="space-y-4 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
-                <li><Link to="/ai-analyst" className="hover:text-primary transition-colors">USE AI Analyst</Link></li>
-                <li><Link to="/plm" className="hover:text-primary transition-colors">PLM Hub</Link></li>
-                <li><Link to="/erp" className="hover:text-primary transition-colors">ERP Nativo</Link></li>
-                <li><Link to="/bi" className="hover:text-primary transition-colors">Business Intelligence</Link></li>
+                <li><Link to="/gerador" className="hover:text-primary transition-colors">Gerador de Apostas</Link></li>
+                <li><Link to="/analise" className="hover:text-primary transition-colors">Central de Análise</Link></li>
+                <li><Link to="/fechamentos" className="hover:text-primary transition-colors">Fechamentos</Link></li>
+                <li><Link to="/planos" className="hover:text-primary transition-colors">Planos</Link></li>
               </ul>
             </div>
             <div>
