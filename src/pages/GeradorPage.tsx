@@ -41,11 +41,11 @@ const GeradorPage = () => {
   const [generating, setGenerating] = useState(false);
   const [results, setResults] = useState<any[]>([]);
 
-    const STRATEGIES = [
-    { id: "balance", name: "Neural Balance", desc: "Otimização 360º com foco em equilíbrio estrutural e dispersão estatística." },
-    { id: "frequency", name: "High Velocity", desc: "Análise de frequência acumulada (Tendência de Hot Numbers)." },
-    { id: "delay", name: "Lag Recovery", desc: "Motor de predição baseado em dezenas com alto índice de atraso histórico." },
-    { id: "coverage", name: "Full Canvas", desc: "Estratégia de cobertura total para máxima diversificação de portfólio." },
+  const STRATEGIES = [
+    { id: "balance", name: "Equilíbrio Neural", desc: "Melhor distribuição estatística" },
+    { id: "frequency", name: "Alta Frequência", desc: "Foco nas dezenas mais sorteadas" },
+    { id: "delay", name: "Atraso Crítico", desc: "Dezenas que não saem há tempo" },
+    { id: "coverage", name: "Cobertura Total", desc: "Máxima diversificação" },
   ];
 
   const handleGenerate = async () => {
