@@ -303,8 +303,8 @@ const GeradorPage = () => {
                         <div className="flex items-center gap-6 shrink-0">
                           <div className="text-right">
                             <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Titan Score</p>
-                            <p className={`text-2xl font-black italic ${res.score >= 90 ? 'text-emerald-400' : res.score >= 75 ? 'text-primary' : 'text-amber-400'}`}>{res.score}/100</p>
-                            <p className="text-[10px] font-black uppercase text-emerald-400 tracking-widest">{res.score >= 90 ? 'Excelente Oportunidade' : res.score >= 75 ? 'Alta Convergência' : 'Estatística Estável'}</p>
+                            <p className={`text-2xl font-black italic leading-none ${res.score >= 90 ? 'text-emerald-400' : res.score >= 75 ? 'text-primary' : 'text-amber-400'}`}>{res.score}/100</p>
+                            <p className="text-[8px] font-black uppercase text-emerald-400 tracking-widest mt-1">{res.score >= 90 ? 'Excelente Oportunidade' : res.score >= 75 ? 'Alta Convergência' : 'Estatística Estável'}</p>
                           </div>
                           <Button 
                             variant="outline" 

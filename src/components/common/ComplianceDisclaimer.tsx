@@ -10,7 +10,7 @@ export function ComplianceDisclaimer({ compact = false }: Props) {
     return (
       <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/5 border border-amber-500/15 text-[10px] text-amber-600 dark:text-amber-400">
         <AlertTriangle className="w-3 h-3 shrink-0" />
-        <span>Análise estatística — sem garantia de premiação.</span>
+        <span>Dados históricos — sem garantia de premiação.</span>
       </div>
     );
   }
