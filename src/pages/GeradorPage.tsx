@@ -164,11 +164,10 @@ const GeradorPage = () => {
           )}
 
           {step === 2 && (
-            <div className="space-y-8">
-              <div className="text-center space-y-3 mb-10">
-                <Badge variant="outline" className="px-3 py-1 bg-primary/10 text-primary border-primary/20 text-[10px] font-black uppercase tracking-widest italic mb-2">Step 02: Engine Selection</Badge>
-                <h3 className="text-xl font-black uppercase tracking-tighter">Selecione o Motor de Predição</h3>
-                <p className="text-muted-foreground text-sm opacity-60 max-w-sm mx-auto">Escolha a heurística que governará a síntese da sua nova coleção de jogos.</p>
+            <div className="space-y-6">
+              <div className="text-center space-y-2 mb-8">
+                <h3 className="text-xl font-black uppercase tracking-tighter">Selecione a Estratégia</h3>
+                <p className="text-muted-foreground">O motor Titan utilizará o modelo escolhido para processar as dezenas.</p>
               </div>
               <div className="grid md:grid-cols-2 gap-6">
                 {STRATEGIES.map((s) => (
