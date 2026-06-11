@@ -151,11 +151,11 @@ const GeradorPage = () => {
                 <span className="text-5xl drop-shadow-lg">{config.icon}</span>
               </div>
               <div className="space-y-3">
-                <h3 className="text-3xl font-black uppercase tracking-tighter italic">Seleção: {config.name}</h3>
-                <p className="text-muted-foreground text-base">O motor Titan está pronto para processar {config.pick} números com as melhores métricas de convergência para este concurso.</p>
+                <h3 className="text-3xl font-black uppercase tracking-tighter italic">Dataset: {config.name}</h3>
+                <p className="text-muted-foreground text-base">O motor USE AI está pronto para processar dezenas {config.name} com as melhores métricas de convergência para o próximo SKU de mercado.</p>
               </div>
-              <Button onClick={nextStep} variant="premium" className="h-16 px-16 group">
-                Avançar para Estratégia
+              <Button onClick={nextStep} variant="premium" className="h-16 px-16 group rounded-full">
+                Configurar Motor de Predição
                 <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Card>
