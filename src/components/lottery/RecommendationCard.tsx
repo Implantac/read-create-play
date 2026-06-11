@@ -72,7 +72,7 @@ export function RecommendationCard({ luckyGame, generating, onGenerate, onShowBr
                 <div className="space-y-3 relative z-10">
                   <Button onClick={onGenerate} variant="premium" className="w-full h-14" disabled={generating}>
                     {generating ? <RefreshCw className="w-5 h-5 animate-spin mr-2" /> : null}
-                    {generating ? "Calibrando..." : "Gerar Novo Jogo"}
+                    {generating ? "Calibrando..." : "Recalcular Predição"}
                   </Button>
 
                   <div className="grid grid-cols-2 gap-3">
