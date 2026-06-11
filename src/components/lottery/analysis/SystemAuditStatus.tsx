@@ -11,11 +11,11 @@ export function SystemAuditStatus() {
       setEntropy(0.84 + Math.random() * 0.01);
       const events = [
         "Neural weights verified",
-        "Fabric tensors synced",
-        "Market entropy: nominal",
-        "Encrypted PLM handshake: OK",
-        "Node MILAN-01: Stable",
-        "Supply Chain: Latency 14ms"
+        "Neural weights synced",
+        "Chaos entropy: nominal",
+        "Neural handshake: OK",
+        "Node TITAN-01: Stable",
+        "Database: Latency 14ms"
       ];
       const event = events[Math.floor(Math.random() * events.length)];
       setLogs(prev => [event, ...prev].slice(0, 3));

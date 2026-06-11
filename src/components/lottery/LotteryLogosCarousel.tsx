@@ -1,14 +1,14 @@
 import { motion } from "framer-motion";
 
 const industries = [
-  { name: "Adobe Illustrator", type: "Design", color: "hsl(var(--neon-red))" },
-  { name: "Audaces", type: "CAD/CAM", color: "hsl(var(--neon-blue))" },
-  { name: "Lectra", type: "PLM System", color: "hsl(var(--neon-green))" },
-  { name: "Gerber", type: "Cutting", color: "hsl(var(--neon-amber))" },
-  { name: "CLO3D", type: "3D Design", color: "hsl(var(--neon-purple))" },
-  { name: "Optitex", type: "Simulation", color: "hsl(var(--neon-cyan))" },
-  { name: "Corel Draw", type: "Graphics", color: "hsl(var(--neon-green))" },
-  { name: "Browzwear", type: "Prototype", color: "hsl(var(--neon-purple))" },
+  { name: "Mega-Sena", type: "Loteria", color: "hsl(var(--neon-green))" },
+  { name: "Lotofácil", type: "Loteria", color: "hsl(var(--neon-blue))" },
+  { name: "Quina", type: "Loteria", color: "hsl(var(--neon-amber))" },
+  { name: "Lotomania", type: "Loteria", color: "hsl(var(--neon-purple))" },
+  { name: "Dupla Sena", type: "Loteria", color: "hsl(var(--neon-red))" },
+  { name: "Dia de Sorte", type: "Loteria", color: "hsl(var(--neon-cyan))" },
+  { name: "Super Sete", type: "Loteria", color: "hsl(var(--neon-green))" },
+  { name: "+Milionária", type: "Loteria", color: "hsl(var(--neon-purple))" },
 ];
 
 // Duplicate for seamless infinite scroll
@@ -19,7 +19,7 @@ export function LotteryLogosCarousel() {
     <section className="py-8 border-b border-border/20 bg-card/20 backdrop-blur-sm overflow-hidden">
       <div className="container mx-auto px-4 mb-6">
         <p className="text-center text-[10px] uppercase tracking-[0.4em] text-muted-foreground font-black opacity-50">
-          Integrações Nativas & Ecossistema de Moda
+          Sincronização com Resultados Oficiais
         </p>
       </div>
 
