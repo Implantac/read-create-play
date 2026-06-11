@@ -128,7 +128,7 @@ export const TitanCommandCenter = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-            <Zap className="w-3 h-3" /> Predictive ROI Accuracy
+            <Zap className="w-3 h-3" /> Alpha Prediction
             </span>
             <span className="text-[10px] font-mono text-primary">{entropyData.entropy.toFixed(1)}%</span>
           </div>
