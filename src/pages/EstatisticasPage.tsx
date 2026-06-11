@@ -39,7 +39,7 @@ const item = {
 
 const EstatisticasPage = () => {
   const { config, draws, syncing, syncDraws, syncAllLotteries } = useLotteryContext();
-  const [period, setPeriod] = useState(0);
+  const [period, setPeriod] = useState(100);
 
   const filteredDraws = useMemo(() => {
     if (period === 0) return draws;
