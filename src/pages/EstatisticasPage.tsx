@@ -21,10 +21,11 @@ const RangeDistribution = lazy(() => import("@/components/lottery/charts/RangeDi
 const DelayChart = lazy(() => import("@/components/lottery/charts/DelayChart").then(m => ({ default: m.DelayChart })));
 
 const PERIOD_OPTIONS = [
-  { label: "Todos", value: 0 },
-  { label: "Últimos 30", value: 30 },
+  { label: "Últimos 10", value: 10 },
+  { label: "Últimos 50", value: 50 },
   { label: "Últimos 100", value: 100 },
-  { label: "Últimos 300", value: 300 },
+  { label: "Últimos 500", value: 500 },
+  { label: "Todos", value: 0 },
 ] as const;
 
 const container = {
