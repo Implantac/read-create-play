@@ -8,6 +8,7 @@ import { DashboardHeader } from "@/components/layout/dashboard/DashboardHeader";
 import { RecommendationCard } from "@/components/lottery/RecommendationCard";
 import { TitanAIModule } from "@/components/lottery/TitanAIModule";
 import { TitanStatsModule } from "@/components/lottery/TitanStatsModule";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, BrainCircuit, Target, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
