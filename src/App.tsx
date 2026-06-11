@@ -34,6 +34,7 @@ const IAAutonomaPage = lazy(() => import("@/pages/IAAutonomaPage"));
 const EstrategiasPage = lazy(() => import("@/pages/EstrategiasPage"));
 const LotofacilPremiumPage = lazy(() => import("@/pages/LotofacilPremiumPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const ThankYouPage = lazy(() => import("./pages/ThankYouPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
