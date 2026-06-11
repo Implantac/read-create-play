@@ -21,12 +21,12 @@ export const TitanCommandCenter = () => {
     const timer = setInterval(() => setUptime(u => u + 1), 1000);
     const logInterval = setInterval(() => {
       const events = [
-        "Analyzing fiber density patterns",
-        "Optimizing supply chain routes",
-        "Processing generative mood boards",
-        "Predicting Summer 2026 demand",
-        "Validating textile sustainability",
-        "Syncing factory node LATAM-04"
+        "Neural weights redistributed",
+        "Entropy variance detected",
+        "Processing quantum patterns",
+        "Alpha signal stabilized",
+        "Cache invalidated",
+        "P2P handshake verified"
       ];
       const newLog = events[Math.floor(Math.random() * events.length)];
       setLogs(prev => [newLog, ...prev.slice(0, 4)]);
