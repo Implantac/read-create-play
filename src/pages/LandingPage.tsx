@@ -134,15 +134,13 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-4 gap-16 mb-24">
             <div className="col-span-2 space-y-8">
               <div className="flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-xl bg-black border border-white/10 flex items-center justify-center font-black text-xl italic transition-all group-hover:border-primary/40">
-                  UM
-                </div>
+                <img src="/logo.png" alt="Titan Loterias" className="w-12 h-12 grayscale opacity-50" />
                 <span className="text-2xl font-black uppercase tracking-tighter italic leading-none">
-                  USE<span className="text-primary/70">MODA</span>
+                  Titan<span className="text-primary/70">Loterias</span>
                 </span>
               </div>
               <p className="text-sm text-muted-foreground max-w-sm leading-relaxed font-medium">
-                USE MODA PLM AI é a plataforma definitiva de inteligência para a indústria fashion global. Unimos IA generativa, ERP nativo e análise preditiva para escalar marcas com perfeição técnica.
+                Titan Loterias é a plataforma definitiva de inteligência analítica para apostadores profissionais. Unimos ciência de dados, IA e estatística para elevar suas chances ao próximo nível.
               </p>
             </div>
             <div>
