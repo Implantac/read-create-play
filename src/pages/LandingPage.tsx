@@ -107,13 +107,13 @@ export default function LandingPage() {
         <div className="container mx-auto px-6 relative z-10">
           <div className="text-center mb-20">
             <div className="inline-flex items-center px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.4em] bg-primary/10 text-primary border border-primary/20 mb-6 backdrop-blur-sm">
-              Processamento em Tempo Real
+              Sincronização em Tempo Real
             </div>
             <h2 className="text-5xl md:text-8xl font-black tracking-tighter uppercase italic leading-[0.8] mb-6">
               Neural <span className="gradient-brand-text">Command Center</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-60">
-              Acompanhe o processamento dos nossos algoritmos e a detecção de padrões em tempo real.
+              Acompanhe o processamento de dados históricos oficiais e a detecção de padrões estatísticos em tempo real pela nossa IA.
             </p>
           </div>
           <div className="max-w-6xl mx-auto">

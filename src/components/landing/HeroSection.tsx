@@ -42,7 +42,7 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
           </span>
-          <span className="text-[11px] font-black uppercase tracking-[0.4em] text-primary italic">{t("landing.hero.badge")}</span>
+          <span className="text-[11px] font-black uppercase tracking-[0.4em] text-primary italic">INTELIGÊNCIA ARTIFICIAL APLICADA</span>
         </motion.div>
 
         <div className="space-y-8">
@@ -53,8 +53,8 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             variants={fadeUp}
             className="text-4xl md:text-[6rem] lg:text-[7.5rem] font-black tracking-tighter uppercase italic leading-[0.85] mb-8"
           >
-            <span className="block text-foreground drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)]">{t("landing.hero.title")}</span>
-            <span className="block gradient-brand-text not-italic leading-none text-[3.5rem] md:text-[5rem] lg:text-[7rem]">{t("landing.hero.subtitle")}</span>
+            <span className="block text-foreground drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)]">INTELIGÊNCIA ARTIFICIAL PARA</span>
+            <span className="block gradient-brand-text not-italic leading-none text-[3.5rem] md:text-[5rem] lg:text-[7rem]">LOTERIAS BRASILEIRAS</span>
           </motion.h1>
           
           <motion.p 
@@ -64,7 +64,7 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             variants={fadeUp}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed"
           >
-            {t("landing.hero.description")}
+            Analise milhares de concursos, descubra padrões ocultos e gere apostas utilizando estratégias matemáticas avançadas e IA. O Titan Loterias é a plataforma definitiva de inteligência aplicada às loterias brasileiras.
           </motion.p>
         </div>
 
@@ -81,7 +81,7 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             onClick={(e) => handleCtaClick(e, "/signup")}
             className="group h-20 px-12 text-sm font-black uppercase tracking-widest rounded-2xl shadow-[0_30px_60px_-12px_hsl(var(--primary)/0.5)] hover:shadow-[0_40px_80px_-12px_hsl(var(--primary)/0.7)] transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
-            {t("landing.hero.cta_primary")}
+            Testar Gratuitamente
             <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Button>
 

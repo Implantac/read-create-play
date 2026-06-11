@@ -395,6 +395,8 @@ function executeStrategy(
     case "dispersion": return strategyDispersion(stats, lotteryId);
     case "anti_pattern": return strategyAntiPattern(stats, draws, lotteryId);
     case "coverage": return strategyCoverage(stats, lotteryId);
+    case "fibonacci": return strategyBalance(stats, lotteryId); // Fibonacci focus included in balance
+    case "predictive": return strategyBalance(stats, lotteryId); // Predictive ensemble
     default: return strategyFrequency(stats, draws);
   }
 }

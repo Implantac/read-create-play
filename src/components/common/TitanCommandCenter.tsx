@@ -12,9 +12,9 @@ export const TitanCommandCenter = () => {
   const selectedLottery = ctx?.selectedLottery ?? "lotofacil";
   const [uptime, setUptime] = React.useState(0);
   const [logs, setLogs] = React.useState<string[]>([
-    "Initializating Neural Core...",
-    "Syncing historical data tensors...",
-    "Kernel version 5.2.0 established."
+    "Initializing Titan Neural Core...",
+    "Syncing official historical data...",
+    "Neural Core v7.5 Alpha established."
   ]);
 
   React.useEffect(() => {
@@ -88,7 +88,7 @@ export const TitanCommandCenter = () => {
             Titan <span className="text-primary">Command</span> Center
           </h2>
           <p className="text-xs text-muted-foreground font-mono uppercase tracking-widest mt-1">
-            v7.5 — Neural Synergy Core • Institutional Grade
+            Titan Loterias • Plataforma de Inteligência Estatística
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -108,7 +108,7 @@ export const TitanCommandCenter = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-              <Activity className="w-3 h-3" /> Core Heatmap
+              <Activity className="w-3 h-3" /> Tendência Neural
             </span>
             <span className="text-[10px] font-mono text-emerald-500">OPTIMAL</span>
           </div>
@@ -128,7 +128,7 @@ export const TitanCommandCenter = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-            <Zap className="w-3 h-3" /> Alpha Prediction
+            <Zap className="w-3 h-3" /> Predição Alpha IA
             </span>
             <span className="text-[10px] font-mono text-primary">{entropyData.entropy.toFixed(1)}%</span>
           </div>
@@ -143,7 +143,7 @@ export const TitanCommandCenter = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-              <ShieldCheck className="w-3 h-3" /> Live Event Log
+              <ShieldCheck className="w-3 h-3" /> Log de Inteligência Ativo
             </span>
           </div>
           <div className="font-mono text-[9px] text-primary/60 space-y-1 h-24 overflow-hidden mask-fade-bottom">
@@ -153,7 +153,7 @@ export const TitanCommandCenter = () => {
                 {log}
               </p>
             ))}
-            <p className="animate-pulse text-primary/40 mt-1">{`> monitoring --lottery=${selectedLottery}`}</p>
+            <p className="animate-pulse text-primary/40 mt-1">{`> monitoring --official-data --mode=intelligence`}</p>
           </div>
         </div>
       </div>

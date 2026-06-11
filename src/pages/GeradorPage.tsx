@@ -42,10 +42,10 @@ const GeradorPage = () => {
   const [results, setResults] = useState<any[]>([]);
 
   const STRATEGIES = [
-    { id: "balance", name: "Neural Balanced (AI)", desc: "Distribuição estatística otimizada por rede neural." },
-    { id: "frequency", name: "High Frequency", desc: "Foco exclusivo nas dezenas com maior taxa de recorrência." },
-    { id: "delay", name: "Critical Delay", desc: "Análise de atraso crítico para detecção de dezenas prontas para sair." },
-    { id: "coverage", name: "Mathematical Coverage", desc: "Máxima dispersão para cobertura total do volante." },
+    { id: "balance", name: "Aposta Equilibrada", desc: "Distribuição estatística otimizada por rede neural." },
+    { id: "predictive", name: "Estatística Preditiva", desc: "Foco em tendências de alta probabilidade baseadas em IA." },
+    { id: "aggressive", name: "Aposta IA Premium", desc: "Modelos avançados para busca de convergência máxima." },
+    { id: "conservative", name: "Aposta Conservadora", desc: "Baseada em frequência histórica estável e ciclos de retorno." },
   ];
 
   const handleGenerate = async () => {
@@ -110,7 +110,7 @@ const GeradorPage = () => {
             Motor de <span className="gradient-brand-text">Geração</span>
           </h1>
           <p className="text-sm text-muted-foreground font-medium max-w-lg leading-relaxed">
-            Plataforma de inteligência aplicada que analisa históricos oficiais e identifica padrões estatísticos para gerar apostas estratégicas.
+            Análises baseadas em dados históricos, estatística, probabilidade e inteligência artificial para auxiliar na sua tomada de decisão estratégica.
           </p>
         </div>
       </div>
@@ -303,7 +303,8 @@ const GeradorPage = () => {
                         <div className="flex items-center gap-6 shrink-0">
                           <div className="text-right">
                             <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Titan Score</p>
-                            <p className={`text-2xl font-black italic ${res.score >= 90 ? 'text-emerald-400' : res.score >= 75 ? 'text-primary' : 'text-amber-400'}`}>{res.score}/100</p>
+                            <p className={`text-2xl font-black italic leading-none ${res.score >= 90 ? 'text-emerald-400' : res.score >= 75 ? 'text-primary' : 'text-amber-400'}`}>{res.score}/100</p>
+                            <p className="text-[8px] font-black uppercase text-emerald-400 tracking-widest mt-1">{res.score >= 90 ? 'Excelente Oportunidade' : res.score >= 75 ? 'Alta Convergência' : 'Estatística Estável'}</p>
                           </div>
                           <Button 
                             variant="outline" 
