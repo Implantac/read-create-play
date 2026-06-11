@@ -97,7 +97,7 @@ const AppContent = () => {
         <Route path="/obrigado" element={<ThankYouPage />} />
         {/* Protected */}
         <Route element={<ProtectedRoute><LotteryProvider><AppLayout /></LotteryProvider></ProtectedRoute>}>
-          <Route path="/" element={<DashboardPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/gerador" element={<GeradorPage />} />
           <Route path="/fechamentos" element={<FechamentosPage />} />
           <Route path="/analise" element={<AnaliseCentralPage />} />
