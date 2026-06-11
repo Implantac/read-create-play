@@ -29,7 +29,7 @@ const workflowGroups: { label: string; items: { title: string; url: string; icon
   {
     label: "Operacional",
     items: [
-      { title: "Dashboard Hub", url: "/", icon: BarChart3, tooltip: "Terminal central de inteligência e resumo de fluxos." },
+      { title: "Dashboard Hub", url: "/dashboard", icon: BarChart3, tooltip: "Terminal central de inteligência e resumo de fluxos." },
       { title: "USE AI Analyst", url: "/ia-chat", icon: MessageCircle, tooltip: "Converse com seu assistente de elite fashion.", badge: "NEW" },
       { title: "Neural Synthesis", url: "/gerador", icon: Sparkles, tooltip: "Geração assistida de coleções inteligentes (Loto Data)." },
       { title: "Lotofácil Premium", url: "/lotofacil-premium", icon: Crown, tooltip: "Ambiente profissional exclusivo para Lotofácil.", badge: "PREMIUM" },
