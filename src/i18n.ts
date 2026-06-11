@@ -127,7 +127,7 @@ const resources = {
               "content": "Finalmente um software que entende a linguagem da moda. O Digital Twin é um divisor de águas para nosso planejamento."
             }
           }
-        }
+        },
         "leads": {
           "title": "Pronto para liderar o mercado?",
           "subtitle": "Solicite uma demonstração personalizada e descubra como o USE MODA pode transformar sua operação.",
