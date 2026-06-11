@@ -22,18 +22,15 @@ export function Navbar() {
           </div>
         </Link>
         <div className="hidden lg:flex items-center gap-10">
-          <Link to="/about" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-all">
-            Plataforma
+          <Link to="/signup" className="text-xs font-black uppercase tracking-widest text-neon-amber hover:text-neon-amber/80 transition-all">
+            {t("common.vital_access")}
           </Link>
-          <Link to="/solutions" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-all">
-            Soluções
-          </Link>
-          <Link to="/login" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all">
+          <Link to="/login" className="text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all">
             {t("common.login")}
           </Link>
           <Link to="/signup">
-            <Button size="lg" variant="premium" className="h-12 px-10 text-[10px] font-black uppercase tracking-widest rounded-full">
-              {t("landing.hero.cta_primary")} <ArrowRight className="w-4 h-4 ml-2" />
+            <Button size="lg" variant="premium" className="h-12 px-10">
+              {t("common.join_network")} <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>
         </div>
