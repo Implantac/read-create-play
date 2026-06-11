@@ -106,21 +106,20 @@ export function AppSidebar() {
           </div>
         )}
 
-        {/* Active lottery indicator */}
-        <div className={`mx-3 mb-10 rounded-[2rem] bg-gradient-to-br from-primary/15 via-primary/5 to-transparent border border-primary/20 transition-all duration-700 hover:border-primary/50 group/lottery relative overflow-hidden ${collapsed ? "p-3 flex justify-center" : "p-5 shadow-2xl shadow-black/40"}`}>
-          <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover/lottery:opacity-100 transition-opacity duration-700" />
+        {/* Active lottery indicator — refined */}
+        <div className={`mx-2 mb-6 rounded-xl bg-gradient-to-br from-primary/12 via-primary/5 to-transparent border border-primary/20 transition-all duration-300 hover:border-primary/40 ${collapsed ? "p-2.5 flex justify-center" : "p-3.5"}`}>
           {collapsed ? (
-            <span className="text-2xl drop-shadow-lg group-hover/lottery:scale-125 transition-all duration-500 cursor-pointer relative z-10" title={config?.name || "Loto"}>{config?.icon || "🍀"}</span>
+            <span className="text-xl" title={config?.name || "Loto"}>{config?.icon || "🍀"}</span>
           ) : (
-            <div className="flex items-center gap-4 relative z-10">
-              <div className="w-14 h-14 rounded-2xl bg-black/40 border border-primary/20 flex items-center justify-center shrink-0 shadow-lg group-hover/lottery:scale-110 transition-all duration-500">
-                <span className="text-3xl drop-shadow-md transition-transform duration-500">{config?.icon || "🍀"}</span>
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-lg bg-background/60 border border-primary/15 flex items-center justify-center shrink-0">
+                <span className="text-2xl">{config?.icon || "🍀"}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-black text-primary uppercase tracking-[0.05em] truncate leading-none">{config?.name || "Loteria"}</p>
-                <div className="flex items-center gap-2 mt-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                    <p className="text-[10px] text-muted-foreground font-bold opacity-60 tracking-widest uppercase italic leading-none">Status: Ativo</p>
+                <p className="text-sm font-bold text-primary truncate leading-tight">{config?.name || "Loteria"}</p>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  <p className="text-[10px] text-muted-foreground font-medium">Ativa</p>
                 </div>
               </div>
             </div>
@@ -147,16 +146,15 @@ export function AppSidebar() {
                             <NavLink
                               to={item.url}
                               end={item.url === "/"}
-                              className={`flex items-center w-full rounded-2xl px-5 py-4 text-sm transition-all duration-500 hover:bg-primary/5 group/item relative overflow-hidden border border-transparent hover:border-primary/10 active:scale-[0.98] ${locked ? "text-muted-foreground/40" : "text-sidebar-foreground font-bold uppercase tracking-tight"}`}
-                              activeClassName="bg-primary/15 text-primary font-black shadow-premium shadow-primary/10 border-primary/20 ring-1 ring-primary/10"
-
+                              className={`flex items-center w-full rounded-lg px-3 py-2.5 text-sm transition-all duration-200 hover:bg-primary/8 relative ${locked ? "text-muted-foreground/40" : "text-sidebar-foreground font-medium"}`}
+                              activeClassName="bg-primary/15 text-primary font-semibold border-l-2 border-primary"
                             >
-                              <item.icon className="mr-3.5 h-5 w-5 shrink-0 group-hover/item:scale-110 transition-transform duration-300" />
+                              <item.icon className="mr-3 h-4 w-4 shrink-0" />
                               {!collapsed && (
                                 <>
-                                  <span className="flex-1 truncate tracking-tighter">{item.title}</span>
+                                  <span className="flex-1 truncate">{item.title}</span>
                                   {item.badge && (
-                                    <span className="ml-2 px-1.5 py-0.5 text-[8px] font-black bg-primary/20 text-primary border border-primary/20 rounded-md animate-pulse">
+                                    <span className="ml-2 px-1.5 py-0.5 text-[9px] font-bold bg-primary/15 text-primary border border-primary/25 rounded-md">
                                       {item.badge}
                                     </span>
                                   )}
@@ -195,11 +193,10 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild className="h-auto p-0">
                     <NavLink
                       to={item.url}
-                      className="flex items-center w-full rounded-2xl px-5 py-4 text-sm font-bold uppercase tracking-tight transition-all duration-500 hover:bg-primary/5 text-sidebar-foreground group/item border border-transparent hover:border-primary/10"
-                      activeClassName="bg-primary/15 text-primary font-black border-primary/20 shadow-premium shadow-primary/10"
-
+                      className="flex items-center w-full rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-primary/8 text-sidebar-foreground"
+                      activeClassName="bg-primary/15 text-primary font-semibold border-l-2 border-primary"
                     >
-                      <item.icon className="mr-3.5 h-4 w-4 shrink-0 group-hover/item:scale-110 transition-transform" />
+                      <item.icon className="mr-3 h-4 w-4 shrink-0" />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
