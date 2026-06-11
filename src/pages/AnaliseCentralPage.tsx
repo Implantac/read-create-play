@@ -35,20 +35,20 @@ const AnaliseCentralPage = () => {
   const [activeTab, setActiveTab] = useState("farol");
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-700 pb-20 max-w-7xl mx-auto">
+    <div className="space-y-10 animate-in fade-in duration-700 pb-20 max-w-7xl mx-auto px-1">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-4">
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Intelligence Hub v6.0</span>
+              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Titan Analysis v4.0</span>
             </div>
           </div>
           <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-tight">
-            Central de <span className="gradient-brand-text">Análise</span>
+            Módulo de <span className="gradient-brand-text">Análise</span> Histórica
           </h1>
           <p className="text-sm text-muted-foreground font-medium max-w-lg leading-relaxed">
-            Exploração dimensional profunda. Analise ciclos, tendências e anomalias com precisão matemática institutional.
+            Exploração dimensional profunda. O Titan utiliza heurísticas avançadas para detectar anomalias estatísticas em milhares de concursos.
           </p>
         </div>
       </div>
