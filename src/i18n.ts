@@ -140,6 +140,17 @@ const resources = {
           "submit_button": "Solicitar Demonstração",
           "success_message": "Sua solicitação foi enviada com sucesso! Nossa equipe entrará em contato em breve.",
           "error_message": "Houve um erro ao enviar sua solicitação. Por favor, tente novamente ou entre em contato via WhatsApp."
+        },
+        "thanks": {
+          "title": "Solicitação Recebida!",
+          "subtitle": "Obrigado pelo seu interesse no USE MODA PLM AI.",
+          "description": "Nossa equipe de especialistas está analisando seu perfil e entrará em contato em até 24 horas úteis para agendar sua demonstração personalizada.",
+          "next_steps_title": "Próximos Passos",
+          "step1": "Um consultor entrará em contato via WhatsApp ou E-mail.",
+          "step2": "Prepare suas principais dúvidas e desafios operacionais.",
+          "step3": "Demonstração ao vivo do USE AI e ERP Nativo.",
+          "back_button": "Voltar para Início",
+          "whatsapp_button": "Falar com Consultor agora"
         }
       },
 
