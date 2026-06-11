@@ -1,6 +1,6 @@
 import { motion, MotionValue } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { BarChart3, Brain, Target, TrendingUp, Dices, Shield } from "lucide-react";
+import { Layers, Sparkles, Clipboard, BarChart3, Box, MessageSquare } from "lucide-react";
 
 interface FeaturesSectionProps {
   featuresRef: React.RefObject<HTMLDivElement>;
@@ -22,37 +22,37 @@ export function FeaturesSection({ featuresRef, featuresRotateX, fadeUp }: Featur
 
   const features = [
     {
-      icon: BarChart3,
+      icon: Layers,
       title: t("landing.features.items.xray.title"),
       description: t("landing.features.items.xray.description"),
       color: "green" as const,
     },
     {
-      icon: Brain,
+      icon: Sparkles,
       title: t("landing.features.items.ia.title"),
       description: t("landing.features.items.ia.description"),
       color: "blue" as const,
     },
     {
-      icon: Target,
+      icon: Clipboard,
       title: t("landing.features.items.optimizer.title"),
       description: t("landing.features.items.optimizer.description"),
       color: "amber" as const,
     },
     {
-      icon: TrendingUp,
+      icon: BarChart3,
       title: t("landing.features.items.backtest.title"),
       description: t("landing.features.items.backtest.description"),
       color: "red" as const,
     },
     {
-      icon: Dices,
+      icon: Box,
       title: t("landing.features.items.simulation.title"),
       description: t("landing.features.items.simulation.description"),
       color: "purple" as const,
     },
     {
-      icon: Shield,
+      icon: MessageSquare,
       title: t("landing.features.items.sync.title"),
       description: t("landing.features.items.sync.description"),
       color: "cyan" as const,
