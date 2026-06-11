@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 
 import { LotteryLogosCarousel } from "@/components/lottery/LotteryLogosCarousel";
-import { ScreensShowcase } from "@/components/common/ScreensShowcase";
+import { ScreensShowcase } from "@/components/landing/ScreensShowcase";
 import { FloatingCTA } from "@/components/common/FloatingCTA";
 import { WhatsAppButton } from "@/components/common/WhatsAppButton";
 import { SocialProofBar } from "@/components/common/SocialProofBar";
