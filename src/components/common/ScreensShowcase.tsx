@@ -69,7 +69,7 @@ function GeradorMock() {
             </div>
           ))}
         </div>
-        <div className="mt-3"><span className="text-[8px] font-mono text-primary bg-primary/10 border border-primary/20 rounded-full px-3 py-1">Score: 94/100 — Grau A+</span></div>
+        <div className="mt-3"><span className="text-[8px] font-mono text-primary bg-primary/10 border border-primary/20 rounded-full px-3 py-1 italic font-black">Titan Score: 94/100 — Excelente Oportunidade</span></div>
       </div>
       <div className="grid grid-cols-4 gap-2">
         {[{ l: "Padrão", v: 87 }, { l: "Neural", v: 74 }, { l: "Genético", v: 91 }, { l: "MC", v: 82 }].map((i) => (
