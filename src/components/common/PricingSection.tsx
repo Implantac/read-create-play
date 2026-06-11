@@ -15,8 +15,8 @@ export function PricingSection() {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const LAUNCH_PRICE = "R$ 297";
-  const ORIGINAL_PRICE = "R$ 997";
+  const LAUNCH_PRICE = "R$ 4.997";
+  const ORIGINAL_PRICE = "R$ 12.997";
 
   const handleCheckout = async () => {
     if (!session) {
