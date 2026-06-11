@@ -126,6 +126,8 @@ export default function LandingPage() {
       <PricingSection />
       <FAQSection />
 
+      <LeadCaptureForm />
+
       <footer className="py-24 border-t border-white/5 bg-black/60 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-20" />
         <div className="container mx-auto px-6 relative z-10">
