@@ -84,7 +84,7 @@ export default function LandingPage() {
       <section className="py-12 border-y border-white/5 bg-black/20 overflow-hidden">
         <div className="container mx-auto px-6">
           <p className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground text-center mb-8 opacity-40">
-            Poder de processamento utilizado pelas maiores holdings de moda
+            Poder de processamento e inteligência analítica de elite
           </p>
           <LotteryLogosCarousel />
         </div>
