@@ -29,9 +29,8 @@ export function ComplianceDisclaimer({ compact = false }: Props) {
           Aviso de Transparência
         </p>
         <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">
-          Este sistema utiliza análise estatística e inteligência artificial para sugerir jogos com base em padrões históricos.
-          <strong className="text-foreground"> Não há garantia de premiação.</strong> Loterias são eventos aleatórios e resultados passados não influenciam sorteios futuros.
-          Jogue com responsabilidade.
+          Análises baseadas em dados históricos, estatística, probabilidade e inteligência artificial.
+          <strong className="text-foreground"> Não há garantia de premiação.</strong> Este é um sistema de suporte à decisão profissional. Jogue com responsabilidade.
         </p>
       </div>
     </motion.div>

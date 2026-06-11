@@ -54,10 +54,10 @@ export function HowItWorksSection() {
                 <div className="flex-1" />
               </div>
               <div className="flex-1 p-8 font-mono text-xs text-primary/40 space-y-2 overflow-hidden">
-                <p>&gt; Initializing Titan Neural Engine...</p>
-                <p>&gt; Loading historical draw data...</p>
-                <p>&gt; Analyzing numerical frequency patterns...</p>
-                <p>&gt; Generating predictive combinations...</p>
+                <p>&gt; Initializing Titan Intelligence Core...</p>
+                <p>&gt; Processing official historical data...</p>
+                <p>&gt; Detecting statistical frequency patterns...</p>
+                <p>&gt; Applying mathematical strategies...</p>
                 <p>&gt; Status: High-probability games identified.</p>
                 <div className="h-px w-full bg-primary/10 my-4" />
                 <div className="grid grid-cols-4 gap-2">

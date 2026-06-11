@@ -31,9 +31,12 @@ export function RecommendationCard({ luckyGame, generating, onGenerate, onShowBr
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ delay: idx * 0.05, type: "spring" }}
                         whileHover={{ y: -8, scale: 1.1 }}
-                        className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center font-black text-xl sm:text-2xl text-primary shadow-xl shadow-primary/5 transition-all cursor-default italic"
+                        className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center font-black text-xl sm:text-2xl text-primary shadow-xl shadow-primary/5 transition-all cursor-default italic relative"
                       >
                         {String(n).padStart(2, '0')}
+                        {idx < 2 && (
+                          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-background animate-pulse" title="Alta Tendência" />
+                        )}
                       </m.div>
                     ))}
                   </div>

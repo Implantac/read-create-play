@@ -52,7 +52,7 @@ export const AIAnalystBriefing = ({ game, score, confidence, strategy, reasons, 
           </div>
           
           <h2 className="text-xl font-black italic uppercase tracking-tighter text-foreground leading-none">
-            Análise do <span className="gradient-brand-text">Especialista</span>
+            Análise de <span className="gradient-brand-text">Inteligência</span> Titan
           </h2>
           {lotteryName && (
             <p className="text-[10px] text-muted-foreground font-medium max-w-md">
