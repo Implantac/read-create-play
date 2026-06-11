@@ -85,10 +85,10 @@ export const TitanCommandCenter = () => {
         <div>
           <h2 className="text-2xl font-black text-foreground flex items-center gap-3 tracking-tighter italic uppercase">
             <Terminal className="w-7 h-7 text-primary" />
-            Titan <span className="text-primary">Command</span> Center
+            USE AI <span className="text-primary">Command</span> Center
           </h2>
           <p className="text-xs text-muted-foreground font-mono uppercase tracking-widest mt-1">
-            v5.3 — Neural Synergy Core • Institutional Grade
+            v2.0 — Neural Fashion Core • Enterprise Grade
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
