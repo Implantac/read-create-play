@@ -42,14 +42,14 @@ export function PricingSection() {
 
   const plans = [
     {
-      name: "Plano Gratuito",
+      name: "Standard Hub",
       price: "R$ 0",
-      description: "Recursos básicos para análise.",
+      description: "Ideal para marcas em estágio inicial.",
       features: [
-        "3 Jogos salvos por loteria",
-        "Estatísticas básicas",
-        "Histórico de sorteios",
-        "Conferidor simples",
+        "Até 50 SKUs ativos",
+        "Mood Board Colaborativo",
+        "Ficha Técnica Essencial",
+        "Workflow de Aprovação",
       ],
       cta: "Começar Grátis",
       popular: false,
@@ -57,20 +57,20 @@ export function PricingSection() {
       icon: Shield
     },
     {
-      name: "Plano ELITE",
+      name: "Enterprise PLM",
       price: LAUNCH_PRICE,
-      description: "O poder total do Titan OS.",
+      description: "O ecossistema completo USE MODA.",
       features: [
-        "Acesso Vitalício",
-        "IA Autônoma v4",
-        "Simulações Massivas",
-        "ROI Dashboard",
-        "Afiliados & Gamificação",
-        "Strategy Lab Pro",
-        "Suporte VIP",
-        "Sem mensalidade",
+        "Acesso Full USE AI",
+        "Digital Twin da Coleção",
+        "ERP Nativo Integrado",
+        "BI Executivo Pro",
+        "Multi-marca & Multi-unidade",
+        "Suporte VIP 24/7",
+        "Onboarding Dedicado",
+        "Migração de Dados Inclusa",
       ],
-      cta: "Garantir Vaga Vitalícia",
+      cta: "Contratar Solução Elite",
       popular: true,
       color: "bg-primary/5 border-primary/20",
       icon: Crown
