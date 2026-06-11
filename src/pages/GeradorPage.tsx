@@ -3,7 +3,7 @@ import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
 import { m, AnimatePresence } from "framer-motion";
-import { Sparkles, Loader2, ChevronRight, ChevronLeft, Target, Settings2, Hash, Play, Save } from "lucide-react";
+import { Sparkles, Loader2, ChevronRight, ChevronLeft, Target, Settings2, Hash, Play, Save, History as HistoryIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -152,7 +152,7 @@ const GeradorPage = () => {
           {step === 1 && (
             <Card className="p-10 space-y-8 max-w-3xl mx-auto border-white/5 glass-card relative overflow-hidden">
               <div className="absolute top-0 right-0 p-8 opacity-5">
-                <History className="w-32 h-32 rotate-12" />
+                <HistoryIcon className="w-32 h-32 rotate-12" />
               </div>
               
               <div className="flex flex-col items-center text-center space-y-6 relative z-10">
@@ -175,7 +175,7 @@ const GeradorPage = () => {
                   </div>
                   <div className="p-4 rounded-2xl bg-white/5 border border-white/5 text-left">
                     <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Último Processo</p>
-                    <p className="text-sm font-black">Concurso #{draws[0]?.number || '---'}</p>
+                    <p className="text-sm font-black">Concurso #{draws[0]?.concurso || '---'}</p>
                   </div>
                 </div>
 
