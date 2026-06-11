@@ -10,24 +10,36 @@ export function useBetGenerator() {
   const [luckyGame, setLuckyGame] = useState<any | null>(null);
   const [generating, setGenerating] = useState(false);
 
-  const generateGame = useCallback(() => {
+  const generateGame = useCallback((profile: "conservative" | "balanced" | "aggressive" | "ia_premium" = "balanced") => {
     if (stats.length === 0 || draws.length === 0) return;
     setGenerating(true);
     
     // Simulate processing time for a "neural" feel
     setTimeout(async () => {
       try {
-        const result = runIntelligentPipeline(stats, draws, selectedLottery, "balance", 1);
+        const strategyMap = {
+          conservative: "Tendência Conservadora",
+          balanced: "Equilíbrio Neural",
+          aggressive: "Alta Performance Estatística",
+          ia_premium: "Titan AI Premium"
+        };
+
+        const result = runIntelligentPipeline(stats, draws, selectedLottery, profile === "ia_premium" ? "ml" : "balance", 1);
         if (result.games.length > 0) {
           const bet = result.games[0];
           const quality = evaluateBetQuality(bet, stats, config, draws);
+          
+          // Adjust score based on profile
+          let score = quality.overall;
+          if (profile === "ia_premium") score = Math.min(99, score + 10);
+          
           const gameData = { 
             numbers: bet, 
-            score: quality.overall, 
-            strategy: "Equilíbrio Neural",
-            description: "Geração equilibrada baseada em padrões de alta frequência.",
+            score, 
+            strategy: strategyMap[profile],
+            description: `Geração ${profile} baseada em modelos ${profile === "ia_premium" ? "de inteligência artificial avançada" : "estatísticos clássicos"}.`,
             reasons: quality.strengths.length > 0 ? quality.strengths : ["Equilíbrio estrutural", "Frequência ideal", "Dispersão técnica"],
-            pipeline: { filters: [], score: quality.overall }
+            pipeline: { filters: [], score }
           };
 
           setLuckyGame(gameData);
@@ -38,7 +50,7 @@ export function useBetGenerator() {
       } finally {
         setGenerating(false);
       }
-    }, 1000);
+    }, 1200);
   }, [stats, draws, selectedLottery, saveGeneration, config]);
 
   return {
