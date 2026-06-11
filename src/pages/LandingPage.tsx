@@ -18,6 +18,7 @@ import { HeroSection } from "@/components/landing/HeroSection";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
 import { FAQSection } from "@/components/landing/FAQSection";
+import { SupportedLotteries } from "@/components/landing/SupportedLotteries";
 
 
 import { burstConfetti } from "@/lib/confetti";
@@ -121,6 +122,8 @@ export default function LandingPage() {
       </section>
 
       <HowItWorksSection />
+      
+      <SupportedLotteries />
       
       <Testimonials />
       <PricingSection />
