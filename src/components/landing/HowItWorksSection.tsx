@@ -23,18 +23,44 @@ export function HowItWorksSection() {
             className="space-y-8"
           >
             <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
-              {t("landing.how_it_works.title").split(" ").map((word, i) => i === 1 ? <span key={i} className="gradient-brand-text">{word} </span> : word + " ")}
+              Como a <span className="gradient-brand-text">Inteligência</span> Funciona
             </h2>
             <div className="space-y-6">
-              {steps.map((item, i) => (
-                <div key={i} className="flex gap-6 items-start group">
-                  <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">{item.step}</span>
+                <div key={0} className="flex gap-6 items-start group">
+                  <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">01</span>
                   <div className="space-y-1">
-                    <h3 className="text-xl font-bold uppercase italic">{item.title}</h3>
-                    <p className="text-muted-foreground leading-relaxed">{item.desc}</p>
+                    <h3 className="text-xl font-bold uppercase italic">Coleta de Históricos</h3>
+                    <p className="text-muted-foreground leading-relaxed">Consolidamos todos os concursos oficiais em uma base de Big Data para análise temporal profunda.</p>
                   </div>
                 </div>
-              ))}
+                <div key={1} className="flex gap-6 items-start group">
+                  <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">02</span>
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-bold uppercase italic">Processamento IA</h3>
+                    <p className="text-muted-foreground leading-relaxed">O Titan AI Core processa milhões de combinações em busca de padrões estatísticos e anomalias.</p>
+                  </div>
+                </div>
+                <div key={2} className="flex gap-6 items-start group">
+                  <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">03</span>
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-bold uppercase italic">Detecção de Padrões</h3>
+                    <p className="text-muted-foreground leading-relaxed">Identificamos tendências de dezenas quentes, frias e ciclos de retorno através de redes neurais.</p>
+                  </div>
+                </div>
+                <div key={3} className="flex gap-6 items-start group">
+                  <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">04</span>
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-bold uppercase italic">Estratégia Matemática</h3>
+                    <p className="text-muted-foreground leading-relaxed">Aplicamos filtros de dispersão, equilíbrio estrutural e fechamentos para otimizar suas chances.</p>
+                  </div>
+                </div>
+                <div key={4} className="flex gap-6 items-start group">
+                  <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">05</span>
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-bold uppercase italic">Apostas Estratégicas</h3>
+                    <p className="text-muted-foreground leading-relaxed">Geramos combinações com o Titan Score proprietário, auxiliando na tomada de decisão baseada em dados.</p>
+                  </div>
+                </div>
             </div>
           </motion.div>
           <motion.div

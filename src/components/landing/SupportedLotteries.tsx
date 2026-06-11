@@ -45,18 +45,18 @@ export function SupportedLotteries() {
                 <div className="text-3xl mb-4 group-hover:scale-110 transition-transform duration-500">{lottery.icon}</div>
                 <h3 className="font-black uppercase tracking-tight italic text-lg mb-4">{lottery.name}</h3>
                 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                     <TrendingUp className="w-3 h-3 text-emerald-500" />
-                    Tendências Ativas
+                    Análise Própria
                   </div>
                   <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                     <BarChart3 className="w-3 h-3 text-blue-500" />
-                    Score Preditivo
+                    Estratégias Próprias
                   </div>
                   <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                     <Binary className="w-3 h-3 text-primary" />
-                    Titan Engine v4
+                    Titan Score v4
                   </div>
                 </div>
               </Card>
