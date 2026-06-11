@@ -319,10 +319,10 @@ export default function LotofacilPremiumPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
-                    { icon: Zap, text: "Sincronização global concluída. 3.142 sorteios indexados.", type: "success", time: "10:42" },
-                    { icon: Brain, text: "Rede neural detectou desvio no quadrante moldura.", type: "info", time: "10:38" },
-                    { icon: Target, text: "Ciclo #512 em estágio final. 4 dezenas restantes.", type: "warning", time: "10:35" },
-                    { icon: Activity, text: "Recalibrando Titan Score para o próximo concurso.", type: "info", time: "10:30" },
+                    { icon: Zap, text: "Sincronização global concluída. Dataset Loto indexado com sucesso.", type: "success", time: "10:42" },
+                    { icon: Brain, text: "USE AI detectou anomalias no quadrante moldura externa.", type: "info", time: "10:38" },
+                    { icon: Target, text: "Ciclo de convergência #512 em estágio final. Processando...", type: "warning", time: "10:35" },
+                    { icon: Activity, text: "Recalibrando Efficiency Score para o próximo concurso.", type: "info", time: "10:30" },
                   ].map((feed, i) => (
                     <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-secondary/10 border border-border/40 group hover:border-primary/40 hover:bg-secondary/20 transition-all cursor-default relative overflow-hidden">
                       <div className={`p-2 rounded-xl bg-background/60 border border-border/40 shrink-0 group-hover:scale-110 group-hover:shadow-[0_0_10px_rgba(var(--primary-rgb),0.2)] transition-all`}>
