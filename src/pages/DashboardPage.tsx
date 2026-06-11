@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, BrainCircuit, Target, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ComplianceDisclaimer } from "@/components/common/ComplianceDisclaimer";
 import { useNavigate } from "react-router-dom";
 
 const DashboardPage = () => {

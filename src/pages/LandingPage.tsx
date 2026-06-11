@@ -9,6 +9,7 @@ import { ScreensShowcase } from "@/components/common/ScreensShowcase";
 import { FloatingCTA } from "@/components/common/FloatingCTA";
 import { WhatsAppButton } from "@/components/common/WhatsAppButton";
 import { SocialProofBar } from "@/components/common/SocialProofBar";
+import { ComplianceDisclaimer } from "@/components/common/ComplianceDisclaimer";
 import { Testimonials } from "@/components/common/Testimonials";
 import { PricingSection } from "@/components/common/PricingSection";
 import { TitanCommandCenter } from "@/components/common/TitanCommandCenter";
@@ -162,6 +163,9 @@ export default function LandingPage() {
                 <li><a href="#" className="hover:text-primary transition-colors">Contato</a></li>
               </ul>
             </div>
+          </div>
+          <div className="mb-12">
+            <ComplianceDisclaimer />
           </div>
           <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
             <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.4em]">
