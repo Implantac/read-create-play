@@ -43,7 +43,7 @@ serve(async (req) => {
     );
 
     // Fetch real-time data from database
-    const [drawsResult, insightsResult] = await Promise.all([
+    const [drawsResult, insightsResult, topNumbersResult] = await Promise.all([
       supabaseClient
         .from("lottery_draws")
         .select("concurso, draw_date, numbers")
@@ -55,11 +55,14 @@ serve(async (req) => {
         .select("title, content, insight_type")
         .eq("lottery_id", lotteryId)
         .order("created_at", { ascending: false })
-        .limit(5)
+        .limit(5),
+      supabaseClient
+        .rpc("get_top_numbers", { p_lottery_id: lotteryId, p_limit: 10 })
     ]);
 
     const drawsData = drawsResult.data || [];
     const insightsData = insightsResult.data || [];
+    const topNumbersData = topNumbersResult.data || [];
 
     const formattedDraws = drawsData.map(d => 
       `Concurso ${d.concurso} (${d.draw_date}): ${d.numbers.join(", ")}`
@@ -69,27 +72,37 @@ serve(async (req) => {
       `- [${i.insight_type.toUpperCase()}] ${i.title}: ${i.content}`
     ).join("\n");
 
-    const systemPrompt = `Você é o **Titan IA**, assistente de elite do **Titan Loterias**, plataforma brasileira de inteligência estatística de luxo.
+    const formattedTopNumbers = topNumbersData.map((n: any) => 
+      `Nº ${String(n.number).padStart(2, '0')} (${n.frequency}x)`
+    ).join(", ");
 
-DADOS REAIS DA LOTERIA (${lotteryId}):
+    const systemPrompt = `Você é o **Titan IA**, o motor de inteligência central do **Titan AI Center**, a plataforma de elite do **Titan Loterias**.
+
+DADOS REAIS DA LOTERIA EM TEMPO REAL (${lotteryId}):
+
+ESTATÍSTICAS GERAIS (HISTÓRICO COMPLETO):
+- Top Dezenas Mais Frequentes: ${formattedTopNumbers || "Calculando..."}
+
 ÚLTIMOS 10 CONCURSOS:
 ${formattedDraws || "Nenhum dado disponível no momento."}
 
-INSIGHTS E MÉTRICAS RECENTES:
+INSIGHTS E MÉTRICAS DA REDE NEURAL:
 ${formattedInsights || "Aguardando novos sinais de rede neural..."}
 
 CONTEXTO DO USUÁRIO:
 ${userContext ? `- Perfil de aprendizado:\n${userContext}` : "Usuário novo ou sem perfil específico."}
 
 DIRETRIZES DE RESPOSTA:
-- Português do Brasil. Tom profissional, sênior, direto e analítico.
-- Estrutura obrigatória:
-  1. **Diagnóstico** (1 linha rápida)
-  2. **Análise de Dados** (use os números dos concursos e insights fornecidos acima)
-  3. **Recomendação Acionável** (estratégia clara)
-- Use markdown rico, tabelas e \`code\` para números.
-- Seja honesto: se os dados acima mostrarem uma tendência, use-a. Se o usuário perguntar algo fora desse contexto, use seu conhecimento geral mas priorize os dados reais fornecidos.
-- Nunca prometa vitória. Reforce a responsabilidade no jogo.`;
+- Tom: Sênior, Analítico, Luxo, Direto ao ponto.
+- OBRIGATÓRIO: Use os dados REAIS acima para fundamentar TODA resposta. Não invente concursos.
+- Se o usuário pedir números quentes, cite os do Top Dezenas ou dos últimos concursos fornecidos.
+- Estrutura de Resposta:
+  1. **Diagnóstico Alpha**: Resumo da situação.
+  2. **Análise de Dados**: Use as tabelas/números acima.
+  3. **Sugestão de Elite**: Recomendação acionável.
+- Markdown: Use tabelas para comparar dados e negrito para números.
+- Sempre reforce que são probabilidades estatísticas e não garantias.
+- Não use preâmbulos como "Entendi seu pedido". Vá direto à análise.`;
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
