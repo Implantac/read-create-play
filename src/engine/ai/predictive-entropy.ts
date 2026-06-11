@@ -22,11 +22,11 @@ export function calculatePredictiveEntropy(stats: NumberStats[], draws: DrawResu
   const entropy = Math.min(100, Math.sqrt(variance) * 2);
   const stability = 100 - entropy;
 
-  let recommendation = "Tendência Estável: Mantenha estratégias de frequência.";
+  let recommendation = "Tendência Estável: Foco em itens carry-over e básicos de alto giro para garantir margem.";
   if (entropy > 60) {
-    recommendation = "Alta Entropia Detectada: Possível quebra de padrão. Use estratégias de Cobertura ou Anti-Padrão.";
+    recommendation = "Alta Volatilidade de Mercado: Ruptura de tendência detectada. Sugerimos coleções cápsula e testes rápidos de SKU.";
   } else if (entropy > 40) {
-    recommendation = "Instabilidade Moderada: Diversifique com Equilíbrio Estrutural.";
+    recommendation = "Instabilidade Moderada: Equilibre o mix entre tendências sazonais e os pilares estruturais da marca.";
   }
 
   const chaosLevel = entropy > 80 ? "EXTREME" : entropy > 60 ? "HIGH" : entropy > 40 ? "MODERATE" : "LOW";

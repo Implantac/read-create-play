@@ -1,25 +1,25 @@
 import { motion } from "framer-motion";
 
-const lotteries = [
-  { name: "Mega-Sena", numbers: "6/60", color: "hsl(var(--neon-green))" },
-  { name: "Lotofácil", numbers: "15/25", color: "hsl(var(--neon-purple))" },
-  { name: "Quina", numbers: "5/80", color: "hsl(var(--neon-blue))" },
-  { name: "Lotomania", numbers: "50/100", color: "hsl(var(--neon-amber))" },
-  { name: "Dupla Sena", numbers: "6/50", color: "hsl(var(--neon-red))" },
-  { name: "Timemania", numbers: "7/80", color: "hsl(var(--neon-cyan))" },
-  { name: "Dia de Sorte", numbers: "7/31", color: "hsl(var(--neon-green))" },
-  { name: "+Milionária", numbers: "6/50+2", color: "hsl(var(--neon-purple))" },
+const industries = [
+  { name: "Adobe Illustrator", type: "Design", color: "hsl(var(--neon-red))" },
+  { name: "Audaces", type: "CAD/CAM", color: "hsl(var(--neon-blue))" },
+  { name: "Lectra", type: "PLM System", color: "hsl(var(--neon-green))" },
+  { name: "Gerber", type: "Cutting", color: "hsl(var(--neon-amber))" },
+  { name: "CLO3D", type: "3D Design", color: "hsl(var(--neon-purple))" },
+  { name: "Optitex", type: "Simulation", color: "hsl(var(--neon-cyan))" },
+  { name: "Corel Draw", type: "Graphics", color: "hsl(var(--neon-green))" },
+  { name: "Browzwear", type: "Prototype", color: "hsl(var(--neon-purple))" },
 ];
 
 // Duplicate for seamless infinite scroll
-const duplicated = [...lotteries, ...lotteries];
+const duplicated = [...industries, ...industries];
 
 export function LotteryLogosCarousel() {
   return (
-    <section className="py-12 border-b border-border/20 bg-card/20 backdrop-blur-sm overflow-hidden">
+    <section className="py-8 border-b border-border/20 bg-card/20 backdrop-blur-sm overflow-hidden">
       <div className="container mx-auto px-4 mb-6">
-        <p className="text-center text-xs uppercase tracking-[0.2em] text-muted-foreground font-mono">
-          Loterias Suportadas
+        <p className="text-center text-[10px] uppercase tracking-[0.4em] text-muted-foreground font-black opacity-50">
+          Integrações Nativas & Ecossistema de Moda
         </p>
       </div>
 
@@ -55,7 +55,7 @@ export function LotteryLogosCarousel() {
                   {lottery.name}
                 </div>
                 <div className="text-[10px] text-muted-foreground font-mono">
-                  {lottery.numbers}
+                  {lottery.type}
                 </div>
               </div>
             </div>

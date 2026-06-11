@@ -15,8 +15,8 @@ export function PricingSection() {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const LAUNCH_PRICE = "R$ 297";
-  const ORIGINAL_PRICE = "R$ 997";
+  const LAUNCH_PRICE = "R$ 4.997";
+  const ORIGINAL_PRICE = "R$ 12.997";
 
   const handleCheckout = async () => {
     if (!session) {
@@ -42,14 +42,14 @@ export function PricingSection() {
 
   const plans = [
     {
-      name: "Plano Gratuito",
+      name: "Standard Hub",
       price: "R$ 0",
-      description: "Recursos básicos para análise.",
+      description: "Ideal para marcas em estágio inicial.",
       features: [
-        "3 Jogos salvos por loteria",
-        "Estatísticas básicas",
-        "Histórico de sorteios",
-        "Conferidor simples",
+        "Até 50 SKUs ativos",
+        "Mood Board Colaborativo",
+        "Ficha Técnica Essencial",
+        "Workflow de Aprovação",
       ],
       cta: "Começar Grátis",
       popular: false,
@@ -57,20 +57,20 @@ export function PricingSection() {
       icon: Shield
     },
     {
-      name: "Plano ELITE",
+      name: "Enterprise PLM",
       price: LAUNCH_PRICE,
-      description: "O poder total do Titan OS.",
+      description: "O ecossistema completo USE MODA.",
       features: [
-        "Acesso Vitalício",
-        "IA Autônoma v4",
-        "Simulações Massivas",
-        "ROI Dashboard",
-        "Afiliados & Gamificação",
-        "Strategy Lab Pro",
-        "Suporte VIP",
-        "Sem mensalidade",
+        "Acesso Full USE AI",
+        "Digital Twin da Coleção",
+        "ERP Nativo Integrado",
+        "BI Executivo Pro",
+        "Multi-marca & Multi-unidade",
+        "Suporte VIP 24/7",
+        "Onboarding Dedicado",
+        "Migração de Dados Inclusa",
       ],
-      cta: "Garantir Vaga Vitalícia",
+      cta: "Contratar Solução Elite",
       popular: true,
       color: "bg-primary/5 border-primary/20",
       icon: Crown
@@ -90,13 +90,13 @@ export function PricingSection() {
           className="text-center mb-20 space-y-4"
         >
           <Badge variant="outline" className="px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.3em] bg-primary/10 text-primary border-primary/20 mb-4">
-            Escolha sua Estratégia
+            Escolha seu Nível de Operação
           </Badge>
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic">
-            Investimento em <span className="gradient-brand-text">Performance</span>
+            Investimento em <span className="gradient-brand-text">Eficiência</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-70">
-            Assuma o controle dos seus jogos com as ferramentas de elite do mercado.
+            Assuma o controle total da sua indústria com as ferramentas que estão redefinindo a moda global.
           </p>
         </motion.div>
 
@@ -166,19 +166,19 @@ export function PricingSection() {
         <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
            <div className="flex flex-col items-center gap-2">
              <TrendingUp className="w-8 h-8" />
-             <p className="text-[10px] font-black uppercase tracking-widest text-center">Analytics ROI</p>
+             <p className="text-[10px] font-black uppercase tracking-widest text-center">ROI de Coleção</p>
            </div>
            <div className="flex flex-col items-center gap-2">
              <Zap className="w-8 h-8" />
-             <p className="text-[10px] font-black uppercase tracking-widest text-center">IA Autônoma</p>
+             <p className="text-[10px] font-black uppercase tracking-widest text-center">USE AI Nativa</p>
            </div>
            <div className="flex flex-col items-center gap-2">
              <Users className="w-8 h-8" />
-             <p className="text-[10px] font-black uppercase tracking-widest text-center">Gestão de Rede</p>
+             <p className="text-[10px] font-black uppercase tracking-widest text-center">Colaboração 360º</p>
            </div>
            <div className="flex flex-col items-center gap-2">
              <Brain className="w-8 h-8" />
-             <p className="text-[10px] font-black uppercase tracking-widest text-center">Neural Core</p>
+             <p className="text-[10px] font-black uppercase tracking-widest text-center">Neural Fashion Core</p>
            </div>
         </div>
       </div>

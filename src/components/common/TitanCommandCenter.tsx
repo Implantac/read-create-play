@@ -12,25 +12,25 @@ export const TitanCommandCenter = () => {
   const selectedLottery = ctx?.selectedLottery ?? "lotofacil";
   const [uptime, setUptime] = React.useState(0);
   const [logs, setLogs] = React.useState<string[]>([
-    "Initializating Neural Core...",
-    "Syncing historical data tensors...",
-    "Kernel version 5.2.0 established."
+    "Initializing USE AI Neural Core...",
+    "Syncing Milan & Paris trend tensors...",
+    "Digital Twin protocol established."
   ]);
 
   React.useEffect(() => {
     const timer = setInterval(() => setUptime(u => u + 1), 1000);
     const logInterval = setInterval(() => {
       const events = [
-        "Neural weights redistributed",
-        "Entropy variance detected",
-        "Processing quantum patterns",
-        "Alpha signal stabilized",
-        "Cache invalidated",
-        "P2P handshake verified"
+        "Analyzing fiber density patterns",
+        "Optimizing supply chain routes",
+        "Processing generative mood boards",
+        "Predicting Summer 2026 demand",
+        "Validating textile sustainability",
+        "Syncing factory node LATAM-04"
       ];
       const newLog = events[Math.floor(Math.random() * events.length)];
       setLogs(prev => [newLog, ...prev.slice(0, 4)]);
-    }, 4000);
+    }, 3000);
 
     return () => {
       clearInterval(timer);
@@ -85,10 +85,10 @@ export const TitanCommandCenter = () => {
         <div>
           <h2 className="text-2xl font-black text-foreground flex items-center gap-3 tracking-tighter italic uppercase">
             <Terminal className="w-7 h-7 text-primary" />
-            Titan <span className="text-primary">Command</span> Center
+            USE AI <span className="text-primary">Command</span> Center
           </h2>
           <p className="text-xs text-muted-foreground font-mono uppercase tracking-widest mt-1">
-            v5.3 — Neural Synergy Core • Institutional Grade
+            v2.0 — Neural Fashion Core • Enterprise Grade
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -108,7 +108,7 @@ export const TitanCommandCenter = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-              <Activity className="w-3 h-3" /> Core Heatmap
+              <Activity className="w-3 h-3" /> Trend Velocity
             </span>
             <span className="text-[10px] font-mono text-emerald-500">OPTIMAL</span>
           </div>
@@ -128,7 +128,7 @@ export const TitanCommandCenter = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-            <Zap className="w-3 h-3" /> Alpha Prediction
+            <Zap className="w-3 h-3" /> Predictive ROI Accuracy
             </span>
             <span className="text-[10px] font-mono text-primary">{entropyData.entropy.toFixed(1)}%</span>
           </div>
