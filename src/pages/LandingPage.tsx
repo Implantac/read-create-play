@@ -18,6 +18,7 @@ import { HeroSection } from "@/components/landing/HeroSection";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
 import { FAQSection } from "@/components/landing/FAQSection";
+import { LeadCaptureForm } from "@/components/landing/LeadCaptureForm";
 
 import { burstConfetti } from "@/lib/confetti";
 
@@ -124,6 +125,8 @@ export default function LandingPage() {
       <Testimonials />
       <PricingSection />
       <FAQSection />
+
+      <LeadCaptureForm />
 
       <footer className="py-24 border-t border-white/5 bg-black/60 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-20" />

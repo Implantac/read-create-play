@@ -314,6 +314,39 @@ export type Database = {
         }
         Relationships: []
       }
+      leads: {
+        Row: {
+          company_name: string | null
+          consent_given: boolean
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          job_title: string | null
+          phone: string | null
+        }
+        Insert: {
+          company_name?: string | null
+          consent_given?: boolean
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          job_title?: string | null
+          phone?: string | null
+        }
+        Update: {
+          company_name?: string | null
+          consent_given?: boolean
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          job_title?: string | null
+          phone?: string | null
+        }
+        Relationships: []
+      }
       lottery_draws: {
         Row: {
           concurso: number
