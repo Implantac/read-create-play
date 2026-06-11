@@ -90,13 +90,13 @@ export function PricingSection() {
           className="text-center mb-20 space-y-4"
         >
           <Badge variant="outline" className="px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.3em] bg-primary/10 text-primary border-primary/20 mb-4">
-            Escolha sua Estratégia
+            Escolha seu Nível de Operação
           </Badge>
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic">
-            Investimento em <span className="gradient-brand-text">Performance</span>
+            Investimento em <span className="gradient-brand-text">Eficiência</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-70">
-            Assuma o controle dos seus jogos com as ferramentas de elite do mercado.
+            Assuma o controle total da sua indústria com as ferramentas que estão redefinindo a moda global.
           </p>
         </motion.div>
 
