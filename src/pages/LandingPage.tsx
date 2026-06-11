@@ -108,10 +108,10 @@ export default function LandingPage() {
               Processamento em Tempo Real
             </div>
             <h2 className="text-5xl md:text-8xl font-black tracking-tighter uppercase italic leading-[0.8] mb-6">
-              Neural <span className="gradient-brand-text">Trend Monitor</span>
+              Neural <span className="gradient-brand-text">Command Center</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-60">
-              Acompanhe a IA processando tendências globais e otimizando mix de produtos em microssegundos.
+              Acompanhe o processamento dos nossos algoritmos e a detecção de padrões em tempo real.
             </p>
           </div>
           <div className="max-w-6xl mx-auto">
