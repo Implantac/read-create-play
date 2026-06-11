@@ -29,10 +29,10 @@ const workflowGroups: { label: string; items: { title: string; url: string; icon
   {
     label: "Operacional",
     items: [
-      { title: "Dashboard", url: "/", icon: BarChart3, tooltip: "Terminal central de inteligência e resumo de fluxos." },
-      { title: "Consultor IA", url: "/ia-chat", icon: MessageCircle, tooltip: "Converse com seu assistente de elite.", badge: "NEW" },
-      { title: "Gerador Neural", url: "/gerador", icon: Sparkles, tooltip: "Geração assistida de apostas inteligentes." },
-      { title: "Lotofácil Elite", url: "/lotofacil-premium", icon: Crown, tooltip: "Ambiente profissional exclusivo para Lotofácil.", badge: "PREMIUM" },
+      { title: "Dashboard Hub", url: "/", icon: BarChart3, tooltip: "Terminal central de inteligência e resumo de fluxos." },
+      { title: "USE AI Analyst", url: "/ia-chat", icon: MessageCircle, tooltip: "Converse com seu assistente de elite fashion.", badge: "NEW" },
+      { title: "Neural Synthesis", url: "/gerador", icon: Sparkles, tooltip: "Geração assistida de coleções inteligentes (Loto Data)." },
+      { title: "Lotofácil Premium", url: "/lotofacil-premium", icon: Crown, tooltip: "Ambiente profissional exclusivo para Lotofácil.", badge: "PREMIUM" },
     ],
   },
   {
@@ -71,14 +71,14 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r border-border/40">
       <SidebarHeader className="p-4 border-b border-border/10 bg-sidebar/50 backdrop-blur-sm">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-xl shadow-primary/20 group-hover:shadow-primary/40 group-hover:scale-110 transition-all duration-500 overflow-hidden border border-white/10 bg-background/50">
-            <img src="/logo.png" alt="Titan Loterias" className="w-10 h-10 object-contain" />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-xl shadow-primary/20 group-hover:shadow-primary/20 group-hover:scale-105 transition-all duration-700 overflow-hidden border border-white/10 bg-black">
+            <span className="text-sm font-black text-white italic tracking-tighter">UM</span>
           </div>
           {!collapsed && (
             <div className="animate-in fade-in slide-in-from-left-2 duration-500">
               <div className="flex items-center gap-1.5">
                 <h1 className="text-lg font-black tracking-tighter text-sidebar-foreground uppercase italic leading-none">
-                  Titan<span className="gradient-brand-text ml-0.5">Loterias</span>
+                  USE<span className="gradient-brand-text ml-0.5">MODA</span>
                 </h1>
                 {isAdmin && (
                   <span className={`px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.2em] rounded-full border animate-pulse ${
@@ -91,7 +91,7 @@ export function AppSidebar() {
                 )}
               </div>
               <p className="text-[9px] text-muted-foreground font-black tracking-[0.3em] uppercase opacity-40 mt-0.5">
-                Neural Core v7.5
+                PLM AI • v2.0 Elite
               </p>
             </div>
           )}

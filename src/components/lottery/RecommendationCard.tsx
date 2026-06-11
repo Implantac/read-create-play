@@ -104,7 +104,7 @@ export function RecommendationCard({ luckyGame, generating, onGenerate, onShowBr
                 ) : (
                   <Sparkles className="w-5 h-5 mr-3" />
                 )}
-                {generating ? "Calibrando Core..." : "Ativar Assistente Titan"}
+                {generating ? "Calibrando Core..." : "Ativar Assistente USE AI"}
               </Button>
             </div>
           )}

@@ -67,7 +67,7 @@ export function AppHeader({
                 </span>
               </div>
             </TooltipTrigger>
-            <TooltipContent>Sorteios carregados no banco</TooltipContent>
+            <TooltipContent>Dataset de coleções (Loto-Sourced)</TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -125,9 +125,9 @@ export function AppHeader({
 
                 <div className="hidden md:flex flex-col items-start text-left shrink-0">
                   <span className="text-xs font-black text-foreground tracking-tight uppercase italic leading-none">
-                    {profile?.full_name || user?.email?.split("@")[0] || "Usuário"}
+                    {profile?.full_name || user?.email?.split("@")[0] || "Executive"}
                   </span>
-                  <span className="text-[8px] text-muted-foreground font-black tracking-widest uppercase opacity-60 mt-1">Status • Online</span>
+                  <span className="text-[8px] text-muted-foreground font-black tracking-widest uppercase opacity-60 mt-1">Status • Certified</span>
                 </div>
               </Button>
             </DropdownMenuTrigger>

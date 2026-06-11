@@ -61,7 +61,7 @@ const IntelligentGeneratorPanel = lazy(() => import("@/components/lottery/genera
 const EvolutiveGeneratorPanel = lazy(() => import("@/components/lottery/generators/EvolutiveGeneratorPanel").then(m => ({ default: m.EvolutiveGeneratorPanel })));
 const AIPredictionPanel = lazy(() => import("@/components/AIPredictionPanel").then(m => ({ default: m.AIPredictionPanel })));
 const ProfessionalGeneratorPanel = lazy(() => import("@/components/lottery/generators/ProfessionalGeneratorPanel").then(m => ({ default: m.ProfessionalGeneratorPanel })));
-import { TitanHealthGauge } from "@/components/lottery/analysis/TitanHealthGauge";
+import { NeuralHealthGauge } from "@/components/lottery/analysis/NeuralHealthGauge";
 
 const LazyFallback = () => (
   <div className="flex items-center justify-center py-12 text-muted-foreground bg-secondary/5 rounded-2xl border border-dashed border-border/40">
@@ -220,14 +220,14 @@ export default function LotofacilPremiumPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-4">
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Intelligence Suite v6.0</span>
+            <span className="px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Intelligence Suite v2.0 Elite</span>
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
           </div>
           <h1 className="text-4xl md:text-6xl font-black text-foreground tracking-tighter italic uppercase leading-tight">
-            Lotofácil <span className="gradient-brand-text not-italic">Elite</span>
+            Lotofácil <span className="gradient-brand-text not-italic">Premium Hub</span>
           </h1>
           <p className="text-sm text-muted-foreground font-medium max-w-2xl leading-relaxed">
-            Seu ambiente profissional de alta performance. Sincronizado com os últimos sorteios e processado por nossa IA proprietária.
+            Seu ambiente profissional de alta performance para análise de dados e predição. Sincronizado com os últimos sorteios e processado pela inteligência USE AI.
           </p>
         </div>
 
@@ -319,10 +319,10 @@ export default function LotofacilPremiumPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
-                    { icon: Zap, text: "Sincronização global concluída. 3.142 sorteios indexados.", type: "success", time: "10:42" },
-                    { icon: Brain, text: "Rede neural detectou desvio no quadrante moldura.", type: "info", time: "10:38" },
-                    { icon: Target, text: "Ciclo #512 em estágio final. 4 dezenas restantes.", type: "warning", time: "10:35" },
-                    { icon: Activity, text: "Recalibrando Titan Score para o próximo concurso.", type: "info", time: "10:30" },
+                    { icon: Zap, text: "Sincronização global concluída. Dataset Loto indexado com sucesso.", type: "success", time: "10:42" },
+                    { icon: Brain, text: "USE AI detectou anomalias no quadrante moldura externa.", type: "info", time: "10:38" },
+                    { icon: Target, text: "Ciclo de convergência #512 em estágio final. Processando...", type: "warning", time: "10:35" },
+                    { icon: Activity, text: "Recalibrando Efficiency Score para o próximo concurso.", type: "info", time: "10:30" },
                   ].map((feed, i) => (
                     <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-secondary/10 border border-border/40 group hover:border-primary/40 hover:bg-secondary/20 transition-all cursor-default relative overflow-hidden">
                       <div className={`p-2 rounded-xl bg-background/60 border border-border/40 shrink-0 group-hover:scale-110 group-hover:shadow-[0_0_10px_rgba(var(--primary-rgb),0.2)] transition-all`}>
@@ -380,13 +380,13 @@ export default function LotofacilPremiumPage() {
                     </h2>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <TitanHealthGauge 
+                    <NeuralHealthGauge 
                       value={88.4} 
                       label="Convergência" 
                       sublabel="Sincronia Global" 
                       color="hsl(var(--primary))" 
                     />
-                    <TitanHealthGauge 
+                    <NeuralHealthGauge 
                       value={92.1} 
                       label="Estabilidade" 
                       sublabel="Fluxo Preditivo" 

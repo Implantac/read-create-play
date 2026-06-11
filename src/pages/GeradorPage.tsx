@@ -40,11 +40,11 @@ const GeradorPage = () => {
   const [generating, setGenerating] = useState(false);
   const [results, setResults] = useState<any[]>([]);
 
-  const STRATEGIES = [
-    { id: "balance", name: "Equilíbrio Neural", desc: "Melhor distribuição estatística" },
-    { id: "frequency", name: "Alta Frequência", desc: "Foco nas dezenas mais sorteadas" },
-    { id: "delay", name: "Atraso Crítico", desc: "Dezenas que não saem há tempo" },
-    { id: "coverage", name: "Cobertura Total", desc: "Máxima diversificação" },
+    const STRATEGIES = [
+    { id: "balance", name: "Neural Balance", desc: "Otimização 360º com foco em equilíbrio estrutural e dispersão estatística." },
+    { id: "frequency", name: "High Velocity", desc: "Análise de frequência acumulada (Tendência de Hot Numbers)." },
+    { id: "delay", name: "Lag Recovery", desc: "Motor de predição baseado em dezenas com alto índice de atraso histórico." },
+    { id: "coverage", name: "Full Canvas", desc: "Estratégia de cobertura total para máxima diversificação de portfólio." },
   ];
 
   const handleGenerate = async () => {
@@ -102,14 +102,14 @@ const GeradorPage = () => {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Neural Generator v6.0</span>
+              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Neural Synthesis v2.0 Elite</span>
             </div>
           </div>
           <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-tight">
-            Assistente de <span className="gradient-brand-text">Geração</span>
+            Neural <span className="gradient-brand-text">Synthesis Lab</span>
           </h1>
           <p className="text-sm text-muted-foreground font-medium max-w-lg leading-relaxed">
-            Configure seu fluxo de predição. O motor Titan utiliza heurísticas avançadas para maximizar a convergência matemática.
+            Configure seu fluxo de predição. O motor USE AI utiliza heurísticas avançadas para processar dados brutos e gerar coleções de alta performance.
           </p>
         </div>
       </div>
@@ -129,7 +129,7 @@ const GeradorPage = () => {
               {i}
             </div>
             <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${step >= i ? "text-primary" : "text-muted-foreground opacity-40"}`}>
-              {i === 1 ? "Loteria" : i === 2 ? "Estratégia" : i === 3 ? "Volume" : "Resultado"}
+              {i === 1 ? "Dataset" : i === 2 ? "Engine" : i === 3 ? "Volume" : "Sponsorship"}
             </span>
             {i < 4 && <div className={`absolute top-6 left-16 w-full h-[1px] hidden md:block ${step > i ? "bg-primary" : "bg-border/40"}`} style={{ width: 'calc(100% + 1rem)' }} />}
           </div>
@@ -151,11 +151,11 @@ const GeradorPage = () => {
                 <span className="text-5xl drop-shadow-lg">{config.icon}</span>
               </div>
               <div className="space-y-3">
-                <h3 className="text-3xl font-black uppercase tracking-tighter italic">Seleção: {config.name}</h3>
-                <p className="text-muted-foreground text-base">O motor Titan está pronto para processar {config.pick} números com as melhores métricas de convergência para este concurso.</p>
+                <h3 className="text-3xl font-black uppercase tracking-tighter italic">Dataset: {config.name}</h3>
+                <p className="text-muted-foreground text-base">O motor USE AI está pronto para processar dezenas {config.name} com as melhores métricas de convergência para o próximo SKU de mercado.</p>
               </div>
-              <Button onClick={nextStep} variant="premium" className="h-16 px-16 group">
-                Avançar para Estratégia
+              <Button onClick={nextStep} variant="premium" className="h-16 px-16 group rounded-full">
+                Configurar Motor de Predição
                 <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Card>
@@ -165,8 +165,8 @@ const GeradorPage = () => {
           {step === 2 && (
             <div className="space-y-6">
               <div className="text-center space-y-2 mb-8">
-                <h3 className="text-xl font-black uppercase tracking-tighter">Selecione a Estratégia</h3>
-                <p className="text-muted-foreground">O motor Titan utilizará o modelo escolhido para processar as dezenas.</p>
+                <h3 className="text-xl font-black uppercase tracking-tighter">Selecione o Motor de Predição</h3>
+                <p className="text-muted-foreground text-sm opacity-60">Escolha a heurística que governará a síntese da sua nova coleção de jogos.</p>
               </div>
               <div className="grid md:grid-cols-2 gap-6">
                 {STRATEGIES.map((s) => (
@@ -202,8 +202,8 @@ const GeradorPage = () => {
           {step === 3 && (
             <Card className="glass-panel border-primary/20 p-8 space-y-8">
               <div className="text-center space-y-2">
-                <h3 className="text-xl font-black uppercase tracking-tighter">Volume de Apostas</h3>
-                <p className="text-muted-foreground">Quantos jogos você deseja que a IA gere para esta estratégia?</p>
+                <h3 className="text-xl font-black uppercase tracking-tighter">Volume de Produção</h3>
+                <p className="text-muted-foreground">Quantas combinações de elite você deseja que a IA gere para esta estratégia?</p>
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -226,23 +226,22 @@ const GeradorPage = () => {
                   onClick={handleGenerate} 
                   disabled={generating}
                   variant="premium"
-                  className="px-16 h-16 group"
-
+                  className="px-16 h-20 group rounded-full"
                 >
                   {generating ? (
                     <>
-                      <Loader2 className="w-6 h-6 animate-spin" />
-                      Processando...
+                      <Loader2 className="w-6 h-6 animate-spin mr-3" />
+                      Sintetizando...
                     </>
                   ) : (
                     <>
-                      <Play className="w-6 h-6 fill-current" />
-                      Gerar {quantity} Jogo{quantity > 1 ? 's' : ''}
+                      <Sparkles className="w-6 h-6 mr-3 fill-current" />
+                      Iniciar Síntese Neural
                     </>
                   )}
                 </Button>
-                <Button variant="ghost" onClick={prevStep} className="gap-2">
-                  <ChevronLeft className="w-4 h-4" /> Alterar Estratégia
+                <Button variant="ghost" onClick={prevStep} className="gap-2 text-[10px] font-black uppercase tracking-widest opacity-40 hover:opacity-100 italic">
+                  <ChevronLeft className="w-3 h-3" /> Redefinir Engine
                 </Button>
               </div>
             </Card>
@@ -254,8 +253,8 @@ const GeradorPage = () => {
                 <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto border border-emerald-500/40 mb-4">
                   <Target className="w-8 h-8 text-emerald-400" />
                 </div>
-                <h3 className="text-2xl font-black uppercase tracking-tighter">Jogos Gerados com Sucesso!</h3>
-                <p className="text-muted-foreground">O Titan Score médio destas combinações é superior a 85.</p>
+                <h3 className="text-2xl font-black uppercase tracking-tighter">Coleção Sintetizada com Sucesso!</h3>
+                <p className="text-muted-foreground">O Quality Score médio destas combinações é superior a 85.</p>
               </div>
 
               <div className="space-y-4">
@@ -274,8 +273,8 @@ const GeradorPage = () => {
                         </div>
                         <div className="flex items-center gap-6 shrink-0">
                           <div className="text-right">
-                            <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Score IA</p>
-                            <p className="text-2xl font-black text-primary italic">{res.score}</p>
+                            <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Efficiency</p>
+                            <p className="text-2xl font-black text-primary italic">{res.score}%</p>
                           </div>
                           <Button 
                             variant="outline" 
