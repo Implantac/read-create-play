@@ -253,8 +253,8 @@ const GeradorPage = () => {
                 <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto border border-emerald-500/40 mb-4">
                   <Target className="w-8 h-8 text-emerald-400" />
                 </div>
-                <h3 className="text-2xl font-black uppercase tracking-tighter">Jogos Gerados com Sucesso!</h3>
-                <p className="text-muted-foreground">O Titan Score médio destas combinações é superior a 85.</p>
+                <h3 className="text-2xl font-black uppercase tracking-tighter">Coleção Sintetizada com Sucesso!</h3>
+                <p className="text-muted-foreground">O Quality Score médio destas combinações é superior a 85.</p>
               </div>
 
               <div className="space-y-4">
