@@ -83,11 +83,30 @@ export default function LandingPage() {
         fadeUp={fadeUp} 
       />
 
-      <section className="py-12 border-y border-white/5 bg-black/20 overflow-hidden">
-        <div className="container mx-auto px-6">
-          <p className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground text-center mb-8 opacity-40">
-            Poder de processamento e inteligência analítica de elite
-          </p>
+      <section className="py-16 border-y border-white/5 bg-black/20 overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 pointer-events-none" />
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="flex flex-col items-center mb-12">
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 text-center mb-4 opacity-70">
+              Poder de processamento e inteligência analítica de elite
+            </p>
+            <div className="h-px w-20 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
+            {[
+              { label: "Concursos Analisados", value: "24.500+" },
+              { label: "Apostas Geradas", value: "1.2M+" },
+              { label: "Loterias Suportadas", value: "09" },
+              { label: "Usuários Ativos", value: "4.800+" },
+            ].map((stat, i) => (
+              <div key={i} className="text-center p-6 rounded-3xl bg-white/5 border border-white/5 backdrop-blur-sm group hover:border-primary/20 transition-all">
+                <p className="text-3xl md:text-5xl font-black tracking-tighter italic gradient-brand-text mb-2">{stat.value}</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+
           <LotteryLogosCarousel />
         </div>
       </section>
@@ -102,8 +121,8 @@ export default function LandingPage() {
 
       <ScreensShowcase />
 
-      <section className="py-24 md:py-48 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent opacity-30" />
+      <section className="py-24 md:py-48 relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-primary/10 rounded-full blur-[120px] opacity-20 pointer-events-none" />
         <div className="container mx-auto px-6 relative z-10">
           <div className="text-center mb-20">
             <div className="inline-flex items-center px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.4em] bg-primary/10 text-primary border border-primary/20 mb-6 backdrop-blur-sm">
