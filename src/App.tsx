@@ -62,7 +62,7 @@ const PageLoader = () => (
         </div>
       </div>
       <div className="space-y-1 text-center">
-        <p className="text-xs font-mono text-primary uppercase tracking-[0.3em] animate-pulse">USE MODA AI</p>
+        <p className="text-xs font-mono text-primary uppercase tracking-[0.3em] animate-pulse">TITAN LOTERIAS</p>
         <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-widest opacity-50">Iniciando Neural Core...</p>
       </div>
     </div>
@@ -84,6 +84,7 @@ const AppContent = () => {
     <Suspense fallback={<PageLoader />}>
       <Routes>
         {/* Public */}
+        <Route path="/" element={<LandingPage />} />
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
@@ -96,7 +97,7 @@ const AppContent = () => {
         <Route path="/obrigado" element={<ThankYouPage />} />
         {/* Protected */}
         <Route element={<ProtectedRoute><LotteryProvider><AppLayout /></LotteryProvider></ProtectedRoute>}>
-          <Route path="/" element={<DashboardPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/gerador" element={<GeradorPage />} />
           <Route path="/fechamentos" element={<FechamentosPage />} />
           <Route path="/analise" element={<AnaliseCentralPage />} />
