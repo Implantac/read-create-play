@@ -97,18 +97,28 @@ export function RecommendationCard({ luckyGame, generating, onGenerate, onShowBr
               </div>
               <div className="space-y-3">
                 <h2 className="text-2xl font-black text-foreground uppercase tracking-tight italic">Assistente em Standby</h2>
-                <p className="text-sm opacity-60 max-w-xs mx-auto">Toque abaixo para que a IA analise o sorteio atual e gere sua melhor recomendação.</p>
+                <p className="text-sm opacity-60 max-w-xs mx-auto">Selecione o perfil de risco para que a IA gere sua melhor recomendação estatística.</p>
               </div>
-              <Button onClick={onGenerate} disabled={generating} variant="premium" className="px-12 h-16">
-                {generating ? (
-                  <m.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}>
-                    <RefreshCw className="w-5 h-5" />
-                  </m.div>
-                ) : (
-                  <Sparkles className="w-5 h-5 mr-3" />
-                )}
-                {generating ? "Calibrando Core..." : "Ativar Assistente USE AI"}
-              </Button>
+              
+              <div className="flex flex-wrap justify-center gap-3 w-full max-w-2xl">
+                {[
+                  { id: 'conservative', label: 'Conservador', icon: '🛡️', color: 'border-emerald-500/20 text-emerald-400' },
+                  { id: 'balanced', label: 'Equilibrado', icon: '⚖️', color: 'border-primary/20 text-primary' },
+                  { id: 'aggressive', label: 'Agressivo', icon: '🔥', color: 'border-orange-500/20 text-orange-400' },
+                  { id: 'ia_premium', label: 'Titan IA Premium', icon: '💎', color: 'border-purple-500/30 text-purple-400 bg-purple-500/5' },
+                ].map((p) => (
+                  <Button 
+                    key={p.id}
+                    onClick={() => onGenerate(p.id)} 
+                    disabled={generating} 
+                    variant="outline" 
+                    className={`h-16 px-6 rounded-2xl font-black uppercase tracking-widest text-[10px] gap-3 backdrop-blur-sm transition-all hover:scale-[1.02] ${p.color}`}
+                  >
+                    <span className="text-lg">{p.icon}</span>
+                    {p.label}
+                  </Button>
+                ))}
+              </div>
             </div>
           )}
         </CardContent>
