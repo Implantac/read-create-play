@@ -6,6 +6,7 @@ import { m, AnimatePresence } from "framer-motion";
 import { Sparkles, Loader2, ChevronRight, ChevronLeft, Target, Settings2, Hash, Play, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { useGenerationHistory } from "@/hooks/useGenerationHistory";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
@@ -120,21 +121,19 @@ const GeradorPage = () => {
         <LotteryContextBanner />
       </div>
 
-      <div className="flex justify-between items-center mb-10 px-4">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="flex flex-col items-center gap-3 relative z-10">
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black transition-all duration-500 ${
-              step >= i ? "bg-primary text-primary-foreground shadow-premium shadow-primary/20 scale-110" : "bg-secondary text-muted-foreground border border-border/40"
-            }`}>
-              {i}
-            </div>
-            <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${step >= i ? "text-primary" : "text-muted-foreground opacity-40"}`}>
-              {i === 1 ? "Dataset" : i === 2 ? "Engine" : i === 3 ? "Volume" : "Sponsorship"}
-            </span>
-            {i < 4 && <div className={`absolute top-6 left-16 w-full h-[1px] hidden md:block ${step > i ? "bg-primary" : "bg-border/40"}`} style={{ width: 'calc(100% + 1rem)' }} />}
-          </div>
-        ))}
-
+      <div className="mb-10 px-4 space-y-6">
+        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">
+          <span>Progresso da Síntese</span>
+          <span>{Math.round((step / 4) * 100)}%</span>
+        </div>
+        <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+          <m.div 
+            className="h-full bg-primary"
+            initial={{ width: 0 }}
+            animate={{ width: `${(step / 4) * 100}%` }}
+            transition={{ duration: 0.5 }}
+          />
+        </div>
       </div>
 
       <AnimatePresence mode="wait">
@@ -151,10 +150,11 @@ const GeradorPage = () => {
                 <span className="text-5xl drop-shadow-lg">{config.icon}</span>
               </div>
               <div className="space-y-3">
+                <Badge variant="outline" className="px-3 py-1 bg-primary/10 text-primary border-primary/20 text-[10px] font-black uppercase tracking-widest italic mb-2">Step 01: Dataset Definition</Badge>
                 <h3 className="text-3xl font-black uppercase tracking-tighter italic">Dataset: {config.name}</h3>
-                <p className="text-muted-foreground text-base">O motor USE AI está pronto para processar dezenas {config.name} com as melhores métricas de convergência para o próximo SKU de mercado.</p>
+                <p className="text-muted-foreground text-base max-w-md mx-auto">O motor USE AI está pronto para processar dezenas {config.name} com as melhores métricas de convergência para o próximo SKU de mercado.</p>
               </div>
-              <Button onClick={nextStep} variant="premium" className="h-16 px-16 group rounded-full">
+              <Button onClick={nextStep} variant="premium" className="h-16 px-16 group rounded-full shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
                 Configurar Motor de Predição
                 <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
@@ -163,10 +163,11 @@ const GeradorPage = () => {
           )}
 
           {step === 2 && (
-            <div className="space-y-6">
-              <div className="text-center space-y-2 mb-8">
+            <div className="space-y-8">
+              <div className="text-center space-y-3 mb-10">
+                <Badge variant="outline" className="px-3 py-1 bg-primary/10 text-primary border-primary/20 text-[10px] font-black uppercase tracking-widest italic mb-2">Step 02: Engine Selection</Badge>
                 <h3 className="text-xl font-black uppercase tracking-tighter">Selecione o Motor de Predição</h3>
-                <p className="text-muted-foreground text-sm opacity-60">Escolha a heurística que governará a síntese da sua nova coleção de jogos.</p>
+                <p className="text-muted-foreground text-sm opacity-60 max-w-sm mx-auto">Escolha a heurística que governará a síntese da sua nova coleção de jogos.</p>
               </div>
               <div className="grid md:grid-cols-2 gap-6">
                 {STRATEGIES.map((s) => (
@@ -200,10 +201,11 @@ const GeradorPage = () => {
           )}
 
           {step === 3 && (
-            <Card className="glass-panel border-primary/20 p-8 space-y-8">
-              <div className="text-center space-y-2">
-                <h3 className="text-xl font-black uppercase tracking-tighter">Volume de Produção</h3>
-                <p className="text-muted-foreground">Quantas combinações de elite você deseja que a IA gere para esta estratégia?</p>
+            <Card className="glass-panel border-primary/20 p-10 space-y-10 rounded-[2.5rem]">
+              <div className="text-center space-y-3">
+                <Badge variant="outline" className="px-3 py-1 bg-primary/10 text-primary border-primary/20 text-[10px] font-black uppercase tracking-widest italic mb-2">Step 03: Production Volume</Badge>
+                <h3 className="text-2xl font-black uppercase tracking-tighter">Volume de Produção</h3>
+                <p className="text-muted-foreground max-w-sm mx-auto">Quantas combinações de elite você deseja que a IA gere para esta estratégia?</p>
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -248,13 +250,14 @@ const GeradorPage = () => {
           )}
 
           {step === 4 && (
-            <div className="space-y-8 animate-in zoom-in duration-500">
-              <div className="text-center space-y-2">
-                <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto border border-emerald-500/40 mb-4">
-                  <Target className="w-8 h-8 text-emerald-400" />
+            <div className="space-y-10 animate-in zoom-in duration-500">
+              <div className="text-center space-y-4">
+                <Badge variant="outline" className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] font-black uppercase tracking-widest italic mb-2">Step 04: Synthesis Output</Badge>
+                <div className="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto border border-emerald-500/40 mb-6 shadow-2xl shadow-emerald-500/20">
+                  <Target className="w-10 h-10 text-emerald-400" />
                 </div>
-                <h3 className="text-2xl font-black uppercase tracking-tighter">Coleção Sintetizada com Sucesso!</h3>
-                <p className="text-muted-foreground">O Quality Score médio destas combinações é superior a 85.</p>
+                <h3 className="text-3xl font-black uppercase tracking-tighter italic leading-none">Coleção Sintetizada!</h3>
+                <p className="text-muted-foreground font-medium opacity-60">O Quality Score médio das combinações é superior a 85%.</p>
               </div>
 
               <div className="space-y-4">
