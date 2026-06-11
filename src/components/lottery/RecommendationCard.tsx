@@ -60,8 +60,8 @@ export function RecommendationCard({ luckyGame, generating, onGenerate, onShowBr
                 <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                 <div className="grid grid-cols-2 gap-4 relative z-10">
                   <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 space-y-1">
-                    <p className="text-[9px] uppercase font-black text-primary/60 tracking-widest">IA Trust</p>
-                    <p className="text-2xl font-black italic tracking-tighter tabular-nums gradient-brand-text leading-none">{luckyGame.score}%</p>
+                    <p className="text-[9px] uppercase font-black text-primary/60 tracking-widest">Titan Score</p>
+                    <p className="text-2xl font-black italic tracking-tighter tabular-nums gradient-brand-text leading-none">{luckyGame.score}/100</p>
                   </div>
                   <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 space-y-1">
                     <p className="text-[9px] uppercase font-black text-emerald-400/60 tracking-widest">Tendência</p>
