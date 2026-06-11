@@ -32,7 +32,7 @@ export function TitanAIModule() {
           </h2>
           
           <p className="text-sm text-muted-foreground font-medium max-w-xl leading-relaxed">
-            Analise dezenas em tendência, melhores combinações e padrões detectados em tempo real pela nossa rede neural. Auxiliamos na sua tomada de decisão estratégica.
+            Titan AI Center é o módulo de inteligência aplicado às loterias brasileiras que analisa históricos oficiais, identifica padrões estatísticos e utiliza IA para gerar apostas mais estratégicas.
           </p>
         </div>
         
