@@ -40,7 +40,7 @@ const DashboardPage = () => {
               CENTRAL DE <span className="gradient-brand-text">INTELIGÊNCIA</span> TITAN
             </h1>
             <p className="text-muted-foreground font-medium max-w-lg opacity-60">
-              Análise baseada em dados históricos, estatística, probabilidade e inteligência artificial.
+              Titan Loterias é uma plataforma de inteligência aplicada às loterias brasileiras que analisa históricos oficiais, identifica padrões estatísticos e utiliza IA para gerar apostas mais estratégicas.
             </p>
           </div>
           
@@ -91,9 +91,9 @@ const DashboardPage = () => {
             
             <div className="space-y-4">
               {[
-                { title: "Tendência de Pares", value: "60% Favorável", desc: "Baseado nos últimos 10 concursos." },
-                { title: "Soma Ideal", value: "185 - 210", desc: "Intervalo de alta probabilidade detectado." },
-                { title: "Alerta de Ciclo", value: "Próximo ao Fim", desc: "Dezenas 14, 22 e 25 estão atrasadas." },
+                { title: "Tendência de Pares", value: "Estatística Premium", desc: "Titan Score 91/100 detectado." },
+                { title: "Soma Ideal", value: "IA Preditiva", desc: "Intervalo de alta probabilidade detectado." },
+                { title: "Alerta de Ciclo", value: "Cíclico Ativo", desc: "Dezenas em convergência estatística." },
               ].map((insight, i) => (
                 <div key={i} className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1">
                   <div className="flex justify-between items-center">

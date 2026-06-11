@@ -22,7 +22,7 @@ export function RecommendationCard({ luckyGame, generating, onGenerate, onShowBr
             <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
               <div className="flex-1 space-y-10 w-full text-center lg:text-left">
                 <div className="space-y-4">
-                  <p className="text-[11px] font-black uppercase tracking-[0.3em] text-primary/60 italic">Recomendação IA Titan</p>
+                  <p className="text-[11px] font-black uppercase tracking-[0.3em] text-primary/60 italic">RECOMENDAÇÃO IA TITAN PREMIUM</p>
                   <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
                     {luckyGame.numbers.map((n: number, idx: number) => (
                       <m.div 

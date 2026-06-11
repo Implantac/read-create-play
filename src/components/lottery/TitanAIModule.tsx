@@ -27,8 +27,8 @@ export function TitanAIModule() {
             </Badge>
           </div>
           
-          <h2 className="text-3xl font-black uppercase tracking-tighter italic italic">
-            Titan <span className="gradient-brand-text">AI Center</span>
+          <h2 className="text-3xl font-black uppercase tracking-tighter italic">
+            TITAN <span className="gradient-brand-text">AI CENTER</span>
           </h2>
           
           <p className="text-sm text-muted-foreground font-medium max-w-xl leading-relaxed">

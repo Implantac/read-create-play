@@ -7,7 +7,7 @@ export function TitanStatsModule() {
     { label: "Concursos Analisados", value: "14.502", icon: History, trend: "+100%", color: "text-emerald-400" },
     { label: "Estratégias Disponíveis", value: "48", icon: Target, trend: "Inteligência", color: "text-blue-400" },
     { label: "Tendências Detectadas", value: "321", icon: Zap, trend: "Real-time", color: "text-amber-400" },
-    { label: "Jogos Recomendados", value: "IA Premium", icon: BarChart3, trend: "Titan Score 91", color: "text-primary", info: "Oportunidade Estatística" },
+    { label: "Melhor Oportunidade", value: "IA Premium", icon: BarChart3, trend: "Titan Score 91", color: "text-primary", info: "Oportunidade Estatística" },
   ];
 
   return (
@@ -30,7 +30,7 @@ export function TitanStatsModule() {
           <div className="flex items-end justify-between">
             <div className="space-y-1">
               <h3 className="text-2xl font-black uppercase tracking-tighter italic leading-none">{stat.value}</h3>
-              {('info' in stat) && <p className="text-[8px] font-black uppercase text-emerald-400 tracking-widest">{stat.info}</p>}
+              {stat.info && <p className="text-[8px] font-black uppercase text-emerald-400 tracking-widest">{stat.info}</p>}
             </div>
             <Badge variant="outline" className="text-[9px] font-black tracking-widest uppercase border-white/10 text-muted-foreground bg-white/5">
               {stat.trend}

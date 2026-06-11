@@ -107,7 +107,7 @@ const GeradorPage = () => {
             </div>
           </div>
           <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-tight">
-            Motor de <span className="gradient-brand-text">Geração</span>
+            MOTOR DE <span className="gradient-brand-text">GERAÇÃO DE APOSTAS</span>
           </h1>
           <p className="text-sm text-muted-foreground font-medium max-w-lg leading-relaxed">
             Análises baseadas em dados históricos, estatística, probabilidade e inteligência artificial para auxiliar na sua tomada de decisão estratégica.

@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 
 import { LotteryLogosCarousel } from "@/components/lottery/LotteryLogosCarousel";
-import { ScreensShowcase } from "@/components/common/ScreensShowcase";
+import { ScreensShowcase } from "@/components/landing/ScreensShowcase";
 import { FloatingCTA } from "@/components/common/FloatingCTA";
 import { WhatsAppButton } from "@/components/common/WhatsAppButton";
 import { SocialProofBar } from "@/components/common/SocialProofBar";
@@ -63,12 +63,12 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden antialiased selection:bg-primary selection:text-white">
       <Helmet>
-        <title>Titan Loterias | Inteligência Artificial e Ciência de Dados</title>
-        <meta name="description" content="Aumente suas chances na Mega-Sena e Lotofácil com inteligência artificial e análise estatística profissional. Transforme sua sorte em ciência." />
-        <meta property="og:title" content="Titan Loterias | Transforme Sorte em Ciência" />
-        <meta property="og:description" content="Pare de apostar no escuro. Utilize inteligência artificial de elite para decifrar padrões e otimizar suas apostas." />
+        <title>Titan Loterias | Inteligência Artificial e Ciência de Dados Aplicada</title>
+        <meta name="description" content="Titan Loterias é uma plataforma de inteligência aplicada às loterias brasileiras que analisa históricos oficiais, identifica padrões estatísticos e utiliza IA para gerar apostas mais estratégicas." />
+        <meta property="og:title" content="Titan Loterias | Inteligência Artificial para Loterias" />
+        <meta property="og:description" content="Analise históricos oficiais, identifique padrões estatísticos e utilize IA para gerar apostas estratégicas." />
         <meta property="og:type" content="website" />
-        <meta name="keywords" content="Mega-Sena, Lotofácil, Quina, Inteligência Artificial, Loterias, Gerador de Apostas, Probabilidade, Estatística" />
+        <meta name="keywords" content="Mega-Sena, Lotofácil, Quina, Inteligência Artificial, Loterias, Gerador de Apostas, Probabilidade, Estatística, Análise de Dados" />
       </Helmet>
       
       <FloatingCTA />
@@ -142,7 +142,7 @@ export default function LandingPage() {
                 </span>
               </div>
               <p className="text-sm text-muted-foreground max-w-sm leading-relaxed font-medium">
-                Titan Loterias é a plataforma definitiva de inteligência analítica para apostadores profissionais. Unimos ciência de dados, IA e estatística para elevar suas chances ao próximo nível.
+                Titan Loterias é uma plataforma de inteligência aplicada às loterias brasileiras que analisa históricos oficiais, identifica padrões estatísticos e utiliza IA para gerar apostas mais estratégicas.
               </p>
             </div>
             <div>

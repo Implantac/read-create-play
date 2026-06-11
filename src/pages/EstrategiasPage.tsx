@@ -34,13 +34,13 @@ const EstrategiasPage = () => {
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
         </div>
         <div className="space-y-2">
-          <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
-            Biblioteca de <span className="gradient-brand-text">Estratégias</span>
-          </h1>
-          <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto font-medium">
-            Explore nossa biblioteca profissional de fechamentos, modelos preditivos e algoritmos de 
-            Machine Learning para otimizar sua tomada de decisão.
-          </p>
+            <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
+              LABORATÓRIO DE <span className="gradient-brand-text">ESTRATÉGIAS</span>
+            </h1>
+            <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto font-medium">
+              Explore nossa biblioteca profissional de fechamentos, modelos preditivos e algoritmos de 
+              Inteligência Artificial para otimizar sua tomada de decisão estratégica.
+            </p>
         </div>
       </div>
 
