@@ -129,7 +129,7 @@ const GeradorPage = () => {
               {i}
             </div>
             <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${step >= i ? "text-primary" : "text-muted-foreground opacity-40"}`}>
-              {i === 1 ? "Loteria" : i === 2 ? "Estratégia" : i === 3 ? "Volume" : "Resultado"}
+              {i === 1 ? "Dataset" : i === 2 ? "Engine" : i === 3 ? "Volume" : "Sponsorship"}
             </span>
             {i < 4 && <div className={`absolute top-6 left-16 w-full h-[1px] hidden md:block ${step > i ? "bg-primary" : "bg-border/40"}`} style={{ width: 'calc(100% + 1rem)' }} />}
           </div>
