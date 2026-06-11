@@ -91,9 +91,9 @@ const DashboardPage = () => {
             
             <div className="space-y-4">
               {[
-                { title: "Tendência de Pares", value: "60% Favorável", desc: "Baseado nos últimos 10 concursos." },
-                { title: "Soma Ideal", value: "185 - 210", desc: "Intervalo de alta probabilidade detectado." },
-                { title: "Alerta de Ciclo", value: "Próximo ao Fim", desc: "Dezenas 14, 22 e 25 estão atrasadas." },
+                { title: "Tendência de Pares", value: "Estatística Premium", desc: "Titan Score 91/100 detectado." },
+                { title: "Soma Ideal", value: "IA Preditiva", desc: "Intervalo de alta probabilidade detectado." },
+                { title: "Alerta de Ciclo", value: "Cíclico Ativo", desc: "Dezenas em convergência estatística." },
               ].map((insight, i) => (
                 <div key={i} className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1">
                   <div className="flex justify-between items-center">
