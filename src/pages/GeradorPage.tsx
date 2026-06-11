@@ -201,11 +201,10 @@ const GeradorPage = () => {
           )}
 
           {step === 3 && (
-            <Card className="glass-panel border-primary/20 p-10 space-y-10 rounded-[2.5rem]">
-              <div className="text-center space-y-3">
-                <Badge variant="outline" className="px-3 py-1 bg-primary/10 text-primary border-primary/20 text-[10px] font-black uppercase tracking-widest italic mb-2">Step 03: Production Volume</Badge>
-                <h3 className="text-2xl font-black uppercase tracking-tighter">Volume de Produção</h3>
-                <p className="text-muted-foreground max-w-sm mx-auto">Quantas combinações de elite você deseja que a IA gere para esta estratégia?</p>
+            <Card className="glass-panel border-primary/20 p-8 space-y-8">
+              <div className="text-center space-y-2">
+                <h3 className="text-xl font-black uppercase tracking-tighter">Volume de Apostas</h3>
+                <p className="text-muted-foreground">Quantos jogos você deseja que a IA gere para esta estratégia?</p>
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
