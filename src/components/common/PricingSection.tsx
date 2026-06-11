@@ -166,19 +166,19 @@ export function PricingSection() {
         <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
            <div className="flex flex-col items-center gap-2">
              <TrendingUp className="w-8 h-8" />
-             <p className="text-[10px] font-black uppercase tracking-widest text-center">Analytics ROI</p>
+             <p className="text-[10px] font-black uppercase tracking-widest text-center">ROI de Coleção</p>
            </div>
            <div className="flex flex-col items-center gap-2">
              <Zap className="w-8 h-8" />
-             <p className="text-[10px] font-black uppercase tracking-widest text-center">IA Autônoma</p>
+             <p className="text-[10px] font-black uppercase tracking-widest text-center">USE AI Nativa</p>
            </div>
            <div className="flex flex-col items-center gap-2">
              <Users className="w-8 h-8" />
-             <p className="text-[10px] font-black uppercase tracking-widest text-center">Gestão de Rede</p>
+             <p className="text-[10px] font-black uppercase tracking-widest text-center">Colaboração 360º</p>
            </div>
            <div className="flex flex-col items-center gap-2">
              <Brain className="w-8 h-8" />
-             <p className="text-[10px] font-black uppercase tracking-widest text-center">Neural Core</p>
+             <p className="text-[10px] font-black uppercase tracking-widest text-center">Neural Fashion Core</p>
            </div>
         </div>
       </div>
