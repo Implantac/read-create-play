@@ -55,7 +55,7 @@ export function LotteryLogosCarousel() {
                   {lottery.name}
                 </div>
                 <div className="text-[10px] text-muted-foreground font-mono">
-                  {lottery.numbers}
+                  {lottery.type}
                 </div>
               </div>
             </div>
