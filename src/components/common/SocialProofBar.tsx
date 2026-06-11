@@ -4,8 +4,8 @@ import { Shield, Lock, Users, Award } from "lucide-react";
 const badges = [
   { icon: Shield, label: "LGPD & Segurança Bancária" },
   { icon: Lock, label: "SSO & Autenticação MFA" },
-  { icon: Users, label: "+500 Indústrias Ativas" },
-  { icon: Award, label: "PLM #1 da América Latina" },
+  { icon: Users, label: "+15.000 Usuários Ativos" },
+  { icon: Award, label: "Estatística #1 da América Latina" },
 ];
 
 export function SocialProofBar() {

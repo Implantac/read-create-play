@@ -32,10 +32,10 @@ const resources = {
       },
       "landing": {
         "hero": {
-          "badge": "PROTOCOL TITAN • PLATAFORMA DE INTELIGÊNCIA PLM",
+          "badge": "PROTOCOL TITAN • INTELIGÊNCIA ANALÍTICA DE ELITE",
           "title": "Domine a Ciência.",
           "subtitle": "Conquiste a Sorte.",
-          "description": "Utilize a plataforma de PLM (Product Lifecycle Management) impulsionada por IA para transformar o caos estatístico em estratégias de jogo de alta performance. Onde a ciência de dados encontra o futuro das apostas.",
+          "description": "Utilize a plataforma de inteligência artificial de elite para transformar o caos estatístico em estratégias de jogo de alta performance. Onde a ciência de dados encontra o futuro das apostas.",
           "cta_primary": "Desbloquear Neural Core",
           "cta_secondary": "Acesso Membro"
         },

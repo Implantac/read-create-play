@@ -2,7 +2,7 @@ import { MessageCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const WHATSAPP_NUMBER = "5543998581400";
-const WHATSAPP_MESSAGE = encodeURIComponent("Olá! Gostaria de agendar uma demonstração do USE MODA PLM AI.");
+const WHATSAPP_MESSAGE = encodeURIComponent("Olá! Gostaria de saber mais sobre o Titan Loterias.");
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`;
 
 export function WhatsAppButton() {

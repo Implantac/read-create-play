@@ -42,14 +42,14 @@ export function PricingSection() {
 
   const plans = [
     {
-      name: "Standard Hub",
+      name: "Plano Grátis",
       price: "R$ 0",
-      description: "Ideal para marcas em estágio inicial.",
+      description: "Ideal para quem está começando.",
       features: [
-        "Até 50 SKUs ativos",
-        "Mood Board Colaborativo",
-        "Ficha Técnica Essencial",
-        "Workflow de Aprovação",
+        "Acesso limitado",
+        "Simulador básico",
+        "Resultados diários",
+        "Estatísticas fundamentais",
       ],
       cta: "Começar Grátis",
       popular: false,
@@ -57,18 +57,18 @@ export function PricingSection() {
       icon: Shield
     },
     {
-      name: "Enterprise PLM",
+      name: "Acesso Vitalício",
       price: LAUNCH_PRICE,
-      description: "O ecossistema completo USE MODA.",
+      description: "O ecossistema completo Titan Loterias.",
       features: [
-        "Acesso Full USE AI",
-        "Digital Twin da Coleção",
-        "ERP Nativo Integrado",
-        "BI Executivo Pro",
-        "Multi-marca & Multi-unidade",
+        "Acesso Vitalício",
+        "Gerador de Apostas Ilimitado",
+        "IA Avançada & Neural Core",
+        "Fechamentos Matemáticos Pro",
+        "Simulações & Backtests",
         "Suporte VIP 24/7",
-        "Onboarding Dedicado",
-        "Migração de Dados Inclusa",
+        "Planilhas Premium Inclusas",
+        "Atualizações Vitalícias",
       ],
       cta: "Contratar Solução Elite",
       popular: true,
@@ -96,7 +96,7 @@ export function PricingSection() {
             Investimento em <span className="gradient-brand-text">Eficiência</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-70">
-            Assuma o controle total da sua indústria com as ferramentas que estão redefinindo a moda global.
+            Assuma o controle total das suas apostas com as ferramentas que estão redefinindo a ciência da sorte.
           </p>
         </motion.div>
 
@@ -166,19 +166,19 @@ export function PricingSection() {
         <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
            <div className="flex flex-col items-center gap-2">
              <TrendingUp className="w-8 h-8" />
-             <p className="text-[10px] font-black uppercase tracking-widest text-center">ROI de Coleção</p>
+             <p className="text-[10px] font-black uppercase tracking-widest text-center">Estatística Avançada</p>
            </div>
            <div className="flex flex-col items-center gap-2">
              <Zap className="w-8 h-8" />
-             <p className="text-[10px] font-black uppercase tracking-widest text-center">USE AI Nativa</p>
+             <p className="text-[10px] font-black uppercase tracking-widest text-center">Titan IA Nativa</p>
            </div>
            <div className="flex flex-col items-center gap-2">
              <Users className="w-8 h-8" />
-             <p className="text-[10px] font-black uppercase tracking-widest text-center">Colaboração 360º</p>
+             <p className="text-[10px] font-black uppercase tracking-widest text-center">Matrizes Matemáticas</p>
            </div>
            <div className="flex flex-col items-center gap-2">
              <Brain className="w-8 h-8" />
-             <p className="text-[10px] font-black uppercase tracking-widest text-center">Neural Fashion Core</p>
+             <p className="text-[10px] font-black uppercase tracking-widest text-center">Neural Core Alpha</p>
            </div>
         </div>
       </div>
