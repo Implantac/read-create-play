@@ -128,6 +128,19 @@ const resources = {
             }
           }
         }
+        "leads": {
+          "title": "Pronto para liderar o mercado?",
+          "subtitle": "Solicite uma demonstração personalizada e descubra como o USE MODA pode transformar sua operação.",
+          "name_label": "Nome Completo",
+          "email_label": "E-mail Profissional",
+          "company_label": "Nome da Empresa",
+          "role_label": "Cargo / Função",
+          "phone_label": "WhatsApp / Telefone",
+          "consent_label": "Concordo em receber comunicações e aceito os Termos de Privacidade.",
+          "submit_button": "Solicitar Demonstração",
+          "success_message": "Sua solicitação foi enviada com sucesso! Nossa equipe entrará em contato em breve.",
+          "error_message": "Houve um erro ao enviar sua solicitação. Por favor, tente novamente ou entre em contato via WhatsApp."
+        }
       },
 
 
