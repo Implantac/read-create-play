@@ -250,14 +250,13 @@ const GeradorPage = () => {
           )}
 
           {step === 4 && (
-            <div className="space-y-10 animate-in zoom-in duration-500">
-              <div className="text-center space-y-4">
-                <Badge variant="outline" className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] font-black uppercase tracking-widest italic mb-2">Step 04: Synthesis Output</Badge>
-                <div className="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto border border-emerald-500/40 mb-6 shadow-2xl shadow-emerald-500/20">
-                  <Target className="w-10 h-10 text-emerald-400" />
+            <div className="space-y-8 animate-in zoom-in duration-500">
+              <div className="text-center space-y-2">
+                <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto border border-emerald-500/40 mb-4">
+                  <Target className="w-8 h-8 text-emerald-400" />
                 </div>
-                <h3 className="text-3xl font-black uppercase tracking-tighter italic leading-none">Coleção Sintetizada!</h3>
-                <p className="text-muted-foreground font-medium opacity-60">O Quality Score médio das combinações é superior a 85%.</p>
+                <h3 className="text-2xl font-black uppercase tracking-tighter">Jogos Gerados com Sucesso!</h3>
+                <p className="text-muted-foreground">O Titan Score médio destas combinações é superior a 85.</p>
               </div>
 
               <div className="space-y-4">
