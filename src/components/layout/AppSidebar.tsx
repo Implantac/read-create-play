@@ -91,7 +91,7 @@ export function AppSidebar() {
                 )}
               </div>
               <p className="text-[9px] text-muted-foreground font-black tracking-[0.3em] uppercase opacity-40 mt-0.5">
-                Neural Core v7.5
+                PLM AI • v2.0 Elite
               </p>
             </div>
           )}
