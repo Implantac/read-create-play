@@ -23,7 +23,7 @@ export function DashboardHeader({ statsCount, drawsCount }: DashboardHeaderProps
           Sua Melhor <span className="gradient-brand-text">Oportunidade</span> Hoje
         </h1>
         <p className="text-sm text-muted-foreground font-medium max-w-lg leading-relaxed">
-          O assistente Titan processou {statsCount} dezenas e {drawsCount} concursos. Receba agora sua recomendação de alta convergência.
+          O motor USE AI processou {statsCount} dezenas e {drawsCount} concursos. Receba agora sua recomendação de alta convergência.
         </p>
       </div>
     </div>
