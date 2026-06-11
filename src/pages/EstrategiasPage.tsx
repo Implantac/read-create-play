@@ -35,11 +35,11 @@ const EstrategiasPage = () => {
         </div>
         <div className="space-y-2">
           <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
-            Laboratório de <span className="gradient-brand-text not-italic">Estratégias</span>
+            Biblioteca de <span className="gradient-brand-text">Estratégias</span>
           </h1>
           <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto font-medium">
-            Machine Learning, otimização genética e análise preditiva de alta frequência para 
-            maximizar suas probabilidades matemáticas.
+            Explore nossa biblioteca profissional de fechamentos, modelos preditivos e algoritmos de 
+            Machine Learning para otimizar sua tomada de decisão.
           </p>
         </div>
       </div>
