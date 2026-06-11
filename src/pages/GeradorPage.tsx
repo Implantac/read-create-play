@@ -273,8 +273,8 @@ const GeradorPage = () => {
                         </div>
                         <div className="flex items-center gap-6 shrink-0">
                           <div className="text-right">
-                            <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Score IA</p>
-                            <p className="text-2xl font-black text-primary italic">{res.score}</p>
+                            <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Efficiency</p>
+                            <p className="text-2xl font-black text-primary italic">{res.score}%</p>
                           </div>
                           <Button 
                             variant="outline" 
