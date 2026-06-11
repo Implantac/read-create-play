@@ -67,7 +67,7 @@ export function AppHeader({
                 </span>
               </div>
             </TooltipTrigger>
-            <TooltipContent>Sorteios carregados no banco</TooltipContent>
+            <TooltipContent>Dataset de coleções (Loto-Sourced)</TooltipContent>
           </Tooltip>
 
           <Tooltip>
