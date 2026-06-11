@@ -11,29 +11,26 @@ export function Navbar() {
     <nav className="fixed top-0 inset-x-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 h-20 md:h-24 flex items-center">
       <div className="container mx-auto px-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-4 group">
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-2xl shadow-primary/10 group-hover:shadow-primary/20 group-hover:scale-105 transition-all duration-700 overflow-hidden border border-white/10 bg-black">
-            <span className="text-xl font-black text-white italic tracking-tighter">UM</span>
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl shadow-primary/20 group-hover:shadow-primary/40 group-hover:scale-110 transition-all duration-700 overflow-hidden border border-white/10 bg-background/50">
+            <img src="/logo.png" alt="Titan Loterias" className="w-14 h-14 object-contain" />
           </div>
           <div className="flex flex-col">
             <span className="text-2xl font-black tracking-tighter uppercase italic leading-none">
-              USE<span className="gradient-brand-text ml-0.5">MODA</span>
+              Titan<span className="gradient-brand-text ml-0.5">Loterias</span>
             </span>
-            <span className="text-[9px] font-black tracking-[0.4em] uppercase opacity-40 mt-1">PLM AI • v2.0 Elite</span>
+            <span className="text-[10px] font-black tracking-[0.3em] uppercase opacity-40 mt-1">Neural Core v7.5 Alpha</span>
           </div>
         </Link>
         <div className="hidden lg:flex items-center gap-10">
-          <Link to="/about" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-all">
-            Plataforma
+          <Link to="/signup" className="text-xs font-black uppercase tracking-widest text-neon-amber hover:text-neon-amber/80 transition-all">
+            {t("common.vital_access")}
           </Link>
-          <Link to="/solutions" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-all">
-            Soluções
-          </Link>
-          <Link to="/login" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all">
+          <Link to="/login" className="text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all">
             {t("common.login")}
           </Link>
           <Link to="/signup">
-            <Button size="lg" variant="premium" className="h-12 px-10 text-[10px] font-black uppercase tracking-widest rounded-full">
-              {t("landing.hero.cta_primary")} <ArrowRight className="w-4 h-4 ml-2" />
+            <Button size="lg" variant="premium" className="h-12 px-10">
+              {t("common.join_network")} <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>
         </div>

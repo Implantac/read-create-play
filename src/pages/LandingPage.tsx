@@ -61,12 +61,12 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden antialiased selection:bg-primary selection:text-white">
       <Helmet>
-        <title>USE MODA PLM AI | A Revolução Digital na Moda</title>
-        <meta name="description" content="A primeira plataforma de PLM com IA generativa e ERP nativo. Transforme sua indústria com inteligência preditiva e gestão 360º." />
-        <meta property="og:title" content="USE MODA PLM AI | O Futuro da Moda é Inteligente" />
-        <meta property="og:description" content="Substitua o caos por previsibilidade. A plataforma definitiva para marcas de moda de elite." />
+        <title>Titan Loterias | Inteligência Artificial e Ciência de Dados</title>
+        <meta name="description" content="Aumente suas chances na Mega-Sena e Lotofácil com inteligência artificial e análise estatística profissional. Transforme sua sorte em ciência." />
+        <meta property="og:title" content="Titan Loterias | Transforme Sorte em Ciência" />
+        <meta property="og:description" content="Pare de apostar no escuro. Utilize inteligência artificial de elite para decifrar padrões e otimizar suas apostas." />
         <meta property="og:type" content="website" />
-        <meta name="keywords" content="PLM Moda, ERP Moda, Inteligência Artificial Moda, Gestão de Coleções, Ficha Técnica Moda, Indústria Têxtil" />
+        <meta name="keywords" content="Mega-Sena, Lotofácil, Quina, Inteligência Artificial, Loterias, Gerador de Apostas, Probabilidade, Estatística" />
       </Helmet>
       
       <FloatingCTA />
@@ -84,7 +84,7 @@ export default function LandingPage() {
       <section className="py-12 border-y border-white/5 bg-black/20 overflow-hidden">
         <div className="container mx-auto px-6">
           <p className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground text-center mb-8 opacity-40">
-            Poder de processamento utilizado pelas maiores holdings de moda
+            Poder de processamento e inteligência analítica de elite
           </p>
           <LotteryLogosCarousel />
         </div>
@@ -108,10 +108,10 @@ export default function LandingPage() {
               Processamento em Tempo Real
             </div>
             <h2 className="text-5xl md:text-8xl font-black tracking-tighter uppercase italic leading-[0.8] mb-6">
-              Neural <span className="gradient-brand-text">Trend Monitor</span>
+              Neural <span className="gradient-brand-text">Command Center</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-60">
-              Acompanhe a IA processando tendências globais e otimizando mix de produtos em microssegundos.
+              Acompanhe o processamento dos nossos algoritmos e a detecção de padrões em tempo real.
             </p>
           </div>
           <div className="max-w-6xl mx-auto">
@@ -126,32 +126,28 @@ export default function LandingPage() {
       <PricingSection />
       <FAQSection />
 
-      <LeadCaptureForm />
-
       <footer className="py-24 border-t border-white/5 bg-black/60 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-20" />
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid md:grid-cols-4 gap-16 mb-24">
             <div className="col-span-2 space-y-8">
               <div className="flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-xl bg-black border border-white/10 flex items-center justify-center font-black text-xl italic transition-all group-hover:border-primary/40">
-                  UM
-                </div>
+                <img src="/logo.png" alt="Titan Loterias" className="w-12 h-12 grayscale opacity-50" />
                 <span className="text-2xl font-black uppercase tracking-tighter italic leading-none">
-                  USE<span className="text-primary/70">MODA</span>
+                  Titan<span className="text-primary/70">Loterias</span>
                 </span>
               </div>
               <p className="text-sm text-muted-foreground max-w-sm leading-relaxed font-medium">
-                USE MODA PLM AI é a plataforma definitiva de inteligência para a indústria fashion global. Unimos IA generativa, ERP nativo e análise preditiva para escalar marcas com perfeição técnica.
+                Titan Loterias é a plataforma definitiva de inteligência analítica para apostadores profissionais. Unimos ciência de dados, IA e estatística para elevar suas chances ao próximo nível.
               </p>
             </div>
             <div>
-              <h4 className="font-black uppercase tracking-[0.3em] text-[10px] text-primary mb-8 italic">Ecossistema</h4>
+              <h4 className="font-black uppercase tracking-[0.3em] text-[10px] text-primary mb-8 italic">Plataforma</h4>
               <ul className="space-y-4 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
-                <li><Link to="/ai-analyst" className="hover:text-primary transition-colors">USE AI Analyst</Link></li>
-                <li><Link to="/plm" className="hover:text-primary transition-colors">PLM Hub</Link></li>
-                <li><Link to="/erp" className="hover:text-primary transition-colors">ERP Nativo</Link></li>
-                <li><Link to="/bi" className="hover:text-primary transition-colors">Business Intelligence</Link></li>
+                <li><Link to="/gerador" className="hover:text-primary transition-colors">Gerador de Apostas</Link></li>
+                <li><Link to="/analise" className="hover:text-primary transition-colors">Central de Análise</Link></li>
+                <li><Link to="/fechamentos" className="hover:text-primary transition-colors">Fechamentos</Link></li>
+                <li><Link to="/planos" className="hover:text-primary transition-colors">Planos</Link></li>
               </ul>
             </div>
             <div>
@@ -166,7 +162,7 @@ export default function LandingPage() {
           </div>
           <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
             <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.4em]">
-              © {new Date().getFullYear()} USE MODA PLM AI. MADE IN ITALY • ENGINEERED GLOBALLY.
+              © {new Date().getFullYear()} Titan Loterias. Todos os direitos reservados.
             </p>
             <div className="flex items-center gap-8">
               <WhatsAppButton />
