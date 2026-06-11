@@ -2,10 +2,10 @@ import { motion } from "framer-motion";
 import { Shield, Lock, Users, Award } from "lucide-react";
 
 const badges = [
-  { icon: Shield, label: "Dados Oficiais da Caixa" },
-  { icon: Lock, label: "100% Seguro (SSL)" },
-  { icon: Users, label: "5.000+ Jogadores Ativos" },
-  { icon: Award, label: "Plataforma #1 do Brasil" },
+  { icon: Shield, label: "LGPD & Segurança Bancária" },
+  { icon: Lock, label: "SSO & Autenticação MFA" },
+  { icon: Users, label: "+500 Indústrias Ativas" },
+  { icon: Award, label: "PLM #1 da América Latina" },
 ];
 
 export function SocialProofBar() {
