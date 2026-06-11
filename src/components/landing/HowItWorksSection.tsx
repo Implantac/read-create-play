@@ -7,7 +7,9 @@ export function HowItWorksSection() {
   const steps = [
     { step: "01", title: t("landing.how_it_works.step1.title"), desc: t("landing.how_it_works.step1.desc") },
     { step: "02", title: t("landing.how_it_works.step2.title"), desc: t("landing.how_it_works.step2.desc") },
-    { step: "03", title: t("landing.how_it_works.step3.title"), desc: t("landing.how_it_works.step3.desc") }
+    { step: "03", title: t("landing.how_it_works.step3.title"), desc: t("landing.how_it_works.step3.desc") },
+    { step: "04", title: t("landing.how_it_works.step4.title"), desc: t("landing.how_it_works.step4.desc") },
+    { step: "05", title: t("landing.how_it_works.step5.title"), desc: t("landing.how_it_works.step5.desc") }
   ];
 
   return (
