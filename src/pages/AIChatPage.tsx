@@ -196,7 +196,7 @@ const AIChatPage = () => {
             <Brain className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-xl font-black uppercase tracking-tighter italic">Titan Concierge</h1>
+            <h1 className="text-xl font-black uppercase tracking-tighter italic">Titan AI Center</h1>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">IA Especialista Online</span>
@@ -230,7 +230,7 @@ const AIChatPage = () => {
                 </div>
               </div>
               <div className="space-y-4 max-w-md">
-                <h2 className="text-3xl font-black tracking-tighter uppercase italic leading-none">Como posso <span className="gradient-brand-text">te ajudar</span> a vencer?</h2>
+                <h2 className="text-3xl font-black tracking-tighter uppercase italic leading-none">Como o <span className="gradient-brand-text">AI Center</span> pode otimizar seus jogos?</h2>
                 <p className="text-sm text-muted-foreground font-medium leading-relaxed">
                   Sou seu analista de elite. Analiso milhões de dados em segundos para te dar a vantagem matemática definitiva.
                 </p>
