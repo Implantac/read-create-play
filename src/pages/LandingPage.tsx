@@ -164,7 +164,7 @@ export default function LandingPage() {
           </div>
           <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
             <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.4em]">
-              © {new Date().getFullYear()} USE MODA PLM AI. MADE IN ITALY • ENGINEERED GLOBALLY.
+              © {new Date().getFullYear()} Titan Loterias. Todos os direitos reservados.
             </p>
             <div className="flex items-center gap-8">
               <WhatsAppButton />
