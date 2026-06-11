@@ -51,10 +51,10 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             animate="visible"
             custom={1}
             variants={fadeUp}
-            className="text-4xl md:text-[6rem] lg:text-[7.5rem] font-black tracking-tighter uppercase italic leading-[0.85] mb-8"
+            className="text-4xl md:text-[5rem] lg:text-[6.5rem] font-black tracking-tighter uppercase italic leading-[0.85] mb-8"
           >
             <span className="block text-foreground drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)]">INTELIGÊNCIA ARTIFICIAL PARA</span>
-            <span className="block gradient-brand-text not-italic leading-none text-[3.5rem] md:text-[5rem] lg:text-[7rem]">LOTERIAS BRASILEIRAS</span>
+            <span className="block gradient-brand-text not-italic leading-none">LOTERIAS BRASILEIRAS</span>
           </motion.h1>
           
           <motion.p 
