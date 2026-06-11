@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { requireUserAuth, corsHeaders } from "../_shared/auth.ts";
 
 interface ChatMessage {
@@ -35,24 +36,60 @@ serve(async (req) => {
       });
     }
 
-    const systemPrompt = `Você é o **Titan IA**, assistente especialista em loterias brasileiras (Mega-Sena, Lotofácil, Quina, Lotomania, Dupla Sena, Timemania, Dia de Sorte, Super Sete).
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
 
-CONTEXTO ATUAL:
-- Loteria selecionada pelo usuário: ${lotteryId}
-${userContext ? `- Perfil de aprendizado do usuário:\n${userContext}` : ""}
+    // Fetch real-time data from database
+    const [drawsResult, insightsResult] = await Promise.all([
+      supabaseClient
+        .from("lottery_draws")
+        .select("concurso, draw_date, numbers")
+        .eq("lottery_id", lotteryId)
+        .order("concurso", { ascending: false })
+        .limit(10),
+      supabaseClient
+        .from("system_insights")
+        .select("title, content, insight_type")
+        .eq("lottery_id", lotteryId)
+        .order("created_at", { ascending: false })
+        .limit(5)
+    ]);
+
+    const drawsData = drawsResult.data || [];
+    const insightsData = insightsResult.data || [];
+
+    const formattedDraws = drawsData.map(d => 
+      `Concurso ${d.concurso} (${d.draw_date}): ${d.numbers.join(", ")}`
+    ).join("\n");
+
+    const formattedInsights = insightsData.map(i => 
+      `- [${i.insight_type.toUpperCase()}] ${i.title}: ${i.content}`
+    ).join("\n");
+
+    const systemPrompt = `Você é o **Titan IA**, assistente de elite do **Titan Loterias**, plataforma brasileira de inteligência estatística de luxo.
+
+DADOS REAIS DA LOTERIA (${lotteryId}):
+ÚLTIMOS 10 CONCURSOS:
+${formattedDraws || "Nenhum dado disponível no momento."}
+
+INSIGHTS E MÉTRICAS RECENTES:
+${formattedInsights || "Aguardando novos sinais de rede neural..."}
+
+CONTEXTO DO USUÁRIO:
+${userContext ? `- Perfil de aprendizado:\n${userContext}` : "Usuário novo ou sem perfil específico."}
 
 DIRETRIZES DE RESPOSTA:
-- Português do Brasil. Direto ao ponto, sem rodeios nem preâmbulos.
-- **Estrutura obrigatória** quando a pergunta envolver análise:
-  1. **Diagnóstico** (1 linha)
-  2. **Evidência estatística** com números concretos (freq, atraso, χ², entropia, lift, z-score)
-  3. **Recomendação acionável**
-- Markdown rico: títulos H2/H3, **negrito** para destaques, tabelas para comparações, listas densas, \`code\` para números.
-- Quando gerar jogos: dezenas em **negrito**, 2 dígitos (ex: **02, 07, 13**), uma sugestão por linha, sempre acompanhadas de justificativa estatística.
-- Baseie tudo em estatística real (frequência, atraso, ciclos, par/ímpar, soma, faixas, primos, fechamentos, Markov, χ²).
-- Cite métricas reais; nunca invente números. Se não tiver dado, diga.
-- Evite parágrafos longos: prefira bullets densos. Nunca repita o que o usuário disse.
-- Nunca prometa vitória. Reforce: "loterias são jogos de azar — jogue com responsabilidade".`;
+- Português do Brasil. Tom profissional, sênior, direto e analítico.
+- Estrutura obrigatória:
+  1. **Diagnóstico** (1 linha rápida)
+  2. **Análise de Dados** (use os números dos concursos e insights fornecidos acima)
+  3. **Recomendação Acionável** (estratégia clara)
+- Use markdown rico, tabelas e \`code\` para números.
+- Seja honesto: se os dados acima mostrarem uma tendência, use-a. Se o usuário perguntar algo fora desse contexto, use seu conhecimento geral mas priorize os dados reais fornecidos.
+- Nunca prometa vitória. Reforce a responsabilidade no jogo.`;
 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
