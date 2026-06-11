@@ -65,10 +65,10 @@ export function FeaturesSection({ featuresRef, featuresRotateX, fadeUp }: Featur
       <motion.div style={{ rotateX: featuresRotateX }} className="container mx-auto px-6">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-24 space-y-4">
           <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic">
-            {t("landing.features.title").split(" ").map((word, i) => i === 2 ? <span key={i} className="gradient-brand-text">{word} </span> : word + " ")}
+            CENTRO DE <span className="gradient-brand-text">INTELIGÊNCIA</span> TITAN
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-70">
-            {t("landing.features.subtitle")}
+            O sistema abandona qualquer aparência de simples gerador e se posiciona como uma Plataforma de Inteligência Estatística para Loterias Brasileiras.
           </p>
         </motion.div>
 
