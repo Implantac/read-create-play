@@ -103,14 +103,14 @@ const GeradorPage = () => {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Neural Synthesis v2.0 Elite</span>
+              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Neural Generator v6.0</span>
             </div>
           </div>
           <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-tight">
-            Neural <span className="gradient-brand-text">Synthesis Lab</span>
+            Assistente de <span className="gradient-brand-text">Geração</span>
           </h1>
           <p className="text-sm text-muted-foreground font-medium max-w-lg leading-relaxed">
-            Configure seu fluxo de predição. O motor USE AI utiliza heurísticas avançadas para processar dados brutos e gerar coleções de alta performance.
+            Configure seu fluxo de predição. O motor Titan utiliza heurísticas avançadas para maximizar a convergência matemática.
           </p>
         </div>
       </div>
