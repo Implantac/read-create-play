@@ -62,7 +62,7 @@ const PageLoader = () => (
         </div>
       </div>
       <div className="space-y-1 text-center">
-        <p className="text-xs font-mono text-primary uppercase tracking-[0.3em] animate-pulse">Titan OS</p>
+        <p className="text-xs font-mono text-primary uppercase tracking-[0.3em] animate-pulse">USE MODA AI</p>
         <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-widest opacity-50">Iniciando Neural Core...</p>
       </div>
     </div>
