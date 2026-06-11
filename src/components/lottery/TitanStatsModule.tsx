@@ -7,7 +7,7 @@ export function TitanStatsModule() {
     { label: "Concursos Analisados", value: "14.502", icon: History, trend: "+100%", color: "text-emerald-400" },
     { label: "Estratégias Disponíveis", value: "48", icon: Target, trend: "Inteligência", color: "text-blue-400" },
     { label: "Tendências Detectadas", value: "321", icon: Zap, trend: "Real-time", color: "text-amber-400" },
-    { label: "Jogos Recomendados", value: "IA Premium", icon: BarChart3, trend: "Titan Score 91", color: "text-primary", info: "Oportunidade Estatística" },
+    { label: "Melhor Oportunidade", value: "IA Premium", icon: BarChart3, trend: "Titan Score 91", color: "text-primary", info: "Oportunidade Estatística" },
   ];
 
   return (

@@ -81,10 +81,10 @@ const EstatisticasPage = () => {
             </div>
           </div>
           <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
-            Estatísticas <span className="gradient-brand-text">Avançadas</span>
+            MÓDULO DE <span className="gradient-brand-text">ANÁLISE HISTÓRICA</span>
           </h1>
           <p className="text-sm text-muted-foreground font-medium max-w-lg leading-relaxed">
-            Exploração dimensional profunda. Analise ciclos, tendências e anomalias com precisão matemática institucional.
+            Análise profunda de frequência, atraso, repetição, distribuição, pares e ímpares, somas, moldura e centro.
           </p>
         </div>
 

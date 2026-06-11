@@ -64,7 +64,7 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             variants={fadeUp}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed"
           >
-            Analise milhares de concursos, descubra padrões ocultos e gere apostas utilizando estratégias matemáticas avançadas e IA. O Titan Loterias é a plataforma definitiva de inteligência aplicada às loterias brasileiras.
+            Analise milhares de concursos, descubra padrões ocultos e gere apostas utilizando estratégias matemáticas avançadas e IA.
           </motion.p>
         </div>
 

@@ -32,7 +32,7 @@ const SimulacoesPage = () => {
     <div className="space-y-10 animate-in fade-in duration-700">
       <PageHeader
         title="Simulador Histórico"
-        description="Ambiente de validação massiva via Monte Carlo e Backtesting de alta profundidade histórica."
+        description="Execute qualquer estratégia contra concursos passados e analise o desempenho histórico, acertos e eficiência teórica."
         icon={FlaskConical}
         badge="SIMULATION CORE v4.0"
       />
