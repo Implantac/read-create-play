@@ -220,14 +220,14 @@ export default function LotofacilPremiumPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-4">
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Intelligence Suite v6.0</span>
+            <span className="px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Intelligence Suite v2.0 Elite</span>
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
           </div>
           <h1 className="text-4xl md:text-6xl font-black text-foreground tracking-tighter italic uppercase leading-tight">
-            Lotofácil <span className="gradient-brand-text not-italic">Elite</span>
+            Lotofácil <span className="gradient-brand-text not-italic">Premium Hub</span>
           </h1>
           <p className="text-sm text-muted-foreground font-medium max-w-2xl leading-relaxed">
-            Seu ambiente profissional de alta performance. Sincronizado com os últimos sorteios e processado por nossa IA proprietária.
+            Seu ambiente profissional de alta performance para análise de dados e predição. Sincronizado com os últimos sorteios e processado pela inteligência USE AI.
           </p>
         </div>
 
