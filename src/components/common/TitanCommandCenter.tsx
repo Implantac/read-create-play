@@ -12,25 +12,25 @@ export const TitanCommandCenter = () => {
   const selectedLottery = ctx?.selectedLottery ?? "lotofacil";
   const [uptime, setUptime] = React.useState(0);
   const [logs, setLogs] = React.useState<string[]>([
-    "Initializating Neural Core...",
-    "Syncing historical data tensors...",
-    "Kernel version 5.2.0 established."
+    "Initializing USE AI Neural Core...",
+    "Syncing Milan & Paris trend tensors...",
+    "Digital Twin protocol established."
   ]);
 
   React.useEffect(() => {
     const timer = setInterval(() => setUptime(u => u + 1), 1000);
     const logInterval = setInterval(() => {
       const events = [
-        "Neural weights redistributed",
-        "Entropy variance detected",
-        "Processing quantum patterns",
-        "Alpha signal stabilized",
-        "Cache invalidated",
-        "P2P handshake verified"
+        "Analyzing fiber density patterns",
+        "Optimizing supply chain routes",
+        "Processing generative mood boards",
+        "Predicting Summer 2026 demand",
+        "Validating textile sustainability",
+        "Syncing factory node LATAM-04"
       ];
       const newLog = events[Math.floor(Math.random() * events.length)];
       setLogs(prev => [newLog, ...prev.slice(0, 4)]);
-    }, 4000);
+    }, 3000);
 
     return () => {
       clearInterval(timer);
