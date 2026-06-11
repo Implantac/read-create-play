@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 interface RecommendationCardProps {
   luckyGame: any;
   generating: boolean;
-  onGenerate: () => void;
+  onGenerate: (profile?: any) => void;
   onShowBriefing: () => void;
 }
 
