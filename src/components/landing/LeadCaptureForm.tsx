@@ -70,6 +70,7 @@ export function LeadCaptureForm() {
 
       toast.success(t("landing.leads.success_message"));
       form.reset();
+      navigate("/obrigado");
     } catch (error: any) {
       console.error("Error submitting lead:", error);
       toast.error(t("landing.leads.error_message"));
