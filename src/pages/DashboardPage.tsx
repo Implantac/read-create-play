@@ -37,10 +37,10 @@ const DashboardPage = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2">
             <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
-              Central de <span className="gradient-brand-text">Inteligência</span> Titan
+              CENTRAL DE <span className="gradient-brand-text">INTELIGÊNCIA</span> TITAN
             </h1>
             <p className="text-muted-foreground font-medium max-w-lg opacity-60">
-              O seu centro operacional para análise estatística avançada e predição de alta performance.
+              Análise baseada em dados históricos, estatística, probabilidade e inteligência artificial.
             </p>
           </div>
           

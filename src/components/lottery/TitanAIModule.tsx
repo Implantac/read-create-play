@@ -32,7 +32,7 @@ export function TitanAIModule() {
           </h2>
           
           <p className="text-sm text-muted-foreground font-medium max-w-xl leading-relaxed">
-            Interaja com o Titan Core para descobrir dezenas em tendência, melhores combinações para hoje e padrões detectados em tempo real pela nossa rede neural.
+            Analise dezenas em tendência, melhores combinações e padrões detectados em tempo real pela nossa rede neural. Auxiliamos na sua tomada de decisão estratégica.
           </p>
         </div>
         

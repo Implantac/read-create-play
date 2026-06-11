@@ -5,9 +5,9 @@ import { BarChart3, Binary, History, Target, Zap } from "lucide-react";
 export function TitanStatsModule() {
   const stats = [
     { label: "Concursos Analisados", value: "14.502", icon: History, trend: "+100%", color: "text-emerald-400" },
-    { label: "Estratégias Ativas", value: "48", icon: Target, trend: "Optimization", color: "text-blue-400" },
+    { label: "Estratégias Disponíveis", value: "48", icon: Target, trend: "Inteligência", color: "text-blue-400" },
     { label: "Tendências Detectadas", value: "321", icon: Zap, trend: "Real-time", color: "text-amber-400" },
-    { label: "Melhor Op. do Dia", value: "Lotofácil", icon: BarChart3, trend: "Titan Score 94", color: "text-primary" },
+    { label: "Melhor Op. do Dia", value: "Lotofácil", icon: BarChart3, trend: "Titan Score 91", color: "text-primary" },
   ];
 
   return (

@@ -110,7 +110,7 @@ const GeradorPage = () => {
             Motor de <span className="gradient-brand-text">Geração</span>
           </h1>
           <p className="text-sm text-muted-foreground font-medium max-w-lg leading-relaxed">
-            Plataforma de inteligência aplicada que analisa históricos oficiais e identifica padrões estatísticos para gerar apostas estratégicas.
+            Análises baseadas em dados históricos, estatística, probabilidade e inteligência artificial para auxiliar na sua tomada de decisão estratégica.
           </p>
         </div>
       </div>
