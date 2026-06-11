@@ -37,6 +37,7 @@ type LeadFormValues = z.infer<typeof leadSchema>;
 
 export function LeadCaptureForm() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<LeadFormValues>({
