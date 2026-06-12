@@ -103,24 +103,37 @@ export function LatestDrawCard() {
             </div>
           </div>
 
-          {locals && locals.length > 0 && (
-            <div className="space-y-2">
-              <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5" /> Estados/Cidades com apostas ganhadoras
+          {(() => {
+            const mainTier = tiers.premiacoes?.[0];
+            const hasMainWinners = mainTier && mainTier.ganhadores > 0;
+            if (!hasMainWinners) {
+              return (
+                <div className="text-xs text-muted-foreground italic">
+                  Nenhum ganhador do prêmio principal neste concurso.
+                </div>
+              );
+            }
+            if (!locals || locals.length === 0) return null;
+            return (
+              <div className="space-y-2">
+                <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5" /> Ganhadores do prêmio principal ({mainTier.descricao})
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {locals.map((l, i) => (
+                    <span
+                      key={`${l.uf}-${l.municipio}-${i}`}
+                      className="px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-[11px] font-mono"
+                    >
+                      {l.municipio}/{l.uf}
+                      {l.ganhadores > 1 ? ` ×${l.ganhadores}` : ""}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <div className="flex flex-wrap gap-1.5">
-                {locals.map((l, i) => (
-                  <span
-                    key={`${l.uf}-${l.municipio}-${i}`}
-                    className="px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-[11px] font-mono"
-                  >
-                    {l.municipio}/{l.uf}
-                    {l.ganhadores > 1 ? ` ×${l.ganhadores}` : ""}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+            );
+          })()}
+
         </>
       ) : (
         <div className="text-xs text-muted-foreground">
