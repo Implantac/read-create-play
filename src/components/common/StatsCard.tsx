@@ -16,59 +16,64 @@ interface StatsCardProps {
   loading?: boolean;
 }
 
-export const StatsCard = memo(({ 
-  title, 
-  value, 
-  icon: Icon, 
-  description, 
-  trend, 
+export const StatsCard = memo(({
+  title,
+  value,
+  icon: Icon,
+  description,
+  trend,
   className,
-  loading 
+  loading,
 }: StatsCardProps) => {
   if (loading) {
     return (
-      <Card className={cn("overflow-hidden glass-card border-white/5", className)}>
+      <Card className={cn("overflow-hidden", className)}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div className="h-4 w-24 bg-muted/40 animate-pulse rounded-full" />
-          <div className="h-5 w-5 bg-muted/40 animate-pulse rounded-lg" />
+          <div className="h-3 w-24 bg-muted/60 animate-pulse rounded" />
+          <div className="h-5 w-5 bg-muted/60 animate-pulse rounded-md" />
         </CardHeader>
         <CardContent>
-          <div className="h-10 w-20 bg-muted/40 animate-pulse rounded-xl mb-3" />
-          <div className="h-3 w-32 bg-muted/40 animate-pulse rounded-full" />
+          <div className="h-8 w-20 bg-muted/60 animate-pulse rounded mb-2" />
+          <div className="h-3 w-32 bg-muted/60 animate-pulse rounded" />
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className={cn("overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 glass-card border-white/5 group relative active:scale-[0.98]", className)}>
-      <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500 pointer-events-none">
-        {Icon && <Icon className="w-16 h-16" />}
-      </div>
-      
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10">
-        <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground group-hover:text-primary transition-colors flex items-center gap-2">
+    <Card
+      className={cn(
+        "overflow-hidden group relative hover:shadow-premium-hover hover:-translate-y-0.5 transition-all duration-300",
+        className,
+      )}
+    >
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           {title}
         </CardTitle>
         {Icon && (
-          <div className="p-2 rounded-xl bg-primary/5 border border-primary/10 group-hover:bg-primary/20 group-hover:border-primary/30 transition-all duration-500 group-hover:scale-110 shadow-inner">
+          <div className="h-9 w-9 rounded-lg bg-primary/10 border border-primary/15 flex items-center justify-center group-hover:bg-primary/15 group-hover:border-primary/30 transition-colors">
             <Icon className="h-4 w-4 text-primary" />
           </div>
         )}
       </CardHeader>
-      
-      <CardContent className="relative z-10">
-        <div className="text-3xl md:text-4xl font-black tracking-tighter text-foreground font-mono group-hover:text-glow-green transition-all tabular-nums italic">
+
+      <CardContent>
+        <div className="text-3xl font-bold tracking-tight text-foreground font-mono tabular-nums">
           {value}
         </div>
 
         {(description || trend) && (
-          <div className="text-[9px] text-muted-foreground mt-3 flex items-center gap-2 font-black uppercase tracking-widest opacity-60 group-hover:opacity-100 transition-opacity">
+          <div className="text-xs text-muted-foreground mt-2 flex items-center gap-2">
             {trend && (
-              <span className={cn(
-                "px-1.5 py-0.5 rounded-lg font-black flex items-center gap-0.5 border",
-                trend.isPositive ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" : "text-rose-400 bg-rose-500/10 border-rose-500/20"
-              )}>
+              <span
+                className={cn(
+                  "px-1.5 py-0.5 rounded font-semibold flex items-center gap-0.5 text-[10px]",
+                  trend.isPositive
+                    ? "text-emerald-400 bg-emerald-500/10"
+                    : "text-rose-400 bg-rose-500/10",
+                )}
+              >
                 {trend.isPositive ? "↑" : "↓"} {Math.abs(trend.value)}%
               </span>
             )}
