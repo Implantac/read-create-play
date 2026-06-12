@@ -24,7 +24,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 const BET_PRICES: Record<string, number> = {
-  lotofacil: 3.0,
+  lotofacil: 3.50,
   megasena: 5.0,
   lotomania: 3.0,
   quina: 2.5,

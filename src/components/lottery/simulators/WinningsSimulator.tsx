@@ -45,7 +45,7 @@ interface SimResult {
 }
 
 const COST_PER_BET: Record<string, number> = {
-  megasena: 5, lotofacil: 3, quina: 2.5, lotomania: 3,
+  megasena: 5, lotofacil: 3.50, quina: 2.5, lotomania: 3,
   duplasena: 2.5, timemania: 3.5, diadesorte: 2.5, supersete: 2.5,
   mais_milionaria: 6,
 };

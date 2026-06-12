@@ -6,7 +6,7 @@ export type BudgetRiskProfile = "low" | "medium" | "high";
 
 export const LOTTERY_BET_COST: Record<string, number> = {
   megasena: 5,
-  lotofacil: 3,
+  lotofacil: 3.50,
   quina: 2.5,
   lotomania: 3,
   duplasena: 2.5,

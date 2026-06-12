@@ -17,7 +17,7 @@ import { DrawResultWithPrizes } from "@/hooks/useLotteryDraws";
 
 // Custo mínimo da aposta simples por loteria
 const BET_COST: Record<string, number> = {
-  megasena: 5.00, lotofacil: 3.00, quina: 2.50, lotomania: 3.00,
+  megasena: 5.00, lotofacil: 3.50, quina: 2.50, lotomania: 3.00,
   duplasena: 2.50, timemania: 3.50, diadesorte: 2.50, supersete: 2.50,
   mais_milionaria: 6.00, // Preço atualizado Mais Milionária
 };
