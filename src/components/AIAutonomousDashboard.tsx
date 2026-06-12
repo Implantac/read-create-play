@@ -965,6 +965,25 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                   </div>
                   {/* Extract and highlight games */}
                   {(() => {
+                    const pick = config.pick;
+                    const totalNumbers = config.numbers;
+                    // Pool de padding: stats ordenados por frequência desc + fallback universo
+                    const padPool: number[] = [
+                      ...[...stats].sort((a, b) => b.frequency - a.frequency).map(s => s.number),
+                      ...Array.from({ length: totalNumbers }, (_, i) => i + 1),
+                    ];
+                    // Garante que cada jogo tenha EXATAMENTE pick dezenas (dedupe + pad + trunc)
+                    const normalizeGame = (nums: number[]): number[] => {
+                      const set = new Set<number>();
+                      for (const n of nums) {
+                        if (Number.isFinite(n) && n >= 1 && n <= totalNumbers) set.add(n);
+                      }
+                      for (const n of padPool) {
+                        if (set.size >= pick) break;
+                        set.add(n);
+                      }
+                      return Array.from(set).slice(0, pick).sort((a, b) => a - b);
+                    };
                     const extractGames = (text: string) => {
                       const games: { numbers: number[]; confidence: number; strategy: string }[] = [];
                       const lines = text.split("\n");
@@ -992,7 +1011,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                               numbers = dezM[1].split(/[,\s]+/).map(n => parseInt(n.trim())).filter(n => !isNaN(n) && n > 0 && n <= 100);
                             }
                           }
-                          if (numbers.length >= 5) games.push({ numbers, confidence, strategy });
+                          if (numbers.length >= 5) games.push({ numbers: normalizeGame(numbers), confidence, strategy });
                           continue;
                         }
                         if (inGameBlock) blockLines.push(line);
@@ -1029,7 +1048,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                         }
                         
                         if (numbers.length >= 5) {
-                          games.push({ numbers, confidence, strategy });
+                          games.push({ numbers: normalizeGame(numbers), confidence, strategy });
                         }
                       }
                       return games;
