@@ -45,10 +45,11 @@ function findNextDraw(betDate: Date, sortedDraws: DrawResultWithPrizes[]): DrawR
  */
 function getRealPrize(hits: number, draw: DrawResultWithPrizes): number {
   if (!draw.prizeTiers?.premiacoes) return 0;
+  // Match exato por fronteira de dígito para evitar colisão de substring
+  // (ex.: hits=5 casando "15 acertos"). `faixa` é índice ordinal — NÃO comparar com hits.
+  const re = new RegExp(`(^|[^\\d])${hits}\\s+(acerto|ponto)s?\\b`, "i");
   for (const tier of draw.prizeTiers.premiacoes) {
-    if (tier.faixa === hits || tier.descricao?.toLowerCase().includes(`${hits} acerto`)) {
-      return tier.valorPremio || 0;
-    }
+    if (re.test(tier.descricao || "")) return tier.valorPremio || 0;
   }
   return 0;
 }
