@@ -256,6 +256,36 @@ const GeradorPage = () => {
                 <p className="text-sm text-muted-foreground">Quantas combinações deseja gerar?</p>
               </div>
 
+              <div className="space-y-3 p-4 rounded-lg bg-muted/30 border border-border/50">
+                <div className="flex items-center gap-2">
+                  <HistoryIcon className="w-4 h-4 text-primary" />
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                    Base de Análise · {scopedDraws.length} sorteios
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {WINDOW_OPTIONS.map(opt => {
+                    const active = historyWindow === opt.value;
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setHistoryWindow(opt.value)}
+                        className={`text-left p-2.5 rounded-md border transition-colors ${
+                          active
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border/60 bg-background/40 hover:border-primary/50"
+                        }`}
+                      >
+                        <div className="text-xs font-semibold">{opt.label}</div>
+                        <div className="text-[10px] text-muted-foreground mt-0.5">{opt.hint}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[1, 5, 10, 20].map((q) => (
                   <button
