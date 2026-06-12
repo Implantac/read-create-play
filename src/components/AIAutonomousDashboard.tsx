@@ -1011,7 +1011,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                               numbers = dezM[1].split(/[,\s]+/).map(n => parseInt(n.trim())).filter(n => !isNaN(n) && n > 0 && n <= 100);
                             }
                           }
-                          if (numbers.length >= 5) games.push({ numbers, confidence, strategy });
+                          if (numbers.length >= 5) games.push({ numbers: normalizeGame(numbers), confidence, strategy });
                           continue;
                         }
                         if (inGameBlock) blockLines.push(line);
