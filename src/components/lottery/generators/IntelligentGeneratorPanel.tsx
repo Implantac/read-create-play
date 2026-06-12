@@ -41,12 +41,29 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
   const [topResults, setTopResults] = useState(20);
   const [simulateHistory, setSimulateHistory] = useState(true);
   const [expandedBet, setExpandedBet] = useState<number | null>(null);
+  const [historyWindow, setHistoryWindow] = useState<HistoryWindow>("all");
 
+  // Slice draws based on user-selected analysis window
+  const scopedDraws = useMemo(() => {
+    if (historyWindow === "all") return draws;
+    const n = parseInt(historyWindow, 10);
+    return draws.slice(0, n);
+  }, [draws, historyWindow]);
+
+  // Recompute stats over the chosen window so probability/frequency reflects user intent
+  const scopedStats = useMemo(() => {
+    if (historyWindow === "all") return stats;
+    return computeFrequencyStats(scopedDraws, config.numbers);
+  }, [scopedDraws, stats, config.numbers, historyWindow]);
 
   const handleGenerate = () => {
+    if (scopedDraws.length === 0) {
+      toast.error("Sem sorteios suficientes para a janela selecionada.");
+      return;
+    }
     setIsGenerating(true);
     setTimeout(() => {
-      const results = generateIntelligentBets(stats, config, draws, {
+      const results = generateIntelligentBets(scopedStats, config, scopedDraws, {
         totalBets,
         topResults,
         strategies: ["hot", "lowDelay", "trend", "cycle", "balanced", "smart", "hybrid", "ml", "sectors", "pattern"],
@@ -55,7 +72,8 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
       });
       setBets(results);
       setIsGenerating(false);
-      toast.success(`${results.length} apostas otimizadas geradas!`);
+      const label = WINDOW_OPTIONS.find(o => o.value === historyWindow)?.label;
+      toast.success(`${results.length} apostas geradas (base: ${label}, ${scopedDraws.length} sorteios)`);
     }, 100);
   };
 
