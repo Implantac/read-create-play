@@ -149,38 +149,38 @@ const GeradorPage = () => {
           transition={{ duration: 0.3 }}
         >
           {step === 1 && (
-            <Card className="p-10 space-y-8 max-w-3xl mx-auto border-white/5 glass-card relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-8 opacity-5">
-                <HistoryIcon className="w-32 h-32 rotate-12" />
+            <Card className="p-8 md:p-10 space-y-7 max-w-3xl mx-auto relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-8 opacity-[0.04] pointer-events-none">
+                <HistoryIcon className="w-32 h-32" />
               </div>
-              
-              <div className="flex flex-col items-center text-center space-y-6 relative z-10">
-                <div className="w-24 h-24 rounded-3xl gradient-brand flex items-center justify-center shadow-2xl shadow-primary/20 rotate-3">
-                  <span className="text-5xl drop-shadow-lg">{config.icon}</span>
+
+              <div className="flex flex-col items-center text-center space-y-5 relative z-10">
+                <div className="w-20 h-20 rounded-2xl gradient-brand flex items-center justify-center shadow-gold">
+                  <span className="text-4xl drop-shadow">{config.icon}</span>
                 </div>
-                
-                <div className="space-y-3">
-                  <Badge variant="outline" className="px-3 py-1 text-[10px] font-black tracking-widest uppercase border-primary/30 text-primary">Etapa 01: Validação de Dataset</Badge>
-                  <h3 className="text-3xl font-black uppercase tracking-tighter italic">Sincronização: {config.name}</h3>
-                  <p className="text-muted-foreground text-base max-w-lg mx-auto">
-                    Base de dados oficial atualizada com {draws.length} concursos. O motor está pronto para processar milhões de combinações.
+
+                <div className="space-y-2.5">
+                  <Badge variant="outline" className="px-2.5 py-0.5 text-[10px] font-semibold tracking-wider uppercase border-primary/30 text-primary">Etapa 01 · Dataset</Badge>
+                  <h3 className="text-2xl font-bold tracking-tight">Sincronização: {config.name}</h3>
+                  <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+                    Base oficial atualizada com {draws.length} concursos. O motor está pronto para processar milhões de combinações.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 w-full max-w-md">
-                  <div className="p-4 rounded-2xl bg-white/5 border border-white/5 text-left">
-                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Status Base</p>
-                    <p className="text-sm font-black text-emerald-400">100% Sincronizada</p>
+                <div className="grid grid-cols-2 gap-3 w-full max-w-md">
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border/40 text-left">
+                    <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-1">Status</p>
+                    <p className="text-sm font-semibold text-emerald-400">100% Sincronizada</p>
                   </div>
-                  <div className="p-4 rounded-2xl bg-white/5 border border-white/5 text-left">
-                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Último Processo</p>
-                    <p className="text-sm font-black">Concurso #{draws[0]?.concurso || '---'}</p>
+                  <div className="p-3 rounded-lg bg-muted/30 border border-border/40 text-left">
+                    <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-1">Último Concurso</p>
+                    <p className="text-sm font-semibold font-mono tabular-nums">#{draws[0]?.concurso || '---'}</p>
                   </div>
                 </div>
 
-                <Button onClick={nextStep} variant="premium" className="h-16 px-16 group w-full sm:w-auto">
-                  Configurar Engine Analítica
-                  <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                <Button onClick={nextStep} variant="premium" size="lg" className="group w-full sm:w-auto">
+                  Configurar Engine
+                  <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
             </Card>
