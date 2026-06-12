@@ -49,6 +49,17 @@ const GeradorPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [generating, setGenerating] = useState(false);
   const [results, setResults] = useState<any[]>([]);
+  const [historyWindow, setHistoryWindow] = useState<HistoryWindow>("all");
+
+  const scopedDraws = useMemo(() => {
+    if (historyWindow === "all") return draws;
+    return draws.slice(0, parseInt(historyWindow, 10));
+  }, [draws, historyWindow]);
+
+  const scopedStats = useMemo(() => {
+    if (historyWindow === "all") return stats;
+    return computeFrequencyStats(scopedDraws, config.numbers);
+  }, [scopedDraws, stats, config.numbers, historyWindow]);
 
   const STRATEGIES = [
     { id: "balance", name: "Aposta Equilibrada", desc: "Distribuição estatística otimizada por rede neural." },
@@ -58,14 +69,18 @@ const GeradorPage = () => {
   ];
 
   const handleGenerate = async () => {
+    if (scopedDraws.length === 0) {
+      toast.error("Sem sorteios suficientes para a janela selecionada.");
+      return;
+    }
     setGenerating(true);
     // Artificial delay for premium feel
     setTimeout(async () => {
       try {
-        const result = runIntelligentPipeline(stats, draws, selectedLottery, strategy, quantity);
+        const result = runIntelligentPipeline(scopedStats, scopedDraws, selectedLottery, strategy, quantity);
         if (result.games.length > 0) {
           const processedResults = result.games.map(bet => {
-            const quality = evaluateBetQuality(bet, stats, config, draws);
+            const quality = evaluateBetQuality(bet, scopedStats, config, scopedDraws);
             return {
               numbers: bet,
               score: quality.overall,
