@@ -13,6 +13,7 @@ import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { evaluateBetQuality } from "@/engine/stats/bet-quality";
 import { computeFrequencyStats } from "@/engine/stats/statistics";
 import { toast } from "sonner";
+import { DrawTestDialog } from "@/components/lottery/DrawTestDialog";
 
 type HistoryWindow = "all" | "10" | "20" | "50";
 const WINDOW_OPTIONS: { value: HistoryWindow; label: string; hint: string }[] = [
