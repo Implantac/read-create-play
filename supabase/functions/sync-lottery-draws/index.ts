@@ -40,6 +40,7 @@ interface CaixaResult {
   valorAcumuladoProximoConcurso?: number;
   valorEstimadoProximoConcurso?: number;
   valorArrecadado?: number;
+  localGanhadores?: Array<{ municipio?: string; uf?: string; ganhadores?: number; nomeFatansiaUL?: string; serie?: string }>;
 }
 
 async function fetchWithRetry(url: string, retries = 3): Promise<Response | null> {
@@ -81,6 +82,15 @@ function extractPrizeTiers(raw: CaixaResult): object | null {
     valorAcumulado: raw.valorAcumuladoProximoConcurso ?? 0,
     valorEstimado: raw.valorEstimadoProximoConcurso ?? 0,
     valorArrecadado: raw.valorArrecadado ?? 0,
+    localGanhadores: Array.isArray(raw.localGanhadores)
+      ? raw.localGanhadores.map(l => ({
+          municipio: l.municipio || "",
+          uf: l.uf || "",
+          ganhadores: Number(l.ganhadores) || 1,
+          nomeFantasia: (l as any).nomeFatansiaUL || (l as any).nomeFantasiaUL || "",
+          serie: l.serie || "",
+        }))
+      : [],
   };
 }
 
