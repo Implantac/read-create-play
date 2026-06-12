@@ -22,6 +22,7 @@ import { m, AnimatePresence } from "framer-motion";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { DrawTestDialog } from "@/components/lottery/DrawTestDialog";
 
 const BET_PRICES: Record<string, number> = {
   lotofacil: 3.50,
