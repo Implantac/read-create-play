@@ -29,8 +29,12 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
   const strategy = getStrategy(config.riskProfile);
   const prevDraw = config.draws.length > 0 ? config.draws[0].numbers : undefined;
 
+  // Sinais avançados: recência exponencial + coocorrência (afinidade)
+  const recencyBoost = computeRecencyBoost(config.draws, rules.totalNumbers);
+  const affinityBoost = computeAffinityBoost(config.draws, rules.totalNumbers, config.stats);
+
   // Build weighted pool
-  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters);
+  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters, recencyBoost, affinityBoost);
   const rng = config.rng;
 
   // Pré-computações p/ rejeição rápida
@@ -116,7 +120,9 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
 function buildWeightedPool(
   stats: NumberStats[],
   strategyFilters: { hotBias: number; coldBias: number },
-  intentFilters: IntentFilters
+  intentFilters: IntentFilters,
+  recencyBoost: Map<number, number>,
+  affinityBoost: Map<number, number>
 ): { number: number; weight: number }[] {
   return stats.map(s => {
     let weight = 1;
@@ -134,6 +140,12 @@ function buildWeightedPool(
     // Momentum
     if (s.momentum > 0) weight += s.momentum * 0.002;
 
+    // Recência exponencial: sorteios recentes têm peso maior
+    weight += (recencyBoost.get(s.number) ?? 0) * 2.5;
+
+    // Afinidade: coocorrência com números atualmente "quentes"
+    weight += (affinityBoost.get(s.number) ?? 0) * 1.8;
+
     // Intent-specific
     if (intentFilters.prioritizeHot && s.status === "hot") weight *= 1.5;
     if (intentFilters.prioritizeCold && s.status === "cold") weight *= 1.5;
@@ -143,6 +155,60 @@ function buildWeightedPool(
 
     return { number: s.number, weight: Math.max(0.01, weight) };
   });
+}
+
+/** Pesa cada número por aparições recentes com decaimento exponencial (meia-vida ~ 20 sorteios) */
+function computeRecencyBoost(draws: DrawResult[], totalNumbers: number): Map<number, number> {
+  const map = new Map<number, number>();
+  const window = Math.min(draws.length, 80);
+  const halfLife = 20;
+  const decay = Math.log(2) / halfLife;
+  let normMax = 0;
+  for (let n = 1; n <= totalNumbers; n++) map.set(n, 0);
+  for (let i = 0; i < window; i++) {
+    const w = Math.exp(-decay * i);
+    for (const num of draws[i]?.numbers ?? []) {
+      const prev = map.get(num) ?? 0;
+      const next = prev + w;
+      map.set(num, next);
+      if (next > normMax) normMax = next;
+    }
+  }
+  if (normMax > 0) {
+    for (const [k, v] of map) map.set(k, v / normMax);
+  }
+  return map;
+}
+
+/** Boost por coocorrência: números que historicamente caem junto com os "quentes" atuais */
+function computeAffinityBoost(
+  draws: DrawResult[],
+  totalNumbers: number,
+  stats: NumberStats[]
+): Map<number, number> {
+  const map = new Map<number, number>();
+  for (let n = 1; n <= totalNumbers; n++) map.set(n, 0);
+  const hotSet = new Set(stats.filter(s => s.status === "hot").map(s => s.number));
+  if (hotSet.size === 0 || draws.length === 0) return map;
+  const window = Math.min(draws.length, 100);
+  let normMax = 0;
+  for (let i = 0; i < window; i++) {
+    const nums = draws[i]?.numbers ?? [];
+    let hotsInDraw = 0;
+    for (const n of nums) if (hotSet.has(n)) hotsInDraw++;
+    if (hotsInDraw === 0) continue;
+    const w = hotsInDraw / nums.length;
+    for (const n of nums) {
+      if (hotSet.has(n)) continue;
+      const next = (map.get(n) ?? 0) + w;
+      map.set(n, next);
+      if (next > normMax) normMax = next;
+    }
+  }
+  if (normMax > 0) {
+    for (const [k, v] of map) map.set(k, v / normMax);
+  }
+  return map;
 }
 
 /** Weighted random sampling without replacement */
