@@ -29,8 +29,12 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
   const strategy = getStrategy(config.riskProfile);
   const prevDraw = config.draws.length > 0 ? config.draws[0].numbers : undefined;
 
+  // Sinais avançados: recência exponencial + coocorrência (afinidade)
+  const recencyBoost = computeRecencyBoost(config.draws, rules.totalNumbers);
+  const affinityBoost = computeAffinityBoost(config.draws, rules.totalNumbers, config.stats);
+
   // Build weighted pool
-  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters);
+  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters, recencyBoost, affinityBoost);
   const rng = config.rng;
 
   // Pré-computações p/ rejeição rápida
