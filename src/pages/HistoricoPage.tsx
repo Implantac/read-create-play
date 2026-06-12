@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
+import { LatestDrawCard } from "@/components/lottery/LatestDrawCard";
 import { motion } from "framer-motion";
 
 const HistoricoPage = () => {
