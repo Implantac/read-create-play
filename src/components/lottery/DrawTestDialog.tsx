@@ -283,7 +283,7 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
 
             {scanResult && (
               <div className="space-y-3">
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   <div className="p-3 rounded-lg border border-border/60 bg-muted/30">
                     <div className="text-[9px] uppercase tracking-wider text-muted-foreground">Melhor acerto</div>
                     <div className="text-xl font-bold font-mono tabular-nums text-primary mt-1">
