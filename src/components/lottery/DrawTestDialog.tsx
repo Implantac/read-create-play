@@ -91,21 +91,17 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
           if (!isNaN(val)) totalRealPrize += val;
         }
       }
-      // Close-miss: find nearest upper prize tier within reach (up to 3 away)
+      // Close-miss: register the gap for EVERY upper prize tier still reachable
       if (!est) {
-        for (let delta = 1; delta <= 3; delta++) {
-          const target = hits + delta;
-          if (target > maxHits) break;
-          if (getEstimatedPrize(selectedLottery, target)) {
-            if (delta === 1) closeMissCount++;
-            const prev = closeMissByTier.get(target);
-            if (!prev || delta < prev.missing) {
-              closeMissByTier.set(target, { count: (prev?.count || 0) + 1, missing: delta });
-            } else {
-              closeMissByTier.set(target, { ...prev, count: prev.count + 1 });
-            }
-            break;
-          }
+        for (let target = hits + 1; target <= maxHits; target++) {
+          if (!getEstimatedPrize(selectedLottery, target)) continue;
+          const delta = target - hits;
+          if (delta === 1) closeMissCount++;
+          const prev = closeMissByTier.get(target);
+          closeMissByTier.set(target, {
+            count: (prev?.count || 0) + 1,
+            missing: prev ? Math.min(prev.missing, delta) : delta,
+          });
         }
       }
     });
