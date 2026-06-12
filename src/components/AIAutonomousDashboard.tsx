@@ -1048,7 +1048,7 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
                         }
                         
                         if (numbers.length >= 5) {
-                          games.push({ numbers, confidence, strategy });
+                          games.push({ numbers: normalizeGame(numbers), confidence, strategy });
                         }
                       }
                       return games;
