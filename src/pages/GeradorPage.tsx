@@ -13,6 +13,7 @@ import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { evaluateBetQuality } from "@/engine/stats/bet-quality";
 import { computeFrequencyStats } from "@/engine/stats/statistics";
 import { toast } from "sonner";
+import { DrawTestDialog } from "@/components/lottery/DrawTestDialog";
 
 type HistoryWindow = "all" | "10" | "20" | "50";
 const WINDOW_OPTIONS: { value: HistoryWindow; label: string; hint: string }[] = [
@@ -357,6 +358,7 @@ const GeradorPage = () => {
                             <p className={`text-2xl font-bold font-mono tabular-nums leading-none ${res.score >= 90 ? 'text-emerald-400' : res.score >= 75 ? 'text-primary' : 'text-amber-400'}`}>{res.score}<span className="text-sm text-muted-foreground">/100</span></p>
                             <p className="text-[10px] font-medium uppercase text-emerald-400/90 tracking-wider mt-1">{res.score >= 90 ? 'Excelente' : res.score >= 75 ? 'Alta Convergência' : 'Estável'}</p>
                           </div>
+                          <DrawTestDialog numbers={res.numbers} />
                           <Button
                             variant="outline"
                             size="icon"

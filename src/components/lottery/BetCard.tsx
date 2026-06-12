@@ -1,10 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Copy, Check, Shield, TrendingUp, ChevronDown, ChevronUp } from "lucide-react";
+import { Copy, Check, Shield, TrendingUp, ChevronDown, ChevronUp, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useState } from "react";
 import { AIAnalystBriefing } from "./AIAnalystBriefing";
+import { DrawTestDialog } from "./DrawTestDialog";
 
 interface BetCardProps {
   numbers: number[];
@@ -165,6 +166,15 @@ export function BetCard({
           {copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
           Copiar
         </Button>
+        <DrawTestDialog
+          numbers={numbers}
+          trigger={
+            <Button variant="outline" size="sm" onClick={(e) => e.stopPropagation()}>
+              <Target className="w-3.5 h-3.5" />
+              Testar
+            </Button>
+          }
+        />
         {onSave && (
           <Button
             variant="secondary"
