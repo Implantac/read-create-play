@@ -142,7 +142,7 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-lg" onClick={(e) => e.stopPropagation()}>
+      <DialogContent className="max-w-2xl sm:max-w-3xl w-[95vw]" onClick={(e) => e.stopPropagation()}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <HistoryIcon className="w-4 h-4 text-primary" />
