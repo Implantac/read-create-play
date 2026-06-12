@@ -189,36 +189,35 @@ const GeradorPage = () => {
 
           {step === 2 && (
             <div className="space-y-6">
-              <div className="text-center space-y-2 mb-8">
-                <Badge variant="outline" className="px-3 py-1 text-[10px] font-black tracking-widest uppercase border-primary/30 text-primary mb-2">Etapa 02: Seleção de Engine</Badge>
-                <h3 className="text-3xl font-black uppercase tracking-tighter italic">Configurar Algoritmo</h3>
-                <p className="text-muted-foreground">O motor Titan utilizará o modelo escolhido para processar milhões de possibilidades.</p>
+              <div className="text-center space-y-2 mb-6">
+                <Badge variant="outline" className="px-2.5 py-0.5 text-[10px] font-semibold tracking-wider uppercase border-primary/30 text-primary mb-2">Etapa 02 · Engine</Badge>
+                <h3 className="text-2xl font-bold tracking-tight">Configurar Algoritmo</h3>
+                <p className="text-sm text-muted-foreground">Selecione o modelo que o motor utilizará para processar as combinações.</p>
               </div>
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 gap-4">
                 {STRATEGIES.map((s) => (
                   <button
                     key={s.id}
                     onClick={() => { setStrategy(s.id); nextStep(); }}
-                    className={`p-8 rounded-[2.5rem] glass-card border transition-all text-left flex items-start gap-6 hover:border-primary/60 group relative overflow-hidden ${
-                      strategy === s.id ? "border-primary/60 bg-primary/10 ring-2 ring-primary/20 shadow-premium-hover" : "border-border/40"
+                    className={`p-5 rounded-xl border transition-all text-left flex items-start gap-4 hover:border-primary/50 group relative overflow-hidden ${
+                      strategy === s.id ? "border-primary/60 bg-primary/5 ring-1 ring-primary/20" : "border-border/60 bg-card"
                     }`}
                   >
-                    <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 shrink-0 relative z-10 ${
-                      strategy === s.id ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 rotate-6" : "bg-secondary group-hover:bg-primary/20 group-hover:text-primary"
+                    <div className={`w-11 h-11 rounded-lg flex items-center justify-center transition-colors shrink-0 ${
+                      strategy === s.id ? "bg-primary text-primary-foreground" : "bg-muted/50 group-hover:bg-primary/15 group-hover:text-primary"
                     }`}>
-                      <Settings2 className="w-7 h-7" />
+                      <Settings2 className="w-5 h-5" />
                     </div>
-                    <div className="relative z-10">
-                      <h4 className="font-black text-xl uppercase tracking-tight italic mb-1">{s.name}</h4>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
+                    <div className="min-w-0">
+                      <h4 className="font-semibold text-base tracking-tight mb-1">{s.name}</h4>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{s.desc}</p>
                     </div>
                   </button>
                 ))}
               </div>
 
               <div className="flex justify-start">
-                <Button variant="ghost" onClick={prevStep} className="gap-2">
+                <Button variant="ghost" size="sm" onClick={prevStep} className="gap-2">
                   <ChevronLeft className="w-4 h-4" /> Voltar
                 </Button>
               </div>
@@ -226,20 +225,20 @@ const GeradorPage = () => {
           )}
 
           {step === 3 && (
-            <Card className="glass-panel border-primary/20 p-8 space-y-8">
+            <Card className="p-8 space-y-7 max-w-3xl mx-auto">
               <div className="text-center space-y-2">
-                <Badge variant="outline" className="px-3 py-1 text-[10px] font-black tracking-widest uppercase border-primary/30 text-primary mb-2">Etapa 03: Dimensionamento</Badge>
-                <h3 className="text-3xl font-black uppercase tracking-tighter italic">Volume de Processamento</h3>
-                <p className="text-muted-foreground">Quantas combinações de alta convergência você deseja gerar agora?</p>
+                <Badge variant="outline" className="px-2.5 py-0.5 text-[10px] font-semibold tracking-wider uppercase border-primary/30 text-primary mb-2">Etapa 03 · Volume</Badge>
+                <h3 className="text-2xl font-bold tracking-tight">Volume de Processamento</h3>
+                <p className="text-sm text-muted-foreground">Quantas combinações deseja gerar?</p>
               </div>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[1, 5, 10, 20].map((q) => (
                   <button
                     key={q}
                     onClick={() => setQuantity(q)}
-                    className={`p-6 rounded-xl border-2 transition-all font-black text-2xl ${
-                      quantity === q ? "border-primary bg-primary/5 text-primary shadow-lg shadow-primary/10" : "border-border/40 hover:border-primary/20"
+                    className={`p-5 rounded-lg border transition-all font-bold text-2xl font-mono tabular-nums ${
+                      quantity === q ? "border-primary bg-primary/5 text-primary" : "border-border/60 hover:border-primary/30 text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     {q}
@@ -247,28 +246,27 @@ const GeradorPage = () => {
                 ))}
               </div>
 
-              <div className="flex flex-col items-center gap-6 pt-6">
-                <Button 
-                  size="lg" 
-                  onClick={handleGenerate} 
+              <div className="flex flex-col items-center gap-4 pt-2">
+                <Button
+                  size="lg"
+                  onClick={handleGenerate}
                   disabled={generating}
                   variant="premium"
-                  className="px-16 h-16 group"
-
+                  className="px-12 group"
                 >
                   {generating ? (
                     <>
-                      <Loader2 className="w-6 h-6 animate-spin" />
+                      <Loader2 className="w-5 h-5 animate-spin" />
                       Processando...
                     </>
                   ) : (
                     <>
-                      <Play className="w-6 h-6 fill-current" />
+                      <Play className="w-5 h-5 fill-current" />
                       Gerar {quantity} Jogo{quantity > 1 ? 's' : ''}
                     </>
                   )}
                 </Button>
-                <Button variant="ghost" onClick={prevStep} className="gap-2">
+                <Button variant="ghost" size="sm" onClick={prevStep} className="gap-2">
                   <ChevronLeft className="w-4 h-4" /> Alterar Estratégia
                 </Button>
               </div>
