@@ -22,7 +22,7 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] bg-primary/10 rounded-full blur-[160px] opacity-20 animate-pulse" />
         <div className="absolute bottom-1/4 left-1/4 w-[800px] h-[800px] bg-accent/10 rounded-full blur-[140px] opacity-10" />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
+        
       </div>
 
       <FloatingLotteryBalls />
