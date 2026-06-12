@@ -7,11 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Bookmark, Trophy, TrendingUp, BarChart3, ChevronDown, ChevronUp, Loader2, Calendar, Star, Trash2 } from "lucide-react";
+import { Bookmark, Trophy, TrendingUp, BarChart3, ChevronDown, ChevronUp, Loader2, Calendar, Star, Trash2, Target } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { useSavedBets, SavedBet } from "@/hooks/useSavedBets";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { StatsCard } from "@/components/common/StatsCard";
+import { DrawTestDialog } from "@/components/lottery/DrawTestDialog";
 
 
 const DRAW_RANGE_OPTIONS = [
