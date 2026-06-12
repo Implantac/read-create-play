@@ -166,6 +166,15 @@ export function BetCard({
           {copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
           Copiar
         </Button>
+        <DrawTestDialog
+          numbers={numbers}
+          trigger={
+            <Button variant="outline" size="sm" onClick={(e) => e.stopPropagation()}>
+              <Target className="w-3.5 h-3.5" />
+              Testar
+            </Button>
+          }
+        />
         {onSave && (
           <Button
             variant="secondary"
