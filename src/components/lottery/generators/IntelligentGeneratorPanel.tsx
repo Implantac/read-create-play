@@ -87,6 +87,36 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* History window selector — controls the analysis base */}
+        <div className="p-4 rounded-lg bg-muted/30 border border-border/50 space-y-3">
+          <div className="flex items-center gap-2">
+            <History className="h-4 w-4 text-primary" />
+            <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              Base de Análise · {scopedDraws.length} sorteios disponíveis
+            </Label>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {WINDOW_OPTIONS.map(opt => {
+              const active = historyWindow === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setHistoryWindow(opt.value)}
+                  className={`text-left p-2.5 rounded-md border transition-colors ${
+                    active
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border/60 bg-background/40 text-foreground hover:border-primary/50"
+                  }`}
+                >
+                  <div className="text-xs font-semibold">{opt.label}</div>
+                  <div className="text-[10px] text-muted-foreground mt-0.5">{opt.hint}</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="grid sm:grid-cols-3 gap-4 p-4 rounded-lg bg-muted/30 border border-border/50">
           <div className="space-y-2">
             <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Candidatos: {totalBets}</Label>
