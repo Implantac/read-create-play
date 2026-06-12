@@ -3,13 +3,24 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Target, Trophy, History as HistoryIcon } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Target, Trophy, History as HistoryIcon, Radar, Sparkles } from "lucide-react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import {
   matchBetAgainstDraw,
   getEstimatedPrize,
   getRealPrizeLabel,
+  formatCurrency,
+  getMaxPossibleHits,
 } from "@/utils/lottery-utils";
+
+type ScanWindow = "10" | "20" | "50" | "all";
+const SCAN_OPTIONS: { value: ScanWindow; label: string }[] = [
+  { value: "10", label: "Últimos 10" },
+  { value: "20", label: "Últimos 20" },
+  { value: "50", label: "Últimos 50" },
+  { value: "all", label: "Histórico Total" },
+];
 
 interface Props {
   numbers: number[];
@@ -47,6 +58,59 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
     return { hits, matched, estimated, real };
   }, [selectedDraw, numbers, selectedLottery, prizeMap]);
 
+  // ─── Scan mode: aggregate over all draws in a window ──────────────────────
+  const [scanWindow, setScanWindow] = useState<ScanWindow>("50");
+  const scanResult = useMemo(() => {
+    if (numbers.length === 0 || draws.length === 0) return null;
+    const subset = scanWindow === "all" ? draws : draws.slice(0, parseInt(scanWindow, 10));
+    const maxHits = getMaxPossibleHits(selectedLottery, numbers.length);
+    const hitsByTier = new Map<number, number>();
+    let bestHit = 0;
+    let bestConcurso: number | null = null;
+    let totalRealPrize = 0;
+    let totalEstimatedPrize = 0;
+    let prizedCount = 0;
+    let closeMissCount = 0; // 1 number away from any prize tier
+
+    subset.forEach(draw => {
+      const { hits } = matchBetAgainstDraw(numbers, draw.numbers, selectedLottery);
+      hitsByTier.set(hits, (hitsByTier.get(hits) || 0) + 1);
+      if (hits > bestHit) { bestHit = hits; bestConcurso = draw.concurso; }
+      const real = getRealPrizeLabel(prizeMap.get(draw.concurso), hits);
+      const est = getEstimatedPrize(selectedLottery, hits);
+      if (est) {
+        prizedCount++;
+        totalEstimatedPrize += est.value;
+      }
+      if (real) {
+        const match = real.match(/R\$\s*([\d.,]+)/);
+        if (match) {
+          const val = parseFloat(match[1].replace(/\./g, "").replace(",", "."));
+          if (!isNaN(val)) totalRealPrize += val;
+        }
+      }
+      // Close-miss: would have prized with 1 more number
+      const nextTierEst = getEstimatedPrize(selectedLottery, hits + 1);
+      if (!est && nextTierEst) closeMissCount++;
+    });
+
+    const tiers = Array.from(hitsByTier.entries())
+      .sort((a, b) => b[0] - a[0])
+      .filter(([h]) => h > 0);
+
+    return {
+      totalDraws: subset.length,
+      maxHits,
+      bestHit,
+      bestConcurso,
+      prizedCount,
+      closeMissCount,
+      totalRealPrize,
+      totalEstimatedPrize,
+      tiers,
+    };
+  }, [numbers, draws, scanWindow, selectedLottery, prizeMap]);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -65,12 +129,22 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          {/* Bet preview */}
-          <div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
-              Sua aposta ({numbers.length} nº)
-            </div>
+        <Tabs defaultValue="single" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="single" className="gap-1.5">
+              <Target className="w-3.5 h-3.5" /> Concurso único
+            </TabsTrigger>
+            <TabsTrigger value="scan" className="gap-1.5">
+              <Radar className="w-3.5 h-3.5" /> Varredura
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="single" className="space-y-4 mt-4">
+            {/* Bet preview */}
+            <div>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
+                Sua aposta ({numbers.length} nº)
+              </div>
             <div className="flex flex-wrap gap-1.5">
               {[...numbers].sort((a, b) => a - b).map(n => (
                 <span
@@ -164,8 +238,115 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
                 </div>
               </div>
             </div>
-          )}
-        </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="scan" className="space-y-4 mt-4">
+            <div>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
+                Janela de varredura
+              </div>
+              <div className="grid grid-cols-4 gap-1.5">
+                {SCAN_OPTIONS.map(opt => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setScanWindow(opt.value)}
+                    className={`p-2 rounded-md border text-[11px] font-semibold transition-colors ${
+                      scanWindow === opt.value
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border/60 bg-background/40 hover:border-primary/50"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {scanResult && (
+              <div className="space-y-3">
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="p-3 rounded-lg border border-border/60 bg-muted/30">
+                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground">Melhor acerto</div>
+                    <div className="text-xl font-bold font-mono tabular-nums text-primary mt-1">
+                      {scanResult.bestHit}<span className="text-xs text-muted-foreground font-normal">/{scanResult.maxHits}</span>
+                    </div>
+                    {scanResult.bestConcurso && (
+                      <div className="text-[9px] text-muted-foreground mt-0.5">Conc. {scanResult.bestConcurso}</div>
+                    )}
+                  </div>
+                  <div className="p-3 rounded-lg border border-border/60 bg-muted/30">
+                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground">Premiações</div>
+                    <div className="text-xl font-bold font-mono tabular-nums text-emerald-400 mt-1">
+                      {scanResult.prizedCount}
+                    </div>
+                    <div className="text-[9px] text-muted-foreground mt-0.5">de {scanResult.totalDraws} sorteios</div>
+                  </div>
+                  <div className="p-3 rounded-lg border border-border/60 bg-muted/30">
+                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground">Quase ganhou</div>
+                    <div className="text-xl font-bold font-mono tabular-nums text-amber-400 mt-1">
+                      {scanResult.closeMissCount}
+                    </div>
+                    <div className="text-[9px] text-muted-foreground mt-0.5">faltou 1 nº</div>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-lg border border-border/60 bg-muted/30">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1 mb-2">
+                    <Trophy className="w-3 h-3" /> Faturamento acumulado
+                  </div>
+                  <div className="flex items-baseline justify-between">
+                    <div>
+                      <div className="text-[9px] text-muted-foreground">Real (oficial)</div>
+                      <div className="text-base font-semibold text-primary font-mono tabular-nums">
+                        {scanResult.totalRealPrize > 0
+                          ? `R$ ${scanResult.totalRealPrize.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
+                          : "—"}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-[9px] text-muted-foreground">Estimado</div>
+                      <div className="text-base font-semibold font-mono tabular-nums">
+                        {formatCurrency(scanResult.totalEstimatedPrize)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {scanResult.tiers.length > 0 && (
+                  <div className="p-3 rounded-lg border border-border/60 bg-muted/30">
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" /> Distribuição por faixa
+                    </div>
+                    <div className="space-y-1.5">
+                      {scanResult.tiers.map(([hits, count]) => {
+                        const pct = (count / scanResult.totalDraws) * 100;
+                        const prized = !!getEstimatedPrize(selectedLottery, hits);
+                        return (
+                          <div key={hits} className="flex items-center gap-2 text-xs">
+                            <span className={`font-mono tabular-nums w-12 font-semibold ${prized ? "text-primary" : "text-muted-foreground"}`}>
+                              {hits} pts
+                            </span>
+                            <div className="flex-1 h-2 rounded-full bg-background/60 overflow-hidden">
+                              <div
+                                className={`h-full ${prized ? "bg-primary" : "bg-muted-foreground/40"}`}
+                                style={{ width: `${Math.max(2, pct)}%` }}
+                              />
+                            </div>
+                            <span className="font-mono tabular-nums text-muted-foreground w-14 text-right">
+                              {count}× ({pct.toFixed(1)}%)
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
