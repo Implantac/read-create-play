@@ -69,6 +69,13 @@ const DashboardPage = () => {
 
       <TitanStatsModule />
 
+      <RecommendationCard
+        luckyGame={luckyGame}
+        generating={generating}
+        onGenerate={(p) => generateGame(p)}
+        onShowBriefing={() => setShowBriefing(true)}
+      />
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <TitanAIModule />
@@ -76,13 +83,6 @@ const DashboardPage = () => {
         </div>
 
         <div className="space-y-6">
-          <RecommendationCard
-            luckyGame={luckyGame}
-            generating={generating}
-            onGenerate={(p) => generateGame(p)}
-            onShowBriefing={() => setShowBriefing(true)}
-          />
-
           <Card className="p-6 space-y-5">
             <h4 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-2 text-foreground/90">
               <Sparkles className="w-4 h-4 text-primary" />
@@ -110,6 +110,7 @@ const DashboardPage = () => {
               <BrainCircuit className="w-4 h-4 group-hover:rotate-12 transition-transform" />
             </Button>
           </Card>
+
         </div>
       </div>
 
