@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from "react";
+import { useState, lazy, Suspense, useMemo } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
@@ -11,7 +11,16 @@ import { useSavedBets } from "@/hooks/useSavedBets";
 import { useGenerationHistory } from "@/hooks/useGenerationHistory";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { evaluateBetQuality } from "@/engine/stats/bet-quality";
+import { computeFrequencyStats } from "@/engine/stats/statistics";
 import { toast } from "sonner";
+
+type HistoryWindow = "all" | "10" | "20" | "50";
+const WINDOW_OPTIONS: { value: HistoryWindow; label: string; hint: string }[] = [
+  { value: "10", label: "Últimos 10", hint: "Tendência imediata" },
+  { value: "20", label: "Últimos 20", hint: "Curto prazo" },
+  { value: "50", label: "Últimos 50", hint: "Médio prazo" },
+  { value: "all", label: "Histórico Total", hint: "Probabilidade real" },
+];
 
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
@@ -40,6 +49,17 @@ const GeradorPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [generating, setGenerating] = useState(false);
   const [results, setResults] = useState<any[]>([]);
+  const [historyWindow, setHistoryWindow] = useState<HistoryWindow>("all");
+
+  const scopedDraws = useMemo(() => {
+    if (historyWindow === "all") return draws;
+    return draws.slice(0, parseInt(historyWindow, 10));
+  }, [draws, historyWindow]);
+
+  const scopedStats = useMemo(() => {
+    if (historyWindow === "all") return stats;
+    return computeFrequencyStats(scopedDraws, config.numbers);
+  }, [scopedDraws, stats, config.numbers, historyWindow]);
 
   const STRATEGIES = [
     { id: "balance", name: "Aposta Equilibrada", desc: "Distribuição estatística otimizada por rede neural." },
@@ -49,14 +69,18 @@ const GeradorPage = () => {
   ];
 
   const handleGenerate = async () => {
+    if (scopedDraws.length === 0) {
+      toast.error("Sem sorteios suficientes para a janela selecionada.");
+      return;
+    }
     setGenerating(true);
     // Artificial delay for premium feel
     setTimeout(async () => {
       try {
-        const result = runIntelligentPipeline(stats, draws, selectedLottery, strategy, quantity);
+        const result = runIntelligentPipeline(scopedStats, scopedDraws, selectedLottery, strategy, quantity);
         if (result.games.length > 0) {
           const processedResults = result.games.map(bet => {
-            const quality = evaluateBetQuality(bet, stats, config, draws);
+            const quality = evaluateBetQuality(bet, scopedStats, config, scopedDraws);
             return {
               numbers: bet,
               score: quality.overall,
@@ -231,6 +255,36 @@ const GeradorPage = () => {
                 <h3 className="text-2xl font-bold tracking-tight">Volume de Processamento</h3>
                 <p className="text-sm text-muted-foreground">Quantas combinações deseja gerar?</p>
               </div>
+
+              <div className="space-y-3 p-4 rounded-lg bg-muted/30 border border-border/50">
+                <div className="flex items-center gap-2">
+                  <HistoryIcon className="w-4 h-4 text-primary" />
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                    Base de Análise · {scopedDraws.length} sorteios
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {WINDOW_OPTIONS.map(opt => {
+                    const active = historyWindow === opt.value;
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setHistoryWindow(opt.value)}
+                        className={`text-left p-2.5 rounded-md border transition-colors ${
+                          active
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border/60 bg-background/40 hover:border-primary/50"
+                        }`}
+                      >
+                        <div className="text-xs font-semibold">{opt.label}</div>
+                        <div className="text-[10px] text-muted-foreground mt-0.5">{opt.hint}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[1, 5, 10, 20].map((q) => (
