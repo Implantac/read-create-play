@@ -124,7 +124,7 @@ const DashboardPage = () => {
           />
         )}
       </AnimatePresence>
-      <div className="pt-10 border-t border-white/5">
+      <div className="pt-8 border-t border-border/40">
         <ComplianceDisclaimer />
       </div>
     </div>
