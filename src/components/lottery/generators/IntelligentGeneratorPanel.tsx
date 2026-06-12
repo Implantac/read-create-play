@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { NumberStats } from "@/engine/stats/statistics";
+import { NumberStats, computeFrequencyStats } from "@/engine/stats/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { IntelligentBet, GenerationSummary, generateIntelligentBets, computeGenerationSummary } from "@/engine/intelligent-generator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,12 +9,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Brain, Sparkles, Trophy, Target, Lightbulb, BarChart3, Zap, ChevronDown, ChevronUp } from "lucide-react";
+import { Brain, Sparkles, Trophy, Target, Lightbulb, BarChart3, Zap, ChevronDown, ChevronUp, History } from "lucide-react";
 import { toast } from "sonner";
 import { BetCard } from "@/components/lottery/BetCard";
 import { AIAnalystBriefing } from "@/components/lottery/AIAnalystBriefing";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { m, AnimatePresence } from "framer-motion";
+
+type HistoryWindow = "all" | "10" | "20" | "50";
+
+const WINDOW_OPTIONS: { value: HistoryWindow; label: string; hint: string }[] = [
+  { value: "10", label: "Últimos 10", hint: "Tendência imediata" },
+  { value: "20", label: "Últimos 20", hint: "Curto prazo" },
+  { value: "50", label: "Últimos 50", hint: "Médio prazo" },
+  { value: "all", label: "Histórico Total", hint: "Probabilidade real" },
+];
 
 
 interface Props {
