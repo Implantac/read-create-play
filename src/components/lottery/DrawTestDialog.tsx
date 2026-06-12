@@ -330,7 +330,8 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
                     </div>
                   </div>
                 )}
-                </div>
+
+
 
                 <div className="p-3 rounded-lg border border-border/60 bg-muted/30">
                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1 mb-2">
