@@ -339,6 +339,7 @@ export function BestGamesPanel({ rankedGames, lotteryId, lotteryName, pick, maxN
                     <Button variant="ghost" size="sm" className="h-7 w-7 sm:h-8 sm:w-8 p-0 rounded-lg" onClick={() => handleCopy(gq.game, key)}>
                       {copiedGame === key ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
                     </Button>
+                    <DrawTestDialog numbers={gq.game} />
                     <Button
                       variant="ghost" size="sm" className="h-7 w-7 sm:h-8 sm:w-8 p-0 rounded-lg"
                       disabled={savingGame === key || isSaved}
