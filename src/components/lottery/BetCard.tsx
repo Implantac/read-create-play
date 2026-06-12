@@ -1,10 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Copy, Check, Shield, TrendingUp, ChevronDown, ChevronUp } from "lucide-react";
+import { Copy, Check, Shield, TrendingUp, ChevronDown, ChevronUp, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useState } from "react";
 import { AIAnalystBriefing } from "./AIAnalystBriefing";
+import { DrawTestDialog } from "./DrawTestDialog";
 
 interface BetCardProps {
   numbers: number[];
