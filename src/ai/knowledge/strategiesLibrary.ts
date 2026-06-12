@@ -314,30 +314,45 @@ export function runIntelligentPipeline(
   const recentDraws = draws.slice(0, 50);
   pipeline.push({ step: "Coleta", detail: `${recentDraws.length} concursos recentes`, count: recentDraws.length });
 
+  // Garante stats válido — se vazio, sintetiza um stats neutro a partir do universo
+  let safeStats = stats;
+  if (!safeStats || safeStats.length === 0) {
+    safeStats = Array.from({ length: rules.totalNumbers }, (_, i) => ({
+      number: i + 1,
+      frequency: 1,
+      lastSeen: 0,
+      cycleScore: 0,
+      status: "neutral",
+    })) as unknown as NumberStats[];
+  }
+
   // Etapa 2 — Calcular métricas
   const avgSum = recentDraws.length > 0
     ? recentDraws.reduce((s, d) => s + d.numbers.reduce((a, b) => a + b, 0), 0) / recentDraws.length
-    : 0;
-  pipeline.push({ step: "Métricas", detail: `Soma média: ${avgSum.toFixed(0)}`, count: stats.length });
+    : (rules.idealSumRange ? (rules.idealSumRange[0] + rules.idealSumRange[1]) / 2 : 0);
+  pipeline.push({ step: "Métricas", detail: `Soma média: ${avgSum.toFixed(0)}`, count: safeStats.length });
 
   // Etapa 3 — Gerar números candidatos via estratégia
-  const strategy = executeStrategy(strategyId, stats, draws, lotteryId);
+  const strategy = executeStrategy(strategyId, safeStats, draws, lotteryId);
   pipeline.push({ step: "Candidatos", detail: `${strategy.candidateNumbers.length} números selecionados`, count: strategy.candidateNumbers.length });
 
   // Etapa 4 — Criar combinações com filtros
-  const rawGames = generateFilteredCombinations(strategy, rules.pick, gameCount * 20, rules);
+  const rawGames = generateFilteredCombinations(strategy, rules.pick, Math.max(gameCount * 20, gameCount + 5), rules);
   pipeline.push({ step: "Combinações", detail: `${rawGames.length} jogos brutos`, count: rawGames.length });
 
   // Etapa 5 — Ranking por score
   const scored = rawGames.map(game => ({
     game,
-    score: computeGameScore(game, stats, rules, avgSum),
+    score: computeGameScore(game, safeStats, rules, avgSum),
   }));
   scored.sort((a, b) => b.score - a.score);
   pipeline.push({ step: "Ranking", detail: `Score máx: ${scored[0]?.score.toFixed(1) || 0}`, count: scored.length });
 
-  // Etapa 6 — Retornar top N jogos diversos
-  const selected = selectDiverseGames(scored, gameCount, rules.pick);
+  // Etapa 6 — Retornar top N jogos diversos (garante mínimo)
+  let selected = selectDiverseGames(scored, gameCount, rules.pick);
+  if (selected.length === 0 && scored.length > 0) {
+    selected = scored.slice(0, gameCount);
+  }
   pipeline.push({ step: "Seleção", detail: `${selected.length} jogos finais`, count: selected.length });
 
   return {
@@ -345,7 +360,7 @@ export function runIntelligentPipeline(
     games: selected.map(s => s.game),
     scores: selected.map(s => s.score),
     confidences: selected.map(s => Math.round(s.score)),
-    reasons: selected.map(s => generateAIEvaluation(s.game, stats, rules, avgSum)),
+    reasons: selected.map(s => generateAIEvaluation(s.game, safeStats, rules, avgSum)),
     pipeline,
   };
 }
