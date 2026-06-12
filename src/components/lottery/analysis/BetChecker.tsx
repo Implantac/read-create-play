@@ -104,10 +104,10 @@ function getEstimatedPrize(lotteryId: string, hits: number): { value: number; la
 /** Try to get the real prize value from prize_tiers data */
 function getRealPrizeLabel(prizeTiers: DrawPrizeData | null | undefined, hits: number): string | undefined {
   if (!prizeTiers?.premiacoes) return undefined;
-  const tier = prizeTiers.premiacoes.find(p => {
-    const desc = p.descricao.toLowerCase();
-    return desc.includes(`${hits} acerto`) || desc.includes(`${hits} ponto`) || p.faixa === hits;
-  });
+  // Match exato por fronteira de dígito — evita colisão (hits=5 vs "15 acertos").
+  // O campo `faixa` é índice ordinal (1..N), NÃO contagem de acertos.
+  const re = new RegExp(`(^|[^\\d])${hits}\\s+(acerto|ponto)s?\\b`, "i");
+  const tier = prizeTiers.premiacoes.find(p => re.test(p.descricao || ""));
   if (tier && tier.valorPremio > 0) {
     return `R$ ${tier.valorPremio.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}${tier.ganhadores > 0 ? ` (${tier.ganhadores} ganh.)` : ""}`;
   }
