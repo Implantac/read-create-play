@@ -129,12 +129,22 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          {/* Bet preview */}
-          <div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
-              Sua aposta ({numbers.length} nº)
-            </div>
+        <Tabs defaultValue="single" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="single" className="gap-1.5">
+              <Target className="w-3.5 h-3.5" /> Concurso único
+            </TabsTrigger>
+            <TabsTrigger value="scan" className="gap-1.5">
+              <Radar className="w-3.5 h-3.5" /> Varredura
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="single" className="space-y-4 mt-4">
+            {/* Bet preview */}
+            <div>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
+                Sua aposta ({numbers.length} nº)
+              </div>
             <div className="flex flex-wrap gap-1.5">
               {[...numbers].sort((a, b) => a - b).map(n => (
                 <span
