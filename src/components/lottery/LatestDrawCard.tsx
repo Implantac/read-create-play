@@ -37,7 +37,7 @@ export function LatestDrawCard() {
         <Button
           size="sm"
           variant="outline"
-          onClick={syncDraws}
+          onClick={() => syncDraws()}
           disabled={syncing}
           className="gap-2 h-8 text-xs"
         >
