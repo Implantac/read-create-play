@@ -58,6 +58,59 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
     return { hits, matched, estimated, real };
   }, [selectedDraw, numbers, selectedLottery, prizeMap]);
 
+  // ─── Scan mode: aggregate over all draws in a window ──────────────────────
+  const [scanWindow, setScanWindow] = useState<ScanWindow>("50");
+  const scanResult = useMemo(() => {
+    if (numbers.length === 0 || draws.length === 0) return null;
+    const subset = scanWindow === "all" ? draws : draws.slice(0, parseInt(scanWindow, 10));
+    const maxHits = getMaxPossibleHits(selectedLottery, numbers.length);
+    const hitsByTier = new Map<number, number>();
+    let bestHit = 0;
+    let bestConcurso: number | null = null;
+    let totalRealPrize = 0;
+    let totalEstimatedPrize = 0;
+    let prizedCount = 0;
+    let closeMissCount = 0; // 1 number away from any prize tier
+
+    subset.forEach(draw => {
+      const { hits } = matchBetAgainstDraw(numbers, draw.numbers, selectedLottery);
+      hitsByTier.set(hits, (hitsByTier.get(hits) || 0) + 1);
+      if (hits > bestHit) { bestHit = hits; bestConcurso = draw.concurso; }
+      const real = getRealPrizeLabel(prizeMap.get(draw.concurso), hits);
+      const est = getEstimatedPrize(selectedLottery, hits);
+      if (est) {
+        prizedCount++;
+        totalEstimatedPrize += est.value;
+      }
+      if (real) {
+        const match = real.match(/R\$\s*([\d.,]+)/);
+        if (match) {
+          const val = parseFloat(match[1].replace(/\./g, "").replace(",", "."));
+          if (!isNaN(val)) totalRealPrize += val;
+        }
+      }
+      // Close-miss: would have prized with 1 more number
+      const nextTierEst = getEstimatedPrize(selectedLottery, hits + 1);
+      if (!est && nextTierEst) closeMissCount++;
+    });
+
+    const tiers = Array.from(hitsByTier.entries())
+      .sort((a, b) => b[0] - a[0])
+      .filter(([h]) => h > 0);
+
+    return {
+      totalDraws: subset.length,
+      maxHits,
+      bestHit,
+      bestConcurso,
+      prizedCount,
+      closeMissCount,
+      totalRealPrize,
+      totalEstimatedPrize,
+      tiers,
+    };
+  }, [numbers, draws, scanWindow, selectedLottery, prizeMap]);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
