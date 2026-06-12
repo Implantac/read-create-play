@@ -424,17 +424,26 @@ function generateFilteredCombinations(
   count: number,
   rules: LotteryRules
 ): number[][] {
-  const pool = strategy.candidateNumbers;
-  if (pool.length < pick) return [];
+  // Pool primário: candidatos da estratégia. Se for pequeno demais,
+  // completa com o universo inteiro para nunca retornar zero jogos.
+  let pool = strategy.candidateNumbers.slice();
+  if (pool.length < pick) {
+    const universe = Array.from({ length: rules.totalNumbers }, (_, i) => i + 1);
+    const set = new Set(pool);
+    for (const n of universe) if (!set.has(n)) pool.push(n);
+  }
 
   const games: number[][] = [];
   const seen = new Set<string>();
+  const maxAttempts = count * 6;
 
-  for (let attempt = 0; attempt < count * 3 && games.length < count; attempt++) {
-    // Weighted sampling
+  for (let attempt = 0; attempt < maxAttempts && games.length < count; attempt++) {
+    // Relaxa os filtros após metade das tentativas se ainda não houver jogos suficientes
+    const relax = attempt > maxAttempts / 2 && games.length < Math.max(1, count / 2);
+
     const game: number[] = [];
     const remaining = [...pool];
-    
+
     for (let i = 0; i < pick && remaining.length > 0; i++) {
       const totalW = remaining.reduce((s, n) => s + (strategy.weights.get(n) || 1), 0);
       let r = Math.random() * totalW;
@@ -448,31 +457,47 @@ function generateFilteredCombinations(
       remaining.splice(idx, 1);
     }
 
+    if (game.length < pick) continue;
+
     game.sort((a, b) => a - b);
     const key = game.join(",");
     if (seen.has(key)) continue;
     seen.add(key);
 
-    // Quick filters
-    const evenCount = game.filter(n => n % 2 === 0).length;
-    const evenRatio = evenCount / pick;
-    if (evenRatio < 0.25 || evenRatio > 0.75) continue;
+    if (!relax) {
+      const evenCount = game.filter(n => n % 2 === 0).length;
+      const evenRatio = evenCount / pick;
+      if (evenRatio < 0.25 || evenRatio > 0.75) continue;
 
-    const sum = game.reduce((a, b) => a + b, 0);
-    if (rules.idealSumRange) {
-      const [lo, hi] = rules.idealSumRange;
-      const margin = (hi - lo) * 0.3;
-      if (sum < lo - margin || sum > hi + margin) continue;
+      const sum = game.reduce((a, b) => a + b, 0);
+      if (rules.idealSumRange) {
+        const [lo, hi] = rules.idealSumRange;
+        const margin = (hi - lo) * 0.4;
+        if (sum < lo - margin || sum > hi + margin) continue;
+      }
+
+      let maxSeq = 1, curSeq = 1;
+      for (let i = 1; i < game.length; i++) {
+        if (game[i] - game[i - 1] === 1) { curSeq++; maxSeq = Math.max(maxSeq, curSeq); }
+        else curSeq = 1;
+      }
+      if (maxSeq > (rules.maxRecommendedSequence || 3)) continue;
     }
 
-    // Sequence check
-    let maxSeq = 1, curSeq = 1;
-    for (let i = 1; i < game.length; i++) {
-      if (game[i] - game[i - 1] === 1) { curSeq++; maxSeq = Math.max(maxSeq, curSeq); }
-      else curSeq = 1;
-    }
-    if (maxSeq > (rules.maxRecommendedSequence || 3)) continue;
+    games.push(game);
+  }
 
+  // Garantia final: se ainda assim não houver jogos, gera amostras aleatórias uniformes
+  while (games.length < count) {
+    const universe = Array.from({ length: rules.totalNumbers }, (_, i) => i + 1);
+    for (let i = universe.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [universe[i], universe[j]] = [universe[j], universe[i]];
+    }
+    const game = universe.slice(0, pick).sort((a, b) => a - b);
+    const key = game.join(",");
+    if (seen.has(key)) { if (games.length === 0) games.push(game); break; }
+    seen.add(key);
     games.push(game);
   }
 
