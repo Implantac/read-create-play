@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from "react";
+import { useState, lazy, Suspense, useMemo } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
@@ -11,7 +11,16 @@ import { useSavedBets } from "@/hooks/useSavedBets";
 import { useGenerationHistory } from "@/hooks/useGenerationHistory";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { evaluateBetQuality } from "@/engine/stats/bet-quality";
+import { computeFrequencyStats } from "@/engine/stats/statistics";
 import { toast } from "sonner";
+
+type HistoryWindow = "all" | "10" | "20" | "50";
+const WINDOW_OPTIONS: { value: HistoryWindow; label: string; hint: string }[] = [
+  { value: "10", label: "Últimos 10", hint: "Tendência imediata" },
+  { value: "20", label: "Últimos 20", hint: "Curto prazo" },
+  { value: "50", label: "Últimos 50", hint: "Médio prazo" },
+  { value: "all", label: "Histórico Total", hint: "Probabilidade real" },
+];
 
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
