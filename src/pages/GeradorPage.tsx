@@ -357,6 +357,7 @@ const GeradorPage = () => {
                             <p className={`text-2xl font-bold font-mono tabular-nums leading-none ${res.score >= 90 ? 'text-emerald-400' : res.score >= 75 ? 'text-primary' : 'text-amber-400'}`}>{res.score}<span className="text-sm text-muted-foreground">/100</span></p>
                             <p className="text-[10px] font-medium uppercase text-emerald-400/90 tracking-wider mt-1">{res.score >= 90 ? 'Excelente' : res.score >= 75 ? 'Alta Convergência' : 'Estável'}</p>
                           </div>
+                          <DrawTestDialog numbers={res.numbers} />
                           <Button
                             variant="outline"
                             size="icon"
