@@ -61,10 +61,11 @@ export function getEstimatedPrize(lotteryId: string, hits: number): { value: num
 
 export function getRealPrizeLabel(prizeTiers: DrawPrizeData | null | undefined, hits: number): string | undefined {
   if (!prizeTiers?.premiacoes) return undefined;
-  const tier = prizeTiers.premiacoes.find(p => {
-    const desc = p.descricao.toLowerCase();
-    return desc.includes(`${hits} acerto`) || desc.includes(`${hits} ponto`) || p.faixa === hits;
-  });
+  // Exact word-boundary match against "<hits> acerto(s)" or "<hits> ponto(s)" to avoid
+  // substring collisions (e.g. hits=5 matching "15 acertos"). The numeric `faixa` field
+  // is an ORDINAL tier index (1..N), NOT the hit count — never compare it to `hits`.
+  const re = new RegExp(`(^|[^\\d])${hits}\\s+(acerto|ponto)s?\\b`, "i");
+  const tier = prizeTiers.premiacoes.find(p => re.test(p.descricao || ""));
   if (tier && tier.valorPremio > 0) {
     return `R$ ${tier.valorPremio.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}${tier.ganhadores > 0 ? ` (${tier.ganhadores} ganh.)` : ""}`;
   }
