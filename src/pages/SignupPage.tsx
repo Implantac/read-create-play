@@ -75,12 +75,12 @@ export default function SignupPage() {
       <div className="min-h-screen flex items-center justify-center bg-background px-4 relative overflow-hidden">
         <div className="absolute inset-0 gradient-mesh" />
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="relative z-10 w-full max-w-md">
-          <Card className="glass-card shadow-2xl shadow-primary/5 text-center">
+          <Card className="text-center">
             <CardHeader>
-              <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center">
-                <Mail className="w-8 h-8 text-primary" />
+              <div className="mx-auto w-14 h-14 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                <Mail className="w-7 h-7 text-primary" />
               </div>
-              <CardTitle className="text-xl">Verifique seu email</CardTitle>
+              <CardTitle className="text-xl mt-2">Verifique seu email</CardTitle>
               <CardDescription>
                 Enviamos um link de confirmação para <strong className="text-foreground">{email}</strong>. Clique no link para ativar sua conta.
               </CardDescription>
@@ -97,15 +97,10 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 relative overflow-hidden">
-      {/* Background effects */}
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8 relative overflow-hidden">
       <div className="absolute inset-0 gradient-mesh" />
       <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/3 left-1/4 w-80 h-80 bg-neon-blue/5 rounded-full blur-3xl" />
-      <div className="absolute inset-0 opacity-[0.02]" style={{
-        backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
-        backgroundSize: '60px 60px'
-      }} />
+      <div className="absolute bottom-1/3 left-1/4 w-80 h-80 bg-accent/5 rounded-full blur-3xl" />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -113,19 +108,19 @@ export default function SignupPage() {
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="w-full max-w-md relative z-10"
       >
-        <Card className="glass-card shadow-premium p-4 rounded-[2.5rem]">
+        <Card className="shadow-premium">
           <CardHeader className="text-center space-y-4 pb-2">
             <motion.div
-              initial={{ scale: 0.8 }}
+              initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
             >
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25 mx-auto overflow-hidden">
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center mx-auto overflow-hidden bg-card border border-primary/20 shadow-gold">
                 <img src="/logo.png" alt="Titan Loterias" className="w-14 h-14 object-contain" />
               </div>
             </motion.div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">
+              <h1 className="text-2xl font-bold tracking-tight">
                 Criar <span className="gradient-brand-text">Conta</span>
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
@@ -135,24 +130,24 @@ export default function SignupPage() {
           </CardHeader>
           <form onSubmit={handleSignup}>
             <CardContent className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Nome completo</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="name" className="text-xs font-medium text-muted-foreground">Nome completo</Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="name"
                     placeholder="Seu nome"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="pl-10 h-11 bg-muted/30 border-border/50 focus:border-primary/50 focus:ring-primary/20 transition-colors"
+                    className="pl-10"
                     required
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Telefone (com DDD)</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="phone" className="text-xs font-medium text-muted-foreground">Telefone (com DDD)</Label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="phone"
                     type="tel"
@@ -169,47 +164,47 @@ export default function SignupPage() {
                         : "";
                       setPhone(formatted);
                     }}
-                    className="pl-10 h-11 bg-muted/30 border-border/50 focus:border-primary/50 focus:ring-primary/20 transition-colors"
+                    className="pl-10"
                     required
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Email</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-xs font-medium text-muted-foreground">Email</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
                     placeholder="seu@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-11 bg-muted/30 border-border/50 focus:border-primary/50 focus:ring-primary/20 transition-colors"
+                    className="pl-10"
                     required
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Senha</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="password" className="text-xs font-medium text-muted-foreground">Senha</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="password"
                     type="password"
                     placeholder="Mínimo 6 caracteres"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 h-11 bg-muted/30 border-border/50 focus:border-primary/50 focus:ring-primary/20 transition-colors"
+                    className="pl-10"
                     required
                   />
                 </div>
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-3 pt-2">
-              <Button type="submit" variant="premium" className="w-full h-14 text-sm" disabled={loading}>
-                {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              <Button type="submit" variant="premium" size="lg" className="w-full" disabled={loading}>
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                 Criar conta grátis
-                {!loading && <ArrowRight className="w-4 h-4 ml-2" />}
+                {!loading && <ArrowRight className="w-4 h-4" />}
               </Button>
               <p className="text-sm text-center text-muted-foreground pt-2">
                 Já tem conta?{" "}
@@ -221,8 +216,8 @@ export default function SignupPage() {
           </form>
         </Card>
 
-        <p className="text-center text-[10px] text-muted-foreground/40 mt-4 font-mono uppercase tracking-widest">
-          Motor estatístico v4.0 • ML • Database
+        <p className="text-center text-[10px] text-muted-foreground/50 mt-4 font-mono uppercase tracking-widest">
+          Motor estatístico v4.0
         </p>
       </motion.div>
     </div>
