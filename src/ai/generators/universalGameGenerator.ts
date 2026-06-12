@@ -109,11 +109,68 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     scoreGame(g, config.lotteryId, config.stats, config.draws, config.riskProfile)
   );
 
+  // BACKTEST RE-RANK: ajusta o totalScore com performance histórica real
+  // (acertos médios + frequência de hits ≥ pick*0.6 nos últimos 50 sorteios).
+  const backtestWindow = config.draws.slice(0, 50);
+  const expectedHits = (rules.pick * rules.pick) / rules.totalNumbers;
+  const rareThreshold = Math.ceil(rules.pick * 0.6);
+  for (const s of scored) {
+    const set = new Set(s.numbers);
+    let hits = 0, rare = 0;
+    for (const d of backtestWindow) {
+      const h = d.numbers.filter(n => set.has(n)).length;
+      hits += h;
+      if (h >= rareThreshold) rare++;
+    }
+    const avgHits = backtestWindow.length > 0 ? hits / backtestWindow.length : 0;
+    const performance = expectedHits > 0 ? avgHits / expectedHits : 1; // 1 = neutro
+    const backtestBonus = Math.max(-8, Math.min(12, (performance - 1) * 20 + rare * 2));
+    s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + backtestBonus)));
+  }
+
   // Sort by score and take top N, ensuring diversity
+  scored.sort((a, b) => b.totalScore - a.totalScore);
+
+  // HILL-CLIMBING: refina os top candidatos trocando 1 número por vez
+  const topK = Math.min(scored.length, Math.max(config.count * 3, 15));
+  const universe = Array.from({ length: rules.totalNumbers }, (_, i) => i + 1);
+  for (let i = 0; i < topK; i++) {
+    scored[i] = hillClimb(scored[i], universe, config, 8);
+  }
   scored.sort((a, b) => b.totalScore - a.totalScore);
 
   const selected = selectDiverse(scored, config.count, rules.pick);
   return selected;
+}
+
+/** Hill-climbing: tenta substituir cada número por outro do universo se melhorar o score. */
+function hillClimb(
+  game: ScoredGame,
+  universe: number[],
+  config: GeneratorConfig,
+  maxIterations: number
+): ScoredGame {
+  let best = game;
+  for (let iter = 0; iter < maxIterations; iter++) {
+    let improved = false;
+    for (let i = 0; i < best.numbers.length; i++) {
+      for (const candidate of universe) {
+        if (best.numbers.includes(candidate)) continue;
+        if (config.filters.excludeNumbers?.includes(candidate)) continue;
+        const next = [...best.numbers];
+        next[i] = candidate;
+        const scored = scoreGame(next, config.lotteryId, config.stats, config.draws, config.riskProfile);
+        if (scored.totalScore > best.totalScore + 1) {
+          best = scored;
+          improved = true;
+          break;
+        }
+      }
+      if (improved) break;
+    }
+    if (!improved) break;
+  }
+  return best;
 }
 
 /** Build weighted number pool based on strategy and stats */

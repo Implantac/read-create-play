@@ -34,9 +34,8 @@ export function scoreGame(
   // Structural score: pattern profile
   const structScore = Math.round(pattern.overallScore * 100);
 
-  // Coverage score: lift observado vs esperado nos últimos 30 sorteios.
-  // Lift = média de acertos / acertos esperados pela hipótese de uniformidade.
-  // Lift = 1.0 → uniforme (50 pts); >1.0 boost; <1.0 penalidade.
+  // Coverage score: lift observado vs esperado nos últimos 30 sorteios,
+  // com SHRINKAGE BAYESIANO (prior uniforme = 1.0) para evitar ruído com poucas amostras.
   const recent = draws.slice(0, 30);
   const gameSet = new Set(sorted);
   let totalHits = 0;
@@ -45,9 +44,15 @@ export function scoreGame(
   }
   const avgHits = recent.length > 0 ? totalHits / recent.length : 0;
   const expectedHits = (rules.pick * sorted.length) / rules.totalNumbers;
-  const lift = expectedHits > 0 ? avgHits / expectedHits : 1;
-  // Mapeia lift∈[0.5,1.5] → score∈[0,100], com 1.0 = 50.
-  const coverageScore = Math.max(0, Math.min(100, Math.round(50 + (lift - 1) * 100)));
+  const rawLift = expectedHits > 0 ? avgHits / expectedHits : 1;
+  // Shrinkage: confiança = n/(n+k), k=15 (peso do prior uniforme)
+  const conf = recent.length / (recent.length + 15);
+  const lift = rawLift * conf + 1 * (1 - conf);
+  // Bônus extra para jogos que acertaram ≥ pick*0.6 em algum sorteio recente (hit raro)
+  const hitThreshold = Math.ceil(rules.pick * 0.6);
+  const rareHits = recent.filter(d => d.numbers.filter(n => gameSet.has(n)).length >= hitThreshold).length;
+  const rareBoost = Math.min(15, rareHits * 5);
+  const coverageScore = Math.max(0, Math.min(100, Math.round(50 + (lift - 1) * 100 + rareBoost)));
 
   // Diversity score: how different from average
   const avgFreq = selectedStats.reduce((s, st) => s + st.frequency, 0) / selectedStats.length;
