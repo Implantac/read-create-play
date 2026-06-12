@@ -113,7 +113,7 @@ function backtestStrategy(
 
 function getCostForLottery(lotteryId: string): number {
   const costs: Record<string, number> = {
-    lotofacil: 3.0, megasena: 5.0, quina: 2.5, lotomania: 3.0,
+    lotofacil: 3.50, megasena: 5.0, quina: 2.5, lotomania: 3.0,
     duplasena: 2.5, timemania: 3.5, diadesorte: 2.5, supersete: 2.5,
   };
   return costs[lotteryId] || 3.0;
