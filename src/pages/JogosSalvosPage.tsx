@@ -7,11 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Bookmark, Trophy, TrendingUp, BarChart3, ChevronDown, ChevronUp, Loader2, Calendar, Star, Trash2 } from "lucide-react";
+import { Bookmark, Trophy, TrendingUp, BarChart3, ChevronDown, ChevronUp, Loader2, Calendar, Star, Trash2, Target } from "lucide-react";
 import { m, AnimatePresence } from "framer-motion";
 import { useSavedBets, SavedBet } from "@/hooks/useSavedBets";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { StatsCard } from "@/components/common/StatsCard";
+import { DrawTestDialog } from "@/components/lottery/DrawTestDialog";
 
 
 const DRAW_RANGE_OPTIONS = [
@@ -107,6 +108,15 @@ const JogosSalvosPage = () => {
                       </p>
                       <p className="text-[10px] text-muted-foreground mt-0.5">Melhor: {perf.bestHits} acertos</p>
                     </div>
+                    <DrawTestDialog
+                      numbers={bet.numbers}
+                      trigger={
+                        <Button variant="outline" size="sm" className="gap-1.5">
+                          <Target className="w-3.5 h-3.5" />
+                          Testar
+                        </Button>
+                      }
+                    />
                     <Button
                       variant="ghost"
                       size="icon"
