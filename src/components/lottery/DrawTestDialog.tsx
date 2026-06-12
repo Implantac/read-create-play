@@ -238,8 +238,115 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
                 </div>
               </div>
             </div>
-          )}
-        </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="scan" className="space-y-4 mt-4">
+            <div>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
+                Janela de varredura
+              </div>
+              <div className="grid grid-cols-4 gap-1.5">
+                {SCAN_OPTIONS.map(opt => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setScanWindow(opt.value)}
+                    className={`p-2 rounded-md border text-[11px] font-semibold transition-colors ${
+                      scanWindow === opt.value
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border/60 bg-background/40 hover:border-primary/50"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {scanResult && (
+              <div className="space-y-3">
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="p-3 rounded-lg border border-border/60 bg-muted/30">
+                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground">Melhor acerto</div>
+                    <div className="text-xl font-bold font-mono tabular-nums text-primary mt-1">
+                      {scanResult.bestHit}<span className="text-xs text-muted-foreground font-normal">/{scanResult.maxHits}</span>
+                    </div>
+                    {scanResult.bestConcurso && (
+                      <div className="text-[9px] text-muted-foreground mt-0.5">Conc. {scanResult.bestConcurso}</div>
+                    )}
+                  </div>
+                  <div className="p-3 rounded-lg border border-border/60 bg-muted/30">
+                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground">Premiações</div>
+                    <div className="text-xl font-bold font-mono tabular-nums text-emerald-400 mt-1">
+                      {scanResult.prizedCount}
+                    </div>
+                    <div className="text-[9px] text-muted-foreground mt-0.5">de {scanResult.totalDraws} sorteios</div>
+                  </div>
+                  <div className="p-3 rounded-lg border border-border/60 bg-muted/30">
+                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground">Quase ganhou</div>
+                    <div className="text-xl font-bold font-mono tabular-nums text-amber-400 mt-1">
+                      {scanResult.closeMissCount}
+                    </div>
+                    <div className="text-[9px] text-muted-foreground mt-0.5">faltou 1 nº</div>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-lg border border-border/60 bg-muted/30">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1 mb-2">
+                    <Trophy className="w-3 h-3" /> Faturamento acumulado
+                  </div>
+                  <div className="flex items-baseline justify-between">
+                    <div>
+                      <div className="text-[9px] text-muted-foreground">Real (oficial)</div>
+                      <div className="text-base font-semibold text-primary font-mono tabular-nums">
+                        {scanResult.totalRealPrize > 0
+                          ? `R$ ${scanResult.totalRealPrize.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
+                          : "—"}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-[9px] text-muted-foreground">Estimado</div>
+                      <div className="text-base font-semibold font-mono tabular-nums">
+                        {formatCurrency(scanResult.totalEstimatedPrize)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {scanResult.tiers.length > 0 && (
+                  <div className="p-3 rounded-lg border border-border/60 bg-muted/30">
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" /> Distribuição por faixa
+                    </div>
+                    <div className="space-y-1.5">
+                      {scanResult.tiers.map(([hits, count]) => {
+                        const pct = (count / scanResult.totalDraws) * 100;
+                        const prized = !!getEstimatedPrize(selectedLottery, hits);
+                        return (
+                          <div key={hits} className="flex items-center gap-2 text-xs">
+                            <span className={`font-mono tabular-nums w-12 font-semibold ${prized ? "text-primary" : "text-muted-foreground"}`}>
+                              {hits} pts
+                            </span>
+                            <div className="flex-1 h-2 rounded-full bg-background/60 overflow-hidden">
+                              <div
+                                className={`h-full ${prized ? "bg-primary" : "bg-muted-foreground/40"}`}
+                                style={{ width: `${Math.max(2, pct)}%` }}
+                              />
+                            </div>
+                            <span className="font-mono tabular-nums text-muted-foreground w-14 text-right">
+                              {count}× ({pct.toFixed(1)}%)
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
