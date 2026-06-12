@@ -16,6 +16,7 @@ import {
   NumberBall, QualityBar, GradeDistributionBar,
 } from "./LabShared";
 import { SmartPickCard } from "./SmartPickCard";
+import { DrawTestDialog } from "@/components/lottery/DrawTestDialog";
 
 export function BestGamesPanel({ rankedGames, lotteryId, lotteryName, pick, maxNum }: {
   rankedGames: GameQuality[];
