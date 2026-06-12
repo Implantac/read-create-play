@@ -108,6 +108,15 @@ const JogosSalvosPage = () => {
                       </p>
                       <p className="text-[10px] text-muted-foreground mt-0.5">Melhor: {perf.bestHits} acertos</p>
                     </div>
+                    <DrawTestDialog
+                      numbers={bet.numbers}
+                      trigger={
+                        <Button variant="outline" size="sm" className="gap-1.5">
+                          <Target className="w-3.5 h-3.5" />
+                          Testar
+                        </Button>
+                      }
+                    />
                     <Button
                       variant="ghost"
                       size="icon"
