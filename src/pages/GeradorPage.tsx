@@ -79,26 +79,27 @@ const GeradorPage = () => {
     setTimeout(async () => {
       try {
         const result = runIntelligentPipeline(scopedStats, scopedDraws, selectedLottery, strategy, quantity);
-        if (result.games.length > 0) {
-          const processedResults = result.games.map(bet => {
-            const quality = evaluateBetQuality(bet, scopedStats, config, scopedDraws);
-            return {
-              numbers: bet,
-              score: quality.overall,
-              strategy: STRATEGIES.find(s => s.id === strategy)?.name || "Personalizada",
-              grade: quality.grade,
-              description: result.strategy.description,
-              pipeline: result.pipeline
-            };
-          });
-          setResults(processedResults);
-          
-          // Save only the first one to history automatically
-          await saveGeneration(processedResults[0]);
-          
-          setStep(4);
+        if (!result.games || result.games.length === 0) {
+          console.warn("[Gerador] Pipeline retornou 0 jogos", { strategy, quantity, draws: scopedDraws.length, stats: scopedStats.length });
+          toast.error("Não foi possível gerar jogos com a estratégia atual. Tente outra estratégia ou janela.");
+          return;
         }
+        const processedResults = result.games.map(bet => {
+          const quality = evaluateBetQuality(bet, scopedStats, config, scopedDraws);
+          return {
+            numbers: bet,
+            score: quality.overall,
+            strategy: STRATEGIES.find(s => s.id === strategy)?.name || "Personalizada",
+            grade: quality.grade,
+            description: result.strategy.description,
+            pipeline: result.pipeline
+          };
+        });
+        setResults(processedResults);
+        await saveGeneration(processedResults[0]);
+        setStep(4);
       } catch (error) {
+        console.error("[Gerador] Erro:", error);
         toast.error("Erro ao gerar jogos. Tente novamente.");
       } finally {
         setGenerating(false);
