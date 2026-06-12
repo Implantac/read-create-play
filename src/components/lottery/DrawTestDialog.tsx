@@ -263,7 +263,7 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
                 Janela de varredura
               </div>
-              <div className="grid grid-cols-4 gap-1.5">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                 {SCAN_OPTIONS.map(opt => (
                   <button
                     key={opt.value}
