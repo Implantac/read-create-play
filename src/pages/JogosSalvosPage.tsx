@@ -79,27 +79,42 @@ const JogosSalvosPage = () => {
         <StatsCard title="Premiações Recentes" value={savedBets.reduce((s, b) => s + computePerformance(b).totalPrizes, 0)} />
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {savedBets.map((bet) => {
           const perf = computePerformance(bet);
-          const isExpanded = expandedBet === bet.id;
+          const hasPrize = perf.totalPrizes > 0;
           return (
-            <Card key={bet.id} className="border-border/60 bg-card/80">
+            <Card
+              key={bet.id}
+              className={hasPrize ? "border-primary/30 bg-primary/[0.03]" : ""}
+            >
               <CardContent className="p-4">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex flex-wrap gap-1">
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  <div className="flex flex-wrap gap-1.5">
                     {bet.numbers.map(n => (
-                      <span key={n} className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-xs font-bold text-primary">
+                      <span
+                        key={n}
+                        className="w-8 h-8 rounded-full bg-muted/60 border border-border/60 flex items-center justify-center text-xs font-mono tabular-nums font-semibold text-foreground"
+                      >
                         {String(n).padStart(2, "0")}
                       </span>
                     ))}
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <p className="text-xs font-bold">{perf.totalPrizes} Premiações</p>
-                      <p className="text-[10px] text-muted-foreground">Melhor: {perf.bestHits} acertos</p>
+                      <p className={`text-sm font-mono tabular-nums font-semibold ${hasPrize ? "text-primary" : "text-foreground"}`}>
+                        {perf.totalPrizes} <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-sans">Premiações</span>
+                      </p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">Melhor: {perf.bestHits} acertos</p>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={() => deleteBet(bet.id)} className="text-destructive"><Trash2 className="w-4 h-4" /></Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => deleteBet(bet.id)}
+                      className="text-muted-foreground hover:text-destructive opacity-60 hover:opacity-100"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
               </CardContent>
