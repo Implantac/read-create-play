@@ -22,42 +22,42 @@ const DashboardPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-12 animate-in fade-in duration-700 max-w-7xl mx-auto px-4 sm:px-6 pb-20">
-      <div className="space-y-4">
-        <div className="flex items-center gap-3">
-          <Badge variant="outline" className="px-3 py-1 text-[10px] font-black uppercase tracking-widest border-primary/30 text-primary bg-primary/5">
-            Neural Command Center v4.0
+    <div className="space-y-10 animate-in fade-in duration-500 max-w-7xl mx-auto px-4 sm:px-6 pb-20">
+      <div className="space-y-5">
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider border-primary/30 text-primary bg-primary/5">
+            Command Center
           </Badge>
-          <div className="flex items-center gap-2 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Sincronizado</span>
+            <span className="text-[10px] font-medium text-emerald-400 uppercase tracking-wider">Sincronizado</span>
           </div>
         </div>
-        
+
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-2">
-            <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
-              CENTRAL DE <span className="gradient-brand-text">INTELIGÊNCIA</span> TITAN
+          <div className="space-y-2 max-w-2xl">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight">
+              Central de <span className="gradient-brand-text">Inteligência</span>
             </h1>
-            <p className="text-muted-foreground font-medium max-w-lg opacity-60">
-              Titan Loterias é uma plataforma de inteligência aplicada às loterias brasileiras que analisa históricos oficiais, identifica padrões estatísticos e utiliza IA para gerar apostas mais estratégicas.
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Análise de históricos oficiais, padrões estatísticos e IA aplicada às loterias brasileiras para gerar apostas mais estratégicas.
             </p>
           </div>
-          
+
           <div className="flex flex-wrap gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="rounded-xl font-black uppercase text-[10px] tracking-widest gap-2 h-10 px-4"
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
               onClick={() => navigate("/analise")}
             >
               <History className="w-4 h-4" />
               Análise Histórica
             </Button>
-            <Button 
-              variant="premium" 
-              size="sm" 
-              className="rounded-xl font-black uppercase text-[10px] tracking-widest gap-2 h-10 px-4 shadow-lg shadow-primary/20"
+            <Button
+              variant="premium"
+              size="sm"
+              className="gap-2"
               onClick={() => navigate("/gerador")}
             >
               <Target className="w-4 h-4" />
@@ -69,45 +69,45 @@ const DashboardPage = () => {
 
       <TitanStatsModule />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
           <TitanAIModule />
           <TitanCommandCenter />
         </div>
-        
-        <div className="space-y-8">
-          <RecommendationCard 
-            luckyGame={luckyGame} 
-            generating={generating} 
-            onGenerate={(p) => generateGame(p)} 
-            onShowBriefing={() => setShowBriefing(true)} 
+
+        <div className="space-y-6">
+          <RecommendationCard
+            luckyGame={luckyGame}
+            generating={generating}
+            onGenerate={(p) => generateGame(p)}
+            onShowBriefing={() => setShowBriefing(true)}
           />
-          
-          <Card className="p-8 glass-card border-white/5 space-y-6">
-            <h4 className="text-lg font-black uppercase tracking-tighter italic flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-primary" />
+
+          <Card className="p-6 space-y-5">
+            <h4 className="text-sm font-semibold uppercase tracking-wider flex items-center gap-2 text-foreground/90">
+              <Sparkles className="w-4 h-4 text-primary" />
               Insights do Dia
             </h4>
-            
-            <div className="space-y-4">
+
+            <div className="space-y-3">
               {[
-                { title: "Tendência de Pares", value: "Estatística Premium", desc: "Titan Score 91/100 detectado." },
-                { title: "Soma Ideal", value: "IA Preditiva", desc: "Intervalo de alta probabilidade detectado." },
-                { title: "Alerta de Ciclo", value: "Cíclico Ativo", desc: "Dezenas em convergência estatística." },
+                { title: "Tendência de Pares", value: "Premium", desc: "Titan Score 91/100 detectado." },
+                { title: "Soma Ideal", value: "IA Preditiva", desc: "Intervalo de alta probabilidade." },
+                { title: "Alerta de Ciclo", value: "Ativo", desc: "Dezenas em convergência estatística." },
               ].map((insight, i) => (
-                <div key={i} className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1">
-                  <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{insight.title}</span>
-                    <span className="text-xs font-black text-primary italic">{insight.value}</span>
+                <div key={i} className="p-3 rounded-lg bg-muted/30 border border-border/40 space-y-1">
+                  <div className="flex justify-between items-center gap-3">
+                    <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{insight.title}</span>
+                    <span className="text-[11px] font-semibold text-primary">{insight.value}</span>
                   </div>
-                  <p className="text-[10px] text-muted-foreground opacity-60 leading-relaxed">{insight.desc}</p>
+                  <p className="text-xs text-muted-foreground/80 leading-relaxed">{insight.desc}</p>
                 </div>
               ))}
             </div>
-            
-            <Button variant="ghost" className="w-full rounded-xl text-[10px] font-black uppercase tracking-widest group">
+
+            <Button variant="ghost" size="sm" className="w-full gap-2 group">
               Ver Relatório Completo
-              <BrainCircuit className="w-4 h-4 ml-2 group-hover:rotate-12 transition-transform" />
+              <BrainCircuit className="w-4 h-4 group-hover:rotate-12 transition-transform" />
             </Button>
           </Card>
         </div>
@@ -124,7 +124,7 @@ const DashboardPage = () => {
           />
         )}
       </AnimatePresence>
-      <div className="pt-10 border-t border-white/5">
+      <div className="pt-8 border-t border-border/40">
         <ComplianceDisclaimer />
       </div>
     </div>
