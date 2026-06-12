@@ -298,6 +298,9 @@ const FechamentosPage = () => {
                         </span>
                       ))}
                     </div>
+                    <div className="shrink-0 ml-3">
+                      <DrawTestDialog numbers={game} />
+                    </div>
                   </div>
                 ))}
               </div>
