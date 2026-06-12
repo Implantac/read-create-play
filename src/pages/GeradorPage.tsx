@@ -274,21 +274,21 @@ const GeradorPage = () => {
           )}
 
           {step === 4 && (
-            <div className="space-y-8 animate-in zoom-in duration-500">
+            <div className="space-y-7 animate-in fade-in duration-500">
               <div className="text-center space-y-2">
-                <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto border border-emerald-500/40 mb-4">
-                  <Target className="w-8 h-8 text-emerald-400" />
+                <div className="w-14 h-14 rounded-full bg-emerald-500/15 flex items-center justify-center mx-auto border border-emerald-500/30 mb-3">
+                  <Target className="w-6 h-6 text-emerald-400" />
                 </div>
-                <h3 className="text-3xl font-black uppercase tracking-tighter italic">Predições Finalizadas</h3>
-                <p className="text-muted-foreground">As combinações abaixo apresentam as maiores probabilidades estatísticas baseadas no Titan Score.</p>
+                <h3 className="text-2xl font-bold tracking-tight">Predições Finalizadas</h3>
+                <p className="text-sm text-muted-foreground">As combinações abaixo apresentam as maiores probabilidades estatísticas.</p>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {results.map((res, i) => (
-                  <Card key={i} className="glass-panel border-border/40 hover:border-primary/30 transition-all overflow-hidden relative">
-                    <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
-                    <CardContent className="p-6">
-                      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                  <Card key={i} className="overflow-hidden relative">
+                    <div className="absolute top-0 left-0 w-0.5 h-full bg-primary" />
+                    <CardContent className="p-5">
+                      <div className="flex flex-col md:flex-row items-center justify-between gap-5">
                         <div className="flex flex-wrap gap-2 justify-center">
                           {res.numbers.map((n: number) => (
                             <div key={n} className="lottery-ball">
@@ -297,22 +297,21 @@ const GeradorPage = () => {
 
                           ))}
                         </div>
-                        <div className="flex items-center gap-6 shrink-0">
+                        <div className="flex items-center gap-5 shrink-0">
                           <div className="text-right">
-                            <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Titan Score</p>
-                            <p className={`text-2xl font-black italic leading-none ${res.score >= 90 ? 'text-emerald-400' : res.score >= 75 ? 'text-primary' : 'text-amber-400'}`}>{res.score}/100</p>
-                            <p className="text-[8px] font-black uppercase text-emerald-400 tracking-widest mt-1">{res.score >= 90 ? 'Excelente Oportunidade' : res.score >= 75 ? 'Alta Convergência' : 'Estatística Estável'}</p>
+                            <p className="text-[10px] uppercase font-medium text-muted-foreground tracking-wider">Titan Score</p>
+                            <p className={`text-2xl font-bold font-mono tabular-nums leading-none ${res.score >= 90 ? 'text-emerald-400' : res.score >= 75 ? 'text-primary' : 'text-amber-400'}`}>{res.score}<span className="text-sm text-muted-foreground">/100</span></p>
+                            <p className="text-[10px] font-medium uppercase text-emerald-400/90 tracking-wider mt-1">{res.score >= 90 ? 'Excelente' : res.score >= 75 ? 'Alta Convergência' : 'Estável'}</p>
                           </div>
-                          <Button 
-                            variant="outline" 
-                            size="icon" 
+                          <Button
+                            variant="outline"
+                            size="icon"
                             onClick={() => {
                               saveBet({ numbers: res.numbers, strategy: res.strategy, score: res.score, grade: res.grade });
                               toast.success("Jogo salvo!");
                             }}
-                            className="rounded-xl hover:bg-primary/10"
                           >
-                            <Save className="w-5 h-5" />
+                            <Save className="w-4 h-4" />
                           </Button>
                         </div>
                       </div>
@@ -321,11 +320,12 @@ const GeradorPage = () => {
                 ))}
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-                <Button size="lg" className="rounded-xl px-12 font-black gap-2" onClick={handleSaveAll}>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
+                <Button variant="premium" size="lg" className="px-8 gap-2" onClick={handleSaveAll}>
+                  <Save className="w-4 h-4" />
                   Salvar Todos no Portfólio
                 </Button>
-                <Button variant="outline" size="lg" className="rounded-xl px-12 font-black" onClick={() => setStep(1)}>
+                <Button variant="outline" size="lg" className="px-8" onClick={() => setStep(1)}>
                   Novo Ciclo de Geração
                 </Button>
               </div>
