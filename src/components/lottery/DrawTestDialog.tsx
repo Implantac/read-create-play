@@ -316,11 +316,11 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                       {scanResult.closeMissList.map(({ target, count, missing }) => (
-                        <div key={target} className="flex items-center justify-between text-xs px-2 py-1.5 rounded-md bg-background/40 border border-border/40">
-                          <span className="text-muted-foreground">
+                        <div key={target} className="flex items-center justify-between gap-2 text-[11px] sm:text-xs px-2 py-1.5 rounded-md bg-background/40 border border-border/40">
+                          <span className="text-muted-foreground leading-tight">
                             faltou <span className="font-semibold text-amber-400 font-mono tabular-nums">{missing}</span> nº para <span className="font-semibold text-foreground font-mono tabular-nums">{target} pts</span>
                           </span>
-                          <span className="font-mono tabular-nums font-semibold text-foreground">{count}×</span>
+                          <span className="font-mono tabular-nums font-semibold text-foreground shrink-0">{count}×</span>
                         </div>
                       ))}
                     </div>
