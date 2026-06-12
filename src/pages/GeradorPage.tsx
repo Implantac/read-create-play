@@ -97,42 +97,41 @@ const GeradorPage = () => {
   const prevStep = () => setStep(s => Math.max(s - 1, 1));
 
   return (
-    <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700 pb-20 px-1">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-4">
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Titan Engine v4.0 Alpha</span>
+    <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 pb-20 px-1">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pt-2">
+        <div className="space-y-3 max-w-2xl">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[10px] font-semibold text-primary uppercase tracking-wider">Titan Engine</span>
             </div>
           </div>
-          <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-tight">
-            MOTOR DE <span className="gradient-brand-text">GERAÇÃO DE APOSTAS</span>
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight">
+            Motor de <span className="gradient-brand-text">Geração de Apostas</span>
           </h1>
-          <p className="text-sm text-muted-foreground font-medium max-w-lg leading-relaxed">
-            Análises baseadas em dados históricos, estatística, probabilidade e inteligência artificial para auxiliar na sua tomada de decisão estratégica.
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Análises baseadas em dados históricos, estatística e inteligência artificial para auxiliar sua tomada de decisão.
           </p>
         </div>
       </div>
 
-      
-      <div className="relative group">
-        <div className="absolute -inset-1 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-[2rem] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-1000 pointer-events-none" />
+
+      <div>
         <LotteryContextBanner />
       </div>
 
-      <div className="mb-10 px-4 space-y-6">
-        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">
-          <div className="flex gap-8">
+      <div className="px-2 space-y-3">
+        <div className="flex justify-between items-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          <div className="flex gap-6">
             <span className={step >= 1 ? "text-primary" : ""}>01. Dataset</span>
             <span className={step >= 2 ? "text-primary" : ""}>02. Engine</span>
             <span className={step >= 3 ? "text-primary" : ""}>03. Volume</span>
             <span className={step >= 4 ? "text-primary" : ""}>04. Resultado</span>
           </div>
-          <span>{Math.round((step / 4) * 100)}%</span>
+          <span className="font-mono tabular-nums">{Math.round((step / 4) * 100)}%</span>
         </div>
-        <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-          <m.div 
+        <div className="h-1.5 w-full bg-muted/50 rounded-full overflow-hidden">
+          <m.div
             className="h-full bg-primary"
             initial={{ width: 0 }}
             animate={{ width: `${(step / 4) * 100}%` }}
