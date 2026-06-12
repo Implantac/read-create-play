@@ -70,7 +70,9 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
     let totalRealPrize = 0;
     let totalEstimatedPrize = 0;
     let prizedCount = 0;
-    let closeMissCount = 0; // 1 number away from any prize tier
+    let closeMissCount = 0;
+    // close-miss breakdown: target tier hits -> { count, missing }
+    const closeMissByTier = new Map<number, { count: number; missing: number }>();
 
     subset.forEach(draw => {
       const { hits } = matchBetAgainstDraw(numbers, draw.numbers, selectedLottery);
@@ -89,14 +91,32 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
           if (!isNaN(val)) totalRealPrize += val;
         }
       }
-      // Close-miss: would have prized with 1 more number
-      const nextTierEst = getEstimatedPrize(selectedLottery, hits + 1);
-      if (!est && nextTierEst) closeMissCount++;
+      // Close-miss: find nearest upper prize tier within reach (up to 3 away)
+      if (!est) {
+        for (let delta = 1; delta <= 3; delta++) {
+          const target = hits + delta;
+          if (target > maxHits) break;
+          if (getEstimatedPrize(selectedLottery, target)) {
+            if (delta === 1) closeMissCount++;
+            const prev = closeMissByTier.get(target);
+            if (!prev || delta < prev.missing) {
+              closeMissByTier.set(target, { count: (prev?.count || 0) + 1, missing: delta });
+            } else {
+              closeMissByTier.set(target, { ...prev, count: prev.count + 1 });
+            }
+            break;
+          }
+        }
+      }
     });
 
     const tiers = Array.from(hitsByTier.entries())
       .sort((a, b) => b[0] - a[0])
       .filter(([h]) => h > 0);
+
+    const closeMissList = Array.from(closeMissByTier.entries())
+      .sort((a, b) => a[0] - b[0])
+      .map(([target, info]) => ({ target, ...info }));
 
     return {
       totalDraws: subset.length,
@@ -105,6 +125,7 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
       bestConcurso,
       prizedCount,
       closeMissCount,
+      closeMissList,
       totalRealPrize,
       totalEstimatedPrize,
       tiers,
