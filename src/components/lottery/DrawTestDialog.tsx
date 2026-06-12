@@ -147,7 +147,7 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
         </DialogHeader>
 
         <Tabs defaultValue="single" className="w-full flex-1 flex flex-col overflow-hidden px-4 sm:px-6 pb-4 sm:pb-6 pt-3">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-2 shrink-0">
             <TabsTrigger value="single" className="gap-1.5">
               <Target className="w-3.5 h-3.5" /> Concurso único
             </TabsTrigger>
@@ -156,7 +156,7 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="single" className="space-y-4 mt-4">
+          <TabsContent value="single" className="space-y-4 mt-4 flex-1 overflow-y-auto pr-1 -mr-1">
             {/* Bet preview */}
             <div>
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
