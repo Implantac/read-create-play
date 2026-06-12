@@ -258,7 +258,7 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
             )}
           </TabsContent>
 
-          <TabsContent value="scan" className="space-y-4 mt-4">
+          <TabsContent value="scan" className="space-y-4 mt-4 flex-1 overflow-y-auto pr-1 -mr-1">
             <div>
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
                 Janela de varredura
