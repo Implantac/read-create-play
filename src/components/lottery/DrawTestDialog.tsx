@@ -307,10 +307,29 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
                   <div className="p-3 rounded-lg border border-border/60 bg-muted/30">
                     <div className="text-[9px] uppercase tracking-wider text-muted-foreground">Quase ganhou</div>
                     <div className="text-xl font-bold font-mono tabular-nums text-amber-400 mt-1">
-                      {scanResult.closeMissCount}
+                      {scanResult.closeMissList.reduce((s, c) => s + c.count, 0)}
                     </div>
-                    <div className="text-[9px] text-muted-foreground mt-0.5">faltou 1 nº</div>
+                    <div className="text-[9px] text-muted-foreground mt-0.5">faixas próximas</div>
                   </div>
+                </div>
+
+                {scanResult.closeMissList.length > 0 && (
+                  <div className="p-3 rounded-lg border border-amber-500/30 bg-amber-500/5">
+                    <div className="text-[10px] uppercase tracking-wider text-amber-400/90 mb-2 flex items-center gap-1">
+                      <Target className="w-3 h-3" /> Detalhe de "quase ganhou"
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                      {scanResult.closeMissList.map(({ target, count, missing }) => (
+                        <div key={target} className="flex items-center justify-between text-xs px-2 py-1.5 rounded-md bg-background/40 border border-border/40">
+                          <span className="text-muted-foreground">
+                            faltou <span className="font-semibold text-amber-400 font-mono tabular-nums">{missing}</span> nº para <span className="font-semibold text-foreground font-mono tabular-nums">{target} pts</span>
+                          </span>
+                          <span className="font-mono tabular-nums font-semibold text-foreground">{count}×</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 </div>
 
                 <div className="p-3 rounded-lg border border-border/60 bg-muted/30">
