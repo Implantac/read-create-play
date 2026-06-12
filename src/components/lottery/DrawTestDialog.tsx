@@ -138,7 +138,7 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-2xl sm:max-w-3xl w-[95vw]" onClick={(e) => e.stopPropagation()}>
+      <DialogContent className="max-w-[calc(100vw-1rem)] sm:max-w-2xl lg:max-w-3xl w-[calc(100vw-1rem)] max-h-[90vh] overflow-y-auto p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <HistoryIcon className="w-4 h-4 text-primary" />
@@ -263,7 +263,7 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
                 Janela de varredura
               </div>
-              <div className="grid grid-cols-4 gap-1.5">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                 {SCAN_OPTIONS.map(opt => (
                   <button
                     key={opt.value}
@@ -283,7 +283,7 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
 
             {scanResult && (
               <div className="space-y-3">
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   <div className="p-3 rounded-lg border border-border/60 bg-muted/30">
                     <div className="text-[9px] uppercase tracking-wider text-muted-foreground">Melhor acerto</div>
                     <div className="text-xl font-bold font-mono tabular-nums text-primary mt-1">
@@ -316,11 +316,11 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                       {scanResult.closeMissList.map(({ target, count, missing }) => (
-                        <div key={target} className="flex items-center justify-between text-xs px-2 py-1.5 rounded-md bg-background/40 border border-border/40">
-                          <span className="text-muted-foreground">
+                        <div key={target} className="flex items-center justify-between gap-2 text-[11px] sm:text-xs px-2 py-1.5 rounded-md bg-background/40 border border-border/40">
+                          <span className="text-muted-foreground leading-tight">
                             faltou <span className="font-semibold text-amber-400 font-mono tabular-nums">{missing}</span> nº para <span className="font-semibold text-foreground font-mono tabular-nums">{target} pts</span>
                           </span>
-                          <span className="font-mono tabular-nums font-semibold text-foreground">{count}×</span>
+                          <span className="font-mono tabular-nums font-semibold text-foreground shrink-0">{count}×</span>
                         </div>
                       ))}
                     </div>
