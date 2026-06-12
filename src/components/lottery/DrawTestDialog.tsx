@@ -138,16 +138,16 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-[calc(100vw-1rem)] sm:max-w-2xl lg:max-w-3xl w-[calc(100vw-1rem)] max-h-[90vh] overflow-y-auto p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <HistoryIcon className="w-4 h-4 text-primary" />
-            Simular em sorteio — {config.name}
+      <DialogContent className="max-w-[calc(100vw-0.5rem)] sm:max-w-2xl lg:max-w-3xl w-[calc(100vw-0.5rem)] max-h-[95vh] sm:max-h-[90vh] h-[95vh] sm:h-auto p-0 gap-0 flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-2 shrink-0 border-b border-border/40">
+          <DialogTitle className="flex items-center gap-2 text-sm sm:text-base pr-8">
+            <HistoryIcon className="w-4 h-4 text-primary shrink-0" />
+            <span className="truncate">Simular em sorteio — {config.name}</span>
           </DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="single" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+        <Tabs defaultValue="single" className="w-full flex-1 flex flex-col overflow-hidden px-4 sm:px-6 pb-4 sm:pb-6 pt-3">
+          <TabsList className="grid w-full grid-cols-2 shrink-0">
             <TabsTrigger value="single" className="gap-1.5">
               <Target className="w-3.5 h-3.5" /> Concurso único
             </TabsTrigger>
@@ -156,7 +156,7 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="single" className="space-y-4 mt-4">
+          <TabsContent value="single" className="space-y-4 mt-4 flex-1 overflow-y-auto pr-1 -mr-1">
             {/* Bet preview */}
             <div>
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
@@ -258,7 +258,7 @@ export function DrawTestDialog({ numbers, trigger, defaultConcurso }: Props) {
             )}
           </TabsContent>
 
-          <TabsContent value="scan" className="space-y-4 mt-4">
+          <TabsContent value="scan" className="space-y-4 mt-4 flex-1 overflow-y-auto pr-1 -mr-1">
             <div>
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
                 Janela de varredura
