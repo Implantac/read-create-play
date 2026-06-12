@@ -47,6 +47,9 @@ const HistoricoPage = () => {
         badge={draws.length > 0 ? `${filtered.length} resultados` : undefined}
       />
       <LotteryContextBanner />
+      <LatestDrawCard />
+
+
 
       {draws.length === 0 ? (
         <EmptyState description="Importe os sorteios primeiro no Dashboard." />
