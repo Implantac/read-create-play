@@ -3,13 +3,24 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Target, Trophy, History as HistoryIcon } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Target, Trophy, History as HistoryIcon, Radar, Sparkles } from "lucide-react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import {
   matchBetAgainstDraw,
   getEstimatedPrize,
   getRealPrizeLabel,
+  formatCurrency,
+  getMaxPossibleHits,
 } from "@/utils/lottery-utils";
+
+type ScanWindow = "10" | "20" | "50" | "all";
+const SCAN_OPTIONS: { value: ScanWindow; label: string }[] = [
+  { value: "10", label: "Últimos 10" },
+  { value: "20", label: "Últimos 20" },
+  { value: "50", label: "Últimos 50" },
+  { value: "all", label: "Histórico Total" },
+];
 
 interface Props {
   numbers: number[];
