@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { StrategyGames } from "@/engine/strategy-evolution";
 import { GameQuality } from "@/engine/strategy-evolution/game-quality";
 import { GRADE_STYLES, stagger, fadeUp, NumberBall } from "./LabShared";
+import { DrawTestDialog } from "@/components/lottery/DrawTestDialog";
 
 export function GeneratedGamesPanel({ generatedGames, lotteryId, pick, maxNum, rankedGames }: {
   generatedGames: StrategyGames[];
