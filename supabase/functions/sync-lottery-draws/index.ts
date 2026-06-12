@@ -40,6 +40,7 @@ interface CaixaResult {
   valorAcumuladoProximoConcurso?: number;
   valorEstimadoProximoConcurso?: number;
   valorArrecadado?: number;
+  localGanhadores?: Array<{ municipio?: string; uf?: string; ganhadores?: number; nomeFatansiaUL?: string; serie?: string }>;
 }
 
 async function fetchWithRetry(url: string, retries = 3): Promise<Response | null> {
