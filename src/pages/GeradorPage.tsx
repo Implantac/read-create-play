@@ -54,13 +54,16 @@ const GeradorPage = () => {
 
   const scopedDraws = useMemo(() => {
     if (historyWindow === "all") return draws;
-    return draws.slice(0, parseInt(historyWindow, 10));
+    const n = parseInt(historyWindow, 10);
+    return draws.slice(0, Math.min(n, draws.length));
   }, [draws, historyWindow]);
 
+  // Sempre recomputa stats a partir de scopedDraws para garantir consistência
+  // com a janela selecionada (inclusive "Histórico Total").
   const scopedStats = useMemo(() => {
-    if (historyWindow === "all") return stats;
+    if (scopedDraws.length === 0) return stats;
     return computeFrequencyStats(scopedDraws, config.numbers);
-  }, [scopedDraws, stats, config.numbers, historyWindow]);
+  }, [scopedDraws, stats, config.numbers]);
 
   const STRATEGIES = [
     { id: "balance", name: "Aposta Equilibrada", desc: "Distribuição estatística otimizada por rede neural." },
