@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { NumberStats } from "@/engine/stats/statistics";
+import { NumberStats, computeFrequencyStats } from "@/engine/stats/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { IntelligentBet, GenerationSummary, generateIntelligentBets, computeGenerationSummary } from "@/engine/intelligent-generator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,12 +9,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Brain, Sparkles, Trophy, Target, Lightbulb, BarChart3, Zap, ChevronDown, ChevronUp } from "lucide-react";
+import { Brain, Sparkles, Trophy, Target, Lightbulb, BarChart3, Zap, ChevronDown, ChevronUp, History } from "lucide-react";
 import { toast } from "sonner";
 import { BetCard } from "@/components/lottery/BetCard";
 import { AIAnalystBriefing } from "@/components/lottery/AIAnalystBriefing";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { m, AnimatePresence } from "framer-motion";
+
+type HistoryWindow = "all" | "10" | "20" | "50";
+
+const WINDOW_OPTIONS: { value: HistoryWindow; label: string; hint: string }[] = [
+  { value: "10", label: "Últimos 10", hint: "Tendência imediata" },
+  { value: "20", label: "Últimos 20", hint: "Curto prazo" },
+  { value: "50", label: "Últimos 50", hint: "Médio prazo" },
+  { value: "all", label: "Histórico Total", hint: "Probabilidade real" },
+];
 
 
 interface Props {
@@ -32,12 +41,29 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
   const [topResults, setTopResults] = useState(20);
   const [simulateHistory, setSimulateHistory] = useState(true);
   const [expandedBet, setExpandedBet] = useState<number | null>(null);
+  const [historyWindow, setHistoryWindow] = useState<HistoryWindow>("all");
 
+  // Slice draws based on user-selected analysis window
+  const scopedDraws = useMemo(() => {
+    if (historyWindow === "all") return draws;
+    const n = parseInt(historyWindow, 10);
+    return draws.slice(0, n);
+  }, [draws, historyWindow]);
+
+  // Recompute stats over the chosen window so probability/frequency reflects user intent
+  const scopedStats = useMemo(() => {
+    if (historyWindow === "all") return stats;
+    return computeFrequencyStats(scopedDraws, config.numbers);
+  }, [scopedDraws, stats, config.numbers, historyWindow]);
 
   const handleGenerate = () => {
+    if (scopedDraws.length === 0) {
+      toast.error("Sem sorteios suficientes para a janela selecionada.");
+      return;
+    }
     setIsGenerating(true);
     setTimeout(() => {
-      const results = generateIntelligentBets(stats, config, draws, {
+      const results = generateIntelligentBets(scopedStats, config, scopedDraws, {
         totalBets,
         topResults,
         strategies: ["hot", "lowDelay", "trend", "cycle", "balanced", "smart", "hybrid", "ml", "sectors", "pattern"],
@@ -46,7 +72,8 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
       });
       setBets(results);
       setIsGenerating(false);
-      toast.success(`${results.length} apostas otimizadas geradas!`);
+      const label = WINDOW_OPTIONS.find(o => o.value === historyWindow)?.label;
+      toast.success(`${results.length} apostas geradas (base: ${label}, ${scopedDraws.length} sorteios)`);
     }, 100);
   };
 
@@ -60,6 +87,36 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* History window selector — controls the analysis base */}
+        <div className="p-4 rounded-lg bg-muted/30 border border-border/50 space-y-3">
+          <div className="flex items-center gap-2">
+            <History className="h-4 w-4 text-primary" />
+            <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              Base de Análise · {scopedDraws.length} sorteios disponíveis
+            </Label>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {WINDOW_OPTIONS.map(opt => {
+              const active = historyWindow === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setHistoryWindow(opt.value)}
+                  className={`text-left p-2.5 rounded-md border transition-colors ${
+                    active
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border/60 bg-background/40 text-foreground hover:border-primary/50"
+                  }`}
+                >
+                  <div className="text-xs font-semibold">{opt.label}</div>
+                  <div className="text-[10px] text-muted-foreground mt-0.5">{opt.hint}</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="grid sm:grid-cols-3 gap-4 p-4 rounded-lg bg-muted/30 border border-border/50">
           <div className="space-y-2">
             <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Candidatos: {totalBets}</Label>
