@@ -11,9 +11,12 @@ import { computePatternProfile } from "../engines/patternEngine";
 import {
   computeWinnerProfile,
   computePairLift,
+  computeTripletLift,
   alignmentScore,
   pairLiftBonus,
+  tripletLiftBonus,
   type PairLiftMap,
+  type TripletLiftMap,
   type WinnerProfile,
 } from "../engines/winnerProfileEngine";
 import type { RiskProfile, IntentFilters, ScoredGame } from "../core/aiTypes";
