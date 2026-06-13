@@ -234,6 +234,19 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     }
   }
 
+  // PRO BETTOR BONUS: prêmio por aderência a primos+fibonacci+dispersão
+  // (heurísticas usadas por apostadores profissionais brasileiros).
+  for (const s of scored) {
+    const pat = computePatternProfile(s.numbers, config.lotteryId, prevDraw);
+    const proBonus =
+      pat.primeBalance * 6 +        // 0..6
+      pat.fibonacciBalance * 3 +    // 0..3
+      pat.dispersalScore * 4;       // 0..4
+    s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + proBonus)));
+    if (pat.primeBalance >= 0.85) s.explanation.push(`🔢 Proporção de primos dentro do padrão histórico`);
+    if (pat.fibonacciBalance >= 0.85) s.explanation.push(`🌀 Distribuição Fibonacci equilibrada`);
+  }
+
   // Ordena por score atual e refina os top-K via simulated annealing
   // (aceita pioras controladas para escapar de máximos locais).
   scored.sort((a, b) => b.totalScore - a.totalScore);
@@ -243,6 +256,46 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     scored[i] = simulatedAnnealing(scored[i], universe, config, 40, config.rng);
   }
   scored.sort((a, b) => b.totalScore - a.totalScore);
+
+  // MONTE CARLO STABILITY: simula cada top-K contra 2000 sorteios aleatórios
+  // e mede acertos médios + variância. Estabilidade alta = jogo robusto
+  // (não depende de "sorte" extrema). Bônus -4..+8 pts.
+  {
+    const mcK = Math.min(scored.length, Math.max(config.count * 2, 10));
+    const iters = 2000;
+    const expHits = (rules.pick * rules.pick) / rules.totalNumbers;
+    for (let i = 0; i < mcK; i++) {
+      const s = scored[i];
+      const set = new Set(s.numbers);
+      let sum = 0, sumSq = 0;
+      for (let it = 0; it < iters; it++) {
+        // sorteia `pick` números únicos via reservoir-light
+        const used = new Set<number>();
+        let hits = 0;
+        while (used.size < rules.pick) {
+          const n = 1 + Math.floor(Math.random() * rules.totalNumbers);
+          if (used.has(n)) continue;
+          used.add(n);
+          if (set.has(n)) hits++;
+        }
+        sum += hits;
+        sumSq += hits * hits;
+      }
+      const mean = sum / iters;
+      const variance = sumSq / iters - mean * mean;
+      const std = Math.sqrt(Math.max(0, variance));
+      // performance: razão entre média e esperado teórico
+      const perf = expHits > 0 ? mean / expHits : 1;
+      // estabilidade: penaliza alta variância (std normalizado)
+      const stability = Math.max(0, 1 - std / Math.max(1, expHits));
+      const mcBonus = Math.max(-4, Math.min(8, (perf - 1) * 20 + stability * 4));
+      s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + mcBonus)));
+      if (stability >= 0.6 && perf >= 0.98) {
+        s.explanation.push(`🎲 Monte Carlo: jogo estável (μ=${mean.toFixed(2)}, σ=${std.toFixed(2)})`);
+      }
+    }
+    scored.sort((a, b) => b.totalScore - a.totalScore);
+  }
 
   const selected = selectDiverse(scored, config.count, rules.pick);
   return selected;
