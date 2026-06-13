@@ -49,6 +49,7 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
   // + matriz de lift de pares (coocorrências mais fortes que o acaso).
   const winnerProfile: WinnerProfile = computeWinnerProfile(config.draws, config.lotteryId, 200);
   const pairLift: PairLiftMap = computePairLift(config.draws, rules.totalNumbers, rules.pick, 200);
+  const tripletLift: TripletLiftMap = computeTripletLift(config.draws, rules.totalNumbers, rules.pick, 200, 1.3);
   const hasProfile = winnerProfile.sample >= 20;
 
   // POSTERIOR por número: combina frequência, recência, afinidade, cycleScore,
