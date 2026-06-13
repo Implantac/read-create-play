@@ -11,9 +11,12 @@ import { computePatternProfile } from "../engines/patternEngine";
 import {
   computeWinnerProfile,
   computePairLift,
+  computeTripletLift,
   alignmentScore,
   pairLiftBonus,
+  tripletLiftBonus,
   type PairLiftMap,
+  type TripletLiftMap,
   type WinnerProfile,
 } from "../engines/winnerProfileEngine";
 import type { RiskProfile, IntentFilters, ScoredGame } from "../core/aiTypes";
@@ -46,6 +49,7 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
   // + matriz de lift de pares (coocorrências mais fortes que o acaso).
   const winnerProfile: WinnerProfile = computeWinnerProfile(config.draws, config.lotteryId, 200);
   const pairLift: PairLiftMap = computePairLift(config.draws, rules.totalNumbers, rules.pick, 200);
+  const tripletLift: TripletLiftMap = computeTripletLift(config.draws, rules.totalNumbers, rules.pick, 200, 1.3);
   const hasProfile = winnerProfile.sample >= 20;
 
   // POSTERIOR por número: combina frequência, recência, afinidade, cycleScore,
@@ -186,7 +190,12 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     const postBonus = (postAvg - 0.5) * 20; // -10..+10
     if (postAvg >= 0.7) s.explanation.push(`🧠 Núcleo de alta convicção (posterior médio ${(postAvg * 100).toFixed(0)}%)`);
 
-    s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + backtestBonus + profileBonus + postBonus)));
+    // TRIPLET (Markov-2) BONUS: trios historicamente fortes presentes no jogo
+    const tripBoost = tripletLiftBonus(s.numbers, tripletLift); // 0..1
+    const tripBonus = tripBoost * 12; // 0..+12
+    if (tripBoost > 0.25) s.explanation.push(`🧬 Contém trios com coocorrência incomum (Markov-2)`);
+
+    s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + backtestBonus + profileBonus + postBonus + tripBonus)));
   }
 
   // VALIDAÇÃO PÓS-GERAÇÃO: anexa um mini-backtest a cada jogo gerado.
@@ -225,14 +234,13 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     }
   }
 
-  // Sort by score and take top N, ensuring diversity
+  // Ordena por score atual e refina os top-K via simulated annealing
+  // (aceita pioras controladas para escapar de máximos locais).
   scored.sort((a, b) => b.totalScore - a.totalScore);
-
-  // HILL-CLIMBING: refina os top candidatos trocando 1 número por vez
   const topK = Math.min(scored.length, Math.max(config.count * 3, 15));
   const universe = Array.from({ length: rules.totalNumbers }, (_, i) => i + 1);
   for (let i = 0; i < topK; i++) {
-    scored[i] = hillClimb(scored[i], universe, config, 8);
+    scored[i] = simulatedAnnealing(scored[i], universe, config, 40, config.rng);
   }
   scored.sort((a, b) => b.totalScore - a.totalScore);
 
@@ -240,35 +248,45 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
   return selected;
 }
 
-/** Hill-climbing: tenta substituir cada número por outro do universo se melhorar o score. */
-function hillClimb(
+/**
+ * Simulated annealing: troca 1 número por iteração, aceita melhoras sempre
+ * e pioras com probabilidade exp(-Δ/T). T decai geometricamente.
+ * Mantém o melhor visto ao longo do percurso.
+ */
+function simulatedAnnealing(
   game: ScoredGame,
   universe: number[],
   config: GeneratorConfig,
-  maxIterations: number
+  iterations: number,
+  rng?: Rng,
 ): ScoredGame {
+  const rnd = rng ?? { next: () => Math.random() };
+  let current = game;
   let best = game;
-  for (let iter = 0; iter < maxIterations; iter++) {
-    let improved = false;
-    for (let i = 0; i < best.numbers.length; i++) {
-      for (const candidate of universe) {
-        if (best.numbers.includes(candidate)) continue;
-        if (config.filters.excludeNumbers?.includes(candidate)) continue;
-        const next = [...best.numbers];
-        next[i] = candidate;
-        const scored = scoreGame(next, config.lotteryId, config.stats, config.draws, config.riskProfile);
-        if (scored.totalScore > best.totalScore + 1) {
-          best = scored;
-          improved = true;
-          break;
-        }
-      }
-      if (improved) break;
+  let T = 6; // temperatura inicial em "pontos de score"
+  const cooling = 0.92;
+
+  for (let iter = 0; iter < iterations; iter++) {
+    // escolhe posição aleatória e candidato aleatório fora do jogo
+    const pos = Math.floor(rnd.next() * current.numbers.length);
+    const cand = universe[Math.floor(rnd.next() * universe.length)];
+    if (current.numbers.includes(cand)) { T *= cooling; continue; }
+    if (config.filters.excludeNumbers?.includes(cand)) { T *= cooling; continue; }
+
+    const next = [...current.numbers];
+    next[pos] = cand;
+    const proposed = scoreGame(next, config.lotteryId, config.stats, config.draws, config.riskProfile);
+    const delta = proposed.totalScore - current.totalScore;
+
+    if (delta >= 0 || rnd.next() < Math.exp(delta / Math.max(0.1, T))) {
+      current = proposed;
+      if (proposed.totalScore > best.totalScore) best = proposed;
     }
-    if (!improved) break;
+    T *= cooling;
   }
   return best;
 }
+
 
 /** Build weighted number pool based on strategy and stats */
 function buildWeightedPool(
