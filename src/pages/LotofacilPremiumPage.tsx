@@ -28,6 +28,7 @@ import { CorrelationNetwork } from "@/components/lottery/CorrelationNetwork";
 import { computeMatrixAnalysis } from "@/engine/matrix-analysis";
 import { MatrizAnaliseTable } from "@/components/lottery/analysis/MatrizAnaliseTable";
 import { FarolDezenas } from "@/components/lottery/analysis/FarolDezenas";
+import { NumberPickerGrid } from "@/components/NumberPickerGrid";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { toast } from "sonner";
 import {
