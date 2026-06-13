@@ -111,6 +111,9 @@ ${summary.overdueNumbers.join(", ")}
 ━━━ 9. MAIORES HOT STREAKS ━━━
 ${hotStreaks.slice(0, 10).map((h: any) => `Nº${h.number}: ${h.streakLength} sorteios consecutivos presentes`).join("\n")}
 
+━━━ 10. Z-SCORES vs ESPERANÇA UNIFORME ━━━
+${zScoreBlock}
+
 ═══ SOLICITAÇÃO DE ANÁLISE ═══
 
 Forneça uma análise completa e acionável em 6 seções:
