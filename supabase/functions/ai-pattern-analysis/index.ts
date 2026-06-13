@@ -1,6 +1,15 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { requireUserAuth } from "../_shared/auth.ts";
 import { getSupabaseAdmin, getCachedAnalysis, setCachedAnalysis } from "../_shared/ai-cache.ts";
+import {
+  FEW_SHOT_PROMPT_BLOCK,
+  runEnsembleOrSingle,
+  chainOfVerification,
+  validateCitations,
+  computeZScoresFromFrequencies,
+  formatZScoreBlock,
+  gatewayErrorResponse,
+} from "../_shared/ai-enhance.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
