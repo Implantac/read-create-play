@@ -562,6 +562,11 @@ export default function LotofacilPremiumPage() {
 
         {/* --- GENERATORS TAB --- */}
         <TabsContent value="generation" className="space-y-6">
+          <NumberPickerGrid
+            config={config}
+            stats={stats}
+            onSaveBet={(numbers) => handleSaveBet(numbers, "Manual")}
+          />
           <div className="grid lg:grid-cols-2 gap-6">
             <Suspense fallback={<LazyFallback />}>
               <IntelligentGeneratorPanel stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />
