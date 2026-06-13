@@ -47,12 +47,33 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
     if (!report) return;
     setAiLoading(true);
     try {
-      await new Promise(r => setTimeout(r, 300));
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data, error } = await supabase.functions.invoke("ai-autonomous-learning", {
+        body: {
+          report,
+          lotteryName: config.name,
+          pick: config.pick,
+          totalNumbers: config.numbers,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const analysis = data?.analysis as string | undefined;
+      if (!analysis) throw new Error("Resposta da IA vazia");
+      setAiAnalysis(analysis);
+      toast({
+        title: data?.fromCache ? "IA (cache)" : "IA Autônoma",
+        description: "Análise real gerada pela IA com base nos dados reais.",
+      });
+    } catch (err: any) {
+      // Fallback local apenas em caso de falha de rede/gateway
       const analysis = generateAutonomousAnalysis(report as any, config);
       setAiAnalysis(analysis);
-      toast({ title: "IA Nativa", description: "Análise concluída com sucesso!" });
-    } catch (err: any) {
-      toast({ title: "Erro", description: err.message, variant: "destructive" });
+      toast({
+        title: "IA indisponível",
+        description: err?.message || "Usando análise estatística local como fallback.",
+        variant: "destructive",
+      });
     } finally {
       setAiLoading(false);
     }
