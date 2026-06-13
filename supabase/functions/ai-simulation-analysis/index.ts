@@ -101,7 +101,7 @@ OBJETIVOS DA ANÁLISE:
 - **Tabela** comparando top vs bottom performers (hits médios, score, padrão)
 - **Substituições recomendadas** em lista densa: \`XX → YY\` com justificativa numérica
 - **Jogos otimizados** com dezenas em **negrito** (2 dígitos) + score esperado
-- Sem rodeios, sem repetir o input, sem disclaimers genéricos.`;
+- Sem rodeios, sem repetir o input, sem disclaimers genéricos.${FEW_SHOT_PROMPT_BLOCK}`;
 
     const userPrompt = `═══ SIMULAÇÃO HISTÓRICA — ${lotteryName} (${lotteryPick}/${lotteryNumbers}) ═══
 Concursos testados: ${simulationData.totalDraws}
