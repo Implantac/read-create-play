@@ -235,18 +235,57 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
   }
 
   // Sort by score and take top N, ensuring diversity
-  scored.sort((a, b) => b.totalScore - a.totalScore);
-
-  // HILL-CLIMBING: refina os top candidatos trocando 1 número por vez
+  // REFINAMENTO: simulated annealing nos top candidatos — aceita pioras
+  // controladas para escapar de máximos locais e converge para combinações
+  // mais consistentes que o hill-climb puro.
   const topK = Math.min(scored.length, Math.max(config.count * 3, 15));
   const universe = Array.from({ length: rules.totalNumbers }, (_, i) => i + 1);
   for (let i = 0; i < topK; i++) {
-    scored[i] = hillClimb(scored[i], universe, config, 8);
+    scored[i] = simulatedAnnealing(scored[i], universe, config, 40, config.rng);
   }
   scored.sort((a, b) => b.totalScore - a.totalScore);
 
   const selected = selectDiverse(scored, config.count, rules.pick);
   return selected;
+}
+
+/**
+ * Simulated annealing: troca 1 número por iteração, aceita melhoras sempre
+ * e pioras com probabilidade exp(-Δ/T). T decai geometricamente.
+ * Mantém o melhor visto ao longo do percurso.
+ */
+function simulatedAnnealing(
+  game: ScoredGame,
+  universe: number[],
+  config: GeneratorConfig,
+  iterations: number,
+  rng?: Rng,
+): ScoredGame {
+  const rnd = rng ?? { next: () => Math.random() };
+  let current = game;
+  let best = game;
+  let T = 6; // temperatura inicial em "pontos de score"
+  const cooling = 0.92;
+
+  for (let iter = 0; iter < iterations; iter++) {
+    // escolhe posição aleatória e candidato aleatório fora do jogo
+    const pos = Math.floor(rnd.next() * current.numbers.length);
+    const cand = universe[Math.floor(rnd.next() * universe.length)];
+    if (current.numbers.includes(cand)) { T *= cooling; continue; }
+    if (config.filters.excludeNumbers?.includes(cand)) { T *= cooling; continue; }
+
+    const next = [...current.numbers];
+    next[pos] = cand;
+    const proposed = scoreGame(next, config.lotteryId, config.stats, config.draws, config.riskProfile);
+    const delta = proposed.totalScore - current.totalScore;
+
+    if (delta >= 0 || rnd.next() < Math.exp(delta / Math.max(0.1, T))) {
+      current = proposed;
+      if (proposed.totalScore > best.totalScore) best = proposed;
+    }
+    T *= cooling;
+  }
+  return best;
 }
 
 /** Hill-climbing: tenta substituir cada número por outro do universo se melhorar o score. */
