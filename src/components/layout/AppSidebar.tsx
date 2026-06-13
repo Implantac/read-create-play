@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { SystemAuditStatus } from "@/components/lottery/analysis/SystemAuditStatus";
+
 
 const workflowGroups: { label: string; items: { title: string; url: string; icon: any; requiredFeature?: Feature; tooltip: string; badge?: string }[] }[] = [
   {
@@ -100,11 +100,6 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="px-2 py-6 scrollbar-hide space-y-2">
-        {!collapsed && (
-          <div className="px-2 mb-6">
-            <SystemAuditStatus />
-          </div>
-        )}
 
         {/* Active lottery indicator — refined */}
         <div className={`mx-2 mb-6 rounded-xl bg-gradient-to-br from-primary/12 via-primary/5 to-transparent border border-primary/20 transition-all duration-300 hover:border-primary/40 ${collapsed ? "p-2.5 flex justify-center" : "p-3.5"}`}>
