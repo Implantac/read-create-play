@@ -267,8 +267,8 @@ INSTRUÇÕES CRÍTICAS:
 Análises baseadas em estatísticas históricas. Não há garantia de ganho financeiro.` },
               { role: "user", content: prompt },
             ],
-            temperature: 0.2,
-            max_tokens: 10000,
+            temperature: 0.15,
+            max_tokens: 14000,
           }),
         });
 
