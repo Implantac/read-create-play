@@ -145,7 +145,20 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     const avgHits = backtestWindow.length > 0 ? hits / backtestWindow.length : 0;
     const performance = expectedHits > 0 ? avgHits / expectedHits : 1; // 1 = neutro
     const backtestBonus = Math.max(-8, Math.min(12, (performance - 1) * 20 + rare * 2));
-    s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + backtestBonus)));
+
+    // Bônus por alinhamento com perfil dos vencedores + pares com lift > 1
+    let profileBonus = 0;
+    if (hasProfile) {
+      const align = alignmentScore(s.numbers, winnerProfile, config.lotteryId, prevDraw);
+      const pairs = pairLiftBonus(s.numbers, pairLift);
+      profileBonus = (align - 0.6) * 25 + pairs * 10; // ~ -15 ... +20
+      // anexa explicação
+      const pct = Math.round(align * 100);
+      s.explanation.push(`🎯 Alinhamento com perfil vencedor: ${pct}%`);
+      if (pairs > 0.15) s.explanation.push(`🔗 Contém pares com coocorrência forte (lift médio elevado)`);
+    }
+
+    s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + backtestBonus + profileBonus)));
   }
 
   // Sort by score and take top N, ensuring diversity
