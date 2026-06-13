@@ -68,7 +68,12 @@ FORMATO DE SAÍDA (markdown rico, português BR):
 ## 4. Recomendação Acionável (números concretos + porquê numérico)
 ## 5. Confiança (0-100) com justificativa e cenários que invalidariam
 
-REGRAS DURAS: sem rodeios, sem repetir pergunta, sem disclaimers genéricos, sem "consulte um especialista". Nunca prometa prêmio — fale em padrões e probabilidades.`;
+REGRAS DURAS: sem rodeios, sem repetir pergunta, sem disclaimers genéricos, sem "consulte um especialista". Nunca prometa prêmio — fale em padrões e probabilidades.${FEW_SHOT_PROMPT_BLOCK}`;
+
+    // (#2) Estatística enriquecida: z-scores das frequências observadas vs esperado uniforme
+    const freqsForZ = (frequencyTrends || []).map((f: any) => ({ number: f.number, count: f.totalFreq ?? f.last30Freq ?? 0 }));
+    const zScores = computeZScoresFromFrequencies(freqsForZ, drawCount || 1, lotteryPick, lotteryNumbers);
+    const zScoreBlock = zScores.length ? formatZScoreBlock(zScores) : "(z-scores indisponíveis)";
 
     const userPrompt = `═══ ANÁLISE DE PADRÕES — ${lotteryName} (${lotteryPick}/${lotteryNumbers}) ═══
 Concursos analisados: ${drawCount}
