@@ -20,6 +20,7 @@ import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   PieChart, Pie, Cell, Legend, ScatterChart, Scatter, ZAxis, LineChart, Line
 } from "recharts";
+import { AutonomousGamesPanel } from "./ai-autonomous/AutonomousGamesPanel";
 
 interface Props {
   config: LotteryConfig;
