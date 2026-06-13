@@ -63,6 +63,15 @@ export interface ScoredGame {
   totalScore: number;
   grade: "S" | "A" | "B" | "C" | "D" | "F";
   explanation: string[];
+  /** Backtest pós-geração contra os últimos N sorteios (opcional). */
+  validation?: {
+    window: number;
+    avgHits: number;
+    bestHits: number;
+    prizedCount: number;        // sorteios em que o jogo bateria alguma faixa premiada
+    closeMissCount: number;     // sorteios em que faltou 1 nº para uma faixa premiada
+    expectedHits: number;       // baseline (pick²/total)
+  };
 }
 
 export interface GameScores {

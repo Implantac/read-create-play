@@ -19,6 +19,7 @@ import {
 import type { RiskProfile, IntentFilters, ScoredGame } from "../core/aiTypes";
 import { scoreGame } from "../engines/rankingEngine";
 import type { Rng } from "../core/rng";
+import { getEstimatedPrize, getMaxPossibleHits } from "@/utils/lottery-utils";
 
 interface GeneratorConfig {
   lotteryId: string;
@@ -159,6 +160,42 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     }
 
     s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + backtestBonus + profileBonus)));
+  }
+
+  // VALIDAÇÃO PÓS-GERAÇÃO: anexa um mini-backtest a cada jogo gerado.
+  // Mostra acertos médios, melhor faixa atingida, quantos sorteios bateriam
+  // alguma faixa premiada e "quase ganhou" (faltou 1 nº para faixa premiada).
+  {
+    const valWindow = config.draws.slice(0, 100);
+    const maxHits = getMaxPossibleHits(config.lotteryId, rules.pick);
+    const prizedTiers: number[] = [];
+    for (let h = 1; h <= maxHits; h++) {
+      if (getEstimatedPrize(config.lotteryId, h)) prizedTiers.push(h);
+    }
+    const expHits = (rules.pick * rules.pick) / rules.totalNumbers;
+    for (const s of scored) {
+      const set = new Set(s.numbers);
+      let total = 0, best = 0, prized = 0, close = 0;
+      for (const d of valWindow) {
+        const h = d.numbers.filter(n => set.has(n)).length;
+        total += h;
+        if (h > best) best = h;
+        if (prizedTiers.includes(h)) prized++;
+        // close-miss: faltou 1 número para QUALQUER faixa premiada acima
+        else if (prizedTiers.some(t => t - h === 1)) close++;
+      }
+      const avg = valWindow.length > 0 ? total / valWindow.length : 0;
+      s.validation = {
+        window: valWindow.length,
+        avgHits: Math.round(avg * 100) / 100,
+        bestHits: best,
+        prizedCount: prized,
+        closeMissCount: close,
+        expectedHits: Math.round(expHits * 100) / 100,
+      };
+      if (prized > 0) s.explanation.push(`📊 Bateria faixa premiada em ${prized}/${valWindow.length} sorteios (últimos 100)`);
+      if (close > 0) s.explanation.push(`🎯 Quase ganhou em ${close} sorteios (faltou 1 nº)`);
+    }
   }
 
   // Sort by score and take top N, ensuring diversity
