@@ -165,43 +165,21 @@ Para cada jogo:
 ## 6. ESTRATÉGIA DE USO
 Como o jogador deve usar esses resultados na prática?`;
 
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3.1-pro-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        temperature: 0.15,
-        max_tokens: 12000,
-      }),
-    });
-
-    if (!aiResponse.ok) {
-      const status = aiResponse.status;
-      await aiResponse.text();
-      if (status === 429) {
-        return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (status === 402) {
-        return new Response(JSON.stringify({ error: "Créditos de IA esgotados." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      throw new Error(`AI response error: ${status}`);
+    const ensemble = await runEnsembleOrSingle(LOVABLE_API_KEY, systemPrompt, userPrompt);
+    if (!ensemble.analysis) {
+      const errResp = gatewayErrorResponse(ensemble.rateLimited ? 429 : ensemble.creditsExhausted ? 402 : 500, corsHeaders);
+      if (errResp) return errResp;
+      throw new Error("Erro na análise de IA");
     }
 
-    const aiData = await aiResponse.json();
-    const analysis = aiData.choices?.[0]?.message?.content || "Análise não disponível.";
+    const { verified, revised } = await chainOfVerification(LOVABLE_API_KEY, ensemble.analysis, userPrompt);
+    const validation = validateCitations(verified, userPrompt);
 
-    const responseData = { success: true, analysis };
+    const responseData = {
+      success: true,
+      analysis: verified,
+      meta: { ensemble: ensemble.ensemble, variants: ensemble.variants, revised, validation },
+    };
     await setCachedAnalysis(supabase, lotteryId, "ai-massive-simulation", cacheInput, responseData, 6);
 
     return new Response(JSON.stringify(responseData), {
