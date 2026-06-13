@@ -48,14 +48,32 @@ const MELODIES: Record<Tier, { notes: [number, number][]; type: OscillatorType }
 };
 
 let audioCtx: AudioContext | null = null;
+let userInteracted = false;
+
+if (typeof window !== "undefined") {
+  const markInteracted = () => {
+    userInteracted = true;
+    if (audioCtx && audioCtx.state === "suspended") {
+      audioCtx.resume().catch(() => {});
+    }
+    window.removeEventListener("pointerdown", markInteracted);
+    window.removeEventListener("keydown", markInteracted);
+    window.removeEventListener("touchstart", markInteracted);
+  };
+  window.addEventListener("pointerdown", markInteracted, { once: true });
+  window.addEventListener("keydown", markInteracted, { once: true });
+  window.addEventListener("touchstart", markInteracted, { once: true });
+}
 
 function getAudioContext(): AudioContext | null {
+  // Don't create/resume AudioContext before user interacts — browsers block it
+  if (!userInteracted) return null;
   try {
     if (!audioCtx || audioCtx.state === "closed") {
       audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
     }
     if (audioCtx.state === "suspended") {
-      audioCtx.resume();
+      audioCtx.resume().catch(() => {});
     }
     return audioCtx;
   } catch {
