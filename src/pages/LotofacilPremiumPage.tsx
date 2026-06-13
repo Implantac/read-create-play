@@ -28,6 +28,7 @@ import { CorrelationNetwork } from "@/components/lottery/CorrelationNetwork";
 import { computeMatrixAnalysis } from "@/engine/matrix-analysis";
 import { MatrizAnaliseTable } from "@/components/lottery/analysis/MatrizAnaliseTable";
 import { FarolDezenas } from "@/components/lottery/analysis/FarolDezenas";
+import { NumberPickerGrid } from "@/components/NumberPickerGrid";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { toast } from "sonner";
 import {
@@ -561,6 +562,11 @@ export default function LotofacilPremiumPage() {
 
         {/* --- GENERATORS TAB --- */}
         <TabsContent value="generation" className="space-y-6">
+          <NumberPickerGrid
+            config={config}
+            stats={stats}
+            onSaveBet={(numbers) => handleSaveBet(numbers, "Manual")}
+          />
           <div className="grid lg:grid-cols-2 gap-6">
             <Suspense fallback={<LazyFallback />}>
               <IntelligentGeneratorPanel stats={stats} config={config} draws={draws} onSaveBet={handleSaveBet} />

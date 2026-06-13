@@ -4,6 +4,7 @@ import { SelectedBetsProvider } from "@/contexts/SelectedBetsContext";
 import { computeMatrixAnalysis } from "@/engine/matrix-analysis";
 import { MatrizAnaliseTable } from "@/components/lottery/analysis/MatrizAnaliseTable";
 import { FarolDezenas } from "@/components/lottery/analysis/FarolDezenas";
+import { NumberPickerGrid } from "@/components/NumberPickerGrid";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
@@ -52,7 +53,7 @@ const SummaryCard = ({ icon, label, value, subtitle, color }: SummaryCardProps) 
 
 
 const MatrizAnalisePage = () => {
-  const { config, draws, syncing, syncDraws, syncAllLotteries, selectedLottery } = useLotteryContext();
+  const { config, draws, stats, syncing, syncDraws, syncAllLotteries, selectedLottery } = useLotteryContext();
   const { saveBet } = useSavedBets(selectedLottery);
 
   const matrixData = useMemo(
@@ -181,6 +182,13 @@ const MatrizAnalisePage = () => {
 
         {/* Matrix Table */}
         <MatrizAnaliseTable data={matrixData} />
+
+        {/* Manual Number Picker */}
+        <NumberPickerGrid
+          config={config}
+          stats={stats}
+          onSaveBet={(numbers) => handleSaveBet(numbers, "Manual")}
+        />
 
         {/* Smart Unfolding Generator */}
         <PlanGate feature="gerador_avancado" fallbackMessage="Desdobramento Inteligente baseado no Score">
