@@ -52,8 +52,8 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
         body: {
           report,
           lotteryName: config.name,
-          pick: config.numbersPerGame,
-          totalNumbers: config.totalNumbers,
+          pick: config.pick,
+          totalNumbers: config.numbers,
         },
       });
       if (error) throw error;
