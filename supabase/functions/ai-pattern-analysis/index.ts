@@ -148,41 +148,30 @@ Para as 10 melhores e 5 piores dezenas:
 - Limitações da análise
 - Cenários que invalidariam as recomendações`;
 
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3.1-pro-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        temperature: 0.15,
-        max_tokens: 12000,
-      }),
-    });
-
-    if (!aiResponse.ok) {
-      if (aiResponse.status === 429) {
-        return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em instantes." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (aiResponse.status === 402) {
-        return new Response(JSON.stringify({ error: "Créditos de IA esgotados." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+    // (#1) Ensemble (opt-in via env AI_ENSEMBLE=1) ou single-call
+    const ensemble = await runEnsembleOrSingle(LOVABLE_API_KEY, systemPrompt, userPrompt);
+    if (!ensemble.analysis) {
+      const errResp = gatewayErrorResponse(ensemble.rateLimited ? 429 : ensemble.creditsExhausted ? 402 : 500, corsHeaders);
+      if (errResp) return errResp;
       throw new Error("Erro na análise de IA");
     }
 
-    const aiData = await aiResponse.json();
-    const analysis = aiData.choices?.[0]?.message?.content || "Análise não disponível.";
+    // (#6) Chain-of-Verification: passe de revisão para remover afirmações sem base
+    const { verified, revised } = await chainOfVerification(LOVABLE_API_KEY, ensemble.analysis, userPrompt);
 
-    const responseData = { success: true, analysis };
+    // (#5) Validação de citações numéricas
+    const validation = validateCitations(verified, userPrompt);
+
+    const responseData = {
+      success: true,
+      analysis: verified,
+      meta: {
+        ensemble: ensemble.ensemble,
+        variants: ensemble.variants,
+        revised,
+        validation,
+      },
+    };
     await setCachedAnalysis(supabase, lotteryId, "ai-pattern-analysis", cacheInput, responseData, 6);
 
     return new Response(JSON.stringify(responseData), {
