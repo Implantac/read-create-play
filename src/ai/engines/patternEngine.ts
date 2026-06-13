@@ -18,8 +18,13 @@ export interface PatternProfile {
   decadeBalance: number;       // 0-1 spread across decades (avoid all-same-decade)
   primeBalance: number;        // 0-1 proximity to historical primes-per-draw ratio
   fibonacciBalance: number;    // 0-1 proximity to historical fibonacci-per-draw ratio
+  deltaScore: number;          // 0-1 healthy gap distribution (Delta System / Gail Howard)
+  terminalDigitBalance: number;// 0-1 spread of last digits (0..9)
+  highLowBalance: number;      // 0-1 balance between low and high halves
+  rootDigitBalance: number;    // 0-1 digital-root spread
   overallScore: number;        // weighted composite
 }
+
 
 export function computePatternProfile(
   numbers: number[],
@@ -129,27 +134,78 @@ export function computePatternProfile(
   const fibCount = sorted.filter(n => FIBONACCI.has(n)).length;
   const fibonacciBalance = Math.max(0, 1 - Math.abs(fibCount - idealFib) / fibTolerance);
 
+  // Delta System (Gail Howard): apostadores profissionais valorizam gaps pequenos
+  // a moderados entre números sorteados. Penaliza gaps gigantes ou todos iguais.
+  let deltaScore = 1;
+  if (sorted.length > 1) {
+    const deltas: number[] = [];
+    for (let i = 1; i < sorted.length; i++) deltas.push(sorted[i] - sorted[i - 1]);
+    const meanDelta = deltas.reduce((a, b) => a + b, 0) / deltas.length;
+    const varDelta = deltas.reduce((a, b) => a + (b - meanDelta) ** 2, 0) / deltas.length;
+    const stdDelta = Math.sqrt(varDelta);
+    const maxDelta = Math.max(...deltas);
+    // Ideal: maior delta ≤ ~2x média; baixa variância = monotonia ruim, alta = buracos
+    const gapRatio = meanDelta > 0 ? Math.min(1, maxDelta / (meanDelta * 3)) : 1;
+    const spreadOk = stdDelta > 0.5 && stdDelta < meanDelta * 2 ? 1 : 0.6;
+    deltaScore = Math.max(0, Math.min(1, (1 - gapRatio) * 0.6 + spreadOk * 0.4));
+  }
+
+  // Terminal Digit Balance: distribuição dos últimos dígitos (0..9).
+  // Apostadores pros evitam concentração (>3 números com mesmo último dígito).
+  const termCounts = new Array(10).fill(0);
+  for (const n of sorted) termCounts[n % 10]++;
+  const usedTerms = termCounts.filter(c => c > 0).length;
+  const maxTerm = Math.max(...termCounts);
+  const idealTerms = Math.min(10, Math.max(3, Math.ceil(rules.pick * 0.7)));
+  const termPenalty = maxTerm > Math.ceil(rules.pick * 0.35) ? 0.5 : 1;
+  const terminalDigitBalance = Math.max(0, Math.min(1, (usedTerms / idealTerms) * termPenalty));
+
+  // High/Low Balance: split entre metade inferior e superior do universo.
+  const half = Math.ceil(rules.totalNumbers / 2);
+  const lowCount = sorted.filter(n => n <= half).length;
+  const idealLow = rules.pick / 2;
+  const hlTolerance = Math.max(1, rules.pick * 0.25);
+  const highLowBalance = Math.max(0, 1 - Math.abs(lowCount - idealLow) / hlTolerance);
+
+  // Root Digit Balance: raiz digital (1..9) dispersa = padrão saudável.
+  const rootCounts = new Array(10).fill(0);
+  for (const n of sorted) {
+    let r = n;
+    while (r > 9) r = String(r).split("").reduce((a, b) => a + Number(b), 0);
+    rootCounts[r]++;
+  }
+  const usedRoots = rootCounts.filter(c => c > 0).length;
+  const idealRoots = Math.min(9, Math.max(3, Math.ceil(rules.pick * 0.6)));
+  const rootDigitBalance = Math.max(0, Math.min(1, usedRoots / idealRoots));
+
   const overallScore = (
-    parityBalance * 0.12 +
-    sumProximity * 0.14 +
-    sequencePenalty * 0.11 +
-    rowBalance * 0.08 +
-    colBalance * 0.08 +
-    frameCenterBalance * 0.08 +
-    repeatScore * 0.09 +
-    dispersalScore * 0.09 +
-    decadeBalance * 0.09 +
-    primeBalance * 0.07 +
-    fibonacciBalance * 0.05
+    parityBalance * 0.10 +
+    sumProximity * 0.12 +
+    sequencePenalty * 0.09 +
+    rowBalance * 0.07 +
+    colBalance * 0.07 +
+    frameCenterBalance * 0.07 +
+    repeatScore * 0.08 +
+    dispersalScore * 0.07 +
+    decadeBalance * 0.08 +
+    primeBalance * 0.06 +
+    fibonacciBalance * 0.04 +
+    deltaScore * 0.06 +
+    terminalDigitBalance * 0.04 +
+    highLowBalance * 0.03 +
+    rootDigitBalance * 0.02
   );
 
   return {
     parityBalance, sumProximity, sequencePenalty,
     rowBalance, colBalance, frameCenterBalance,
     repeatScore, dispersalScore, decadeBalance,
-    primeBalance, fibonacciBalance, overallScore,
+    primeBalance, fibonacciBalance,
+    deltaScore, terminalDigitBalance, highLowBalance, rootDigitBalance,
+    overallScore,
   };
 }
+
 
 /** Analyze how often specific patterns appear across history */
 export function detectHistoricalPatterns(draws: DrawResult[], lotteryId: string): string[] {

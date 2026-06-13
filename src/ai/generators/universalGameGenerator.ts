@@ -234,18 +234,27 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     }
   }
 
-  // PRO BETTOR BONUS: prêmio por aderência a primos+fibonacci+dispersão
-  // (heurísticas usadas por apostadores profissionais brasileiros).
+  // PRO BETTOR BONUS: aderência a primos + Fibonacci + dispersão + Delta System
+  // (Gail Howard) + dígitos terminais + alto/baixo + raiz digital. Conjunto de
+  // heurísticas usadas por apostadores profissionais ao redor do mundo.
   for (const s of scored) {
     const pat = computePatternProfile(s.numbers, config.lotteryId, prevDraw);
     const proBonus =
-      pat.primeBalance * 6 +        // 0..6
-      pat.fibonacciBalance * 3 +    // 0..3
-      pat.dispersalScore * 4;       // 0..4
+      pat.primeBalance * 5 +         // 0..5
+      pat.fibonacciBalance * 3 +     // 0..3
+      pat.dispersalScore * 3 +       // 0..3
+      pat.deltaScore * 4 +           // 0..4  (Delta System)
+      pat.terminalDigitBalance * 3 + // 0..3
+      pat.highLowBalance * 3 +       // 0..3
+      pat.rootDigitBalance * 2;      // 0..2
     s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + proBonus)));
     if (pat.primeBalance >= 0.85) s.explanation.push(`🔢 Proporção de primos dentro do padrão histórico`);
     if (pat.fibonacciBalance >= 0.85) s.explanation.push(`🌀 Distribuição Fibonacci equilibrada`);
+    if (pat.deltaScore >= 0.8) s.explanation.push(`📐 Delta System saudável (gaps bem distribuídos)`);
+    if (pat.terminalDigitBalance >= 0.85) s.explanation.push(`🔚 Dígitos terminais bem dispersos`);
+    if (pat.highLowBalance >= 0.85) s.explanation.push(`⚖️ Equilíbrio alto/baixo dentro da média`);
   }
+
 
   // Ordena por score atual e refina os top-K via simulated annealing
   // (aceita pioras controladas para escapar de máximos locais).
