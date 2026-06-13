@@ -4,7 +4,7 @@
  */
 
 import { DrawResult } from "@/data/lotteries";
-import { getLotteryRules, LOTOFACIL_FRAME, LOTOFACIL_CENTER } from "../knowledge/lotteriesKnowledge";
+import { getLotteryRules, LOTOFACIL_FRAME, LOTOFACIL_CENTER, PRIMES, FIBONACCI } from "../knowledge/lotteriesKnowledge";
 
 export interface PatternProfile {
   parityBalance: number;      // 0-1 how balanced even/odd
@@ -16,6 +16,8 @@ export interface PatternProfile {
   repeatScore: number;         // 0-1 how well repeat matches historical avg
   dispersalScore: number;      // 0-1 how spread out numbers are
   decadeBalance: number;       // 0-1 spread across decades (avoid all-same-decade)
+  primeBalance: number;        // 0-1 proximity to historical primes-per-draw ratio
+  fibonacciBalance: number;    // 0-1 proximity to historical fibonacci-per-draw ratio
   overallScore: number;        // weighted composite
 }
 
@@ -110,22 +112,42 @@ export function computePatternProfile(
     Math.min(1, (usedDecades / idealDecades) * concentrationPenalty),
   );
 
+  // Prime balance — apostadores profissionais monitoram a proporção de primos
+  // (historicamente ~30-38% por sorteio). Penaliza excesso/escassez.
+  const primesInPool = Array.from({ length: rules.totalNumbers }, (_, i) => i + 1)
+    .filter(n => PRIMES.has(n)).length;
+  const idealPrimes = (primesInPool / rules.totalNumbers) * rules.pick;
+  const primeTolerance = Math.max(1.5, rules.pick * 0.18);
+  const primeCount = sorted.filter(n => PRIMES.has(n)).length;
+  const primeBalance = Math.max(0, 1 - Math.abs(primeCount - idealPrimes) / primeTolerance);
+
+  // Fibonacci balance — proporção esperada da sequência de Fibonacci no universo.
+  const fibInPool = Array.from({ length: rules.totalNumbers }, (_, i) => i + 1)
+    .filter(n => FIBONACCI.has(n)).length;
+  const idealFib = (fibInPool / rules.totalNumbers) * rules.pick;
+  const fibTolerance = Math.max(1, rules.pick * 0.15);
+  const fibCount = sorted.filter(n => FIBONACCI.has(n)).length;
+  const fibonacciBalance = Math.max(0, 1 - Math.abs(fibCount - idealFib) / fibTolerance);
+
   const overallScore = (
-    parityBalance * 0.14 +
-    sumProximity * 0.16 +
-    sequencePenalty * 0.13 +
-    rowBalance * 0.09 +
-    colBalance * 0.09 +
-    frameCenterBalance * 0.09 +
-    repeatScore * 0.10 +
-    dispersalScore * 0.10 +
-    decadeBalance * 0.10
+    parityBalance * 0.12 +
+    sumProximity * 0.14 +
+    sequencePenalty * 0.11 +
+    rowBalance * 0.08 +
+    colBalance * 0.08 +
+    frameCenterBalance * 0.08 +
+    repeatScore * 0.09 +
+    dispersalScore * 0.09 +
+    decadeBalance * 0.09 +
+    primeBalance * 0.07 +
+    fibonacciBalance * 0.05
   );
 
   return {
     parityBalance, sumProximity, sequencePenalty,
     rowBalance, colBalance, frameCenterBalance,
-    repeatScore, dispersalScore, decadeBalance, overallScore,
+    repeatScore, dispersalScore, decadeBalance,
+    primeBalance, fibonacciBalance, overallScore,
   };
 }
 
