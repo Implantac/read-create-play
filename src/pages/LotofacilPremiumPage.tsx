@@ -254,7 +254,7 @@ export default function LotofacilPremiumPage() {
 
       <LotteryContextBanner />
 
-      <Tabs defaultValue="overview" className="space-y-8" onValueChange={setActiveTab}>
+      <Tabs value={activeTab} className="space-y-8" onValueChange={setActiveTab}>
         <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/40 -mx-6 px-6 py-4">
           <TabsList className="bg-secondary/20 border border-border/20 p-1.5 rounded-2xl w-full sm:w-auto overflow-x-auto justify-start flex-nowrap scrollbar-hide">
             {[
