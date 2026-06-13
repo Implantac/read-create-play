@@ -133,8 +133,14 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     // GATE pelo perfil dos vencedores: descarta jogos muito desalinhados
     if (hasProfile) {
       const align = alignmentScore(game, winnerProfile, config.lotteryId, prevDraw);
-      if (align < 0.5) continue;
+      if (align < 0.55) continue;
     }
+
+    // CORE GATE: exige que pelo menos minCoreInGame números venham do top-40%
+    // de convicção (posterior). Elimina jogos "aleatórios" com muitos números fracos.
+    let coreInGame = 0;
+    for (const n of game) if (coreSet.has(n)) coreInGame++;
+    if (coreInGame < minCoreInGame) continue;
 
     candidates.push(game);
   }
