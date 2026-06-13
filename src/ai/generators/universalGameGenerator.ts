@@ -263,7 +263,8 @@ function buildWeightedPool(
   strategyFilters: { hotBias: number; coldBias: number },
   intentFilters: IntentFilters,
   recencyBoost: Map<number, number>,
-  affinityBoost: Map<number, number>
+  affinityBoost: Map<number, number>,
+  posterior?: Map<number, number>,
 ): { number: number; weight: number }[] {
   return stats.map(s => {
     let weight = 1;
@@ -287,6 +288,12 @@ function buildWeightedPool(
     // Afinidade: coocorrência com números atualmente "quentes"
     weight += (affinityBoost.get(s.number) ?? 0) * 1.8;
 
+    // POSTERIOR (convicção combinada): amplifica não-linearmente
+    if (posterior) {
+      const p = posterior.get(s.number) ?? 0;
+      weight *= (1 + p) * (1 + p);
+    }
+
     // Intent-specific
     if (intentFilters.prioritizeHot && s.status === "hot") weight *= 1.5;
     if (intentFilters.prioritizeCold && s.status === "cold") weight *= 1.5;
@@ -296,6 +303,67 @@ function buildWeightedPool(
 
     return { number: s.number, weight: Math.max(0.01, weight) };
   });
+}
+
+/**
+ * Posterior por número: combina sinais já existentes (freq z-score, recência,
+ * afinidade, cycleScore, tendência) + média de pair-lift do número com os
+ * "quentes" do momento. Normalizado para 0..1.
+ */
+function computeNumberPosterior(
+  stats: NumberStats[],
+  recency: Map<number, number>,
+  affinity: Map<number, number>,
+  pairLift: PairLiftMap,
+  totalNumbers: number,
+): Map<number, number> {
+  const freqs = stats.map(s => s.frequency);
+  const mean = freqs.reduce((a, b) => a + b, 0) / Math.max(1, freqs.length);
+  const std = Math.sqrt(
+    freqs.reduce((s, f) => s + (f - mean) ** 2, 0) / Math.max(1, freqs.length),
+  ) || 1;
+  const hot = stats.filter(s => s.status === "hot").map(s => s.number);
+
+  const raw = new Map<number, number>();
+  for (const s of stats) {
+    const fz = (s.frequency - mean) / std;           // -∞..+∞
+    const rec = recency.get(s.number) ?? 0;          // 0..1
+    const aff = affinity.get(s.number) ?? 0;         // 0..1
+    const cyc = Math.max(0, (s.cycleScore || 1) - 1); // due bonus
+    const trd = Math.max(0, s.trend || 0);            // upward trend
+    // média de pair-lift contra os quentes (excluindo self)
+    let pairAvg = 0, pairN = 0;
+    const row = pairLift.get(s.number);
+    if (row) {
+      for (const h of hot) {
+        if (h === s.number) continue;
+        const a = Math.min(s.number, h), b = Math.max(s.number, h);
+        const lv = pairLift.get(a)?.get(b);
+        if (lv !== undefined) { pairAvg += lv; pairN++; }
+      }
+      if (pairN > 0) pairAvg /= pairN;
+    }
+    const pairBonus = Math.max(0, pairAvg - 1); // só lift acima de 1
+
+    const score =
+      0.30 * Math.tanh(fz * 0.6) +   // -0.3..+0.3 saturado
+      0.25 * rec +
+      0.15 * aff +
+      0.15 * cyc +
+      0.10 * Math.min(1, trd) +
+      0.15 * Math.min(1, pairBonus);
+    raw.set(s.number, score);
+  }
+  // normaliza para 0..1
+  let lo = Infinity, hi = -Infinity;
+  for (const v of raw.values()) { if (v < lo) lo = v; if (v > hi) hi = v; }
+  const span = hi - lo || 1;
+  const out = new Map<number, number>();
+  for (let n = 1; n <= totalNumbers; n++) {
+    const v = raw.get(n) ?? lo;
+    out.set(n, (v - lo) / span);
+  }
+  return out;
 }
 
 /** Pesa cada número por aparições recentes com decaimento exponencial (meia-vida ~ 20 sorteios) */
