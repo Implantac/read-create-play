@@ -210,3 +210,74 @@ export function pairLiftBonus(numbers: number[], lift: PairLiftMap): number {
   // map lift 0.5..1.5 to 0..1
   return Math.max(0, Math.min(1, (avg - 0.5)));
 }
+
+// ───────────────────────── Triplet lift (Markov-2) ─────────────────────────
+
+/** Compact map of high-lift triplets keyed by "a-b-c" (a<b<c). Only stores lift > 1.3. */
+export type TripletLiftMap = Map<string, number>;
+
+const tripletKey = (a: number, b: number, c: number) => `${a}-${b}-${c}`;
+
+/**
+ * Triplet "lift" = observed / expected for the three numbers co-occurring,
+ * over the recent window. Only keeps triplets clearly above chance (lift>1.3)
+ * to keep the map small even on Lotofácil-sized lotteries.
+ */
+export function computeTripletLift(
+  draws: DrawResult[],
+  totalNumbers: number,
+  pick: number,
+  windowSize = 200,
+  minLift = 1.3,
+): TripletLiftMap {
+  const out: TripletLiftMap = new Map();
+  const subset = draws.slice(0, Math.min(windowSize, draws.length));
+  const n = subset.length;
+  if (n < 30 || pick < 3) return out;
+
+  const marg = new Array(totalNumbers + 1).fill(0);
+  for (const d of subset) for (const v of d.numbers) marg[v]++;
+
+  const counts = new Map<string, number>();
+  for (const d of subset) {
+    const nums = [...d.numbers].sort((a, b) => a - b);
+    const L = nums.length;
+    for (let i = 0; i < L - 2; i++) {
+      for (let j = i + 1; j < L - 1; j++) {
+        for (let k = j + 1; k < L; k++) {
+          const key = tripletKey(nums[i], nums[j], nums[k]);
+          counts.set(key, (counts.get(key) || 0) + 1);
+        }
+      }
+    }
+  }
+
+  for (const [key, obs] of counts) {
+    if (obs < 2) continue;
+    const [aS, bS, cS] = key.split("-");
+    const a = +aS, b = +bS, c = +cS;
+    const pa = marg[a] / n, pb = marg[b] / n, pc = marg[c] / n;
+    const expected = pa * pb * pc * n;
+    if (expected < 0.3) continue;
+    const lift = obs / expected;
+    if (lift >= minLift) out.set(key, lift);
+  }
+  return out;
+}
+
+/** 0..1 — fraction of strong triplets present in the game, saturated. */
+export function tripletLiftBonus(numbers: number[], triplets: TripletLiftMap): number {
+  if (numbers.length < 3 || triplets.size === 0) return 0;
+  const sorted = [...numbers].sort((a, b) => a - b);
+  let hits = 0, weight = 0;
+  for (let i = 0; i < sorted.length - 2; i++) {
+    for (let j = i + 1; j < sorted.length - 1; j++) {
+      for (let k = j + 1; k < sorted.length; k++) {
+        const l = triplets.get(tripletKey(sorted[i], sorted[j], sorted[k]));
+        if (l !== undefined) { hits++; weight += l - 1; }
+      }
+    }
+  }
+  if (hits === 0) return 0;
+  return Math.max(0, Math.min(1, hits * 0.2 + weight * 0.05));
+}
