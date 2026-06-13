@@ -8,6 +8,14 @@ import { NumberStats } from "@/engine/stats/statistics";
 import { getLotteryRules } from "../knowledge/lotteriesKnowledge";
 import { getStrategy } from "../knowledge/strategiesKnowledge";
 import { computePatternProfile } from "../engines/patternEngine";
+import {
+  computeWinnerProfile,
+  computePairLift,
+  alignmentScore,
+  pairLiftBonus,
+  type PairLiftMap,
+  type WinnerProfile,
+} from "../engines/winnerProfileEngine";
 import type { RiskProfile, IntentFilters, ScoredGame } from "../core/aiTypes";
 import { scoreGame } from "../engines/rankingEngine";
 import type { Rng } from "../core/rng";
@@ -32,6 +40,12 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
   // Sinais avançados: recência exponencial + coocorrência (afinidade)
   const recencyBoost = computeRecencyBoost(config.draws, rules.totalNumbers);
   const affinityBoost = computeAffinityBoost(config.draws, rules.totalNumbers, config.stats);
+
+  // Perfil dos vencedores (centroide estatístico dos últimos 200 sorteios)
+  // + matriz de lift de pares (coocorrências mais fortes que o acaso).
+  const winnerProfile: WinnerProfile = computeWinnerProfile(config.draws, config.lotteryId, 200);
+  const pairLift: PairLiftMap = computePairLift(config.draws, rules.totalNumbers, rules.pick, 200);
+  const hasProfile = winnerProfile.sample >= 20;
 
   // Build weighted pool
   const pool = buildWeightedPool(config.stats, strategy.filters, config.filters, recencyBoost, affinityBoost);
@@ -101,6 +115,12 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     if (pattern.sumProximity < 0.3) continue; // always filter extreme sums
     if (pattern.decadeBalance < 0.35) continue; // exige variedade de décadas
 
+    // GATE pelo perfil dos vencedores: descarta jogos muito desalinhados
+    if (hasProfile) {
+      const align = alignmentScore(game, winnerProfile, config.lotteryId, prevDraw);
+      if (align < 0.5) continue;
+    }
+
     candidates.push(game);
   }
 
@@ -125,7 +145,20 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     const avgHits = backtestWindow.length > 0 ? hits / backtestWindow.length : 0;
     const performance = expectedHits > 0 ? avgHits / expectedHits : 1; // 1 = neutro
     const backtestBonus = Math.max(-8, Math.min(12, (performance - 1) * 20 + rare * 2));
-    s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + backtestBonus)));
+
+    // Bônus por alinhamento com perfil dos vencedores + pares com lift > 1
+    let profileBonus = 0;
+    if (hasProfile) {
+      const align = alignmentScore(s.numbers, winnerProfile, config.lotteryId, prevDraw);
+      const pairs = pairLiftBonus(s.numbers, pairLift);
+      profileBonus = (align - 0.6) * 25 + pairs * 10; // ~ -15 ... +20
+      // anexa explicação
+      const pct = Math.round(align * 100);
+      s.explanation.push(`🎯 Alinhamento com perfil vencedor: ${pct}%`);
+      if (pairs > 0.15) s.explanation.push(`🔗 Contém pares com coocorrência forte (lift médio elevado)`);
+    }
+
+    s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + backtestBonus + profileBonus)));
   }
 
   // Sort by score and take top N, ensuring diversity
