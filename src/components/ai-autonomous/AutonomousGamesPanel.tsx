@@ -228,7 +228,7 @@ export function AutonomousGamesPanel({ config, draws, stats }: Props) {
                       <Stat
                         label="Concurso top"
                         value={bt.bestDraw ? `#${bt.bestDraw.concurso}` : "—"}
-                        hint={bt.bestDraw?.data || ""}
+                        hint={bt.bestDraw?.date || ""}
                       />
                     </div>
 
