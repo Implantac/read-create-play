@@ -65,6 +65,27 @@ export const STRATEGIES: Record<string, StrategyDefinition> = {
     riskLevel: "high",
     filters: { hotBias: 0.1, coldBias: 0.6, diversityWeight: 0.7, sequencePenalty: 0.8 },
   },
+  pro_bettor: {
+    id: "pro_bettor",
+    name: "Apostador Profissional",
+    description: "Combina Monte Carlo, primos, Fibonacci e padrões de coocorrência. Estratégia usada por apostadores experientes que privilegiam jogos estáveis e estatisticamente robustos.",
+    riskLevel: "medium",
+    filters: { hotBias: 0.45, coldBias: 0.2, diversityWeight: 0.75, sequencePenalty: 1.5 },
+  },
+  monte_carlo: {
+    id: "monte_carlo",
+    name: "Monte Carlo",
+    description: "Refinado por milhares de simulações; seleciona jogos com maior estabilidade estatística e menor variância.",
+    riskLevel: "medium",
+    filters: { hotBias: 0.4, coldBias: 0.25, diversityWeight: 0.85, sequencePenalty: 1.2 },
+  },
+  prime_focus: {
+    id: "prime_focus",
+    name: "Foco em Primos",
+    description: "Otimiza a proporção de números primos/Fibonacci dentro da faixa histórica, padrão sub-explorado pelo apostador comum.",
+    riskLevel: "medium",
+    filters: { hotBias: 0.35, coldBias: 0.3, diversityWeight: 0.8, sequencePenalty: 1.0 },
+  },
 };
 
 export function getStrategy(id: string): StrategyDefinition {
