@@ -48,8 +48,22 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
   const pairLift: PairLiftMap = computePairLift(config.draws, rules.totalNumbers, rules.pick, 200);
   const hasProfile = winnerProfile.sample >= 20;
 
-  // Build weighted pool
-  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters, recencyBoost, affinityBoost);
+  // POSTERIOR por número: combina frequência, recência, afinidade, cycleScore,
+  // tendência e lift de pares numa única "convicção" 0..1. Usado para:
+  //  (a) reforçar o pool (peso ∝ (1+posterior)²)
+  //  (b) exigir um "núcleo" de números fortes em cada jogo
+  const posterior = computeNumberPosterior(
+    config.stats, recencyBoost, affinityBoost, pairLift, rules.totalNumbers,
+  );
+  // top 40% dos números viram o "core" (números de alta convicção)
+  const sortedByPost = [...posterior.entries()].sort((a, b) => b[1] - a[1]);
+  const coreCount = Math.max(1, Math.ceil(sortedByPost.length * 0.4));
+  const coreSet = new Set(sortedByPost.slice(0, coreCount).map(([n]) => n));
+  // mínimo de números do core dentro de cada jogo (≈60% do pick)
+  const minCoreInGame = Math.max(2, Math.ceil(rules.pick * 0.6));
+
+  // Build weighted pool (posterior amplifica os pesos)
+  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters, recencyBoost, affinityBoost, posterior);
   const rng = config.rng;
 
   // Pré-computações p/ rejeição rápida
