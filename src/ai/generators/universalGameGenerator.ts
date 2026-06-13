@@ -179,7 +179,14 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
       if (pairs > 0.15) s.explanation.push(`🔗 Contém pares com coocorrência forte (lift médio elevado)`);
     }
 
-    s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + backtestBonus + profileBonus)));
+    // POSTERIOR BONUS: convicção média dos números do jogo
+    let postSum = 0;
+    for (const n of s.numbers) postSum += posterior.get(n) ?? 0;
+    const postAvg = postSum / s.numbers.length; // 0..1
+    const postBonus = (postAvg - 0.5) * 20; // -10..+10
+    if (postAvg >= 0.7) s.explanation.push(`🧠 Núcleo de alta convicção (posterior médio ${(postAvg * 100).toFixed(0)}%)`);
+
+    s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + backtestBonus + profileBonus + postBonus)));
   }
 
   // VALIDAÇÃO PÓS-GERAÇÃO: anexa um mini-backtest a cada jogo gerado.
