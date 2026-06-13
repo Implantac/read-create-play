@@ -19,6 +19,7 @@ import {
 import type { RiskProfile, IntentFilters, ScoredGame } from "../core/aiTypes";
 import { scoreGame } from "../engines/rankingEngine";
 import type { Rng } from "../core/rng";
+import { getEstimatedPrize, getMaxPossibleHits } from "@/utils/lottery-utils";
 
 interface GeneratorConfig {
   lotteryId: string;
