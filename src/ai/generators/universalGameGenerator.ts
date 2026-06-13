@@ -41,6 +41,12 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
   const recencyBoost = computeRecencyBoost(config.draws, rules.totalNumbers);
   const affinityBoost = computeAffinityBoost(config.draws, rules.totalNumbers, config.stats);
 
+  // Perfil dos vencedores (centroide estatístico dos últimos 200 sorteios)
+  // + matriz de lift de pares (coocorrências mais fortes que o acaso).
+  const winnerProfile: WinnerProfile = computeWinnerProfile(config.draws, config.lotteryId, 200);
+  const pairLift: PairLiftMap = computePairLift(config.draws, rules.totalNumbers, rules.pick, 200);
+  const hasProfile = winnerProfile.sample >= 20;
+
   // Build weighted pool
   const pool = buildWeightedPool(config.stats, strategy.filters, config.filters, recencyBoost, affinityBoost);
   const rng = config.rng;
