@@ -276,8 +276,9 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
       </Card>
 
       {/* Main Tabs */}
-      <Tabs defaultValue="ranking" className="space-y-4">
+      <Tabs defaultValue="games" className="space-y-4">
         <TabsList className="flex flex-wrap h-auto gap-1">
+          <TabsTrigger value="games">Jogos Gerados</TabsTrigger>
           <TabsTrigger value="ranking">Ranking</TabsTrigger>
           <TabsTrigger value="entropy">Entropia</TabsTrigger>
           <TabsTrigger value="chisquare">χ² Test</TabsTrigger>
@@ -289,6 +290,10 @@ export function AIAutonomousDashboard({ config, draws, stats }: Props) {
           <TabsTrigger value="shifts">Mudanças</TabsTrigger>
           <TabsTrigger value="ai">Análise IA</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="games" className="space-y-6 outline-none">
+          <AutonomousGamesPanel config={config} draws={draws} stats={stats} />
+        </TabsContent>
 
         {/* Ranking Tab */}
         <TabsContent value="ranking" className="space-y-6 outline-none">
