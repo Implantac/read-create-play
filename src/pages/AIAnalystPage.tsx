@@ -186,6 +186,11 @@ const AIAnalystPage = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-8 space-y-8">
+                  <NumberPickerGrid
+                    config={config}
+                    stats={stats}
+                    onSaveBet={(numbers) => { saveBet({ numbers, strategy: "Manual" }); toast.success("Jogo salvo!"); }}
+                  />
                   <div className="grid md:grid-cols-3 gap-8 p-6 bg-secondary/20 rounded-3xl border border-border/10">
                     <div className="space-y-3">
                       <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Arquitetura de Risco</label>
