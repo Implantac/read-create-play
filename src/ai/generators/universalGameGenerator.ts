@@ -115,6 +115,12 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     if (pattern.sumProximity < 0.3) continue; // always filter extreme sums
     if (pattern.decadeBalance < 0.35) continue; // exige variedade de décadas
 
+    // GATE pelo perfil dos vencedores: descarta jogos muito desalinhados
+    if (hasProfile) {
+      const align = alignmentScore(game, winnerProfile, config.lotteryId, prevDraw);
+      if (align < 0.5) continue;
+    }
+
     candidates.push(game);
   }
 
