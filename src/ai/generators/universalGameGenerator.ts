@@ -287,35 +287,6 @@ function simulatedAnnealing(
   return best;
 }
 
-/** Hill-climbing: tenta substituir cada número por outro do universo se melhorar o score. */
-function hillClimb(
-  game: ScoredGame,
-  universe: number[],
-  config: GeneratorConfig,
-  maxIterations: number
-): ScoredGame {
-  let best = game;
-  for (let iter = 0; iter < maxIterations; iter++) {
-    let improved = false;
-    for (let i = 0; i < best.numbers.length; i++) {
-      for (const candidate of universe) {
-        if (best.numbers.includes(candidate)) continue;
-        if (config.filters.excludeNumbers?.includes(candidate)) continue;
-        const next = [...best.numbers];
-        next[i] = candidate;
-        const scored = scoreGame(next, config.lotteryId, config.stats, config.draws, config.riskProfile);
-        if (scored.totalScore > best.totalScore + 1) {
-          best = scored;
-          improved = true;
-          break;
-        }
-      }
-      if (improved) break;
-    }
-    if (!improved) break;
-  }
-  return best;
-}
 
 /** Build weighted number pool based on strategy and stats */
 function buildWeightedPool(
