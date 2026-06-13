@@ -175,20 +175,34 @@ export function MassiveSimulationDashboard({ stats, config, draws }: Props) {
   const requestAIAnalysis = async () => {
     if (!result) return;
     setAiLoading(true);
+    const topGames = result.topGames.slice(0, 15);
+    const patternInsights = toNativePatternInsights(result.patternInsights);
     try {
-      await new Promise(r => setTimeout(r, 200));
-      const { generateMassiveSimAnalysis } = await import("@/engine/ai/native-analysis");
-      const analysis = generateMassiveSimAnalysis(
-        result.topGames.slice(0, 15),
-        toNativePatternInsights(result.patternInsights),
-        result.distributionSummary,
-        config,
-        result.totalGenerated,
-        result.totalEvaluated
-      );
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data, error } = await supabase.functions.invoke("ai-massive-simulation", {
+        body: {
+          topGames,
+          patternInsights,
+          distributionSummary: result.distributionSummary,
+          lotteryName: config.name,
+          lotteryPick: config.pick,
+          lotteryNumbers: config.numbers,
+          totalGenerated: result.totalGenerated,
+          totalEvaluated: result.totalEvaluated,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const analysis = (data?.analysis ?? data?.text) as string | undefined;
+      if (!analysis) throw new Error("Resposta vazia da IA");
       setAiAnalysis(analysis);
-    } catch (e) {
-      toast.error("Erro na análise");
+      toast.success(data?.fromCache ? "IA (cache)" : "Análise real concluída");
+    } catch (e: any) {
+      const { generateMassiveSimAnalysis } = await import("@/engine/ai/native-analysis");
+      setAiAnalysis(
+        generateMassiveSimAnalysis(topGames, patternInsights, result.distributionSummary, config, result.totalGenerated, result.totalEvaluated)
+      );
+      toast.error(`IA indisponível: ${e?.message || "fallback local"}`);
     } finally {
       setAiLoading(false);
     }

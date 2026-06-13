@@ -162,27 +162,38 @@ export function IntelligentSimulatorPanel({ config, draws, stats }: Props) {
   const handleAiAnalysis = async () => {
     if (!simulation) return;
     setLoadingAi(true);
+    const simulationData = {
+      bets: (simulation.bets as any).map((b: any) => ({
+        bet: b.bet.numbers,
+        bestHit: b.bestHit,
+        avgHits: b.avgHits,
+        hitDistribution: b.hitDistribution,
+        prizeCount: b.prizeCount,
+        stability: b.stability,
+      })),
+      totalDraws: simulation.totalDraws,
+      ranking: simulation.ranking,
+    };
     try {
-      await new Promise(r => setTimeout(r, 200));
-      const { generateSimulationAnalysis } = await import("@/engine/ai/native-analysis");
-      const analysis = generateSimulationAnalysis(
-        {
-          bets: (simulation.bets as any).map((b: any) => ({
-            bet: b.bet.numbers,
-            bestHit: b.bestHit,
-            avgHits: b.avgHits,
-            hitDistribution: b.hitDistribution,
-            prizeCount: b.prizeCount,
-            stability: b.stability,
-          })),
-          totalDraws: simulation.totalDraws,
-          ranking: simulation.ranking,
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data, error } = await supabase.functions.invoke("ai-simulation-analysis", {
+        body: {
+          simulationData,
+          lotteryName: config.name,
+          lotteryPick: config.pick,
+          lotteryNumbers: config.numbers,
         },
-        config
-      );
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const analysis = (data?.analysis ?? data?.text) as string | undefined;
+      if (!analysis) throw new Error("Resposta vazia da IA");
       setAiAnalysis(analysis);
+      toast.success(data?.fromCache ? "IA (cache)" : "Análise real concluída");
     } catch (e: any) {
-      toast.error(e.message || "Erro na análise");
+      const { generateSimulationAnalysis } = await import("@/engine/ai/native-analysis");
+      setAiAnalysis(generateSimulationAnalysis(simulationData, config));
+      toast.error(`IA indisponível: ${e?.message || "fallback local"}`);
     } finally {
       setLoadingAi(false);
     }
