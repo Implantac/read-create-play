@@ -8,6 +8,14 @@ import { NumberStats } from "@/engine/stats/statistics";
 import { getLotteryRules } from "../knowledge/lotteriesKnowledge";
 import { getStrategy } from "../knowledge/strategiesKnowledge";
 import { computePatternProfile } from "../engines/patternEngine";
+import {
+  computeWinnerProfile,
+  computePairLift,
+  alignmentScore,
+  pairLiftBonus,
+  type PairLiftMap,
+  type WinnerProfile,
+} from "../engines/winnerProfileEngine";
 import type { RiskProfile, IntentFilters, ScoredGame } from "../core/aiTypes";
 import { scoreGame } from "../engines/rankingEngine";
 import type { Rng } from "../core/rng";
