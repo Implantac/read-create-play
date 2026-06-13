@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { FarolEstatistico } from "@/components/lottery/analysis/FarolEstatistico";
 import { EliteGameCard } from "@/components/lottery/EliteGameCard";
+import { NumberPickerGrid } from "@/components/NumberPickerGrid";
 
 const AIAnalystPage = () => {
   const { config, draws, stats, selectedLottery } = useLotteryContext();
