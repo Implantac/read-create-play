@@ -48,8 +48,22 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
   const pairLift: PairLiftMap = computePairLift(config.draws, rules.totalNumbers, rules.pick, 200);
   const hasProfile = winnerProfile.sample >= 20;
 
-  // Build weighted pool
-  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters, recencyBoost, affinityBoost);
+  // POSTERIOR por número: combina frequência, recência, afinidade, cycleScore,
+  // tendência e lift de pares numa única "convicção" 0..1. Usado para:
+  //  (a) reforçar o pool (peso ∝ (1+posterior)²)
+  //  (b) exigir um "núcleo" de números fortes em cada jogo
+  const posterior = computeNumberPosterior(
+    config.stats, recencyBoost, affinityBoost, pairLift, rules.totalNumbers,
+  );
+  // top 40% dos números viram o "core" (números de alta convicção)
+  const sortedByPost = [...posterior.entries()].sort((a, b) => b[1] - a[1]);
+  const coreCount = Math.max(1, Math.ceil(sortedByPost.length * 0.4));
+  const coreSet = new Set(sortedByPost.slice(0, coreCount).map(([n]) => n));
+  // mínimo de números do core dentro de cada jogo (≈60% do pick)
+  const minCoreInGame = Math.max(2, Math.ceil(rules.pick * 0.6));
+
+  // Build weighted pool (posterior amplifica os pesos)
+  const pool = buildWeightedPool(config.stats, strategy.filters, config.filters, recencyBoost, affinityBoost, posterior);
   const rng = config.rng;
 
   // Pré-computações p/ rejeição rápida
@@ -119,8 +133,14 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     // GATE pelo perfil dos vencedores: descarta jogos muito desalinhados
     if (hasProfile) {
       const align = alignmentScore(game, winnerProfile, config.lotteryId, prevDraw);
-      if (align < 0.5) continue;
+      if (align < 0.55) continue;
     }
+
+    // CORE GATE: exige que pelo menos minCoreInGame números venham do top-40%
+    // de convicção (posterior). Elimina jogos "aleatórios" com muitos números fracos.
+    let coreInGame = 0;
+    for (const n of game) if (coreSet.has(n)) coreInGame++;
+    if (coreInGame < minCoreInGame) continue;
 
     candidates.push(game);
   }
@@ -159,7 +179,14 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
       if (pairs > 0.15) s.explanation.push(`🔗 Contém pares com coocorrência forte (lift médio elevado)`);
     }
 
-    s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + backtestBonus + profileBonus)));
+    // POSTERIOR BONUS: convicção média dos números do jogo
+    let postSum = 0;
+    for (const n of s.numbers) postSum += posterior.get(n) ?? 0;
+    const postAvg = postSum / s.numbers.length; // 0..1
+    const postBonus = (postAvg - 0.5) * 20; // -10..+10
+    if (postAvg >= 0.7) s.explanation.push(`🧠 Núcleo de alta convicção (posterior médio ${(postAvg * 100).toFixed(0)}%)`);
+
+    s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + backtestBonus + profileBonus + postBonus)));
   }
 
   // VALIDAÇÃO PÓS-GERAÇÃO: anexa um mini-backtest a cada jogo gerado.
@@ -249,7 +276,8 @@ function buildWeightedPool(
   strategyFilters: { hotBias: number; coldBias: number },
   intentFilters: IntentFilters,
   recencyBoost: Map<number, number>,
-  affinityBoost: Map<number, number>
+  affinityBoost: Map<number, number>,
+  posterior?: Map<number, number>,
 ): { number: number; weight: number }[] {
   return stats.map(s => {
     let weight = 1;
@@ -273,6 +301,12 @@ function buildWeightedPool(
     // Afinidade: coocorrência com números atualmente "quentes"
     weight += (affinityBoost.get(s.number) ?? 0) * 1.8;
 
+    // POSTERIOR (convicção combinada): amplifica não-linearmente
+    if (posterior) {
+      const p = posterior.get(s.number) ?? 0;
+      weight *= (1 + p) * (1 + p);
+    }
+
     // Intent-specific
     if (intentFilters.prioritizeHot && s.status === "hot") weight *= 1.5;
     if (intentFilters.prioritizeCold && s.status === "cold") weight *= 1.5;
@@ -282,6 +316,67 @@ function buildWeightedPool(
 
     return { number: s.number, weight: Math.max(0.01, weight) };
   });
+}
+
+/**
+ * Posterior por número: combina sinais já existentes (freq z-score, recência,
+ * afinidade, cycleScore, tendência) + média de pair-lift do número com os
+ * "quentes" do momento. Normalizado para 0..1.
+ */
+function computeNumberPosterior(
+  stats: NumberStats[],
+  recency: Map<number, number>,
+  affinity: Map<number, number>,
+  pairLift: PairLiftMap,
+  totalNumbers: number,
+): Map<number, number> {
+  const freqs = stats.map(s => s.frequency);
+  const mean = freqs.reduce((a, b) => a + b, 0) / Math.max(1, freqs.length);
+  const std = Math.sqrt(
+    freqs.reduce((s, f) => s + (f - mean) ** 2, 0) / Math.max(1, freqs.length),
+  ) || 1;
+  const hot = stats.filter(s => s.status === "hot").map(s => s.number);
+
+  const raw = new Map<number, number>();
+  for (const s of stats) {
+    const fz = (s.frequency - mean) / std;           // -∞..+∞
+    const rec = recency.get(s.number) ?? 0;          // 0..1
+    const aff = affinity.get(s.number) ?? 0;         // 0..1
+    const cyc = Math.max(0, (s.cycleScore || 1) - 1); // due bonus
+    const trd = Math.max(0, s.trend || 0);            // upward trend
+    // média de pair-lift contra os quentes (excluindo self)
+    let pairAvg = 0, pairN = 0;
+    const row = pairLift.get(s.number);
+    if (row) {
+      for (const h of hot) {
+        if (h === s.number) continue;
+        const a = Math.min(s.number, h), b = Math.max(s.number, h);
+        const lv = pairLift.get(a)?.get(b);
+        if (lv !== undefined) { pairAvg += lv; pairN++; }
+      }
+      if (pairN > 0) pairAvg /= pairN;
+    }
+    const pairBonus = Math.max(0, pairAvg - 1); // só lift acima de 1
+
+    const score =
+      0.30 * Math.tanh(fz * 0.6) +   // -0.3..+0.3 saturado
+      0.25 * rec +
+      0.15 * aff +
+      0.15 * cyc +
+      0.10 * Math.min(1, trd) +
+      0.15 * Math.min(1, pairBonus);
+    raw.set(s.number, score);
+  }
+  // normaliza para 0..1
+  let lo = Infinity, hi = -Infinity;
+  for (const v of raw.values()) { if (v < lo) lo = v; if (v > hi) hi = v; }
+  const span = hi - lo || 1;
+  const out = new Map<number, number>();
+  for (let n = 1; n <= totalNumbers; n++) {
+    const v = raw.get(n) ?? lo;
+    out.set(n, (v - lo) / span);
+  }
+  return out;
 }
 
 /** Pesa cada número por aparições recentes com decaimento exponencial (meia-vida ~ 20 sorteios) */
