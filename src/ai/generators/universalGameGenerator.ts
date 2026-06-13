@@ -190,7 +190,12 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     const postBonus = (postAvg - 0.5) * 20; // -10..+10
     if (postAvg >= 0.7) s.explanation.push(`🧠 Núcleo de alta convicção (posterior médio ${(postAvg * 100).toFixed(0)}%)`);
 
-    s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + backtestBonus + profileBonus + postBonus)));
+    // TRIPLET (Markov-2) BONUS: trios historicamente fortes presentes no jogo
+    const tripBoost = tripletLiftBonus(s.numbers, tripletLift); // 0..1
+    const tripBonus = tripBoost * 12; // 0..+12
+    if (tripBoost > 0.25) s.explanation.push(`🧬 Contém trios com coocorrência incomum (Markov-2)`);
+
+    s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + backtestBonus + profileBonus + postBonus + tripBonus)));
   }
 
   // VALIDAÇÃO PÓS-GERAÇÃO: anexa um mini-backtest a cada jogo gerado.
