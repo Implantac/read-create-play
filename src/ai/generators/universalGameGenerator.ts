@@ -234,10 +234,9 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     }
   }
 
-  // Sort by score and take top N, ensuring diversity
-  // REFINAMENTO: simulated annealing nos top candidatos — aceita pioras
-  // controladas para escapar de máximos locais e converge para combinações
-  // mais consistentes que o hill-climb puro.
+  // Ordena por score atual e refina os top-K via simulated annealing
+  // (aceita pioras controladas para escapar de máximos locais).
+  scored.sort((a, b) => b.totalScore - a.totalScore);
   const topK = Math.min(scored.length, Math.max(config.count * 3, 15));
   const universe = Array.from({ length: rules.totalNumbers }, (_, i) => i + 1);
   for (let i = 0; i < topK; i++) {
