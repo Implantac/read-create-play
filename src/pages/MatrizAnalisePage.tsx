@@ -4,6 +4,7 @@ import { SelectedBetsProvider } from "@/contexts/SelectedBetsContext";
 import { computeMatrixAnalysis } from "@/engine/matrix-analysis";
 import { MatrizAnaliseTable } from "@/components/lottery/analysis/MatrizAnaliseTable";
 import { FarolDezenas } from "@/components/lottery/analysis/FarolDezenas";
+import { NumberPickerGrid } from "@/components/NumberPickerGrid";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { EmptyState } from "@/components/common/EmptyState";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
