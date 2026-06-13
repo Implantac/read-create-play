@@ -165,13 +165,13 @@ Como o jogador deve usar esses resultados na prática?`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-3.1-pro-preview",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        temperature: 0.25,
-        max_tokens: 8000,
+        temperature: 0.15,
+        max_tokens: 12000,
       }),
     });
 
