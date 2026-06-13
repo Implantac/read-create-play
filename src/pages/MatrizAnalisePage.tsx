@@ -183,6 +183,13 @@ const MatrizAnalisePage = () => {
         {/* Matrix Table */}
         <MatrizAnaliseTable data={matrixData} />
 
+        {/* Manual Number Picker */}
+        <NumberPickerGrid
+          config={config}
+          stats={stats}
+          onSaveBet={(numbers) => handleSaveBet(numbers, "Manual")}
+        />
+
         {/* Smart Unfolding Generator */}
         <PlanGate feature="gerador_avancado" fallbackMessage="Desdobramento Inteligente baseado no Score">
           <Suspense fallback={<LazyFallback />}>
