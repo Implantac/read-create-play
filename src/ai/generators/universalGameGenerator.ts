@@ -121,10 +121,14 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     if (recentSignatures.has(game.join(","))) continue;
 
     // Rejeita concentração extrema numa única dezena (>60% em uma década)
-    const decadeBuckets = Math.max(2, Math.ceil(rules.totalNumbers / 10));
-    const decadeCounts = new Array(decadeBuckets).fill(0);
-    for (const n of game) decadeCounts[Math.min(Math.floor((n - 1) / 10), decadeBuckets - 1)]++;
-    if (Math.max(...decadeCounts) > Math.ceil(rules.pick * 0.6)) continue;
+    // — só faz sentido quando o universo tem múltiplas dezenas (>10 números).
+    const hasMultipleDecades = rules.totalNumbers > 10;
+    if (hasMultipleDecades) {
+      const decadeBuckets = Math.max(2, Math.ceil(rules.totalNumbers / 10));
+      const decadeCounts = new Array(decadeBuckets).fill(0);
+      for (const n of game) decadeCounts[Math.min(Math.floor((n - 1) / 10), decadeBuckets - 1)]++;
+      if (Math.max(...decadeCounts) > Math.ceil(rules.pick * 0.6)) continue;
+    }
 
     const pattern = computePatternProfile(game, config.lotteryId, prevDraw);
 
@@ -132,7 +136,7 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     if (config.filters.balanceParity && pattern.parityBalance < 0.5) continue;
     if (config.filters.avoidSequences && pattern.sequencePenalty < 0.5) continue;
     if (pattern.sumProximity < 0.3) continue; // always filter extreme sums
-    if (pattern.decadeBalance < 0.35) continue; // exige variedade de décadas
+    if (hasMultipleDecades && pattern.decadeBalance < 0.35) continue; // exige variedade de décadas
 
     // GATE pelo perfil dos vencedores: descarta jogos muito desalinhados
     if (hasProfile) {
