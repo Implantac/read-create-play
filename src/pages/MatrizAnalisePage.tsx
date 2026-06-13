@@ -53,7 +53,7 @@ const SummaryCard = ({ icon, label, value, subtitle, color }: SummaryCardProps) 
 
 
 const MatrizAnalisePage = () => {
-  const { config, draws, syncing, syncDraws, syncAllLotteries, selectedLottery } = useLotteryContext();
+  const { config, draws, stats, syncing, syncDraws, syncAllLotteries, selectedLottery } = useLotteryContext();
   const { saveBet } = useSavedBets(selectedLottery);
 
   const matrixData = useMemo(
