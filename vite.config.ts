@@ -42,6 +42,8 @@ export default defineConfig(({ mode }) => ({
     react(),
     VitePWA({
       registerType: "autoUpdate",
+      injectRegister: null,
+      devOptions: { enabled: false },
       includeAssets: ["favicon.png", "favicon.ico"],
       manifest: {
         name: "Titan Loterias — Análise Estatística Inteligente",
@@ -59,7 +61,43 @@ export default defineConfig(({ mode }) => ({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
+        navigateFallback: "/index.html",
+        navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//, /\/functions\/v1\//],
         runtimeCaching: [
+          {
+            // HTML navigations — sempre tenta rede, cai para cache se offline
+            urlPattern: ({ request }) => request.mode === "navigate",
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "html-navigations",
+              networkTimeoutSeconds: 4,
+              expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 7 },
+            },
+          },
+          {
+            // Assets hasheados do próprio domínio
+            urlPattern: ({ url, sameOrigin }) =>
+              sameOrigin && /\.(?:js|css|woff2?|png|jpg|jpeg|svg|webp|ico)$/.test(url.pathname),
+            handler: "CacheFirst",
+            options: {
+              cacheName: "static-assets",
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            },
+          },
+          {
+            // Chamadas Supabase REST/Functions — rede primeiro, cache curto como fallback
+            urlPattern: /^https:\/\/.*\.supabase\.co\/(rest|functions)\/.*/i,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "supabase-api",
+              networkTimeoutSeconds: 6,
+              expiration: { maxEntries: 100, maxAgeSeconds: 60 * 10 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: "CacheFirst",
@@ -71,7 +109,6 @@ export default defineConfig(({ mode }) => ({
             options: { cacheName: "gstatic-fonts-cache", expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 } },
           },
         ],
-        navigateFallbackDenylist: [/^\/~oauth/],
       },
     }),
   ].filter(Boolean),
