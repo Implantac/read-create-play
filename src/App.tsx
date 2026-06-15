@@ -29,6 +29,7 @@ const LandingPage = lazy(() => import("./pages/LandingPage"));
 const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage"));
 const SuportePage = lazy(() => import("./pages/SuportePage"));
 const InstallPage = lazy(() => import("./pages/InstallPage"));
+const PwaOfflineTestPage = lazy(() => import("./pages/PwaOfflineTestPage"));
 const AdminPage = lazy(() => import("@/pages/AdminPage"));
 const AIChatPage = lazy(() => import("@/pages/AIChatPage"));
 const IAAutonomaPage = lazy(() => import("@/pages/IAAutonomaPage"));
