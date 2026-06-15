@@ -83,6 +83,7 @@ const AppContent = () => {
 
   return (
     <Suspense fallback={<PageLoader />}>
+      <AutoInstallPrompt />
       <Routes>
         {/* Public */}
         <Route path="/" element={<LandingPage />} />
