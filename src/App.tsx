@@ -12,6 +12,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { lazy, Suspense, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { ReferralSystem } from "@/lib/referral-system";
+import { AutoInstallPrompt } from "@/components/pwa/AutoInstallPrompt";
 
 const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
 const GeradorPage = lazy(() => import("@/pages/GeradorPage"));
@@ -82,6 +83,7 @@ const AppContent = () => {
 
   return (
     <Suspense fallback={<PageLoader />}>
+      <AutoInstallPrompt />
       <Routes>
         {/* Public */}
         <Route path="/" element={<LandingPage />} />
