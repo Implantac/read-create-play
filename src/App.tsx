@@ -97,6 +97,7 @@ const AppContent = () => {
         <Route path="/suporte" element={<SuportePage />} />
         <Route path="/payment-success" element={<PaymentSuccessPage />} />
         <Route path="/install" element={<InstallPage />} />
+        <Route path="/pwa-test" element={<PwaOfflineTestPage />} />
         
         {/* Protected */}
         <Route element={<ProtectedRoute><LotteryProvider><AppLayout /></LotteryProvider></ProtectedRoute>}>
