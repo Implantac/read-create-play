@@ -13,6 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, BrainCircuit, Target, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ComplianceDisclaimer } from "@/components/common/ComplianceDisclaimer";
+import { GamificationCard } from "@/components/GamificationCard";
+import { NeuralMissionCenter } from "@/components/NeuralMissionCenter";
 import { useNavigate } from "react-router-dom";
 
 const DashboardPage = () => {
@@ -110,6 +112,9 @@ const DashboardPage = () => {
               <BrainCircuit className="w-4 h-4 group-hover:rotate-12 transition-transform" />
             </Button>
           </Card>
+
+          <GamificationCard />
+          <NeuralMissionCenter />
 
         </div>
       </div>
