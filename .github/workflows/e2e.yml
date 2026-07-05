@@ -63,15 +63,25 @@ jobs:
         run: npx playwright install-deps ${{ matrix.project }}
 
       - name: Run Playwright tests
-        run: npm run test:e2e -- --project=${{ matrix.project }} --reporter=list,html
+        run: npm run test:e2e -- --project=${{ matrix.project }} --reporter=list,blob,html
+        env:
+          PLAYWRIGHT_BLOB_OUTPUT_FILE: blob-report/report-${{ matrix.project }}.zip
 
-      - name: Upload HTML report
+      - name: Upload per-browser HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report-${{ matrix.project }}
           path: playwright-report
           retention-days: 14
+
+      - name: Upload blob report (for merge)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-report-${{ matrix.project }}
+          path: blob-report
+          retention-days: 3
 
       - name: Upload traces
         if: failure()
@@ -80,3 +90,50 @@ jobs:
           name: playwright-traces-${{ matrix.project }}
           path: test-results
           retention-days: 7
+
+  merge-reports:
+    name: Merge reports (all browsers)
+    if: always()
+    needs: playwright
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download all blob reports
+        uses: actions/download-artifact@v4
+        with:
+          path: all-blob-reports
+          pattern: blob-report-*
+          merge-multiple: true
+
+      - name: Merge into single HTML report
+        run: npx playwright merge-reports --reporter html ./all-blob-reports
+
+      - name: Upload unified HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-merged
+          path: playwright-report
+          retention-days: 14
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## Playwright E2E — Relatório unificado"
+            echo ""
+            echo "Artefato: **playwright-report-merged** (Chromium + Firefox + WebKit)."
+            echo ""
+            echo "Relatórios individuais também disponíveis: \`playwright-report-chromium\`, \`playwright-report-firefox\`, \`playwright-report-webkit\`."
+          } >> "$GITHUB_STEP_SUMMARY"
