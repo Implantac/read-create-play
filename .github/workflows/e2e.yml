@@ -123,8 +123,8 @@ jobs:
       - name: Merge into JSON (para matriz)
         run: npx playwright merge-reports --reporter json ./all-blob-reports > merged.json
 
-      - name: Gerar matriz HTML por navegador
-        run: node scripts/e2e-matrix.mjs merged.json playwright-report/matrix.html
+      - name: Gerar matriz HTML + CSV
+        run: node scripts/e2e-matrix.mjs merged.json playwright-report/matrix.html playwright-report/matrix.csv
 
       - name: Upload unified HTML report
         uses: actions/upload-artifact@v4
@@ -133,11 +133,13 @@ jobs:
           path: playwright-report
           retention-days: 14
 
-      - name: Upload matriz standalone
+      - name: Upload matriz standalone (HTML + CSV)
         uses: actions/upload-artifact@v4
         with:
           name: playwright-matrix
-          path: playwright-report/matrix.html
+          path: |
+            playwright-report/matrix.html
+            playwright-report/matrix.csv
           retention-days: 14
 
       - name: Job summary
