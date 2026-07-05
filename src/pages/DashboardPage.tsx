@@ -113,6 +113,9 @@ const DashboardPage = () => {
             </Button>
           </Card>
 
+          <GamificationCard />
+          <NeuralMissionCenter />
+
         </div>
       </div>
 
