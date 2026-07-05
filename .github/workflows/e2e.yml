@@ -150,14 +150,3 @@ jobs:
             echo "- **playwright-matrix**: apenas a página \`matrix.html\` (teste × navegador)."
             echo "- Relatórios individuais: \`playwright-report-{chromium,firefox,webkit}\`."
           } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Job summary
-        if: always()
-        run: |
-          {
-            echo "## Playwright E2E — Relatório unificado"
-            echo ""
-            echo "Artefato: **playwright-report-merged** (Chromium + Firefox + WebKit)."
-            echo ""
-            echo "Relatórios individuais também disponíveis: \`playwright-report-chromium\`, \`playwright-report-firefox\`, \`playwright-report-webkit\`."
-          } >> "$GITHUB_STEP_SUMMARY"
