@@ -17,7 +17,7 @@ const report = JSON.parse(readFileSync(inputPath, "utf8"));
 
 /** @type {Set<string>} */
 const browsers = new Set();
-/** @type {Map<string, {file: string, title: string, results: Record<string, {status: string, duration: number, error?: string}>}>} */
+/** @type {Map<string, {file: string, title: string, results: Record<string, {status: string, duration: number, error?: string, testId?: string}>}>} */
 const rows = new Map();
 
 function walkSuite(suite, filePath) {
@@ -33,7 +33,8 @@ function walkSuite(suite, filePath) {
       const status = last?.status || testRun.status || "unknown";
       const duration = last?.duration ?? 0;
       const error = last?.error?.message;
-      rows.get(key).results[project] = { status, duration, error };
+      const testId = testRun.id || spec.id;
+      rows.get(key).results[project] = { status, duration, error, testId };
     }
   }
   for (const child of suite.suites || []) walkSuite(child, currentFile);
