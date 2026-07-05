@@ -1,17 +1,20 @@
 #!/usr/bin/env node
 /**
- * Gera uma página HTML com a matriz de status por teste x navegador
+ * Gera:
+ *   - página HTML com a matriz de status por teste x navegador
+ *   - CSV long-format (arquivo, teste, navegador, status, duração, erro)
  * a partir do JSON produzido por `playwright merge-reports --reporter json`.
  *
- * Uso: node scripts/e2e-matrix.mjs <merged.json> <output.html>
+ * Uso: node scripts/e2e-matrix.mjs <merged.json> <output.html> [output.csv]
  */
 import { readFileSync, writeFileSync } from "node:fs";
 
-const [, , inputPath, outputPath] = process.argv;
+const [, , inputPath, outputPath, csvPath] = process.argv;
 if (!inputPath || !outputPath) {
-  console.error("Uso: node scripts/e2e-matrix.mjs <merged.json> <output.html>");
+  console.error("Uso: node scripts/e2e-matrix.mjs <merged.json> <output.html> [output.csv]");
   process.exit(1);
 }
+const csvOut = csvPath || outputPath.replace(/\.html?$/i, ".csv");
 
 const report = JSON.parse(readFileSync(inputPath, "utf8"));
 
@@ -150,4 +153,22 @@ ${bodyRows}
 </html>`;
 
 writeFileSync(outputPath, html);
-console.log(`Matriz gerada: ${outputPath} (${rows.size} testes × ${browserList.length} navegadores)`);
+
+const csvEscape = (v) => {
+  const s = String(v ?? "");
+  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+};
+const csvLines = ["file,test,browser,status,duration_ms,error"];
+for (const { file, title, results } of rows.values()) {
+  for (const b of browserList) {
+    const r = results[b];
+    csvLines.push(
+      [file, title, b, r?.status ?? "unknown", r?.duration ?? 0, (r?.error ?? "").replace(/\s+/g, " ").trim()]
+        .map(csvEscape)
+        .join(","),
+    );
+  }
+}
+writeFileSync(csvOut, csvLines.join("\n") + "\n");
+
+console.log(`Matriz gerada: ${outputPath} + ${csvOut} (${rows.size} testes × ${browserList.length} navegadores)`);
