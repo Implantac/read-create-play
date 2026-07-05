@@ -36,7 +36,11 @@ export function AchievementDisplay() {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
       {achievements.map((achievement: any, idx: number) => {
-        const Icon = (LucideIcons as any)[achievement.badges.icon] || LucideIcons.Award;
+        const meta = achievement.metadata || {};
+        const name = meta.name || achievement.achievement_type;
+        const description = meta.description || "Conquista desbloqueada";
+        const iconName = meta.icon || "Award";
+        const Icon = (LucideIcons as any)[iconName] || LucideIcons.Award;
         return (
           <motion.div
             key={idx}
@@ -49,8 +53,8 @@ export function AchievementDisplay() {
               <Icon className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-tight">{achievement.badges.name}</p>
-              <p className="text-[8px] text-muted-foreground leading-tight mt-1 line-clamp-2">{achievement.badges.description}</p>
+              <p className="text-[10px] font-black uppercase tracking-tight">{name}</p>
+              <p className="text-[8px] text-muted-foreground leading-tight mt-1 line-clamp-2">{description}</p>
             </div>
             <Badge variant="outline" className="text-[7px] font-mono mt-auto opacity-50">
               {new Date(achievement.unlocked_at).toLocaleDateString()}
