@@ -15,17 +15,10 @@ export function AchievementDisplay() {
       if (!user) return [];
       const { data, error } = await supabase
         .from("user_achievements")
-        .select(`
-          unlocked_at,
-          badges (
-            name,
-            description,
-            icon,
-            category
-          )
-        `)
-        .eq("user_id", user.id);
-        
+        .select("unlocked_at, achievement_type, metadata")
+        .eq("user_id", user.id)
+        .order("unlocked_at", { ascending: false });
+
       if (error) return [];
       return data;
     },
