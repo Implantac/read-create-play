@@ -44,7 +44,7 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       injectRegister: null,
       devOptions: { enabled: false },
-      includeAssets: ["favicon.png", "favicon.ico"],
+      includeAssets: ["favicon.png", "favicon.ico", "apple-touch-icon.png"],
       manifest: {
         name: "Titan Loterias — Análise Estatística Inteligente",
         short_name: "Titan Loterias",
@@ -55,8 +55,10 @@ export default defineConfig(({ mode }) => ({
         orientation: "portrait-primary",
         start_url: "/",
         icons: [
-          { src: "/favicon.png", sizes: "192x192", type: "image/png" },
-          { src: "/favicon.png", sizes: "512x512", type: "image/png", purpose: "any maskable" },
+          { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+          { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+          { src: "/icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+          { src: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
         ],
       },
       workbox: {
