@@ -35,6 +35,18 @@ const AIChatPage = lazy(() => import("@/pages/AIChatPage"));
 const IAAutonomaPage = lazy(() => import("@/pages/IAAutonomaPage"));
 const EstrategiasPage = lazy(() => import("@/pages/EstrategiasPage"));
 const LotofacilPremiumPage = lazy(() => import("@/pages/LotofacilPremiumPage"));
+const AIAnalystPage = lazy(() => import("@/pages/AIAnalystPage"));
+const AffiliatePage = lazy(() => import("@/pages/AffiliatePage"));
+const EstatisticasPage = lazy(() => import("@/pages/EstatisticasPage"));
+const FarolEstatisticoPage = lazy(() => import("@/pages/FarolEstatisticoPage"));
+const HistoricoApostasPage = lazy(() => import("@/pages/HistoricoApostasPage"));
+const HistoricoPage = lazy(() => import("@/pages/HistoricoPage"));
+const JogosSalvosPage = lazy(() => import("@/pages/JogosSalvosPage"));
+const MatrizAnalisePage = lazy(() => import("@/pages/MatrizAnalisePage"));
+const PlanilhasMatrizPage = lazy(() => import("@/pages/PlanilhasMatrizPage"));
+const ROIDashboardPage = lazy(() => import("@/pages/ROIDashboardPage"));
+const SimulacoesPage = lazy(() => import("@/pages/SimulacoesPage"));
+const StrategyLabPage = lazy(() => import("@/pages/StrategyLabPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 
@@ -110,6 +122,18 @@ const AppContent = () => {
           <Route path="/ia-autonoma" element={<IAAutonomaPage />} />
           <Route path="/estrategias" element={<EstrategiasPage />} />
           <Route path="/lotofacil-premium" element={<LotofacilPremiumPage />} />
+          <Route path="/ai-analyst" element={<AIAnalystPage />} />
+          <Route path="/afiliados" element={<AffiliatePage />} />
+          <Route path="/estatisticas" element={<EstatisticasPage />} />
+          <Route path="/farol" element={<FarolEstatisticoPage />} />
+          <Route path="/historico-apostas" element={<HistoricoApostasPage />} />
+          <Route path="/historico-legacy" element={<HistoricoPage />} />
+          <Route path="/jogos-salvos" element={<JogosSalvosPage />} />
+          <Route path="/matriz" element={<MatrizAnalisePage />} />
+          <Route path="/planilhas" element={<PlanilhasMatrizPage />} />
+          <Route path="/roi" element={<ROIDashboardPage />} />
+          <Route path="/simulacoes" element={<SimulacoesPage />} />
+          <Route path="/strategy-lab" element={<StrategyLabPage />} />
           <Route path="/perfil" element={<PerfilPage />} />
           <Route path="/admin" element={<AdminGuard><AdminPage /></AdminGuard>} />
         </Route>
