@@ -120,11 +120,24 @@ jobs:
       - name: Merge into single HTML report
         run: npx playwright merge-reports --reporter html ./all-blob-reports
 
+      - name: Merge into JSON (para matriz)
+        run: npx playwright merge-reports --reporter json ./all-blob-reports > merged.json
+
+      - name: Gerar matriz HTML por navegador
+        run: node scripts/e2e-matrix.mjs merged.json playwright-report/matrix.html
+
       - name: Upload unified HTML report
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report-merged
           path: playwright-report
+          retention-days: 14
+
+      - name: Upload matriz standalone
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-matrix
+          path: playwright-report/matrix.html
           retention-days: 14
 
       - name: Job summary
@@ -133,7 +146,7 @@ jobs:
           {
             echo "## Playwright E2E — Relatório unificado"
             echo ""
-            echo "Artefato: **playwright-report-merged** (Chromium + Firefox + WebKit)."
-            echo ""
-            echo "Relatórios individuais também disponíveis: \`playwright-report-chromium\`, \`playwright-report-firefox\`, \`playwright-report-webkit\`."
+            echo "- **playwright-report-merged**: HTML navegável com os 3 navegadores + \`matrix.html\` incluso."
+            echo "- **playwright-matrix**: apenas a página \`matrix.html\` (teste × navegador)."
+            echo "- Relatórios individuais: \`playwright-report-{chromium,firefox,webkit}\`."
           } >> "$GITHUB_STEP_SUMMARY"
