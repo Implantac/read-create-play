@@ -75,6 +75,11 @@ export function computeFarolStats(
     drawsInCurrentCycle: currentCycleDraws
   };
 
+  // Draws belonging to the currently open (unfinished) cycle — used by cycleFreq
+  const currentCycleDrawsList = currentCycleDraws > 0
+    ? sortedDraws.slice(-currentCycleDraws)
+    : [];
+
   // 2. Correlation Matrix
   const correlationMap = new Map<number, Map<number, number>>();
   draws.slice(0, 100).forEach(draw => {
@@ -154,7 +159,7 @@ export function computeFarolStats(
       historicalFreq: s.frequency,
       recentFreq10,
       recentFreq50,
-      cycleFreq: last5Draws.filter(d => d.numbers.includes(n)).length, // placeholder
+      cycleFreq: currentCycleDrawsList.filter(d => d.numbers.includes(n)).length,
       currentDelay,
       maxDelay: s.maxGap,
       avgDelay: s.avgGap,
