@@ -72,51 +72,78 @@ const PwaOfflineTestPage = () => {
     setRunning(true);
     const out: TestResult[] = [];
 
+    const htmlRoutes = ["/", "/dashboard", "/gerador", "/estatisticas", "/planos", "/install"];
+    const staticAssets = ["/favicon.png", "/manifest.webmanifest", "/robots.txt"];
+    const supabaseTables: Array<{ table: string; select: string }> = [
+      { table: "profiles", select: "id" },
+      { table: "lottery_draws", select: "id" },
+      { table: "saved_bets", select: "id" },
+      { table: "notifications", select: "id" },
+      { table: "user_gamification", select: "user_id" },
+    ];
+
+    const htmlTest = (route: string) => async (): Promise<TestResult> => {
+      try {
+        const res = await fetch(route, { cache: "no-store" });
+        const ok = res.ok && (res.headers.get("content-type") || "").includes("html");
+        return { name: "", status: ok ? "pass" : "fail", detail: `HTTP ${res.status}` };
+      } catch (e) {
+        return { name: "", status: "fail", detail: (e as Error).message };
+      }
+    };
+
+    const assetTest = (path: string) => async (): Promise<TestResult> => {
+      try {
+        const res = await fetch(path, { cache: "no-store" });
+        return { name: "", status: res.ok ? "pass" : "fail", detail: `HTTP ${res.status}` };
+      } catch (e) {
+        return { name: "", status: "fail", detail: (e as Error).message };
+      }
+    };
+
+    const supabaseTest = (table: string, select: string) => async (): Promise<TestResult> => {
+      if (!SUPABASE_URL) return { name: "", status: "fail", detail: "VITE_SUPABASE_URL ausente" };
+      try {
+        const { error } = await supabase.from(table as never).select(select).limit(1);
+        if (error && offline) {
+          const cached = await caches.match(
+            `${SUPABASE_URL}/rest/v1/${table}?select=${select}&limit=1`,
+            { ignoreSearch: true },
+          );
+          if (cached) return { name: "", status: "pass", detail: "Servido do cache do SW" };
+          return { name: "", status: "fail", detail: error.message };
+        }
+        if (error) return { name: "", status: "fail", detail: error.message };
+        return { name: "", status: "pass", detail: offline ? "Cache hit" : "Online OK" };
+      } catch (e) {
+        return { name: "", status: "fail", detail: (e as Error).message };
+      }
+    };
+
+    const edgeFunctionTest = (fn: string) => async (): Promise<TestResult> => {
+      if (!SUPABASE_URL) return { name: "", status: "fail", detail: "VITE_SUPABASE_URL ausente" };
+      const url = `${SUPABASE_URL}/functions/v1/${fn}`;
+      try {
+        const res = await fetch(url, { method: "OPTIONS", cache: "no-store" });
+        return { name: "", status: res.ok || res.status === 204 ? "pass" : "fail", detail: `HTTP ${res.status}` };
+      } catch (e) {
+        if (offline) {
+          const cached = await caches.match(url, { ignoreSearch: true, ignoreVary: true });
+          if (cached) return { name: "", status: "pass", detail: "Cache hit" };
+        }
+        return { name: "", status: "fail", detail: (e as Error).message };
+      }
+    };
+
     const tests: Array<{ name: string; run: () => Promise<TestResult> }> = [
-      {
-        name: "HTML navigation (/) servida pelo SW",
-        run: async () => {
-          try {
-            const res = await fetch("/", { cache: "no-store" });
-            const ok = res.ok && (res.headers.get("content-type") || "").includes("html");
-            return { name: "", status: ok ? "pass" : "fail", detail: `HTTP ${res.status}` };
-          } catch (e) {
-            return { name: "", status: "fail", detail: (e as Error).message };
-          }
-        },
-      },
-      {
-        name: "Asset estático em cache",
-        run: async () => {
-          try {
-            const res = await fetch("/favicon.png", { cache: "no-store" });
-            return { name: "", status: res.ok ? "pass" : "fail", detail: `HTTP ${res.status}` };
-          } catch (e) {
-            return { name: "", status: "fail", detail: (e as Error).message };
-          }
-        },
-      },
-      {
-        name: "API Supabase (REST) com fallback",
-        run: async () => {
-          if (!SUPABASE_URL) return { name: "", status: "fail", detail: "VITE_SUPABASE_URL ausente" };
-          try {
-            // Faz uma leitura barata; se online popula cache; se offline cai no cache do SW.
-            const { error } = await supabase.from("profiles").select("id").limit(1);
-            if (error && offline) {
-              // Tenta direto pelo cache
-              const cached = await caches.match(`${SUPABASE_URL}/rest/v1/profiles?select=id&limit=1`, {
-                ignoreSearch: true,
-              });
-              if (cached) return { name: "", status: "pass", detail: "Servido do cache do SW" };
-              return { name: "", status: "fail", detail: error.message };
-            }
-            return { name: "", status: "pass", detail: offline ? "Cache hit" : "Online OK" };
-          } catch (e) {
-            return { name: "", status: "fail", detail: (e as Error).message };
-          }
-        },
-      },
+      ...htmlRoutes.map((r) => ({ name: `HTML navigation (${r})`, run: htmlTest(r) })),
+      ...staticAssets.map((a) => ({ name: `Asset estático (${a})`, run: assetTest(a) })),
+      ...supabaseTables.map((t) => ({
+        name: `Supabase REST (${t.table})`,
+        run: supabaseTest(t.table, t.select),
+      })),
+      { name: "Edge Function (check-subscription)", run: edgeFunctionTest("check-subscription") },
+      { name: "Edge Function (sync-lottery-draws)", run: edgeFunctionTest("sync-lottery-draws") },
     ];
 
     for (const t of tests) {
