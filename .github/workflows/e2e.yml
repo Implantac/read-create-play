@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: [chromium]
+        project: [chromium, firefox, webkit]
     env:
       E2E_BASE_URL: ${{ github.event.inputs.base_url || 'https://titanloterias.lovable.app' }}
       CI: "true"
