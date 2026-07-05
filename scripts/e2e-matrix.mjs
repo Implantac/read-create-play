@@ -1,17 +1,20 @@
 #!/usr/bin/env node
 /**
- * Gera uma página HTML com a matriz de status por teste x navegador
+ * Gera:
+ *   - página HTML com a matriz de status por teste x navegador
+ *   - CSV long-format (arquivo, teste, navegador, status, duração, erro)
  * a partir do JSON produzido por `playwright merge-reports --reporter json`.
  *
- * Uso: node scripts/e2e-matrix.mjs <merged.json> <output.html>
+ * Uso: node scripts/e2e-matrix.mjs <merged.json> <output.html> [output.csv]
  */
 import { readFileSync, writeFileSync } from "node:fs";
 
-const [, , inputPath, outputPath] = process.argv;
+const [, , inputPath, outputPath, csvPath] = process.argv;
 if (!inputPath || !outputPath) {
-  console.error("Uso: node scripts/e2e-matrix.mjs <merged.json> <output.html>");
+  console.error("Uso: node scripts/e2e-matrix.mjs <merged.json> <output.html> [output.csv]");
   process.exit(1);
 }
+const csvOut = csvPath || outputPath.replace(/\.html?$/i, ".csv");
 
 const report = JSON.parse(readFileSync(inputPath, "utf8"));
 
