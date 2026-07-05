@@ -126,6 +126,7 @@ const html = `<!doctype html>
   <h1>Matriz E2E — status por navegador</h1>
   <div class="meta">
     Gerado em ${new Date().toISOString()} · ${rows.size} teste(s) · ${browserList.length} navegador(es)
+    <br /><small>Links abrem a seção do teste no <code>index.html</code> ao lado (funcionam dentro do artefato <strong>playwright-report-merged</strong>).</small>
   </div>
   <table>
     <thead>
