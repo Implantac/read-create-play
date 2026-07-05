@@ -153,4 +153,22 @@ ${bodyRows}
 </html>`;
 
 writeFileSync(outputPath, html);
-console.log(`Matriz gerada: ${outputPath} (${rows.size} testes × ${browserList.length} navegadores)`);
+
+const csvEscape = (v) => {
+  const s = String(v ?? "");
+  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+};
+const csvLines = ["file,test,browser,status,duration_ms,error"];
+for (const { file, title, results } of rows.values()) {
+  for (const b of browserList) {
+    const r = results[b];
+    csvLines.push(
+      [file, title, b, r?.status ?? "unknown", r?.duration ?? 0, (r?.error ?? "").replace(/\s+/g, " ").trim()]
+        .map(csvEscape)
+        .join(","),
+    );
+  }
+}
+writeFileSync(csvOut, csvLines.join("\n") + "\n");
+
+console.log(`Matriz gerada: ${outputPath} + ${csvOut} (${rows.size} testes × ${browserList.length} navegadores)`);
