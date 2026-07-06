@@ -20,8 +20,9 @@ import {
 import {
   Users, Crown, TrendingUp, Search, Shield, Loader2, RefreshCw, Ban, CheckCircle2,
   ShieldCheck, AlertTriangle, History, UserCog, Eye, Grid3X3, DollarSign,
-  ArrowUpRight, Target
+  ArrowUpRight, Target, FlaskConical
 } from "lucide-react";
+import { AdminBacktestPanel } from "@/components/admin/AdminBacktestPanel";
 
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -330,11 +331,12 @@ export default function AdminPage() {
       </div>
 
       <Tabs defaultValue="users" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4 max-w-lg">
+        <TabsList className="grid w-full grid-cols-5 max-w-2xl">
           <TabsTrigger value="users" className="gap-1.5"><Users className="w-4 h-4" /> Usuários</TabsTrigger>
           <TabsTrigger value="revenue" className="gap-1.5"><DollarSign className="w-4 h-4" /> Receita</TabsTrigger>
           <TabsTrigger value="usage" className="gap-1.5"><TrendingUp className="w-4 h-4" /> Uso</TabsTrigger>
           <TabsTrigger value="audit" className="gap-1.5"><History className="w-4 h-4" /> Auditoria</TabsTrigger>
+          <TabsTrigger value="backtest" className="gap-1.5"><FlaskConical className="w-4 h-4" /> Backtest</TabsTrigger>
         </TabsList>
 
 
@@ -639,7 +641,12 @@ export default function AdminPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="backtest">
+          <AdminBacktestPanel />
+        </TabsContent>
       </Tabs>
+
 
       {/* Confirmation Dialog */}
       <Dialog open={confirmDialog.open} onOpenChange={(o) => setConfirmDialog(prev => ({ ...prev, open: o }))}>
