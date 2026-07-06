@@ -6,9 +6,55 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, ArrowDownRight, GitCompareArrows, X } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowUpRight, ArrowDownRight, GitCompareArrows, X, Loader2 } from "lucide-react";
 import { LOTTERIES } from "@/data/lotteries";
 import type { BacktestComparison, BacktestMetrics } from "@/engine/validation/backtestRunner";
+
+export function BacktestCompareSkeleton() {
+  return (
+    <Card className="bg-card/60 border-primary/40">
+      <CardHeader className="pb-3">
+        <div className="flex items-center gap-2">
+          <Loader2 className="w-4 h-4 text-primary animate-spin" />
+          <CardTitle className="text-base">Calculando comparação...</CardTitle>
+        </div>
+        <p className="text-[11px] text-muted-foreground mt-1">
+          Alinhando métricas e computando deltas das duas execuções selecionadas.
+        </p>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {[0, 1].map(i => (
+            <div key={i} className="rounded border border-border/40 bg-muted/10 px-3 py-2 space-y-2">
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-3 w-16" />
+                <Skeleton className="h-4 w-14 rounded-full" />
+              </div>
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-3 w-56" />
+            </div>
+          ))}
+        </div>
+        {[0, 1, 2].map(i => (
+          <div key={i} className="space-y-2">
+            <Skeleton className="h-3 w-40" />
+            <div className="rounded border border-border/40 overflow-hidden">
+              <div className="bg-muted/20 px-3 py-2 grid grid-cols-4 gap-2">
+                {[0, 1, 2, 3].map(j => <Skeleton key={j} className="h-3 w-full" />)}
+              </div>
+              {[0, 1, 2, 3].map(row => (
+                <div key={row} className="px-3 py-2 grid grid-cols-4 gap-2 border-t border-border/20">
+                  {[0, 1, 2, 3].map(j => <Skeleton key={j} className="h-3 w-full" />)}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
 
 export interface BacktestRunLite {
   id: string;
