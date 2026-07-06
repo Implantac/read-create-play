@@ -245,6 +245,17 @@ export interface AIRequest {
   stats?: NumberStats[];
   config?: LotteryConfig;
   existingGames?: number[][];
+  /** Perfil de aprendizado do usuário (opcional). Quando presente e com histórico
+   * suficiente, o gerador aplica uma pequena personalização (favoritos/evitados). */
+  userProfile?: {
+    favoriteNumbers: number[];
+    avoidedNumbers: number[];
+    preferredStrategies: string[];
+    bestPerformingStrategy: string | null;
+    riskProfile: string;
+    totalGamesGenerated: number;
+    avgScoreByStrategy: Record<string, number>;
+  } | null;
 }
 
 export interface AIResponse {

@@ -61,21 +61,23 @@ export class NativeAIOrchestrator {
     const enginesUsed: string[] = ["intentClassifier"];
     let response: AIResponse;
 
+    const userProfile = (request.userProfile ?? null) as any;
+
     switch (parsedIntent.intent) {
       case "generate_games":
-        response = await this.handleGenerate(parsedIntent, lotteryId, draws, stats, enginesUsed);
+        response = await this.handleGenerate(parsedIntent, lotteryId, draws, stats, enginesUsed, userProfile);
         break;
       case "create_wheeling":
         response = await this.handleWheeling(parsedIntent, lotteryId, stats, enginesUsed);
         break;
       case "simulate":
-        response = await this.handleSimulate(parsedIntent, lotteryId, draws, stats, enginesUsed);
+        response = await this.handleSimulate(parsedIntent, lotteryId, draws, stats, enginesUsed, userProfile);
         break;
       case "analyze_history":
         response = await this.handleAnalyze(parsedIntent, lotteryId, draws, enginesUsed);
         break;
       case "rank_games":
-        response = await this.handleRank(parsedIntent, lotteryId, draws, stats, request.existingGames, enginesUsed);
+        response = await this.handleRank(parsedIntent, lotteryId, draws, stats, request.existingGames, enginesUsed, userProfile);
         break;
       case "explain_strategy":
         response = this.handleExplain(parsedIntent, enginesUsed);
@@ -87,7 +89,7 @@ export class NativeAIOrchestrator {
         response = await this.handleCompare(parsedIntent, lotteryId, draws, stats, request.existingGames, enginesUsed);
         break;
       default:
-        response = await this.handleGenerate(parsedIntent, lotteryId, draws, stats, enginesUsed);
+        response = await this.handleGenerate(parsedIntent, lotteryId, draws, stats, enginesUsed, userProfile);
     }
 
     const processingTimeMs = Math.round(performance.now() - startTime);
@@ -105,9 +107,11 @@ export class NativeAIOrchestrator {
 
 
   private async handleGenerate(
-    intent: ParsedIntent, lotteryId: string, draws: DrawResult[], stats: NumberStats[], engines: string[]
+    intent: ParsedIntent, lotteryId: string, draws: DrawResult[], stats: NumberStats[], engines: string[],
+    userProfile?: any,
   ): Promise<AIResponse> {
     engines.push("universalGenerator", "rankingEngine", "patternEngine");
+    if (userProfile && userProfile.totalGamesGenerated >= 5) engines.push("userLearning");
 
     const games = generateGames({
       lotteryId,
@@ -117,6 +121,7 @@ export class NativeAIOrchestrator {
       stats,
       draws,
       rng: createXorshift32(hashStringToSeed(`${lotteryId}::generate::${intent.quantity}::${intent.rawInput}`)),
+      userProfile,
     });
 
 
@@ -187,7 +192,8 @@ export class NativeAIOrchestrator {
   }
 
   private async handleSimulate(
-    intent: ParsedIntent, lotteryId: string, draws: DrawResult[], stats: NumberStats[], engines: string[]
+    intent: ParsedIntent, lotteryId: string, draws: DrawResult[], stats: NumberStats[], engines: string[],
+    userProfile?: any,
   ): Promise<AIResponse> {
     engines.push("simulationEngine", "universalGenerator");
 
@@ -196,6 +202,7 @@ export class NativeAIOrchestrator {
       lotteryId, count: Math.min(intent.quantity, 20),
       riskProfile: intent.riskProfile, filters: intent.filters, stats, draws,
       rng: createXorshift32(hashStringToSeed(`${lotteryId}::simulate::${intent.quantity}::${intent.rawInput}`)),
+      userProfile,
     });
 
 
@@ -238,13 +245,15 @@ export class NativeAIOrchestrator {
 
   private async handleRank(
     intent: ParsedIntent, lotteryId: string, draws: DrawResult[], stats: NumberStats[],
-    existingGames: number[][] | undefined, engines: string[]
+    existingGames: number[][] | undefined, engines: string[],
+    userProfile?: any,
   ): Promise<AIResponse> {
     engines.push("rankingEngine");
 
     const gamesToRank = existingGames || generateGames({
       lotteryId, count: intent.quantity, riskProfile: intent.riskProfile,
       filters: intent.filters, stats, draws,
+      userProfile,
     }).map(g => g.numbers);
 
     const ranked = rankGames(gamesToRank, lotteryId, stats, draws, intent.riskProfile);
