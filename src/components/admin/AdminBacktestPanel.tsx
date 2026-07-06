@@ -90,6 +90,18 @@ export function AdminBacktestPanel() {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [compareOpen, setCompareOpen] = useState(false);
+  const [comparing, setComparing] = useState(false);
+
+  const openComparison = () => {
+    if (selectedIds.length !== 2) return;
+    setCompareOpen(false);
+    setComparing(true);
+    // Simula carregamento assíncrono para dar feedback visual do alinhamento das métricas.
+    window.setTimeout(() => {
+      setComparing(false);
+      setCompareOpen(true);
+    }, 450);
+  };
 
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => {
