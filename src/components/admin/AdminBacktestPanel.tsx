@@ -28,7 +28,7 @@ import {
 } from "@/engine/validation/backtestRunner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { BacktestCompareView } from "./BacktestCompareView";
+import { BacktestCompareView, BacktestCompareSkeleton } from "./BacktestCompareView";
 
 const LOOKBACK = 200;
 
@@ -90,6 +90,18 @@ export function AdminBacktestPanel() {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [compareOpen, setCompareOpen] = useState(false);
+  const [comparing, setComparing] = useState(false);
+
+  const openComparison = () => {
+    if (selectedIds.length !== 2) return;
+    setCompareOpen(false);
+    setComparing(true);
+    // Simula carregamento assíncrono para dar feedback visual do alinhamento das métricas.
+    window.setTimeout(() => {
+      setComparing(false);
+      setCompareOpen(true);
+    }, 450);
+  };
 
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => {
@@ -263,14 +275,14 @@ export function AdminBacktestPanel() {
                 <Button
                   variant={selectedIds.length === 2 ? "default" : "outline"}
                   size="sm"
-                  disabled={selectedIds.length !== 2}
+                  disabled={selectedIds.length !== 2 || comparing}
                   onClick={(e) => {
-                    if (selectedIds.length !== 2) {
+                    if (selectedIds.length !== 2 || comparing) {
                       e.preventDefault();
                       e.stopPropagation();
                       return;
                     }
-                    setCompareOpen(true);
+                    openComparison();
                   }}
                   className="h-8 gap-1 disabled:opacity-50 disabled:pointer-events-none"
                   title={
@@ -279,8 +291,10 @@ export function AdminBacktestPanel() {
                       : `Selecione exatamente 2 execuções (${selectedIds.length}/2)`
                   }
                 >
-                  <GitCompareArrows className="w-3.5 h-3.5" />
-                  Comparar ({selectedIds.length}/2)
+                  {comparing
+                    ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    : <GitCompareArrows className="w-3.5 h-3.5" />}
+                  {comparing ? "Calculando..." : `Comparar (${selectedIds.length}/2)`}
                 </Button>
               </span>
               <Select value={historyFilter} onValueChange={setHistoryFilter}>
@@ -300,7 +314,8 @@ export function AdminBacktestPanel() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {compareOpen && runA && runB && (
+          {comparing && <BacktestCompareSkeleton />}
+          {!comparing && compareOpen && runA && runB && (
             <BacktestCompareView runA={runA} runB={runB} onClose={() => setCompareOpen(false)} />
           )}
           {loadingHistory ? (
