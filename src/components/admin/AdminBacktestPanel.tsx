@@ -305,7 +305,7 @@ export function AdminBacktestPanel() {
                   {comparing ? "Calculando..." : `Comparar (${selectedIds.length}/2)`}
                 </Button>
               </span>
-              <Select value={historyFilter} onValueChange={setHistoryFilter}>
+              <Select value={historyFilter} onValueChange={setHistoryFilter} disabled={comparing}>
                 <SelectTrigger className="h-8 w-[180px] text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todas as modalidades</SelectItem>
@@ -314,7 +314,7 @@ export function AdminBacktestPanel() {
                   ))}
                 </SelectContent>
               </Select>
-              <Button variant="ghost" size="sm" onClick={loadHistory} disabled={loadingHistory} className="h-8 gap-1">
+              <Button variant="ghost" size="sm" onClick={loadHistory} disabled={loadingHistory || comparing} className="h-8 gap-1">
                 {loadingHistory ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
                 Atualizar
               </Button>
