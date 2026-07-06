@@ -314,7 +314,8 @@ export function AdminBacktestPanel() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {compareOpen && runA && runB && (
+          {comparing && <BacktestCompareSkeleton />}
+          {!comparing && compareOpen && runA && runB && (
             <BacktestCompareView runA={runA} runB={runB} onClose={() => setCompareOpen(false)} />
           )}
           {loadingHistory ? (
