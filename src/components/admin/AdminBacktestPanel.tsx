@@ -248,15 +248,14 @@ export function AdminBacktestPanel() {
               <Button
                 variant={selectedIds.length === 2 ? "default" : "outline"}
                 size="sm"
-                onClick={() => {
-                  if (selectedIds.length !== 2) {
-                    toast.info("Selecione 2 execuções para comparar");
-                    return;
-                  }
-                  setCompareOpen(true);
-                }}
-                className="h-8 gap-1"
-                title="Comparar 2 execuções lado a lado"
+                disabled={selectedIds.length !== 2}
+                onClick={() => setCompareOpen(true)}
+                className="h-8 gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                title={
+                  selectedIds.length === 2
+                    ? "Comparar 2 execuções lado a lado"
+                    : `Selecione exatamente 2 execuções (${selectedIds.length}/2)`
+                }
               >
                 <GitCompareArrows className="w-3.5 h-3.5" />
                 Comparar ({selectedIds.length}/2)
