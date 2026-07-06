@@ -233,7 +233,7 @@ export function AdminBacktestPanel() {
           <div className="flex flex-wrap gap-3 items-end">
             <div className="flex-1 min-w-[200px]">
               <label className="text-xs text-muted-foreground mb-1 block">Modalidade</label>
-              <Select value={lotteryId} onValueChange={setLotteryId} disabled={running}>
+              <Select value={lotteryId} onValueChange={setLotteryId} disabled={running || comparing}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {LOTTERIES.map(l => (
@@ -242,7 +242,7 @@ export function AdminBacktestPanel() {
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={run} disabled={running} className="gap-2">
+            <Button onClick={run} disabled={running || comparing} className="gap-2">
               {running ? <Loader2 className="w-4 h-4 animate-spin" /> : <FlaskConical className="w-4 h-4" />}
               {running ? "Rodando..." : "Rodar backtest"}
             </Button>
