@@ -192,6 +192,7 @@ export function AdminBacktestPanel() {
       return;
     }
     setHistory(h => h.filter(r => r.id !== id));
+    setSelectedIds(prev => prev.filter(x => x !== id));
     toast.success("Execução removida");
   };
 
