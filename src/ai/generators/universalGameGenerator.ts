@@ -223,6 +223,9 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
 
     s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + backtestBonus + profileBonus + postBonus + tripBonus + personalBonus)));
   }
+
+  // VALIDAÇÃO PÓS-GERAÇÃO: anexa um mini-backtest a cada jogo gerado.
+  {
     const valWindow = config.draws.slice(0, 100);
     const maxHits = getMaxPossibleHits(config.lotteryId, rules.pick);
     const prizedTiers: number[] = [];
