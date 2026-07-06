@@ -248,9 +248,27 @@ export function AdminBacktestPanel() {
               <Button
                 variant={selectedIds.length === 2 ? "default" : "outline"}
                 size="sm"
-                disabled={selectedIds.length !== 2}
-                onClick={() => setCompareOpen(true)}
-                className="h-8 gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-disabled={selectedIds.length !== 2}
+                onClick={() => {
+                  if (selectedIds.length === 0) {
+                    toast.warning("Selecione 2 execuções para comparar", {
+                      description: "Marque duas linhas no histórico usando as caixas de seleção.",
+                    });
+                    return;
+                  }
+                  if (selectedIds.length === 1) {
+                    toast.warning("Selecione mais 1 execução", {
+                      description: "A comparação exige exatamente 2 execuções (1/2 marcadas).",
+                    });
+                    return;
+                  }
+                  if (selectedIds.length !== 2) {
+                    toast.warning(`Selecione exatamente 2 execuções (${selectedIds.length}/2)`);
+                    return;
+                  }
+                  setCompareOpen(true);
+                }}
+                className={`h-8 gap-1 ${selectedIds.length !== 2 ? "opacity-60" : ""}`}
                 title={
                   selectedIds.length === 2
                     ? "Comparar 2 execuções lado a lado"
