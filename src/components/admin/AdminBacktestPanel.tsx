@@ -91,9 +91,37 @@ export function AdminBacktestPanel() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [compareOpen, setCompareOpen] = useState(false);
   const [comparing, setComparing] = useState(false);
+  const compareRegionRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
+
+  // Move focus into the comparison region while it is loading, and restore
+  // focus to the trigger when the panel closes so keyboard users don't get lost.
+  useEffect(() => {
+    if (comparing || compareOpen) {
+      // Defer so the region is mounted before we focus it.
+      const id = window.requestAnimationFrame(() => {
+        compareRegionRef.current?.focus();
+      });
+      return () => window.cancelAnimationFrame(id);
+    }
+    if (triggerRef.current) {
+      triggerRef.current.focus();
+      triggerRef.current = null;
+    }
+  }, [comparing, compareOpen]);
+
+  // Focus retention: while calculating, keep Tab focus inside the region.
+  const handleRegionKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!comparing) return;
+    if (e.key === "Tab") {
+      e.preventDefault();
+      compareRegionRef.current?.focus();
+    }
+  };
 
   const openComparison = () => {
     if (selectedIds.length !== 2) return;
+    triggerRef.current = (document.activeElement as HTMLElement) ?? null;
     setCompareOpen(false);
     setComparing(true);
     // Simula carregamento assíncrono para dar feedback visual do alinhamento das métricas.
@@ -102,6 +130,7 @@ export function AdminBacktestPanel() {
       setCompareOpen(true);
     }, 450);
   };
+
 
   const toggleSelect = (id: string) => {
     if (comparing) {
