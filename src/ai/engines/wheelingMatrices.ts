@@ -268,8 +268,8 @@ export const WHEELING_MATRICES = {
     probability: "1 em 800",
     coverage: "Alta",
     games: generateLotofacil18_14(),
-  }
-};
+  },
+
 
   lotofacil_18_14: {
     name: "PLAN 18X24",
