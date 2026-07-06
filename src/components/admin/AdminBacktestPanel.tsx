@@ -140,7 +140,7 @@ export function AdminBacktestPanel() {
 function ComparisonView({ cmp }: { cmp: BacktestComparison }) {
   const rows = [
     { label: "Acertos médios / jogo", before: cmp.before.avgHits, after: cmp.after.avgHits, delta: cmp.delta.avgHits, fmt: (v: number) => v.toFixed(3) },
-    { label: "Taxa de faixa premiável (%)", before: cmp.before.premiumHitRate, after: cmp.after.premiumHitRate, delta: cmp.delta.premiumHitRate, fmt: (v: number) => `${v.toFixed(2)}%` },
+    { label: "Taxa de faixa premiável (%)", before: cmp.before.premiumHitRate * 100, after: cmp.after.premiumHitRate * 100, delta: cmp.delta.premiumHitRate * 100, fmt: (v: number) => `${v.toFixed(2)}%` },
     { label: "Quality Score (0-100)", before: cmp.before.qualityScore, after: cmp.after.qualityScore, delta: cmp.delta.qualityScore, fmt: (v: number) => v.toFixed(1) },
     { label: "Melhor acerto observado", before: cmp.before.maxHits, after: cmp.after.maxHits, delta: cmp.after.maxHits - cmp.before.maxHits, fmt: (v: number) => `${v}` },
   ];
