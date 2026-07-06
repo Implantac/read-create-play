@@ -204,13 +204,25 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
     const tripBonus = tripBoost * 12; // 0..+12
     if (tripBoost > 0.25) s.explanation.push(`🧬 Contém trios com coocorrência incomum (Markov-2)`);
 
-    s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + backtestBonus + profileBonus + postBonus + tripBonus)));
-  }
+    // PERSONALIZAÇÃO: aprendizado do usuário (opcional, leve — ±6 pts).
+    // Não altera os sinais estatísticos principais; apenas ajusta pequenas
+    // preferências pessoais para que jogos gerados "soem" mais como os do usuário.
+    let personalBonus = 0;
+    if (config.userProfile && config.userProfile.totalGamesGenerated >= 5) {
+      const favs = new Set(config.userProfile.favoriteNumbers);
+      const avoid = new Set(config.userProfile.avoidedNumbers);
+      let favHits = 0, avoidHits = 0;
+      for (const n of s.numbers) {
+        if (favs.has(n)) favHits++;
+        if (avoid.has(n)) avoidHits++;
+      }
+      // até +4 por favoritos, até -3 por evitados
+      personalBonus = Math.min(4, favHits * 0.8) - Math.min(3, avoidHits * 0.8);
+      if (favHits >= 3) s.explanation.push(`👤 Contém ${favHits} números favoritos do seu histórico`);
+    }
 
-  // VALIDAÇÃO PÓS-GERAÇÃO: anexa um mini-backtest a cada jogo gerado.
-  // Mostra acertos médios, melhor faixa atingida, quantos sorteios bateriam
-  // alguma faixa premiada e "quase ganhou" (faltou 1 nº para faixa premiada).
-  {
+    s.totalScore = Math.max(0, Math.min(100, Math.round(s.totalScore + backtestBonus + profileBonus + postBonus + tripBonus + personalBonus)));
+  }
     const valWindow = config.draws.slice(0, 100);
     const maxHits = getMaxPossibleHits(config.lotteryId, rules.pick);
     const prizedTiers: number[] = [];
