@@ -104,6 +104,10 @@ export function AdminBacktestPanel() {
   };
 
   const toggleSelect = (id: string) => {
+    if (comparing) {
+      toast.info("Aguarde a comparação carregar antes de mudar a seleção");
+      return;
+    }
     setSelectedIds(prev => {
       if (prev.includes(id)) return prev.filter(x => x !== id);
       if (prev.length >= 2) {
