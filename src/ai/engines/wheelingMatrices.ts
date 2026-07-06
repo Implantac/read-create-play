@@ -1,8 +1,18 @@
 /**
  * Pre-computed Wheeling Matrices — Optimized closure systems
- * 
- * Includes the specialized LOTOFÁCIL "PLAN" series.
+ *
+ * Includes the specialized LOTOFÁCIL "PLAN" series + matrizes matemáticas
+ * reais (garantia demonstrada) para Mega, Quina e Lotofácil.
  */
+
+import {
+  megaSena8_28,
+  megaSena7_7,
+  quina6_6,
+  quina7_21,
+  lotofacil16_16,
+  validateWheelCoverage,
+} from "@/engine/wheeling/coverageValidator";
 
 // Helper: Shuffle array
 function shuffle<T>(array: T[]): T[] {
