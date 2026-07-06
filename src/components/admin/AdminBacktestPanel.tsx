@@ -28,7 +28,7 @@ import {
 } from "@/engine/validation/backtestRunner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { BacktestCompareView } from "./BacktestCompareView";
+import { BacktestCompareView, BacktestCompareSkeleton } from "./BacktestCompareView";
 
 const LOOKBACK = 200;
 
