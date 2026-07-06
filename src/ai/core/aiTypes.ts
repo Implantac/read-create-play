@@ -301,4 +301,54 @@ export interface LotteryRules {
   idealFrameRange?: [number, number];
   avgRepeatFromPrevious: [number, number];
   maxRecommendedSequence: number;
+
+  // ──────────────────────────────────────────────────────
+  // Campos opcionais adicionados na Fase 3 (aprendizado das IAs).
+  // Todos opcionais → zero impacto em consumidores existentes.
+  // ──────────────────────────────────────────────────────
+
+  /** Documento oficial que rege a modalidade (Caixa/portaria SEAE). */
+  officialRegulation?: string;
+  /** Hora do sorteio (fuso Brasília). */
+  drawTimeBrasilia?: string;
+  /** Prêmio mínimo garantido para a faixa principal (BRL, quando aplicável). */
+  minGuaranteedPrize?: number;
+  /** Percentual da arrecadação destinado a prêmios. */
+  prizePoolPercent?: number;
+
+  /** Números-bônus extras à dezena principal (trevos, mês, time do coração). */
+  bonusPool?: {
+    name: string;                 // ex: "Trevos", "Mês da Sorte", "Time do Coração"
+    range: [number, number];      // faixa numérica ou identificadores
+    pickCount: number;            // quantos escolher por jogo
+    ticketExtraCost?: number;     // custo adicional por bônus, se houver
+    note?: string;
+  };
+
+  /** Regras específicas da modalidade em texto curto, para explicabilidade da IA. */
+  specialRules?: string[];
+
+  /** Vieses estatísticos historicamente observados na modalidade. */
+  knownBiases?: {
+    /** Dezenas historicamente mais frequentes (top 5-10, ordem decrescente). */
+    hotNumbers?: number[];
+    /** Dezenas historicamente menos frequentes. */
+    coldNumbers?: number[];
+    /** Faixa/década mais premiada (ex: "51-60" na Mega). */
+    hotDecade?: string;
+    /** Soma média empírica dos sorteios. */
+    avgSum?: number;
+    /** Distribuição típica de pares (média histórica). */
+    avgEvens?: number;
+    /** Frequência histórica de sorteios sem nenhum número consecutivo. */
+    noConsecutiveRate?: number;
+    /** Nota textual sobre vieses observados (para explicabilidade). */
+    notes?: string[];
+  };
+
+  /** Erros comuns de apostador iniciante que a IA deve evitar. */
+  commonPitfalls?: string[];
+
+  /** Estratégias recomendadas para esta modalidade específica. */
+  recommendedStrategies?: string[];
 }
