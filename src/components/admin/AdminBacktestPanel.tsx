@@ -351,9 +351,22 @@ export function AdminBacktestPanel() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {comparing && <BacktestCompareSkeleton />}
-          {!comparing && compareOpen && runA && runB && (
-            <BacktestCompareView runA={runA} runB={runB} onClose={() => setCompareOpen(false)} />
+          {(comparing || compareOpen) && (
+            <div
+              ref={compareRegionRef}
+              tabIndex={-1}
+              role="region"
+              aria-label={comparing ? "Calculando comparação de execuções" : "Comparação de execuções"}
+              aria-busy={comparing}
+              aria-live="polite"
+              onKeyDown={handleRegionKeyDown}
+              className="outline-none rounded focus-visible:ring-2 focus-visible:ring-primary/50"
+            >
+              {comparing && <BacktestCompareSkeleton />}
+              {!comparing && compareOpen && runA && runB && (
+                <BacktestCompareView runA={runA} runB={runB} onClose={() => setCompareOpen(false)} />
+              )}
+            </div>
           )}
           {loadingHistory ? (
             <div className="text-center py-8 text-muted-foreground text-sm">Carregando...</div>
@@ -365,8 +378,9 @@ export function AdminBacktestPanel() {
             <div
               className={`overflow-x-auto transition-opacity ${comparing ? "opacity-60 pointer-events-none select-none" : ""}`}
               aria-busy={comparing}
-              aria-disabled={comparing}
+              {...(comparing ? { inert: "" as unknown as boolean } : {})}
             >
+
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/50 text-xs text-muted-foreground">
