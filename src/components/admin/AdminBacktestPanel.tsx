@@ -5,7 +5,7 @@
  * Persiste cada execução em `backtest_runs` para comparações históricas.
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -91,9 +91,37 @@ export function AdminBacktestPanel() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [compareOpen, setCompareOpen] = useState(false);
   const [comparing, setComparing] = useState(false);
+  const compareRegionRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
+
+  // Move focus into the comparison region while it is loading, and restore
+  // focus to the trigger when the panel closes so keyboard users don't get lost.
+  useEffect(() => {
+    if (comparing || compareOpen) {
+      // Defer so the region is mounted before we focus it.
+      const id = window.requestAnimationFrame(() => {
+        compareRegionRef.current?.focus();
+      });
+      return () => window.cancelAnimationFrame(id);
+    }
+    if (triggerRef.current) {
+      triggerRef.current.focus();
+      triggerRef.current = null;
+    }
+  }, [comparing, compareOpen]);
+
+  // Focus retention: while calculating, keep Tab focus inside the region.
+  const handleRegionKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!comparing) return;
+    if (e.key === "Tab") {
+      e.preventDefault();
+      compareRegionRef.current?.focus();
+    }
+  };
 
   const openComparison = () => {
     if (selectedIds.length !== 2) return;
+    triggerRef.current = (document.activeElement as HTMLElement) ?? null;
     setCompareOpen(false);
     setComparing(true);
     // Simula carregamento assíncrono para dar feedback visual do alinhamento das métricas.
@@ -102,6 +130,7 @@ export function AdminBacktestPanel() {
       setCompareOpen(true);
     }, 450);
   };
+
 
   const toggleSelect = (id: string) => {
     if (comparing) {
@@ -322,9 +351,22 @@ export function AdminBacktestPanel() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {comparing && <BacktestCompareSkeleton />}
-          {!comparing && compareOpen && runA && runB && (
-            <BacktestCompareView runA={runA} runB={runB} onClose={() => setCompareOpen(false)} />
+          {(comparing || compareOpen) && (
+            <div
+              ref={compareRegionRef}
+              tabIndex={-1}
+              role="region"
+              aria-label={comparing ? "Calculando comparação de execuções" : "Comparação de execuções"}
+              aria-busy={comparing}
+              aria-live="polite"
+              onKeyDown={handleRegionKeyDown}
+              className="outline-none rounded focus-visible:ring-2 focus-visible:ring-primary/50"
+            >
+              {comparing && <BacktestCompareSkeleton />}
+              {!comparing && compareOpen && runA && runB && (
+                <BacktestCompareView runA={runA} runB={runB} onClose={() => setCompareOpen(false)} />
+              )}
+            </div>
           )}
           {loadingHistory ? (
             <div className="text-center py-8 text-muted-foreground text-sm">Carregando...</div>
@@ -336,8 +378,9 @@ export function AdminBacktestPanel() {
             <div
               className={`overflow-x-auto transition-opacity ${comparing ? "opacity-60 pointer-events-none select-none" : ""}`}
               aria-busy={comparing}
-              aria-disabled={comparing}
+              {...(comparing ? { inert: "" as unknown as boolean } : {})}
             >
+
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/50 text-xs text-muted-foreground">
