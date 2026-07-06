@@ -47,17 +47,42 @@ test.describe("Gerador de apostas — fluxo E2E", () => {
       timeout: 30_000,
     });
 
-    // Deve renderizar ao menos uma bola do jogo gerado (elementos .lottery-ball)
+    // 3a. Bolas: pelo menos 5 renderizadas, todas com número de 2 dígitos e sem duplicatas
     const balls = page.locator(".lottery-ball");
     await expect(balls.first()).toBeVisible();
     const ballCount = await balls.count();
     expect(ballCount).toBeGreaterThanOrEqual(5);
 
-    // Cada bola deve exibir um número de 2 dígitos
-    const firstBallText = (await balls.first().textContent())?.trim() ?? "";
-    expect(firstBallText).toMatch(/^\d{2}$/);
+    const ballTexts: string[] = [];
+    for (let i = 0; i < ballCount; i++) {
+      const t = (await balls.nth(i).textContent())?.trim() ?? "";
+      expect(t, `bola #${i} deve ter 2 dígitos`).toMatch(/^\d{2}$/);
+      ballTexts.push(t);
+    }
+    // Números dentro de um mesmo jogo devem ser únicos (checagem por card)
+    // (verificamos que ao menos o primeiro card não tem duplicatas na sua fatia)
+    const firstCardBalls = ballTexts.slice(0, Math.min(ballCount, 25));
+    expect(new Set(firstCardBalls).size).toBe(firstCardBalls.length);
 
-    // O Titan Score também deve aparecer (X/100)
-    await expect(page.getByText(/\/100/).first()).toBeVisible();
+    // 3b. Titan Score: label + valor numérico 0-100 + classificação qualitativa
+    await expect(page.getByText(/Titan Score/i).first()).toBeVisible();
+
+    const scoreLocator = page.getByText(/\/100/).first();
+    await expect(scoreLocator).toBeVisible();
+    const scoreRaw = (await scoreLocator.textContent())?.trim() ?? "";
+    const scoreMatch = scoreRaw.match(/(\d{1,3})\s*\/\s*100/);
+    expect(scoreMatch, `Titan Score deve estar no formato N/100 (recebido: "${scoreRaw}")`).not.toBeNull();
+    const scoreValue = Number(scoreMatch![1]);
+    expect(scoreValue).toBeGreaterThanOrEqual(0);
+    expect(scoreValue).toBeLessThanOrEqual(100);
+
+    // Rótulo qualitativo derivado do score (Excelente ≥90, Alta Convergência ≥75, Estável <75)
+    const expectedLabel =
+      scoreValue >= 90 ? /Excelente/i : scoreValue >= 75 ? /Alta Convergência/i : /Estável/i;
+    await expect(page.getByText(expectedLabel).first()).toBeVisible();
+
+    // 3c. Ações pós-geração disponíveis (salvar portfólio + novo ciclo)
+    await expect(page.getByRole("button", { name: /Salvar Todos no Portfólio/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Novo Ciclo de Geração/i })).toBeVisible();
   });
 });
