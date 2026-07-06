@@ -23,6 +23,7 @@ import type { RiskProfile, IntentFilters, ScoredGame } from "../core/aiTypes";
 import { scoreGame } from "../engines/rankingEngine";
 import type { Rng } from "../core/rng";
 import { getEstimatedPrize, getMaxPossibleHits } from "@/utils/lottery-utils";
+import type { UserLearningProfile } from "../engines/userLearningEngine";
 
 interface GeneratorConfig {
   lotteryId: string;
@@ -32,6 +33,10 @@ interface GeneratorConfig {
   stats: NumberStats[];
   draws: DrawResult[];
   rng?: Rng;
+  /** Perfil de aprendizado pessoal do usuário (opcional).
+   *  Aplica leve personalização: bônus para números favoritos e
+   *  penalidade leve para números evitados, sem sobrepor os sinais estatísticos. */
+  userProfile?: UserLearningProfile | null;
 }
 
 /** Main generation function — generates, filters and ranks games */
