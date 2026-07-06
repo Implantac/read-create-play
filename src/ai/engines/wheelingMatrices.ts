@@ -271,6 +271,81 @@ export const WHEELING_MATRICES = {
   }
 };
 
+  lotofacil_18_14: {
+    name: "PLAN 18X24",
+    description: "18 dezenas → 24 jogos com garantia de 14 acertos (se 15 na base).",
+    lottery: "lotofacil",
+    baseSize: 18,
+    pick: 15,
+    guarantee: 14,
+    efficiency: "90%",
+    probability: "1 em 800",
+    coverage: "Alta",
+    games: generateLotofacil18_14(),
+  },
+  // ─── Matrizes matemáticas reais (garantia demonstrada por combinatória) ───
+  lotofacil_16_16: {
+    name: "MATH 16X16",
+    description: "16 dezenas → 16 jogos. Garantia matemática: 14 acertos se 15 caírem na base (C(16,15)).",
+    lottery: "lotofacil",
+    baseSize: 16,
+    pick: 15,
+    guarantee: 14,
+    efficiency: "100%",
+    probability: "Garantia matemática",
+    coverage: "Matemática",
+    games: lotofacil16_16(),
+  },
+  megasena_8_28: {
+    name: "MATH MEGA 8X28",
+    description: "8 dezenas → 28 jogos. Garantia matemática: SENA se os 6 sorteados estiverem na base (C(8,6)).",
+    lottery: "megasena",
+    baseSize: 8,
+    pick: 6,
+    guarantee: 6,
+    efficiency: "100%",
+    probability: "Garantia matemática",
+    coverage: "Matemática",
+    games: megaSena8_28(),
+  },
+  megasena_7_7: {
+    name: "MATH MEGA 7X7",
+    description: "7 dezenas → 7 jogos. Garantia matemática: SENA se os 6 sorteados estiverem na base (C(7,6)).",
+    lottery: "megasena",
+    baseSize: 7,
+    pick: 6,
+    guarantee: 6,
+    efficiency: "100%",
+    probability: "Garantia matemática",
+    coverage: "Matemática",
+    games: megaSena7_7(),
+  },
+  quina_6_6: {
+    name: "MATH QUINA 6X6",
+    description: "6 dezenas → 6 jogos. Garantia matemática: QUINA se os 5 sorteados estiverem na base (C(6,5)).",
+    lottery: "quina",
+    baseSize: 6,
+    pick: 5,
+    guarantee: 5,
+    efficiency: "100%",
+    probability: "Garantia matemática",
+    coverage: "Matemática",
+    games: quina6_6(),
+  },
+  quina_7_21: {
+    name: "MATH QUINA 7X21",
+    description: "7 dezenas → 21 jogos. Garantia matemática: QUINA se os 5 sorteados estiverem na base (C(7,5)).",
+    lottery: "quina",
+    baseSize: 7,
+    pick: 5,
+    guarantee: 5,
+    efficiency: "100%",
+    probability: "Garantia matemática",
+    coverage: "Matemática",
+    games: quina7_21(),
+  },
+};
+
 export type WheelingMatrixId = keyof typeof WHEELING_MATRICES;
 
 export function applyWheelingMatrix(
