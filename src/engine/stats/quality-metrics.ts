@@ -7,6 +7,16 @@ export interface BetQualityReport {
   warnings: string[];
   strengths: string[];
   grade: "S" | "A" | "B" | "C" | "D" | "F";
+  /** Detalhamento por dimensão calibrada (Fase 2). Opcional para não quebrar consumidores. */
+  dimensionBreakdown?: Record<string, number>;
+  /** Resumo dos filtros profissionais (Fase 1). Opcional. */
+  professional?: {
+    passRate: number;
+    averageScore: number;
+    isProfessional: boolean;
+    reasons: string[];
+    warnings: string[];
+  };
 }
 
 export interface QualityDimension {
