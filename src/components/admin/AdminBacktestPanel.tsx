@@ -10,9 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   FlaskConical, Loader2, ArrowUpRight, ArrowDownRight, Target,
-  History, Trash2, RefreshCw,
+  History, Trash2, RefreshCw, GitCompareArrows,
 } from "lucide-react";
 import { toast } from "sonner";
 import { LOTTERIES } from "@/data/lotteries";
@@ -27,6 +28,7 @@ import {
 } from "@/engine/validation/backtestRunner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { BacktestCompareView } from "./BacktestCompareView";
 
 const LOOKBACK = 200;
 
@@ -86,6 +88,23 @@ export function AdminBacktestPanel() {
   const [history, setHistory] = useState<BacktestRunRow[]>([]);
   const [historyFilter, setHistoryFilter] = useState<string>("all");
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [compareOpen, setCompareOpen] = useState(false);
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      if (prev.includes(id)) return prev.filter(x => x !== id);
+      if (prev.length >= 2) {
+        toast.info("Máximo 2 execuções — desmarque uma para trocar");
+        return prev;
+      }
+      return [...prev, id];
+    });
+  };
+
+  const runA = history.find(r => r.id === selectedIds[0]);
+  const runB = history.find(r => r.id === selectedIds[1]);
+
 
   const loadHistory = useCallback(async () => {
     setLoadingHistory(true);
@@ -173,6 +192,7 @@ export function AdminBacktestPanel() {
       return;
     }
     setHistory(h => h.filter(r => r.id !== id));
+    setSelectedIds(prev => prev.filter(x => x !== id));
     toast.success("Execução removida");
   };
 
@@ -224,7 +244,23 @@ export function AdminBacktestPanel() {
               Histórico de execuções
               <Badge variant="outline" className="ml-1">{history.length}</Badge>
             </CardTitle>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                variant={selectedIds.length === 2 ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  if (selectedIds.length !== 2) {
+                    toast.info("Selecione 2 execuções para comparar");
+                    return;
+                  }
+                  setCompareOpen(true);
+                }}
+                className="h-8 gap-1"
+                title="Comparar 2 execuções lado a lado"
+              >
+                <GitCompareArrows className="w-3.5 h-3.5" />
+                Comparar ({selectedIds.length}/2)
+              </Button>
               <Select value={historyFilter} onValueChange={setHistoryFilter}>
                 <SelectTrigger className="h-8 w-[180px] text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -241,7 +277,10 @@ export function AdminBacktestPanel() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          {compareOpen && runA && runB && (
+            <BacktestCompareView runA={runA} runB={runB} onClose={() => setCompareOpen(false)} />
+          )}
           {loadingHistory ? (
             <div className="text-center py-8 text-muted-foreground text-sm">Carregando...</div>
           ) : history.length === 0 ? (
@@ -253,6 +292,7 @@ export function AdminBacktestPanel() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/50 text-xs text-muted-foreground">
+                    <th className="w-8 pl-1"></th>
                     <th className="text-left py-2 pr-2">Data</th>
                     <th className="text-left px-2">Modalidade</th>
                     <th className="text-right px-2">Sorteios</th>
@@ -271,7 +311,14 @@ export function AdminBacktestPanel() {
                     const positive = dHits > 0;
                     const neutral = Math.abs(dHits) < 1e-6;
                     return (
-                      <tr key={row.id} className="border-b border-border/30 hover:bg-muted/20">
+                      <tr key={row.id} className={`border-b border-border/30 hover:bg-muted/20 ${selectedIds.includes(row.id) ? "bg-primary/5" : ""}`}>
+                        <td className="pl-1">
+                          <Checkbox
+                            checked={selectedIds.includes(row.id)}
+                            onCheckedChange={() => toggleSelect(row.id)}
+                            aria-label="Selecionar para comparar"
+                          />
+                        </td>
                         <td className="py-2 pr-2 text-xs text-muted-foreground whitespace-nowrap">
                           {new Date(row.created_at).toLocaleString("pt-BR", {
                             day: "2-digit", month: "2-digit", year: "2-digit",
