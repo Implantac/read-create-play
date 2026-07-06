@@ -641,7 +641,12 @@ export default function AdminPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="backtest">
+          <AdminBacktestPanel />
+        </TabsContent>
       </Tabs>
+
 
       {/* Confirmation Dialog */}
       <Dialog open={confirmDialog.open} onOpenChange={(o) => setConfirmDialog(prev => ({ ...prev, open: o }))}>
