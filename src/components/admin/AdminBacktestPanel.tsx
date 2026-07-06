@@ -245,39 +245,44 @@ export function AdminBacktestPanel() {
               <Badge variant="outline" className="ml-1">{history.length}</Badge>
             </CardTitle>
             <div className="flex items-center gap-2 flex-wrap">
-              <Button
-                variant={selectedIds.length === 2 ? "default" : "outline"}
-                size="sm"
-                aria-disabled={selectedIds.length !== 2}
+              <span
                 onClick={() => {
-                  if (selectedIds.length === 0) {
-                    toast.warning("Selecione 2 execuções para comparar", {
-                      description: "Marque duas linhas no histórico usando as caixas de seleção.",
-                    });
-                    return;
-                  }
-                  if (selectedIds.length === 1) {
-                    toast.warning("Selecione mais 1 execução", {
-                      description: "A comparação exige exatamente 2 execuções (1/2 marcadas).",
-                    });
-                    return;
-                  }
-                  if (selectedIds.length !== 2) {
-                    toast.warning(`Selecione exatamente 2 execuções (${selectedIds.length}/2)`);
-                    return;
-                  }
-                  setCompareOpen(true);
+                  if (selectedIds.length === 2) return;
+                  const msg =
+                    selectedIds.length === 0
+                      ? "Selecione 2 execuções para comparar"
+                      : selectedIds.length === 1
+                        ? "Selecione mais 1 execução (1/2 marcadas)"
+                        : `Selecione exatamente 2 execuções (${selectedIds.length}/2)`;
+                  toast.warning(msg, {
+                    description: "Use as caixas de seleção no histórico abaixo.",
+                  });
                 }}
-                className={`h-8 gap-1 ${selectedIds.length !== 2 ? "opacity-60" : ""}`}
-                title={
-                  selectedIds.length === 2
-                    ? "Comparar 2 execuções lado a lado"
-                    : `Selecione exatamente 2 execuções (${selectedIds.length}/2)`
-                }
+                className={selectedIds.length !== 2 ? "cursor-not-allowed" : ""}
               >
-                <GitCompareArrows className="w-3.5 h-3.5" />
-                Comparar ({selectedIds.length}/2)
-              </Button>
+                <Button
+                  variant={selectedIds.length === 2 ? "default" : "outline"}
+                  size="sm"
+                  disabled={selectedIds.length !== 2}
+                  onClick={(e) => {
+                    if (selectedIds.length !== 2) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      return;
+                    }
+                    setCompareOpen(true);
+                  }}
+                  className="h-8 gap-1 disabled:opacity-50 disabled:pointer-events-none"
+                  title={
+                    selectedIds.length === 2
+                      ? "Comparar 2 execuções lado a lado"
+                      : `Selecione exatamente 2 execuções (${selectedIds.length}/2)`
+                  }
+                >
+                  <GitCompareArrows className="w-3.5 h-3.5" />
+                  Comparar ({selectedIds.length}/2)
+                </Button>
+              </span>
               <Select value={historyFilter} onValueChange={setHistoryFilter}>
                 <SelectTrigger className="h-8 w-[180px] text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent>
