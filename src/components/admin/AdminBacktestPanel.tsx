@@ -104,6 +104,10 @@ export function AdminBacktestPanel() {
   };
 
   const toggleSelect = (id: string) => {
+    if (comparing) {
+      toast.info("Aguarde a comparação carregar antes de mudar a seleção");
+      return;
+    }
     setSelectedIds(prev => {
       if (prev.includes(id)) return prev.filter(x => x !== id);
       if (prev.length >= 2) {
@@ -198,6 +202,10 @@ export function AdminBacktestPanel() {
   };
 
   const deleteRun = async (id: string) => {
+    if (comparing) {
+      toast.info("Aguarde a comparação carregar antes de apagar execuções");
+      return;
+    }
     const { error } = await supabase.from("backtest_runs").delete().eq("id", id);
     if (error) {
       toast.error("Falha ao apagar execução");
@@ -225,7 +233,7 @@ export function AdminBacktestPanel() {
           <div className="flex flex-wrap gap-3 items-end">
             <div className="flex-1 min-w-[200px]">
               <label className="text-xs text-muted-foreground mb-1 block">Modalidade</label>
-              <Select value={lotteryId} onValueChange={setLotteryId} disabled={running}>
+              <Select value={lotteryId} onValueChange={setLotteryId} disabled={running || comparing}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {LOTTERIES.map(l => (
@@ -234,7 +242,7 @@ export function AdminBacktestPanel() {
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={run} disabled={running} className="gap-2">
+            <Button onClick={run} disabled={running || comparing} className="gap-2">
               {running ? <Loader2 className="w-4 h-4 animate-spin" /> : <FlaskConical className="w-4 h-4" />}
               {running ? "Rodando..." : "Rodar backtest"}
             </Button>
@@ -297,7 +305,7 @@ export function AdminBacktestPanel() {
                   {comparing ? "Calculando..." : `Comparar (${selectedIds.length}/2)`}
                 </Button>
               </span>
-              <Select value={historyFilter} onValueChange={setHistoryFilter}>
+              <Select value={historyFilter} onValueChange={setHistoryFilter} disabled={comparing}>
                 <SelectTrigger className="h-8 w-[180px] text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todas as modalidades</SelectItem>
@@ -306,7 +314,7 @@ export function AdminBacktestPanel() {
                   ))}
                 </SelectContent>
               </Select>
-              <Button variant="ghost" size="sm" onClick={loadHistory} disabled={loadingHistory} className="h-8 gap-1">
+              <Button variant="ghost" size="sm" onClick={loadHistory} disabled={loadingHistory || comparing} className="h-8 gap-1">
                 {loadingHistory ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
                 Atualizar
               </Button>
@@ -325,7 +333,11 @@ export function AdminBacktestPanel() {
               Nenhuma execução salva ainda. Rode um backtest acima para começar.
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div
+              className={`overflow-x-auto transition-opacity ${comparing ? "opacity-60 pointer-events-none select-none" : ""}`}
+              aria-busy={comparing}
+              aria-disabled={comparing}
+            >
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/50 text-xs text-muted-foreground">
@@ -353,6 +365,7 @@ export function AdminBacktestPanel() {
                           <Checkbox
                             checked={selectedIds.includes(row.id)}
                             onCheckedChange={() => toggleSelect(row.id)}
+                            disabled={comparing}
                             aria-label="Selecionar para comparar"
                           />
                         </td>
@@ -392,7 +405,8 @@ export function AdminBacktestPanel() {
                             variant="ghost" size="icon"
                             className="h-7 w-7 text-muted-foreground hover:text-destructive"
                             onClick={() => deleteRun(row.id)}
-                            title="Apagar execução"
+                            disabled={comparing}
+                            title={comparing ? "Aguarde a comparação carregar" : "Apagar execução"}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </Button>
