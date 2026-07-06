@@ -355,14 +355,33 @@ export function applyWheelingMatrix(
   return { games, matrix };
 }
 
-export function validateMatrix(matrixId: WheelingMatrixId): any {
+export function validateMatrix(matrixId: WheelingMatrixId): {
+  valid: boolean;
+  coveragePercent: number;
+  totalDraws: number;
+  coveredDraws: number;
+  worstCaseHits: number;
+  gameCount: number;
+  exhaustive: boolean;
+} {
   const matrix = WHEELING_MATRICES[matrixId];
+  // Cenário: TODOS os números-alvo (pick) caem dentro da base.
+  // Reporta a garantia REAL (menor acerto no melhor jogo do desdobramento).
+  const result = validateWheelCoverage(
+    matrix.games,
+    matrix.baseSize,
+    matrix.pick,
+    matrix.pick,
+    matrix.guarantee,
+  );
   return {
-    valid: true,
-    coveragePercent: 85 + Math.random() * 14,
-    totalDraws: 1000,
-    coveredDraws: 900,
-    worstCaseHits: matrix.guarantee,
+    valid: result.guaranteedHits >= matrix.guarantee,
+    coveragePercent: Math.round(result.meetsGoalPercent * 100) / 100,
+    totalDraws: result.testedScenarios,
+    coveredDraws: Math.round((result.meetsGoalPercent / 100) * result.testedScenarios),
+    worstCaseHits: result.guaranteedHits,
     gameCount: matrix.games.length,
+    exhaustive: result.exhaustive,
   };
 }
+
