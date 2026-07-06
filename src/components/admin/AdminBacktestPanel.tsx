@@ -244,7 +244,23 @@ export function AdminBacktestPanel() {
               Histórico de execuções
               <Badge variant="outline" className="ml-1">{history.length}</Badge>
             </CardTitle>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                variant={selectedIds.length === 2 ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  if (selectedIds.length !== 2) {
+                    toast.info("Selecione 2 execuções para comparar");
+                    return;
+                  }
+                  setCompareOpen(true);
+                }}
+                className="h-8 gap-1"
+                title="Comparar 2 execuções lado a lado"
+              >
+                <GitCompareArrows className="w-3.5 h-3.5" />
+                Comparar ({selectedIds.length}/2)
+              </Button>
               <Select value={historyFilter} onValueChange={setHistoryFilter}>
                 <SelectTrigger className="h-8 w-[180px] text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -261,7 +277,10 @@ export function AdminBacktestPanel() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          {compareOpen && runA && runB && (
+            <BacktestCompareView runA={runA} runB={runB} onClose={() => setCompareOpen(false)} />
+          )}
           {loadingHistory ? (
             <div className="text-center py-8 text-muted-foreground text-sm">Carregando...</div>
           ) : history.length === 0 ? (
