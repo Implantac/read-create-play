@@ -292,6 +292,7 @@ export function AdminBacktestPanel() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/50 text-xs text-muted-foreground">
+                    <th className="w-8 pl-1"></th>
                     <th className="text-left py-2 pr-2">Data</th>
                     <th className="text-left px-2">Modalidade</th>
                     <th className="text-right px-2">Sorteios</th>
