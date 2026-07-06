@@ -88,6 +88,23 @@ export function AdminBacktestPanel() {
   const [history, setHistory] = useState<BacktestRunRow[]>([]);
   const [historyFilter, setHistoryFilter] = useState<string>("all");
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [compareOpen, setCompareOpen] = useState(false);
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      if (prev.includes(id)) return prev.filter(x => x !== id);
+      if (prev.length >= 2) {
+        toast.info("Máximo 2 execuções — desmarque uma para trocar");
+        return prev;
+      }
+      return [...prev, id];
+    });
+  };
+
+  const runA = history.find(r => r.id === selectedIds[0]);
+  const runB = history.find(r => r.id === selectedIds[1]);
+
 
   const loadHistory = useCallback(async () => {
     setLoadingHistory(true);
