@@ -192,7 +192,8 @@ export class NativeAIOrchestrator {
   }
 
   private async handleSimulate(
-    intent: ParsedIntent, lotteryId: string, draws: DrawResult[], stats: NumberStats[], engines: string[]
+    intent: ParsedIntent, lotteryId: string, draws: DrawResult[], stats: NumberStats[], engines: string[],
+    userProfile?: any,
   ): Promise<AIResponse> {
     engines.push("simulationEngine", "universalGenerator");
 
@@ -201,6 +202,7 @@ export class NativeAIOrchestrator {
       lotteryId, count: Math.min(intent.quantity, 20),
       riskProfile: intent.riskProfile, filters: intent.filters, stats, draws,
       rng: createXorshift32(hashStringToSeed(`${lotteryId}::simulate::${intent.quantity}::${intent.rawInput}`)),
+      userProfile,
     });
 
 
