@@ -202,6 +202,10 @@ export function AdminBacktestPanel() {
   };
 
   const deleteRun = async (id: string) => {
+    if (comparing) {
+      toast.info("Aguarde a comparação carregar antes de apagar execuções");
+      return;
+    }
     const { error } = await supabase.from("backtest_runs").delete().eq("id", id);
     if (error) {
       toast.error("Falha ao apagar execução");
