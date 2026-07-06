@@ -20,8 +20,9 @@ import {
 import {
   Users, Crown, TrendingUp, Search, Shield, Loader2, RefreshCw, Ban, CheckCircle2,
   ShieldCheck, AlertTriangle, History, UserCog, Eye, Grid3X3, DollarSign,
-  ArrowUpRight, Target
+  ArrowUpRight, Target, FlaskConical
 } from "lucide-react";
+import { AdminBacktestPanel } from "@/components/admin/AdminBacktestPanel";
 
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
