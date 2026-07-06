@@ -239,6 +239,48 @@ export type Database = {
         }
         Relationships: []
       }
+      backtest_runs: {
+        Row: {
+          after_metrics: Json
+          before_metrics: Json
+          created_at: string
+          delta: Json
+          draws_evaluated: number
+          id: string
+          improved: boolean
+          lookback: number
+          lottery_id: string
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          after_metrics: Json
+          before_metrics: Json
+          created_at?: string
+          delta: Json
+          draws_evaluated: number
+          id?: string
+          improved: boolean
+          lookback: number
+          lottery_id: string
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          after_metrics?: Json
+          before_metrics?: Json
+          created_at?: string
+          delta?: Json
+          draws_evaluated?: number
+          id?: string
+          improved?: boolean
+          lookback?: number
+          lottery_id?: string
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       generation_history: {
         Row: {
           created_at: string
