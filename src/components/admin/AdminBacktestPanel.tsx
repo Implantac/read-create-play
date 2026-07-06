@@ -66,11 +66,7 @@ export function AdminBacktestPanel() {
       const lottery = LOTTERIES.find(l => l.id === lotteryId)!;
       setProgress(`Carregando últimos ${LOOKBACK + 50} sorteios de ${lottery.name}...`);
       const { draws } = await fetchDraws(lotteryId, LOOKBACK + 50);
-      const drawResults = draws.map(d => ({
-        concurso: d.concurso,
-        date: d.draw_date,
-        numbers: d.numbers,
-      }));
+      const drawResults = draws;
       if (drawResults.length < 50) {
         toast.error(`Poucos sorteios disponíveis (${drawResults.length}). Mínimo 50.`);
         return;
