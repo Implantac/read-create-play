@@ -405,7 +405,8 @@ export function AdminBacktestPanel() {
                             variant="ghost" size="icon"
                             className="h-7 w-7 text-muted-foreground hover:text-destructive"
                             onClick={() => deleteRun(row.id)}
-                            title="Apagar execução"
+                            disabled={comparing}
+                            title={comparing ? "Aguarde a comparação carregar" : "Apagar execução"}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </Button>
