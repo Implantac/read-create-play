@@ -271,18 +271,6 @@ export const WHEELING_MATRICES = {
   },
 
 
-  lotofacil_18_14: {
-    name: "PLAN 18X24",
-    description: "18 dezenas → 24 jogos com garantia de 14 acertos (se 15 na base).",
-    lottery: "lotofacil",
-    baseSize: 18,
-    pick: 15,
-    guarantee: 14,
-    efficiency: "90%",
-    probability: "1 em 800",
-    coverage: "Alta",
-    games: generateLotofacil18_14(),
-  },
   // ─── Matrizes matemáticas reais (garantia demonstrada por combinatória) ───
   lotofacil_16_16: {
     name: "MATH 16X16",
