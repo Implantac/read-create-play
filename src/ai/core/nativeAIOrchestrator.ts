@@ -245,13 +245,15 @@ export class NativeAIOrchestrator {
 
   private async handleRank(
     intent: ParsedIntent, lotteryId: string, draws: DrawResult[], stats: NumberStats[],
-    existingGames: number[][] | undefined, engines: string[]
+    existingGames: number[][] | undefined, engines: string[],
+    userProfile?: any,
   ): Promise<AIResponse> {
     engines.push("rankingEngine");
 
     const gamesToRank = existingGames || generateGames({
       lotteryId, count: intent.quantity, riskProfile: intent.riskProfile,
       filters: intent.filters, stats, draws,
+      userProfile,
     }).map(g => g.numbers);
 
     const ranked = rankGames(gamesToRank, lotteryId, stats, draws, intent.riskProfile);
