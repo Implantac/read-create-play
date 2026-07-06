@@ -365,6 +365,7 @@ export function AdminBacktestPanel() {
                           <Checkbox
                             checked={selectedIds.includes(row.id)}
                             onCheckedChange={() => toggleSelect(row.id)}
+                            disabled={comparing}
                             aria-label="Selecionar para comparar"
                           />
                         </td>
