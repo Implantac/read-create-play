@@ -311,7 +311,14 @@ export function AdminBacktestPanel() {
                     const positive = dHits > 0;
                     const neutral = Math.abs(dHits) < 1e-6;
                     return (
-                      <tr key={row.id} className="border-b border-border/30 hover:bg-muted/20">
+                      <tr key={row.id} className={`border-b border-border/30 hover:bg-muted/20 ${selectedIds.includes(row.id) ? "bg-primary/5" : ""}`}>
+                        <td className="pl-1">
+                          <Checkbox
+                            checked={selectedIds.includes(row.id)}
+                            onCheckedChange={() => toggleSelect(row.id)}
+                            aria-label="Selecionar para comparar"
+                          />
+                        </td>
                         <td className="py-2 pr-2 text-xs text-muted-foreground whitespace-nowrap">
                           {new Date(row.created_at).toLocaleString("pt-BR", {
                             day: "2-digit", month: "2-digit", year: "2-digit",
