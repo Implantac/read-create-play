@@ -333,7 +333,11 @@ export function AdminBacktestPanel() {
               Nenhuma execução salva ainda. Rode um backtest acima para começar.
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div
+              className={`overflow-x-auto transition-opacity ${comparing ? "opacity-60 pointer-events-none select-none" : ""}`}
+              aria-busy={comparing}
+              aria-disabled={comparing}
+            >
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border/50 text-xs text-muted-foreground">
