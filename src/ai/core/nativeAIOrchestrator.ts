@@ -107,9 +107,11 @@ export class NativeAIOrchestrator {
 
 
   private async handleGenerate(
-    intent: ParsedIntent, lotteryId: string, draws: DrawResult[], stats: NumberStats[], engines: string[]
+    intent: ParsedIntent, lotteryId: string, draws: DrawResult[], stats: NumberStats[], engines: string[],
+    userProfile?: any,
   ): Promise<AIResponse> {
     engines.push("universalGenerator", "rankingEngine", "patternEngine");
+    if (userProfile && userProfile.totalGamesGenerated >= 5) engines.push("userLearning");
 
     const games = generateGames({
       lotteryId,
@@ -119,6 +121,7 @@ export class NativeAIOrchestrator {
       stats,
       draws,
       rng: createXorshift32(hashStringToSeed(`${lotteryId}::generate::${intent.quantity}::${intent.rawInput}`)),
+      userProfile,
     });
 
 
