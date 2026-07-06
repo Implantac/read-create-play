@@ -61,21 +61,23 @@ export class NativeAIOrchestrator {
     const enginesUsed: string[] = ["intentClassifier"];
     let response: AIResponse;
 
+    const userProfile = (request.userProfile ?? null) as any;
+
     switch (parsedIntent.intent) {
       case "generate_games":
-        response = await this.handleGenerate(parsedIntent, lotteryId, draws, stats, enginesUsed);
+        response = await this.handleGenerate(parsedIntent, lotteryId, draws, stats, enginesUsed, userProfile);
         break;
       case "create_wheeling":
         response = await this.handleWheeling(parsedIntent, lotteryId, stats, enginesUsed);
         break;
       case "simulate":
-        response = await this.handleSimulate(parsedIntent, lotteryId, draws, stats, enginesUsed);
+        response = await this.handleSimulate(parsedIntent, lotteryId, draws, stats, enginesUsed, userProfile);
         break;
       case "analyze_history":
         response = await this.handleAnalyze(parsedIntent, lotteryId, draws, enginesUsed);
         break;
       case "rank_games":
-        response = await this.handleRank(parsedIntent, lotteryId, draws, stats, request.existingGames, enginesUsed);
+        response = await this.handleRank(parsedIntent, lotteryId, draws, stats, request.existingGames, enginesUsed, userProfile);
         break;
       case "explain_strategy":
         response = this.handleExplain(parsedIntent, enginesUsed);
@@ -87,7 +89,7 @@ export class NativeAIOrchestrator {
         response = await this.handleCompare(parsedIntent, lotteryId, draws, stats, request.existingGames, enginesUsed);
         break;
       default:
-        response = await this.handleGenerate(parsedIntent, lotteryId, draws, stats, enginesUsed);
+        response = await this.handleGenerate(parsedIntent, lotteryId, draws, stats, enginesUsed, userProfile);
     }
 
     const processingTimeMs = Math.round(performance.now() - startTime);
