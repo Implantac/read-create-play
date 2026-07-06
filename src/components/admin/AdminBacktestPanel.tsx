@@ -10,9 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   FlaskConical, Loader2, ArrowUpRight, ArrowDownRight, Target,
-  History, Trash2, RefreshCw,
+  History, Trash2, RefreshCw, GitCompareArrows,
 } from "lucide-react";
 import { toast } from "sonner";
 import { LOTTERIES } from "@/data/lotteries";
@@ -27,6 +28,7 @@ import {
 } from "@/engine/validation/backtestRunner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { BacktestCompareView } from "./BacktestCompareView";
 
 const LOOKBACK = 200;
 
