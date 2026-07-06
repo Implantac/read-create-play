@@ -65,7 +65,7 @@ export function AdminBacktestPanel() {
     try {
       const lottery = LOTTERIES.find(l => l.id === lotteryId)!;
       setProgress(`Carregando últimos ${LOOKBACK + 50} sorteios de ${lottery.name}...`);
-      const draws = await fetchDraws(lotteryId, LOOKBACK + 50);
+      const { draws } = await fetchDraws(lotteryId, LOOKBACK + 50);
       const drawResults = draws.map(d => ({
         concurso: d.concurso,
         date: d.draw_date,
@@ -77,23 +77,18 @@ export function AdminBacktestPanel() {
       }
       const lookback = Math.min(LOOKBACK, drawResults.length - 10);
 
-      setProgress(`Rodando baseline (aleatório) em ${lookback} sorteios...`);
+      setProgress(`Rodando baseline vs Titan em ${lookback} sorteios de ${lottery.name}...`);
       await new Promise(r => setTimeout(r, 30));
-      const before = runBacktest(drawResults, randomGenerator(lottery.pick, lottery.numbers), {
-        lotteryId, lookback,
-      });
-
-      setProgress(`Rodando Titan (motor profissional) em ${lookback} sorteios...`);
-      await new Promise(r => setTimeout(r, 30));
-      const after = runBacktest(drawResults, titanGenerator(lotteryId, lottery.numbers), {
-        lotteryId, lookback,
-      });
-
-      const cmp = compareStrategies(before, after);
+      const cmp = compareStrategies(
+        drawResults,
+        randomGenerator(lottery.pick, lottery.numbers),
+        titanGenerator(lotteryId, lottery.numbers),
+        { lotteryId, lookback },
+      );
       setComparison(cmp);
       toast.success(
         cmp.improved
-          ? `Titan superou baseline em ${lottery.name}: +${((cmp.delta.avgHits / before.avgHits) * 100).toFixed(1)}% acertos médios`
+          ? `Titan superou baseline em ${lottery.name}: +${cmp.before.avgHits > 0 ? ((cmp.delta.avgHits / cmp.before.avgHits) * 100).toFixed(1) : "0"}% acertos médios`
           : `Nenhum ganho estatístico em ${lottery.name}`
       );
     } catch (e) {
