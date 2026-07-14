@@ -227,6 +227,46 @@ const FechamentoUniversalPage = () => {
               </Button>
             </div>
 
+            {running && (
+              <div
+                className="rounded-lg border bg-muted/30 p-3 space-y-2"
+                role="status"
+                aria-live="polite"
+                aria-busy="true"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-xs font-medium">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                    <span>{progress.label || "Processando…"}</span>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={cancel}
+                    className="h-7 px-2 text-destructive hover:text-destructive"
+                  >
+                    <X className="h-3.5 w-3.5 mr-1" /> Cancelar
+                  </Button>
+                </div>
+                <Progress
+                  value={
+                    progress.total > 0
+                      ? Math.min(100, (progress.current / progress.total) * 100)
+                      : undefined
+                  }
+                  className="h-1.5"
+                />
+                <p className="text-[10px] text-muted-foreground font-mono">
+                  {progress.total > 1
+                    ? `${progress.current}/${progress.total} · `
+                    : ""}
+                  {progress.startedAt
+                    ? `${((Date.now() - progress.startedAt) / 1000).toFixed(1)}s`
+                    : ""}
+                </p>
+              </div>
+            )}
+
             {!canGenerate && (
               <Alert variant="default" className="text-xs">
                 <Info className="h-4 w-4" />
