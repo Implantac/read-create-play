@@ -21,6 +21,7 @@ import { ClosingExportPanel } from "@/components/closing/ClosingExportPanel";
 import { ClosingConstraintsPanel } from "@/components/closing/ClosingConstraintsPanel";
 import { ClosingLibraryPanel, type ClosingLibraryApply } from "@/components/closing/ClosingLibraryPanel";
 import { ClosingMatrixEditor } from "@/components/closing/ClosingMatrixEditor";
+import { ClosingAIRecommendationPanel } from "@/components/closing/ClosingAIRecommendationPanel";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -321,6 +322,17 @@ const FechamentoUniversalPage = () => {
           </CardContent>
         </Card>
       </div>
+
+      <ClosingAIRecommendationPanel
+        lottery={{ id: config.id, name: config.name, totalNumbers: total, pick, ticketPrice: 3 }}
+        baseSize={baseNumbers.length}
+        onApply={(rec) => {
+          setMinHits(Math.min(pick, rec.minHits));
+          setMaxGames(rec.maxGames);
+          setStrategy(rec.strategy);
+          toast.success(`Recomendação aplicada: ${rec.strategy} · ${rec.maxGames} jogos · garantia ${rec.minHits}.`);
+        }}
+      />
 
       <ClosingConstraintsPanel value={constraints} onChange={setConstraints} />
 

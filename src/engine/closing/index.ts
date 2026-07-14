@@ -49,4 +49,11 @@ export {
   normalizeMatrix,
   type ClosingMatrix,
 } from "./io/ClosingMatrixSchema";
+export {
+  heuristicRecommendation,
+  aiRecommendation,
+  type Recommendation,
+  type RiskProfile,
+  type RecommendationInput,
+} from "./ai/AIRecommendationEngine";
 
