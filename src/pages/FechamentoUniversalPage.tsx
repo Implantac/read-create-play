@@ -13,11 +13,12 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sparkles, Target, Shield, Coins, Play, Loader2, Info, Trophy, GitCompare, X } from "lucide-react";
-import { calculateGuarantee, type ClosingResult, type ClosingStrategy } from "@/engine/closing";
+import { calculateGuarantee, applyConstraints, type ClosingResult, type ClosingStrategy, type ActiveConstraint } from "@/engine/closing";
 import { useClosingWorker, ClosingCanceledError } from "@/hooks/useClosingWorker";
 import { useClosingHistory } from "@/hooks/useClosingHistory";
 import { ClosingDashboardPanel } from "@/components/closing/ClosingDashboardPanel";
 import { ClosingExportPanel } from "@/components/closing/ClosingExportPanel";
+import { ClosingConstraintsPanel } from "@/components/closing/ClosingConstraintsPanel";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -52,6 +53,7 @@ const FechamentoUniversalPage = () => {
   const [comparing, setComparing] = useState(false);
   const [result, setResult] = useState<ClosingResult | null>(null);
   const [comparison, setComparison] = useState<ClosingResult[] | null>(null);
+  const [constraints, setConstraints] = useState<ActiveConstraint[]>([]);
 
   const toggle = (n: number) => {
     setBaseNumbers(prev => prev.includes(n) ? prev.filter(x => x !== n) : [...prev, n].sort((a, b) => a - b));
@@ -73,13 +75,39 @@ const FechamentoUniversalPage = () => {
     kind: "guaranteed" as const,
   });
 
+  const applyFilters = (r: ClosingResult): ClosingResult => {
+    if (!constraints.length || r.games.length === 0) return r;
+    const filtered = applyConstraints(r.games, constraints, {
+      lottery: r.request.lottery,
+      baseNumbers: r.request.baseNumbers,
+    });
+    if (filtered.kept.length === 0) {
+      toast.warning(`Todos os ${r.games.length} jogos foram rejeitados pelos filtros. Mostrando resultado sem filtro.`);
+      return r;
+    }
+    if (filtered.rejected.length > 0) {
+      toast.info(`${filtered.rejected.length} jogos rejeitados pelos filtros temáticos.`);
+    }
+    return {
+      ...r,
+      games: filtered.kept,
+      gameCount: filtered.kept.length,
+      cost: filtered.kept.length * (r.cost / Math.max(1, r.games.length)),
+      notes: [
+        ...r.notes,
+        `Filtros temáticos: ${filtered.stats.keptCount}/${filtered.stats.total} mantidos.`,
+      ],
+    };
+  };
+
   const runGenerate = async () => {
     if (!canGenerate) { toast.error(`Selecione ao menos ${pick} dezenas.`); return; }
     setGenerating(true);
     setResult(null);
     setComparison(null);
     try {
-      const r = await generate({ ...buildRequest(), strategy });
+      const raw = await generate({ ...buildRequest(), strategy });
+      const r = applyFilters(raw);
       setResult(r);
       if (r.games.length === 0) {
         toast.error(r.notes[0] || "Falha ao gerar.");
@@ -105,7 +133,8 @@ const FechamentoUniversalPage = () => {
     setComparison(null);
     setResult(null);
     try {
-      const rs = await compare(buildRequest(), COMPARE_SET);
+      const rsRaw = await compare(buildRequest(), COMPARE_SET);
+      const rs = rsRaw.map(applyFilters);
       setComparison(rs);
       toast.success(`Comparação concluída: vencedor ${STRATEGY_LABELS[rs[0].strategy]}`);
       if (rs[0] && rs[0].games.length > 0) {
@@ -290,6 +319,8 @@ const FechamentoUniversalPage = () => {
           </CardContent>
         </Card>
       </div>
+
+      <ClosingConstraintsPanel value={constraints} onChange={setConstraints} />
 
       {comparison && <ComparisonPanel results={comparison} onPick={(r) => setResult(r)} />}
       {result && result.games.length > 0 && <ResultPanel result={result} />}
