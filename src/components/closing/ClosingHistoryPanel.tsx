@@ -223,17 +223,55 @@ export function ClosingHistoryPanel({ lotteryId }: { lotteryId: string }) {
             Nenhum fechamento corresponde aos filtros.
           </p>
         ) : (
-          <div className="space-y-2">
-            {filtered.map(row => (
-              <ClosingRow
-                key={row.id}
-                row={row}
-                open={openId === row.id}
-                onToggle={() => setOpenId(openId === row.id ? null : row.id)}
-                onDelete={() => deleteClosing(row.id)}
-              />
-            ))}
-          </div>
+          <>
+            <div className="space-y-2">
+              {paged.map(row => (
+                <ClosingRow
+                  key={row.id}
+                  row={row}
+                  open={openId === row.id}
+                  onToggle={() => setOpenId(openId === row.id ? null : row.id)}
+                  onDelete={() => deleteClosing(row.id)}
+                />
+              ))}
+            </div>
+
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 pt-2 border-t">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span>
+                  {pageStart + 1}–{Math.min(pageStart + pageSize, filtered.length)} de {filtered.length}
+                </span>
+                <Select value={String(pageSize)} onValueChange={(v) => setPageSize(Number(v))}>
+                  <SelectTrigger className="h-7 w-[90px] text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="5">5 / pág</SelectItem>
+                    <SelectItem value="10">10 / pág</SelectItem>
+                    <SelectItem value="20">20 / pág</SelectItem>
+                    <SelectItem value="50">50 / pág</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center gap-1">
+                <Button
+                  size="sm" variant="outline" className="h-7 px-2"
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage <= 1}
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                </Button>
+                <span className="text-xs font-mono px-2">
+                  {currentPage} / {totalPages}
+                </span>
+                <Button
+                  size="sm" variant="outline" className="h-7 px-2"
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage >= totalPages}
+                >
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </div>
+          </>
         )}
       </CardContent>
     </Card>
