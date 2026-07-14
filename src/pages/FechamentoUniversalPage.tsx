@@ -75,13 +75,39 @@ const FechamentoUniversalPage = () => {
     kind: "guaranteed" as const,
   });
 
+  const applyFilters = (r: ClosingResult): ClosingResult => {
+    if (!constraints.length || r.games.length === 0) return r;
+    const filtered = applyConstraints(r.games, constraints, {
+      lottery: r.request.lottery,
+      baseNumbers: r.request.baseNumbers,
+    });
+    if (filtered.kept.length === 0) {
+      toast.warning(`Todos os ${r.games.length} jogos foram rejeitados pelos filtros. Mostrando resultado sem filtro.`);
+      return r;
+    }
+    if (filtered.rejected.length > 0) {
+      toast.info(`${filtered.rejected.length} jogos rejeitados pelos filtros temáticos.`);
+    }
+    return {
+      ...r,
+      games: filtered.kept,
+      gameCount: filtered.kept.length,
+      cost: filtered.kept.length * (r.cost / Math.max(1, r.games.length)),
+      notes: [
+        ...r.notes,
+        `Filtros temáticos: ${filtered.stats.keptCount}/${filtered.stats.total} mantidos.`,
+      ],
+    };
+  };
+
   const runGenerate = async () => {
     if (!canGenerate) { toast.error(`Selecione ao menos ${pick} dezenas.`); return; }
     setGenerating(true);
     setResult(null);
     setComparison(null);
     try {
-      const r = await generate({ ...buildRequest(), strategy });
+      const raw = await generate({ ...buildRequest(), strategy });
+      const r = applyFilters(raw);
       setResult(r);
       if (r.games.length === 0) {
         toast.error(r.notes[0] || "Falha ao gerar.");
