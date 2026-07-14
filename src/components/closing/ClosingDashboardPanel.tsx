@@ -60,6 +60,7 @@ export function ClosingDashboardPanel({ result, prizeTiers }: Props) {
           drawSize: result.request.lottery.pick,
           trials,
           targetHits: result.validation.targetMinHits,
+          captureHeatmap: true,
         });
         setMc(r);
       } finally { setRunningMC(false); }
