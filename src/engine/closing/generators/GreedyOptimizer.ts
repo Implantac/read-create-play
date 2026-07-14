@@ -14,8 +14,8 @@
  *      maxGames atingido.
  */
 
-import { binomial, combinations, sampleCombinations } from "./combinatorics";
-import { gameMSubsets } from "./CoverageCalculator";
+import { binomial, combinations, sampleCombinations } from "../core/combinatorics";
+import { gameMSubsets } from "../core/CoverageCalculator";
 
 const MAX_CANDIDATE_GAMES = 20_000;
 const MAX_UNIVERSE = 200_000;
