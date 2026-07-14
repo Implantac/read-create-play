@@ -2,9 +2,10 @@
  * ClosingEngine — facade do Motor Universal de Fechamentos.
  *
  * API pública:
- *   - generateClosing(request)
- *   - validateClosing(games, ...)
- *   - calculateCoverage(games, ...)
+ *   - generateClosing(request)         — despacha por estratégia
+ *   - compareStrategies(request, list) — roda várias e compara
+ *   - validateClosing(...)
+ *   - calculateCoverage(...)
  *   - calculateGuarantee(baseSize, pick, m)
  *   - compareClosings(a, b)
  */
@@ -14,6 +15,10 @@ import type {
   LotteryParams, ClosingValidation,
 } from "./types";
 import { greedyCover } from "../generators/GreedyOptimizer";
+import { runHillClimbing } from "../generators/HillClimbing";
+import { runSimulatedAnnealing } from "../generators/SimulatedAnnealingCover";
+import { runGeneticAlgorithm } from "../generators/GeneticOptimizer";
+import { runCoveringDesign } from "../generators/CoveringDesignEngine";
 import { validateClosing as runValidation } from "../validation/ValidationEngine";
 import { computeScore } from "../scoring/ScoreEngine";
 import { calculateCoverage, type CoverageReport } from "./CoverageCalculator";
@@ -39,16 +44,53 @@ export function generateClosing(request: ClosingRequest): ClosingResult {
     ]);
   }
 
-  // Índices [0..b-1] → geramos jogos como índices, depois mapeamos para dezenas reais.
-  const greedy = greedyCover(b, pick, m, { maxGames: request.maxGames });
+  // Executa a estratégia escolhida. Todos retornam índices em [0..b-1].
+  let idxGames: number[][] = [];
+  let exhaustiveUniverse = true;
+  let exhaustiveCandidates = true;
 
-  const gamesReal: number[][] = greedy.games.map(g => g.map(i => base[i]).sort((a, b) => a - b));
+  switch (strategy) {
+    case "hill_climbing": {
+      const r = runHillClimbing(b, pick, m, { maxGames: request.maxGames });
+      idxGames = r.games;
+      notes.push(`Hill Climbing: ${r.iterations} iterações, ${r.improvements} melhorias.`);
+      break;
+    }
+    case "simulated_annealing": {
+      const r = runSimulatedAnnealing(b, pick, m, { maxGames: request.maxGames });
+      idxGames = r.games;
+      notes.push(`Simulated Annealing: ${r.iterations} passos, ${r.accepted} aceitos.`);
+      break;
+    }
+    case "genetic": {
+      const r = runGeneticAlgorithm(b, pick, m, { maxGames: request.maxGames });
+      idxGames = r.games;
+      notes.push(`Algoritmo Genético: ${r.generations} gerações, fitness ${r.bestFitness.toFixed(1)}.`);
+      break;
+    }
+    case "covering_design": {
+      const r = runCoveringDesign(b, pick, m, { maxGames: request.maxGames });
+      idxGames = r.games;
+      notes.push(
+        r.reachedBound
+          ? `Covering Design: atingiu lower bound de Schönheim (${r.lowerBound}).`
+          : `Covering Design: ${r.passes} passes, cobertura ${r.finalCoverage.toFixed(1)}%.`,
+      );
+      break;
+    }
+    case "greedy":
+    default: {
+      const g = greedyCover(b, pick, m, { maxGames: request.maxGames });
+      idxGames = g.games;
+      exhaustiveUniverse = g.exhaustiveUniverse;
+      exhaustiveCandidates = g.exhaustiveCandidates;
+    }
+  }
+
+  const gamesReal: number[][] = idxGames.map(g => g.map(i => base[i]).sort((a, b) => a - b));
 
   const validation = runValidation(
-    greedy.games,
-    b,
-    request.guarantee.hitsInBase,
-    m,
+    idxGames, b, request.guarantee.hitsInBase, m,
   );
 
   const lowerBound = schonheimBound(b, pick, m);
@@ -59,31 +101,30 @@ export function generateClosing(request: ClosingRequest): ClosingResult {
     elapsedMs: elapsed, baseSize: b, pick,
   });
 
-  if (!greedy.exhaustiveUniverse) {
-    notes.push("Universo de M-subconjuntos muito grande — cobertura estimada por amostragem.");
-  }
-  if (!greedy.exhaustiveCandidates) {
-    notes.push("Pool de candidatos amostrado (universo combinatório enorme).");
-  }
-  if (!validation.exhaustive) {
-    notes.push("Validação por amostragem (cenários demais para checagem exaustiva).");
-  }
-  if (gamesReal.length === lowerBound && lowerBound > 0) {
+  if (!exhaustiveUniverse) notes.push("Universo de M-subconjuntos muito grande — cobertura estimada por amostragem.");
+  if (!exhaustiveCandidates) notes.push("Pool de candidatos amostrado (universo combinatório enorme).");
+  if (!validation.exhaustive) notes.push("Validação por amostragem (cenários demais para checagem exaustiva).");
+  if (gamesReal.length === lowerBound && lowerBound > 0 && validation.meetsGuarantee) {
     notes.push(`Ótimo alcançado: ${gamesReal.length} jogos = lower bound de Schönheim.`);
   }
 
   return {
-    request,
-    strategy,
-    games: gamesReal,
-    gameCount: gamesReal.length,
+    request, strategy,
+    games: gamesReal, gameCount: gamesReal.length,
     cost: gamesReal.length * request.lottery.ticketPrice,
-    validation,
-    score,
+    validation, score,
     elapsedMs: Math.round(elapsed),
-    lowerBound,
-    notes,
+    lowerBound, notes,
   };
+}
+
+/** Roda várias estratégias e devolve resultados ordenados por overall score. */
+export function compareStrategies(
+  request: ClosingRequest,
+  strategies: ClosingStrategy[],
+): ClosingResult[] {
+  const results = strategies.map(s => generateClosing({ ...request, strategy: s }));
+  return results.sort((a, b) => b.score.overall - a.score.overall);
 }
 
 export function calculateGuarantee(baseSize: number, pick: number, m: number) {
