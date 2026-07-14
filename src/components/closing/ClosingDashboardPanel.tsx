@@ -1,0 +1,262 @@
+/**
+ * ClosingDashboardPanel — Fase 3 do Motor de Fechamentos.
+ * Monte Carlo (probabilidade) + Backtest histórico (ROI real) para um
+ * fechamento já gerado.
+ */
+
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, TrendingUp, Dice5, History, Info, Trophy } from "lucide-react";
+import {
+  runMonteCarlo, runHistoricalBacktest,
+  type ClosingResult, type MonteCarloResult, type BacktestResult, type HistoricalDraw,
+} from "@/engine/closing";
+import { formatCurrency, formatNumber } from "@/utils/formatters";
+import { useLotteryContext } from "@/contexts/LotteryContext";
+import { useLotteryDraws } from "@/hooks/useLotteryDraws";
+import { cn } from "@/lib/utils";
+
+interface Props {
+  result: ClosingResult;
+  /** Prêmios estimados por faixa (hits → BRL). Opcional. */
+  prizeTiers?: Record<number, number>;
+}
+
+const DEFAULT_TIERS: Record<string, Record<number, number>> = {
+  lotofacil: { 15: 1_500_000, 14: 2_000, 13: 30, 12: 12, 11: 6 },
+  megasena: { 6: 50_000_000, 5: 60_000, 4: 1_500 },
+  quina: { 5: 8_000_000, 4: 8_000, 3: 100, 2: 3 },
+  lotomania: { 20: 4_000_000, 19: 40_000, 18: 800, 17: 40, 16: 6, 0: 2_000_000 },
+};
+
+export function ClosingDashboardPanel({ result, prizeTiers }: Props) {
+  const { config } = useLotteryContext();
+  const { draws: drawsData } = useLotteryDraws(config.id);
+  const [mc, setMc] = useState<MonteCarloResult | null>(null);
+  const [bt, setBt] = useState<BacktestResult | null>(null);
+  const [trials, setTrials] = useState(100_000);
+  const [drawLimit, setDrawLimit] = useState(500);
+  const [runningMC, setRunningMC] = useState(false);
+  const [runningBT, setRunningBT] = useState(false);
+
+  const tiers = prizeTiers ?? DEFAULT_TIERS[config.id] ?? {};
+
+  const runMC = () => {
+    setRunningMC(true);
+    setTimeout(() => {
+      try {
+        const r = runMonteCarlo({
+          games: result.games,
+          totalNumbers: result.request.lottery.totalNumbers,
+          drawSize: result.request.lottery.pick,
+          trials,
+          targetHits: result.validation.targetMinHits,
+        });
+        setMc(r);
+      } finally { setRunningMC(false); }
+    }, 40);
+  };
+
+  const runBT = () => {
+    if (!drawsData || drawsData.length === 0) return;
+    setRunningBT(true);
+    setTimeout(() => {
+      try {
+        const historic: HistoricalDraw[] = drawsData
+          .slice(0, drawLimit)
+          .map(d => ({ contest: d.concurso, date: d.date, numbers: d.numbers }));
+        const r = runHistoricalBacktest({
+          games: result.games,
+          draws: historic,
+          ticketPrice: result.request.lottery.ticketPrice,
+          prizeTiers: tiers,
+        });
+        setBt(r);
+      } finally { setRunningBT(false); }
+    }, 40);
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <TrendingUp className="h-5 w-5" />
+          Dashboard Executivo — Simulação & Backtest
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue="montecarlo">
+          <TabsList>
+            <TabsTrigger value="montecarlo">
+              <Dice5 className="h-4 w-4 mr-1" /> Monte Carlo
+            </TabsTrigger>
+            <TabsTrigger value="backtest">
+              <History className="h-4 w-4 mr-1" /> Backtest Histórico
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="montecarlo" className="space-y-4 mt-4">
+            <div className="flex items-end gap-2">
+              <div className="flex-1">
+                <label className="text-xs text-muted-foreground">Sorteios simulados</label>
+                <div className="flex gap-2 mt-1">
+                  {[10_000, 100_000, 500_000, 1_000_000].map(n => (
+                    <Button key={n} size="sm" variant={trials === n ? "default" : "outline"}
+                      onClick={() => setTrials(n)}>
+                      {formatNumber(n)}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <Button onClick={runMC} disabled={runningMC}>
+                {runningMC ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Dice5 className="h-4 w-4 mr-1" />}
+                Simular
+              </Button>
+            </div>
+            {mc && <MCResults mc={mc} />}
+          </TabsContent>
+
+          <TabsContent value="backtest" className="space-y-4 mt-4">
+            {!drawsData || drawsData.length === 0 ? (
+              <Alert><Info className="h-4 w-4" />
+                <AlertDescription>Sem histórico local. Sincronize concursos antes do backtest.</AlertDescription>
+              </Alert>
+            ) : (
+              <>
+                <div className="flex items-end gap-2">
+                  <div className="flex-1">
+                    <label className="text-xs text-muted-foreground">
+                      Concursos testados (histórico disponível: {drawsData.length})
+                    </label>
+                    <div className="flex gap-2 mt-1 flex-wrap">
+                      {[50, 100, 500, drawsData.length].map(n => (
+                        <Button key={n} size="sm" variant={drawLimit === n ? "default" : "outline"}
+                          onClick={() => setDrawLimit(n)}>
+                          {n === drawsData.length ? "Todos" : n}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  <Button onClick={runBT} disabled={runningBT}>
+                    {runningBT ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <History className="h-4 w-4 mr-1" />}
+                    Backtest
+                  </Button>
+                </div>
+                {bt && <BTResults bt={bt} />}
+              </>
+            )}
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
+  );
+}
+
+function MCResults({ mc }: { mc: MonteCarloResult }) {
+  const dist = Object.entries(mc.distribution).sort(([a], [b]) => Number(b) - Number(a));
+  const maxCount = Math.max(...dist.map(([, c]) => c));
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <StatBox label="Trials" value={formatNumber(mc.trials)} />
+        <StatBox label="Hit-rate ≥ meta" value={`${mc.hitRate.toFixed(2)}%`} accent />
+        <StatBox label="Média de acertos" value={mc.meanHits.toFixed(2)} />
+        <StatBox label="Melhor / pior" value={`${mc.bestHits} / ${mc.worstHits}`} />
+      </div>
+      <div>
+        <p className="text-sm font-semibold mb-2">Distribuição de acertos (melhor jogo por sorteio)</p>
+        <div className="space-y-1.5">
+          {dist.map(([hits, count]) => {
+            const pct = (count / mc.trials) * 100;
+            return (
+              <div key={hits} className="flex items-center gap-2 text-xs">
+                <span className="w-16 font-mono">{hits} pts</span>
+                <div className="flex-1 bg-muted rounded-full h-3 overflow-hidden">
+                  <div className="h-full bg-primary transition-all"
+                    style={{ width: `${(count / maxCount) * 100}%` }} />
+                </div>
+                <span className="w-28 text-right font-mono text-muted-foreground">
+                  {formatNumber(count)} · {pct.toFixed(2)}%
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <p className="text-xs text-muted-foreground">Simulado em {mc.elapsedMs}ms.</p>
+    </div>
+  );
+}
+
+function BTResults({ bt }: { bt: BacktestResult }) {
+  const dist = Object.entries(bt.hitDistribution).sort(([a], [b]) => Number(b) - Number(a));
+  const roiPositive = bt.roi >= 0;
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <StatBox label="Concursos" value={formatNumber(bt.totalDraws)} />
+        <StatBox label="Custo total" value={formatCurrency(bt.totalCost)} />
+        <StatBox label="Prêmios" value={formatCurrency(bt.totalPrize)} accent />
+        <StatBox
+          label="ROI"
+          value={`${bt.roi >= 0 ? "+" : ""}${bt.roi.toFixed(2)}%`}
+          highlight={roiPositive ? "green" : "red"}
+        />
+      </div>
+
+      {bt.bestOutcome && bt.bestOutcome.bestHits > 0 && (
+        <Alert>
+          <Trophy className="h-4 w-4" />
+          <AlertDescription>
+            <span className="font-semibold">Melhor concurso:</span> #{bt.bestOutcome.contest}
+            {bt.bestOutcome.date && ` (${bt.bestOutcome.date})`} —
+            <span className="font-mono ml-1">{bt.bestOutcome.bestHits} acertos</span>
+            {bt.bestOutcome.prize > 0 && <> · prêmio {formatCurrency(bt.bestOutcome.prize)}</>}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      <div>
+        <p className="text-sm font-semibold mb-2">Distribuição histórica de acertos</p>
+        <div className="space-y-1.5">
+          {dist.map(([hits, count]) => {
+            const pct = (count / bt.totalDraws) * 100;
+            return (
+              <div key={hits} className="flex items-center gap-2 text-xs">
+                <Badge variant="secondary" className="w-16 font-mono justify-center">{hits} pts</Badge>
+                <Progress value={pct} className="flex-1" />
+                <span className="w-28 text-right font-mono text-muted-foreground">
+                  {count} · {pct.toFixed(2)}%
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Backtest em {bt.elapsedMs}ms · média {bt.meanHits.toFixed(2)} acertos/concurso.
+      </p>
+    </div>
+  );
+}
+
+function StatBox({
+  label, value, accent, highlight,
+}: { label: string; value: string; accent?: boolean; highlight?: "green" | "red" }) {
+  return (
+    <div className="rounded-lg border bg-muted/20 p-3">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className={cn(
+        "text-xl font-bold font-mono mt-1",
+        accent && "text-primary",
+        highlight === "green" && "text-green-500",
+        highlight === "red" && "text-red-500",
+      )}>{value}</p>
+    </div>
+  );
+}
