@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sparkles, Target, Shield, Coins, Play, Loader2, Info, Trophy, GitCompare, X } from "lucide-react";
 import { calculateGuarantee, type ClosingResult, type ClosingStrategy } from "@/engine/closing";
 import { useClosingWorker, ClosingCanceledError } from "@/hooks/useClosingWorker";
+import { useClosingHistory } from "@/hooks/useClosingHistory";
 import { ClosingDashboardPanel } from "@/components/closing/ClosingDashboardPanel";
 import { ClosingExportPanel } from "@/components/closing/ClosingExportPanel";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
@@ -41,6 +42,7 @@ const FechamentoUniversalPage = () => {
   const pick = config.pick;
   const total = config.numbers;
   const { generate, compare, cancel, progress, running } = useClosingWorker();
+  const { saveClosing } = useClosingHistory(config.id);
 
   const [baseNumbers, setBaseNumbers] = useState<number[]>([]);
   const [minHits, setMinHits] = useState<number>(Math.max(1, pick - 1));
@@ -79,9 +81,16 @@ const FechamentoUniversalPage = () => {
     try {
       const r = await generate({ ...buildRequest(), strategy });
       setResult(r);
-      if (r.games.length === 0) toast.error(r.notes[0] || "Falha ao gerar.");
-      else if (r.validation.meetsGuarantee) toast.success(`${r.games.length} jogos · garantia ${r.validation.guaranteedHits}.`);
-      else toast.warning(`${r.games.length} jogos, garantia real ${r.validation.guaranteedHits} < meta ${minHits}.`);
+      if (r.games.length === 0) {
+        toast.error(r.notes[0] || "Falha ao gerar.");
+      } else {
+        if (r.validation.meetsGuarantee) toast.success(`${r.games.length} jogos · garantia ${r.validation.guaranteedHits}.`);
+        else toast.warning(`${r.games.length} jogos, garantia real ${r.validation.guaranteedHits} < meta ${minHits}.`);
+        // Auto-arquiva no histórico
+        saveClosing(r).then(ok => {
+          if (ok) toast.info("Fechamento salvo em Meus Jogos.", { duration: 2500 });
+        });
+      }
     } catch (e) {
       if (e instanceof ClosingCanceledError) toast.info("Geração cancelada.");
       else toast.error(e instanceof Error ? e.message : "Erro ao gerar.");
@@ -99,6 +108,11 @@ const FechamentoUniversalPage = () => {
       const rs = await compare(buildRequest(), COMPARE_SET);
       setComparison(rs);
       toast.success(`Comparação concluída: vencedor ${STRATEGY_LABELS[rs[0].strategy]}`);
+      if (rs[0] && rs[0].games.length > 0) {
+        saveClosing(rs[0]).then(ok => {
+          if (ok) toast.info("Fechamento vencedor salvo em Meus Jogos.", { duration: 2500 });
+        });
+      }
     } catch (e) {
       if (e instanceof ClosingCanceledError) toast.info("Comparação cancelada.");
       else toast.error(e instanceof Error ? e.message : "Erro na comparação.");
