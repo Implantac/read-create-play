@@ -12,9 +12,9 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sparkles, Target, Shield, Coins, Play, Loader2, Info, Trophy, GitCompare } from "lucide-react";
+import { Sparkles, Target, Shield, Coins, Play, Loader2, Info, Trophy, GitCompare, X } from "lucide-react";
 import { calculateGuarantee, type ClosingResult, type ClosingStrategy } from "@/engine/closing";
-import { useClosingWorker } from "@/hooks/useClosingWorker";
+import { useClosingWorker, ClosingCanceledError } from "@/hooks/useClosingWorker";
 import { ClosingDashboardPanel } from "@/components/closing/ClosingDashboardPanel";
 import { ClosingExportPanel } from "@/components/closing/ClosingExportPanel";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
@@ -40,7 +40,7 @@ const FechamentoUniversalPage = () => {
   const { config } = useLotteryContext();
   const pick = config.pick;
   const total = config.numbers;
-  const { generate, compare } = useClosingWorker();
+  const { generate, compare, cancel, progress, running } = useClosingWorker();
 
   const [baseNumbers, setBaseNumbers] = useState<number[]>([]);
   const [minHits, setMinHits] = useState<number>(Math.max(1, pick - 1));
@@ -83,7 +83,8 @@ const FechamentoUniversalPage = () => {
       else if (r.validation.meetsGuarantee) toast.success(`${r.games.length} jogos · garantia ${r.validation.guaranteedHits}.`);
       else toast.warning(`${r.games.length} jogos, garantia real ${r.validation.guaranteedHits} < meta ${minHits}.`);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erro ao gerar.");
+      if (e instanceof ClosingCanceledError) toast.info("Geração cancelada.");
+      else toast.error(e instanceof Error ? e.message : "Erro ao gerar.");
     } finally {
       setGenerating(false);
     }
@@ -99,7 +100,8 @@ const FechamentoUniversalPage = () => {
       setComparison(rs);
       toast.success(`Comparação concluída: vencedor ${STRATEGY_LABELS[rs[0].strategy]}`);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erro na comparação.");
+      if (e instanceof ClosingCanceledError) toast.info("Comparação cancelada.");
+      else toast.error(e instanceof Error ? e.message : "Erro na comparação.");
     } finally {
       setComparing(false);
     }
@@ -224,6 +226,46 @@ const FechamentoUniversalPage = () => {
                 Comparar
               </Button>
             </div>
+
+            {running && (
+              <div
+                className="rounded-lg border bg-muted/30 p-3 space-y-2"
+                role="status"
+                aria-live="polite"
+                aria-busy="true"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-xs font-medium">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                    <span>{progress.label || "Processando…"}</span>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={cancel}
+                    className="h-7 px-2 text-destructive hover:text-destructive"
+                  >
+                    <X className="h-3.5 w-3.5 mr-1" /> Cancelar
+                  </Button>
+                </div>
+                <Progress
+                  value={
+                    progress.total > 0
+                      ? Math.min(100, (progress.current / progress.total) * 100)
+                      : undefined
+                  }
+                  className="h-1.5"
+                />
+                <p className="text-[10px] text-muted-foreground font-mono">
+                  {progress.total > 1
+                    ? `${progress.current}/${progress.total} · `
+                    : ""}
+                  {progress.startedAt
+                    ? `${((Date.now() - progress.startedAt) / 1000).toFixed(1)}s`
+                    : ""}
+                </p>
+              </div>
+            )}
 
             {!canGenerate && (
               <Alert variant="default" className="text-xs">
