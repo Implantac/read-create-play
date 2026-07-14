@@ -19,6 +19,7 @@ import { useClosingHistory } from "@/hooks/useClosingHistory";
 import { ClosingDashboardPanel } from "@/components/closing/ClosingDashboardPanel";
 import { ClosingExportPanel } from "@/components/closing/ClosingExportPanel";
 import { ClosingConstraintsPanel } from "@/components/closing/ClosingConstraintsPanel";
+import { ClosingLibraryPanel, type ClosingLibraryApply } from "@/components/closing/ClosingLibraryPanel";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -321,6 +322,25 @@ const FechamentoUniversalPage = () => {
       </div>
 
       <ClosingConstraintsPanel value={constraints} onChange={setConstraints} />
+
+      <ClosingLibraryPanel
+        lotteryId={config.id}
+        currentBaseSize={baseNumbers.length}
+        onApply={(opts: ClosingLibraryApply) => {
+          setMinHits(Math.min(pick, opts.minHits));
+          setMaxGames(opts.maxGames);
+          setStrategy(opts.strategy);
+          if (baseNumbers.length < opts.baseSize) {
+            toast.warning(
+              `Preset ${opts.preset.code} aplicado. Selecione ao menos ${opts.baseSize} dezenas antes de gerar.`,
+            );
+          } else {
+            toast.success(
+              `Preset ${opts.preset.code} aplicado — ${opts.maxGames} jogos, garantia ${opts.minHits}.`,
+            );
+          }
+        }}
+      />
 
       {comparison && <ComparisonPanel results={comparison} onPick={(r) => setResult(r)} />}
       {result && result.games.length > 0 && <ResultPanel result={result} />}
