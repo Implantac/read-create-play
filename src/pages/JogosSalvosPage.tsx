@@ -13,6 +13,7 @@ import { useSavedBets, SavedBet } from "@/hooks/useSavedBets";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { StatsCard } from "@/components/common/StatsCard";
 import { DrawTestDialog } from "@/components/lottery/DrawTestDialog";
+import { ClosingHistoryPanel } from "@/components/closing/ClosingHistoryPanel";
 
 
 const DRAW_RANGE_OPTIONS = [
@@ -132,6 +133,8 @@ const JogosSalvosPage = () => {
           );
         })}
       </div>
+
+      <ClosingHistoryPanel lotteryId={selectedLottery} />
     </div>
   );
 };
