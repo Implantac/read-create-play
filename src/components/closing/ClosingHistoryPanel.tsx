@@ -46,6 +46,8 @@ export function ClosingHistoryPanel({ lotteryId }: { lotteryId: string }) {
   const [dateRange, setDateRange] = useState<string>("all");
   const [minScore, setMinScore] = useState<number>(0);
   const [sort, setSort] = useState<SortKey>("date_desc");
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [page, setPage] = useState<number>(1);
 
   const strategiesInHistory = useMemo(() => {
     const set = new Set<string>();
