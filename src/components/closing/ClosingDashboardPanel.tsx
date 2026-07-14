@@ -11,11 +11,15 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, TrendingUp, Dice5, History, Info, Trophy } from "lucide-react";
+import { Loader2, TrendingUp, Dice5, History, Info, Trophy, Flame } from "lucide-react";
 import {
   runMonteCarlo, runHistoricalBacktest,
   type ClosingResult, type MonteCarloResult, type BacktestResult, type HistoricalDraw,
 } from "@/engine/closing";
+import {
+  LineChart, Line, XAxis, YAxis, Tooltip as RTooltip, CartesianGrid, ResponsiveContainer,
+  ReferenceArea,
+} from "recharts";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useLotteryDraws } from "@/hooks/useLotteryDraws";
