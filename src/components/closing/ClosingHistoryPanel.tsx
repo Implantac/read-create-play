@@ -3,14 +3,14 @@
  * do usuário, expandíveis para revisar parâmetros, métricas e jogos.
  */
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Sparkles, ChevronDown, ChevronUp, Trash2, Loader2, Target, Coins, Shield, Search, FilterX } from "lucide-react";
+import { Sparkles, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Trash2, Loader2, Target, Coins, Shield, Search, FilterX } from "lucide-react";
 import { useClosingHistory, type ClosingHistoryRow } from "@/hooks/useClosingHistory";
 import { formatCurrency } from "@/utils/formatters";
 import { cn } from "@/lib/utils";
@@ -46,6 +46,8 @@ export function ClosingHistoryPanel({ lotteryId }: { lotteryId: string }) {
   const [dateRange, setDateRange] = useState<string>("all");
   const [minScore, setMinScore] = useState<number>(0);
   const [sort, setSort] = useState<SortKey>("date_desc");
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [page, setPage] = useState<number>(1);
 
   const strategiesInHistory = useMemo(() => {
     const set = new Set<string>();
@@ -103,8 +105,21 @@ export function ClosingHistoryPanel({ lotteryId }: { lotteryId: string }) {
     !!search || strategy !== "all" || dateRange !== "all" || minScore > 0 || sort !== "date_desc";
 
   const clearFilters = () => {
-    setSearch(""); setStrategy("all"); setDateRange("all"); setMinScore(0); setSort("date_desc");
+    setSearch(""); setStrategy("all"); setDateRange("all"); setMinScore(0); setSort("date_desc"); setPage(1);
   };
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const pageStart = (currentPage - 1) * pageSize;
+  const paged = filtered.slice(pageStart, pageStart + pageSize);
+
+  // Reset to page 1 when filters change
+  const filterKey = `${search}|${strategy}|${dateRange}|${minScore}|${sort}|${pageSize}`;
+  const lastKeyRef = useRef(filterKey);
+  if (lastKeyRef.current !== filterKey) {
+    lastKeyRef.current = filterKey;
+    if (page !== 1) setTimeout(() => setPage(1), 0);
+  }
 
   if (isLoading) {
     return (
@@ -208,17 +223,55 @@ export function ClosingHistoryPanel({ lotteryId }: { lotteryId: string }) {
             Nenhum fechamento corresponde aos filtros.
           </p>
         ) : (
-          <div className="space-y-2">
-            {filtered.map(row => (
-              <ClosingRow
-                key={row.id}
-                row={row}
-                open={openId === row.id}
-                onToggle={() => setOpenId(openId === row.id ? null : row.id)}
-                onDelete={() => deleteClosing(row.id)}
-              />
-            ))}
-          </div>
+          <>
+            <div className="space-y-2">
+              {paged.map(row => (
+                <ClosingRow
+                  key={row.id}
+                  row={row}
+                  open={openId === row.id}
+                  onToggle={() => setOpenId(openId === row.id ? null : row.id)}
+                  onDelete={() => deleteClosing(row.id)}
+                />
+              ))}
+            </div>
+
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 pt-2 border-t">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span>
+                  {pageStart + 1}–{Math.min(pageStart + pageSize, filtered.length)} de {filtered.length}
+                </span>
+                <Select value={String(pageSize)} onValueChange={(v) => setPageSize(Number(v))}>
+                  <SelectTrigger className="h-7 w-[90px] text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="5">5 / pág</SelectItem>
+                    <SelectItem value="10">10 / pág</SelectItem>
+                    <SelectItem value="20">20 / pág</SelectItem>
+                    <SelectItem value="50">50 / pág</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center gap-1">
+                <Button
+                  size="sm" variant="outline" className="h-7 px-2"
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage <= 1}
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                </Button>
+                <span className="text-xs font-mono px-2">
+                  {currentPage} / {totalPages}
+                </span>
+                <Button
+                  size="sm" variant="outline" className="h-7 px-2"
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage >= totalPages}
+                >
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </div>
+          </>
         )}
       </CardContent>
     </Card>
