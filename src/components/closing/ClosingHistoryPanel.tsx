@@ -3,11 +3,14 @@
  * do usuário, expandíveis para revisar parâmetros, métricas e jogos.
  */
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Sparkles, ChevronDown, ChevronUp, Trash2, Loader2, Target, Coins, Shield } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Sparkles, ChevronDown, ChevronUp, Trash2, Loader2, Target, Coins, Shield, Search, FilterX } from "lucide-react";
 import { useClosingHistory, type ClosingHistoryRow } from "@/hooks/useClosingHistory";
 import { formatCurrency } from "@/utils/formatters";
 import { cn } from "@/lib/utils";
@@ -26,8 +29,83 @@ const fmtDate = (iso: string) => {
 };
 
 export function ClosingHistoryPanel({ lotteryId }: { lotteryId: string }) {
+type SortKey = "date_desc" | "date_asc" | "score_desc" | "games_asc" | "games_desc";
+
+const DATE_RANGES: Record<string, number | null> = {
+  all: null,
+  "7d": 7,
+  "30d": 30,
+  "90d": 90,
+};
+
+export function ClosingHistoryPanel({ lotteryId }: { lotteryId: string }) {
   const { history, isLoading, deleteClosing } = useClosingHistory(lotteryId);
   const [openId, setOpenId] = useState<string | null>(null);
+
+  const [search, setSearch] = useState("");
+  const [strategy, setStrategy] = useState<string>("all");
+  const [dateRange, setDateRange] = useState<string>("all");
+  const [minScore, setMinScore] = useState<number>(0);
+  const [sort, setSort] = useState<SortKey>("date_desc");
+
+  const strategiesInHistory = useMemo(() => {
+    const set = new Set<string>();
+    history.forEach(h => set.add(h.strategy));
+    return Array.from(set);
+  }, [history]);
+
+  const filtered = useMemo(() => {
+    const now = Date.now();
+    const days = DATE_RANGES[dateRange];
+    const cutoff = days ? now - days * 24 * 60 * 60 * 1000 : null;
+    const searchNums = search
+      .split(/[^\d]+/)
+      .map(s => parseInt(s, 10))
+      .filter(n => Number.isFinite(n) && n > 0);
+    const searchLower = search.trim().toLowerCase();
+
+    const out = history.filter(row => {
+      if (strategy !== "all" && row.strategy !== strategy) return false;
+      if (cutoff && new Date(row.created_at).getTime() < cutoff) return false;
+      const overall = row.score?.overall ?? 0;
+      if (overall < minScore) return false;
+
+      if (searchLower) {
+        const baseSet = new Set(row.base_numbers);
+        const matchesNums = searchNums.length > 0 && searchNums.every(n => baseSet.has(n));
+        const matchesText =
+          (STRATEGY_LABELS[row.strategy] ?? row.strategy).toLowerCase().includes(searchLower) ||
+          row.strategy.toLowerCase().includes(searchLower) ||
+          fmtDate(row.created_at).toLowerCase().includes(searchLower);
+        if (!matchesNums && !matchesText) return false;
+      }
+      return true;
+    });
+
+    out.sort((a, b) => {
+      switch (sort) {
+        case "date_asc":
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case "score_desc":
+          return (b.score?.overall ?? 0) - (a.score?.overall ?? 0);
+        case "games_asc":
+          return a.game_count - b.game_count;
+        case "games_desc":
+          return b.game_count - a.game_count;
+        case "date_desc":
+        default:
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+    });
+    return out;
+  }, [history, search, strategy, dateRange, minScore, sort]);
+
+  const hasFilters =
+    !!search || strategy !== "all" || dateRange !== "all" || minScore > 0 || sort !== "date_desc";
+
+  const clearFilters = () => {
+    setSearch(""); setStrategy("all"); setDateRange("all"); setMinScore(0); setSort("date_desc");
+  };
 
   if (isLoading) {
     return (
@@ -60,23 +138,94 @@ export function ClosingHistoryPanel({ lotteryId }: { lotteryId: string }) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="h-5 w-5" /> Fechamentos Salvos
-          <Badge variant="secondary" className="ml-2">{history.length}</Badge>
+          <Badge variant="secondary" className="ml-2">
+            {filtered.length}
+            {filtered.length !== history.length && <span className="opacity-60"> / {history.length}</span>}
+          </Badge>
+          {hasFilters && (
+            <Button size="sm" variant="ghost" onClick={clearFilters} className="ml-auto h-7 px-2 text-xs">
+              <FilterX className="h-3.5 w-3.5 mr-1" /> Limpar
+            </Button>
+          )}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-2">
-        {history.map(row => (
-          <ClosingRow
-            key={row.id}
-            row={row}
-            open={openId === row.id}
-            onToggle={() => setOpenId(openId === row.id ? null : row.id)}
-            onDelete={() => deleteClosing(row.id)}
-          />
-        ))}
+      <CardContent className="space-y-3">
+        <div className="grid gap-2 md:grid-cols-4">
+          <div className="relative md:col-span-2">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por dezena (ex: 5 12 25), estratégia ou data…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+          <Select value={strategy} onValueChange={setStrategy}>
+            <SelectTrigger><SelectValue placeholder="Estratégia" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas as estratégias</SelectItem>
+              {strategiesInHistory.map(s => (
+                <SelectItem key={s} value={s}>{STRATEGY_LABELS[s] ?? s}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={dateRange} onValueChange={setDateRange}>
+            <SelectTrigger><SelectValue placeholder="Período" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Qualquer data</SelectItem>
+              <SelectItem value="7d">Últimos 7 dias</SelectItem>
+              <SelectItem value="30d">Últimos 30 dias</SelectItem>
+              <SelectItem value="90d">Últimos 90 dias</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-2 items-center">
+          <div>
+            <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+              <span>Nota mínima</span>
+              <span className="font-mono font-semibold text-foreground">{minScore}</span>
+            </div>
+            <Slider
+              min={0} max={100} step={5}
+              value={[minScore]}
+              onValueChange={([v]) => setMinScore(v)}
+            />
+          </div>
+          <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="date_desc">Mais recentes</SelectItem>
+              <SelectItem value="date_asc">Mais antigos</SelectItem>
+              <SelectItem value="score_desc">Maior nota</SelectItem>
+              <SelectItem value="games_asc">Menos jogos</SelectItem>
+              <SelectItem value="games_desc">Mais jogos</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {filtered.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-6 text-center">
+            Nenhum fechamento corresponde aos filtros.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {filtered.map(row => (
+              <ClosingRow
+                key={row.id}
+                row={row}
+                open={openId === row.id}
+                onToggle={() => setOpenId(openId === row.id ? null : row.id)}
+                onDelete={() => deleteClosing(row.id)}
+              />
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
 }
+
 
 function ClosingRow({
   row, open, onToggle, onDelete,
