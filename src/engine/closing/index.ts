@@ -29,4 +29,13 @@ export type {
   ConstraintContext,
   ConstraintFilterResult,
 } from "./constraints";
+export {
+  CLASSIC_CLOSINGS,
+  filterClassicClosings,
+} from "./library/classicClosings";
+export type {
+  ClassicClosing,
+  ClassicComplexityFilter,
+  Complexity as ClassicComplexity,
+} from "./library/classicClosings";
 
