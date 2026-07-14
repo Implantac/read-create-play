@@ -11,7 +11,7 @@ import {
 import type { ConstraintContext } from "@/engine/closing/constraints/types";
 
 const ctx: ConstraintContext = {
-  lottery: { id: "lotofacil", totalNumbers: 25, pick: 15, ticketPrice: 3 },
+  lottery: { id: "lotofacil", name: "Lotofácil", totalNumbers: 25, pick: 15, ticketPrice: 3 },
 };
 
 describe("constraints/builtins", () => {
