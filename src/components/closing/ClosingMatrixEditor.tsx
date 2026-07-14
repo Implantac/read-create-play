@@ -101,8 +101,8 @@ export function ClosingMatrixEditor({
     if (bad > 0) {
       toast.warning(`${bad} jogos com números fora da base — validação parcial.`);
     }
-    const cov = calculateCoverage(idxGames, activeBase.length, pick, pick);
-    const v = validateClosing(idxGames, activeBase.length, pick, pick, cov);
+    const cov = calculateCoverage(idxGames, activeBase.length, pick);
+    const v = validateClosing(idxGames, activeBase.length, pick, pick);
     toast.info(`Validação: garantia real ${v.guaranteedHits}, cobertura ${v.coveragePercent.toFixed(1)}%.`);
   };
 
