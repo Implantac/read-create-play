@@ -20,6 +20,7 @@ import { ClosingDashboardPanel } from "@/components/closing/ClosingDashboardPane
 import { ClosingExportPanel } from "@/components/closing/ClosingExportPanel";
 import { ClosingConstraintsPanel } from "@/components/closing/ClosingConstraintsPanel";
 import { ClosingLibraryPanel, type ClosingLibraryApply } from "@/components/closing/ClosingLibraryPanel";
+import { ClosingMatrixEditor } from "@/components/closing/ClosingMatrixEditor";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -340,6 +341,15 @@ const FechamentoUniversalPage = () => {
             );
           }
         }}
+      />
+
+      <ClosingMatrixEditor
+        lotteryId={config.id}
+        lotteryName={config.name}
+        pick={pick}
+        totalNumbers={total}
+        initialGames={result?.games}
+        initialBase={result?.request.baseNumbers}
       />
 
       {comparison && <ComparisonPanel results={comparison} onPick={(r) => setResult(r)} />}

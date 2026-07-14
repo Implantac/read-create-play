@@ -296,10 +296,13 @@ export type Database = {
           max_games: number | null
           min_hits: number
           notes: string[] | null
+          parent_id: string | null
           score: Json
+          source: string
           strategy: string
           user_id: string
           validation: Json
+          version: number
         }
         Insert: {
           base_numbers: number[]
@@ -315,10 +318,13 @@ export type Database = {
           max_games?: number | null
           min_hits: number
           notes?: string[] | null
+          parent_id?: string | null
           score?: Json
+          source?: string
           strategy: string
           user_id: string
           validation?: Json
+          version?: number
         }
         Update: {
           base_numbers?: number[]
@@ -334,12 +340,23 @@ export type Database = {
           max_games?: number | null
           min_hits?: number
           notes?: string[] | null
+          parent_id?: string | null
           score?: Json
+          source?: string
           strategy?: string
           user_id?: string
           validation?: Json
+          version?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "closing_history_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "closing_history"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       generation_history: {
         Row: {
