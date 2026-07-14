@@ -11,11 +11,15 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, TrendingUp, Dice5, History, Info, Trophy } from "lucide-react";
+import { Loader2, TrendingUp, Dice5, History, Info, Trophy, Flame } from "lucide-react";
 import {
   runMonteCarlo, runHistoricalBacktest,
   type ClosingResult, type MonteCarloResult, type BacktestResult, type HistoricalDraw,
 } from "@/engine/closing";
+import {
+  LineChart, Line, XAxis, YAxis, Tooltip as RTooltip, CartesianGrid, ResponsiveContainer,
+  ReferenceArea,
+} from "recharts";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useLotteryDraws } from "@/hooks/useLotteryDraws";
@@ -56,6 +60,7 @@ export function ClosingDashboardPanel({ result, prizeTiers }: Props) {
           drawSize: result.request.lottery.pick,
           trials,
           targetHits: result.validation.targetMinHits,
+          captureHeatmap: true,
         });
         setMc(r);
       } finally { setRunningMC(false); }
@@ -160,14 +165,54 @@ export function ClosingDashboardPanel({ result, prizeTiers }: Props) {
 function MCResults({ mc }: { mc: MonteCarloResult }) {
   const dist = Object.entries(mc.distribution).sort(([a], [b]) => Number(b) - Number(a));
   const maxCount = Math.max(...dist.map(([, c]) => c));
+  const ciLow = mc.hitRateCI95[0];
+  const ciHigh = mc.hitRateCI95[1];
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatBox label="Trials" value={formatNumber(mc.trials)} />
-        <StatBox label="Hit-rate ≥ meta" value={`${mc.hitRate.toFixed(2)}%`} accent />
+        <StatBox
+          label="Hit-rate ≥ meta"
+          value={`${mc.hitRate.toFixed(2)}%`}
+          accent
+          hint={`IC 95%: ${ciLow.toFixed(2)}% – ${ciHigh.toFixed(2)}%`}
+        />
         <StatBox label="Média de acertos" value={mc.meanHits.toFixed(2)} />
         <StatBox label="Melhor / pior" value={`${mc.bestHits} / ${mc.worstHits}`} />
       </div>
+
+      {mc.convergence.length > 1 && (
+        <div>
+          <p className="text-sm font-semibold mb-2">Curva de convergência (hit-rate ao longo dos trials)</p>
+          <div className="h-56 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={mc.convergence} margin={{ top: 8, right: 12, left: 0, bottom: 8 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                <XAxis dataKey="trial" tick={{ fontSize: 10 }}
+                  tickFormatter={(v) => formatNumber(v as number)} />
+                <YAxis tick={{ fontSize: 10 }} domain={["auto", "auto"]}
+                  tickFormatter={(v) => `${(v as number).toFixed(1)}%`} />
+                <RTooltip
+                  formatter={(v: number | string, name) =>
+                    name === "hitRate"
+                      ? [`${Number(v).toFixed(3)}%`, "Hit-rate"]
+                      : [Number(v).toFixed(2), "Média acertos"]
+                  }
+                  labelFormatter={(l) => `Trial ${formatNumber(l as number)}`}
+                />
+                <ReferenceArea y1={ciLow} y2={ciHigh} fill="hsl(var(--primary))" fillOpacity={0.08} />
+                <Line type="monotone" dataKey="hitRate" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            Faixa sombreada = IC 95% (Wilson) da estimativa final.
+          </p>
+        </div>
+      )}
+
+      {mc.heatmap && Object.keys(mc.heatmap).length > 0 && <MCHeatmap heatmap={mc.heatmap} trials={mc.trials} />}
+
       <div>
         <p className="text-sm font-semibold mb-2">Distribuição de acertos (melhor jogo por sorteio)</p>
         <div className="space-y-1.5">
@@ -189,6 +234,46 @@ function MCResults({ mc }: { mc: MonteCarloResult }) {
         </div>
       </div>
       <p className="text-xs text-muted-foreground">Simulado em {mc.elapsedMs}ms.</p>
+    </div>
+  );
+}
+
+function MCHeatmap({ heatmap, trials }: { heatmap: Record<number, number>; trials: number }) {
+  const entries = Object.entries(heatmap)
+    .map(([n, c]) => ({ n: Number(n), c }))
+    .sort((a, b) => a.n - b.n);
+  if (entries.length === 0) return null;
+  const max = Math.max(...entries.map(e => e.c));
+  const min = Math.min(...entries.map(e => e.c));
+  const range = Math.max(1, max - min);
+  return (
+    <div>
+      <p className="text-sm font-semibold mb-2 flex items-center gap-1">
+        <Flame className="h-4 w-4 text-orange-500" />
+        Heatmap por dezena — frequência nos sorteios simulados
+      </p>
+      <div className="grid grid-cols-10 gap-1">
+        {entries.map(({ n, c }) => {
+          const intensity = (c - min) / range;
+          const pct = (c / trials) * 100;
+          return (
+            <div
+              key={n}
+              title={`Dezena ${n}: ${pct.toFixed(2)}%`}
+              className="aspect-square rounded flex items-center justify-center text-[10px] font-mono font-semibold border"
+              style={{
+                background: `hsl(var(--primary) / ${0.12 + intensity * 0.75})`,
+                color: intensity > 0.55 ? "hsl(var(--primary-foreground))" : "hsl(var(--foreground))",
+              }}
+            >
+              {n}
+            </div>
+          );
+        })}
+      </div>
+      <p className="text-xs text-muted-foreground mt-1">
+        Cores mais quentes = dezena apareceu com mais frequência nos {formatNumber(trials)} sorteios simulados.
+      </p>
     </div>
   );
 }
@@ -246,8 +331,8 @@ function BTResults({ bt }: { bt: BacktestResult }) {
 }
 
 function StatBox({
-  label, value, accent, highlight,
-}: { label: string; value: string; accent?: boolean; highlight?: "green" | "red" }) {
+  label, value, accent, highlight, hint,
+}: { label: string; value: string; accent?: boolean; highlight?: "green" | "red"; hint?: string }) {
   return (
     <div className="rounded-lg border bg-muted/20 p-3">
       <p className="text-xs text-muted-foreground">{label}</p>
@@ -257,6 +342,7 @@ function StatBox({
         highlight === "green" && "text-green-500",
         highlight === "red" && "text-red-500",
       )}>{value}</p>
+      {hint && <p className="text-[10px] text-muted-foreground mt-1 font-mono">{hint}</p>}
     </div>
   );
 }
