@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Sparkles, ChevronDown, ChevronUp, Trash2, Loader2, Target, Coins, Shield, Search, FilterX } from "lucide-react";
+import { Sparkles, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Trash2, Loader2, Target, Coins, Shield, Search, FilterX } from "lucide-react";
 import { useClosingHistory, type ClosingHistoryRow } from "@/hooks/useClosingHistory";
 import { formatCurrency } from "@/utils/formatters";
 import { cn } from "@/lib/utils";
