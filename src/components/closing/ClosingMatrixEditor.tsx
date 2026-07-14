@@ -20,7 +20,7 @@ import {
   type ClosingFileFormat,
 } from "@/engine/closing/io/parsers";
 import type { ClosingMatrix } from "@/engine/closing/io/ClosingMatrixSchema";
-import { validateClosing, calculateCoverage } from "@/engine/closing";
+import { validateClosing } from "@/engine/closing";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Props {
@@ -101,7 +101,6 @@ export function ClosingMatrixEditor({
     if (bad > 0) {
       toast.warning(`${bad} jogos com números fora da base — validação parcial.`);
     }
-    const cov = calculateCoverage(idxGames, activeBase.length, pick);
     const v = validateClosing(idxGames, activeBase.length, pick, pick);
     toast.info(`Validação: garantia real ${v.guaranteedHits}, cobertura ${v.coveragePercent.toFixed(1)}%.`);
   };
