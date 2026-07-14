@@ -218,6 +218,30 @@ export function ClosingHistoryPanel({ lotteryId }: { lotteryId: string }) {
           </Select>
         </div>
 
+        <div className="flex flex-wrap items-center gap-2 text-xs rounded-md border bg-muted/30 px-3 py-2">
+          <span className="text-muted-foreground">Resultados:</span>
+          <span className="font-mono font-semibold text-foreground">{filtered.length}</span>
+          {filtered.length !== history.length && (
+            <span className="text-muted-foreground">de {history.length} arquivados</span>
+          )}
+          <span className="text-muted-foreground mx-1">·</span>
+          <span className="text-muted-foreground">Páginas:</span>
+          <span className="font-mono font-semibold text-foreground">
+            {filtered.length === 0 ? 0 : totalPages}
+          </span>
+          {filtered.length > 0 && (
+            <>
+              <span className="text-muted-foreground mx-1">·</span>
+              <span className="text-muted-foreground">Página atual:</span>
+              <span className="font-mono font-semibold text-foreground">{currentPage}</span>
+            </>
+          )}
+          {hasFilters && (
+            <Badge variant="outline" className="ml-auto text-[10px]">filtros ativos</Badge>
+          )}
+        </div>
+
+
         {filtered.length === 0 ? (
           <p className="text-sm text-muted-foreground py-6 text-center">
             Nenhum fechamento corresponde aos filtros.
