@@ -105,8 +105,21 @@ export function ClosingHistoryPanel({ lotteryId }: { lotteryId: string }) {
     !!search || strategy !== "all" || dateRange !== "all" || minScore > 0 || sort !== "date_desc";
 
   const clearFilters = () => {
-    setSearch(""); setStrategy("all"); setDateRange("all"); setMinScore(0); setSort("date_desc");
+    setSearch(""); setStrategy("all"); setDateRange("all"); setMinScore(0); setSort("date_desc"); setPage(1);
   };
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const pageStart = (currentPage - 1) * pageSize;
+  const paged = filtered.slice(pageStart, pageStart + pageSize);
+
+  // Reset to page 1 when filters change
+  const filterKey = `${search}|${strategy}|${dateRange}|${minScore}|${sort}|${pageSize}`;
+  const lastKeyRef = useRef(filterKey);
+  if (lastKeyRef.current !== filterKey) {
+    lastKeyRef.current = filterKey;
+    if (page !== 1) setTimeout(() => setPage(1), 0);
+  }
 
   if (isLoading) {
     return (
