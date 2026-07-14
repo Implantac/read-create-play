@@ -38,4 +38,15 @@ export type {
   ClassicComplexityFilter,
   Complexity as ClassicComplexity,
 } from "./library/classicClosings";
+export {
+  parseClosingFile,
+  serializeClosingFile,
+  downloadBlob,
+  type ClosingFileFormat,
+} from "./io/parsers";
+export {
+  ClosingMatrixSchema,
+  normalizeMatrix,
+  type ClosingMatrix,
+} from "./io/ClosingMatrixSchema";
 
