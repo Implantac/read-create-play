@@ -17,3 +17,16 @@ export { runMonteCarlo, type MonteCarloResult, type MonteCarloOptions } from "./
 export { runHistoricalBacktest, type BacktestResult, type BacktestOptions, type HistoricalDraw, type DrawOutcome } from "./simulation/HistoricalBacktest";
 export { schonheimBound, binomial, combinations } from "./core/combinatorics";
 export { computeScore } from "./scoring/ScoreEngine";
+export {
+  applyConstraints,
+  CONSTRAINT_REGISTRY,
+  CONSTRAINT_LIST,
+  CONSTRAINT_PRESETS,
+} from "./constraints";
+export type {
+  ConstraintDefinition,
+  ActiveConstraint,
+  ConstraintContext,
+  ConstraintFilterResult,
+} from "./constraints";
+
