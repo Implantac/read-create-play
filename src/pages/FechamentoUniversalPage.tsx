@@ -21,6 +21,7 @@ import { ClosingExportPanel } from "@/components/closing/ClosingExportPanel";
 import { ClosingConstraintsPanel } from "@/components/closing/ClosingConstraintsPanel";
 import { ClosingLibraryPanel, type ClosingLibraryApply } from "@/components/closing/ClosingLibraryPanel";
 import { ClosingMatrixEditor } from "@/components/closing/ClosingMatrixEditor";
+import { ClosingAIRecommendationPanel } from "@/components/closing/ClosingAIRecommendationPanel";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
