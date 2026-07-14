@@ -70,7 +70,7 @@ describe("io/parsers", () => {
   it("serializeClosingFile devolve Blob + filename", async () => {
     const out = await serializeClosingFile(baseMatrix, "csv");
     expect(out.filename).toMatch(/\.csv$/);
-    const text = await out.blob.text();
+    const text = await blobText(out.blob);
     expect(text).toContain("01,02,03");
   });
 });
