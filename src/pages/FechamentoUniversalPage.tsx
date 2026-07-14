@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sparkles, Target, Shield, Coins, Play, Loader2, Info, Trophy, GitCompare } from "lucide-react";
 import { calculateGuarantee, type ClosingResult, type ClosingStrategy } from "@/engine/closing";
 import { useClosingWorker } from "@/hooks/useClosingWorker";
+import { ClosingDashboardPanel } from "@/components/closing/ClosingDashboardPanel";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
