@@ -1,0 +1,163 @@
+/**
+ * ClosingExportPanel — Fase 4: exportação e persistência.
+ * - Exporta jogos em CSV, TXT ou JSON.
+ * - Copia para clipboard.
+ * - Salva todos os jogos em saved_bets (com limite do plano).
+ */
+
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Download, Copy, Save, FileJson, FileText, FileSpreadsheet, Loader2, Check } from "lucide-react";
+import type { ClosingResult } from "@/engine/closing";
+import { useSavedBets } from "@/hooks/useSavedBets";
+import { useLotteryContext } from "@/contexts/LotteryContext";
+import { toast } from "sonner";
+
+interface Props {
+  result: ClosingResult;
+}
+
+export function ClosingExportPanel({ result }: Props) {
+  const { config } = useLotteryContext();
+  const { saveBet, remaining, isAtLimit } = useSavedBets(config.id);
+  const [savingAll, setSavingAll] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [savedCount, setSavedCount] = useState(0);
+
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  const strategyLabel = result.strategy;
+
+  const toTXT = () =>
+    result.games.map((g, i) => `#${i + 1}\t${g.map(pad).join("  ")}`).join("\n");
+
+  const toCSV = () => {
+    const header = ["jogo", ...Array.from({ length: result.request.lottery.pick }, (_, i) => `n${i + 1}`)].join(",");
+    const rows = result.games.map((g, i) => [i + 1, ...g].join(","));
+    return [header, ...rows].join("\n");
+  };
+
+  const toJSON = () =>
+    JSON.stringify(
+      {
+        lottery: result.request.lottery,
+        strategy: result.strategy,
+        guarantee: result.request.guarantee,
+        gameCount: result.gameCount,
+        cost: result.cost,
+        validation: result.validation,
+        score: result.score,
+        games: result.games,
+        generatedAt: new Date().toISOString(),
+      },
+      null,
+      2,
+    );
+
+  const download = (content: string, ext: "txt" | "csv" | "json") => {
+    const mime = ext === "json" ? "application/json" : ext === "csv" ? "text/csv" : "text/plain";
+    const blob = new Blob([content], { type: `${mime};charset=utf-8` });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `fechamento-${config.id}-${strategyLabel}-${result.gameCount}jogos.${ext}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success(`Exportado como .${ext}`);
+  };
+
+  const copyAll = async () => {
+    try {
+      await navigator.clipboard.writeText(toTXT());
+      setCopied(true);
+      toast.success("Jogos copiados!");
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      toast.error("Falha ao copiar.");
+    }
+  };
+
+  const saveAll = async () => {
+    if (isAtLimit) {
+      toast.error("Limite de jogos salvos atingido no seu plano.");
+      return;
+    }
+    setSavingAll(true);
+    setSavedCount(0);
+    const toSave = result.games.slice(0, remaining);
+    let ok = 0;
+    for (let i = 0; i < toSave.length; i++) {
+      const success = await saveBet({
+        numbers: toSave[i],
+        strategy: `fechamento:${result.strategy}`,
+        score: result.score.overall,
+        grade: result.score.overall >= 90 ? "S" : result.score.overall >= 75 ? "A" : result.score.overall >= 60 ? "B" : "C",
+        label: `Fechamento #${i + 1}/${result.gameCount}`,
+      });
+      if (success) ok++;
+      setSavedCount(ok);
+    }
+    setSavingAll(false);
+    if (ok > 0) toast.success(`${ok} jogo(s) salvos em Meus Jogos.`);
+    if (ok < result.games.length) {
+      toast.warning(`${result.games.length - ok} não salvo(s) — limite do plano.`);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Download className="h-5 w-5" />
+          Exportar & Salvar
+          <Badge variant="secondary" className="ml-auto">
+            {result.gameCount} jogos
+          </Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          <Button variant="outline" size="sm" onClick={() => download(toTXT(), "txt")}>
+            <FileText className="h-4 w-4 mr-1" /> TXT
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => download(toCSV(), "csv")}>
+            <FileSpreadsheet className="h-4 w-4 mr-1" /> CSV
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => download(toJSON(), "json")}>
+            <FileJson className="h-4 w-4 mr-1" /> JSON
+          </Button>
+          <Button variant="outline" size="sm" onClick={copyAll}>
+            {copied ? <Check className="h-4 w-4 mr-1 text-green-500" /> : <Copy className="h-4 w-4 mr-1" />}
+            Copiar
+          </Button>
+        </div>
+
+        <div className="flex items-center justify-between rounded-lg border bg-muted/20 p-3">
+          <div className="text-sm">
+            <p className="font-semibold">Salvar em Meus Jogos</p>
+            <p className="text-xs text-muted-foreground">
+              {isAtLimit
+                ? "Limite do plano atingido."
+                : `Serão salvos até ${Math.min(remaining, result.gameCount)} de ${result.gameCount} jogos.`}
+            </p>
+          </div>
+          <Button size="sm" onClick={saveAll} disabled={savingAll || isAtLimit}>
+            {savingAll ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                {savedCount}/{Math.min(remaining, result.gameCount)}
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-1" /> Salvar todos
+              </>
+            )}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
