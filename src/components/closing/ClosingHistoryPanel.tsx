@@ -293,6 +293,22 @@ export function ClosingHistoryPanel({ lotteryId }: { lotteryId: string }) {
                 >
                   <ChevronRight className="h-3.5 w-3.5" />
                 </Button>
+                {totalPages > 1 && (
+                  <div className="flex items-center gap-1 ml-2 pl-2 border-l">
+                    <span className="text-xs text-muted-foreground">Ir para</span>
+                    <Select
+                      value={String(currentPage)}
+                      onValueChange={(v) => setPage(Number(v))}
+                    >
+                      <SelectTrigger className="h-7 w-[70px] text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent className="max-h-60">
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                          <SelectItem key={p} value={String(p)}>{p}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
             </div>
           </>
