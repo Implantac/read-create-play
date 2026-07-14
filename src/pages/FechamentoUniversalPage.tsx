@@ -10,22 +10,44 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Sparkles, Target, Shield, Coins, Play, Loader2, Info } from "lucide-react";
-import { generateClosing, calculateGuarantee, type ClosingResult } from "@/engine/closing";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sparkles, Target, Shield, Coins, Play, Loader2, Info, Trophy, GitCompare } from "lucide-react";
+import { calculateGuarantee, type ClosingResult, type ClosingStrategy } from "@/engine/closing";
+import { useClosingWorker } from "@/hooks/useClosingWorker";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+
+const STRATEGY_LABELS: Record<ClosingStrategy, string> = {
+  greedy: "Guloso (Chvátal)",
+  hill_climbing: "Hill Climbing",
+  simulated_annealing: "Simulated Annealing",
+  genetic: "Algoritmo Genético",
+  covering_design: "Covering Design",
+  beam_search: "Beam Search",
+  backtracking: "Backtracking",
+  branch_and_bound: "Branch & Bound",
+  monte_carlo: "Monte Carlo",
+  hybrid: "Híbrido",
+};
+
+const COMPARE_SET: ClosingStrategy[] = ["greedy", "hill_climbing", "simulated_annealing", "genetic", "covering_design"];
 
 const FechamentoUniversalPage = () => {
   const { config } = useLotteryContext();
   const pick = config.pick;
   const total = config.numbers;
+  const { generate, compare } = useClosingWorker();
 
   const [baseNumbers, setBaseNumbers] = useState<number[]>([]);
   const [minHits, setMinHits] = useState<number>(Math.max(1, pick - 1));
   const [maxGames, setMaxGames] = useState<number>(0);
+  const [strategy, setStrategy] = useState<ClosingStrategy>("greedy");
   const [generating, setGenerating] = useState(false);
+  const [comparing, setComparing] = useState(false);
   const [result, setResult] = useState<ClosingResult | null>(null);
+  const [comparison, setComparison] = useState<ClosingResult[] | null>(null);
 
   const toggle = (n: number) => {
     setBaseNumbers(prev => prev.includes(n) ? prev.filter(x => x !== n) : [...prev, n].sort((a, b) => a - b));
@@ -38,56 +60,59 @@ const FechamentoUniversalPage = () => {
 
   const canGenerate = baseNumbers.length >= pick && minHits >= 1 && minHits <= pick;
 
-  const runGenerate = () => {
-    if (!canGenerate) {
-      toast.error(`Selecione ao menos ${pick} dezenas.`);
-      return;
-    }
+  const buildRequest = () => ({
+    lottery: { id: config.id, name: config.name, totalNumbers: total, pick, ticketPrice: 3 },
+    baseNumbers,
+    guarantee: { hitsInBase: pick, minHits },
+    maxGames: maxGames > 0 ? maxGames : undefined,
+    strategy,
+    kind: "guaranteed" as const,
+  });
+
+  const runGenerate = async () => {
+    if (!canGenerate) { toast.error(`Selecione ao menos ${pick} dezenas.`); return; }
     setGenerating(true);
     setResult(null);
-    // desatrela do main thread pra UI atualizar antes do trabalho pesado
-    setTimeout(() => {
-      try {
-        const r = generateClosing({
-          lottery: {
-            id: config.id, name: config.name,
-            totalNumbers: total, pick,
-            ticketPrice: 3, // TODO Fase 4: preços por modalidade
-          },
-          baseNumbers,
-          guarantee: { hitsInBase: pick, minHits },
-          maxGames: maxGames > 0 ? maxGames : undefined,
-          strategy: "greedy",
-          kind: "guaranteed",
-        });
-        setResult(r);
-        if (r.games.length === 0) {
-          toast.error(r.notes[0] || "Não foi possível gerar o fechamento.");
-        } else if (r.validation.meetsGuarantee) {
-          toast.success(`Fechamento gerado: ${r.games.length} jogos, garantia ${r.validation.guaranteedHits} acertos.`);
-        } else {
-          toast.warning(`Gerado com ${r.games.length} jogos, mas garantia real ${r.validation.guaranteedHits} < meta ${minHits}.`);
-        }
-      } catch (e) {
-        console.error(e);
-        toast.error("Erro ao gerar fechamento.");
-      } finally {
-        setGenerating(false);
-      }
-    }, 60);
+    setComparison(null);
+    try {
+      const r = await generate({ ...buildRequest(), strategy });
+      setResult(r);
+      if (r.games.length === 0) toast.error(r.notes[0] || "Falha ao gerar.");
+      else if (r.validation.meetsGuarantee) toast.success(`${r.games.length} jogos · garantia ${r.validation.guaranteedHits}.`);
+      else toast.warning(`${r.games.length} jogos, garantia real ${r.validation.guaranteedHits} < meta ${minHits}.`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao gerar.");
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const runCompare = async () => {
+    if (!canGenerate) { toast.error(`Selecione ao menos ${pick} dezenas.`); return; }
+    setComparing(true);
+    setComparison(null);
+    setResult(null);
+    try {
+      const rs = await compare(buildRequest(), COMPARE_SET);
+      setComparison(rs);
+      toast.success(`Comparação concluída: vencedor ${STRATEGY_LABELS[rs[0].strategy]}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro na comparação.");
+    } finally {
+      setComparing(false);
+    }
   };
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Motor Universal de Fechamentos"
-        description="Gerador matemático dinâmico — Greedy + Cobertura + Validação"
+        description="Greedy · Hill Climbing · SA · Genético · Covering Design — validados matematicamente"
         icon={Sparkles}
       />
       <LotteryContextBanner />
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Seleção de dezenas */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -119,9 +144,7 @@ const FechamentoUniversalPage = () => {
               })}
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
-              <Button size="sm" variant="outline" onClick={() => setBaseNumbers([])}>
-                Limpar
-              </Button>
+              <Button size="sm" variant="outline" onClick={() => setBaseNumbers([])}>Limpar</Button>
               <Button size="sm" variant="outline" onClick={() => {
                 const rand = new Set<number>();
                 while (rand.size < Math.min(pick + 3, total)) rand.add(Math.floor(Math.random() * total) + 1);
@@ -133,7 +156,6 @@ const FechamentoUniversalPage = () => {
           </CardContent>
         </Card>
 
-        {/* Parâmetros */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -150,7 +172,7 @@ const FechamentoUniversalPage = () => {
                 onChange={e => setMinHits(Math.max(1, Math.min(pick, Number(e.target.value) || 1)))}
               />
               <p className="text-xs text-muted-foreground mt-1">
-                Se {pick} dezenas caírem na sua base, ao menos um jogo terá ≥ {minHits} acertos.
+                Se {pick} dezenas caírem na base, ao menos um jogo terá ≥ {minHits} acertos.
               </p>
             </div>
             <div>
@@ -160,6 +182,17 @@ const FechamentoUniversalPage = () => {
                 value={maxGames}
                 onChange={e => setMaxGames(Math.max(0, Number(e.target.value) || 0))}
               />
+            </div>
+            <div>
+              <Label>Estratégia</Label>
+              <Select value={strategy} onValueChange={(v) => setStrategy(v as ClosingStrategy)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {COMPARE_SET.map(s => (
+                    <SelectItem key={s} value={s}>{STRATEGY_LABELS[s]}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {bounds && (
@@ -179,9 +212,16 @@ const FechamentoUniversalPage = () => {
               </div>
             )}
 
-            <Button onClick={runGenerate} disabled={!canGenerate || generating} className="w-full">
-              {generating ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Gerando...</> : <><Play className="h-4 w-4 mr-2" /> Gerar fechamento</>}
-            </Button>
+            <div className="grid grid-cols-2 gap-2">
+              <Button onClick={runGenerate} disabled={!canGenerate || generating || comparing}>
+                {generating ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Play className="h-4 w-4 mr-1" />}
+                Gerar
+              </Button>
+              <Button variant="secondary" onClick={runCompare} disabled={!canGenerate || generating || comparing}>
+                {comparing ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <GitCompare className="h-4 w-4 mr-1" />}
+                Comparar
+              </Button>
+            </div>
 
             {!canGenerate && (
               <Alert variant="default" className="text-xs">
@@ -193,25 +233,83 @@ const FechamentoUniversalPage = () => {
         </Card>
       </div>
 
-      {/* Resultado */}
-      {result && result.games.length > 0 && (
-        <ResultPanel result={result} />
-      )}
+      {comparison && <ComparisonPanel results={comparison} onPick={(r) => setResult(r)} />}
+      {result && result.games.length > 0 && <ResultPanel result={result} />}
     </div>
   );
 };
 
+function ComparisonPanel({ results, onPick }: { results: ClosingResult[]; onPick: (r: ClosingResult) => void }) {
+  const winner = results[0];
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Trophy className="h-5 w-5 text-amber-500" />
+          Comparação de Estratégias
+          <Badge variant="secondary" className="ml-2">
+            Vencedor: {STRATEGY_LABEL(winner.strategy)}
+          </Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="text-xs text-muted-foreground border-b">
+              <tr>
+                <th className="text-left py-2 px-2">Estratégia</th>
+                <th className="text-right py-2 px-2">Nota</th>
+                <th className="text-right py-2 px-2">Jogos</th>
+                <th className="text-right py-2 px-2">Garantia</th>
+                <th className="text-right py-2 px-2">Cobertura</th>
+                <th className="text-right py-2 px-2">Custo</th>
+                <th className="text-right py-2 px-2">Tempo</th>
+                <th className="py-2 px-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {results.map((r, i) => (
+                <tr key={r.strategy} className={cn("border-b hover:bg-muted/30", i === 0 && "bg-amber-500/5")}>
+                  <td className="py-2 px-2 font-medium">
+                    {i === 0 && <Trophy className="inline h-3 w-3 mr-1 text-amber-500" />}
+                    {STRATEGY_LABEL(r.strategy)}
+                  </td>
+                  <td className="text-right py-2 px-2 font-mono font-semibold">{r.score.overall}</td>
+                  <td className="text-right py-2 px-2 font-mono">{r.gameCount}</td>
+                  <td className={cn("text-right py-2 px-2 font-mono", r.validation.meetsGuarantee ? "text-green-500" : "text-amber-500")}>
+                    {r.validation.guaranteedHits}
+                  </td>
+                  <td className="text-right py-2 px-2 font-mono">{r.validation.coveragePercent.toFixed(1)}%</td>
+                  <td className="text-right py-2 px-2 font-mono">{formatCurrency(r.cost)}</td>
+                  <td className="text-right py-2 px-2 font-mono text-muted-foreground">{r.elapsedMs}ms</td>
+                  <td className="text-right py-2 px-2">
+                    <Button size="sm" variant="ghost" onClick={() => onPick(r)}>Ver</Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function STRATEGY_LABEL(s: ClosingStrategy): string {
+  return STRATEGY_LABELS[s] ?? s;
+}
+
 function ResultPanel({ result }: { result: ClosingResult }) {
   const v = result.validation;
   const s = result.score;
-
   return (
     <div className="space-y-4">
-      {/* Score */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span className="flex items-center gap-2"><Sparkles className="h-5 w-5" /> Fechamento gerado</span>
+            <span className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5" /> {STRATEGY_LABEL(result.strategy)}
+            </span>
             <Badge className="text-lg" variant={s.overall >= 80 ? "default" : "secondary"}>
               Nota {s.overall}
             </Badge>
@@ -224,9 +322,7 @@ function ResultPanel({ result }: { result: ClosingResult }) {
             <Stat label="Garantia real" value={`${v.guaranteedHits} acertos`} sub={`meta: ${v.targetMinHits}`} ok={v.meetsGuarantee} />
             <Stat label="Cobertura" value={`${v.coveragePercent.toFixed(1)}%`} sub={v.exhaustive ? "exaustiva" : "amostrada"} />
           </div>
-
           <Separator className="my-4" />
-
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm">
             <ScoreBar label="Cobertura" value={s.coverage} />
             <ScoreBar label="Eficiência" value={s.efficiency} />
@@ -234,7 +330,6 @@ function ResultPanel({ result }: { result: ClosingResult }) {
             <ScoreBar label="Não-redundância" value={s.redundancy} />
             <ScoreBar label="Tempo" value={s.time} />
           </div>
-
           {result.notes.length > 0 && (
             <div className="mt-4 space-y-1">
               {result.notes.map((n, i) => (
@@ -247,57 +342,58 @@ function ResultPanel({ result }: { result: ClosingResult }) {
         </CardContent>
       </Card>
 
-      {/* Distribuição */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Distribuição de acertos (pior caso por cenário)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {Object.entries(v.distribution)
-              .sort(([a], [b]) => Number(b) - Number(a))
-              .map(([hits, count]) => {
-                const pct = (count / v.testedScenarios) * 100;
-                return (
-                  <div key={hits} className="flex items-center gap-3 text-sm">
-                    <span className="w-24 font-mono">{hits} acertos</span>
-                    <Progress value={pct} className="flex-1" />
-                    <span className="w-20 text-right text-muted-foreground">{count} ({pct.toFixed(1)}%)</span>
+      <Tabs defaultValue="games">
+        <TabsList>
+          <TabsTrigger value="games">Jogos ({result.gameCount})</TabsTrigger>
+          <TabsTrigger value="dist">Distribuição de acertos</TabsTrigger>
+        </TabsList>
+        <TabsContent value="games">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="space-y-2 max-h-[500px] overflow-auto">
+                {result.games.map((g, i) => (
+                  <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-muted/30">
+                    <span className="text-xs font-mono text-muted-foreground w-8">#{i + 1}</span>
+                    <div className="flex flex-wrap gap-1">
+                      {g.map(n => (
+                        <span key={n} className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-xs font-mono font-semibold">
+                          {n.toString().padStart(2, "0")}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                );
-              })}
-          </div>
-          <p className="text-xs text-muted-foreground mt-3">
-            Testados {formatNumber(v.testedScenarios)} cenários {v.exhaustive ? "(exaustivo)" : "(amostrado)"}.
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Jogos */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span className="flex items-center gap-2"><Coins className="h-5 w-5" /> Jogos ({result.gameCount})</span>
-            <span className="text-sm text-muted-foreground">{result.elapsedMs}ms</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2 max-h-[500px] overflow-auto">
-            {result.games.map((g, i) => (
-              <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-muted/30">
-                <span className="text-xs font-mono text-muted-foreground w-8">#{i + 1}</span>
-                <div className="flex flex-wrap gap-1">
-                  {g.map(n => (
-                    <span key={n} className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-xs font-mono font-semibold">
-                      {n.toString().padStart(2, "0")}
-                    </span>
-                  ))}
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              <p className="text-xs text-muted-foreground mt-3 flex items-center gap-2">
+                <Coins className="h-3 w-3" /> Gerado em {result.elapsedMs}ms · {result.gameCount} jogos · {formatCurrency(result.cost)}
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="dist">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="space-y-2">
+                {Object.entries(v.distribution)
+                  .sort(([a], [b]) => Number(b) - Number(a))
+                  .map(([hits, count]) => {
+                    const pct = (count / v.testedScenarios) * 100;
+                    return (
+                      <div key={hits} className="flex items-center gap-3 text-sm">
+                        <span className="w-24 font-mono">{hits} acertos</span>
+                        <Progress value={pct} className="flex-1" />
+                        <span className="w-24 text-right text-muted-foreground">{count} ({pct.toFixed(1)}%)</span>
+                      </div>
+                    );
+                  })}
+              </div>
+              <p className="text-xs text-muted-foreground mt-3">
+                Testados {formatNumber(v.testedScenarios)} cenários {v.exhaustive ? "(exaustivo)" : "(amostrado)"}.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
