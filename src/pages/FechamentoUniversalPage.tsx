@@ -108,6 +108,11 @@ const FechamentoUniversalPage = () => {
       const rs = await compare(buildRequest(), COMPARE_SET);
       setComparison(rs);
       toast.success(`Comparação concluída: vencedor ${STRATEGY_LABELS[rs[0].strategy]}`);
+      if (rs[0] && rs[0].games.length > 0) {
+        saveClosing(rs[0]).then(ok => {
+          if (ok) toast.info("Fechamento vencedor salvo em Meus Jogos.", { duration: 2500 });
+        });
+      }
     } catch (e) {
       if (e instanceof ClosingCanceledError) toast.info("Comparação cancelada.");
       else toast.error(e instanceof Error ? e.message : "Erro na comparação.");
