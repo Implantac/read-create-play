@@ -320,6 +320,8 @@ const FechamentoUniversalPage = () => {
         </Card>
       </div>
 
+      <ClosingConstraintsPanel value={constraints} onChange={setConstraints} />
+
       {comparison && <ComparisonPanel results={comparison} onPick={(r) => setResult(r)} />}
       {result && result.games.length > 0 && <ResultPanel result={result} />}
       {result && result.games.length > 0 && <ClosingExportPanel result={result} />}
