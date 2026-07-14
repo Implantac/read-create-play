@@ -16,6 +16,7 @@ import { Sparkles, Target, Shield, Coins, Play, Loader2, Info, Trophy, GitCompar
 import { calculateGuarantee, type ClosingResult, type ClosingStrategy } from "@/engine/closing";
 import { useClosingWorker } from "@/hooks/useClosingWorker";
 import { ClosingDashboardPanel } from "@/components/closing/ClosingDashboardPanel";
+import { ClosingExportPanel } from "@/components/closing/ClosingExportPanel";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -236,6 +237,7 @@ const FechamentoUniversalPage = () => {
 
       {comparison && <ComparisonPanel results={comparison} onPick={(r) => setResult(r)} />}
       {result && result.games.length > 0 && <ResultPanel result={result} />}
+      {result && result.games.length > 0 && <ClosingExportPanel result={result} />}
       {result && result.games.length > 0 && <ClosingDashboardPanel result={result} />}
     </div>
   );
