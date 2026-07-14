@@ -53,6 +53,7 @@ const FechamentoUniversalPage = () => {
   const [comparing, setComparing] = useState(false);
   const [result, setResult] = useState<ClosingResult | null>(null);
   const [comparison, setComparison] = useState<ClosingResult[] | null>(null);
+  const [constraints, setConstraints] = useState<ActiveConstraint[]>([]);
 
   const toggle = (n: number) => {
     setBaseNumbers(prev => prev.includes(n) ? prev.filter(x => x !== n) : [...prev, n].sort((a, b) => a - b));
