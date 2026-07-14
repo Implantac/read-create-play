@@ -69,7 +69,7 @@ export function ClosingDashboardPanel({ result, prizeTiers }: Props) {
       try {
         const historic: HistoricalDraw[] = drawsData
           .slice(0, drawLimit)
-          .map(d => ({ contest: d.contest, date: d.date, numbers: d.numbers }));
+          .map(d => ({ contest: d.concurso, date: d.date, numbers: d.numbers }));
         const r = runHistoricalBacktest({
           games: result.games,
           draws: historic,
