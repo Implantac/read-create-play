@@ -10,7 +10,16 @@ const opts = {
 } as const;
 
 function fileFrom(content: string, name: string): File {
-  return new File([content], name, { type: "text/plain" });
+  return {
+    name,
+    async text() { return content; },
+    async arrayBuffer() { return new TextEncoder().encode(content).buffer; },
+  } as unknown as File;
+}
+
+async function blobText(blob: Blob): Promise<string> {
+  const buf = await new Response(blob).text();
+  return buf;
 }
 
 const baseMatrix: ClosingMatrix = {
