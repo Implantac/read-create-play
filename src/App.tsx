@@ -17,6 +17,7 @@ import { AutoInstallPrompt } from "@/components/pwa/AutoInstallPrompt";
 const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
 const GeradorPage = lazy(() => import("@/pages/GeradorPage"));
 const FechamentosPage = lazy(() => import("@/pages/FechamentosPage"));
+const FechamentoUniversalPage = lazy(() => import("@/pages/FechamentoUniversalPage"));
 const AnaliseCentralPage = lazy(() => import("@/pages/AnaliseCentralPage"));
 const HistoricoUnificadoPage = lazy(() => import("@/pages/HistoricoUnificadoPage"));
 const PerfilPage = lazy(() => import("@/pages/PerfilPage"));
