@@ -235,6 +235,7 @@ const FechamentoUniversalPage = () => {
 
       {comparison && <ComparisonPanel results={comparison} onPick={(r) => setResult(r)} />}
       {result && result.games.length > 0 && <ResultPanel result={result} />}
+      {result && result.games.length > 0 && <ClosingDashboardPanel result={result} />}
     </div>
   );
 };

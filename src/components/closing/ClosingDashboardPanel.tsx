@@ -36,7 +36,7 @@ const DEFAULT_TIERS: Record<string, Record<number, number>> = {
 
 export function ClosingDashboardPanel({ result, prizeTiers }: Props) {
   const { config } = useLotteryContext();
-  const { data: drawsData } = useLotteryDraws(config.id);
+  const { draws: drawsData } = useLotteryDraws(config.id);
   const [mc, setMc] = useState<MonteCarloResult | null>(null);
   const [bt, setBt] = useState<BacktestResult | null>(null);
   const [trials, setTrials] = useState(100_000);
