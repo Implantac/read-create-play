@@ -133,7 +133,8 @@ const FechamentoUniversalPage = () => {
     setComparison(null);
     setResult(null);
     try {
-      const rs = await compare(buildRequest(), COMPARE_SET);
+      const rsRaw = await compare(buildRequest(), COMPARE_SET);
+      const rs = rsRaw.map(applyFilters);
       setComparison(rs);
       toast.success(`Comparação concluída: vencedor ${STRATEGY_LABELS[rs[0].strategy]}`);
       if (rs[0] && rs[0].games.length > 0) {
