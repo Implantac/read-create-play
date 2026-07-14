@@ -1,103 +1,74 @@
 
-# Motor Universal de Fechamentos — Plano de Implementação
+# Fase 3 — Motor Universal de Fechamentos
 
-Este é um módulo grande. Proponho entregar em **4 fases incrementais**, cada uma funcional e testável. Antes de codar, quero confirmar escopo e prioridades com você.
+Extensão do que já existe (`src/engine/closing/*`, `MonteCarloEngine`, `HistoricalBacktest`, worker assíncrono, `closing_history`, `FechamentoUniversalPage`). Nada será recriado — só adicionado ou reforçado sobre a arquitetura atual, respeitando a regra de memória "NEVER recreate features".
 
----
+## Entregas (em 4 ondas)
 
-## Visão
+### Onda 1 — Constraint Solver + Fechamentos temáticos
+Novo módulo `src/engine/closing/constraints/` plugável no `ClosingEngine`:
+- `ConstraintSolver.ts`: aplica filtros no espaço de jogos gerados por qualquer gerador.
+- Constraints puros: `parityConstraint`, `sumConstraint`, `primesConstraint`, `fibonacciConstraint`, `multiplesConstraint`, `frameCoreConstraint` (moldura/miolo, genérico via `lotteryProfiles`), `rowsColsConstraint`, `groupsConstraint`, `excludedNumbersConstraint`.
+- Constraints estatísticos (usam `statisticsEngine` existente): `frequencyConstraint`, `delayConstraint`.
+- Presets prontos: Econômico, Garantido, Balanceado, Híbrido, "Por IA" (delegam para o `AIRecommendationEngine` da Onda 4).
+- UI: novo painel `ClosingConstraintsPanel` em `FechamentoUniversalPage` com abas (Geométrico / Aritmético / Estatístico), toggles e sliders.
 
-Um motor matemático genérico (`ClosingEngine`) que gera fechamentos **dinamicamente** para qualquer loteria, sem depender de matrizes fixas em banco. Configurado apenas por parâmetros (`totalNumbers`, `pick`, `guarantee`, `budget`).
+### Onda 2 — Biblioteca de fechamentos clássicos
+- `src/engine/closing/library/classicClosings.ts`: catálogo de metadados (17x8, 18x12, 19x5, 19x20, 20x25, 21x50, 22x100, 23x200, 24x400 e equivalentes para Mega/Quina/Lotomania), cada entrada com `{ base, min_hits, games, coverage, complexity, origin, applicableLotteries[] }`.
+- Não guarda matrizes — cada preset apenas dispara `ClosingEngine.generate()` com os parâmetros exatos. Assim continua tudo dinâmico.
+- Componente `ClosingLibraryPanel` (lista consultável, filtros por modalidade/garantia/custo, botão "Aplicar preset").
 
-Arquitetura hexagonal: **core matemático puro** (sem React, sem Supabase) + **adapters** (UI, workers, API).
+### Onda 3 — Editor visual + Import/Export universal
+- `src/engine/closing/io/`: `parsers/{csv,txt,json,xml,xlsx}.ts` + `serializers/*` + `ClosingMatrixSchema.ts` (validação Zod).
+- Componente `ClosingMatrixEditor`: grid editável (linhas = jogos, colunas = dezenas), duplicar/reordenar/versionar em `closing_history` (adiciona coluna `parent_id` via migração para linhagem).
+- Botões: Importar (aceita `.csv .txt .json .xml .xlsx`), Exportar (mesmos formatos + PDF via `jspdf` existente).
+- Validação usa o `ValidationEngine` atual antes de salvar.
 
+### Onda 4 — AG/MC reforçados + AIRecommendationEngine
+- `GeneticOptimizer.ts` (upgrade): fitness multi-objetivo (cobertura + diversidade Jaccard + redundância + peso estatístico + score IA), elitismo N=2, torneio, mutação adaptativa, parada por estagnação, seed opcional.
+- `MonteCarloEngine.ts` (upgrade): curva de convergência, IC 95%, heatmap por dezena, distribuição de acertos, exportação dos dados brutos.
+- `src/engine/closing/ai/AIRecommendationEngine.ts`: recebe `{ baseNumbers, lotteryId, historicalDraws, budget?, riskProfile? }` e retorna `{ strategy, minHits, maxGames, expectedCoverage, expectedROI, rationale[] }`. Consulta Lovable AI (`google/gemini-3-flash-preview`) via edge function nova `supabase/functions/ai-closing-recommendation` para gerar rationale em português; heurística local cobre fallback offline (Elite = maior cobertura, Free = menor custo, etc.).
+- Painel `ClosingAIRecommendationPanel`: card com sugestão + explicabilidade + botão "Aplicar recomendação".
+
+## Detalhes técnicos
+
+**Arquitetura**
 ```text
-src/engine/closing/
-├── core/                    # Domínio puro
-│   ├── types.ts             # ClosingRequest, ClosingResult, Coverage, Score
-│   ├── ClosingEngine.ts     # Facade/orquestrador
-│   └── config.ts            # Parâmetros por modalidade (deriva de LOTTERIES)
-├── generators/
-│   ├── GreedyOptimizer.ts
-│   ├── GeneticOptimizer.ts
-│   ├── SimulatedAnnealing.ts
-│   ├── HillClimbing.ts
-│   ├── BeamSearch.ts
-│   ├── Backtracking.ts
-│   ├── BranchAndBound.ts
-│   └── CoveringDesignEngine.ts  # Schönheim bound + construções conhecidas
-├── validation/
-│   ├── CoverageCalculator.ts    # C(k,t) real vs teórico
-│   ├── ValidationEngine.ts      # garantia, cobertura, redundância
-│   └── ConstraintSolver.ts
-├── scoring/
-│   ├── ScoreEngine.ts           # 0-100 multi-critério
-│   ├── ProbabilityEngine.ts
-│   └── StatisticsAnalyzer.ts
-├── simulation/
-│   ├── MonteCarloEngine.ts
-│   └── HistoricalBacktest.ts
-├── ai/
-│   └── AIRecommendationEngine.ts
-└── filters/                     # Filtros de tipos de fechamento
-    ├── frameMioloFilter.ts, parityFilter.ts, sumFilter.ts,
-    └── primesFilter.ts, fibonacciFilter.ts, delayFilter.ts, ...
-
-src/workers/closing.worker.ts    # Roda GA/MC fora da main thread
-src/pages/FechamentoUniversalPage.tsx
-src/components/closing/          # UI: wizard, dashboard, editor, backtest
+ClosingEngine (existente)
+  ├─ generators/           [existente: Greedy, HC, SA, Genetic, CoveringDesign]
+  ├─ core/CoverEval        [existente]
+  ├─ simulation/           [existente: MonteCarlo, HistoricalBacktest]
+  ├─ constraints/          [NOVO — Onda 1]
+  ├─ library/              [NOVO — Onda 2]
+  ├─ io/                   [NOVO — Onda 3]
+  └─ ai/                   [NOVO — Onda 4]
 ```
 
-Toda a UI consome o motor via API pública:
-`generateClosing`, `validateClosing`, `simulateClosing`, `calculateCoverage`, `optimizeClosing`, `calculateGuarantee`, `compareClosings`.
+**Contrato do ConstraintSolver**
+```ts
+type Constraint = {
+  id: string;
+  label: string;
+  test: (game: number[], ctx: ConstraintContext) => boolean;
+};
+solver.filter(games, activeConstraints) → { kept, rejected, stats }
+```
+Roda depois do gerador; se sobrar menos que `maxGames`, aciona re-geração automática com pesos ajustados (loop máximo de 3 tentativas para não travar).
 
----
+**Banco**
+- Migração única (Onda 3): adiciona `parent_id uuid`, `version int default 1`, `source text` em `closing_history`, mantém RLS e grants existentes.
 
-## Fases
+**Performance**
+- Constraints e AG rodam no `closing.worker.ts` já existente (progresso e cancelamento já funcionam).
+- Parsers XLSX via `xlsx` (lazy import) só no editor.
 
-### Fase 1 — Núcleo matemático + Greedy + Validação (MVP funcional)
-- Tipos, `ClosingEngine` facade, config por modalidade.
-- `CoverageCalculator` (cobertura t-cover exata para pequenos, amostragem para grandes).
-- `GreedyOptimizer` com t-cover (algoritmo clássico de set cover) — já produz fechamentos utilizáveis.
-- `ValidationEngine` (garantia matemática, cobertura %, redundância, eficiência).
-- `ScoreEngine` v1 (cobertura, diversidade, redundância, eficiência).
-- Página `Fechamentos` refeita com wizard: escolhe loteria → escolhe dezenas → define garantia → gera → mostra jogos + score + validação.
-- Testes unitários dos algoritmos-chave.
+**Testes**
+- Vitest para: cada constraint (input/output determinístico), `ConstraintSolver` (composição AND), `classicClosings` (metadados coerentes), parsers (round-trip CSV/JSON), fitness do AG (monotonicidade).
 
-### Fase 2 — Otimização avançada + Workers
-- `GeneticOptimizer` completo (população, fitness, crossover, mutação, elitismo, parada adaptativa).
-- `SimulatedAnnealing`, `HillClimbing`, `BeamSearch`.
-- `CoveringDesignEngine` com Schönheim lower bound e construções recursivas.
-- Web Worker para GA/SA/MC (não trava UI).
-- Comparação lado-a-lado de estratégias (Greedy vs GA vs SA).
+## Fora do escopo desta fase
+- Substituir motores existentes (respeita memória "NEVER recreate features").
+- Alterar API pública já usada pela `FechamentoUniversalPage`.
+- Matrizes fixas em BD (proibido pela especificação).
 
-### Fase 3 — Simulação + Backtest histórico + Dashboard
-- `MonteCarloEngine` (milhões de simulações, distribuição de acertos, convergência).
-- `HistoricalBacktest` sobre últimos 50/100/500/1000/todos concursos usando `lottery_draws`.
-- Dashboard executivo: cobertura, garantia, ROI, heatmap de acertos, ranking, gráficos (Recharts já no projeto).
-- Filtros de tipos de fechamento (moldura, miolo, pares/ímpares, soma, primos, Fibonacci, atraso, frequência).
-
-### Fase 4 — IA + Biblioteca + Editor + Import/Export
-- `AIRecommendationEngine`: recomenda melhor fechamento por perfil (custo/benefício, risco, retorno histórico) usando Lovable AI Gateway apenas para explicações, com decisão numérica em código.
-- Biblioteca de fechamentos clássicos (17x8, 18x12, 19x20, 20x25, 21x50 etc.) — **gerados on-demand pelo próprio motor**, não hardcoded.
-- Editor visual de matrizes: criar, editar, duplicar, versionar. Persistência em nova tabela `user_closings` (RLS por usuário).
-- Import/Export: CSV, TXT, JSON, XLSX (usa `xlsx` já no projeto).
-
----
-
-## Perguntas de escopo antes de começar
-
-1. **Ponto de partida da UI**: substituir a atual `FechamentosPage` ou criar rota nova `/fechamento-universal` e manter a antiga como legado?
-2. **Persistência**: os fechamentos gerados devem ser salváveis por usuário (nova tabela `user_closings`)? Isso vira Fase 4, mas quero confirmar.
-3. **Prioridade do MVP**: fecha na Fase 1 (Greedy + validação usável em produção) ou você prefere que eu emende Fase 1+2 num único envio para já ter GA?
-4. **Escopo desta primeira entrega**: começo pela Fase 1 completa nesta rodada?
-
----
-
-## Notas técnicas
-
-- Todo o core é **TypeScript puro sem dependências de React/Supabase** — testável isoladamente, portável para worker.
-- Uso `LOTTERIES` de `src/data/lotteries.ts` e `LOTTERY_RULES` de `src/ai/knowledge/lotteriesKnowledge.ts` como fonte de parâmetros. Nada específico por loteria no motor.
-- Reaproveito `src/engine/wheeling/coverageValidator.ts` e `src/engine/lottery-wheels.ts` onde couber (refatorando, não duplicando).
-- Workers seguem o padrão de `src/workers/monte-carlo.worker.ts`.
-- Sem alterações em endpoints de API existentes (respeitando a memória do projeto).
+## Ordem de execução
+Onda 1 → 2 → 3 → 4, cada onda em um turno separado com validação de build entre elas. Prossigo com a Onda 1 na aprovação.
