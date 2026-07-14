@@ -117,6 +117,7 @@ const AppContent = () => {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/gerador" element={<GeradorPage />} />
           <Route path="/fechamentos" element={<FechamentosPage />} />
+          <Route path="/fechamento-universal" element={<FechamentoUniversalPage />} />
           <Route path="/analise" element={<AnaliseCentralPage />} />
           <Route path="/historico" element={<HistoricoUnificadoPage />} />
           <Route path="/ia-chat" element={<AIChatPage />} />
