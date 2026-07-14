@@ -331,8 +331,8 @@ function BTResults({ bt }: { bt: BacktestResult }) {
 }
 
 function StatBox({
-  label, value, accent, highlight,
-}: { label: string; value: string; accent?: boolean; highlight?: "green" | "red" }) {
+  label, value, accent, highlight, hint,
+}: { label: string; value: string; accent?: boolean; highlight?: "green" | "red"; hint?: string }) {
   return (
     <div className="rounded-lg border bg-muted/20 p-3">
       <p className="text-xs text-muted-foreground">{label}</p>
@@ -342,6 +342,7 @@ function StatBox({
         highlight === "green" && "text-green-500",
         highlight === "red" && "text-red-500",
       )}>{value}</p>
+      {hint && <p className="text-[10px] text-muted-foreground mt-1 font-mono">{hint}</p>}
     </div>
   );
 }
