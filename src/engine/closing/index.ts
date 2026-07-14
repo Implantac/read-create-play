@@ -5,6 +5,7 @@
 export * from "./core/types";
 export {
   generateClosing,
+  compareStrategies,
   calculateGuarantee,
   compareClosings,
   calculateCoverageForGames,
