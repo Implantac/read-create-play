@@ -28,7 +28,6 @@ const fmtDate = (iso: string) => {
   return d.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
 };
 
-export function ClosingHistoryPanel({ lotteryId }: { lotteryId: string }) {
 type SortKey = "date_desc" | "date_asc" | "score_desc" | "games_asc" | "games_desc";
 
 const DATE_RANGES: Record<string, number | null> = {
