@@ -281,6 +281,66 @@ export type Database = {
         }
         Relationships: []
       }
+      closing_history: {
+        Row: {
+          base_numbers: number[]
+          cost: number
+          created_at: string
+          elapsed_ms: number | null
+          game_count: number
+          games: Json
+          id: string
+          lottery_id: string
+          lottery_name: string | null
+          lower_bound: number | null
+          max_games: number | null
+          min_hits: number
+          notes: string[] | null
+          score: Json
+          strategy: string
+          user_id: string
+          validation: Json
+        }
+        Insert: {
+          base_numbers: number[]
+          cost?: number
+          created_at?: string
+          elapsed_ms?: number | null
+          game_count: number
+          games: Json
+          id?: string
+          lottery_id: string
+          lottery_name?: string | null
+          lower_bound?: number | null
+          max_games?: number | null
+          min_hits: number
+          notes?: string[] | null
+          score?: Json
+          strategy: string
+          user_id: string
+          validation?: Json
+        }
+        Update: {
+          base_numbers?: number[]
+          cost?: number
+          created_at?: string
+          elapsed_ms?: number | null
+          game_count?: number
+          games?: Json
+          id?: string
+          lottery_id?: string
+          lottery_name?: string | null
+          lower_bound?: number | null
+          max_games?: number | null
+          min_hits?: number
+          notes?: string[] | null
+          score?: Json
+          strategy?: string
+          user_id?: string
+          validation?: Json
+        }
+        Relationships: []
+      }
       generation_history: {
         Row: {
           created_at: string
