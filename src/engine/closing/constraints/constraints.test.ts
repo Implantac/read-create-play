@@ -12,6 +12,7 @@ import type { ConstraintContext } from "@/engine/closing/constraints/types";
 
 const ctx: ConstraintContext = {
   lottery: { id: "lotofacil", name: "Lotofácil", totalNumbers: 25, pick: 15, ticketPrice: 3 },
+  baseNumbers: Array.from({ length: 25 }, (_, i) => i + 1),
 };
 
 describe("constraints/builtins", () => {
