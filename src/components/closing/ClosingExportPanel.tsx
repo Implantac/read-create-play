@@ -112,6 +112,9 @@ export function ClosingExportPanel({ result }: Props) {
     doc.text(`Titan Loterias — pagina ${doc.getNumberOfPages()}`, w - 40, doc.internal.pageSize.getHeight() - 20, { align: "right" });
     doc.save(`fechamento-${config.id}-${result.strategy}-${result.gameCount}jogos.pdf`);
     toast.success("PDF exportado");
+  };
+
+
 
   const saveAll = async () => {
     if (isAtLimit) {
