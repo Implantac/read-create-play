@@ -82,6 +82,37 @@ export function ClosingExportPanel({ result }: Props) {
     }
   };
 
+  const downloadPDF = () => {
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const w = doc.internal.pageSize.getWidth();
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text(`Fechamento — ${result.request.lottery.name}`, 40, 50);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(90);
+    const info = [
+      `Estrategia: ${result.strategy}`,
+      `Jogos: ${result.gameCount}   Custo: R$ ${result.cost.toFixed(2)}`,
+      `Garantia: ${result.request.guarantee.minHits} acertos se ${result.request.guarantee.hitsInBase} cairem na base de ${result.request.baseNumbers.length}`,
+      `Score: ${result.score.overall}/100   Gerado em ${new Date().toLocaleString("pt-BR")}`,
+    ];
+    info.forEach((t, i) => doc.text(t, 40, 70 + i * 14));
+    autoTable(doc, {
+      startY: 140,
+      head: [["#", ...Array.from({ length: result.request.lottery.pick }, (_, i) => `N${i + 1}`)]],
+      body: result.games.map((g, i) => [i + 1, ...g.map(pad)]),
+      styles: { font: "helvetica", fontSize: 10, halign: "center", cellPadding: 4 },
+      headStyles: { fillColor: [30, 30, 40], textColor: 255 },
+      alternateRowStyles: { fillColor: [245, 245, 250] },
+      margin: { left: 40, right: 40 },
+    });
+    doc.setFontSize(8);
+    doc.setTextColor(120);
+    doc.text(`Titan Loterias — pagina ${doc.getNumberOfPages()}`, w - 40, doc.internal.pageSize.getHeight() - 20, { align: "right" });
+    doc.save(`fechamento-${config.id}-${result.strategy}-${result.gameCount}jogos.pdf`);
+    toast.success("PDF exportado");
+
   const saveAll = async () => {
     if (isAtLimit) {
       toast.error("Limite de jogos salvos atingido no seu plano.");
