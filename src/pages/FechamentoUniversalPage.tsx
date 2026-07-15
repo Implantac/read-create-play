@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
@@ -22,6 +23,8 @@ import { ClosingConstraintsPanel } from "@/components/closing/ClosingConstraints
 import { ClosingLibraryPanel, type ClosingLibraryApply } from "@/components/closing/ClosingLibraryPanel";
 import { ClosingMatrixEditor } from "@/components/closing/ClosingMatrixEditor";
 import { ClosingAIRecommendationPanel } from "@/components/closing/ClosingAIRecommendationPanel";
+import { ClosingConferencePanel } from "@/components/closing/ClosingConferencePanel";
+import { ClosingHistoryPanel } from "@/components/closing/ClosingHistoryPanel";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -57,6 +60,21 @@ const FechamentoUniversalPage = () => {
   const [result, setResult] = useState<ClosingResult | null>(null);
   const [comparison, setComparison] = useState<ClosingResult[] | null>(null);
   const [constraints, setConstraints] = useState<ActiveConstraint[]>([]);
+
+  // Recebe base vinda do Gerador (via navigate state)
+  const location = useLocation();
+  useEffect(() => {
+    const state = location.state as { baseNumbers?: number[]; fromGerador?: boolean } | null;
+    if (state?.baseNumbers?.length) {
+      const clean = [...new Set(state.baseNumbers)].filter(n => n >= 1 && n <= total).sort((a, b) => a - b);
+      setBaseNumbers(clean);
+      if (state.fromGerador) {
+        toast.success(`${clean.length} dezenas importadas do Gerador.`);
+      }
+      window.history.replaceState({}, "");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const toggle = (n: number) => {
     setBaseNumbers(prev => prev.includes(n) ? prev.filter(x => x !== n) : [...prev, n].sort((a, b) => a - b));
@@ -367,7 +385,29 @@ const FechamentoUniversalPage = () => {
       {comparison && <ComparisonPanel results={comparison} onPick={(r) => setResult(r)} />}
       {result && result.games.length > 0 && <ResultPanel result={result} />}
       {result && result.games.length > 0 && <ClosingExportPanel result={result} />}
+      {result && result.games.length > 0 && <ClosingConferencePanel result={result} />}
       {result && result.games.length > 0 && <ClosingDashboardPanel result={result} />}
+
+      <ClosingHistoryPanel
+        lotteryId={config.id}
+        onReopen={(r) => {
+          setResult(r);
+          setBaseNumbers(r.request.baseNumbers);
+          setMinHits(r.request.guarantee.minHits);
+          setMaxGames(r.request.maxGames ?? 0);
+          setStrategy(r.strategy);
+          toast.success("Fechamento reaberto.");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+        onDuplicate={(p) => {
+          setBaseNumbers(p.baseNumbers);
+          setMinHits(p.minHits);
+          setMaxGames(p.maxGames);
+          setStrategy(p.strategy);
+          toast.success("Parametros carregados. Clique em Gerar para reprocessar.");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
     </div>
   );
 };
