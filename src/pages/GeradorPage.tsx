@@ -32,6 +32,7 @@ const GeradorPage = () => {
   const { saveBet } = useSavedBets(selectedLottery);
   const { saveGeneration } = useGenerationHistory(selectedLottery);
   const location = useLocation();
+  const navigate = useNavigate();
   
   const [step, setStep] = useState(1);
   const [strategy, setStrategy] = useState<string>("balance");
