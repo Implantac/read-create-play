@@ -16,8 +16,8 @@ import { ptBR } from "date-fns/locale";
 
 interface Props {
   lotteryId: string;
-  onReopen: (result: ClosingResult) => void;
-  onDuplicate: (params: { baseNumbers: number[]; minHits: number; maxGames: number; strategy: ClosingStrategy }) => void;
+  onReopen?: (result: ClosingResult) => void;
+  onDuplicate?: (params: { baseNumbers: number[]; minHits: number; maxGames: number; strategy: ClosingStrategy }) => void;
 }
 
 function rowToResult(row: ClosingHistoryRow): ClosingResult {
