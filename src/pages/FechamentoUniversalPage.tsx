@@ -41,6 +41,7 @@ import { ClosingFixedExcludedPanel } from "@/components/closing/ClosingFixedExcl
 import { ClosingSensitivityPanel } from "@/components/closing/ClosingSensitivityPanel";
 import { ClosingProExportPanel } from "@/components/closing/ClosingProExportPanel";
 import { ClosingExecutiveSummaryPanel } from "@/components/closing/ClosingExecutiveSummaryPanel";
+import { ClosingProbabilityPanel } from "@/components/closing/ClosingProbabilityPanel";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -421,6 +422,7 @@ const FechamentoUniversalPage = () => {
       />
 
       {(result || comparison) && <ClosingExecutiveSummaryPanel result={result} comparison={comparison} />}
+      {result && result.games.length > 0 && <ClosingProbabilityPanel result={result} />}
       {comparison && <ClosingStrategyMatrixPanel results={comparison} onPick={(r) => setResult(r)} />}
       {comparison && <ComparisonPanel results={comparison} onPick={(r) => setResult(r)} />}
       {result && result.games.length > 0 && <ResultPanel result={result} />}
