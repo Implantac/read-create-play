@@ -28,6 +28,10 @@ import { ClosingHistoryPanel } from "@/components/closing/ClosingHistoryPanel";
 import { ClosingRankingPanel } from "@/components/closing/ClosingRankingPanel";
 import { ClosingBaseSuggestionPanel } from "@/components/closing/ClosingBaseSuggestionPanel";
 import { ClosingTicketPanel } from "@/components/closing/ClosingTicketPanel";
+import { ClosingROISimulatorPanel } from "@/components/closing/ClosingROISimulatorPanel";
+import { ClosingProgressivePanel } from "@/components/closing/ClosingProgressivePanel";
+import { ClosingStrategyMatrixPanel } from "@/components/closing/ClosingStrategyMatrixPanel";
+import { ClosingBolaoPanel } from "@/components/closing/ClosingBolaoPanel";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -396,9 +400,22 @@ const FechamentoUniversalPage = () => {
         }}
       />
 
+      {comparison && <ClosingStrategyMatrixPanel results={comparison} onPick={(r) => setResult(r)} />}
       {comparison && <ComparisonPanel results={comparison} onPick={(r) => setResult(r)} />}
       {result && result.games.length > 0 && <ResultPanel result={result} />}
+      {result && result.games.length > 0 && <ClosingROISimulatorPanel result={result} />}
+      {result && result.games.length > 0 && (
+        <ClosingProgressivePanel
+          result={result}
+          onAdoptFinalBase={(base) => {
+            setBaseNumbers(base);
+            toast.success(`Base atualizada com ${base.length} dezenas.`);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        />
+      )}
       {result && result.games.length > 0 && <ClosingRankingPanel result={result} />}
+      {result && result.games.length > 0 && <ClosingBolaoPanel result={result} />}
       {result && result.games.length > 0 && <ClosingTicketPanel result={result} />}
       {result && result.games.length > 0 && <ClosingExportPanel result={result} />}
       {result && result.games.length > 0 && <ClosingConferencePanel result={result} />}
