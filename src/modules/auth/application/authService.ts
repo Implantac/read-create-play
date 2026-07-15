@@ -6,6 +6,6 @@
  * `@/features/auth/services/*` em novas migrações.
  */
 export {
-  loadUserProfile,
+  checkAdminStatus,
   syncSubscriptionPlan,
 } from "@/features/auth/services/auth-queries";
