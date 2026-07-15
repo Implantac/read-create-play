@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { isCustomerPortalResponse } from "@/core/contracts";
+import { openCustomerPortal } from "@/modules/subscriptions/application/subscriptionService";
 import { useTheme } from "next-themes";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -53,12 +53,9 @@ export default function PerfilPage() {
   const handleManageSubscription = async () => {
     setOpeningPortal(true);
     try {
-      const { data, error } = await supabase.functions.invoke("customer-portal", {
-        headers: { Authorization: `Bearer ${session?.access_token}` },
-      });
-      if (error) throw error;
-      if (isCustomerPortalResponse(data) && data.url) {
-        window.open(data.url, "_blank");
+      const result = await openCustomerPortal(session?.access_token);
+      if (result?.url) {
+        window.open(result.url, "_blank");
       } else {
         throw new Error("URL do portal não recebida");
       }
