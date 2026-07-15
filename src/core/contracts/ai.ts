@@ -16,10 +16,10 @@ export type {
   ScoredGame,
   WheelingResult,
   SimulationResult,
-  NumberStats,
-  DrawResult,
-  LotteryConfig,
 } from "@/ai/core/aiTypes";
+
+export type { DrawResult, LotteryConfig } from "@/data/lotteries";
+export type { NumberStats } from "@/engine/stats/statistics";
 
 export {
   isAIRequest,
