@@ -176,7 +176,20 @@ export function ClosingDashboardPanel({ result, prizeTiers }: Props) {
                     {runningBT ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <History className="h-4 w-4 mr-1" />}
                     Backtest
                   </Button>
+                  {runningBT && (
+                    <Button variant="outline" size="icon" onClick={btWorker.cancel} title="Cancelar">
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
+                {runningBT && (
+                  <div className="space-y-1">
+                    <Progress value={btPct} />
+                    <p className="text-xs text-muted-foreground font-mono">
+                      {formatNumber(btWorker.progress.current)} / {formatNumber(btWorker.progress.total)} concursos
+                    </p>
+                  </div>
+                )}
                 {bt && <BTResults bt={bt} />}
               </>
             )}
