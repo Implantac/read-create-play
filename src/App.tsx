@@ -48,6 +48,7 @@ const PlanilhasMatrizPage = lazy(() => import("@/pages/PlanilhasMatrizPage"));
 const ROIDashboardPage = lazy(() => import("@/pages/ROIDashboardPage"));
 const SimulacoesPage = lazy(() => import("@/pages/SimulacoesPage"));
 const StrategyLabPage = lazy(() => import("@/pages/StrategyLabPage"));
+const ClosingSharePage = lazy(() => import("@/pages/ClosingSharePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 
