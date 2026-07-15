@@ -46,46 +46,55 @@ export function ClosingDashboardPanel({ result, prizeTiers }: Props) {
   const [bt, setBt] = useState<BacktestResult | null>(null);
   const [trials, setTrials] = useState(100_000);
   const [drawLimit, setDrawLimit] = useState(500);
-  const [runningMC, setRunningMC] = useState(false);
-  const [runningBT, setRunningBT] = useState(false);
+
+  const mcWorker = useMonteCarloWorker();
+  const btWorker = useBacktestWorker();
 
   const tiers = prizeTiers ?? DEFAULT_TIERS[config.id] ?? {};
 
-  const runMC = () => {
-    setRunningMC(true);
-    setTimeout(() => {
-      try {
-        const r = runMonteCarlo({
+  const runMC = async () => {
+    try {
+      const r = await mcWorker.run(
+        {
           games: result.games,
           totalNumbers: result.request.lottery.totalNumbers,
           drawSize: result.request.lottery.pick,
           trials,
           targetHits: result.validation.targetMinHits,
           captureHeatmap: true,
-        });
-        setMc(r);
-      } finally { setRunningMC(false); }
-    }, 40);
+        },
+        20,
+      );
+      setMc(r);
+    } catch (e) {
+      if (!(e instanceof MonteCarloCanceledError)) console.error(e);
+    }
   };
 
-  const runBT = () => {
+  const runBT = async () => {
     if (!drawsData || drawsData.length === 0) return;
-    setRunningBT(true);
-    setTimeout(() => {
-      try {
-        const historic: HistoricalDraw[] = drawsData
-          .slice(0, drawLimit)
-          .map(d => ({ contest: d.concurso, date: d.date, numbers: d.numbers }));
-        const r = runHistoricalBacktest({
-          games: result.games,
-          draws: historic,
-          ticketPrice: result.request.lottery.ticketPrice,
-          prizeTiers: tiers,
-        });
-        setBt(r);
-      } finally { setRunningBT(false); }
-    }, 40);
+    try {
+      const historic: HistoricalDraw[] = drawsData
+        .slice(0, drawLimit)
+        .map(d => ({ contest: d.concurso, date: d.date, numbers: d.numbers }));
+      const r = await btWorker.run({
+        games: result.games,
+        draws: historic,
+        ticketPrice: result.request.lottery.ticketPrice,
+        prizeTiers: tiers,
+      });
+      setBt(r);
+    } catch (e) {
+      if (!(e instanceof BacktestCanceledError)) console.error(e);
+    }
   };
+
+  const runningMC = mcWorker.running;
+  const runningBT = btWorker.running;
+  const mcPct = mcWorker.progress.total > 0
+    ? (mcWorker.progress.current / mcWorker.progress.total) * 100 : 0;
+  const btPct = btWorker.progress.total > 0
+    ? (btWorker.progress.current / btWorker.progress.total) * 100 : 0;
 
   return (
     <Card>
