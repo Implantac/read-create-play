@@ -24,37 +24,37 @@ export function FeaturesSection({ featuresRef, featuresRotateX, fadeUp }: Featur
     {
       icon: Layers,
       title: "Análise Histórica Avançada",
-      description: "Processamos milhões de dados de concursos oficiais para identificar tendências de frequência, atraso e distribuição.",
+      description: "Processamos o histórico oficial completo para revelar frequência, atraso, ciclos e distribuição de cada dezena em múltiplas dimensões.",
       color: "green" as const,
     },
     {
       icon: Sparkles,
       title: "Titan AI Core",
-      description: "Nossa rede neural aplica modelos matemáticos complexos para detectar padrões ocultos que desafiam a sorte comum.",
+      description: "Redes neurais e modelos estatísticos aplicados aos sorteios brasileiros para identificar padrões que escapam da análise humana.",
       color: "blue" as const,
     },
     {
       icon: Clipboard,
       title: "Motor de Probabilidade",
-      description: "Geramos apostas estratégicas com base em modelos de Fibonacci, Monte Carlo e Cadeias de Markov.",
+      description: "Apostas geradas com Monte Carlo, Cadeias de Markov e distribuições balanceadas — foco em consistência estatística, não em sorte.",
       color: "amber" as const,
     },
     {
       icon: BarChart3,
       title: "Simulador de Performance",
-      description: "Execute sua estratégia contra concursos passados e descubra o ROI teórico e a eficiência real antes de apostar.",
+      description: "Coloque sua estratégia contra centenas de concursos passados e descubra o ROI teórico antes de gastar um real com apostas.",
       color: "red" as const,
     },
     {
       icon: Box,
       title: "Laboratório de Estratégias",
-      description: "Acesse uma biblioteca profissional de fechamentos, distribuições balanceadas e estratégias proprietárias.",
+      description: "Fechamentos matemáticos, matrizes de cobertura, filtros avançados e estratégias proprietárias com pontuação Titan Score.",
       color: "purple" as const,
     },
     {
       icon: MessageSquare,
       title: "Sincronização Oficial",
-      description: "Dados coletados e atualizados em tempo real diretamente das fontes oficiais, garantindo 100% de precisão.",
+      description: "Resultados oficiais atualizados em tempo real direto da fonte, garantindo 100% de precisão em cada análise que você fizer.",
       color: "cyan" as const,
     },
   ];
@@ -68,7 +68,7 @@ export function FeaturesSection({ featuresRef, featuresRotateX, fadeUp }: Featur
             CENTRO DE <span className="gradient-brand-text">INTELIGÊNCIA</span> TITAN
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-70">
-            Titan Loterias é uma plataforma de inteligência aplicada às loterias brasileiras que analisa históricos oficiais, identifica padrões estatísticos e utiliza IA para gerar apostas mais estratégicas.
+            Muito além de um gerador de números: uma plataforma completa de inteligência estatística aplicada às loterias brasileiras.
           </p>
         </motion.div>
 

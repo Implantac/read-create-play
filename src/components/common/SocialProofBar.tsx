@@ -2,10 +2,10 @@ import { motion } from "framer-motion";
 import { Shield, Lock, Users, Award } from "lucide-react";
 
 const badges = [
-  { icon: Shield, label: "LGPD & Segurança Bancária" },
-  { icon: Lock, label: "SSO & Autenticação MFA" },
-  { icon: Users, label: "+15.000 Usuários Ativos" },
-  { icon: Award, label: "Estatística #1 da América Latina" },
+  { icon: Shield, label: "Conformidade com a LGPD" },
+  { icon: Lock, label: "Login seguro com 2FA" },
+  { icon: Users, label: "+4.800 apostadores ativos" },
+  { icon: Award, label: "Plataforma nº 1 em estatística de loterias" },
 ];
 
 export function SocialProofBar() {

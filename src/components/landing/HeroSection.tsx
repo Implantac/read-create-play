@@ -42,7 +42,7 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
           </span>
-          <span className="text-[11px] font-black uppercase tracking-[0.4em] text-primary italic">INTELIGÊNCIA ARTIFICIAL APLICADA</span>
+          <span className="text-[11px] font-black uppercase tracking-[0.4em] text-primary italic">INTELIGÊNCIA ARTIFICIAL APLICADA ÀS LOTERIAS</span>
         </motion.div>
 
         <div className="space-y-8">
@@ -53,8 +53,8 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             variants={fadeUp}
             className="text-4xl md:text-[5rem] lg:text-[6.5rem] font-black tracking-tighter uppercase italic leading-[0.85] mb-8"
           >
-            <span className="block text-foreground drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)]">INTELIGÊNCIA ARTIFICIAL PARA</span>
-            <span className="block gradient-brand-text not-italic leading-none">LOTERIAS BRASILEIRAS</span>
+            <span className="block text-foreground drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)]">PARE DE APOSTAR NO ESCURO.</span>
+            <span className="block gradient-brand-text not-italic leading-none">APOSTE COM CIÊNCIA.</span>
           </motion.h1>
           
           <motion.p 
@@ -64,7 +64,7 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             variants={fadeUp}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed"
           >
-            Analise milhares de concursos, descubra padrões ocultos e gere apostas utilizando estratégias matemáticas avançadas e IA.
+            Mais de <span className="text-foreground font-bold">24 mil concursos oficiais</span> analisados por IA, estatística avançada e modelos matemáticos. Descubra padrões, monte apostas estratégicas e tome decisões baseadas em dados — não em achismo.
           </motion.p>
         </div>
 
@@ -86,7 +86,7 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
           </Button>
 
           <Link to="/login" className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-primary transition-colors italic px-4 py-2">
-            Já sou um Titan
+            Já tenho conta
           </Link>
         </motion.div>
 
@@ -102,11 +102,11 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             <div className="w-9 h-9 rounded-full border-2 border-background bg-gradient-to-br from-accent/40 to-accent/10" />
             <div className="w-9 h-9 rounded-full border-2 border-background bg-gradient-to-br from-neon-blue/40 to-neon-blue/10" />
             <div className="w-9 h-9 rounded-full border-2 border-background bg-primary/20 flex items-center justify-center text-[9px] font-black text-primary tracking-tight">
-              +2k
+              +4k
             </div>
           </div>
           <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-muted-foreground">
-            Mais de 2.400 membros ativos na rede neural
+            Mais de 4.800 apostadores já confiam no Titan
           </p>
         </motion.div>
       </motion.div>

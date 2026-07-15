@@ -96,9 +96,9 @@ export default function LandingPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
             {[
               { label: "Concursos Analisados", value: "24.500+" },
-              { label: "Apostas Geradas", value: "1.2M+" },
+              { label: "Apostas Geradas", value: "1,2M+" },
               { label: "Loterias Suportadas", value: "09" },
-              { label: "Usuários Ativos", value: "4.800+" },
+              { label: "Apostadores Ativos", value: "4.800+" },
             ].map((stat, i) => (
               <div key={i} className="text-center p-6 rounded-3xl bg-white/5 border border-white/5 backdrop-blur-sm group hover:border-primary/20 transition-all">
                 <p className="text-3xl md:text-5xl font-black tracking-tighter italic gradient-brand-text mb-2">{stat.value}</p>
@@ -129,10 +129,10 @@ export default function LandingPage() {
               Sincronização em Tempo Real
             </div>
             <h2 className="text-5xl md:text-8xl font-black tracking-tighter uppercase italic leading-[0.8] mb-6">
-              Neural <span className="gradient-brand-text">Command Center</span>
+              Central <span className="gradient-brand-text">Neural Titan</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-60">
-              Acompanhe o processamento de dados históricos oficiais e a detecção de padrões estatísticos em tempo real pela nossa IA.
+              Acompanhe em tempo real o processamento dos concursos oficiais e a detecção de padrões estatísticos pela nossa IA.
             </p>
           </div>
           <div className="max-w-6xl mx-auto">
@@ -161,7 +161,7 @@ export default function LandingPage() {
                 </span>
               </div>
               <p className="text-sm text-muted-foreground max-w-sm leading-relaxed font-medium">
-                Titan Loterias é uma plataforma de inteligência aplicada às loterias brasileiras que analisa históricos oficiais, identifica padrões estatísticos e utiliza IA para gerar apostas mais estratégicas.
+                Plataforma brasileira de inteligência estatística e IA aplicada às loterias oficiais. Analise, simule e monte apostas com base em dados — nunca no achismo.
               </p>
             </div>
             <div>

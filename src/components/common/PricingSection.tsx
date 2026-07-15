@@ -44,14 +44,14 @@ export function PricingSection() {
     {
       name: "Plano Grátis",
       price: "R$ 0",
-      description: "Ideal para quem está começando.",
+      description: "Ideal para conhecer a plataforma.",
       features: [
-        "Acesso limitado",
-        "Simulador básico",
-        "Resultados diários",
-        "Estatísticas fundamentais",
+        "Acesso ao painel principal",
+        "Gerador básico de apostas",
+        "Resultados oficiais em tempo real",
+        "Estatísticas essenciais",
       ],
-      cta: "Começar Grátis",
+      cta: "Começar de Graça",
       popular: false,
       color: "bg-muted/50 border-white/5",
       icon: Shield
@@ -59,18 +59,18 @@ export function PricingSection() {
     {
       name: "Acesso Vitalício",
       price: LAUNCH_PRICE,
-      description: "O ecossistema completo Titan Loterias.",
+      description: "O ecossistema Titan completo, para sempre.",
       features: [
-        "Acesso Vitalício",
-        "Gerador de Apostas Ilimitado",
-        "IA Avançada & Neural Core",
-        "Fechamentos Matemáticos Pro",
-        "Simulações & Backtests",
-        "Suporte VIP 24/7",
-        "Planilhas Premium Inclusas",
-        "Atualizações Vitalícias",
+        "Acesso vitalício — pagamento único",
+        "Gerador de apostas ilimitado",
+        "Titan AI Core & Neural Alpha",
+        "Fechamentos matemáticos avançados",
+        "Simulações massivas e backtests",
+        "Suporte prioritário",
+        "Planilhas e matrizes premium",
+        "Todas as atualizações futuras inclusas",
       ],
-      cta: "Contratar Solução Elite",
+      cta: "Garantir Acesso Vitalício",
       popular: true,
       color: "bg-primary/5 border-primary/20",
       icon: Crown
@@ -93,10 +93,10 @@ export function PricingSection() {
             Escolha seu Nível de Operação
           </Badge>
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic">
-            INTELIGÊNCIA <span className="gradient-brand-text">APLICADA</span>
+            PLANOS <span className="gradient-brand-text">TITAN</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-70">
-            Titan Loterias é uma plataforma de inteligência aplicada às loterias brasileiras que analisa históricos oficiais, identifica padrões estatísticos e utiliza IA para gerar apostas mais estratégicas.
+            Um pagamento único, acesso vitalício ao ecossistema completo. Sem mensalidades, sem renovações, sem letras miúdas.
           </p>
         </motion.div>
 

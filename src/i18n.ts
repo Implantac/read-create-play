@@ -35,37 +35,37 @@ const resources = {
           "badge": "TITAN INTEL • INTELIGÊNCIA ESTATÍSTICA APLICADA",
           "title": "INTELIGÊNCIA ARTIFICIAL PARA",
           "subtitle": "LOTERIAS BRASILEIRAS",
-          "description": "Analise milhares de concursos, descubra padrões ocultos e gere apostas utilizando estratégias matemáticas avançadas e IA. O Titan Loterias é a plataforma definitiva de inteligência aplicada às loterias brasileiras.",
+          "description": "Analise mais de 24 mil concursos oficiais, revele padrões que passam despercebidos e monte apostas com base em estatística, probabilidade e IA — não em achismo.",
           "cta_primary": "Testar Gratuitamente",
-          "cta_secondary": "Conhecer Recursos"
+          "cta_secondary": "Conhecer os Recursos"
         },
         "features": {
           "title": "Centro de Inteligência Titan",
-          "subtitle": "O sistema abandona qualquer aparência de simples gerador e se posiciona como uma Plataforma de Inteligência Estatística para Loterias Brasileiras.",
+          "subtitle": "Muito além de um gerador de números: uma plataforma completa de inteligência estatística aplicada às loterias brasileiras.",
           "items": {
             "xray": {
               "title": "Análise Histórica Avançada",
-              "description": "Processamos milhões de dados de concursos oficiais para identificar tendências de frequência, atraso e distribuição em múltiplas dimensões."
+              "description": "Processamos o histórico oficial completo para revelar frequência, atraso, ciclos e distribuição de cada dezena em múltiplas dimensões."
             },
             "ia": {
               "title": "Titan AI Core",
-              "description": "Nossa rede neural aplica modelos matemáticos complexos para detectar padrões ocultos que desafiam a sorte comum através de IA Preditiva."
+              "description": "Redes neurais e modelos estatísticos aplicados aos sorteios brasileiros para identificar padrões que escapam da análise humana."
             },
             "optimizer": {
               "title": "Motor de Probabilidade",
-              "description": "Geramos apostas estratégicas com base em modelos de Fibonacci, Monte Carlo e Cadeias de Markov, focando na consistência estatística."
+              "description": "Gere apostas apoiadas em Monte Carlo, Cadeias de Markov e distribuições balanceadas — foco em consistência estatística, não em sorte."
             },
             "backtest": {
               "title": "Simulador de Performance",
-              "description": "Execute sua estratégia contra concursos passados e descubra o ROI teórico e a eficiência real antes de realizar qualquer aposta."
+              "description": "Coloque sua estratégia contra centenas de concursos passados e descubra o ROI teórico antes de gastar um real com apostas."
             },
             "simulation": {
               "title": "Laboratório de Estratégias",
-              "description": "Acesse uma biblioteca profissional de fechamentos, distribuições balanceadas e estratégias proprietárias com Titan Score."
+              "description": "Fechamentos matemáticos, matrizes de cobertura, filtros avançados e estratégias proprietárias com pontuação Titan Score."
             },
             "sync": {
               "title": "Sincronização Oficial",
-              "description": "Dados coletados e atualizados em tempo real diretamente das fontes oficiais, garantindo 100% de precisão para suas decisões."
+              "description": "Resultados oficiais atualizados em tempo real direto da fonte, garantindo 100% de precisão para cada análise."
             }
           }
         },
@@ -73,26 +73,40 @@ const resources = {
           "title": "Arquitetura de Inteligência",
           "step1": {
             "title": "Coleta de Históricos",
-            "desc": "Consolidamos todos os concursos oficiais em uma base de Big Data para análise temporal profunda."
+            "desc": "Consolidamos todos os concursos oficiais em uma base de dados única, pronta para análise temporal profunda."
           },
           "step2": {
-            "title": "Processamento IA",
-            "desc": "O Titan AI Core processa milhões de combinações em busca de padrões estatísticos e anomalias de frequência."
+            "title": "Processamento com IA",
+            "desc": "O Titan AI Core cruza milhões de combinações em busca de padrões estatísticos e anomalias de frequência."
           },
           "step3": {
             "title": "Detecção de Padrões",
-            "desc": "Identificamos tendências de dezenas quentes, frias e ciclos de retorno através de redes neurais especializadas."
+            "desc": "Redes neurais especializadas identificam dezenas quentes, frias, ciclos de retorno e tendências emergentes."
           },
           "step4": {
             "title": "Estratégia Matemática",
-            "desc": "Aplicamos filtros de dispersão, equilíbrio estrutural e fechamentos matemáticos para otimizar suas chances."
+            "desc": "Aplicamos filtros de dispersão, equilíbrio estrutural e fechamentos matemáticos para maximizar sua cobertura."
           },
           "step5": {
             "title": "Apostas Estratégicas",
-            "desc": "Geramos combinações com o Titan Score proprietário, auxiliando na tomada de decisão baseada puramente em dados."
+            "desc": "Você recebe combinações prontas com o Titan Score — decisões baseadas em dados, não em palpite."
           }
         },
-        "disclaimer": "As análises são baseadas em dados históricos, estatística, probabilidade e inteligência artificial. O sistema não garante ganhos e deve ser usado como ferramenta de suporte à decisão."
+        "faq": {
+          "q1": "O Titan Loterias garante que eu vou ganhar na loteria?",
+          "a1": "Não. Nenhuma ferramenta, sistema ou pessoa pode garantir prêmios em jogos de sorte. O Titan Loterias é uma plataforma de análise estatística e inteligência artificial que ajuda você a tomar decisões mais informadas — mas o resultado final continua sendo probabilístico.",
+          "q2": "Como funciona a análise por IA?",
+          "a2": "Nosso Titan AI Core processa o histórico completo de cada loteria oficial, aplicando modelos matemáticos como Cadeias de Markov, simulação de Monte Carlo e redes neurais. O objetivo é identificar padrões de frequência, atraso e distribuição que passariam despercebidos em uma análise manual.",
+          "q3": "Preciso entender de matemática ou estatística para usar?",
+          "a3": "Não. A plataforma foi desenhada para ser intuitiva: você escolhe a loteria, define seus parâmetros e recebe apostas com pontuação estratégica pronta. Todo o rigor matemático fica nos bastidores.",
+          "q4": "Quais loterias são suportadas?",
+          "a4": "Suportamos as principais loterias da Caixa Econômica Federal: Mega-Sena, Lotofácil, Quina, Lotomania, Dupla Sena, Timemania, Dia de Sorte, Super Sete e +Milionária.",
+          "q5": "Meus dados e apostas ficam seguros?",
+          "a5": "Sim. Utilizamos criptografia de ponta a ponta, autenticação segura e infraestrutura em conformidade com a LGPD. Seus dados pessoais e histórico de apostas nunca são compartilhados.",
+          "q6": "Posso cancelar quando quiser?",
+          "a6": "O plano vitalício é um pagamento único — sem mensalidades, sem renovações automáticas, sem cobranças recorrentes. Você paga uma vez e usa para sempre, incluindo todas as atualizações futuras."
+        },
+        "disclaimer": "As análises são baseadas em dados históricos, estatística, probabilidade e inteligência artificial. O sistema não garante ganhos e deve ser utilizado como ferramenta de suporte à decisão."
       },
       "testimonials": {
         "title": "Depoimentos de Usuários Reais",
