@@ -385,8 +385,21 @@ const FechamentoUniversalPage = () => {
         initialBase={result?.request.baseNumbers}
       />
 
+      <ClosingBaseSuggestionPanel
+        lottery={{ id: config.id, name: config.name, totalNumbers: total, pick, ticketPrice: 3 }}
+        onApply={(p) => {
+          setBaseNumbers(p.baseNumbers);
+          setMinHits(p.minHits);
+          setMaxGames(p.maxGames);
+          setStrategy(p.strategy);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
+
       {comparison && <ComparisonPanel results={comparison} onPick={(r) => setResult(r)} />}
       {result && result.games.length > 0 && <ResultPanel result={result} />}
+      {result && result.games.length > 0 && <ClosingRankingPanel result={result} />}
+      {result && result.games.length > 0 && <ClosingTicketPanel result={result} />}
       {result && result.games.length > 0 && <ClosingExportPanel result={result} />}
       {result && result.games.length > 0 && <ClosingConferencePanel result={result} />}
       {result && result.games.length > 0 && <ClosingDashboardPanel result={result} />}
