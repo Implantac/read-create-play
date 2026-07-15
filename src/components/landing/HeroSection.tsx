@@ -102,11 +102,11 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             <div className="w-9 h-9 rounded-full border-2 border-background bg-gradient-to-br from-accent/40 to-accent/10" />
             <div className="w-9 h-9 rounded-full border-2 border-background bg-gradient-to-br from-neon-blue/40 to-neon-blue/10" />
             <div className="w-9 h-9 rounded-full border-2 border-background bg-primary/20 flex items-center justify-center text-[9px] font-black text-primary tracking-tight">
-              +2k
+              +4k
             </div>
           </div>
           <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-muted-foreground">
-            Mais de 2.400 membros ativos na rede neural
+            Mais de 4.800 apostadores já confiam no Titan
           </p>
         </motion.div>
       </motion.div>
