@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { isCheckoutSessionResponse } from "@/core/contracts";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { PlanFAQ } from "@/components/plans/PlanFAQ";
@@ -32,7 +33,7 @@ export default function PlanosPage() {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       if (error) throw error;
-      if (data?.url) window.open(data.url, "_blank");
+      if (isCheckoutSessionResponse(data) && data.url) window.open(data.url, "_blank");
     } catch (e: any) {
       toast.error("Erro ao iniciar checkout: " + (e.message || "Tente novamente"));
     } finally {

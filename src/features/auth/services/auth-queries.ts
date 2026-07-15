@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { LotteryService } from "@/services/lottery/lottery.service";
+import { isCheckSubscriptionResponse, type CheckSubscriptionResponse } from "@/core/contracts";
 
 export async function checkAdminStatus(userId: string) {
   const { data } = await supabase
@@ -9,7 +9,7 @@ export async function checkAdminStatus(userId: string) {
     .in("role", ["admin", "super_admin"]);
 
   const roles = (data || []).map((r: { role: string }) => r.role);
-  
+
   return {
     isAdmin: roles.includes("admin") || roles.includes("super_admin"),
     isSuperAdmin: roles.includes("super_admin"),
@@ -17,9 +17,9 @@ export async function checkAdminStatus(userId: string) {
   };
 }
 
-export async function syncSubscriptionPlan(accessToken: string) {
+export async function syncSubscriptionPlan(accessToken: string): Promise<CheckSubscriptionResponse | null> {
   const { data } = await supabase.functions.invoke("check-subscription", {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
-  return data;
+  return isCheckSubscriptionResponse(data) ? data : null;
 }

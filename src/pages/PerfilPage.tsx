@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { isCustomerPortalResponse } from "@/core/contracts";
 import { useTheme } from "next-themes";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -56,7 +57,7 @@ export default function PerfilPage() {
         headers: { Authorization: `Bearer ${session?.access_token}` },
       });
       if (error) throw error;
-      if (data?.url) {
+      if (isCustomerPortalResponse(data) && data.url) {
         window.open(data.url, "_blank");
       } else {
         throw new Error("URL do portal não recebida");
