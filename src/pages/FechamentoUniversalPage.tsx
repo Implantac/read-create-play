@@ -451,8 +451,25 @@ const FechamentoUniversalPage = () => {
         />
       )}
       {result && result.games.length > 0 && <ClosingRankingPanel result={result} />}
+      {result && result.games.length > 0 && <ClosingCoverageHeatmapPanel result={result} />}
+      {result && result.games.length > 0 && <ClosingSensitivityPanel result={result} />}
+      {result && result.games.length > 0 && (
+        <ClosingFixedExcludedPanel
+          result={result}
+          onApplyReduction={(games) => {
+            setResult({
+              ...result,
+              games,
+              gameCount: games.length,
+              cost: games.length * result.request.lottery.ticketPrice,
+              notes: [...result.notes, `Filtro fixas/excluídas: ${result.gameCount - games.length} jogos removidos.`],
+            });
+          }}
+        />
+      )}
       {result && result.games.length > 0 && <ClosingBolaoPanel result={result} />}
       {result && result.games.length > 0 && <ClosingTicketPanel result={result} />}
+      {result && result.games.length > 0 && <ClosingProExportPanel result={result} />}
       {result && result.games.length > 0 && <ClosingExportPanel result={result} />}
       {result && result.games.length > 0 && <ClosingConferencePanel result={result} />}
       {result && result.games.length > 0 && <ClosingDashboardPanel result={result} />}
