@@ -385,7 +385,29 @@ const FechamentoUniversalPage = () => {
       {comparison && <ComparisonPanel results={comparison} onPick={(r) => setResult(r)} />}
       {result && result.games.length > 0 && <ResultPanel result={result} />}
       {result && result.games.length > 0 && <ClosingExportPanel result={result} />}
+      {result && result.games.length > 0 && <ClosingConferencePanel result={result} />}
       {result && result.games.length > 0 && <ClosingDashboardPanel result={result} />}
+
+      <ClosingHistoryPanel
+        lotteryId={config.id}
+        onReopen={(r) => {
+          setResult(r);
+          setBaseNumbers(r.request.baseNumbers);
+          setMinHits(r.request.guarantee.minHits);
+          setMaxGames(r.request.maxGames ?? 0);
+          setStrategy(r.strategy);
+          toast.success("Fechamento reaberto.");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+        onDuplicate={(p) => {
+          setBaseNumbers(p.baseNumbers);
+          setMinHits(p.minHits);
+          setMaxGames(p.maxGames);
+          setStrategy(p.strategy);
+          toast.success("Parametros carregados. Clique em Gerar para reprocessar.");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
     </div>
   );
 };
