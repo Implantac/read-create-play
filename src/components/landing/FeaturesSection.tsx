@@ -68,7 +68,7 @@ export function FeaturesSection({ featuresRef, featuresRotateX, fadeUp }: Featur
             CENTRO DE <span className="gradient-brand-text">INTELIGÊNCIA</span> TITAN
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-70">
-            Titan Loterias é uma plataforma de inteligência aplicada às loterias brasileiras que analisa históricos oficiais, identifica padrões estatísticos e utiliza IA para gerar apostas mais estratégicas.
+            Muito além de um gerador de números: uma plataforma completa de inteligência estatística aplicada às loterias brasileiras.
           </p>
         </motion.div>
 
