@@ -106,26 +106,26 @@ const resources = {
           "q6": "Posso cancelar quando quiser?",
           "a6": "O plano vitalício é um pagamento único — sem mensalidades, sem renovações automáticas, sem cobranças recorrentes. Você paga uma vez e usa para sempre, incluindo todas as atualizações futuras."
         },
-        "disclaimer": "As análises são baseadas em dados históricos, estatística, probabilidade e inteligência artificial. O sistema não garante ganhos e deve ser utilizado como ferramenta de suporte à decisão."
-      },
-      "testimonials": {
-        "title": "Depoimentos de Usuários Reais",
-        "subtitle": "Junte-se a milhares de jogadores que já profissionalizaram suas estratégias.",
-        "items": {
-          "t1": {
-            "name": "Ricardo Silva",
-            "role": "Analista de Dados",
-            "content": "O Titan Loterias mudou completamente minha forma de enxergar os sorteios. A precisão da IA é assustadora."
-          },
-          "t2": {
-            "name": "Ana Oliveira",
-            "role": "Jogadora Profissional",
-            "content": "As ferramentas de backtest me economizaram centenas de reais em apostas sem sentido. Agora só jogo com estratégia."
-          },
-          "t3": {
-            "name": "Marcos Santos",
-            "role": "Entusiasta de Matemática",
-            "content": "Melhor plataforma do Brasil. O otimizador de matrizes é simplesmente fantástico para quem busca cobertura real."
+        "disclaimer": "As análises são baseadas em dados históricos, estatística, probabilidade e inteligência artificial. O sistema não garante ganhos e deve ser utilizado como ferramenta de suporte à decisão.",
+        "testimonials": {
+          "title": "O que dizem, nossos usuários",
+          "subtitle": "Junte-se a milhares de apostadores brasileiros que trocaram o achismo por decisões guiadas por estatística e inteligência artificial.",
+          "items": {
+            "t1": {
+              "name": "Ricardo Silva",
+              "role": "Analista de Dados • SP",
+              "content": "O Titan Loterias mudou completamente a forma como eu enxergo os sorteios. A profundidade das análises e a precisão da IA impressionam — é o nível de rigor que eu esperava encontrar em uma ferramenta profissional."
+            },
+            "t2": {
+              "name": "Ana Oliveira",
+              "role": "Apostadora Recorrente • RJ",
+              "content": "As simulações e o backtest me pouparam centenas de reais em apostas sem critério. Hoje eu só jogo com estratégia validada — e minha consistência de acertos secundários subiu de forma clara."
+            },
+            "t3": {
+              "name": "Marcos Santos",
+              "role": "Entusiasta de Estatística • MG",
+              "content": "Melhor plataforma de loterias do Brasil. Os fechamentos matemáticos e o Titan Score entregam cobertura real, com critério — nada de gerador aleatório disfarçado de inteligência."
+            }
           }
         }
       },
