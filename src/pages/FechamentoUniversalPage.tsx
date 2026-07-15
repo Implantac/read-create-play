@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { LotteryContextBanner } from "@/components/LotteryContextBanner";
