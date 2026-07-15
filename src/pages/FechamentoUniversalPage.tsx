@@ -422,6 +422,7 @@ const FechamentoUniversalPage = () => {
       />
 
       {(result || comparison) && <ClosingExecutiveSummaryPanel result={result} comparison={comparison} />}
+      {result && result.games.length > 0 && <ClosingProbabilityPanel result={result} />}
       {comparison && <ClosingStrategyMatrixPanel results={comparison} onPick={(r) => setResult(r)} />}
       {comparison && <ComparisonPanel results={comparison} onPick={(r) => setResult(r)} />}
       {result && result.games.length > 0 && <ResultPanel result={result} />}
