@@ -9,9 +9,11 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Copy, Save, FileJson, FileText, FileSpreadsheet, Loader2, Check } from "lucide-react";
+import { Download, Copy, Save, FileJson, FileText, FileSpreadsheet, FileDown, Loader2, Check } from "lucide-react";
 import type { ClosingResult } from "@/engine/closing";
 import { useSavedBets } from "@/hooks/useSavedBets";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { toast } from "sonner";
 
