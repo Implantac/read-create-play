@@ -88,17 +88,21 @@ export function ClosingHistoryPanel({ lotteryId, onReopen, onDuplicate }: Props)
                     </div>
                   </div>
                   <div className="flex gap-1">
-                    <Button size="sm" variant="outline" onClick={() => onReopen(rowToResult(row))} title="Reabrir">
-                      <FolderOpen className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => onDuplicate({
-                      baseNumbers: row.base_numbers,
-                      minHits: row.min_hits,
-                      maxGames: row.max_games ?? 0,
-                      strategy: row.strategy as ClosingStrategy,
-                    })} title="Duplicar parametros">
-                      <Copy className="h-3.5 w-3.5" />
-                    </Button>
+                    {onReopen && (
+                      <Button size="sm" variant="outline" onClick={() => onReopen(rowToResult(row))} title="Reabrir">
+                        <FolderOpen className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                    {onDuplicate && (
+                      <Button size="sm" variant="outline" onClick={() => onDuplicate({
+                        baseNumbers: row.base_numbers,
+                        minHits: row.min_hits,
+                        maxGames: row.max_games ?? 0,
+                        strategy: row.strategy as ClosingStrategy,
+                      })} title="Duplicar parametros">
+                        <Copy className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
                     <Button
                       size="sm"
                       variant="outline"
