@@ -34,7 +34,7 @@ export function ClosingBaseSuggestionPanel({ lottery, onApply }: Props) {
   const compute = () => {
     setComputing(true);
     try {
-      const recent = draws.slice(0, 80).map(d => d.dezenas);
+      const recent = draws.slice(0, 80).map(d => d.numbers);
       if (recent.length === 0) {
         toast.warning("Sem histórico local. Sincronize sorteios primeiro.");
       }

@@ -31,7 +31,7 @@ export function ClosingRankingPanel({ result }: Props) {
   const [topN, setTopN] = useState<number>(Math.min(10, result.games.length));
 
   const ranked = useMemo(() => {
-    const recent = draws.slice(0, 80).map(d => d.dezenas);
+    const recent = draws.slice(0, 80).map(d => d.numbers);
     return rankGames({
       games: result.games,
       totalNumbers: result.request.lottery.totalNumbers,
