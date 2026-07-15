@@ -61,6 +61,21 @@ const FechamentoUniversalPage = () => {
   const [comparison, setComparison] = useState<ClosingResult[] | null>(null);
   const [constraints, setConstraints] = useState<ActiveConstraint[]>([]);
 
+  // Recebe base vinda do Gerador (via navigate state)
+  const location = useLocation();
+  useEffect(() => {
+    const state = location.state as { baseNumbers?: number[]; fromGerador?: boolean } | null;
+    if (state?.baseNumbers?.length) {
+      const clean = [...new Set(state.baseNumbers)].filter(n => n >= 1 && n <= total).sort((a, b) => a - b);
+      setBaseNumbers(clean);
+      if (state.fromGerador) {
+        toast.success(`${clean.length} dezenas importadas do Gerador.`);
+      }
+      window.history.replaceState({}, "");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const toggle = (n: number) => {
     setBaseNumbers(prev => prev.includes(n) ? prev.filter(x => x !== n) : [...prev, n].sort((a, b) => a - b));
   };
