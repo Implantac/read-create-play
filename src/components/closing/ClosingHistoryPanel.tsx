@@ -44,8 +44,9 @@ function rowToResult(row: ClosingHistoryRow): ClosingResult {
 }
 
 export function ClosingHistoryPanel({ lotteryId, onReopen, onDuplicate }: Props) {
-  const { history, isLoading, deleteClosing } = useClosingHistory(lotteryId);
+  const { history, isLoading, deleteClosing, shareClosing, unshareClosing } = useClosingHistory(lotteryId);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [sharingId, setSharingId] = useState<string | null>(null);
 
   return (
     <Card>
