@@ -387,6 +387,22 @@ const GeradorPage = () => {
                   <Save className="w-4 h-4" />
                   Salvar Todos no Portfólio
                 </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="px-8 gap-2"
+                  onClick={() => {
+                    const union = [...new Set(results.flatMap((r: any) => r.numbers as number[]))].sort((a, b) => a - b);
+                    if (union.length < config.pick) {
+                      toast.error(`Base insuficiente (${union.length}/${config.pick}). Gere mais jogos.`);
+                      return;
+                    }
+                    navigate("/fechamento-universal", { state: { baseNumbers: union, fromGerador: true } });
+                  }}
+                >
+                  <Layers className="w-4 h-4" />
+                  Aplicar Fechamento
+                </Button>
                 <Button variant="outline" size="lg" className="px-8" onClick={() => setStep(1)}>
                   Novo Ciclo de Geração
                 </Button>
