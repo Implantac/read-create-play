@@ -86,7 +86,7 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
           </Button>
 
           <Link to="/login" className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-primary transition-colors italic px-4 py-2">
-            Já sou um Titan
+            Já tenho conta
           </Link>
         </motion.div>
 
