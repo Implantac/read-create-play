@@ -185,7 +185,7 @@ const slideData: ScreenSlide[] = [
   {
     id: "simulador",
     title: "Simulação Massiva",
-    subtitle: "Simule milhões de jogos em segundos e descubra probabilidades reais",
+    subtitle: "Rode milhões de jogos em segundos e descubra as probabilidades reais",
     icon: Dices,
     color: "text-neon-purple",
     accentBg: "bg-neon-purple/10",
@@ -194,7 +194,7 @@ const slideData: ScreenSlide[] = [
   {
     id: "ia",
     title: "IA Autônoma",
-    subtitle: "Modelos de Machine Learning identificam padrões ocultos nos resultados",
+    subtitle: "Modelos de Machine Learning revelam padrões ocultos nos resultados",
     icon: Brain,
     color: "text-primary",
     accentBg: "bg-primary/10",
