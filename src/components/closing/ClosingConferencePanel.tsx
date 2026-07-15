@@ -71,7 +71,7 @@ export function ClosingConferencePanel({ result }: Props) {
                   <SelectContent>
                     {selectableDraws.map((d, i) => (
                       <SelectItem key={d.concurso} value={String(i)}>
-                        #{d.concurso} — {d.data}
+                        #{d.concurso} — {d.date}
                       </SelectItem>
                     ))}
                   </SelectContent>
