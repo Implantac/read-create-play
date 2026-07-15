@@ -456,7 +456,7 @@ const FechamentoUniversalPage = () => {
       {result && result.games.length > 0 && (
         <ClosingFixedExcludedPanel
           result={result}
-          onApplyReduction={(games) => {
+          onApply={(games) => {
             setResult({
               ...result,
               games,
