@@ -32,6 +32,10 @@ import { ClosingROISimulatorPanel } from "@/components/closing/ClosingROISimulat
 import { ClosingProgressivePanel } from "@/components/closing/ClosingProgressivePanel";
 import { ClosingStrategyMatrixPanel } from "@/components/closing/ClosingStrategyMatrixPanel";
 import { ClosingBolaoPanel } from "@/components/closing/ClosingBolaoPanel";
+import { ClosingGuaranteeBacktestPanel } from "@/components/closing/ClosingGuaranteeBacktestPanel";
+import { ClosingDominatedGamesPanel } from "@/components/closing/ClosingDominatedGamesPanel";
+import { ClosingNextDrawPanel } from "@/components/closing/ClosingNextDrawPanel";
+import { ClosingSmartAlertsPanel } from "@/components/closing/ClosingSmartAlertsPanel";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
