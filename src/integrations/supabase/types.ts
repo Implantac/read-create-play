@@ -298,6 +298,7 @@ export type Database = {
           notes: string[] | null
           parent_id: string | null
           score: Json
+          share_id: string | null
           source: string
           strategy: string
           user_id: string
@@ -320,6 +321,7 @@ export type Database = {
           notes?: string[] | null
           parent_id?: string | null
           score?: Json
+          share_id?: string | null
           source?: string
           strategy: string
           user_id: string
@@ -342,6 +344,7 @@ export type Database = {
           notes?: string[] | null
           parent_id?: string | null
           score?: Json
+          share_id?: string | null
           source?: string
           strategy?: string
           user_id?: string
