@@ -155,7 +155,10 @@ export function ClosingExportPanel({ result }: Props) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+          <Button variant="outline" size="sm" onClick={downloadPDF}>
+            <FileDown className="h-4 w-4 mr-1" /> PDF
+          </Button>
           <Button variant="outline" size="sm" onClick={() => download(toTXT(), "txt")}>
             <FileText className="h-4 w-4 mr-1" /> TXT
           </Button>
