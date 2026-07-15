@@ -132,7 +132,22 @@ export function ClosingDashboardPanel({ result, prizeTiers }: Props) {
                 {runningMC ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Dice5 className="h-4 w-4 mr-1" />}
                 Simular
               </Button>
+              {runningMC && (
+                <Button variant="outline" size="icon" onClick={mcWorker.cancel} title="Cancelar">
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
             </div>
+            {runningMC && (
+              <div className="space-y-1">
+                <Progress value={mcPct} />
+                <p className="text-xs text-muted-foreground font-mono">
+                  {formatNumber(mcWorker.progress.current)} / {formatNumber(mcWorker.progress.total)} trials
+                  {typeof mcWorker.progress.hitRate === "number" &&
+                    ` · hit-rate parcial ${mcWorker.progress.hitRate.toFixed(2)}%`}
+                </p>
+              </div>
+            )}
             {mc && <MCResults mc={mc} />}
           </TabsContent>
 
