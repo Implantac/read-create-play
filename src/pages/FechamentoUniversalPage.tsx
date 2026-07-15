@@ -404,10 +404,38 @@ const FechamentoUniversalPage = () => {
         }}
       />
 
+      <ClosingNextDrawPanel
+        onApply={(rec) => {
+          setBaseNumbers(rec.baseNumbers);
+          setMinHits(rec.minHits);
+          setMaxGames(rec.maxGames);
+          setStrategy(rec.strategy);
+          toast.success(`Recomendação aplicada — ${rec.baseNumbers.length} dezenas, garantia ${rec.minHits}.`);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
+
       {comparison && <ClosingStrategyMatrixPanel results={comparison} onPick={(r) => setResult(r)} />}
       {comparison && <ComparisonPanel results={comparison} onPick={(r) => setResult(r)} />}
       {result && result.games.length > 0 && <ResultPanel result={result} />}
+      {result && result.games.length > 0 && <ClosingSmartAlertsPanel result={result} />}
+      {result && result.games.length > 0 && <ClosingGuaranteeBacktestPanel result={result} />}
       {result && result.games.length > 0 && <ClosingROISimulatorPanel result={result} />}
+      {result && result.games.length > 0 && (
+        <ClosingDominatedGamesPanel
+          result={result}
+          onApplyReduction={(games) => {
+            setResult({
+              ...result,
+              games,
+              gameCount: games.length,
+              cost: games.length * result.request.lottery.ticketPrice,
+              notes: [...result.notes, `Otimizador removeu ${result.gameCount - games.length} jogos dominados.`],
+            });
+            toast.success(`Fechamento reduzido para ${games.length} jogos.`);
+          }}
+        />
+      )}
       {result && result.games.length > 0 && (
         <ClosingProgressivePanel
           result={result}
