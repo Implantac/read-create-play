@@ -11,10 +11,9 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, TrendingUp, Dice5, History, Info, Trophy, Flame } from "lucide-react";
-import {
-  runMonteCarlo, runHistoricalBacktest,
-  type ClosingResult, type MonteCarloResult, type BacktestResult, type HistoricalDraw,
+import { Loader2, TrendingUp, Dice5, History, Info, Trophy, Flame, X } from "lucide-react";
+import type {
+  ClosingResult, MonteCarloResult, BacktestResult, HistoricalDraw,
 } from "@/engine/closing";
 import {
   LineChart, Line, XAxis, YAxis, Tooltip as RTooltip, CartesianGrid, ResponsiveContainer,
@@ -23,6 +22,8 @@ import {
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useLotteryDraws } from "@/hooks/useLotteryDraws";
+import { useMonteCarloWorker, MonteCarloCanceledError } from "@/hooks/useMonteCarloWorker";
+import { useBacktestWorker, BacktestCanceledError } from "@/hooks/useBacktestWorker";
 import { cn } from "@/lib/utils";
 
 interface Props {
