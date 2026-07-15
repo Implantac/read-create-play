@@ -36,6 +36,10 @@ import { ClosingGuaranteeBacktestPanel } from "@/components/closing/ClosingGuara
 import { ClosingDominatedGamesPanel } from "@/components/closing/ClosingDominatedGamesPanel";
 import { ClosingNextDrawPanel } from "@/components/closing/ClosingNextDrawPanel";
 import { ClosingSmartAlertsPanel } from "@/components/closing/ClosingSmartAlertsPanel";
+import { ClosingCoverageHeatmapPanel } from "@/components/closing/ClosingCoverageHeatmapPanel";
+import { ClosingFixedExcludedPanel } from "@/components/closing/ClosingFixedExcludedPanel";
+import { ClosingSensitivityPanel } from "@/components/closing/ClosingSensitivityPanel";
+import { ClosingProExportPanel } from "@/components/closing/ClosingProExportPanel";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
