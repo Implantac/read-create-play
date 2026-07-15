@@ -104,7 +104,40 @@ export function ClosingHistoryPanel({ lotteryId, onReopen, onDuplicate }: Props)
                       })} title="Duplicar parametros">
                         <Copy className="h-3.5 w-3.5" />
                       </Button>
-                    )}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={sharingId === row.id}
+                      onClick={async () => {
+                        setSharingId(row.id);
+                        try {
+                          if (row.share_id) {
+                            const ok = await unshareClosing(row.id);
+                            if (ok) toast.success("Compartilhamento removido.");
+                          } else {
+                            const sid = await shareClosing(row.id);
+                            if (sid) {
+                              const url = `${window.location.origin}/f/${sid}`;
+                              try { await navigator.clipboard.writeText(url); } catch { /* noop */ }
+                              toast.success("Link copiado para a área de transferência.", { description: url });
+                            }
+                          }
+                        } finally {
+                          setSharingId(null);
+                        }
+                      }}
+                      title={row.share_id ? "Remover compartilhamento" : "Compartilhar por link"}
+                      className={row.share_id ? "text-emerald-500 hover:text-emerald-400" : ""}
+                    >
+                      {sharingId === row.id ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : row.share_id ? (
+                        <Link2Off className="h-3.5 w-3.5" />
+                      ) : (
+                        <Share2 className="h-3.5 w-3.5" />
+                      )}
+                    </Button>
+
                     <Button
                       size="sm"
                       variant="outline"
