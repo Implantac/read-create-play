@@ -42,6 +42,7 @@ import { ClosingSensitivityPanel } from "@/components/closing/ClosingSensitivity
 import { ClosingProExportPanel } from "@/components/closing/ClosingProExportPanel";
 import { ClosingExecutiveSummaryPanel } from "@/components/closing/ClosingExecutiveSummaryPanel";
 import { ClosingProbabilityPanel } from "@/components/closing/ClosingProbabilityPanel";
+import { ClosingStatisticsPanel } from "@/components/closing/ClosingStatisticsPanel";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
