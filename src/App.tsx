@@ -48,6 +48,7 @@ const PlanilhasMatrizPage = lazy(() => import("@/pages/PlanilhasMatrizPage"));
 const ROIDashboardPage = lazy(() => import("@/pages/ROIDashboardPage"));
 const SimulacoesPage = lazy(() => import("@/pages/SimulacoesPage"));
 const StrategyLabPage = lazy(() => import("@/pages/StrategyLabPage"));
+const ClosingSharePage = lazy(() => import("@/pages/ClosingSharePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 
@@ -111,6 +112,7 @@ const AppContent = () => {
         <Route path="/payment-success" element={<PaymentSuccessPage />} />
         <Route path="/install" element={<InstallPage />} />
         <Route path="/pwa-test" element={<PwaOfflineTestPage />} />
+        <Route path="/f/:shareId" element={<ClosingSharePage />} />
         
         {/* Protected */}
         <Route element={<ProtectedRoute><LotteryProvider><AppLayout /></LotteryProvider></ProtectedRoute>}>

@@ -7,7 +7,8 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Cloud, FolderOpen, Copy, Trash2, Loader2 } from "lucide-react";
+import { Cloud, FolderOpen, Copy, Trash2, Loader2, Share2, Link2Off } from "lucide-react";
+import { toast } from "sonner";
 import { useClosingHistory, type ClosingHistoryRow } from "@/hooks/useClosingHistory";
 import type { ClosingResult, ClosingStrategy } from "@/engine/closing";
 import { formatCurrency } from "@/utils/formatters";
@@ -43,8 +44,9 @@ function rowToResult(row: ClosingHistoryRow): ClosingResult {
 }
 
 export function ClosingHistoryPanel({ lotteryId, onReopen, onDuplicate }: Props) {
-  const { history, isLoading, deleteClosing } = useClosingHistory(lotteryId);
+  const { history, isLoading, deleteClosing, shareClosing, unshareClosing } = useClosingHistory(lotteryId);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [sharingId, setSharingId] = useState<string | null>(null);
 
   return (
     <Card>
@@ -103,6 +105,40 @@ export function ClosingHistoryPanel({ lotteryId, onReopen, onDuplicate }: Props)
                         <Copy className="h-3.5 w-3.5" />
                       </Button>
                     )}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={sharingId === row.id}
+                      onClick={async () => {
+                        setSharingId(row.id);
+                        try {
+                          if (row.share_id) {
+                            const ok = await unshareClosing(row.id);
+                            if (ok) toast.success("Compartilhamento removido.");
+                          } else {
+                            const sid = await shareClosing(row.id);
+                            if (sid) {
+                              const url = `${window.location.origin}/f/${sid}`;
+                              try { await navigator.clipboard.writeText(url); } catch { /* noop */ }
+                              toast.success("Link copiado para a área de transferência.", { description: url });
+                            }
+                          }
+                        } finally {
+                          setSharingId(null);
+                        }
+                      }}
+                      title={row.share_id ? "Remover compartilhamento" : "Compartilhar por link"}
+                      className={row.share_id ? "text-emerald-500 hover:text-emerald-400" : ""}
+                    >
+                      {sharingId === row.id ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : row.share_id ? (
+                        <Link2Off className="h-3.5 w-3.5" />
+                      ) : (
+                        <Share2 className="h-3.5 w-3.5" />
+                      )}
+                    </Button>
+
                     <Button
                       size="sm"
                       variant="outline"
