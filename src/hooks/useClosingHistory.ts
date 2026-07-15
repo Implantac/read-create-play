@@ -26,7 +26,27 @@ export interface ClosingHistoryRow {
   lower_bound: number | null;
   elapsed_ms: number | null;
   notes: string[] | null;
+  share_id: string | null;
   created_at: string;
+}
+
+function randomShareId(): string {
+  const alphabet = "abcdefghijkmnopqrstuvwxyz23456789";
+  let out = "";
+  const buf = new Uint8Array(10);
+  crypto.getRandomValues(buf);
+  for (const b of buf) out += alphabet[b % alphabet.length];
+  return out;
+}
+
+export async function fetchSharedClosing(shareId: string): Promise<ClosingHistoryRow | null> {
+  const { data, error } = await supabase
+    .from("closing_history")
+    .select("*")
+    .eq("share_id", shareId)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as unknown as ClosingHistoryRow | null) ?? null;
 }
 
 export function useClosingHistory(lotteryId?: string) {
