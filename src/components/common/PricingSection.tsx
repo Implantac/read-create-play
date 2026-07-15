@@ -93,10 +93,10 @@ export function PricingSection() {
             Escolha seu Nível de Operação
           </Badge>
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic">
-            INTELIGÊNCIA <span className="gradient-brand-text">APLICADA</span>
+            PLANOS <span className="gradient-brand-text">TITAN</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-70">
-            Titan Loterias é uma plataforma de inteligência aplicada às loterias brasileiras que analisa históricos oficiais, identifica padrões estatísticos e utiliza IA para gerar apostas mais estratégicas.
+            Um pagamento único, acesso vitalício ao ecossistema completo. Sem mensalidades, sem renovações, sem letras miúdas.
           </p>
         </motion.div>
 
