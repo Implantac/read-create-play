@@ -121,5 +121,43 @@ export function useClosingHistory(lotteryId?: string) {
     catch { return false; }
   }, [deleteMutation]);
 
-  return { history, isLoading, saveClosing, deleteClosing, refetch };
+  const shareMutation = useMutation({
+    mutationFn: async (id: string): Promise<string> => {
+      const shareId = randomShareId();
+      const { error } = await supabase
+        .from("closing_history")
+        .update({ share_id: shareId })
+        .eq("id", id);
+      if (error) throw error;
+      return shareId;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["closing-history"] });
+    },
+  });
+
+  const unshareMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("closing_history")
+        .update({ share_id: null })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["closing-history"] });
+    },
+  });
+
+  const shareClosing = useCallback(async (id: string): Promise<string | null> => {
+    try { return await shareMutation.mutateAsync(id); }
+    catch { toast.error("Falha ao compartilhar."); return null; }
+  }, [shareMutation]);
+
+  const unshareClosing = useCallback(async (id: string): Promise<boolean> => {
+    try { await unshareMutation.mutateAsync(id); return true; }
+    catch { toast.error("Falha ao remover compartilhamento."); return false; }
+  }, [unshareMutation]);
+
+  return { history, isLoading, saveClosing, deleteClosing, shareClosing, unshareClosing, refetch };
 }
