@@ -11,10 +11,9 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, TrendingUp, Dice5, History, Info, Trophy, Flame } from "lucide-react";
-import {
-  runMonteCarlo, runHistoricalBacktest,
-  type ClosingResult, type MonteCarloResult, type BacktestResult, type HistoricalDraw,
+import { Loader2, TrendingUp, Dice5, History, Info, Trophy, Flame, X } from "lucide-react";
+import type {
+  ClosingResult, MonteCarloResult, BacktestResult, HistoricalDraw,
 } from "@/engine/closing";
 import {
   LineChart, Line, XAxis, YAxis, Tooltip as RTooltip, CartesianGrid, ResponsiveContainer,
@@ -23,6 +22,8 @@ import {
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useLotteryDraws } from "@/hooks/useLotteryDraws";
+import { useMonteCarloWorker, MonteCarloCanceledError } from "@/hooks/useMonteCarloWorker";
+import { useBacktestWorker, BacktestCanceledError } from "@/hooks/useBacktestWorker";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -45,46 +46,55 @@ export function ClosingDashboardPanel({ result, prizeTiers }: Props) {
   const [bt, setBt] = useState<BacktestResult | null>(null);
   const [trials, setTrials] = useState(100_000);
   const [drawLimit, setDrawLimit] = useState(500);
-  const [runningMC, setRunningMC] = useState(false);
-  const [runningBT, setRunningBT] = useState(false);
+
+  const mcWorker = useMonteCarloWorker();
+  const btWorker = useBacktestWorker();
 
   const tiers = prizeTiers ?? DEFAULT_TIERS[config.id] ?? {};
 
-  const runMC = () => {
-    setRunningMC(true);
-    setTimeout(() => {
-      try {
-        const r = runMonteCarlo({
+  const runMC = async () => {
+    try {
+      const r = await mcWorker.run(
+        {
           games: result.games,
           totalNumbers: result.request.lottery.totalNumbers,
           drawSize: result.request.lottery.pick,
           trials,
           targetHits: result.validation.targetMinHits,
           captureHeatmap: true,
-        });
-        setMc(r);
-      } finally { setRunningMC(false); }
-    }, 40);
+        },
+        20,
+      );
+      setMc(r);
+    } catch (e) {
+      if (!(e instanceof MonteCarloCanceledError)) console.error(e);
+    }
   };
 
-  const runBT = () => {
+  const runBT = async () => {
     if (!drawsData || drawsData.length === 0) return;
-    setRunningBT(true);
-    setTimeout(() => {
-      try {
-        const historic: HistoricalDraw[] = drawsData
-          .slice(0, drawLimit)
-          .map(d => ({ contest: d.concurso, date: d.date, numbers: d.numbers }));
-        const r = runHistoricalBacktest({
-          games: result.games,
-          draws: historic,
-          ticketPrice: result.request.lottery.ticketPrice,
-          prizeTiers: tiers,
-        });
-        setBt(r);
-      } finally { setRunningBT(false); }
-    }, 40);
+    try {
+      const historic: HistoricalDraw[] = drawsData
+        .slice(0, drawLimit)
+        .map(d => ({ contest: d.concurso, date: d.date, numbers: d.numbers }));
+      const r = await btWorker.run({
+        games: result.games,
+        draws: historic,
+        ticketPrice: result.request.lottery.ticketPrice,
+        prizeTiers: tiers,
+      });
+      setBt(r);
+    } catch (e) {
+      if (!(e instanceof BacktestCanceledError)) console.error(e);
+    }
   };
+
+  const runningMC = mcWorker.running;
+  const runningBT = btWorker.running;
+  const mcPct = mcWorker.progress.total > 0
+    ? (mcWorker.progress.current / mcWorker.progress.total) * 100 : 0;
+  const btPct = btWorker.progress.total > 0
+    ? (btWorker.progress.current / btWorker.progress.total) * 100 : 0;
 
   return (
     <Card>
@@ -122,7 +132,22 @@ export function ClosingDashboardPanel({ result, prizeTiers }: Props) {
                 {runningMC ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Dice5 className="h-4 w-4 mr-1" />}
                 Simular
               </Button>
+              {runningMC && (
+                <Button variant="outline" size="icon" onClick={mcWorker.cancel} title="Cancelar">
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
             </div>
+            {runningMC && (
+              <div className="space-y-1">
+                <Progress value={mcPct} />
+                <p className="text-xs text-muted-foreground font-mono">
+                  {formatNumber(mcWorker.progress.current)} / {formatNumber(mcWorker.progress.total)} trials
+                  {typeof mcWorker.progress.hitRate === "number" &&
+                    ` · hit-rate parcial ${mcWorker.progress.hitRate.toFixed(2)}%`}
+                </p>
+              </div>
+            )}
             {mc && <MCResults mc={mc} />}
           </TabsContent>
 
@@ -151,7 +176,20 @@ export function ClosingDashboardPanel({ result, prizeTiers }: Props) {
                     {runningBT ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <History className="h-4 w-4 mr-1" />}
                     Backtest
                   </Button>
+                  {runningBT && (
+                    <Button variant="outline" size="icon" onClick={btWorker.cancel} title="Cancelar">
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
+                {runningBT && (
+                  <div className="space-y-1">
+                    <Progress value={btPct} />
+                    <p className="text-xs text-muted-foreground font-mono">
+                      {formatNumber(btWorker.progress.current)} / {formatNumber(btWorker.progress.total)} concursos
+                    </p>
+                  </div>
+                )}
                 {bt && <BTResults bt={bt} />}
               </>
             )}
