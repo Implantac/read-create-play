@@ -104,6 +104,7 @@ export function ClosingHistoryPanel({ lotteryId, onReopen, onDuplicate }: Props)
                       })} title="Duplicar parametros">
                         <Copy className="h-3.5 w-3.5" />
                       </Button>
+                    )}
                     <Button
                       size="sm"
                       variant="outline"
