@@ -185,7 +185,7 @@ const slideData: ScreenSlide[] = [
   {
     id: "simulador",
     title: "Simulação Massiva",
-    subtitle: "Simule milhões de jogos em segundos e descubra probabilidades reais",
+    subtitle: "Rode milhões de jogos em segundos e descubra as probabilidades reais",
     icon: Dices,
     color: "text-neon-purple",
     accentBg: "bg-neon-purple/10",
@@ -194,7 +194,7 @@ const slideData: ScreenSlide[] = [
   {
     id: "ia",
     title: "IA Autônoma",
-    subtitle: "Modelos de Machine Learning identificam padrões ocultos nos resultados",
+    subtitle: "Modelos de Machine Learning revelam padrões ocultos nos resultados",
     icon: Brain,
     color: "text-primary",
     accentBg: "bg-primary/10",
@@ -233,13 +233,13 @@ export function ScreensShowcase() {
         >
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-mono font-semibold tracking-wider uppercase mb-4">
             <Sparkles className="w-3.5 h-3.5" />
-            Tour pela Plataforma
+            Um tour pela plataforma
           </span>
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight mt-3">
             Conheça as <span className="gradient-brand-text">principais telas</span>
           </h2>
           <p className="text-muted-foreground mt-3 max-w-xl mx-auto">
-            Uma plataforma completa para análise, geração e simulação de apostas com inteligência artificial
+            Análise, geração, simulação e IA — tudo em um só lugar, pronto para transformar dados em decisões.
           </p>
         </motion.div>
 
