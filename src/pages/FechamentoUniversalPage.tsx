@@ -23,6 +23,8 @@ import { ClosingConstraintsPanel } from "@/components/closing/ClosingConstraints
 import { ClosingLibraryPanel, type ClosingLibraryApply } from "@/components/closing/ClosingLibraryPanel";
 import { ClosingMatrixEditor } from "@/components/closing/ClosingMatrixEditor";
 import { ClosingAIRecommendationPanel } from "@/components/closing/ClosingAIRecommendationPanel";
+import { ClosingConferencePanel } from "@/components/closing/ClosingConferencePanel";
+import { ClosingHistoryPanel } from "@/components/closing/ClosingHistoryPanel";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
