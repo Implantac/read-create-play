@@ -3,8 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { isCheckoutSessionResponse } from "@/core/contracts";
+import { createCheckoutSession } from "@/modules/subscriptions/application/subscriptionService";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { PlanFAQ } from "@/components/plans/PlanFAQ";
@@ -28,12 +27,8 @@ export default function PlanosPage() {
 
     setLoadingPlan(true);
     try {
-      const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { planId: "lifetime" },
-        headers: { Authorization: `Bearer ${session.access_token}` },
-      });
-      if (error) throw error;
-      if (isCheckoutSessionResponse(data) && data.url) window.open(data.url, "_blank");
+      const result = await createCheckoutSession("lifetime", session.access_token);
+      if (result?.url) window.open(result.url, "_blank");
     } catch (e: any) {
       toast.error("Erro ao iniciar checkout: " + (e.message || "Tente novamente"));
     } finally {
