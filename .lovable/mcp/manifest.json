@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "sdk_version": "0.22.2",
+  "path": "/functions/v1/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://cghydrrvebnkdugdlcia.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "titan-loterias-mcp",
+      "version": "0.1.0",
+      "title": "Titan Loterias"
+    },
+    "tools": [
+      {
+        "name": "list_recent_draws",
+        "title": "Listar sorteios recentes",
+        "description": "Retorna os sorteios oficiais mais recentes de uma loteria (Mega-Sena, Lotofácil, Quina, Lotomania, etc.) com concurso, data e dezenas sorteadas.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "lottery_id": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Identificador da loteria, ex.: 'lotofacil', 'megasena', 'quina', 'lotomania'."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10,
+              "description": "Quantos sorteios retornar (1–50)."
+            }
+          },
+          "required": [
+            "lottery_id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "top_numbers",
+        "title": "Dezenas mais frequentes",
+        "description": "Retorna as dezenas mais frequentes de uma loteria com base em todo o histórico oficial já sincronizado.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "lottery_id": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Identificador da loteria, ex.: 'lotofacil', 'megasena'."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10,
+              "description": "Quantas dezenas retornar."
+            }
+          },
+          "required": [
+            "lottery_id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_my_saved_bets",
+        "title": "Minhas apostas salvas",
+        "description": "Lista as apostas salvas do usuário autenticado no Titan Loterias, opcionalmente filtrando por loteria.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "lottery_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "default": null,
+              "description": "Filtro opcional por loteria (ex.: 'lotofacil'). null para todas."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "description": "Máximo de apostas a retornar."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

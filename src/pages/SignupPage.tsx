@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Zap, Loader2, Mail, Lock, User, ArrowRight, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
+
+function safeNext(raw: string | null): string {
+  if (!raw) return "/dashboard";
+  if (!raw.startsWith("/") || raw.startsWith("//")) return "/dashboard";
+  return raw;
+}
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -17,7 +23,9 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const { toast } = useToast();
-  
+  const [urlParams] = useSearchParams();
+  const nextPath = safeNext(urlParams.get("next"));
+
   // Get referral code from URL
   const searchParams = new URLSearchParams(window.location.search);
   const refCode = searchParams.get("ref") || localStorage.getItem("titan_ref_code") || "";
@@ -59,7 +67,7 @@ export default function SignupPage() {
           phone_number: cleanPhone,
           referral_code: refCode 
         },
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: `${window.location.origin}${nextPath}`,
       },
     });
     setLoading(false);

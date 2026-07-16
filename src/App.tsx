@@ -50,6 +50,7 @@ const SimulacoesPage = lazy(() => import("@/pages/SimulacoesPage"));
 const StrategyLabPage = lazy(() => import("@/pages/StrategyLabPage"));
 const ClosingSharePage = lazy(() => import("@/pages/ClosingSharePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const OAuthConsentPage = lazy(() => import("@/pages/OAuthConsentPage"));
 
 
 const queryClient = new QueryClient({
@@ -113,6 +114,7 @@ const AppContent = () => {
         <Route path="/install" element={<InstallPage />} />
         <Route path="/pwa-test" element={<PwaOfflineTestPage />} />
         <Route path="/f/:shareId" element={<ClosingSharePage />} />
+        <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
         
         {/* Protected */}
         <Route element={<ProtectedRoute><LotteryProvider><AppLayout /></LotteryProvider></ProtectedRoute>}>
