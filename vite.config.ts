@@ -40,6 +40,7 @@ export default defineConfig(({ mode }) => ({
     chunkSizeWarningLimit: 1000,
   },
   plugins: [
+    mcpPlugin(),
     react(),
     VitePWA({
       registerType: "autoUpdate",
