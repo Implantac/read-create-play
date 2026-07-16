@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,11 +9,20 @@ import { Zap, Loader2, Mail, Lock, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 
+// Only accept same-origin relative paths as post-login redirect targets.
+function safeNext(raw: string | null): string {
+  if (!raw) return "/dashboard";
+  if (!raw.startsWith("/") || raw.startsWith("//")) return "/dashboard";
+  return raw;
+}
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const nextPath = safeNext(searchParams.get("next"));
   const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -24,14 +33,15 @@ export default function LoginPage() {
     if (error) {
       toast({ title: "Erro ao entrar", description: error.message, variant: "destructive" });
     } else {
-      navigate("/dashboard");
+      navigate(nextPath);
     }
   };
 
   const handleGoogleLogin = async () => {
+    const redirectTo = `${window.location.origin}${nextPath}`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin },
+      options: { redirectTo },
     });
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
