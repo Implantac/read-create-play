@@ -28,9 +28,9 @@ export default defineTool({
     }
     const { data, error } = await supabaseForUser(ctx)
       .from("lottery_draws")
-      .select("contest_number, draw_date, numbers")
+      .select("concurso, draw_date, numbers")
       .eq("lottery_id", lottery_id)
-      .order("contest_number", { ascending: false })
+      .order("concurso", { ascending: false })
       .limit(limit);
 
     if (error) {
