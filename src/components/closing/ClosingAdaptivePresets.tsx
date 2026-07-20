@@ -192,7 +192,7 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, disa
           ...existing,
         ].slice(0, 80);
         saveAll(merged);
-        setPresets(merged.filter(p => p.lotteryId === lotteryId));
+        refresh();
         const added = normalized.filter(p => !existingKeys.has(`${p.lotteryId}|${p.name}`)).length;
         toast.success(`${added} preset(s) importado(s)${added < normalized.length ? ` · ${normalized.length - added} duplicado(s) ignorado(s)` : ""}.`);
       } catch (e) {
