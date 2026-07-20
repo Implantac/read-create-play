@@ -158,14 +158,25 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
             </p>
           </div>
 
-          <div className="flex items-center justify-between rounded-md border p-3">
-            <div className="space-y-0.5">
-              <Label className="text-sm">Reduzir jogos dominados</Label>
-              <p className="text-[11px] text-muted-foreground">
-                Remove redundâncias mantendo garantia matemática.
-              </p>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between rounded-md border p-3">
+              <div className="space-y-0.5">
+                <Label className="text-sm">Reduzir jogos dominados</Label>
+                <p className="text-[11px] text-muted-foreground">
+                  Remove redundâncias mantendo garantia matemática.
+                </p>
+              </div>
+              <Switch checked={reduce} onCheckedChange={setReduce} disabled={running || tuning} />
             </div>
-            <Switch checked={reduce} onCheckedChange={setReduce} disabled={running} />
+            <div className="flex items-center justify-between rounded-md border p-3">
+              <div className="space-y-0.5">
+                <Label className="text-sm">Refinamento fino (Auto-Tune)</Label>
+                <p className="text-[11px] text-muted-foreground">
+                  Passada extra ±10% em passos de 2% ao redor do vencedor.
+                </p>
+              </div>
+              <Switch checked={refine} onCheckedChange={setRefine} disabled={running || tuning} />
+            </div>
           </div>
         </div>
 
