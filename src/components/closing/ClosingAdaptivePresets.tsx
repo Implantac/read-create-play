@@ -71,9 +71,15 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, disa
   const [name, setName] = useState("");
   const [adding, setAdding] = useState(false);
 
-  useEffect(() => {
-    setPresets(loadAll().filter(p => p.lotteryId === lotteryId));
+  const refresh = useCallback(() => {
+    setPresets(
+      loadAll()
+        .filter(p => p.lotteryId === lotteryId)
+        .sort((a, b) => (b.lastUsedAt ?? b.createdAt) - (a.lastUsedAt ?? a.createdAt)),
+    );
   }, [lotteryId]);
+
+  useEffect(() => { refresh(); }, [refresh]);
 
   const save = useCallback(() => {
     const trimmed = name.trim();
@@ -86,21 +92,47 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, disa
       ...current,
       meta,
       createdAt: Date.now(),
+      useCount: 0,
     };
     const next = [preset, ...all].slice(0, 40);
     saveAll(next);
-    setPresets(next.filter(p => p.lotteryId === lotteryId));
+    refresh();
     setName("");
     setAdding(false);
     toast.success(`Preset "${trimmed}" salvo.`);
-  }, [name, lotteryId, current, meta]);
+  }, [name, lotteryId, current, meta, refresh]);
 
   const remove = useCallback((id: string) => {
     const next = loadAll().filter(p => p.id !== id);
     saveAll(next);
-    setPresets(next.filter(p => p.lotteryId === lotteryId));
+    refresh();
     toast.success("Preset removido.");
-  }, [lotteryId]);
+  }, [refresh]);
+
+  const duplicate = useCallback((p: AdaptivePreset) => {
+    const all = loadAll();
+    const copy: AdaptivePreset = {
+      ...p,
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      name: `${p.name} (cópia)`,
+      createdAt: Date.now(),
+      lastUsedAt: undefined,
+      useCount: 0,
+    };
+    saveAll([copy, ...all].slice(0, 40));
+    refresh();
+    toast.success(`Preset duplicado.`);
+  }, [refresh]);
+
+  const handleApply = useCallback((p: AdaptivePreset) => {
+    const all = loadAll();
+    const updated = all.map(x => x.id === p.id
+      ? { ...x, lastUsedAt: Date.now(), useCount: (x.useCount ?? 0) + 1 }
+      : x);
+    saveAll(updated);
+    refresh();
+    onApply(p);
+  }, [onApply, refresh]);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
