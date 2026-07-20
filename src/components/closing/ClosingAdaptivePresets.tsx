@@ -86,6 +86,74 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, disa
     toast.success("Preset removido.");
   }, [lotteryId]);
 
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const exportPresets = useCallback(() => {
+    if (presets.length === 0) { toast.error("Nada para exportar."); return; }
+    const payload = {
+      kind: "titan.adaptive.presets",
+      version: 1,
+      lotteryId,
+      exportedAt: new Date().toISOString(),
+      presets,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `titan-presets-${lotteryId}-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`${presets.length} preset(s) exportado(s).`);
+  }, [presets, lotteryId]);
+
+  const copyPresets = useCallback(async () => {
+    if (presets.length === 0) { toast.error("Nada para copiar."); return; }
+    try {
+      const payload = { kind: "titan.adaptive.presets", version: 1, lotteryId, presets };
+      await navigator.clipboard.writeText(JSON.stringify(payload));
+      toast.success("Presets copiados para a área de transferência.");
+    } catch {
+      toast.error("Falha ao copiar.");
+    }
+  }, [presets, lotteryId]);
+
+  const importPresets = useCallback((file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(String(reader.result));
+        const incoming: AdaptivePreset[] = Array.isArray(parsed) ? parsed : parsed?.presets;
+        if (!Array.isArray(incoming)) throw new Error("Formato inválido");
+        const valid = incoming.filter(p =>
+          p && typeof p.name === "string" && typeof p.statWeight === "number"
+          && typeof p.reduce === "boolean" && typeof p.refine === "boolean"
+          && typeof p.runs === "number",
+        );
+        if (valid.length === 0) throw new Error("Nenhum preset válido");
+        const existing = loadAll();
+        const existingKeys = new Set(existing.map(p => `${p.lotteryId}|${p.name}`));
+        const normalized: AdaptivePreset[] = valid.map(p => ({
+          ...p,
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          lotteryId: p.lotteryId || lotteryId,
+          createdAt: p.createdAt || Date.now(),
+        }));
+        const merged = [
+          ...normalized.filter(p => !existingKeys.has(`${p.lotteryId}|${p.name}`)),
+          ...existing,
+        ].slice(0, 80);
+        saveAll(merged);
+        setPresets(merged.filter(p => p.lotteryId === lotteryId));
+        const added = normalized.filter(p => !existingKeys.has(`${p.lotteryId}|${p.name}`)).length;
+        toast.success(`${added} preset(s) importado(s)${added < normalized.length ? ` · ${normalized.length - added} duplicado(s) ignorado(s)` : ""}.`);
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Arquivo inválido.");
+      }
+    };
+    reader.readAsText(file);
+  }, [lotteryId]);
+
   return (
     <div className="rounded-lg border bg-background/60 p-3 space-y-2">
       <div className="flex items-center justify-between">
