@@ -7,7 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Bookmark, Trash2, Check, Plus, Download, Upload, Copy, Files, Star, Search, StickyNote, X, Link2 } from "lucide-react";
+import { Bookmark, Trash2, Check, Plus, Download, Upload, Copy, Files, Star, Search, StickyNote, X, Link2, ArrowUpDown } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
+type SortMode = "recent" | "used" | "alpha";
+const SORT_KEY = "titan.adaptive.presets.sort";
+const SORT_LABEL: Record<SortMode, string> = { recent: "Recentes", used: "Mais usados", alpha: "A–Z" };
 import { toast } from "sonner";
 
 function formatRelative(ts: number): string {
