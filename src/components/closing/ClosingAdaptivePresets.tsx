@@ -200,7 +200,7 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, disa
       }
     };
     reader.readAsText(file);
-  }, [lotteryId]);
+  }, [lotteryId, refresh]);
 
   return (
     <div className="rounded-lg border bg-background/60 p-3 space-y-2">
