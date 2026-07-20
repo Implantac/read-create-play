@@ -137,12 +137,26 @@ export function ClosingHistoryPanel({ lotteryId, onReopen, onDuplicate }: Props)
           <p className="text-sm text-muted-foreground py-4 text-center">
             Nenhum fechamento salvo. Gere um fechamento e ele sera arquivado aqui automaticamente.
           </p>
+        ) : filtered.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-4 text-center">
+            Nenhum fechamento corresponde ao filtro atual.
+          </p>
         ) : (
           <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
-            {history.map((row) => {
+            {filtered.map((row) => {
               const meets = row.validation?.meetsGuarantee;
+              const isFav = favorites.has(row.id);
               return (
                 <div key={row.id} className="rounded-lg border bg-muted/10 p-3 flex flex-wrap items-center gap-3 hover:bg-muted/20 transition-colors">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className={`h-8 w-8 p-0 ${isFav ? "text-amber-400 hover:text-amber-300" : "text-muted-foreground hover:text-amber-400"}`}
+                    onClick={() => toggleFavorite(row.id)}
+                    title={isFav ? "Remover dos favoritos" : "Marcar como favorito"}
+                  >
+                    <Star className={`h-4 w-4 ${isFav ? "fill-current" : ""}`} />
+                  </Button>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <Badge variant="outline" className="text-[10px]">{row.strategy}</Badge>
