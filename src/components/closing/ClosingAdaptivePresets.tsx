@@ -6,8 +6,22 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Bookmark, Trash2, Check, Plus, Download, Upload, Copy } from "lucide-react";
+import { Bookmark, Trash2, Check, Plus, Download, Upload, Copy, Files } from "lucide-react";
 import { toast } from "sonner";
+
+function formatRelative(ts: number): string {
+  const diff = Date.now() - ts;
+  const s = Math.floor(diff / 1000);
+  if (s < 60) return "agora";
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}min`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h`;
+  const d = Math.floor(h / 24);
+  if (d < 30) return `${d}d`;
+  const mo = Math.floor(d / 30);
+  return `${mo}mo`;
+}
 
 export interface AdaptivePreset {
   id: string;
@@ -18,6 +32,8 @@ export interface AdaptivePreset {
   refine: boolean;
   runs: number;
   createdAt: number;
+  lastUsedAt?: number;
+  useCount?: number;
   meta?: { games?: number; cost?: number; adaptive?: number };
 }
 
@@ -55,9 +71,15 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, disa
   const [name, setName] = useState("");
   const [adding, setAdding] = useState(false);
 
-  useEffect(() => {
-    setPresets(loadAll().filter(p => p.lotteryId === lotteryId));
+  const refresh = useCallback(() => {
+    setPresets(
+      loadAll()
+        .filter(p => p.lotteryId === lotteryId)
+        .sort((a, b) => (b.lastUsedAt ?? b.createdAt) - (a.lastUsedAt ?? a.createdAt)),
+    );
   }, [lotteryId]);
+
+  useEffect(() => { refresh(); }, [refresh]);
 
   const save = useCallback(() => {
     const trimmed = name.trim();
@@ -70,21 +92,47 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, disa
       ...current,
       meta,
       createdAt: Date.now(),
+      useCount: 0,
     };
     const next = [preset, ...all].slice(0, 40);
     saveAll(next);
-    setPresets(next.filter(p => p.lotteryId === lotteryId));
+    refresh();
     setName("");
     setAdding(false);
     toast.success(`Preset "${trimmed}" salvo.`);
-  }, [name, lotteryId, current, meta]);
+  }, [name, lotteryId, current, meta, refresh]);
 
   const remove = useCallback((id: string) => {
     const next = loadAll().filter(p => p.id !== id);
     saveAll(next);
-    setPresets(next.filter(p => p.lotteryId === lotteryId));
+    refresh();
     toast.success("Preset removido.");
-  }, [lotteryId]);
+  }, [refresh]);
+
+  const duplicate = useCallback((p: AdaptivePreset) => {
+    const all = loadAll();
+    const copy: AdaptivePreset = {
+      ...p,
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      name: `${p.name} (cópia)`,
+      createdAt: Date.now(),
+      lastUsedAt: undefined,
+      useCount: 0,
+    };
+    saveAll([copy, ...all].slice(0, 40));
+    refresh();
+    toast.success(`Preset duplicado.`);
+  }, [refresh]);
+
+  const handleApply = useCallback((p: AdaptivePreset) => {
+    const all = loadAll();
+    const updated = all.map(x => x.id === p.id
+      ? { ...x, lastUsedAt: Date.now(), useCount: (x.useCount ?? 0) + 1 }
+      : x);
+    saveAll(updated);
+    refresh();
+    onApply(p);
+  }, [onApply, refresh]);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -144,7 +192,7 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, disa
           ...existing,
         ].slice(0, 80);
         saveAll(merged);
-        setPresets(merged.filter(p => p.lotteryId === lotteryId));
+        refresh();
         const added = normalized.filter(p => !existingKeys.has(`${p.lotteryId}|${p.name}`)).length;
         toast.success(`${added} preset(s) importado(s)${added < normalized.length ? ` · ${normalized.length - added} duplicado(s) ignorado(s)` : ""}.`);
       } catch (e) {
@@ -152,7 +200,7 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, disa
       }
     };
     reader.readAsText(file);
-  }, [lotteryId]);
+  }, [lotteryId, refresh]);
 
   return (
     <div className="rounded-lg border bg-background/60 p-3 space-y-2">
@@ -215,10 +263,27 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, disa
 
       {presets.length > 0 && (
         <div className="grid gap-1.5 sm:grid-cols-2">
-          {presets.map(p => (
-            <div key={p.id} className="flex items-center justify-between gap-2 rounded-md border p-2 text-xs">
+          {presets.map((p, idx) => (
+            <div
+              key={p.id}
+              className={`flex items-center justify-between gap-2 rounded-md border p-2 text-xs ${
+                idx === 0 && p.lastUsedAt ? "border-primary/40 bg-primary/5" : ""
+              }`}
+            >
               <div className="min-w-0 flex-1">
-                <div className="truncate font-medium">{p.name}</div>
+                <div className="flex items-center gap-1.5">
+                  <span className="truncate font-medium">{p.name}</span>
+                  {p.lastUsedAt && (
+                    <Badge variant="outline" className="shrink-0 text-[9px] font-normal px-1 py-0 h-4">
+                      {formatRelative(p.lastUsedAt)}
+                    </Badge>
+                  )}
+                  {(p.useCount ?? 0) >= 3 && (
+                    <Badge variant="secondary" className="shrink-0 text-[9px] font-normal px-1 py-0 h-4">
+                      {p.useCount}×
+                    </Badge>
+                  )}
+                </div>
                 <div className="flex flex-wrap gap-1 pt-0.5 text-[10px] text-muted-foreground">
                   <span className="font-mono">peso {p.statWeight}%</span>
                   <span>·</span>
@@ -229,10 +294,13 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, disa
                 </div>
               </div>
               <div className="flex shrink-0 gap-1">
-                <Button size="sm" variant="secondary" className="h-7 px-2" onClick={() => onApply(p)} disabled={disabled}>
+                <Button size="sm" variant="secondary" className="h-7 px-2" onClick={() => handleApply(p)} disabled={disabled}>
                   Aplicar
                 </Button>
-                <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => remove(p.id)}>
+                <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => duplicate(p)} title="Duplicar">
+                  <Files className="h-3.5 w-3.5" />
+                </Button>
+                <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => remove(p.id)} title="Remover">
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               </div>
