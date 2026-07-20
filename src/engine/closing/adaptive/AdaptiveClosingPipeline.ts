@@ -10,7 +10,8 @@
  */
 
 import type { ClosingRequest, ClosingResult, ClosingStrategy } from "../core/types";
-import { compareStrategies, calculateGuarantee } from "../core/ClosingEngine";
+import { compareStrategies } from "../core/ClosingEngine";
+import { validateClosing } from "../validation/ValidationEngine";
 import { findDominatedGames } from "../analysis/dominatedGames";
 import { rankGames, type RankedGame } from "../analysis/rankGames";
 
