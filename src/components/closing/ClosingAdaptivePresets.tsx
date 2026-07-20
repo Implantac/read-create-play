@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Bookmark, Trash2, Check, Plus, Download, Upload, Copy, Files, Star, Search, StickyNote, X } from "lucide-react";
+import { Bookmark, Trash2, Check, Plus, Download, Upload, Copy, Files, Star, Search, StickyNote, X, Link2 } from "lucide-react";
 import { toast } from "sonner";
 
 function formatRelative(ts: number): string {
