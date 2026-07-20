@@ -77,7 +77,21 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAu
   const [query, setQuery] = useState("");
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [noteDraft, setNoteDraft] = useState("");
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameDraft, setRenameDraft] = useState("");
   const autoLoadedRef = useRef<string | null>(null);
+
+  const rename = useCallback((id: string, next: string) => {
+    const trimmed = next.trim();
+    if (!trimmed) { toast.error("Nome vazio."); return; }
+    const all = loadAll();
+    const updated = all.map(p => p.id === id ? { ...p, name: trimmed } : p);
+    saveAll(updated);
+    setRenamingId(null);
+    setRenameDraft("");
+    setPresets(prev => prev.map(p => p.id === id ? { ...p, name: trimmed } : p));
+    toast.success("Renomeado.");
+  }, []);
 
   const refresh = useCallback(() => {
     setPresets(
