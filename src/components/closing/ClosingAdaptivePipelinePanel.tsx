@@ -233,6 +233,34 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
 
         {(running || tuning) && <Progress value={undefined} className="h-1.5" />}
 
+        {bestOfNRuns && bestOfNRuns.length > 1 && (
+          <div className="rounded-lg border bg-background/60 p-3 space-y-2">
+            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Best-of-{bestOfNRuns.length} · resultados por execução
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {bestOfNRuns.map((r, i) => {
+                const isBest = r.adaptive === Math.max(...bestOfNRuns.map(x => x.adaptive));
+                return (
+                  <div
+                    key={i}
+                    className={`min-w-[72px] rounded-md border p-2 text-center ${
+                      isBest ? "border-emerald-500/40 bg-emerald-500/10" : "border-border"
+                    }`}
+                  >
+                    <div className="text-[10px] text-muted-foreground">Run {i + 1}</div>
+                    <div className={`font-mono text-sm font-bold ${isBest ? "text-emerald-500" : "text-primary"}`}>
+                      {r.adaptive.toFixed(1)}
+                    </div>
+                    <div className="text-[10px] text-muted-foreground">{r.games}j</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+
         {tuneSweep && (
           <div className="rounded-lg border bg-background/60 p-3 space-y-2">
             <div className="flex items-center justify-between">
