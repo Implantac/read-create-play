@@ -6,7 +6,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Bookmark, Trash2, Check, Plus, Download, Upload, Copy, Files } from "lucide-react";
+import { Bookmark, Trash2, Check, Plus, Download, Upload, Copy, Files, Star } from "lucide-react";
 import { toast } from "sonner";
 
 function formatRelative(ts: number): string {
@@ -34,6 +34,7 @@ export interface AdaptivePreset {
   createdAt: number;
   lastUsedAt?: number;
   useCount?: number;
+  isDefault?: boolean;
   meta?: { games?: number; cost?: number; adaptive?: number };
 }
 
@@ -63,23 +64,53 @@ interface Props {
   current: { statWeight: number; reduce: boolean; refine: boolean; runs: number };
   meta?: { games?: number; cost?: number; adaptive?: number };
   onApply: (p: AdaptivePreset) => void;
+  onAutoLoadDefault?: (p: AdaptivePreset) => void;
   disabled?: boolean;
 }
 
-export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, disabled }: Props) {
+export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAutoLoadDefault, disabled }: Props) {
   const [presets, setPresets] = useState<AdaptivePreset[]>([]);
   const [name, setName] = useState("");
   const [adding, setAdding] = useState(false);
+  const autoLoadedRef = useRef<string | null>(null);
 
   const refresh = useCallback(() => {
     setPresets(
       loadAll()
         .filter(p => p.lotteryId === lotteryId)
-        .sort((a, b) => (b.lastUsedAt ?? b.createdAt) - (a.lastUsedAt ?? a.createdAt)),
+        .sort((a, b) => {
+          if ((b.isDefault ? 1 : 0) !== (a.isDefault ? 1 : 0)) return (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0);
+          return (b.lastUsedAt ?? b.createdAt) - (a.lastUsedAt ?? a.createdAt);
+        }),
     );
   }, [lotteryId]);
 
   useEffect(() => { refresh(); }, [refresh]);
+
+  // Carrega automaticamente o preset padrão (uma vez por modalidade)
+  useEffect(() => {
+    if (!onAutoLoadDefault || autoLoadedRef.current === lotteryId) return;
+    const def = loadAll().find(p => p.lotteryId === lotteryId && p.isDefault);
+    if (def) {
+      autoLoadedRef.current = lotteryId;
+      onAutoLoadDefault(def);
+    }
+  }, [lotteryId, onAutoLoadDefault]);
+
+  const toggleDefault = useCallback((id: string) => {
+    const all = loadAll();
+    const target = all.find(p => p.id === id);
+    if (!target) return;
+    const nextDefault = !target.isDefault;
+    const updated = all.map(p => {
+      if (p.lotteryId !== lotteryId) return p;
+      if (p.id === id) return { ...p, isDefault: nextDefault };
+      return nextDefault ? { ...p, isDefault: false } : p;
+    });
+    saveAll(updated);
+    refresh();
+    toast.success(nextDefault ? `"${target.name}" definido como padrão.` : "Padrão removido.");
+  }, [lotteryId, refresh]);
 
   const save = useCallback(() => {
     const trimmed = name.trim();
@@ -267,11 +298,13 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, disa
             <div
               key={p.id}
               className={`flex items-center justify-between gap-2 rounded-md border p-2 text-xs ${
-                idx === 0 && p.lastUsedAt ? "border-primary/40 bg-primary/5" : ""
+                p.isDefault ? "border-amber-500/40 bg-amber-500/5"
+                            : idx === 0 && p.lastUsedAt ? "border-primary/40 bg-primary/5" : ""
               }`}
             >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
+                  {p.isDefault && <Star className="h-3 w-3 shrink-0 fill-amber-500 text-amber-500" />}
                   <span className="truncate font-medium">{p.name}</span>
                   {p.lastUsedAt && (
                     <Badge variant="outline" className="shrink-0 text-[9px] font-normal px-1 py-0 h-4">
@@ -296,6 +329,15 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, disa
               <div className="flex shrink-0 gap-1">
                 <Button size="sm" variant="secondary" className="h-7 px-2" onClick={() => handleApply(p)} disabled={disabled}>
                   Aplicar
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 w-7 p-0"
+                  onClick={() => toggleDefault(p.id)}
+                  title={p.isDefault ? "Remover como padrão" : "Definir como padrão"}
+                >
+                  <Star className={`h-3.5 w-3.5 ${p.isDefault ? "fill-amber-500 text-amber-500" : ""}`} />
                 </Button>
                 <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => duplicate(p)} title="Duplicar">
                   <Files className="h-3.5 w-3.5" />
