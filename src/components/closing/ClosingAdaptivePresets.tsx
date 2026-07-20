@@ -263,10 +263,27 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, disa
 
       {presets.length > 0 && (
         <div className="grid gap-1.5 sm:grid-cols-2">
-          {presets.map(p => (
-            <div key={p.id} className="flex items-center justify-between gap-2 rounded-md border p-2 text-xs">
+          {presets.map((p, idx) => (
+            <div
+              key={p.id}
+              className={`flex items-center justify-between gap-2 rounded-md border p-2 text-xs ${
+                idx === 0 && p.lastUsedAt ? "border-primary/40 bg-primary/5" : ""
+              }`}
+            >
               <div className="min-w-0 flex-1">
-                <div className="truncate font-medium">{p.name}</div>
+                <div className="flex items-center gap-1.5">
+                  <span className="truncate font-medium">{p.name}</span>
+                  {p.lastUsedAt && (
+                    <Badge variant="outline" className="shrink-0 text-[9px] font-normal px-1 py-0 h-4">
+                      {formatRelative(p.lastUsedAt)}
+                    </Badge>
+                  )}
+                  {(p.useCount ?? 0) >= 3 && (
+                    <Badge variant="secondary" className="shrink-0 text-[9px] font-normal px-1 py-0 h-4">
+                      {p.useCount}×
+                    </Badge>
+                  )}
+                </div>
                 <div className="flex flex-wrap gap-1 pt-0.5 text-[10px] text-muted-foreground">
                   <span className="font-mono">peso {p.statWeight}%</span>
                   <span>·</span>
@@ -277,10 +294,13 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, disa
                 </div>
               </div>
               <div className="flex shrink-0 gap-1">
-                <Button size="sm" variant="secondary" className="h-7 px-2" onClick={() => onApply(p)} disabled={disabled}>
+                <Button size="sm" variant="secondary" className="h-7 px-2" onClick={() => handleApply(p)} disabled={disabled}>
                   Aplicar
                 </Button>
-                <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => remove(p.id)}>
+                <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => duplicate(p)} title="Duplicar">
+                  <Files className="h-3.5 w-3.5" />
+                </Button>
+                <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => remove(p.id)} title="Remover">
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               </div>
