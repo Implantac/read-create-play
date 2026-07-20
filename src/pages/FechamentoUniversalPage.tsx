@@ -513,6 +513,7 @@ const FechamentoUniversalPage = () => {
           window.scrollTo({ top: 0, behavior: "smooth" });
         }}
       />
+      <ClosingCompareTwoPanel lotteryId={config.id} />
     </div>
   );
 };
