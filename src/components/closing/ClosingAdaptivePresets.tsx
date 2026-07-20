@@ -2,11 +2,11 @@
  * ClosingAdaptivePresets — persiste configurações vencedoras do Pipeline Adaptativo
  * no localStorage, permitindo salvar, aplicar e remover presets por modalidade.
  */
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Bookmark, Trash2, Check, Plus } from "lucide-react";
+import { Bookmark, Trash2, Check, Plus, Download, Upload, Copy } from "lucide-react";
 import { toast } from "sonner";
 
 export interface AdaptivePreset {
