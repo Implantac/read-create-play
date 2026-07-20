@@ -44,19 +44,89 @@ function rowToResult(row: ClosingHistoryRow): ClosingResult {
   } as unknown as ClosingResult;
 }
 
+const FAV_STORAGE_KEY = "titan.closingHistory.favorites.v1";
+
+function loadFavorites(): Set<string> {
+  try {
+    const raw = localStorage.getItem(FAV_STORAGE_KEY);
+    if (!raw) return new Set();
+    const arr = JSON.parse(raw) as string[];
+    return new Set(Array.isArray(arr) ? arr : []);
+  } catch { return new Set(); }
+}
+
+function saveFavorites(set: Set<string>) {
+  try { localStorage.setItem(FAV_STORAGE_KEY, JSON.stringify([...set])); } catch { /* noop */ }
+}
+
 export function ClosingHistoryPanel({ lotteryId, onReopen, onDuplicate }: Props) {
   const { history, isLoading, deleteClosing, shareClosing, unshareClosing } = useClosingHistory(lotteryId);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [sharingId, setSharingId] = useState<string | null>(null);
+  const [favorites, setFavorites] = useState<Set<string>>(() => loadFavorites());
+  const [search, setSearch] = useState("");
+  const [showFavOnly, setShowFavOnly] = useState(false);
+
+  useEffect(() => { saveFavorites(favorites); }, [favorites]);
+
+  const toggleFavorite = useCallback((id: string) => {
+    setFavorites((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const base = showFavOnly ? history.filter((r) => favorites.has(r.id)) : history;
+    const searched = q
+      ? base.filter((r) =>
+          r.strategy.toLowerCase().includes(q) ||
+          String(r.game_count).includes(q) ||
+          (r.lottery_name ?? "").toLowerCase().includes(q) ||
+          r.base_numbers.join(",").includes(q),
+        )
+      : base;
+    return [...searched].sort((a, b) => {
+      const fa = favorites.has(a.id) ? 1 : 0;
+      const fb = favorites.has(b.id) ? 1 : 0;
+      if (fa !== fb) return fb - fa;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+  }, [history, search, showFavOnly, favorites]);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 flex-wrap">
           <Cloud className="h-5 w-5" />
           Biblioteca na Nuvem
-          <Badge variant="secondary" className="ml-auto">{history.length} salvos</Badge>
+          <Badge variant="secondary" className="ml-auto">{filtered.length}/{history.length}</Badge>
         </CardTitle>
+        {history.length > 0 && (
+          <div className="flex items-center gap-2 pt-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Buscar por estratégia, base, jogos..."
+                className="pl-7 h-8 text-xs"
+              />
+            </div>
+            <Button
+              variant={showFavOnly ? "default" : "outline"}
+              size="sm"
+              className="h-8"
+              onClick={() => setShowFavOnly((v) => !v)}
+              title="Somente favoritos"
+            >
+              <Filter className="h-3.5 w-3.5 mr-1" />
+              <Star className={`h-3.5 w-3.5 ${showFavOnly ? "fill-current" : ""}`} />
+            </Button>
+          </div>
+        )}
       </CardHeader>
       <CardContent>
         {isLoading ? (
