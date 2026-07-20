@@ -192,6 +192,16 @@ export interface AutoTuneResult {
   best: AdaptivePipelineReport;
   bestWeight: number;
   sweep: Array<{ weight: number; adaptive: number; games: number; cost: number; overall: number }>;
+  /** Delta entre baseline (peso 0 = puramente matemático) e o vencedor. */
+  delta: {
+    baselineWeight: number;
+    baselineAdaptive: number;
+    baselineGames: number;
+    baselineCost: number;
+    adaptiveGain: number;
+    gamesGain: number;
+    costGain: number;
+  };
 }
 
 export function autoTuneAdaptivePipeline(
@@ -214,7 +224,6 @@ export function autoTuneAdaptivePipeline(
       cost: rep.chosen.cost,
       overall: top?.overall ?? 0,
     });
-    // Critério: maior nota adaptativa; empate → menos jogos.
     const score = adaptive - rep.chosen.gameCount * 0.01;
     if (score > bestScore) {
       bestScore = score;
@@ -224,5 +233,18 @@ export function autoTuneAdaptivePipeline(
   }
 
   if (!best) throw new Error("Auto-tune sem resultados");
-  return { best, bestWeight, sweep };
+
+  const baseline = sweep.find(s => s.weight === 0) ?? sweep[0];
+  const winner = sweep.find(s => s.weight === bestWeight) ?? sweep[0];
+  const delta = {
+    baselineWeight: baseline.weight,
+    baselineAdaptive: baseline.adaptive,
+    baselineGames: baseline.games,
+    baselineCost: baseline.cost,
+    adaptiveGain: Math.round((winner.adaptive - baseline.adaptive) * 10) / 10,
+    gamesGain: baseline.games - winner.games,
+    costGain: Math.round((baseline.cost - winner.cost) * 100) / 100,
+  };
+
+  return { best, bestWeight, sweep, delta };
 }
