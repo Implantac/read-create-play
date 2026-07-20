@@ -74,6 +74,9 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAu
   const [presets, setPresets] = useState<AdaptivePreset[]>([]);
   const [name, setName] = useState("");
   const [adding, setAdding] = useState(false);
+  const [query, setQuery] = useState("");
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [noteDraft, setNoteDraft] = useState("");
   const autoLoadedRef = useRef<string | null>(null);
 
   const refresh = useCallback(() => {
