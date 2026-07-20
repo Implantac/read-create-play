@@ -87,6 +87,31 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAu
 
   useEffect(() => { refresh(); }, [refresh]);
 
+  // Carrega automaticamente o preset padrão (uma vez por modalidade)
+  useEffect(() => {
+    if (!onAutoLoadDefault || autoLoadedRef.current === lotteryId) return;
+    const def = loadAll().find(p => p.lotteryId === lotteryId && p.isDefault);
+    if (def) {
+      autoLoadedRef.current = lotteryId;
+      onAutoLoadDefault(def);
+    }
+  }, [lotteryId, onAutoLoadDefault]);
+
+  const toggleDefault = useCallback((id: string) => {
+    const all = loadAll();
+    const target = all.find(p => p.id === id);
+    if (!target) return;
+    const nextDefault = !target.isDefault;
+    const updated = all.map(p => {
+      if (p.lotteryId !== lotteryId) return p;
+      if (p.id === id) return { ...p, isDefault: nextDefault };
+      return nextDefault ? { ...p, isDefault: false } : p;
+    });
+    saveAll(updated);
+    refresh();
+    toast.success(nextDefault ? `"${target.name}" definido como padrão.` : "Padrão removido.");
+  }, [lotteryId, refresh]);
+
   const save = useCallback(() => {
     const trimmed = name.trim();
     if (!trimmed) { toast.error("Dê um nome ao preset."); return; }
