@@ -12,11 +12,13 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { Wand2, Loader2, CheckCircle2, TrendingUp, Zap, Filter, Trophy } from "lucide-react";
+import { Wand2, Loader2, CheckCircle2, TrendingUp, Zap, Filter, Trophy, Sparkles } from "lucide-react";
 import type { ClosingRequest, ClosingResult, ClosingStrategy } from "@/engine/closing";
 import {
   runAdaptivePipeline,
+  autoTuneAdaptivePipeline,
   type AdaptivePipelineReport,
+  type AutoTuneResult,
 } from "@/engine/closing/adaptive/AdaptiveClosingPipeline";
 import { useLotteryDraws } from "@/hooks/useLotteryDraws";
 import { formatCurrency } from "@/utils/formatters";
@@ -46,7 +48,9 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
   const [statWeight, setStatWeight] = useState(35);
   const [reduce, setReduce] = useState(true);
   const [running, setRunning] = useState(false);
+  const [tuning, setTuning] = useState(false);
   const [report, setReport] = useState<AdaptivePipelineReport | null>(null);
+  const [tuneSweep, setTuneSweep] = useState<AutoTuneResult["sweep"] | null>(null);
 
   const runPipeline = async () => {
     if (!request) { toast.error("Configure a base primeiro."); return; }
