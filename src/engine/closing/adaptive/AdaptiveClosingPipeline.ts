@@ -185,6 +185,30 @@ export function runAdaptivePipeline(input: AdaptivePipelineInput): AdaptivePipel
 }
 
 /**
+ * runAdaptivePipelineBestOfN — executa o pipeline N vezes e retorna o melhor por nota adaptativa.
+ * Útil para estratégias estocásticas (genetic/SA/monte_carlo) onde a semente altera o resultado.
+ */
+export function runAdaptivePipelineBestOfN(
+  input: AdaptivePipelineInput,
+  runs = 3,
+): { best: AdaptivePipelineReport; allRuns: Array<{ adaptive: number; games: number; cost: number }> } {
+  const n = Math.max(1, Math.min(10, runs));
+  let bestRep: AdaptivePipelineReport | null = null;
+  let bestScore = -Infinity;
+  const allRuns: Array<{ adaptive: number; games: number; cost: number }> = [];
+  for (let i = 0; i < n; i++) {
+    const rep = runAdaptivePipeline(input);
+    const top = rep.strategies[0];
+    const adaptive = top?.adaptive ?? 0;
+    allRuns.push({ adaptive, games: rep.chosen.gameCount, cost: rep.chosen.cost });
+    const score = adaptive - rep.chosen.gameCount * 0.01;
+    if (score > bestScore) { bestScore = score; bestRep = rep; }
+  }
+  if (!bestRep) throw new Error("Best-of-N sem resultados");
+  return { best: bestRep, allRuns };
+}
+
+/**
  * autoTuneAdaptivePipeline — varre pesos estatísticos e retorna o melhor report.
  * Mantém a garantia matemática (usa o próprio pipeline em cada iteração).
  */
