@@ -208,18 +208,32 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
 
         {tuneSweep && (
           <div className="rounded-lg border bg-background/60 p-3 space-y-2">
-            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Varredura de peso estatístico
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Varredura de peso estatístico
+              </div>
+              {refinedSweep && (
+                <Badge variant="outline" className="text-[10px]">
+                  {tuneSweep.filter(s => s.refined).length} pontos refinados
+                </Badge>
+              )}
             </div>
-            <div className="grid grid-cols-5 gap-2">
+            <div className="flex flex-wrap gap-2">
               {tuneSweep.map(s => {
                 const isBest = Math.round(s.weight * 100) === statWeight;
                 return (
                   <div
                     key={s.weight}
-                    className={`rounded-md border p-2 text-center ${isBest ? "border-primary bg-primary/10" : "border-border"}`}
+                    className={`min-w-[64px] rounded-md border p-2 text-center ${
+                      isBest ? "border-primary bg-primary/10"
+                             : s.refined ? "border-primary/40 bg-primary/5"
+                                          : "border-border"
+                    }`}
+                    title={s.refined ? "Refinamento fino" : "Varredura ampla"}
                   >
-                    <div className="text-[10px] text-muted-foreground">{Math.round(s.weight * 100)}%</div>
+                    <div className="text-[10px] text-muted-foreground">
+                      {(s.weight * 100).toFixed(0)}%{s.refined && <span className="ml-0.5 text-primary">•</span>}
+                    </div>
                     <div className="font-mono text-sm font-bold text-primary">{s.adaptive.toFixed(1)}</div>
                     <div className="text-[10px] text-muted-foreground">{s.games}j</div>
                   </div>
