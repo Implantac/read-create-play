@@ -16,8 +16,8 @@ export default function PlanosPage() {
   const [loadingPlan, setLoadingPlan] = useState(false);
   const navigate = useNavigate();
 
-  const LAUNCH_PRICE = "R$ 297";
-  const ORIGINAL_PRICE = "R$ 997";
+  const LAUNCH_PRICE = "R$ 99,90";
+  const ORIGINAL_PRICE = "R$ 297";
 
   const handleCheckout = async () => {
     if (!session) {
