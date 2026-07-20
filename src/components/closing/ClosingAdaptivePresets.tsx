@@ -7,7 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Bookmark, Trash2, Check, Plus, Download, Upload, Copy, Files, Star, Search, StickyNote, X, Link2 } from "lucide-react";
+import { Bookmark, Trash2, Check, Plus, Download, Upload, Copy, Files, Star, Search, StickyNote, X, Link2, ArrowUpDown } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
+type SortMode = "recent" | "used" | "alpha";
+const SORT_KEY = "titan.adaptive.presets.sort";
+const SORT_LABEL: Record<SortMode, string> = { recent: "Recentes", used: "Mais usados", alpha: "A–Z" };
 import { toast } from "sonner";
 
 function formatRelative(ts: number): string {
@@ -80,6 +85,10 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAu
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameDraft, setRenameDraft] = useState("");
   const autoLoadedRef = useRef<string | null>(null);
+  const [sortMode, setSortMode] = useState<SortMode>(() => {
+    try { return (localStorage.getItem(SORT_KEY) as SortMode) || "recent"; } catch { return "recent"; }
+  });
+  useEffect(() => { try { localStorage.setItem(SORT_KEY, sortMode); } catch { /* ignore */ } }, [sortMode]);
 
   const rename = useCallback((id: string, next: string) => {
     const trimmed = next.trim();
@@ -99,10 +108,12 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAu
         .filter(p => p.lotteryId === lotteryId)
         .sort((a, b) => {
           if ((b.isDefault ? 1 : 0) !== (a.isDefault ? 1 : 0)) return (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0);
+          if (sortMode === "alpha") return a.name.localeCompare(b.name, "pt-BR");
+          if (sortMode === "used") return (b.useCount ?? 0) - (a.useCount ?? 0) || (b.lastUsedAt ?? b.createdAt) - (a.lastUsedAt ?? a.createdAt);
           return (b.lastUsedAt ?? b.createdAt) - (a.lastUsedAt ?? a.createdAt);
         }),
     );
-  }, [lotteryId]);
+  }, [lotteryId, sortMode]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
@@ -367,6 +378,22 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAu
             <Button size="sm" variant="ghost" className="h-7 px-2" onClick={copyPresets} disabled={disabled || presets.length === 0} title="Copiar JSON">
               <Copy className="h-3.5 w-3.5" />
             </Button>
+            {presets.length >= 2 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" variant="ghost" className="h-7 px-2" disabled={disabled} title={`Ordenar: ${SORT_LABEL[sortMode]}`}>
+                    <ArrowUpDown className="h-3.5 w-3.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {(["recent", "used", "alpha"] as SortMode[]).map(m => (
+                    <DropdownMenuItem key={m} onClick={() => setSortMode(m)} className={sortMode === m ? "font-semibold" : ""}>
+                      {sortMode === m && <Check className="mr-1 h-3 w-3" />} {SORT_LABEL[m]}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
             <Button size="sm" variant="outline" onClick={() => setAdding(true)} disabled={disabled}>
               <Plus className="mr-1 h-3.5 w-3.5" /> Salvar atual
             </Button>
