@@ -6,8 +6,22 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Bookmark, Trash2, Check, Plus, Download, Upload, Copy } from "lucide-react";
+import { Bookmark, Trash2, Check, Plus, Download, Upload, Copy, Files } from "lucide-react";
 import { toast } from "sonner";
+
+function formatRelative(ts: number): string {
+  const diff = Date.now() - ts;
+  const s = Math.floor(diff / 1000);
+  if (s < 60) return "agora";
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}min`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h`;
+  const d = Math.floor(h / 24);
+  if (d < 30) return `${d}d`;
+  const mo = Math.floor(d / 30);
+  return `${mo}mo`;
+}
 
 export interface AdaptivePreset {
   id: string;
