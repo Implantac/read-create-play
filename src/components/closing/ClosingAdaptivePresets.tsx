@@ -77,7 +77,21 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAu
   const [query, setQuery] = useState("");
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [noteDraft, setNoteDraft] = useState("");
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameDraft, setRenameDraft] = useState("");
   const autoLoadedRef = useRef<string | null>(null);
+
+  const rename = useCallback((id: string, next: string) => {
+    const trimmed = next.trim();
+    if (!trimmed) { toast.error("Nome vazio."); return; }
+    const all = loadAll();
+    const updated = all.map(p => p.id === id ? { ...p, name: trimmed } : p);
+    saveAll(updated);
+    setRenamingId(null);
+    setRenameDraft("");
+    setPresets(prev => prev.map(p => p.id === id ? { ...p, name: trimmed } : p));
+    toast.success("Renomeado.");
+  }, []);
 
   const refresh = useCallback(() => {
     setPresets(
@@ -420,7 +434,26 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAu
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
                     {p.isDefault && <Star className="h-3 w-3 shrink-0 fill-amber-500 text-amber-500" />}
-                    <span className="truncate font-medium">{p.name}</span>
+                    {renamingId === p.id ? (
+                      <Input
+                        autoFocus
+                        value={renameDraft}
+                        onChange={e => setRenameDraft(e.target.value)}
+                        onBlur={() => { if (renameDraft.trim() && renameDraft.trim() !== p.name) rename(p.id, renameDraft); else { setRenamingId(null); setRenameDraft(""); } }}
+                        onKeyDown={e => {
+                          if (e.key === "Enter") rename(p.id, renameDraft);
+                          if (e.key === "Escape") { setRenamingId(null); setRenameDraft(""); }
+                        }}
+                        className="h-5 px-1 py-0 text-xs"
+                        maxLength={60}
+                      />
+                    ) : (
+                      <span
+                        className="truncate font-medium cursor-text hover:text-primary"
+                        title="Duplo clique para renomear"
+                        onDoubleClick={() => { setRenamingId(p.id); setRenameDraft(p.name); }}
+                      >{p.name}</span>
+                    )}
                     {p.lastUsedAt && (
                       <Badge variant="outline" className="shrink-0 text-[9px] font-normal px-1 py-0 h-4">
                         {formatRelative(p.lastUsedAt)}
