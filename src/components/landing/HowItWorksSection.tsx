@@ -22,7 +22,7 @@ export function HowItWorksSection() {
             viewport={{ once: true }}
             className="space-y-8"
           >
-            <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-none">
+            <h2 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic leading-none">
               Como a <span className="gradient-brand-text">Inteligência</span> Funciona
             </h2>
             <div className="space-y-6">

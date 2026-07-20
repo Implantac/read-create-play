@@ -90,7 +90,7 @@ export function PricingSection() {
           <Badge variant="outline" className="px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.3em] bg-primary/10 text-primary border-primary/20 mb-4">
             Escolha seu Nível de Operação
           </Badge>
-          <h2 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic">
+          <h2 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic">
             PLANOS <span className="gradient-brand-text">TITAN</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-70">
