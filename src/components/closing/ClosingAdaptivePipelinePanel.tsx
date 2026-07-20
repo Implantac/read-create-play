@@ -21,6 +21,7 @@ import {
   type AdaptivePipelineReport,
   type AutoTuneResult,
 } from "@/engine/closing/adaptive/AdaptiveClosingPipeline";
+import { ClosingAdaptivePresets, type AdaptivePreset } from "./ClosingAdaptivePresets";
 import { useLotteryDraws } from "@/hooks/useLotteryDraws";
 import { formatCurrency } from "@/utils/formatters";
 import { toast } from "sonner";
