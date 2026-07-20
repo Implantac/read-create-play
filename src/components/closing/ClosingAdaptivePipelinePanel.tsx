@@ -1,0 +1,228 @@
+/**
+ * ClosingAdaptivePipelinePanel — orquestra o Pipeline Adaptativo:
+ * comparação multi-estratégia → seleção estatística ponderada →
+ * remoção de jogos dominados (com validação matemática) → reordenação por ranking.
+ */
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Progress } from "@/components/ui/progress";
+import { Wand2, Loader2, CheckCircle2, TrendingUp, Zap, Filter, Trophy } from "lucide-react";
+import type { ClosingRequest, ClosingResult, ClosingStrategy } from "@/engine/closing";
+import {
+  runAdaptivePipeline,
+  type AdaptivePipelineReport,
+} from "@/engine/closing/adaptive/AdaptiveClosingPipeline";
+import { useLotteryDraws } from "@/hooks/useLotteryDraws";
+import { formatCurrency } from "@/utils/formatters";
+import { toast } from "sonner";
+
+interface Props {
+  request: ClosingRequest | null;
+  disabled?: boolean;
+  onApply: (result: ClosingResult) => void;
+}
+
+const STRATEGY_LABEL: Record<ClosingStrategy, string> = {
+  greedy: "Guloso",
+  hill_climbing: "Hill Climbing",
+  simulated_annealing: "SA",
+  genetic: "Genético",
+  covering_design: "Covering",
+  beam_search: "Beam",
+  backtracking: "Backtracking",
+  branch_and_bound: "B&B",
+  monte_carlo: "Monte Carlo",
+  hybrid: "Híbrido",
+};
+
+export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Props) {
+  const { draws } = useLotteryDraws(request?.lottery.id ?? "");
+  const [statWeight, setStatWeight] = useState(35);
+  const [reduce, setReduce] = useState(true);
+  const [running, setRunning] = useState(false);
+  const [report, setReport] = useState<AdaptivePipelineReport | null>(null);
+
+  const runPipeline = async () => {
+    if (!request) { toast.error("Configure a base primeiro."); return; }
+    if (!request.baseNumbers?.length || request.baseNumbers.length < request.lottery.pick) {
+      toast.error(`Selecione ao menos ${request.lottery.pick} dezenas na base.`);
+      return;
+    }
+    setRunning(true);
+    setReport(null);
+    // Cede o event loop para o loading aparecer
+    await new Promise(r => setTimeout(r, 30));
+    try {
+      const recent = draws.slice(0, 80).map(d => d.numbers);
+      const rep = runAdaptivePipeline({
+        request,
+        recentDraws: recent,
+        statWeight: statWeight / 100,
+        reduceDominated: reduce,
+      });
+      setReport(rep);
+      toast.success(
+        `Pipeline concluído · ${STRATEGY_LABEL[rep.chosen.strategy]} · ${rep.chosen.gameCount} jogos`,
+      );
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha no pipeline adaptativo.");
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  const apply = () => {
+    if (!report) return;
+    onApply(report.chosen);
+    toast.success("Resultado adaptativo aplicado ao fechamento.");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  return (
+    <Card className="border-primary/30 bg-primary/5">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Wand2 className="h-5 w-5 text-primary" />
+          Pipeline Adaptativo (Modo Híbrido)
+          <Badge variant="secondary" className="ml-auto">
+            Matemática + Estatística
+          </Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-sm text-muted-foreground">
+          Executa 5 estratégias, escolhe pela nota composta (garantia matemática + força estatística),
+          remove jogos dominados sem quebrar a garantia e reordena do mais forte ao mais fraco.
+        </p>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <Label className="text-muted-foreground">Peso estatístico</Label>
+              <span className="font-mono font-semibold">{statWeight}%</span>
+            </div>
+            <Slider
+              value={[statWeight]}
+              onValueChange={([v]) => setStatWeight(v)}
+              min={0} max={70} step={5}
+              disabled={running}
+            />
+            <p className="text-[10px] text-muted-foreground">
+              0% = puramente matemático · 70% = prioriza dezenas quentes/atrasadas
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between rounded-md border p-3">
+            <div className="space-y-0.5">
+              <Label className="text-sm">Reduzir jogos dominados</Label>
+              <p className="text-[11px] text-muted-foreground">
+                Remove redundâncias mantendo garantia matemática.
+              </p>
+            </div>
+            <Switch checked={reduce} onCheckedChange={setReduce} disabled={running} />
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          <Button
+            onClick={runPipeline}
+            disabled={running || disabled || !request}
+            className="min-w-[200px]"
+          >
+            {running ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processando…</>
+                     : <><Zap className="mr-2 h-4 w-4" /> Executar Pipeline</>}
+          </Button>
+          {report && (
+            <Button variant="secondary" onClick={apply}>
+              <CheckCircle2 className="mr-2 h-4 w-4" /> Aplicar ao fechamento
+            </Button>
+          )}
+        </div>
+
+        {running && <Progress value={undefined} className="h-1.5" />}
+
+        {report && (
+          <div className="space-y-4 pt-2">
+            <div className="grid gap-3 sm:grid-cols-4">
+              <KPI icon={Trophy} label="Estratégia vencedora" value={STRATEGY_LABEL[report.chosen.strategy]} tone="amber" />
+              <KPI icon={TrendingUp} label="Jogos finais" value={String(report.chosen.gameCount)} tone="emerald" />
+              <KPI icon={Filter} label="Redução" value={report.droppedGames > 0 ? `-${report.droppedGames}` : "—"} tone={report.droppedGames > 0 ? "sky" : "slate"} />
+              <KPI icon={CheckCircle2} label="Custo" value={formatCurrency(report.chosen.cost)} tone="primary" />
+            </div>
+
+            {!report.guaranteeIntact && (
+              <Alert variant="destructive">
+                <AlertDescription>
+                  Não foi possível reduzir mantendo a garantia. Resultado sem redução.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <div className="rounded-lg border bg-background/60 p-3 space-y-2">
+              <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Etapas
+              </div>
+              {report.steps.map((s, i) => (
+                <div key={i} className="flex items-center justify-between gap-2 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 text-primary text-[10px] font-bold">{i + 1}</span>
+                    <span className="font-medium">{s.name}</span>
+                    <span className="text-muted-foreground">— {s.detail}</span>
+                  </div>
+                  <span className="font-mono text-muted-foreground">{s.elapsedMs.toFixed(0)}ms</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="rounded-lg border bg-background/60 p-3 space-y-2">
+              <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Ranking das estratégias
+              </div>
+              <div className="space-y-1.5">
+                {report.strategies.map((s, i) => (
+                  <div key={s.strategy} className="grid grid-cols-[24px_1fr_60px_60px_80px] items-center gap-2 text-xs">
+                    <Badge variant={i === 0 ? "default" : "outline"} className="justify-center px-1.5">{i + 1}</Badge>
+                    <span className="font-medium">{STRATEGY_LABEL[s.strategy]}</span>
+                    <span className="font-mono text-muted-foreground">Mat: {s.overall}</span>
+                    <span className="font-mono text-primary">Adp: {s.adaptive}</span>
+                    <span className="font-mono text-right text-muted-foreground">{s.games}j · {formatCurrency(s.cost)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function KPI({
+  icon: Icon, label, value, tone,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string; value: string;
+  tone: "amber" | "emerald" | "sky" | "slate" | "primary";
+}) {
+  const map: Record<string, string> = {
+    amber: "border-amber-500/30 bg-amber-500/10 text-amber-500",
+    emerald: "border-emerald-500/30 bg-emerald-500/10 text-emerald-500",
+    sky: "border-sky-500/30 bg-sky-500/10 text-sky-500",
+    slate: "border-slate-500/30 bg-slate-500/10 text-muted-foreground",
+    primary: "border-primary/30 bg-primary/10 text-primary",
+  };
+  return (
+    <div className={`rounded-lg border p-3 ${map[tone]}`}>
+      <div className="flex items-center gap-2 text-[10px] uppercase tracking-wide opacity-80">
+        <Icon className="h-3.5 w-3.5" /> {label}
+      </div>
+      <div className="mt-1 text-lg font-bold font-mono">{value}</div>
+    </div>
+  );
+}
