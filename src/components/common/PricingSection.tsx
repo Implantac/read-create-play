@@ -15,8 +15,8 @@ export function PricingSection() {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const LAUNCH_PRICE = "R$ 4.997";
-  const ORIGINAL_PRICE = "R$ 12.997";
+  const LAUNCH_PRICE = "R$ 99,90";
+  const ORIGINAL_PRICE = "R$ 297";
 
   const handleCheckout = async () => {
     if (!session) {
@@ -26,12 +26,9 @@ export function PricingSection() {
 
     setLoadingPlan(true);
     try {
-      // Redirecionamento simulado para demonstração do fluxo premium
       toast.info("Processando seu acesso ELITE...");
       setTimeout(() => {
         toast.success("Redirecionando para checkout seguro...");
-        // Em produção aqui chamamos a Edge Function:
-        // const { data, error } = await supabase.functions.invoke("create-checkout", { body: { planId: "lifetime" } });
       }, 1500);
     } catch (e: any) {
       toast.error("Erro ao iniciar checkout: " + (e.message || "Tente novamente"));
@@ -44,14 +41,15 @@ export function PricingSection() {
     {
       name: "Plano Grátis",
       price: "R$ 0",
-      description: "Ideal para conhecer a plataforma.",
+      description: "Conheça a plataforma sem custo.",
       features: [
-        "Acesso ao painel principal",
-        "Gerador básico de apostas",
+        "Acesso a todas as 9 loterias oficiais",
+        "3 jogos salvos por loteria",
+        "Gerador básico com estatística essencial",
         "Resultados oficiais em tempo real",
-        "Estatísticas essenciais",
+        "Conferidor de apostas ilimitado",
       ],
-      cta: "Começar de Graça",
+      cta: "Criar Conta Grátis",
       popular: false,
       color: "bg-muted/50 border-white/5",
       icon: Shield
@@ -59,16 +57,16 @@ export function PricingSection() {
     {
       name: "Acesso Vitalício",
       price: LAUNCH_PRICE,
-      description: "O ecossistema Titan completo, para sempre.",
+      description: "O ecossistema Titan completo — pagamento único.",
       features: [
-        "Acesso vitalício — pagamento único",
-        "Gerador de apostas ilimitado",
-        "Titan AI Core & Neural Alpha",
-        "Fechamentos matemáticos avançados",
-        "Simulações massivas e backtests",
-        "Suporte prioritário",
-        "Planilhas e matrizes premium",
-        "Todas as atualizações futuras inclusas",
+        "Pagamento único · sem mensalidade · sem renovação",
+        "Jogos e simulações ilimitadas em todas as loterias",
+        "Titan AI Core, Neural Alpha e Motor Adaptativo",
+        "Fechamentos matemáticos, matrizes e cobertura extrema",
+        "Backtests massivos, ROI real e comparador de estratégias",
+        "Exportações profissionais (PDF, Excel e planilhas)",
+        "Suporte prioritário via chat e e-mail",
+        "Todas as atualizações futuras incluídas para sempre",
       ],
       cta: "Garantir Acesso Vitalício",
       popular: true,
