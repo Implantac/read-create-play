@@ -18,6 +18,8 @@ export interface AdaptivePreset {
   refine: boolean;
   runs: number;
   createdAt: number;
+  lastUsedAt?: number;
+  useCount?: number;
   meta?: { games?: number; cost?: number; adaptive?: number };
 }
 
