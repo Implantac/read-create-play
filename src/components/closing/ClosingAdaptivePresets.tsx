@@ -64,19 +64,24 @@ interface Props {
   current: { statWeight: number; reduce: boolean; refine: boolean; runs: number };
   meta?: { games?: number; cost?: number; adaptive?: number };
   onApply: (p: AdaptivePreset) => void;
+  onAutoLoadDefault?: (p: AdaptivePreset) => void;
   disabled?: boolean;
 }
 
-export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, disabled }: Props) {
+export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAutoLoadDefault, disabled }: Props) {
   const [presets, setPresets] = useState<AdaptivePreset[]>([]);
   const [name, setName] = useState("");
   const [adding, setAdding] = useState(false);
+  const autoLoadedRef = useRef<string | null>(null);
 
   const refresh = useCallback(() => {
     setPresets(
       loadAll()
         .filter(p => p.lotteryId === lotteryId)
-        .sort((a, b) => (b.lastUsedAt ?? b.createdAt) - (a.lastUsedAt ?? a.createdAt)),
+        .sort((a, b) => {
+          if ((b.isDefault ? 1 : 0) !== (a.isDefault ? 1 : 0)) return (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0);
+          return (b.lastUsedAt ?? b.createdAt) - (a.lastUsedAt ?? a.createdAt);
+        }),
     );
   }, [lotteryId]);
 
