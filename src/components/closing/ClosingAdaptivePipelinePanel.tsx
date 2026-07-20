@@ -16,6 +16,7 @@ import { Wand2, Loader2, CheckCircle2, TrendingUp, Zap, Filter, Trophy, Sparkles
 import type { ClosingRequest, ClosingResult, ClosingStrategy } from "@/engine/closing";
 import {
   runAdaptivePipeline,
+  runAdaptivePipelineBestOfN,
   autoTuneAdaptivePipeline,
   type AdaptivePipelineReport,
   type AutoTuneResult,
@@ -48,12 +49,14 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
   const [statWeight, setStatWeight] = useState(35);
   const [reduce, setReduce] = useState(true);
   const [refine, setRefine] = useState(false);
+  const [runs, setRuns] = useState(1);
   const [running, setRunning] = useState(false);
   const [tuning, setTuning] = useState(false);
   const [report, setReport] = useState<AdaptivePipelineReport | null>(null);
   const [tuneSweep, setTuneSweep] = useState<AutoTuneResult["sweep"] | null>(null);
   const [tuneDelta, setTuneDelta] = useState<AutoTuneResult["delta"] | null>(null);
   const [refinedSweep, setRefinedSweep] = useState<AutoTuneResult["refinedSweep"] | null>(null);
+  const [bestOfNRuns, setBestOfNRuns] = useState<Array<{ adaptive: number; games: number; cost: number }> | null>(null);
 
   const runPipeline = async () => {
     if (!request) { toast.error("Configure a base primeiro."); return; }
@@ -63,20 +66,30 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
     }
     setRunning(true);
     setReport(null);
-    // Cede o event loop para o loading aparecer
+    setBestOfNRuns(null);
     await new Promise(r => setTimeout(r, 30));
     try {
       const recent = draws.slice(0, 80).map(d => d.numbers);
-      const rep = runAdaptivePipeline({
+      const input = {
         request,
         recentDraws: recent,
         statWeight: statWeight / 100,
         reduceDominated: reduce,
-      });
-      setReport(rep);
-      toast.success(
-        `Pipeline concluído · ${STRATEGY_LABEL[rep.chosen.strategy]} · ${rep.chosen.gameCount} jogos`,
-      );
+      };
+      if (runs > 1) {
+        const { best, allRuns } = runAdaptivePipelineBestOfN(input, runs);
+        setReport(best);
+        setBestOfNRuns(allRuns);
+        toast.success(
+          `Best-of-${runs} · ${STRATEGY_LABEL[best.chosen.strategy]} · ${best.chosen.gameCount} jogos`,
+        );
+      } else {
+        const rep = runAdaptivePipeline(input);
+        setReport(rep);
+        toast.success(
+          `Pipeline concluído · ${STRATEGY_LABEL[rep.chosen.strategy]} · ${rep.chosen.gameCount} jogos`,
+        );
+      }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha no pipeline adaptativo.");
     } finally {
@@ -156,6 +169,20 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
             <p className="text-[10px] text-muted-foreground">
               0% = puramente matemático · 70% = prioriza dezenas quentes/atrasadas
             </p>
+
+            <div className="flex items-center justify-between text-xs pt-2">
+              <Label className="text-muted-foreground">Best-of-N (execuções)</Label>
+              <span className="font-mono font-semibold">{runs}×</span>
+            </div>
+            <Slider
+              value={[runs]}
+              onValueChange={([v]) => setRuns(v)}
+              min={1} max={7} step={1}
+              disabled={running || tuning}
+            />
+            <p className="text-[10px] text-muted-foreground">
+              Repete o pipeline N vezes e mantém o melhor (útil para Genético/SA).
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -205,6 +232,34 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
         </div>
 
         {(running || tuning) && <Progress value={undefined} className="h-1.5" />}
+
+        {bestOfNRuns && bestOfNRuns.length > 1 && (
+          <div className="rounded-lg border bg-background/60 p-3 space-y-2">
+            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Best-of-{bestOfNRuns.length} · resultados por execução
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {bestOfNRuns.map((r, i) => {
+                const isBest = r.adaptive === Math.max(...bestOfNRuns.map(x => x.adaptive));
+                return (
+                  <div
+                    key={i}
+                    className={`min-w-[72px] rounded-md border p-2 text-center ${
+                      isBest ? "border-emerald-500/40 bg-emerald-500/10" : "border-border"
+                    }`}
+                  >
+                    <div className="text-[10px] text-muted-foreground">Run {i + 1}</div>
+                    <div className={`font-mono text-sm font-bold ${isBest ? "text-emerald-500" : "text-primary"}`}>
+                      {r.adaptive.toFixed(1)}
+                    </div>
+                    <div className="text-[10px] text-muted-foreground">{r.games}j</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
 
         {tuneSweep && (
           <div className="rounded-lg border bg-background/60 p-3 space-y-2">
