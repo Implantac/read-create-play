@@ -138,6 +138,14 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const applyPreset = (p: AdaptivePreset) => {
+    setStatWeight(p.statWeight);
+    setReduce(p.reduce);
+    setRefine(p.refine);
+    setRuns(p.runs);
+    toast.success(`Preset "${p.name}" carregado. Execute o pipeline para aplicar.`);
+  };
+
   return (
     <Card className="border-primary/30 bg-primary/5">
       <CardHeader>
