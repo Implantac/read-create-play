@@ -164,9 +164,31 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, disa
           )}
         </div>
         {!adding && (
-          <Button size="sm" variant="outline" onClick={() => setAdding(true)} disabled={disabled}>
-            <Plus className="mr-1 h-3.5 w-3.5" /> Salvar atual
-          </Button>
+          <div className="flex gap-1">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="application/json,.json"
+              className="hidden"
+              onChange={e => {
+                const f = e.target.files?.[0];
+                if (f) importPresets(f);
+                e.target.value = "";
+              }}
+            />
+            <Button size="sm" variant="ghost" className="h-7 px-2" onClick={() => fileInputRef.current?.click()} disabled={disabled} title="Importar de arquivo">
+              <Upload className="h-3.5 w-3.5" />
+            </Button>
+            <Button size="sm" variant="ghost" className="h-7 px-2" onClick={exportPresets} disabled={disabled || presets.length === 0} title="Exportar arquivo">
+              <Download className="h-3.5 w-3.5" />
+            </Button>
+            <Button size="sm" variant="ghost" className="h-7 px-2" onClick={copyPresets} disabled={disabled || presets.length === 0} title="Copiar JSON">
+              <Copy className="h-3.5 w-3.5" />
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => setAdding(true)} disabled={disabled}>
+              <Plus className="mr-1 h-3.5 w-3.5" /> Salvar atual
+            </Button>
+          </div>
         )}
       </div>
 
