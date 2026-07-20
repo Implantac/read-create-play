@@ -222,6 +222,70 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAu
     }
   }, [presets, lotteryId]);
 
+  const sharePreset = useCallback(async (p: AdaptivePreset) => {
+    try {
+      const slim = {
+        n: p.name,
+        l: p.lotteryId,
+        w: p.statWeight,
+        rd: p.reduce ? 1 : 0,
+        rf: p.refine ? 1 : 0,
+        r: p.runs,
+        nt: p.note,
+      };
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(slim))))
+        .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      const url = `${window.location.origin}${window.location.pathname}?preset=${encoded}`;
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copiado — cole para compartilhar.");
+    } catch {
+      toast.error("Falha ao gerar link.");
+    }
+  }, []);
+
+  // Detecta preset compartilhado via URL e oferece importação
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("preset");
+    if (!raw) return;
+    try {
+      const b64 = raw.replace(/-/g, "+").replace(/_/g, "/");
+      const padded = b64 + "===".slice((b64.length + 3) % 4);
+      const slim = JSON.parse(decodeURIComponent(escape(atob(padded))));
+      if (!slim || typeof slim.n !== "string") throw new Error("payload");
+      const preset: AdaptivePreset = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        name: slim.n,
+        lotteryId: slim.l || lotteryId,
+        statWeight: Number(slim.w) || 0,
+        reduce: slim.rd === 1,
+        refine: slim.rf === 1,
+        runs: Number(slim.r) || 1,
+        note: slim.nt,
+        createdAt: Date.now(),
+        useCount: 0,
+      };
+      toast(`Preset compartilhado "${preset.name}" recebido`, {
+        action: {
+          label: "Importar",
+          onClick: () => {
+            const all = loadAll();
+            saveAll([preset, ...all].slice(0, 80));
+            refresh();
+            toast.success("Preset importado.");
+          },
+        },
+        duration: 8000,
+      });
+    } catch {
+      /* payload inválido — ignora silenciosamente */
+    } finally {
+      params.delete("preset");
+      const clean = params.toString();
+      window.history.replaceState({}, "", window.location.pathname + (clean ? `?${clean}` : ""));
+    }
+  }, [lotteryId, refresh]);
+
   const importPresets = useCallback((file: File) => {
     const reader = new FileReader();
     reader.onload = () => {
