@@ -21,6 +21,7 @@ import {
   type AdaptivePipelineReport,
   type AutoTuneResult,
 } from "@/engine/closing/adaptive/AdaptiveClosingPipeline";
+import { ClosingAdaptivePresets, type AdaptivePreset } from "./ClosingAdaptivePresets";
 import { useLotteryDraws } from "@/hooks/useLotteryDraws";
 import { formatCurrency } from "@/utils/formatters";
 import { toast } from "sonner";
@@ -137,6 +138,14 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const applyPreset = (p: AdaptivePreset) => {
+    setStatWeight(p.statWeight);
+    setReduce(p.reduce);
+    setRefine(p.refine);
+    setRuns(p.runs);
+    toast.success(`Preset "${p.name}" carregado. Execute o pipeline para aplicar.`);
+  };
+
   return (
     <Card className="border-primary/30 bg-primary/5">
       <CardHeader>
@@ -232,6 +241,16 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
         </div>
 
         {(running || tuning) && <Progress value={undefined} className="h-1.5" />}
+
+        {request && (
+          <ClosingAdaptivePresets
+            lotteryId={request.lottery.id}
+            current={{ statWeight, reduce, refine, runs }}
+            meta={report ? { games: report.chosen.gameCount, cost: report.chosen.cost, adaptive: report.strategies[0]?.adaptive } : undefined}
+            onApply={applyPreset}
+            disabled={running || tuning}
+          />
+        )}
 
         {bestOfNRuns && bestOfNRuns.length > 1 && (
           <div className="rounded-lg border bg-background/60 p-3 space-y-2">
