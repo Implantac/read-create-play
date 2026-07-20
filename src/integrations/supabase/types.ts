@@ -984,6 +984,38 @@ export type Database = {
     }
     Functions: {
       check_phone_exists: { Args: { _phone: string }; Returns: boolean }
+      get_shared_closing: {
+        Args: { _share_id: string }
+        Returns: {
+          base_numbers: number[]
+          cost: number
+          created_at: string
+          elapsed_ms: number | null
+          game_count: number
+          games: Json
+          id: string
+          lottery_id: string
+          lottery_name: string | null
+          lower_bound: number | null
+          max_games: number | null
+          min_hits: number
+          notes: string[] | null
+          parent_id: string | null
+          score: Json
+          share_id: string | null
+          source: string
+          strategy: string
+          user_id: string
+          validation: Json
+          version: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "closing_history"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_top_numbers: {
         Args: { p_limit?: number; p_lottery_id: string }
         Returns: {
