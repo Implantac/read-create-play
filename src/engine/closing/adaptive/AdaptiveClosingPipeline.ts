@@ -191,7 +191,9 @@ export function runAdaptivePipeline(input: AdaptivePipelineInput): AdaptivePipel
 export interface AutoTuneResult {
   best: AdaptivePipelineReport;
   bestWeight: number;
-  sweep: Array<{ weight: number; adaptive: number; games: number; cost: number; overall: number }>;
+  sweep: Array<{ weight: number; adaptive: number; games: number; cost: number; overall: number; refined?: boolean }>;
+  /** Sweep fino em torno do vencedor (presente quando refine=true). */
+  refinedSweep?: Array<{ weight: number; adaptive: number; games: number; cost: number; overall: number }>;
   /** Delta entre baseline (peso 0 = puramente matemático) e o vencedor. */
   delta: {
     baselineWeight: number;
@@ -204,10 +206,21 @@ export interface AutoTuneResult {
   };
 }
 
+export interface AutoTuneOptions {
+  weights?: number[];
+  /** Executa segunda passada estreita (±10% / passo 2%) ao redor do vencedor. */
+  refine?: boolean;
+}
+
+function scoreOf(adaptive: number, games: number) {
+  return adaptive - games * 0.01;
+}
+
 export function autoTuneAdaptivePipeline(
   input: Omit<AdaptivePipelineInput, "statWeight">,
-  weights: number[] = [0, 0.15, 0.3, 0.45, 0.6],
+  options: AutoTuneOptions = {},
 ): AutoTuneResult {
+  const weights = options.weights ?? [0, 0.15, 0.3, 0.45, 0.6];
   const sweep: AutoTuneResult["sweep"] = [];
   let best: AdaptivePipelineReport | null = null;
   let bestWeight = weights[0];
@@ -224,7 +237,7 @@ export function autoTuneAdaptivePipeline(
       cost: rep.chosen.cost,
       overall: top?.overall ?? 0,
     });
-    const score = adaptive - rep.chosen.gameCount * 0.01;
+    const score = scoreOf(adaptive, rep.chosen.gameCount);
     if (score > bestScore) {
       bestScore = score;
       best = rep;
@@ -234,8 +247,49 @@ export function autoTuneAdaptivePipeline(
 
   if (!best) throw new Error("Auto-tune sem resultados");
 
+  // Refinamento fino: ±10% em passos de 2% em torno do vencedor
+  let refinedSweep: AutoTuneResult["refinedSweep"];
+  if (options.refine) {
+    const lo = Math.max(0, bestWeight - 0.1);
+    const hi = Math.min(0.7, bestWeight + 0.1);
+    const fineWeights: number[] = [];
+    for (let w = lo; w <= hi + 1e-9; w += 0.02) {
+      const rounded = Math.round(w * 100) / 100;
+      if (!weights.includes(rounded) && !fineWeights.includes(rounded)) fineWeights.push(rounded);
+    }
+    refinedSweep = [];
+    for (const w of fineWeights) {
+      const rep = runAdaptivePipeline({ ...input, statWeight: w });
+      const top = rep.strategies[0];
+      const adaptive = top?.adaptive ?? 0;
+      refinedSweep.push({
+        weight: w,
+        adaptive,
+        games: rep.chosen.gameCount,
+        cost: rep.chosen.cost,
+        overall: top?.overall ?? 0,
+      });
+      sweep.push({
+        weight: w,
+        adaptive,
+        games: rep.chosen.gameCount,
+        cost: rep.chosen.cost,
+        overall: top?.overall ?? 0,
+        refined: true,
+      });
+      const score = scoreOf(adaptive, rep.chosen.gameCount);
+      if (score > bestScore) {
+        bestScore = score;
+        best = rep;
+        bestWeight = w;
+      }
+    }
+    sweep.sort((a, b) => a.weight - b.weight);
+    refinedSweep.sort((a, b) => a.weight - b.weight);
+  }
+
   const baseline = sweep.find(s => s.weight === 0) ?? sweep[0];
-  const winner = sweep.find(s => s.weight === bestWeight) ?? sweep[0];
+  const winner = sweep.find(s => Math.abs(s.weight - bestWeight) < 1e-9) ?? sweep[0];
   const delta = {
     baselineWeight: baseline.weight,
     baselineAdaptive: baseline.adaptive,
@@ -246,5 +300,5 @@ export function autoTuneAdaptivePipeline(
     costGain: Math.round((baseline.cost - winner.cost) * 100) / 100,
   };
 
-  return { best, bestWeight, sweep, delta };
+  return { best, bestWeight, sweep, refinedSweep, delta };
 }
