@@ -25,6 +25,7 @@ import { ClosingMatrixEditor } from "@/components/closing/ClosingMatrixEditor";
 import { ClosingAIRecommendationPanel } from "@/components/closing/ClosingAIRecommendationPanel";
 import { ClosingConferencePanel } from "@/components/closing/ClosingConferencePanel";
 import { ClosingHistoryPanel } from "@/components/closing/ClosingHistoryPanel";
+import { ClosingCompareTwoPanel } from "@/components/closing/ClosingCompareTwoPanel";
 import { ClosingRankingPanel } from "@/components/closing/ClosingRankingPanel";
 import { ClosingBaseSuggestionPanel } from "@/components/closing/ClosingBaseSuggestionPanel";
 import { ClosingTicketPanel } from "@/components/closing/ClosingTicketPanel";
