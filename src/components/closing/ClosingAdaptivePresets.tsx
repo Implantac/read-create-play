@@ -304,6 +304,7 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAu
             >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
+                  {p.isDefault && <Star className="h-3 w-3 shrink-0 fill-amber-500 text-amber-500" />}
                   <span className="truncate font-medium">{p.name}</span>
                   {p.lastUsedAt && (
                     <Badge variant="outline" className="shrink-0 text-[9px] font-normal px-1 py-0 h-4">
