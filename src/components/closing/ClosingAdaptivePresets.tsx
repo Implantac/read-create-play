@@ -330,6 +330,15 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAu
                 <Button size="sm" variant="secondary" className="h-7 px-2" onClick={() => handleApply(p)} disabled={disabled}>
                   Aplicar
                 </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 w-7 p-0"
+                  onClick={() => toggleDefault(p.id)}
+                  title={p.isDefault ? "Remover como padrão" : "Definir como padrão"}
+                >
+                  <Star className={`h-3.5 w-3.5 ${p.isDefault ? "fill-amber-500 text-amber-500" : ""}`} />
+                </Button>
                 <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => duplicate(p)} title="Duplicar">
                   <Files className="h-3.5 w-3.5" />
                 </Button>
