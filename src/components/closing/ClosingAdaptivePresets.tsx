@@ -298,7 +298,8 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAu
             <div
               key={p.id}
               className={`flex items-center justify-between gap-2 rounded-md border p-2 text-xs ${
-                idx === 0 && p.lastUsedAt ? "border-primary/40 bg-primary/5" : ""
+                p.isDefault ? "border-amber-500/40 bg-amber-500/5"
+                            : idx === 0 && p.lastUsedAt ? "border-primary/40 bg-primary/5" : ""
               }`}
             >
               <div className="min-w-0 flex-1">
