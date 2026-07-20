@@ -16,6 +16,7 @@ import { Wand2, Loader2, CheckCircle2, TrendingUp, Zap, Filter, Trophy, Sparkles
 import type { ClosingRequest, ClosingResult, ClosingStrategy } from "@/engine/closing";
 import {
   runAdaptivePipeline,
+  runAdaptivePipelineBestOfN,
   autoTuneAdaptivePipeline,
   type AdaptivePipelineReport,
   type AutoTuneResult,
