@@ -661,6 +661,33 @@ export type Database = {
         }
         Relationships: []
       }
+      signup_ip_registry: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          ip_hash: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          ip_hash: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          ip_hash?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       simulation_scenarios: {
         Row: {
           created_at: string
