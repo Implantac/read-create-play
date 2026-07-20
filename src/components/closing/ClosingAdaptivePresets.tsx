@@ -317,60 +317,131 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAu
         </p>
       )}
 
-      {presets.length > 0 && (
+      {presets.length >= 4 && (
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Buscar por nome ou nota…"
+            className="h-7 pl-7 pr-7 text-xs"
+          />
+          {query && (
+            <button
+              onClick={() => setQuery("")}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              aria-label="Limpar busca"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          )}
+        </div>
+      )}
+
+      {presets.length > 0 && filtered.length === 0 && (
+        <p className="text-[11px] text-muted-foreground">Nenhum preset corresponde a "{query}".</p>
+      )}
+
+      {filtered.length > 0 && (
         <div className="grid gap-1.5 sm:grid-cols-2">
-          {presets.map((p, idx) => (
+          {filtered.map((p, idx) => (
             <div
               key={p.id}
-              className={`flex items-center justify-between gap-2 rounded-md border p-2 text-xs ${
+              className={`rounded-md border p-2 text-xs ${
                 p.isDefault ? "border-amber-500/40 bg-amber-500/5"
-                            : idx === 0 && p.lastUsedAt ? "border-primary/40 bg-primary/5" : ""
+                            : idx === 0 && p.lastUsedAt && !query ? "border-primary/40 bg-primary/5" : ""
               }`}
             >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  {p.isDefault && <Star className="h-3 w-3 shrink-0 fill-amber-500 text-amber-500" />}
-                  <span className="truncate font-medium">{p.name}</span>
-                  {p.lastUsedAt && (
-                    <Badge variant="outline" className="shrink-0 text-[9px] font-normal px-1 py-0 h-4">
-                      {formatRelative(p.lastUsedAt)}
-                    </Badge>
-                  )}
-                  {(p.useCount ?? 0) >= 3 && (
-                    <Badge variant="secondary" className="shrink-0 text-[9px] font-normal px-1 py-0 h-4">
-                      {p.useCount}×
-                    </Badge>
-                  )}
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    {p.isDefault && <Star className="h-3 w-3 shrink-0 fill-amber-500 text-amber-500" />}
+                    <span className="truncate font-medium">{p.name}</span>
+                    {p.lastUsedAt && (
+                      <Badge variant="outline" className="shrink-0 text-[9px] font-normal px-1 py-0 h-4">
+                        {formatRelative(p.lastUsedAt)}
+                      </Badge>
+                    )}
+                    {(p.useCount ?? 0) >= 3 && (
+                      <Badge variant="secondary" className="shrink-0 text-[9px] font-normal px-1 py-0 h-4">
+                        {p.useCount}×
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-1 pt-0.5 text-[10px] text-muted-foreground">
+                    <span className="font-mono">peso {p.statWeight}%</span>
+                    <span>·</span>
+                    <span className="font-mono">{p.runs}×</span>
+                    {p.reduce && <><span>·</span><span>reduz</span></>}
+                    {p.refine && <><span>·</span><span>refino</span></>}
+                    {p.meta?.games !== undefined && <><span>·</span><span className="font-mono">{p.meta.games}j</span></>}
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-1 pt-0.5 text-[10px] text-muted-foreground">
-                  <span className="font-mono">peso {p.statWeight}%</span>
-                  <span>·</span>
-                  <span className="font-mono">{p.runs}×</span>
-                  {p.reduce && <><span>·</span><span>reduz</span></>}
-                  {p.refine && <><span>·</span><span>refino</span></>}
-                  {p.meta?.games !== undefined && <><span>·</span><span className="font-mono">{p.meta.games}j</span></>}
+                <div className="flex shrink-0 gap-1">
+                  <Button size="sm" variant="secondary" className="h-7 px-2" onClick={() => handleApply(p)} disabled={disabled}>
+                    Aplicar
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 w-7 p-0"
+                    onClick={() => toggleDefault(p.id)}
+                    title={p.isDefault ? "Remover como padrão" : "Definir como padrão"}
+                  >
+                    <Star className={`h-3.5 w-3.5 ${p.isDefault ? "fill-amber-500 text-amber-500" : ""}`} />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 w-7 p-0"
+                    onClick={() => {
+                      if (editingNoteId === p.id) { setEditingNoteId(null); setNoteDraft(""); }
+                      else { setEditingNoteId(p.id); setNoteDraft(p.note ?? ""); }
+                    }}
+                    title={p.note ? "Editar nota" : "Adicionar nota"}
+                  >
+                    <StickyNote className={`h-3.5 w-3.5 ${p.note ? "text-primary" : ""}`} />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => duplicate(p)} title="Duplicar">
+                    <Files className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => remove(p.id)} title="Remover">
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
                 </div>
               </div>
-              <div className="flex shrink-0 gap-1">
-                <Button size="sm" variant="secondary" className="h-7 px-2" onClick={() => handleApply(p)} disabled={disabled}>
-                  Aplicar
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-7 w-7 p-0"
-                  onClick={() => toggleDefault(p.id)}
-                  title={p.isDefault ? "Remover como padrão" : "Definir como padrão"}
-                >
-                  <Star className={`h-3.5 w-3.5 ${p.isDefault ? "fill-amber-500 text-amber-500" : ""}`} />
-                </Button>
-                <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => duplicate(p)} title="Duplicar">
-                  <Files className="h-3.5 w-3.5" />
-                </Button>
-                <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => remove(p.id)} title="Remover">
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
-              </div>
+
+              {editingNoteId === p.id ? (
+                <div className="mt-2 space-y-1">
+                  <Textarea
+                    autoFocus
+                    value={noteDraft}
+                    onChange={e => setNoteDraft(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === "Escape") { setEditingNoteId(null); setNoteDraft(""); }
+                      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) saveNote(p.id, noteDraft);
+                    }}
+                    placeholder="Observações sobre este preset…"
+                    className="min-h-[52px] text-[11px]"
+                    maxLength={280}
+                  />
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] text-muted-foreground">{noteDraft.length}/280 · ⌘/Ctrl+Enter</span>
+                    <div className="flex gap-1">
+                      <Button size="sm" variant="ghost" className="h-6 px-2 text-[10px]" onClick={() => { setEditingNoteId(null); setNoteDraft(""); }}>
+                        Cancelar
+                      </Button>
+                      <Button size="sm" className="h-6 px-2 text-[10px]" onClick={() => saveNote(p.id, noteDraft)}>
+                        Salvar
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ) : p.note ? (
+                <p className="mt-1.5 whitespace-pre-wrap rounded bg-muted/40 p-1.5 text-[10.5px] leading-snug text-muted-foreground">
+                  {p.note}
+                </p>
+              ) : null}
             </div>
           ))}
         </div>
