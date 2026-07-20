@@ -58,6 +58,25 @@ export default function SignupPage() {
       return;
     }
 
+    // IP guard: bloqueia múltiplas contas gratuitas do mesmo IP
+    try {
+      const { data: guard } = await supabase.functions.invoke("signup-guard", {
+        body: { email, mode: "check" },
+      });
+      if (guard && guard.allowed === false) {
+        setLoading(false);
+        toast({
+          title: "Cadastro não permitido",
+          description: guard.message || "Já existe uma conta gratuita associada a esta conexão.",
+          variant: "destructive",
+        });
+        return;
+      }
+    } catch (err) {
+      // Falha do guard não deve travar cadastro legítimo
+      console.warn("signup-guard falhou, prosseguindo:", err);
+    }
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
