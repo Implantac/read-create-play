@@ -36,6 +36,7 @@ export interface AdaptivePreset {
   lastUsedAt?: number;
   useCount?: number;
   isDefault?: boolean;
+  note?: string;
   meta?: { games?: number; cost?: number; adaptive?: number };
 }
 
