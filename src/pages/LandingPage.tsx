@@ -1,28 +1,53 @@
 import { useScroll, useTransform } from "framer-motion";
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, lazy, Suspense, useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
-
-import { LotteryLogosCarousel } from "@/components/lottery/LotteryLogosCarousel";
-import { ScreensShowcase } from "@/components/landing/ScreensShowcase";
-import { FloatingCTA } from "@/components/common/FloatingCTA";
-import { WhatsAppButton } from "@/components/common/WhatsAppButton";
-import { SocialProofBar } from "@/components/common/SocialProofBar";
-import { ComplianceDisclaimer } from "@/components/common/ComplianceDisclaimer";
-import { Testimonials } from "@/components/common/Testimonials";
-import { PricingSection } from "@/components/common/PricingSection";
-import { TitanCommandCenter } from "@/components/common/TitanCommandCenter";
 
 import { Navbar } from "@/components/landing/Navbar";
 import { HeroSection } from "@/components/landing/HeroSection";
-import { FeaturesSection } from "@/components/landing/FeaturesSection";
-import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
-import { FAQSection } from "@/components/landing/FAQSection";
-import { SupportedLotteries } from "@/components/landing/SupportedLotteries";
-
+import { ComplianceDisclaimer } from "@/components/common/ComplianceDisclaimer";
 
 import { burstConfetti } from "@/lib/confetti";
+
+// Below-the-fold sections – code-split to keep the initial landing chunk tiny
+const LotteryLogosCarousel = lazy(() =>
+  import("@/components/lottery/LotteryLogosCarousel").then((m) => ({ default: m.LotteryLogosCarousel }))
+);
+const SocialProofBar = lazy(() =>
+  import("@/components/common/SocialProofBar").then((m) => ({ default: m.SocialProofBar }))
+);
+const FeaturesSection = lazy(() =>
+  import("@/components/landing/FeaturesSection").then((m) => ({ default: m.FeaturesSection }))
+);
+const ScreensShowcase = lazy(() =>
+  import("@/components/landing/ScreensShowcase").then((m) => ({ default: m.ScreensShowcase }))
+);
+const TitanCommandCenter = lazy(() =>
+  import("@/components/common/TitanCommandCenter").then((m) => ({ default: m.TitanCommandCenter }))
+);
+const HowItWorksSection = lazy(() =>
+  import("@/components/landing/HowItWorksSection").then((m) => ({ default: m.HowItWorksSection }))
+);
+const SupportedLotteries = lazy(() =>
+  import("@/components/landing/SupportedLotteries").then((m) => ({ default: m.SupportedLotteries }))
+);
+const Testimonials = lazy(() =>
+  import("@/components/common/Testimonials").then((m) => ({ default: m.Testimonials }))
+);
+const PricingSection = lazy(() =>
+  import("@/components/common/PricingSection").then((m) => ({ default: m.PricingSection }))
+);
+const FAQSection = lazy(() =>
+  import("@/components/landing/FAQSection").then((m) => ({ default: m.FAQSection }))
+);
+const FloatingCTA = lazy(() =>
+  import("@/components/common/FloatingCTA").then((m) => ({ default: m.FloatingCTA }))
+);
+const WhatsAppButton = lazy(() =>
+  import("@/components/common/WhatsAppButton").then((m) => ({ default: m.WhatsAppButton }))
+);
+
+const SectionFallback = () => <div className="min-h-[280px]" aria-hidden />;
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -34,9 +59,9 @@ const fadeUp = {
 };
 
 export default function LandingPage() {
-  const { t } = useTranslation();
   const navigate = useNavigate();
-  
+  const [deferredReady, setDeferredReady] = useState(false);
+
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
 
@@ -45,6 +70,16 @@ export default function LandingPage() {
     burstConfetti(e);
     setTimeout(() => navigate(to), 500);
   }, [navigate]);
+
+  // Defer non-critical overlays (floating CTA / WhatsApp) until after paint
+  useEffect(() => {
+    const idle = (cb: () => void) => {
+      const w = window as unknown as { requestIdleCallback?: (cb: () => void) => number };
+      if (typeof w.requestIdleCallback === "function") w.requestIdleCallback(cb);
+      else setTimeout(cb, 1200);
+    };
+    idle(() => setDeferredReady(true));
+  }, []);
 
   const { scrollYProgress: heroProgress } = useScroll({
     target: heroRef,
@@ -70,17 +105,21 @@ export default function LandingPage() {
         <meta property="og:type" content="website" />
         <meta name="keywords" content="Mega-Sena, Lotofácil, Quina, Inteligência Artificial, Loterias, Gerador de Apostas, Probabilidade, Estatística, Análise de Dados" />
       </Helmet>
-      
-      <FloatingCTA />
+
+      {deferredReady && (
+        <Suspense fallback={null}>
+          <FloatingCTA />
+        </Suspense>
+      )}
       <Navbar />
 
-      <HeroSection 
-        heroRef={heroRef} 
-        heroY={heroY} 
-        heroOpacity={heroOpacity} 
-        heroScale={heroScale} 
-        handleCtaClick={handleCtaClick} 
-        fadeUp={fadeUp} 
+      <HeroSection
+        heroRef={heroRef}
+        heroY={heroY}
+        heroOpacity={heroOpacity}
+        heroScale={heroScale}
+        handleCtaClick={handleCtaClick}
+        fadeUp={fadeUp}
       />
 
       <section className="py-16 border-y border-white/5 bg-black/20 overflow-hidden relative">
@@ -92,7 +131,7 @@ export default function LandingPage() {
             </p>
             <div className="h-px w-20 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
           </div>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
             {[
               { label: "Concursos Analisados", value: "24.500+" },
@@ -107,19 +146,27 @@ export default function LandingPage() {
             ))}
           </div>
 
-          <LotteryLogosCarousel />
+          <Suspense fallback={<SectionFallback />}>
+            <LotteryLogosCarousel />
+          </Suspense>
         </div>
       </section>
 
-      <SocialProofBar />
+      <Suspense fallback={<SectionFallback />}>
+        <SocialProofBar />
+      </Suspense>
 
-      <FeaturesSection 
-        featuresRef={featuresRef} 
-        featuresRotateX={featuresRotateX} 
-        fadeUp={fadeUp} 
-      />
+      <Suspense fallback={<SectionFallback />}>
+        <FeaturesSection
+          featuresRef={featuresRef}
+          featuresRotateX={featuresRotateX}
+          fadeUp={fadeUp}
+        />
+      </Suspense>
 
-      <ScreensShowcase />
+      <Suspense fallback={<SectionFallback />}>
+        <ScreensShowcase />
+      </Suspense>
 
       <section className="py-24 md:py-48 relative overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-primary/10 rounded-full blur-[120px] opacity-20 pointer-events-none" />
@@ -136,18 +183,30 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="max-w-6xl mx-auto">
-            <TitanCommandCenter />
+            <Suspense fallback={<SectionFallback />}>
+              <TitanCommandCenter />
+            </Suspense>
           </div>
         </div>
       </section>
 
-      <HowItWorksSection />
-      
-      <SupportedLotteries />
-      
-      <Testimonials />
-      <PricingSection />
-      <FAQSection />
+      <Suspense fallback={<SectionFallback />}>
+        <HowItWorksSection />
+      </Suspense>
+
+      <Suspense fallback={<SectionFallback />}>
+        <SupportedLotteries />
+      </Suspense>
+
+      <Suspense fallback={<SectionFallback />}>
+        <Testimonials />
+      </Suspense>
+      <Suspense fallback={<SectionFallback />}>
+        <PricingSection />
+      </Suspense>
+      <Suspense fallback={<SectionFallback />}>
+        <FAQSection />
+      </Suspense>
 
       <footer className="py-24 border-t border-white/5 bg-black/60 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-20" />
@@ -155,7 +214,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-4 gap-16 mb-24">
             <div className="col-span-2 space-y-8">
               <div className="flex items-center gap-4 group">
-                <img src="/logo.png" alt="Titan Loterias" className="w-12 h-12 grayscale opacity-50" />
+                <img src="/logo.png" alt="Titan Loterias" className="w-12 h-12 grayscale opacity-50" loading="lazy" decoding="async" />
                 <span className="text-2xl font-black uppercase tracking-tighter italic leading-none">
                   Titan<span className="text-primary/70">Loterias</span>
                 </span>
@@ -191,7 +250,11 @@ export default function LandingPage() {
               © {new Date().getFullYear()} Titan Loterias. Todos os direitos reservados.
             </p>
             <div className="flex items-center gap-8">
-              <WhatsAppButton />
+              {deferredReady && (
+                <Suspense fallback={null}>
+                  <WhatsAppButton />
+                </Suspense>
+              )}
             </div>
           </div>
         </div>
