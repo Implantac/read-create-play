@@ -103,8 +103,8 @@ const resources = {
           "a4": "Suportamos as principais loterias da Caixa Econômica Federal: Mega-Sena, Lotofácil, Quina, Lotomania, Dupla Sena, Timemania, Dia de Sorte, Super Sete e +Milionária.",
           "q5": "Meus dados e apostas ficam seguros?",
           "a5": "Sim. Utilizamos criptografia de ponta a ponta, autenticação segura e infraestrutura em conformidade com a LGPD. Seus dados pessoais e histórico de apostas nunca são compartilhados.",
-          "q6": "Posso cancelar quando quiser?",
-          "a6": "O plano vitalício é um pagamento único — sem mensalidades, sem renovações automáticas, sem cobranças recorrentes. Você paga uma vez e usa para sempre, incluindo todas as atualizações futuras."
+          "q6": "Como funciona o pagamento?",
+          "a6": "O Acesso Vitalício é um pagamento único de R$ 99,90 — sem mensalidade, sem renovação automática, sem cobrança recorrente. Você paga uma vez e usa para sempre, com todas as atualizações futuras incluídas. O plano gratuito continua disponível com acesso a todas as loterias e até 3 jogos salvos por modalidade."
         },
         "disclaimer": "As análises são baseadas em dados históricos, estatística, probabilidade e inteligência artificial. O sistema não garante ganhos e deve ser utilizado como ferramenta de suporte à decisão.",
         "testimonials": {
