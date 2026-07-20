@@ -94,20 +94,21 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
     setReport(null);
     setTuneSweep(null);
     setTuneDelta(null);
+    setRefinedSweep(null);
     await new Promise(r => setTimeout(r, 30));
     try {
       const recent = draws.slice(0, 80).map(d => d.numbers);
-      const tuned = autoTuneAdaptivePipeline({
-        request,
-        recentDraws: recent,
-        reduceDominated: reduce,
-      });
+      const tuned = autoTuneAdaptivePipeline(
+        { request, recentDraws: recent, reduceDominated: reduce },
+        { refine },
+      );
       setReport(tuned.best);
       setTuneSweep(tuned.sweep);
       setTuneDelta(tuned.delta);
+      setRefinedSweep(tuned.refinedSweep ?? null);
       setStatWeight(Math.round(tuned.bestWeight * 100));
       toast.success(
-        `Auto-Tune: peso ótimo ${Math.round(tuned.bestWeight * 100)}% · ${tuned.best.chosen.gameCount} jogos`,
+        `Auto-Tune${refine ? " + refino" : ""}: peso ótimo ${Math.round(tuned.bestWeight * 100)}% · ${tuned.best.chosen.gameCount} jogos`,
       );
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha no auto-tune.");
