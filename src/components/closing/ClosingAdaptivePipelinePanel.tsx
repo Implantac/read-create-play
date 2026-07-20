@@ -66,20 +66,30 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
     }
     setRunning(true);
     setReport(null);
-    // Cede o event loop para o loading aparecer
+    setBestOfNRuns(null);
     await new Promise(r => setTimeout(r, 30));
     try {
       const recent = draws.slice(0, 80).map(d => d.numbers);
-      const rep = runAdaptivePipeline({
+      const input = {
         request,
         recentDraws: recent,
         statWeight: statWeight / 100,
         reduceDominated: reduce,
-      });
-      setReport(rep);
-      toast.success(
-        `Pipeline concluído · ${STRATEGY_LABEL[rep.chosen.strategy]} · ${rep.chosen.gameCount} jogos`,
-      );
+      };
+      if (runs > 1) {
+        const { best, allRuns } = runAdaptivePipelineBestOfN(input, runs);
+        setReport(best);
+        setBestOfNRuns(allRuns);
+        toast.success(
+          `Best-of-${runs} · ${STRATEGY_LABEL[best.chosen.strategy]} · ${best.chosen.gameCount} jogos`,
+        );
+      } else {
+        const rep = runAdaptivePipeline(input);
+        setReport(rep);
+        toast.success(
+          `Pipeline concluído · ${STRATEGY_LABEL[rep.chosen.strategy]} · ${rep.chosen.gameCount} jogos`,
+        );
+      }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha no pipeline adaptativo.");
     } finally {
