@@ -43,6 +43,7 @@ import { ClosingProExportPanel } from "@/components/closing/ClosingProExportPane
 import { ClosingExecutiveSummaryPanel } from "@/components/closing/ClosingExecutiveSummaryPanel";
 import { ClosingProbabilityPanel } from "@/components/closing/ClosingProbabilityPanel";
 import { ClosingStatisticsPanel } from "@/components/closing/ClosingStatisticsPanel";
+import { ClosingAdaptivePipelinePanel } from "@/components/closing/ClosingAdaptivePipelinePanel";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -419,6 +420,17 @@ const FechamentoUniversalPage = () => {
           setStrategy(rec.strategy);
           toast.success(`Recomendação aplicada — ${rec.baseNumbers.length} dezenas, garantia ${rec.minHits}.`);
           window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
+
+      <ClosingAdaptivePipelinePanel
+        request={canGenerate ? buildRequest() : null}
+        disabled={generating || comparing}
+        onApply={(r) => {
+          setResult(r);
+          setComparison(null);
+          setStrategy(r.strategy);
+          saveClosing(r).catch(() => {});
         }}
       />
 
