@@ -170,6 +170,26 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAu
     onApply(p);
   }, [onApply, refresh]);
 
+  const saveNote = useCallback((id: string, note: string) => {
+    const all = loadAll();
+    const trimmed = note.trim();
+    const updated = all.map(p => p.id === id ? { ...p, note: trimmed || undefined } : p);
+    saveAll(updated);
+    refresh();
+    setEditingNoteId(null);
+    setNoteDraft("");
+    toast.success(trimmed ? "Nota salva." : "Nota removida.");
+  }, [refresh]);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return presets;
+    return presets.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      (p.note ?? "").toLowerCase().includes(q),
+    );
+  }, [presets, query]);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const exportPresets = useCallback(() => {
