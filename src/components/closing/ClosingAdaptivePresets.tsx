@@ -108,10 +108,12 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAu
         .filter(p => p.lotteryId === lotteryId)
         .sort((a, b) => {
           if ((b.isDefault ? 1 : 0) !== (a.isDefault ? 1 : 0)) return (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0);
+          if (sortMode === "alpha") return a.name.localeCompare(b.name, "pt-BR");
+          if (sortMode === "used") return (b.useCount ?? 0) - (a.useCount ?? 0) || (b.lastUsedAt ?? b.createdAt) - (a.lastUsedAt ?? a.createdAt);
           return (b.lastUsedAt ?? b.createdAt) - (a.lastUsedAt ?? a.createdAt);
         }),
     );
-  }, [lotteryId]);
+  }, [lotteryId, sortMode]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
