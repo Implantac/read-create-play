@@ -12,11 +12,13 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { Wand2, Loader2, CheckCircle2, TrendingUp, Zap, Filter, Trophy } from "lucide-react";
+import { Wand2, Loader2, CheckCircle2, TrendingUp, Zap, Filter, Trophy, Sparkles } from "lucide-react";
 import type { ClosingRequest, ClosingResult, ClosingStrategy } from "@/engine/closing";
 import {
   runAdaptivePipeline,
+  autoTuneAdaptivePipeline,
   type AdaptivePipelineReport,
+  type AutoTuneResult,
 } from "@/engine/closing/adaptive/AdaptiveClosingPipeline";
 import { useLotteryDraws } from "@/hooks/useLotteryDraws";
 import { formatCurrency } from "@/utils/formatters";
@@ -46,7 +48,9 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
   const [statWeight, setStatWeight] = useState(35);
   const [reduce, setReduce] = useState(true);
   const [running, setRunning] = useState(false);
+  const [tuning, setTuning] = useState(false);
   const [report, setReport] = useState<AdaptivePipelineReport | null>(null);
+  const [tuneSweep, setTuneSweep] = useState<AutoTuneResult["sweep"] | null>(null);
 
   const runPipeline = async () => {
     if (!request) { toast.error("Configure a base primeiro."); return; }
@@ -74,6 +78,36 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
       toast.error(e instanceof Error ? e.message : "Falha no pipeline adaptativo.");
     } finally {
       setRunning(false);
+    }
+  };
+
+  const runAutoTune = async () => {
+    if (!request) { toast.error("Configure a base primeiro."); return; }
+    if (!request.baseNumbers?.length || request.baseNumbers.length < request.lottery.pick) {
+      toast.error(`Selecione ao menos ${request.lottery.pick} dezenas na base.`);
+      return;
+    }
+    setTuning(true);
+    setReport(null);
+    setTuneSweep(null);
+    await new Promise(r => setTimeout(r, 30));
+    try {
+      const recent = draws.slice(0, 80).map(d => d.numbers);
+      const tuned = autoTuneAdaptivePipeline({
+        request,
+        recentDraws: recent,
+        reduceDominated: reduce,
+      });
+      setReport(tuned.best);
+      setTuneSweep(tuned.sweep);
+      setStatWeight(Math.round(tuned.bestWeight * 100));
+      toast.success(
+        `Auto-Tune: peso ótimo ${Math.round(tuned.bestWeight * 100)}% · ${tuned.best.chosen.gameCount} jogos`,
+      );
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha no auto-tune.");
+    } finally {
+      setTuning(false);
     }
   };
 
@@ -132,11 +166,19 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={runPipeline}
-            disabled={running || disabled || !request}
+            disabled={running || tuning || disabled || !request}
             className="min-w-[200px]"
           >
             {running ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processando…</>
                      : <><Zap className="mr-2 h-4 w-4" /> Executar Pipeline</>}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={runAutoTune}
+            disabled={running || tuning || disabled || !request}
+          >
+            {tuning ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Ajustando…</>
+                    : <><Sparkles className="mr-2 h-4 w-4" /> Auto-Tune</>}
           </Button>
           {report && (
             <Button variant="secondary" onClick={apply}>
@@ -145,7 +187,30 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
           )}
         </div>
 
-        {running && <Progress value={undefined} className="h-1.5" />}
+        {(running || tuning) && <Progress value={undefined} className="h-1.5" />}
+
+        {tuneSweep && (
+          <div className="rounded-lg border bg-background/60 p-3 space-y-2">
+            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Varredura de peso estatístico
+            </div>
+            <div className="grid grid-cols-5 gap-2">
+              {tuneSweep.map(s => {
+                const isBest = Math.round(s.weight * 100) === statWeight;
+                return (
+                  <div
+                    key={s.weight}
+                    className={`rounded-md border p-2 text-center ${isBest ? "border-primary bg-primary/10" : "border-border"}`}
+                  >
+                    <div className="text-[10px] text-muted-foreground">{Math.round(s.weight * 100)}%</div>
+                    <div className="font-mono text-sm font-bold text-primary">{s.adaptive.toFixed(1)}</div>
+                    <div className="text-[10px] text-muted-foreground">{s.games}j</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {report && (
           <div className="space-y-4 pt-2">

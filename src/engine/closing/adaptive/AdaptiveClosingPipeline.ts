@@ -183,3 +183,46 @@ export function runAdaptivePipeline(input: AdaptivePipelineInput): AdaptivePipel
     elapsedMs: performance.now() - t0,
   };
 }
+
+/**
+ * autoTuneAdaptivePipeline — varre pesos estatísticos e retorna o melhor report.
+ * Mantém a garantia matemática (usa o próprio pipeline em cada iteração).
+ */
+export interface AutoTuneResult {
+  best: AdaptivePipelineReport;
+  bestWeight: number;
+  sweep: Array<{ weight: number; adaptive: number; games: number; cost: number; overall: number }>;
+}
+
+export function autoTuneAdaptivePipeline(
+  input: Omit<AdaptivePipelineInput, "statWeight">,
+  weights: number[] = [0, 0.15, 0.3, 0.45, 0.6],
+): AutoTuneResult {
+  const sweep: AutoTuneResult["sweep"] = [];
+  let best: AdaptivePipelineReport | null = null;
+  let bestWeight = weights[0];
+  let bestScore = -Infinity;
+
+  for (const w of weights) {
+    const rep = runAdaptivePipeline({ ...input, statWeight: w });
+    const top = rep.strategies[0];
+    const adaptive = top?.adaptive ?? 0;
+    sweep.push({
+      weight: w,
+      adaptive,
+      games: rep.chosen.gameCount,
+      cost: rep.chosen.cost,
+      overall: top?.overall ?? 0,
+    });
+    // Critério: maior nota adaptativa; empate → menos jogos.
+    const score = adaptive - rep.chosen.gameCount * 0.01;
+    if (score > bestScore) {
+      bestScore = score;
+      best = rep;
+      bestWeight = w;
+    }
+  }
+
+  if (!best) throw new Error("Auto-tune sem resultados");
+  return { best, bestWeight, sweep };
+}
