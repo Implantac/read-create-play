@@ -378,6 +378,22 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAu
             <Button size="sm" variant="ghost" className="h-7 px-2" onClick={copyPresets} disabled={disabled || presets.length === 0} title="Copiar JSON">
               <Copy className="h-3.5 w-3.5" />
             </Button>
+            {presets.length >= 2 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" variant="ghost" className="h-7 px-2" disabled={disabled} title={`Ordenar: ${SORT_LABEL[sortMode]}`}>
+                    <ArrowUpDown className="h-3.5 w-3.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {(["recent", "used", "alpha"] as SortMode[]).map(m => (
+                    <DropdownMenuItem key={m} onClick={() => setSortMode(m)} className={sortMode === m ? "font-semibold" : ""}>
+                      {sortMode === m && <Check className="mr-1 h-3 w-3" />} {SORT_LABEL[m]}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
             <Button size="sm" variant="outline" onClick={() => setAdding(true)} disabled={disabled}>
               <Plus className="mr-1 h-3.5 w-3.5" /> Salvar atual
             </Button>
