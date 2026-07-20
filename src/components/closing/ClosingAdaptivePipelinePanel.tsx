@@ -47,11 +47,13 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
   const { draws } = useLotteryDraws(request?.lottery.id ?? "");
   const [statWeight, setStatWeight] = useState(35);
   const [reduce, setReduce] = useState(true);
+  const [refine, setRefine] = useState(false);
   const [running, setRunning] = useState(false);
   const [tuning, setTuning] = useState(false);
   const [report, setReport] = useState<AdaptivePipelineReport | null>(null);
   const [tuneSweep, setTuneSweep] = useState<AutoTuneResult["sweep"] | null>(null);
   const [tuneDelta, setTuneDelta] = useState<AutoTuneResult["delta"] | null>(null);
+  const [refinedSweep, setRefinedSweep] = useState<AutoTuneResult["refinedSweep"] | null>(null);
 
   const runPipeline = async () => {
     if (!request) { toast.error("Configure a base primeiro."); return; }
