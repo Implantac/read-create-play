@@ -3,11 +3,12 @@
  * Permite reabrir (rehidrata jogos e parametros), duplicar (aplica params ao formulario)
  * e excluir cada fechamento arquivado.
  */
-import { useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Cloud, FolderOpen, Copy, Trash2, Loader2, Share2, Link2Off } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Cloud, FolderOpen, Copy, Trash2, Loader2, Share2, Link2Off, Star, Search, Filter } from "lucide-react";
 import { toast } from "sonner";
 import { useClosingHistory, type ClosingHistoryRow } from "@/hooks/useClosingHistory";
 import type { ClosingResult, ClosingStrategy } from "@/engine/closing";
