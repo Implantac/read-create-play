@@ -169,6 +169,20 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
             <p className="text-[10px] text-muted-foreground">
               0% = puramente matemático · 70% = prioriza dezenas quentes/atrasadas
             </p>
+
+            <div className="flex items-center justify-between text-xs pt-2">
+              <Label className="text-muted-foreground">Best-of-N (execuções)</Label>
+              <span className="font-mono font-semibold">{runs}×</span>
+            </div>
+            <Slider
+              value={[runs]}
+              onValueChange={([v]) => setRuns(v)}
+              min={1} max={7} step={1}
+              disabled={running || tuning}
+            />
+            <p className="text-[10px] text-muted-foreground">
+              Repete o pipeline N vezes e mantém o melhor (útil para Genético/SA).
+            </p>
           </div>
 
           <div className="space-y-2">
