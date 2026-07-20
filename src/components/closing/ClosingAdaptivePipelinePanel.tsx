@@ -242,6 +242,16 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
 
         {(running || tuning) && <Progress value={undefined} className="h-1.5" />}
 
+        {request && (
+          <ClosingAdaptivePresets
+            lotteryId={request.lottery.id}
+            current={{ statWeight, reduce, refine, runs }}
+            meta={report ? { games: report.chosen.gameCount, cost: report.chosen.cost, adaptive: report.strategies[0]?.adaptive } : undefined}
+            onApply={applyPreset}
+            disabled={running || tuning}
+          />
+        )}
+
         {bestOfNRuns && bestOfNRuns.length > 1 && (
           <div className="rounded-lg border bg-background/60 p-3 space-y-2">
             <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
