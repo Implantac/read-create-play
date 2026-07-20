@@ -113,11 +113,15 @@ export function runAdaptivePipeline(input: AdaptivePipelineInput): AdaptivePipel
       pick: chosen.request.lottery.pick,
     });
     if (dom.savings > 0) {
-      const validation = calculateGuarantee(
-        dom.keptGames,
-        chosen.request.baseNumbers,
+      // Reindexa jogos para índices da base (validateClosing usa índices 0..b-1)
+      const baseArr = chosen.request.baseNumbers;
+      const idxMap = new Map(baseArr.map((n, i) => [n, i]));
+      const keptIdx = dom.keptGames.map(g => g.map(n => idxMap.get(n) ?? -1));
+      const validation = validateClosing(
+        keptIdx,
+        baseArr.length,
+        chosen.request.guarantee.hitsInBase,
         chosen.request.guarantee.minHits,
-        chosen.request.lottery.pick,
       );
       if (validation.guaranteedHits >= chosen.request.guarantee.minHits) {
         dropped = dom.savings;
