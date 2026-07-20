@@ -91,6 +91,7 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
     setTuning(true);
     setReport(null);
     setTuneSweep(null);
+    setTuneDelta(null);
     await new Promise(r => setTimeout(r, 30));
     try {
       const recent = draws.slice(0, 80).map(d => d.numbers);
@@ -101,6 +102,7 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
       });
       setReport(tuned.best);
       setTuneSweep(tuned.sweep);
+      setTuneDelta(tuned.delta);
       setStatWeight(Math.round(tuned.bestWeight * 100));
       toast.success(
         `Auto-Tune: peso ótimo ${Math.round(tuned.bestWeight * 100)}% · ${tuned.best.chosen.gameCount} jogos`,
@@ -213,6 +215,34 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
           </div>
         )}
 
+        {tuneDelta && (
+          <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 space-y-2">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-primary">
+              <Sparkles className="h-3.5 w-3.5" /> Ganho vs baseline matemático (peso 0%)
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <DeltaCell
+                label="Nota adaptativa"
+                value={tuneDelta.adaptiveGain > 0 ? `+${tuneDelta.adaptiveGain}` : `${tuneDelta.adaptiveGain}`}
+                positive={tuneDelta.adaptiveGain > 0}
+                sub={`base ${tuneDelta.baselineAdaptive.toFixed(1)}`}
+              />
+              <DeltaCell
+                label="Jogos"
+                value={tuneDelta.gamesGain > 0 ? `-${tuneDelta.gamesGain}` : tuneDelta.gamesGain < 0 ? `+${-tuneDelta.gamesGain}` : "="}
+                positive={tuneDelta.gamesGain > 0}
+                sub={`base ${tuneDelta.baselineGames}j`}
+              />
+              <DeltaCell
+                label="Custo"
+                value={tuneDelta.costGain > 0 ? `-${formatCurrency(tuneDelta.costGain)}` : tuneDelta.costGain < 0 ? `+${formatCurrency(-tuneDelta.costGain)}` : "="}
+                positive={tuneDelta.costGain > 0}
+                sub={`base ${formatCurrency(tuneDelta.baselineCost)}`}
+              />
+            </div>
+          </div>
+        )}
+
         {report && (
           <div className="space-y-4 pt-2">
             <div className="grid gap-3 sm:grid-cols-4">
@@ -289,6 +319,20 @@ function KPI({
         <Icon className="h-3.5 w-3.5" /> {label}
       </div>
       <div className="mt-1 text-lg font-bold font-mono">{value}</div>
+    </div>
+  );
+}
+
+function DeltaCell({
+  label, value, positive, sub,
+}: {
+  label: string; value: string; positive: boolean; sub: string;
+}) {
+  return (
+    <div className={`rounded-md border p-2 ${positive ? "border-emerald-500/30 bg-emerald-500/10" : "border-border bg-background/40"}`}>
+      <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className={`font-mono text-base font-bold ${positive ? "text-emerald-500" : "text-muted-foreground"}`}>{value}</div>
+      <div className="text-[10px] text-muted-foreground">{sub}</div>
     </div>
   );
 }
