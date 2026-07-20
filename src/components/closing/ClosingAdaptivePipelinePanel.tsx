@@ -256,6 +256,7 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
             current={{ statWeight, reduce, refine, runs }}
             meta={report ? { games: report.chosen.gameCount, cost: report.chosen.cost, adaptive: report.strategies[0]?.adaptive } : undefined}
             onApply={applyPreset}
+            onAutoLoadDefault={autoLoadDefault}
             disabled={running || tuning}
           />
         )}
