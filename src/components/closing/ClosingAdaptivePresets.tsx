@@ -6,7 +6,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Bookmark, Trash2, Check, Plus, Download, Upload, Copy, Files } from "lucide-react";
+import { Bookmark, Trash2, Check, Plus, Download, Upload, Copy, Files, Star } from "lucide-react";
 import { toast } from "sonner";
 
 function formatRelative(ts: number): string {
