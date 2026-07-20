@@ -128,7 +128,7 @@ export default function LandingPage() {
             <div className="inline-flex items-center px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.4em] bg-primary/10 text-primary border border-primary/20 mb-6 backdrop-blur-sm">
               Sincronização em Tempo Real
             </div>
-            <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-[0.8] mb-6">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight md:tracking-tighter uppercase italic leading-[0.95] md:leading-[0.85] mb-6">
               Central <span className="gradient-brand-text">Neural Titan</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-60">

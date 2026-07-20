@@ -235,7 +235,7 @@ export function ScreensShowcase() {
             <Sparkles className="w-3.5 h-3.5" />
             Um tour pela plataforma
           </span>
-          <h2 className="text-2xl md:text-3xl font-bold tracking-tight mt-3">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight leading-tight mt-3">
             Conheça as <span className="gradient-brand-text">principais telas</span>
           </h2>
           <p className="text-muted-foreground mt-3 max-w-xl mx-auto">
