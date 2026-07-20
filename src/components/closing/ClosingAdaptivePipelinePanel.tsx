@@ -146,6 +146,14 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
     toast.success(`Preset "${p.name}" carregado. Execute o pipeline para aplicar.`);
   };
 
+  const autoLoadDefault = (p: AdaptivePreset) => {
+    setStatWeight(p.statWeight);
+    setReduce(p.reduce);
+    setRefine(p.refine);
+    setRuns(p.runs);
+    toast.info(`Preset padrão "${p.name}" carregado.`, { duration: 2500 });
+  };
+
   return (
     <Card className="border-primary/30 bg-primary/5">
       <CardHeader>
