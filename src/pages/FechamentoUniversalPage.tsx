@@ -423,6 +423,17 @@ const FechamentoUniversalPage = () => {
         }}
       />
 
+      <ClosingAdaptivePipelinePanel
+        request={canGenerate ? buildRequest() : null}
+        disabled={generating || comparing}
+        onApply={(r) => {
+          setResult(r);
+          setComparison(null);
+          setStrategy(r.strategy);
+          saveClosing(r).catch(() => {});
+        }}
+      />
+
       {(result || comparison) && <ClosingExecutiveSummaryPanel result={result} comparison={comparison} />}
       {result && result.games.length > 0 && <ClosingProbabilityPanel result={result} />}
       {result && result.games.length > 0 && <ClosingStatisticsPanel result={result} />}
