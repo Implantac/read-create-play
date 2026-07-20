@@ -40,13 +40,13 @@ function randomShareId(): string {
 }
 
 export async function fetchSharedClosing(shareId: string): Promise<ClosingHistoryRow | null> {
+  // Uses a SECURITY DEFINER RPC that scopes access to the exact share_id token,
+  // preventing enumeration of shared closings via a broad IS NOT NULL policy.
   const { data, error } = await supabase
-    .from("closing_history")
-    .select("*")
-    .eq("share_id", shareId)
-    .maybeSingle();
+    .rpc("get_shared_closing", { _share_id: shareId });
   if (error) throw error;
-  return (data as unknown as ClosingHistoryRow | null) ?? null;
+  const row = Array.isArray(data) ? data[0] : data;
+  return (row as unknown as ClosingHistoryRow | null) ?? null;
 }
 
 export function useClosingHistory(lotteryId?: string) {
