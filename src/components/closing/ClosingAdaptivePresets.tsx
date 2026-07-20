@@ -469,6 +469,9 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAu
                   <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => duplicate(p)} title="Duplicar">
                     <Files className="h-3.5 w-3.5" />
                   </Button>
+                  <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => sharePreset(p)} title="Compartilhar por link">
+                    <Link2 className="h-3.5 w-3.5" />
+                  </Button>
                   <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => remove(p.id)} title="Remover">
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
