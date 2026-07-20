@@ -51,6 +51,7 @@ export function ClosingAdaptivePipelinePanel({ request, disabled, onApply }: Pro
   const [tuning, setTuning] = useState(false);
   const [report, setReport] = useState<AdaptivePipelineReport | null>(null);
   const [tuneSweep, setTuneSweep] = useState<AutoTuneResult["sweep"] | null>(null);
+  const [tuneDelta, setTuneDelta] = useState<AutoTuneResult["delta"] | null>(null);
 
   const runPipeline = async () => {
     if (!request) { toast.error("Configure a base primeiro."); return; }
