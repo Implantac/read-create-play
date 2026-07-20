@@ -85,6 +85,10 @@ export function ClosingAdaptivePresets({ lotteryId, current, meta, onApply, onAu
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameDraft, setRenameDraft] = useState("");
   const autoLoadedRef = useRef<string | null>(null);
+  const [sortMode, setSortMode] = useState<SortMode>(() => {
+    try { return (localStorage.getItem(SORT_KEY) as SortMode) || "recent"; } catch { return "recent"; }
+  });
+  useEffect(() => { try { localStorage.setItem(SORT_KEY, sortMode); } catch { /* ignore */ } }, [sortMode]);
 
   const rename = useCallback((id: string, next: string) => {
     const trimmed = next.trim();
