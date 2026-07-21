@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { BrainCircuit, MessageSquare, Sparkles, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { prefetchRoute } from "@/lib/routePrefetch";
 
 export function TitanAIModule() {
   const navigate = useNavigate();
