@@ -4,6 +4,7 @@ import {
   MessageCircle, User
 } from "lucide-react";
 import { NavLink } from "@/components/layout/NavLink";
+import { prefetchRoute } from "@/lib/routePrefetch";
 import { usePlanAccess } from "@/hooks/usePlanAccess";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLotteryContext } from "@/contexts/LotteryContext";
