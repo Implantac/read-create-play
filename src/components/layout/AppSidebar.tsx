@@ -192,6 +192,9 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild className="h-auto p-0">
                     <NavLink
                       to={item.url}
+                      onMouseEnter={() => prefetchRoute(item.url)}
+                      onFocus={() => prefetchRoute(item.url)}
+                      onTouchStart={() => prefetchRoute(item.url)}
                       className="flex items-center w-full rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-primary/8 text-sidebar-foreground"
                       activeClassName="bg-primary/15 text-primary font-semibold border-l-2 border-primary"
                     >
