@@ -226,10 +226,10 @@ export default function LandingPage() {
             <div>
               <h4 className="font-black uppercase tracking-[0.3em] text-[10px] text-primary mb-8 italic">Plataforma</h4>
               <ul className="space-y-4 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
-                <li><Link to="/gerador" className="hover:text-primary transition-colors">Gerador de Apostas</Link></li>
-                <li><Link to="/analise" className="hover:text-primary transition-colors">Central de Análise</Link></li>
-                <li><Link to="/fechamentos" className="hover:text-primary transition-colors">Fechamentos</Link></li>
-                <li><Link to="/planos" className="hover:text-primary transition-colors">Planos</Link></li>
+                <li><Link to="/gerador" onMouseEnter={() => prefetchRoute("/gerador")} onFocus={() => prefetchRoute("/gerador")} onTouchStart={() => prefetchRoute("/gerador")} className="hover:text-primary transition-colors">Gerador de Apostas</Link></li>
+                <li><Link to="/analise" onMouseEnter={() => prefetchRoute("/analise")} onFocus={() => prefetchRoute("/analise")} onTouchStart={() => prefetchRoute("/analise")} className="hover:text-primary transition-colors">Central de Análise</Link></li>
+                <li><Link to="/fechamentos" onMouseEnter={() => prefetchRoute("/fechamentos")} onFocus={() => prefetchRoute("/fechamentos")} onTouchStart={() => prefetchRoute("/fechamentos")} className="hover:text-primary transition-colors">Fechamentos</Link></li>
+                <li><Link to="/planos" onMouseEnter={() => prefetchRoute("/planos")} onFocus={() => prefetchRoute("/planos")} onTouchStart={() => prefetchRoute("/planos")} className="hover:text-primary transition-colors">Planos</Link></li>
               </ul>
             </div>
             <div>
