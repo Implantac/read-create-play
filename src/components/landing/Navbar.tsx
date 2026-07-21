@@ -1,11 +1,26 @@
-import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useEffect, useCallback } from "react";
+
+const prefetchLogin = () => import("@/pages/LoginPage");
+const prefetchSignup = () => import("@/pages/SignupPage");
 
 export function Navbar() {
   const { t } = useTranslation();
+
+  useEffect(() => {
+    const idle = (cb: () => void) => {
+      const w = window as unknown as { requestIdleCallback?: (cb: () => void) => number };
+      if (typeof w.requestIdleCallback === "function") w.requestIdleCallback(cb);
+      else setTimeout(cb, 1500);
+    };
+    idle(() => { prefetchLogin(); prefetchSignup(); });
+  }, []);
+
+  const onHoverLogin = useCallback(() => { prefetchLogin(); }, []);
+  const onHoverSignup = useCallback(() => { prefetchSignup(); }, []);
 
   return (
     <nav className="fixed top-0 inset-x-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 h-20 md:h-24 flex items-center">
@@ -22,13 +37,13 @@ export function Navbar() {
           </div>
         </Link>
         <div className="hidden lg:flex items-center gap-10">
-          <Link to="/signup" className="text-xs font-black uppercase tracking-widest text-neon-amber hover:text-neon-amber/80 transition-all">
+          <Link to="/signup" onMouseEnter={onHoverSignup} onFocus={onHoverSignup} className="text-xs font-black uppercase tracking-widest text-neon-amber hover:text-neon-amber/80 transition-all">
             {t("common.vital_access")}
           </Link>
-          <Link to="/login" className="text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all">
+          <Link to="/login" onMouseEnter={onHoverLogin} onFocus={onHoverLogin} className="text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all">
             {t("common.login")}
           </Link>
-          <Link to="/signup">
+          <Link to="/signup" onMouseEnter={onHoverSignup} onFocus={onHoverSignup}>
             <Button size="lg" variant="premium" className="h-12 px-10">
               {t("common.join_network")} <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
