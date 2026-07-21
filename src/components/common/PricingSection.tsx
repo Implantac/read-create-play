@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
+import { prefetchRoute } from "@/lib/routePrefetch";
 
 export function PricingSection() {
   const { session } = useAuth();
