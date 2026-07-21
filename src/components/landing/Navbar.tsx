@@ -1,11 +1,26 @@
-import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useEffect, useCallback } from "react";
+
+const prefetchLogin = () => import("@/pages/LoginPage");
+const prefetchSignup = () => import("@/pages/SignupPage");
 
 export function Navbar() {
   const { t } = useTranslation();
+
+  useEffect(() => {
+    const idle = (cb: () => void) => {
+      const w = window as unknown as { requestIdleCallback?: (cb: () => void) => number };
+      if (typeof w.requestIdleCallback === "function") w.requestIdleCallback(cb);
+      else setTimeout(cb, 1500);
+    };
+    idle(() => { prefetchLogin(); prefetchSignup(); });
+  }, []);
+
+  const onHoverLogin = useCallback(() => { prefetchLogin(); }, []);
+  const onHoverSignup = useCallback(() => { prefetchSignup(); }, []);
 
   return (
     <nav className="fixed top-0 inset-x-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 h-20 md:h-24 flex items-center">
