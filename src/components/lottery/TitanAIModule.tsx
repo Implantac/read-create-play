@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { BrainCircuit, MessageSquare, Sparkles, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { prefetchRoute } from "@/lib/routePrefetch";
 
 export function TitanAIModule() {
   const navigate = useNavigate();
@@ -46,6 +47,9 @@ export function TitanAIModule() {
             variant="outline"
             className="rounded-xl font-black uppercase text-[10px] tracking-widest gap-2 h-12 hover:bg-primary/10"
             onClick={() => navigate("/ia-chat")}
+            onMouseEnter={() => prefetchRoute("/ia-chat")}
+            onFocus={() => prefetchRoute("/ia-chat")}
+            onTouchStart={() => prefetchRoute("/ia-chat")}
           >
             <MessageSquare className="w-4 h-4" />
             Abrir Chat IA
@@ -54,6 +58,9 @@ export function TitanAIModule() {
             variant="premium"
             className="rounded-xl font-black uppercase text-[10px] tracking-widest gap-2 h-12 shadow-lg shadow-primary/20"
             onClick={() => navigate("/ia-autonoma")}
+            onMouseEnter={() => prefetchRoute("/ia-autonoma")}
+            onFocus={() => prefetchRoute("/ia-autonoma")}
+            onTouchStart={() => prefetchRoute("/ia-autonoma")}
           >
             <Sparkles className="w-4 h-4" />
             Modo Autônomo
