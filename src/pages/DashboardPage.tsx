@@ -16,6 +16,7 @@ import { ComplianceDisclaimer } from "@/components/common/ComplianceDisclaimer";
 import { GamificationCard } from "@/components/GamificationCard";
 import { NeuralMissionCenter } from "@/components/NeuralMissionCenter";
 import { useNavigate } from "react-router-dom";
+import { prefetchRoute } from "@/lib/routePrefetch";
 
 const DashboardPage = () => {
   const { stats, draws, selectedLottery } = useLotteryContext();
@@ -52,6 +53,9 @@ const DashboardPage = () => {
               size="sm"
               className="gap-2"
               onClick={() => navigate("/analise")}
+              onMouseEnter={() => prefetchRoute("/analise")}
+              onFocus={() => prefetchRoute("/analise")}
+              onTouchStart={() => prefetchRoute("/analise")}
             >
               <History className="w-4 h-4" />
               Análise Histórica
@@ -61,6 +65,9 @@ const DashboardPage = () => {
               size="sm"
               className="gap-2"
               onClick={() => navigate("/gerador")}
+              onMouseEnter={() => prefetchRoute("/gerador")}
+              onFocus={() => prefetchRoute("/gerador")}
+              onTouchStart={() => prefetchRoute("/gerador")}
             >
               <Target className="w-4 h-4" />
               Gerar Apostas
