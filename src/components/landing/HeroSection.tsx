@@ -4,6 +4,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { FloatingLotteryBalls } from "@/components/lottery/FloatingLotteryBalls";
+import { prefetchRoute } from "@/lib/routePrefetch";
+
+const prefetchSignup = () => prefetchRoute("/signup");
+const prefetchLogin = () => prefetchRoute("/login");
 
 interface HeroSectionProps {
   heroRef: React.RefObject<HTMLDivElement>;
@@ -79,13 +83,22 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             size="lg" 
             variant="premium"
             onClick={(e) => handleCtaClick(e, "/signup")}
+            onMouseEnter={prefetchSignup}
+            onFocus={prefetchSignup}
+            onTouchStart={prefetchSignup}
             className="group h-20 px-12 text-sm font-black uppercase tracking-widest rounded-2xl shadow-[0_30px_60px_-12px_hsl(var(--primary)/0.5)] hover:shadow-[0_40px_80px_-12px_hsl(var(--primary)/0.7)] transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             Testar Gratuitamente
             <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Button>
 
-          <Link to="/login" className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-primary transition-colors italic px-4 py-2">
+          <Link
+            to="/login"
+            onMouseEnter={prefetchLogin}
+            onFocus={prefetchLogin}
+            onTouchStart={prefetchLogin}
+            className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-primary transition-colors italic px-4 py-2"
+          >
             Já tenho conta
           </Link>
         </motion.div>
