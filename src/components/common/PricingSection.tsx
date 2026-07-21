@@ -152,6 +152,9 @@ export function PricingSection() {
 
                 <Button 
                   onClick={plan.price === "R$ 0" ? () => navigate("/signup") : handleCheckout}
+                  onMouseEnter={() => prefetchRoute(plan.price === "R$ 0" ? "/signup" : session ? "/planos" : "/login")}
+                  onFocus={() => prefetchRoute(plan.price === "R$ 0" ? "/signup" : session ? "/planos" : "/login")}
+                  onTouchStart={() => prefetchRoute(plan.price === "R$ 0" ? "/signup" : session ? "/planos" : "/login")}
                   disabled={loadingPlan}
                   className={`w-full h-16 rounded-2xl text-base font-black uppercase tracking-widest transition-all ${plan.popular ? 'gradient-brand text-primary-foreground shadow-xl shadow-primary/20 hover:scale-[1.02]' : 'bg-background hover:bg-muted border-2 border-white/10'}`}
                 >
