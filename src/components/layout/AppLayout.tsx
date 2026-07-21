@@ -11,6 +11,7 @@ import { GuidedOnboarding } from "@/components/GuidedOnboarding";
 import { NoiseBackground } from "@/components/common/NoiseBackground";
 import { AppHeader } from "./AppHeader";
 import { AppFooter } from "./AppFooter";
+import { useIdlePrefetch } from "@/hooks/useIdlePrefetch";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -27,6 +28,18 @@ export function AppLayout() {
   } = useLotteryContext();
   const { user, profile, signOut } = useAuth();
   const location = useLocation();
+
+  // Wave 3 — idle prefetch of the most-used protected routes so navigation
+  // from the sidebar feels instant (mounts once inside the authenticated shell).
+  useIdlePrefetch([
+    () => import("@/pages/DashboardPage"),
+    () => import("@/pages/GeradorPage"),
+    () => import("@/pages/FechamentoUniversalPage"),
+    () => import("@/pages/AnaliseCentralPage"),
+    () => import("@/pages/HistoricoUnificadoPage"),
+    () => import("@/pages/JogosSalvosPage"),
+  ]);
+
 
   return (
     <SidebarProvider>
