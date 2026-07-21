@@ -8,6 +8,7 @@ import { HeroSection } from "@/components/landing/HeroSection";
 import { ComplianceDisclaimer } from "@/components/common/ComplianceDisclaimer";
 
 import { burstConfetti } from "@/lib/confetti";
+import { prefetchRoute } from "@/lib/routePrefetch";
 
 // Below-the-fold sections – code-split to keep the initial landing chunk tiny
 const LotteryLogosCarousel = lazy(() =>
