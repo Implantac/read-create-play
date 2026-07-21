@@ -16,6 +16,7 @@ import { ComplianceDisclaimer } from "@/components/common/ComplianceDisclaimer";
 import { GamificationCard } from "@/components/GamificationCard";
 import { NeuralMissionCenter } from "@/components/NeuralMissionCenter";
 import { useNavigate } from "react-router-dom";
+import { prefetchRoute } from "@/lib/routePrefetch";
 
 const DashboardPage = () => {
   const { stats, draws, selectedLottery } = useLotteryContext();
