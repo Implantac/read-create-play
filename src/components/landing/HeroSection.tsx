@@ -4,6 +4,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { FloatingLotteryBalls } from "@/components/lottery/FloatingLotteryBalls";
+import { prefetchRoute } from "@/lib/routePrefetch";
+
+const prefetchSignup = () => prefetchRoute("/signup");
+const prefetchLogin = () => prefetchRoute("/login");
 
 interface HeroSectionProps {
   heroRef: React.RefObject<HTMLDivElement>;
