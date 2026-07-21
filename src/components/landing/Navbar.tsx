@@ -37,13 +37,13 @@ export function Navbar() {
           </div>
         </Link>
         <div className="hidden lg:flex items-center gap-10">
-          <Link to="/signup" className="text-xs font-black uppercase tracking-widest text-neon-amber hover:text-neon-amber/80 transition-all">
+          <Link to="/signup" onMouseEnter={onHoverSignup} onFocus={onHoverSignup} className="text-xs font-black uppercase tracking-widest text-neon-amber hover:text-neon-amber/80 transition-all">
             {t("common.vital_access")}
           </Link>
-          <Link to="/login" className="text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all">
+          <Link to="/login" onMouseEnter={onHoverLogin} onFocus={onHoverLogin} className="text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all">
             {t("common.login")}
           </Link>
-          <Link to="/signup">
+          <Link to="/signup" onMouseEnter={onHoverSignup} onFocus={onHoverSignup}>
             <Button size="lg" variant="premium" className="h-12 px-10">
               {t("common.join_network")} <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
