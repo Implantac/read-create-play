@@ -865,6 +865,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_alert_configs: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          last_concurso: number
+          lottery_id: string
+          triggers: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          last_concurso?: number
+          lottery_id: string
+          triggers?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          last_concurso?: number
+          lottery_id?: string
+          triggers?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_favorites: {
         Row: {
           created_at: string | null
