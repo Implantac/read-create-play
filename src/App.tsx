@@ -139,6 +139,7 @@ const AppContent = () => {
           <Route path="/matriz" element={<MatrizAnalisePage />} />
           <Route path="/planilhas" element={<PlanilhasMatrizPage />} />
           <Route path="/roi" element={<ROIDashboardPage />} />
+          <Route path="/banca" element={<GestaoBancaPage />} />
           <Route path="/simulacoes" element={<SimulacoesPage />} />
           <Route path="/strategy-lab" element={<StrategyLabPage />} />
           <Route path="/perfil" element={<PerfilPage />} />
