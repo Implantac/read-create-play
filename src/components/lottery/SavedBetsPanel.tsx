@@ -207,6 +207,10 @@ export function SavedBetsPanel() {
         )}
       </AnimatePresence>
 
+      <div className="relative z-10">
+        <LotteryExtraCard lotteryId={selectedLottery} />
+      </div>
+
 
 
       <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide relative z-10 border-b border-white/5">
