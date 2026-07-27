@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { ShareBetButton } from "@/components/ShareBetButton";
+import { LotteryExtraCard } from "@/components/lottery/LotteryExtraCard";
 import { exportToCsv, exportToExcel } from "@/utils/export";
 import { exportToPdf } from "@/engine/pdf-export";
 
@@ -205,6 +206,10 @@ export function SavedBetsPanel() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <div className="relative z-10">
+        <LotteryExtraCard lotteryId={selectedLottery} />
+      </div>
 
 
 
