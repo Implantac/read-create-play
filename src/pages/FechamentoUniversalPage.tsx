@@ -365,7 +365,7 @@ const FechamentoUniversalPage = () => {
       </div>
 
       <ClosingAIRecommendationPanel
-        lottery={{ id: config.id, name: config.name, totalNumbers: total, pick, ticketPrice: 3 }}
+        lottery={{ id: config.id, name: config.name, totalNumbers: total, pick, ticketPrice }}
         baseSize={baseNumbers.length}
         onApply={(rec) => {
           setMinHits(Math.min(pick, rec.minHits));
@@ -406,7 +406,7 @@ const FechamentoUniversalPage = () => {
       />
 
       <ClosingBaseSuggestionPanel
-        lottery={{ id: config.id, name: config.name, totalNumbers: total, pick, ticketPrice: 3 }}
+        lottery={{ id: config.id, name: config.name, totalNumbers: total, pick, ticketPrice }}
         onApply={(p) => {
           setBaseNumbers(p.baseNumbers);
           setMinHits(p.minHits);
