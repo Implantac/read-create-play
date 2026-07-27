@@ -13,6 +13,10 @@ export interface WorksheetMatrixPreset {
   eliminatedCount?: number;
   gameCount: number;
   description: string;
+  /** Aproximação estatística de cobertura quando as 15 dezenas sorteadas estão dentro da base. */
+  statisticalCoverage?: string;
+  /** Chance empírica de ao menos 11 acertos em um jogo, dado que todas as 15 caíram na base. */
+  minPrizeChance?: string;
 }
 
 export interface WorksheetGameAnalysis {
