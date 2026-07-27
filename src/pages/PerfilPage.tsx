@@ -20,6 +20,7 @@ import { GamificationCard } from "@/components/GamificationCard";
 import { AchievementDisplay } from "@/components/lottery/AchievementDisplay";
 import { PushNotificationsCard } from "@/components/settings/PushNotificationsCard";
 import { AlertsConfigCard } from "@/components/settings/AlertsConfigCard";
+import { BetResultsCheckerCard } from "@/components/settings/BetResultsCheckerCard";
 
 export default function PerfilPage() {
   const { user, profile, session } = useAuth();
@@ -138,6 +139,7 @@ export default function PerfilPage() {
 
       <PushNotificationsCard />
       <AlertsConfigCard />
+      <BetResultsCheckerCard />
 
 
       <Card className="glass-card">

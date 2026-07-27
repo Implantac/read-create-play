@@ -42,3 +42,6 @@ verify_jwt = false
 
 [functions.alerts-scan]
 verify_jwt = false
+
+[functions.notify-bet-results]
+verify_jwt = false
