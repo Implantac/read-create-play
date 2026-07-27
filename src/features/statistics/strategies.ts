@@ -17,6 +17,7 @@ export type Strategy =
   | "sectors"
   | "coreSectors"
   | "repetition"
+  | "coreRepetition"
   | "trend"
   | "cycle"
   | "hybrid"
