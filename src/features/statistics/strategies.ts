@@ -51,6 +51,7 @@ export const STRATEGIES: StrategyInfo[] = [
   { id: "golden", label: "Razão Áurea", desc: "Distribuição otimizada por φ (1.618)", category: "math" },
   { id: "sectors", label: "Setores", desc: "Cobertura equilibrada por faixas com melhor de cada setor", category: "math" },
   { id: "coreSectors", label: "Núcleo Fixo + Setores", desc: "Fixa top-6 quentes e completa com sectorização — maior lift comprovado em backtest", category: "math" },
+  { id: "repetition", label: "Repetidas + Núcleo", desc: "Aproveita a média histórica de 8–9 repetidas do concurso anterior (Lotofácil)", category: "math" },
   { id: "lowDelay", label: "Baixo Atraso", desc: "Números com maior atraso + detecção de ciclo vencido", category: "math" },
   { id: "pattern", label: "Padrão", desc: "Padrões par/ímpar, alto/baixo e consecutividade", category: "math" },
   { id: "cycle", label: "Ciclo", desc: "Seleção baseada no desvio padrão e regularidade de gaps", category: "math" },
