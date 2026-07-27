@@ -108,8 +108,10 @@ const FechamentoUniversalPage = () => {
 
   const canGenerate = baseNumbers.length >= pick && minHits >= 1 && minHits <= pick;
 
+  const ticketPrice = LOTTERY_BET_COST[config.id] ?? 3;
+
   const buildRequest = () => ({
-    lottery: { id: config.id, name: config.name, totalNumbers: total, pick, ticketPrice: 3 },
+    lottery: { id: config.id, name: config.name, totalNumbers: total, pick, ticketPrice },
     baseNumbers,
     guarantee: { hitsInBase: pick, minHits },
     maxGames: maxGames > 0 ? maxGames : undefined,
