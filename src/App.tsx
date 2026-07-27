@@ -48,6 +48,7 @@ const PlanilhasMatrizPage = lazy(() => import("@/pages/PlanilhasMatrizPage"));
 const ROIDashboardPage = lazy(() => import("@/pages/ROIDashboardPage"));
 const SimulacoesPage = lazy(() => import("@/pages/SimulacoesPage"));
 const StrategyLabPage = lazy(() => import("@/pages/StrategyLabPage"));
+const GestaoBancaPage = lazy(() => import("@/pages/GestaoBancaPage"));
 const ClosingSharePage = lazy(() => import("@/pages/ClosingSharePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const OAuthConsentPage = lazy(() => import("@/pages/OAuthConsentPage"));
@@ -138,6 +139,7 @@ const AppContent = () => {
           <Route path="/matriz" element={<MatrizAnalisePage />} />
           <Route path="/planilhas" element={<PlanilhasMatrizPage />} />
           <Route path="/roi" element={<ROIDashboardPage />} />
+          <Route path="/banca" element={<GestaoBancaPage />} />
           <Route path="/simulacoes" element={<SimulacoesPage />} />
           <Route path="/strategy-lab" element={<StrategyLabPage />} />
           <Route path="/perfil" element={<PerfilPage />} />
