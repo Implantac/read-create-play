@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sparkles, Play, Zap } from "lucide-react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { recommendNextDraw, type NextDrawRecommendation } from "@/engine/closing/analysis/nextDrawRecommender";
+import { LOTTERY_BET_COST } from "@/engine/betting-budget";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -35,7 +36,7 @@ export function ClosingNextDrawPanel({ onApply }: Props) {
       })),
       targetBaseSize: baseSize,
       budget,
-      ticketPrice: 3,
+      ticketPrice: LOTTERY_BET_COST[config.id] ?? 3,
       riskProfile: risk,
     });
   }, [ran, draws, config, budget, risk, baseSize]);
