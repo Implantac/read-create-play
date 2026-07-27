@@ -115,6 +115,21 @@ export const STRATEGY_REGISTRY: StrategyDefinition[] = [
     category: "ai", baseStrategy: "markov_model", supportedLotteries: [],
     params: { ...DEFAULT_PARAMS },
   },
+  {
+    id: "nucleo_setores", name: "Núcleo Fixo + Setores ⭐", description: "Top-6 quentes fixos + moldura/centro 10:5 + soma-alvo 180–220 (Lotofácil). Melhor lift comprovado em backtest (+26,8% em 11+).",
+    category: "math", baseStrategy: "coreSectors", supportedLotteries: ["lotofacil"],
+    params: { ...DEFAULT_PARAMS, frequencyWeight: 0.85, dispersalWeight: 0.8, sumBalanceWeight: 0.8 },
+  },
+  {
+    id: "repeticao_estruturada", name: "Repetição Estruturada", description: "8 repetidas do último sorteio + complemento com filtro moldura/centro e soma-alvo (Lotofácil).",
+    category: "math", baseStrategy: "repetition", supportedLotteries: ["lotofacil"],
+    params: { ...DEFAULT_PARAMS, repeatFromLastWeight: 0.9, dispersalWeight: 0.7, sumBalanceWeight: 0.7 },
+  },
+  {
+    id: "nucleo_repeticao", name: "Núcleo + Repetidas + Setores", description: "Fusão dos melhores sinais: 6 fixos por score + 7 repetidas + 2 setoriais (Lotofácil).",
+    category: "hybrid", baseStrategy: "coreRepetition", supportedLotteries: ["lotofacil"],
+    params: { ...DEFAULT_PARAMS, frequencyWeight: 0.8, repeatFromLastWeight: 0.85, dispersalWeight: 0.7 },
+  },
 ];
 
 export function getStrategy(id: string): StrategyDefinition | undefined {
