@@ -18,6 +18,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RTooltip,
   ResponsiveContainer, Cell
 } from "recharts";
+import { PRIZE_MAP } from "@/engine/simulators/lib/simulation-utils";
 
 interface SimGame {
   id: string;
