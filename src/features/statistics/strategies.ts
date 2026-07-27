@@ -131,7 +131,7 @@ export function generateByStrategy(
     case "hot": {
       const pool = [...stats]
         .filter(s => s.status === "hot" || (s.status === "normal" && s.trend > 0))
-        .map(s => ({ ...s, weight: Math.max(0.1, s.recentFreq * 2 + s.trend * 0.5 + s.momentum * 0.2 + Math.random() * 3) }));
+        .map(s => ({ ...s, weight: Math.max(0.1, s.recentFreq * 2 + s.trend * 0.5 + s.momentum * 0.2 + Math.random() * 1) }));
       const shuffled = weightedShuffle(pool);
       const selected = shuffled.slice(0, pick).map(s => s.number);
       while (selected.length < pick) {
@@ -144,7 +144,7 @@ export function generateByStrategy(
     case "cold": {
       const pool = [...stats]
         .filter(s => s.status === "cold" || s.cycleScore > 1.2)
-        .map(s => ({ ...s, weight: Math.max(0.1, s.cycleScore * 3 + s.lastSeen * 0.1 + Math.random() * 3) }));
+        .map(s => ({ ...s, weight: Math.max(0.1, s.cycleScore * 3 + s.lastSeen * 0.1 + Math.random() * 1) }));
       const shuffled = weightedShuffle(pool);
       const selected = shuffled.slice(0, pick).map(s => s.number);
       while (selected.length < pick) {
