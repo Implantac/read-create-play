@@ -18,6 +18,7 @@ import UserPreferencesPanel from "@/components/UserPreferencesPanel";
 import { usePlanAccess } from "@/hooks/usePlanAccess";
 import { GamificationCard } from "@/components/GamificationCard";
 import { AchievementDisplay } from "@/components/lottery/AchievementDisplay";
+import { PushNotificationsCard } from "@/components/settings/PushNotificationsCard";
 
 export default function PerfilPage() {
   const { user, profile, session } = useAuth();
@@ -133,6 +134,9 @@ export default function PerfilPage() {
       <h1 className="text-2xl font-bold text-foreground">Meu Perfil</h1>
 
       <GamificationCard />
+
+      <PushNotificationsCard />
+
 
       <Card className="glass-card">
         <CardHeader>
