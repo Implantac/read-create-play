@@ -252,6 +252,25 @@ serve(async (req) => {
       results.push({ lottery: lottery.id, inserted, errors, latest: latestConcurso });
     }
 
+    // Fire-and-forget: encadeia o orquestrador pós-sorteio (alerts + notificações de prêmio)
+    // Só dispara se houve nova inserção em qualquer loteria — evita ruído em polls sem novidade.
+    const lotteriesWithNew = results.filter((r) => r.inserted > 0).map((r) => r.lottery);
+    if (lotteriesWithNew.length > 0) {
+      const serviceRole = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      const supabaseUrl = Deno.env.get("SUPABASE_URL");
+      if (serviceRole && supabaseUrl) {
+        fetch(`${supabaseUrl}/functions/v1/post-sync-notify`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-service-key": serviceRole,
+            Authorization: `Bearer ${serviceRole}`,
+          },
+          body: JSON.stringify({ lotteries: lotteriesWithNew }),
+        }).catch((e) => console.warn("[sync] post-sync-notify chain failed", e));
+      }
+    }
+
     return new Response(JSON.stringify({ success: true, results }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
