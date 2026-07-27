@@ -60,6 +60,8 @@ export const LOTOFACIL_WORKSHEET_PRESETS: WorksheetMatrixPreset[] = [
     baseCount: 21,
     gameCount: 50,
     description: "21 dezenas selecionadas para gerar 50 jogos equilibrados de 15 dezenas.",
+    statisticalCoverage: "~92%",
+    minPrizeChance: "Alta se 14+ na base",
   },
   {
     id: "plan19x5",
@@ -69,6 +71,8 @@ export const LOTOFACIL_WORKSHEET_PRESETS: WorksheetMatrixPreset[] = [
     baseCount: 19,
     gameCount: 5,
     description: "Fechamento economico com 19 dezenas e 5 jogos.",
+    statisticalCoverage: "~35%",
+    minPrizeChance: "Média se 15 na base",
   },
   {
     id: "plan17x8",
@@ -78,6 +82,8 @@ export const LOTOFACIL_WORKSHEET_PRESETS: WorksheetMatrixPreset[] = [
     baseCount: 17,
     gameCount: 8,
     description: "17 dezenas-base para 8 jogos com boa repeticao interna.",
+    statisticalCoverage: "~60%",
+    minPrizeChance: "Alta se 15 na base",
   },
   {
     id: "plan13x6",
@@ -88,6 +94,8 @@ export const LOTOFACIL_WORKSHEET_PRESETS: WorksheetMatrixPreset[] = [
     poolCount: 12,
     gameCount: 6,
     description: "13 dezenas fixas e combinacao rotativa com as 12 restantes.",
+    statisticalCoverage: "Depende das 13 fixas",
+    minPrizeChance: "Baixa (base pequena)",
   },
   {
     id: "six-absent",
@@ -98,6 +106,8 @@ export const LOTOFACIL_WORKSHEET_PRESETS: WorksheetMatrixPreset[] = [
     poolCount: 14,
     gameCount: 15,
     description: "6 ausentes fixas combinadas com 14 dezenas repetidas/selecionadas.",
+    statisticalCoverage: "Depende do pool",
+    minPrizeChance: "Média se pool bem escolhido",
   },
   {
     id: "plan6x13",
@@ -108,6 +118,8 @@ export const LOTOFACIL_WORKSHEET_PRESETS: WorksheetMatrixPreset[] = [
     poolCount: 13,
     gameCount: 38,
     description: "6 dezenas fixas e 13 dezenas-base em 38 jogos.",
+    statisticalCoverage: "~55%",
+    minPrizeChance: "Média se 6 fixas caem",
   },
   {
     id: "plan-gf",
@@ -118,6 +130,8 @@ export const LOTOFACIL_WORKSHEET_PRESETS: WorksheetMatrixPreset[] = [
     eliminatedCount: 2,
     gameCount: 10,
     description: "3 fixas, 2 eliminadas e grupos rotativos para gerar 10 jogos.",
+    statisticalCoverage: "~25%",
+    minPrizeChance: "Baixa (aposta especulativa)",
   },
 ];
 
