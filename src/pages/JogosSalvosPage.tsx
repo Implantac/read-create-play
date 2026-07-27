@@ -64,11 +64,42 @@ const JogosSalvosPage = () => {
     );
   }
 
+  const buildExportRows = () => {
+    const header = ["Loteria", "Criado em", "Estratégia", "Score", "Grade", "Rótulo", "Números", "Premiações Recentes", "Melhor Acerto"];
+    const rows = savedBets.map((bet) => {
+      const perf = computePerformance(bet);
+      return [
+        bet.lottery_id,
+        new Date(bet.created_at).toLocaleString("pt-BR"),
+        bet.strategy ?? "",
+        bet.score ?? "",
+        bet.grade ?? "",
+        bet.label ?? "",
+        bet.numbers.map((n) => String(n).padStart(2, "0")).join(" "),
+        perf.totalPrizes,
+        perf.bestHits,
+      ];
+    });
+    return [header, ...rows];
+  };
+
+  const handleExport = (kind: "csv" | "xlsx") => {
+    if (!savedBets.length) {
+      toast.error("Nenhum jogo salvo para exportar");
+      return;
+    }
+    const rows = buildExportRows();
+    const filename = `titan-jogos-salvos-${selectedLottery}-${new Date().toISOString().slice(0, 10)}`;
+    if (kind === "csv") exportToCsv(filename, rows);
+    else exportToExcel(filename, rows);
+    toast.success(`Exportado: ${filename}.${kind === "csv" ? "csv" : "xls"}`);
+  };
+
   return (
     <div className="space-y-6">
       <PageHeader title="Jogos Salvos" description="Desempenho dos seus jogos salvos" icon={Bookmark} />
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <span className="text-sm text-muted-foreground">Analisar contra:</span>
         <Select value={drawRange} onValueChange={setDrawRange}>
           <SelectTrigger className="w-[180px] bg-card"><SelectValue /></SelectTrigger>
@@ -76,6 +107,16 @@ const JogosSalvosPage = () => {
             {DRAW_RANGE_OPTIONS.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
           </SelectContent>
         </Select>
+        <div className="ml-auto flex items-center gap-2">
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => handleExport("csv")} disabled={!savedBets.length}>
+            <Download className="w-3.5 h-3.5" />
+            CSV
+          </Button>
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => handleExport("xlsx")} disabled={!savedBets.length}>
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+            Excel
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
