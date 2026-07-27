@@ -230,44 +230,93 @@ export function runWorksheetBacktest(
   };
 }
 
-function generateBalancedBaseGames(baseNumbers: number[], gameCount: number) {
-  if (baseNumbers.length < 15) return [];
-  const games: number[][] = [];
-  const usage = new Map(baseNumbers.map((n) => [n, 0]));
-  const seen = new Set<string>();
+// Deterministic PRNG (mulberry32) so results are reproducible.
+function makeRng(seed: number) {
+  let s = seed >>> 0;
+  return () => {
+    s = (s + 0x6D2B79F5) >>> 0;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
-  for (let attempt = 0; games.length < gameCount && attempt < gameCount * 12; attempt++) {
-    const rotated = [...baseNumbers].sort((a, b) => {
-      const usageDiff = (usage.get(a) ?? 0) - (usage.get(b) ?? 0);
-      if (usageDiff !== 0) return usageDiff;
-      return ((a + attempt * 7) % 25) - ((b + attempt * 7) % 25);
+// Fisher–Yates over a fresh copy of `arr` using `rng`.
+function shuffleWith<T>(arr: T[], rng: () => number): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Sample `count` distinct k-subsets of `arr`, biased toward even usage of each element.
+function sampleDistinctSubsets(arr: number[], k: number, count: number, seed = 42): number[][] {
+  if (arr.length < k || k <= 0 || count <= 0) return [];
+  const results: number[][] = [];
+  const seen = new Set<string>();
+  const usage = new Map(arr.map((n) => [n, 0]));
+  const rng = makeRng(seed);
+  const maxAttempts = Math.max(count * 40, 400);
+
+  for (let attempt = 0; results.length < count && attempt < maxAttempts; attempt++) {
+    // Sort by (usage asc, random tiebreak) so under-used numbers surface earlier
+    const ranked = [...arr].sort((a, b) => {
+      const du = (usage.get(a) ?? 0) - (usage.get(b) ?? 0);
+      if (du !== 0) return du;
+      return rng() - 0.5;
     });
-    const game = rotated.slice(0, 15).sort((a, b) => a - b);
-    const key = game.join(",");
+    // Take the least-used k, then perturb the last few positions with a random swap
+    // to break ties differently across attempts and force uniqueness.
+    const pick = ranked.slice(0, k);
+    // Random swaps between selected and unselected to diversify
+    const swaps = 1 + Math.floor(rng() * 3);
+    const unselected = ranked.slice(k);
+    for (let s = 0; s < swaps && unselected.length > 0; s++) {
+      const inIdx = Math.floor(rng() * pick.length);
+      const outIdx = Math.floor(rng() * unselected.length);
+      [pick[inIdx], unselected[outIdx]] = [unselected[outIdx], pick[inIdx]];
+    }
+    const sorted = pick.slice().sort((a, b) => a - b);
+    const key = sorted.join(",");
     if (seen.has(key)) continue;
     seen.add(key);
-    games.push(game);
-    game.forEach((n) => usage.set(n, (usage.get(n) ?? 0) + 1));
+    results.push(sorted);
+    sorted.forEach((n) => usage.set(n, (usage.get(n) ?? 0) + 1));
   }
 
-  return games;
+  // Fallback: if capacity of C(n,k) is above what we produced but we still fell short,
+  // top up with pure random distinct subsets.
+  while (results.length < count) {
+    const shuffled = shuffleWith(arr, rng).slice(0, k).sort((a, b) => a - b);
+    const key = shuffled.join(",");
+    if (seen.has(key)) { seen.add(key); results.push(shuffled); }
+    // Safety: stop if the combinatorial space is exhausted
+    if (seen.size >= combinationCount(arr.length, k)) break;
+  }
+  return results;
+}
+
+function combinationCount(n: number, k: number): number {
+  if (k < 0 || k > n) return 0;
+  k = Math.min(k, n - k);
+  let c = 1;
+  for (let i = 0; i < k; i++) c = (c * (n - i)) / (i + 1);
+  return Math.round(c);
+}
+
+function generateBalancedBaseGames(baseNumbers: number[], gameCount: number) {
+  if (baseNumbers.length < 15) return [];
+  return sampleDistinctSubsets(baseNumbers, 15, gameCount, 2101);
 }
 
 function generateFixedPlusPoolGames(fixed: number[], pool: number[], gameCount: number) {
   const take = 15 - fixed.length;
   if (fixed.length <= 0 || pool.length < take) return [];
-  const games: number[][] = [];
-  const seen = new Set<string>();
-  for (let i = 0; games.length < gameCount && i < gameCount * 8; i++) {
-    const rotated = rotate(pool, i * 2);
-    const selection = rotated.slice(0, take);
-    const game = [...fixed, ...selection].sort((a, b) => a - b);
-    const key = game.join(",");
-    if (seen.has(key)) continue;
-    seen.add(key);
-    games.push(game);
-  }
-  return games;
+  const subsets = sampleDistinctSubsets(pool, take, gameCount, 3141);
+  return subsets.map((sub) => [...fixed, ...sub].sort((a, b) => a - b));
 }
 
 function generateGroupedFixedGames(fixed: number[], pool: number[], gameCount: number) {
