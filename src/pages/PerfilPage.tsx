@@ -137,6 +137,7 @@ export default function PerfilPage() {
       <GamificationCard />
 
       <PushNotificationsCard />
+      <AlertsConfigCard />
 
 
       <Card className="glass-card">
