@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { Copy, Check, Shuffle, Heart, CalendarDays } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Copy, Check, Shuffle, Heart, CalendarDays, Star } from "lucide-react";
 import {
   generateLotteryExtra,
   requiresExtra,
@@ -12,10 +12,13 @@ interface Props {
   lotteryId: string;
 }
 
+const FAV_KEY = (lotteryId: string) => `titan.extra.fav.${lotteryId}`;
+
 /**
  * Card compacto que exibe o elemento extra obrigatório da modalidade
  * (Time do Coração para Timemania, Mês da Sorte para Dia de Sorte).
- * Permite sortear novo, escolher manualmente e copiar para colar na Caixa.
+ * Permite sortear novo, escolher manualmente, marcar favorito (persistente)
+ * e copiar para colar na Caixa.
  */
 export function LotteryExtraCard({ lotteryId }: Props) {
   const isTime = lotteryId === "timemania";
@@ -25,8 +28,23 @@ export function LotteryExtraCard({ lotteryId }: Props) {
     [isTime, isMes],
   );
 
-  const [extra, setExtra] = useState(() => generateLotteryExtra(lotteryId));
+  // Carrega favorito salvo (se houver) como valor inicial
+  const [favorite, setFavorite] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    try { return localStorage.getItem(FAV_KEY(lotteryId)); } catch { return null; }
+  });
+  const [extra, setExtra] = useState(() =>
+    generateLotteryExtra(lotteryId, favorite ?? undefined),
+  );
   const [copied, setCopied] = useState(false);
+
+  // Sincroniza quando muda a loteria
+  useEffect(() => {
+    let fav: string | null = null;
+    try { fav = localStorage.getItem(FAV_KEY(lotteryId)); } catch { fav = null; }
+    setFavorite(fav);
+    setExtra(generateLotteryExtra(lotteryId, fav ?? undefined));
+  }, [lotteryId]);
 
   if (!requiresExtra(lotteryId) || !extra) return null;
 
@@ -40,6 +58,24 @@ export function LotteryExtraCard({ lotteryId }: Props) {
     setTimeout(() => setCopied(false), 1500);
   };
 
+  const toggleFavorite = () => {
+    const isFav = favorite && favorite === extra.value;
+    try {
+      if (isFav) {
+        localStorage.removeItem(FAV_KEY(lotteryId));
+        setFavorite(null);
+        toast.info(`${extra.label} favorito removido`);
+      } else {
+        localStorage.setItem(FAV_KEY(lotteryId), extra.value);
+        setFavorite(extra.value);
+        toast.success(`${extra.value} salvo como favorito`);
+      }
+    } catch {
+      toast.error("Não foi possível salvar o favorito");
+    }
+  };
+
+  const isFavorite = favorite === extra.value;
   const Icon = isTime ? Heart : CalendarDays;
   const accent = isTime ? "text-rose-400" : "text-amber-400";
   const border = isTime ? "border-rose-400/20" : "border-amber-400/20";
@@ -56,10 +92,24 @@ export function LotteryExtraCard({ lotteryId }: Props) {
             </p>
             <p className={`text-sm font-black ${accent}`}>
               {String(extra.index).padStart(2, "0")} · {extra.value}
+              {isFavorite && (
+                <span className="ml-2 text-[9px] font-bold uppercase tracking-widest text-amber-400/80">
+                  ★ favorito
+                </span>
+              )}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-1 shrink-0">
+          <button
+            onClick={toggleFavorite}
+            className={`p-1.5 rounded-md hover:bg-white/10 transition ${
+              isFavorite ? "text-amber-400" : "text-muted-foreground hover:text-foreground"
+            }`}
+            title={isFavorite ? "Remover favorito" : "Salvar como favorito"}
+          >
+            <Star className={`w-3.5 h-3.5 ${isFavorite ? "fill-amber-400" : ""}`} />
+          </button>
           <button
             onClick={roll}
             className="p-1.5 rounded-md hover:bg-white/10 text-muted-foreground hover:text-foreground transition"
@@ -84,15 +134,15 @@ export function LotteryExtraCard({ lotteryId }: Props) {
       >
         {list.map((v, i) => (
           <option key={v} value={v}>
-            {String(i + 1).padStart(2, "0")} — {v}
+            {String(i + 1).padStart(2, "0")} — {v}{favorite === v ? "  ★" : ""}
           </option>
         ))}
       </select>
 
       <p className="text-[9px] text-muted-foreground leading-tight">
         {isTime
-          ? "A Timemania exige 1 time do coração — dá direito a prêmio fixo de R$ 6,50 quando sorteado."
-          : "O Dia de Sorte exige 1 mês da sorte — integra a faixa principal do prêmio."}
+          ? "A Timemania exige 1 time do coração — dá direito a prêmio fixo de R$ 6,50 quando sorteado. Marque como ★ para reutilizar em toda aposta."
+          : "O Dia de Sorte exige 1 mês da sorte — integra a faixa principal do prêmio. Marque como ★ para reutilizar em toda aposta."}
       </p>
     </div>
   );
