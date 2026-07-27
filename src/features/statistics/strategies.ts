@@ -158,11 +158,12 @@ export function generateByStrategy(
       const hot = stats.filter(s => s.status === "hot");
       const cold = stats.filter(s => s.status === "cold" && s.cycleScore > 1);
       const normal = stats.filter(s => s.status === "normal");
-      const hotPick = Math.floor(pick * 0.35);
-      const coldPick = Math.floor(pick * 0.25);
+      // Split ajustado (backtest 100 sorteios): 45% hot / 15% cold / 40% normal
+      const hotPick = Math.floor(pick * 0.45);
+      const coldPick = Math.floor(pick * 0.15);
       const normalPick = pick - hotPick - coldPick;
       const sortByScore = (arr: NumberStats[]) =>
-        [...arr].sort((a, b) => (b.trend + b.cycleScore * 2 + Math.random() * 3) - (a.trend + a.cycleScore * 2 + Math.random() * 3));
+        [...arr].sort((a, b) => (b.trend + b.cycleScore * 2 + Math.random() * 1) - (a.trend + a.cycleScore * 2 + Math.random() * 1));
       const selected = [
         ...sortByScore(hot).slice(0, hotPick),
         ...sortByScore(cold).slice(0, coldPick),
