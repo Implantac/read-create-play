@@ -13,6 +13,7 @@ import { useSavedBets, SavedBet } from "@/hooks/useSavedBets";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { StatsCard } from "@/components/common/StatsCard";
 import { DrawTestDialog } from "@/components/lottery/DrawTestDialog";
+import { QuickBacktestDialog } from "@/components/lottery/QuickBacktestDialog";
 import { ClosingHistoryPanel } from "@/components/closing/ClosingHistoryPanel";
 import { exportToCsv, exportToExcel } from "@/utils/export";
 import { toast } from "sonner";
