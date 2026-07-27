@@ -44,11 +44,9 @@ interface SimResult {
   hitRate: number; // chance of any prize per bet per draw
 }
 
-const COST_PER_BET: Record<string, number> = {
-  megasena: 5, lotofacil: 3.50, quina: 2.5, lotomania: 3,
-  duplasena: 2.5, timemania: 3.5, diadesorte: 2.5, supersete: 2.5,
-  mais_milionaria: 6,
-};
+// Custo oficial da aposta simples (fonte única em betting-budget)
+import { LOTTERY_BET_COST } from "@/engine/betting-budget";
+const COST_PER_BET: Record<string, number> = LOTTERY_BET_COST;
 
 const PRIZE_TABLE: Record<string, Record<number, { value: number; label: string }>> = {
   megasena: { 6: { value: 50000000, label: "Sena" }, 5: { value: 40000, label: "Quina" }, 4: { value: 800, label: "Quadra" } },
