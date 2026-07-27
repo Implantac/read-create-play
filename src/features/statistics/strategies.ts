@@ -259,6 +259,51 @@ export function generateByStrategy(
       return selected.sort((a, b) => a - b);
     }
 
+    case "coreSectors": {
+      // Núcleo Fixo + Setores: fixa top-N quentes (~40% do pick) + preenche por sectorização
+      // Estratégia com maior lift comprovado em backtest walk-forward (Lotofácil)
+      const coreCount = Math.max(1, Math.floor(pick * 0.4));
+      const hotRanking = [...stats].sort((a, b) => {
+        const scoreA = a.recentFreq * 3 + (a.status === "hot" ? 5 : 0) + a.trend * 1.5;
+        const scoreB = b.recentFreq * 3 + (b.status === "hot" ? 5 : 0) + b.trend * 1.5;
+        return scoreB - scoreA;
+      });
+      const core = hotRanking.slice(0, coreCount).map(s => s.number);
+      const remaining = pick - core.length;
+
+      // Sectorização para o restante
+      const sectorCount = Math.min(remaining, 5);
+      const sectorSize = Math.ceil(config.numbers / sectorCount);
+      const selected: number[] = [...core];
+
+      for (let sec = 0; sec < sectorCount && selected.length < pick; sec++) {
+        const start = sec * sectorSize + 1;
+        const end = Math.min((sec + 1) * sectorSize, config.numbers);
+        const sectorStats = stats.filter(
+          s => s.number >= start && s.number <= end && !selected.includes(s.number)
+        );
+        const perSector = Math.ceil(remaining / sectorCount);
+
+        const sorted = [...sectorStats].sort((a, b) => {
+          const scoreA = a.recentFreq * 2 + a.trend * 1.5 + (a.cycleScore > 1 ? 4 : 0) + Math.random() * 1;
+          const scoreB = b.recentFreq * 2 + b.trend * 1.5 + (b.cycleScore > 1 ? 4 : 0) + Math.random() * 1;
+          return scoreB - scoreA;
+        });
+
+        sorted.slice(0, perSector).forEach(s => {
+          if (selected.length < pick && !selected.includes(s.number)) {
+            selected.push(s.number);
+          }
+        });
+      }
+
+      while (selected.length < pick) {
+        const n = Math.floor(Math.random() * config.numbers) + 1;
+        if (!selected.includes(n)) selected.push(n);
+      }
+      return selected.sort((a, b) => a - b);
+    }
+
     case "lowDelay": {
       const sorted = [...stats].sort((a, b) => {
         const cycleA = a.cycleScore + (a.stdDev < a.avgGap ? 1 : 0);
