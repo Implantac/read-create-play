@@ -1,7 +1,7 @@
 import {
   BarChart3, Sparkles, History, Zap, Grid3X3,
   Brain, ShieldCheck, Crown, PieChart, Lock,
-  MessageCircle, User
+  MessageCircle, User, Wallet
 } from "lucide-react";
 import { NavLink } from "@/components/layout/NavLink";
 import { prefetchRoute } from "@/lib/routePrefetch";
