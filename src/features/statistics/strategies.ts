@@ -167,12 +167,19 @@ export function generateByStrategy(
       const hotPick = Math.floor(pick * 0.45);
       const coldPick = Math.floor(pick * 0.15);
       const normalPick = pick - hotPick - coldPick;
-      const sortByScore = (arr: NumberStats[]) =>
+      const sortHotCold = (arr: NumberStats[]) =>
         [...arr].sort((a, b) => (b.trend + b.cycleScore * 2 + Math.random() * 1) - (a.trend + a.cycleScore * 2 + Math.random() * 1));
+      // Pool "normal": ordenação híbrida frequência + ciclo (backtest: melhora vs. trend puro)
+      const sortNormal = (arr: NumberStats[]) =>
+        [...arr].sort((a, b) => {
+          const sa = a.recentFreq * 2 + a.cycleScore * 1.5 + (a.trend > 0 ? a.trend : 0) + Math.random() * 0.8;
+          const sb = b.recentFreq * 2 + b.cycleScore * 1.5 + (b.trend > 0 ? b.trend : 0) + Math.random() * 0.8;
+          return sb - sa;
+        });
       const selected = [
-        ...sortByScore(hot).slice(0, hotPick),
-        ...sortByScore(cold).slice(0, coldPick),
-        ...sortByScore(normal).slice(0, normalPick),
+        ...sortHotCold(hot).slice(0, hotPick),
+        ...sortHotCold(cold).slice(0, coldPick),
+        ...sortNormal(normal).slice(0, normalPick),
       ].map(s => s.number);
       while (selected.length < pick) {
         const n = Math.floor(Math.random() * config.numbers) + 1;
