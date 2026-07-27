@@ -263,8 +263,8 @@ export function generateByStrategy(
     }
 
     case "coreSectors": {
-      // Núcleo Fixo + Setores: fixa top-N quentes (~40% do pick) + preenche por sectorização
-      // Estratégia com maior lift comprovado em backtest walk-forward (Lotofácil)
+      // Núcleo Fixo + Setores com balance frame/miolo (Lotofácil) + soma-alvo
+      const isLotofacil = config.id === "lotofacil";
       const coreCount = Math.max(1, Math.floor(pick * 0.4));
       const hotRanking = [...stats].sort((a, b) => {
         const scoreA = a.recentFreq * 3 + (a.status === "hot" ? 5 : 0) + a.trend * 1.5;
@@ -274,10 +274,15 @@ export function generateByStrategy(
       const core = hotRanking.slice(0, coreCount).map(s => s.number);
       const remaining = pick - core.length;
 
-      // Sectorização para o restante
       const sectorCount = Math.min(remaining, 5);
       const sectorSize = Math.ceil(config.numbers / sectorCount);
       const selected: number[] = [...core];
+
+      // Alvo frame/miolo para Lotofácil: 10 frame + 5 miolo (padrão histórico 87% aderência)
+      const targetFrame = isLotofacil ? 10 : Infinity;
+      const targetCenter = isLotofacil ? 5 : Infinity;
+      const countFrame = (arr: number[]) => arr.filter(n => LOTOFACIL_FRAME.has(n)).length;
+      const countCenter = (arr: number[]) => arr.filter(n => LOTOFACIL_CENTER.has(n)).length;
 
       for (let sec = 0; sec < sectorCount && selected.length < pick; sec++) {
         const start = sec * sectorSize + 1;
@@ -288,8 +293,16 @@ export function generateByStrategy(
         const perSector = Math.ceil(remaining / sectorCount);
 
         const sorted = [...sectorStats].sort((a, b) => {
-          const scoreA = a.recentFreq * 2 + a.trend * 1.5 + (a.cycleScore > 1 ? 4 : 0) + Math.random() * 1;
-          const scoreB = b.recentFreq * 2 + b.trend * 1.5 + (b.cycleScore > 1 ? 4 : 0) + Math.random() * 1;
+          const frameBonusA = isLotofacil
+            ? (LOTOFACIL_FRAME.has(a.number) && countFrame(selected) < targetFrame ? 2 : 0) +
+              (LOTOFACIL_CENTER.has(a.number) && countCenter(selected) < targetCenter ? 2 : 0)
+            : 0;
+          const frameBonusB = isLotofacil
+            ? (LOTOFACIL_FRAME.has(b.number) && countFrame(selected) < targetFrame ? 2 : 0) +
+              (LOTOFACIL_CENTER.has(b.number) && countCenter(selected) < targetCenter ? 2 : 0)
+            : 0;
+          const scoreA = a.recentFreq * 2 + a.trend * 1.5 + (a.cycleScore > 1 ? 4 : 0) + frameBonusA + Math.random() * 0.8;
+          const scoreB = b.recentFreq * 2 + b.trend * 1.5 + (b.cycleScore > 1 ? 4 : 0) + frameBonusB + Math.random() * 0.8;
           return scoreB - scoreA;
         });
 
@@ -304,8 +317,60 @@ export function generateByStrategy(
         const n = Math.floor(Math.random() * config.numbers) + 1;
         if (!selected.includes(n)) selected.push(n);
       }
+
+      // Ajuste fino de soma-alvo para Lotofácil (180–220)
+      if (isLotofacil && selected.length === pick) {
+        let sum = selected.reduce((a, b) => a + b, 0);
+        let guard = 0;
+        while ((sum < 180 || sum > 220) && guard++ < 8) {
+          const idx = sum < 180
+            ? selected.indexOf(Math.min(...selected))
+            : selected.indexOf(Math.max(...selected));
+          if (idx < 0) break;
+          const candidates = stats
+            .filter(s => !selected.includes(s.number))
+            .sort((a, b) => (sum < 180 ? b.number - a.number : a.number - b.number));
+          if (!candidates.length) break;
+          selected[idx] = candidates[0].number;
+          sum = selected.reduce((a, b) => a + b, 0);
+        }
+      }
       return selected.sort((a, b) => a - b);
     }
+
+    case "repetition": {
+      // Repetidas + Núcleo: usa a média histórica de 8–9 repetidas do concurso anterior (Lotofácil)
+      const lastDraw = draws[0]?.numbers ?? [];
+      const repeatTarget = config.id === "lotofacil" ? 9 : Math.round(pick * 0.55);
+
+      // Rankeia dezenas do último sorteio pelo score
+      const lastRanked = lastDraw
+        .map(n => stats.find(s => s.number === n))
+        .filter((s): s is NumberStats => !!s)
+        .sort((a, b) => (b.recentFreq * 2 + b.trend) - (a.recentFreq * 2 + a.trend))
+        .slice(0, repeatTarget)
+        .map(s => s.number);
+
+      // Complementa com números "prontos" (ciclo vencido + trend positiva) fora do último
+      const complement = stats
+        .filter(s => !lastRanked.includes(s.number))
+        .sort((a, b) => {
+          const scoreA = (a.cycleScore > 1 ? 3 : 0) + a.trend * 1.5 + a.recentFreq + Math.random() * 0.8;
+          const scoreB = (b.cycleScore > 1 ? 3 : 0) + b.trend * 1.5 + b.recentFreq + Math.random() * 0.8;
+          return scoreB - scoreA;
+        })
+        .slice(0, pick - lastRanked.length)
+        .map(s => s.number);
+
+      const selected = [...lastRanked, ...complement];
+      while (selected.length < pick) {
+        const n = Math.floor(Math.random() * config.numbers) + 1;
+        if (!selected.includes(n)) selected.push(n);
+      }
+      return selected.slice(0, pick).sort((a, b) => a - b);
+    }
+
+
 
     case "lowDelay": {
       const sorted = [...stats].sort((a, b) => {
