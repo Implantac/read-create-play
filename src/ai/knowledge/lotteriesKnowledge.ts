@@ -17,7 +17,7 @@ export const LOTTERY_RULES: Record<string, LotteryRules> = {
   lotofacil: {
     id: "lotofacil", name: "Lotofácil",
     totalNumbers: 25, pick: 15, minBet: 15, maxBet: 20,
-    ticketPrice: 3.0,
+    ticketPrice: 3.5,
     drawDays: ["segunda", "terça", "quarta", "quinta", "sexta", "sábado"],
     hasGrid: true, gridRows: 5, gridCols: 5,
     prizeTiers: [
@@ -70,7 +70,7 @@ export const LOTTERY_RULES: Record<string, LotteryRules> = {
   megasena: {
     id: "megasena", name: "Mega-Sena",
     totalNumbers: 60, pick: 6, minBet: 6, maxBet: 20,
-    ticketPrice: 5.0,
+    ticketPrice: 6.0,
     drawDays: ["terça", "quinta", "sábado"],
     hasGrid: false, gridRows: 10, gridCols: 6,
     prizeTiers: [
@@ -121,7 +121,7 @@ export const LOTTERY_RULES: Record<string, LotteryRules> = {
   quina: {
     id: "quina", name: "Quina",
     totalNumbers: 80, pick: 5, minBet: 5, maxBet: 15,
-    ticketPrice: 2.5,
+    ticketPrice: 3.0,
     drawDays: ["segunda", "terça", "quarta", "quinta", "sexta", "sábado"],
     hasGrid: false, gridRows: 8, gridCols: 10,
     prizeTiers: [
@@ -168,7 +168,7 @@ export const LOTTERY_RULES: Record<string, LotteryRules> = {
   lotomania: {
     id: "lotomania", name: "Lotomania",
     totalNumbers: 100, pick: 50, minBet: 50, maxBet: 50,
-    ticketPrice: 3.0,
+    ticketPrice: 3.5,
     drawDays: ["terça", "sexta"],
     hasGrid: false, gridRows: 10, gridCols: 10,
     prizeTiers: [
@@ -217,7 +217,7 @@ export const LOTTERY_RULES: Record<string, LotteryRules> = {
   duplasena: {
     id: "duplasena", name: "Dupla Sena",
     totalNumbers: 50, pick: 6, minBet: 6, maxBet: 15,
-    ticketPrice: 2.5,
+    ticketPrice: 3.0,
     drawDays: ["terça", "quinta", "sábado"],
     hasGrid: false, gridRows: 5, gridCols: 10,
     prizeTiers: [
@@ -264,7 +264,7 @@ export const LOTTERY_RULES: Record<string, LotteryRules> = {
   timemania: {
     id: "timemania", name: "Timemania",
     totalNumbers: 80, pick: 10, minBet: 10, maxBet: 10,
-    ticketPrice: 3.5,
+    ticketPrice: 4.5,
     drawDays: ["terça", "quinta", "sábado"],
     hasGrid: false, gridRows: 8, gridCols: 10,
     prizeTiers: [
@@ -316,7 +316,7 @@ export const LOTTERY_RULES: Record<string, LotteryRules> = {
   diadesorte: {
     id: "diadesorte", name: "Dia de Sorte",
     totalNumbers: 31, pick: 7, minBet: 7, maxBet: 15,
-    ticketPrice: 2.5,
+    ticketPrice: 3.0,
     drawDays: ["terça", "quinta", "sábado"],
     hasGrid: false, gridRows: 4, gridCols: 8,
     prizeTiers: [

@@ -12,6 +12,7 @@ import { Cloud, FolderOpen, Copy, Trash2, Loader2, Share2, Link2Off, Star, Searc
 import { toast } from "sonner";
 import { useClosingHistory, type ClosingHistoryRow } from "@/hooks/useClosingHistory";
 import type { ClosingResult, ClosingStrategy } from "@/engine/closing";
+import { LOTTERY_BET_COST } from "@/engine/betting-budget";
 import { formatCurrency } from "@/utils/formatters";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -26,7 +27,7 @@ function rowToResult(row: ClosingHistoryRow): ClosingResult {
   return {
     strategy: row.strategy as ClosingStrategy,
     request: {
-      lottery: { id: row.lottery_id, name: row.lottery_name ?? row.lottery_id, totalNumbers: 0, pick: (row.games[0]?.length ?? 0), ticketPrice: 3 },
+      lottery: { id: row.lottery_id, name: row.lottery_name ?? row.lottery_id, totalNumbers: 0, pick: (row.games[0]?.length ?? 0), ticketPrice: LOTTERY_BET_COST[row.lottery_id] ?? 3 },
       baseNumbers: row.base_numbers,
       guarantee: { hitsInBase: row.games[0]?.length ?? 0, minHits: row.min_hits },
       maxGames: row.max_games ?? undefined,

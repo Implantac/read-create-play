@@ -4,14 +4,15 @@ import { buildStrategyBriefing, type StrategyBriefingTone } from "@/engine/strat
 
 export type BudgetRiskProfile = "low" | "medium" | "high";
 
+// Preços oficiais Caixa — vigentes desde nov/2024
 export const LOTTERY_BET_COST: Record<string, number> = {
-  megasena: 5,
-  lotofacil: 3.50,
-  quina: 2.5,
-  lotomania: 3,
-  duplasena: 2.5,
-  timemania: 3.5,
-  diadesorte: 2.5,
+  megasena: 6.0,
+  lotofacil: 3.5,
+  quina: 3.0,
+  lotomania: 3.5,
+  duplasena: 3.0,
+  timemania: 4.5,
+  diadesorte: 3.0,
   supersete: 2.5,
 };
 
