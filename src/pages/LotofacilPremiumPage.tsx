@@ -285,8 +285,8 @@ export default function LotofacilPremiumPage() {
             {[
               { title: "Score Elite", value: topElite.length, icon: Crown, color: "text-amber-400" },
               { title: "Ciclo Atual", value: `#${cycle?.currentCycle || 0}`, icon: Clock, color: "text-primary" },
-              { title: "Prob. Fechamento", value: `${(100 - (cycle?.missingNumbers.length || 0) * 4).toFixed(0)}%`, icon: Target, color: "text-emerald-400" },
-              { title: "Sinal de Hoje", value: "ALTÍSSIMO", icon: Zap, color: "text-rose-500" },
+              { title: "Ciclo Completado", value: `${(((25 - (cycle?.missingNumbers.length || 0)) / 25) * 100).toFixed(0)}%`, icon: Target, color: "text-emerald-400" },
+              { title: "Dezenas Faltantes", value: `${cycle?.missingNumbers.length ?? 0}/25`, icon: Zap, color: "text-rose-500" },
             ].map((stat) => (
               <Card key={stat.title} className="glass-card border-border/40 bg-background/40 rounded-2xl p-6 hover:border-primary/40 transition-all group overflow-hidden relative">
                 <div className="absolute -right-4 -top-4 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity">
