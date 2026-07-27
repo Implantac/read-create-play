@@ -17,6 +17,7 @@ export type Strategy =
   | "sectors"
   | "coreSectors"
   | "repetition"
+  | "coreRepetition"
   | "trend"
   | "cycle"
   | "hybrid"
@@ -52,6 +53,7 @@ export const STRATEGIES: StrategyInfo[] = [
   { id: "sectors", label: "Setores", desc: "Cobertura equilibrada por faixas com melhor de cada setor", category: "math" },
   { id: "coreSectors", label: "Núcleo Fixo + Setores", desc: "Fixa top-6 quentes e completa com sectorização — maior lift comprovado em backtest", category: "math" },
   { id: "repetition", label: "Repetidas + Núcleo", desc: "Aproveita a média histórica de 8–9 repetidas do concurso anterior (Lotofácil)", category: "math" },
+  { id: "coreRepetition", label: "Núcleo + Repetidas + Setores", desc: "Fusão dos melhores sinais: 6 fixos por score + 7 repetidas + 2 setoriais (Lotofácil)", category: "math" },
   { id: "lowDelay", label: "Baixo Atraso", desc: "Números com maior atraso + detecção de ciclo vencido", category: "math" },
   { id: "pattern", label: "Padrão", desc: "Padrões par/ímpar, alto/baixo e consecutividade", category: "math" },
   { id: "cycle", label: "Ciclo", desc: "Seleção baseada no desvio padrão e regularidade de gaps", category: "math" },
@@ -165,12 +167,19 @@ export function generateByStrategy(
       const hotPick = Math.floor(pick * 0.45);
       const coldPick = Math.floor(pick * 0.15);
       const normalPick = pick - hotPick - coldPick;
-      const sortByScore = (arr: NumberStats[]) =>
+      const sortHotCold = (arr: NumberStats[]) =>
         [...arr].sort((a, b) => (b.trend + b.cycleScore * 2 + Math.random() * 1) - (a.trend + a.cycleScore * 2 + Math.random() * 1));
+      // Pool "normal": ordenação híbrida frequência + ciclo (backtest: melhora vs. trend puro)
+      const sortNormal = (arr: NumberStats[]) =>
+        [...arr].sort((a, b) => {
+          const sa = a.recentFreq * 2 + a.cycleScore * 1.5 + (a.trend > 0 ? a.trend : 0) + Math.random() * 0.8;
+          const sb = b.recentFreq * 2 + b.cycleScore * 1.5 + (b.trend > 0 ? b.trend : 0) + Math.random() * 0.8;
+          return sb - sa;
+        });
       const selected = [
-        ...sortByScore(hot).slice(0, hotPick),
-        ...sortByScore(cold).slice(0, coldPick),
-        ...sortByScore(normal).slice(0, normalPick),
+        ...sortHotCold(hot).slice(0, hotPick),
+        ...sortHotCold(cold).slice(0, coldPick),
+        ...sortNormal(normal).slice(0, normalPick),
       ].map(s => s.number);
       while (selected.length < pick) {
         const n = Math.floor(Math.random() * config.numbers) + 1;
@@ -339,24 +348,42 @@ export function generateByStrategy(
     }
 
     case "repetition": {
-      // Repetidas + Núcleo: usa a média histórica de 8–9 repetidas do concurso anterior (Lotofácil)
+      // Repetidas + Núcleo (v2): alvo 8 repetidas (não 9) + filtro frame 10:5 + soma-alvo 180–220
+      const isLotofacil = config.id === "lotofacil";
       const lastDraw = draws[0]?.numbers ?? [];
-      const repeatTarget = config.id === "lotofacil" ? 9 : Math.round(pick * 0.55);
+      const repeatTarget = isLotofacil ? 8 : Math.round(pick * 0.55);
 
-      // Rankeia dezenas do último sorteio pelo score
+      // Rankeia repetidas do último sorteio combinando score + preferência de ciclo (evita "quentes duas vezes")
       const lastRanked = lastDraw
         .map(n => stats.find(s => s.number === n))
         .filter((s): s is NumberStats => !!s)
-        .sort((a, b) => (b.recentFreq * 2 + b.trend) - (a.recentFreq * 2 + a.trend))
+        .sort((a, b) => {
+          const sa = a.recentFreq * 1.5 + a.trend + a.cycleScore * 0.8;
+          const sb = b.recentFreq * 1.5 + b.trend + b.cycleScore * 0.8;
+          return sb - sa;
+        })
         .slice(0, repeatTarget)
         .map(s => s.number);
 
-      // Complementa com números "prontos" (ciclo vencido + trend positiva) fora do último
+      // Complemento com filtro frame/miolo coeso (Lotofácil): completar 10 frame / 5 miolo
+      const targetFrame = isLotofacil ? 10 : Infinity;
+      const targetCenter = isLotofacil ? 5 : Infinity;
+      const countFrame = (arr: number[]) => arr.filter(n => LOTOFACIL_FRAME.has(n)).length;
+      const countCenter = (arr: number[]) => arr.filter(n => LOTOFACIL_CENTER.has(n)).length;
+
       const complement = stats
         .filter(s => !lastRanked.includes(s.number))
         .sort((a, b) => {
-          const scoreA = (a.cycleScore > 1 ? 3 : 0) + a.trend * 1.5 + a.recentFreq + Math.random() * 0.8;
-          const scoreB = (b.cycleScore > 1 ? 3 : 0) + b.trend * 1.5 + b.recentFreq + Math.random() * 0.8;
+          const frameBonusA = isLotofacil
+            ? (LOTOFACIL_FRAME.has(a.number) && countFrame(lastRanked) < targetFrame ? 2.5 : 0) +
+              (LOTOFACIL_CENTER.has(a.number) && countCenter(lastRanked) < targetCenter ? 2.5 : 0)
+            : 0;
+          const frameBonusB = isLotofacil
+            ? (LOTOFACIL_FRAME.has(b.number) && countFrame(lastRanked) < targetFrame ? 2.5 : 0) +
+              (LOTOFACIL_CENTER.has(b.number) && countCenter(lastRanked) < targetCenter ? 2.5 : 0)
+            : 0;
+          const scoreA = (a.cycleScore > 1 ? 3 : 0) + a.trend * 1.5 + a.recentFreq + frameBonusA + Math.random() * 0.6;
+          const scoreB = (b.cycleScore > 1 ? 3 : 0) + b.trend * 1.5 + b.recentFreq + frameBonusB + Math.random() * 0.6;
           return scoreB - scoreA;
         })
         .slice(0, pick - lastRanked.length)
@@ -367,8 +394,110 @@ export function generateByStrategy(
         const n = Math.floor(Math.random() * config.numbers) + 1;
         if (!selected.includes(n)) selected.push(n);
       }
+
+      // Ajuste fino de soma-alvo (180–220) para Lotofácil
+      if (isLotofacil && selected.length === pick) {
+        let sum = selected.reduce((a, b) => a + b, 0);
+        let guard = 0;
+        while ((sum < 180 || sum > 220) && guard++ < 8) {
+          // Só permite trocar posições do complemento (mantém repetidas intactas)
+          const swappable = selected.filter(n => !lastRanked.includes(n));
+          if (!swappable.length) break;
+          const target = sum < 180 ? Math.min(...swappable) : Math.max(...swappable);
+          const idx = selected.indexOf(target);
+          const candidates = stats
+            .filter(s => !selected.includes(s.number))
+            .sort((a, b) => (sum < 180 ? b.number - a.number : a.number - b.number));
+          if (!candidates.length) break;
+          selected[idx] = candidates[0].number;
+          sum = selected.reduce((a, b) => a + b, 0);
+        }
+      }
       return selected.slice(0, pick).sort((a, b) => a - b);
     }
+
+    case "coreRepetition": {
+      // Fusão dos dois melhores sinais: núcleo fixo por score + repetidas + setoriais
+      const isLotofacil = config.id === "lotofacil";
+      const lastDraw = draws[0]?.numbers ?? [];
+
+      // Distribuição alvo (Lotofácil): 6 fixos + 7 repetidas + 2 setoriais = 15
+      const coreCount = isLotofacil ? 6 : Math.max(1, Math.floor(pick * 0.4));
+      const repeatCount = isLotofacil ? 7 : Math.round(pick * 0.45);
+
+      // 1) Núcleo fixo: top-N por score global (independente do último sorteio)
+      const core = [...stats]
+        .sort((a, b) => {
+          const sa = a.recentFreq * 3 + (a.status === "hot" ? 5 : 0) + a.trend * 1.5 + a.cycleScore;
+          const sb = b.recentFreq * 3 + (b.status === "hot" ? 5 : 0) + b.trend * 1.5 + b.cycleScore;
+          return sb - sa;
+        })
+        .slice(0, coreCount)
+        .map(s => s.number);
+
+      // 2) Repetidas do último sorteio que ainda não estão no núcleo
+      const repeated = lastDraw
+        .filter(n => !core.includes(n))
+        .map(n => stats.find(s => s.number === n))
+        .filter((s): s is NumberStats => !!s)
+        .sort((a, b) => (b.recentFreq * 1.5 + b.trend + b.cycleScore * 0.8) - (a.recentFreq * 1.5 + a.trend + a.cycleScore * 0.8))
+        .slice(0, repeatCount)
+        .map(s => s.number);
+
+      const selected = [...core, ...repeated];
+
+      // 3) Complemento setorial priorizando balance frame/miolo (Lotofácil 10:5)
+      const targetFrame = isLotofacil ? 10 : Infinity;
+      const targetCenter = isLotofacil ? 5 : Infinity;
+      const countFrame = (arr: number[]) => arr.filter(n => LOTOFACIL_FRAME.has(n)).length;
+      const countCenter = (arr: number[]) => arr.filter(n => LOTOFACIL_CENTER.has(n)).length;
+
+      const sectorPool = stats
+        .filter(s => !selected.includes(s.number))
+        .sort((a, b) => {
+          const bonusA = isLotofacil
+            ? (LOTOFACIL_FRAME.has(a.number) && countFrame(selected) < targetFrame ? 2.5 : 0) +
+              (LOTOFACIL_CENTER.has(a.number) && countCenter(selected) < targetCenter ? 2.5 : 0)
+            : 0;
+          const bonusB = isLotofacil
+            ? (LOTOFACIL_FRAME.has(b.number) && countFrame(selected) < targetFrame ? 2.5 : 0) +
+              (LOTOFACIL_CENTER.has(b.number) && countCenter(selected) < targetCenter ? 2.5 : 0)
+            : 0;
+          return (b.recentFreq * 2 + b.cycleScore * 1.5 + bonusB + Math.random() * 0.6)
+               - (a.recentFreq * 2 + a.cycleScore * 1.5 + bonusA + Math.random() * 0.6);
+        });
+
+      for (const s of sectorPool) {
+        if (selected.length >= pick) break;
+        selected.push(s.number);
+      }
+      while (selected.length < pick) {
+        const n = Math.floor(Math.random() * config.numbers) + 1;
+        if (!selected.includes(n)) selected.push(n);
+      }
+
+      // Ajuste soma-alvo (só troca fora do núcleo/repetidas)
+      if (isLotofacil && selected.length === pick) {
+        const locked = new Set([...core, ...repeated]);
+        let sum = selected.reduce((a, b) => a + b, 0);
+        let guard = 0;
+        while ((sum < 180 || sum > 220) && guard++ < 8) {
+          const swappable = selected.filter(n => !locked.has(n));
+          if (!swappable.length) break;
+          const target = sum < 180 ? Math.min(...swappable) : Math.max(...swappable);
+          const idx = selected.indexOf(target);
+          const candidates = stats
+            .filter(s => !selected.includes(s.number))
+            .sort((a, b) => (sum < 180 ? b.number - a.number : a.number - b.number));
+          if (!candidates.length) break;
+          selected[idx] = candidates[0].number;
+          sum = selected.reduce((a, b) => a + b, 0);
+        }
+      }
+      return selected.slice(0, pick).sort((a, b) => a - b);
+    }
+
+
 
 
 
