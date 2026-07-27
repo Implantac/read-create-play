@@ -162,6 +162,7 @@ const JogosSalvosPage = () => {
                         </Button>
                       }
                     />
+                    <QuickBacktestDialog numbers={bet.numbers} lotteryId={bet.lottery_id} />
                     <Button
                       variant="ghost"
                       size="icon"
