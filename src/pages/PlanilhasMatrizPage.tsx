@@ -159,6 +159,16 @@ export default function PlanilhasMatrizPage() {
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground leading-relaxed">{preset.description}</p>
+                {(preset.statisticalCoverage || preset.minPrizeChance) && (
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {preset.statisticalCoverage && (
+                      <Badge variant="outline" className="text-[10px]">Cobertura: {preset.statisticalCoverage}</Badge>
+                    )}
+                    {preset.minPrizeChance && (
+                      <Badge variant="outline" className="text-[10px]">Prêmio ≥11: {preset.minPrizeChance}</Badge>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
