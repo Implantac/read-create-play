@@ -12,6 +12,8 @@ import { Label } from "@/components/ui/label";
 import { Brain, Sparkles, Trophy, Target, Lightbulb, BarChart3, Zap, ChevronDown, ChevronUp, History } from "lucide-react";
 import { toast } from "sonner";
 import { BetCard } from "@/components/lottery/BetCard";
+import { LotteryExtraCard } from "@/components/lottery/LotteryExtraCard";
+import { requiresExtra } from "@/engine/lottery-extras";
 import { AIAnalystBriefing } from "@/components/lottery/AIAnalystBriefing";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { m, AnimatePresence } from "framer-motion";
@@ -135,6 +137,10 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
         <Button onClick={handleGenerate} disabled={isGenerating || draws.length === 0} className="w-full gradient-brand h-12 uppercase font-black tracking-widest text-xs" size="lg">
           {isGenerating ? <><Zap className="h-4 w-4 animate-spin mr-2" /> Calculando Matrizes...</> : <><Sparkles className="h-4 w-4 mr-2" /> Gerar Apostas Titan (FAROL)</>}
         </Button>
+
+        {bets.length > 0 && requiresExtra(config.id) && (
+          <LotteryExtraCard lotteryId={config.id} />
+        )}
 
         {bets.length > 0 && (
           <div className="grid gap-4">
