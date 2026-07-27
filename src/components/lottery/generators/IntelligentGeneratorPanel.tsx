@@ -12,6 +12,8 @@ import { Label } from "@/components/ui/label";
 import { Brain, Sparkles, Trophy, Target, Lightbulb, BarChart3, Zap, ChevronDown, ChevronUp, History } from "lucide-react";
 import { toast } from "sonner";
 import { BetCard } from "@/components/lottery/BetCard";
+import { LotteryExtraCard } from "@/components/lottery/LotteryExtraCard";
+import { requiresExtra } from "@/engine/lottery-extras";
 import { AIAnalystBriefing } from "@/components/lottery/AIAnalystBriefing";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { m, AnimatePresence } from "framer-motion";
