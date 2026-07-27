@@ -138,6 +138,10 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
           {isGenerating ? <><Zap className="h-4 w-4 animate-spin mr-2" /> Calculando Matrizes...</> : <><Sparkles className="h-4 w-4 mr-2" /> Gerar Apostas Titan (FAROL)</>}
         </Button>
 
+        {bets.length > 0 && requiresExtra(config.id) && (
+          <LotteryExtraCard lotteryId={config.id} />
+        )}
+
         {bets.length > 0 && (
           <div className="grid gap-4">
             {bets.map((bet) => (
