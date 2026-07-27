@@ -44,6 +44,7 @@ const workflowGroups: { label: string; items: { title: string; url: string; icon
         { title: "IA Autônoma", url: "/ia-autonoma", icon: Zap, tooltip: "Predição preditiva baseada em redes neurais." },
         { title: "Central Analítica", url: "/analise", icon: PieChart, tooltip: "Estatísticas avançadas, tendências e farol neural." },
         { title: "Fechamentos", url: "/fechamentos", icon: Grid3X3, requiredFeature: "fechamentos", tooltip: "Fechamentos matemáticos de alta performance." },
+        { title: "Gestão de Banca", url: "/banca", icon: Wallet, tooltip: "Kelly defensivo, alocação por ROI e stops operacionais.", badge: "PRO" },
         { title: "Histórico Unificado", url: "/historico", icon: History, tooltip: "Seus jogos, resultados e auditoria de apostas." },
     ]
   }
