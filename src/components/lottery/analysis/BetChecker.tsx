@@ -18,6 +18,12 @@ import { computeFrequencyStats } from "@/engine/stats/statistics";
 import { useSavedBets, SavedBet } from "@/hooks/useSavedBets";
 import { Progress } from "@/components/ui/progress";
 import { BetHitsChart } from "@/components/lottery/charts/BetHitsChart";
+import {
+  getMaxPossibleHits,
+  matchBetAgainstDraw,
+  getEstimatedPrize,
+  getRealPrizeLabel,
+} from "@/utils/lottery-utils";
 
 interface Props {
   draws: DrawResult[];
