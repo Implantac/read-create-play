@@ -45,3 +45,6 @@ verify_jwt = false
 
 [functions.notify-bet-results]
 verify_jwt = false
+
+[functions.post-sync-notify]
+verify_jwt = false
