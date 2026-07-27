@@ -14,6 +14,7 @@ export const LOTTERY_BET_COST: Record<string, number> = {
   timemania: 4.5,
   diadesorte: 3.0,
   supersete: 2.5,
+  mais_milionaria: 6.0,
 };
 
 const DRAWS_PER_MONTH: Record<string, number> = {

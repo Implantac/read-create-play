@@ -16,11 +16,8 @@ import { PrizeHistoryPanel } from "@/components/lottery/analysis/PrizeHistoryPan
 import { DrawResultWithPrizes } from "@/hooks/useLotteryDraws";
 import { LOTTERY_BET_COST } from "@/engine/betting-budget";
 
-// Custo oficial da aposta simples (centralizado em betting-budget)
-const BET_COST: Record<string, number> = {
-  ...LOTTERY_BET_COST,
-  mais_milionaria: 6.00,
-};
+// Custo oficial da aposta simples (fonte única em betting-budget)
+const BET_COST = LOTTERY_BET_COST;
 
 /**
  * Encontra o próximo sorteio REAL após a data de criação da aposta
