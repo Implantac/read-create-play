@@ -14,6 +14,7 @@ export type Strategy =
   | "pattern"
   | "lowDelay"
   | "sectors"
+  | "coreSectors"
   | "trend"
   | "cycle"
   | "hybrid"
