@@ -23,18 +23,10 @@ import { useSavedBets } from "@/hooks/useSavedBets";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { DrawTestDialog } from "@/components/lottery/DrawTestDialog";
+import { LOTTERY_BET_COST } from "@/engine/betting-budget";
 
-const BET_PRICES: Record<string, number> = {
-  lotofacil: 3.50,
-  megasena: 5.0,
-  lotomania: 3.0,
-  quina: 2.5,
-  duplasena: 2.5,
-  timemania: 3.5,
-  diadesorte: 2.5,
-  supersete: 2.5,
-  mais_milionaria: 6.0,
-};
+// Preços oficiais Caixa (fonte única em betting-budget)
+const BET_PRICES: Record<string, number> = LOTTERY_BET_COST;
 
 const MATRIX_LIST = Object.entries(WHEELING_MATRICES).map(([id, m]) => ({
   id: id as WheelingMatrixId,
