@@ -112,9 +112,10 @@ function backtestStrategy(
 }
 
 function getCostForLottery(lotteryId: string): number {
+  // Preços oficiais Caixa — vigentes desde nov/2024
   const costs: Record<string, number> = {
-    lotofacil: 3.50, megasena: 5.0, quina: 2.5, lotomania: 3.0,
-    duplasena: 2.5, timemania: 3.5, diadesorte: 2.5, supersete: 2.5,
+    lotofacil: 3.5, megasena: 6.0, quina: 3.0, lotomania: 3.5,
+    duplasena: 3.0, timemania: 4.5, diadesorte: 3.0, supersete: 2.5,
   };
   return costs[lotteryId] || 3.0;
 }
