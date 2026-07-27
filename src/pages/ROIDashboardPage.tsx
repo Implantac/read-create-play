@@ -14,12 +14,12 @@ import { CHART_TOOLTIP_STYLE } from "@/lib/chart-theme";
 import { ROIFilters, ROIFilterState } from "@/components/ROIFilters";
 import { PrizeHistoryPanel } from "@/components/lottery/analysis/PrizeHistoryPanel";
 import { DrawResultWithPrizes } from "@/hooks/useLotteryDraws";
+import { LOTTERY_BET_COST } from "@/engine/betting-budget";
 
-// Custo mínimo da aposta simples por loteria
+// Custo oficial da aposta simples (centralizado em betting-budget)
 const BET_COST: Record<string, number> = {
-  megasena: 5.00, lotofacil: 3.50, quina: 2.50, lotomania: 3.00,
-  duplasena: 2.50, timemania: 3.50, diadesorte: 2.50, supersete: 2.50,
-  mais_milionaria: 6.00, // Preço atualizado Mais Milionária
+  ...LOTTERY_BET_COST,
+  mais_milionaria: 6.00,
 };
 
 /**
