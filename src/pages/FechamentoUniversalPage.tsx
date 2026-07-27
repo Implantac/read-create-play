@@ -15,6 +15,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sparkles, Target, Shield, Coins, Play, Loader2, Info, Trophy, GitCompare, X } from "lucide-react";
 import { calculateGuarantee, applyConstraints, type ClosingResult, type ClosingStrategy, type ActiveConstraint } from "@/engine/closing";
+import { LOTTERY_BET_COST } from "@/engine/betting-budget";
 import { useClosingWorker, ClosingCanceledError } from "@/hooks/useClosingWorker";
 import { useClosingHistory } from "@/hooks/useClosingHistory";
 import { ClosingDashboardPanel } from "@/components/closing/ClosingDashboardPanel";
