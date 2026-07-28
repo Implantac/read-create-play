@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Scale, Save, Trophy, Layers } from "lucide-react";
+import { Loader2, Scale, Save, Trophy, Layers, Download } from "lucide-react";
 import { toast } from "sonner";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { evaluateBetQuality } from "@/engine/stats/bet-quality";
@@ -72,6 +72,28 @@ export function StrategyComparePanel({ stats, draws, config, selectedLottery, st
 
   const best = rows[0];
 
+  const exportCsv = () => {
+    if (rows.length === 0) return;
+    const header = ["rank", "estrategia", "score", "grade", "numeros"];
+    const lines = rows.map((r, i) => [
+      i + 1,
+      `"${r.name.replace(/"/g, '""')}"`,
+      r.score,
+      r.grade,
+      `"${r.numbers.map((n) => String(n).padStart(2, "0")).join(" ")}"`,
+    ].join(","));
+    const csv = [header.join(","), ...lines].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `comparador-${selectedLottery}-${Date.now()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("CSV exportado!");
+  };
+
+
   return (
     <Card className="border-border/60">
       <CardContent className="p-5 space-y-4">
@@ -85,10 +107,17 @@ export function StrategyComparePanel({ stats, draws, config, selectedLottery, st
               <p className="text-xs text-muted-foreground">Gera 1 jogo por estratégia e ranqueia pelo Titan Score.</p>
             </div>
           </div>
-          <Button size="sm" variant="premium" onClick={run} disabled={running} className="gap-2">
-            {running ? <Loader2 className="w-4 h-4 animate-spin" /> : <Scale className="w-4 h-4" />}
-            {running ? "Analisando..." : "Comparar Agora"}
-          </Button>
+          <div className="flex items-center gap-2">
+            {rows.length > 0 && (
+              <Button size="sm" variant="outline" onClick={exportCsv} className="gap-2">
+                <Download className="w-4 h-4" /> CSV
+              </Button>
+            )}
+            <Button size="sm" variant="premium" onClick={run} disabled={running} className="gap-2">
+              {running ? <Loader2 className="w-4 h-4 animate-spin" /> : <Scale className="w-4 h-4" />}
+              {running ? "Analisando..." : "Comparar Agora"}
+            </Button>
+          </div>
         </div>
 
         {rows.length > 0 && (
