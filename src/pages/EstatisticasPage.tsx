@@ -37,8 +37,10 @@ const item = {
   show: { opacity: 1, y: 0 },
 };
 
+const CycleThermometer = lazy(() => import("@/components/lottery/analysis/CycleThermometer").then(m => ({ default: m.CycleThermometer })));
+
 const EstatisticasPage = () => {
-  const { config, draws, syncing, syncDraws, syncAllLotteries } = useLotteryContext();
+  const { config, draws, syncing, syncDraws, syncAllLotteries, selectedLottery } = useLotteryContext();
   const [period, setPeriod] = useState(100);
 
   const filteredDraws = useMemo(() => {
@@ -124,7 +126,14 @@ const EstatisticasPage = () => {
         <m.div variants={item}><StatsCard title="Maior Atraso" value={maxDelay} icon={TrendingUp} /></m.div>
       </m.div>
 
+      {selectedLottery === "lotofacil" && (
+        <Suspense fallback={<Skeleton className="h-[280px] w-full" />}>
+          <CycleThermometer draws={draws} totalNumbers={config.numbers} window={12} />
+        </Suspense>
+      )}
+
       <m.div variants={container} initial="hidden" animate="show" className="grid lg:grid-cols-2 gap-6">
+
         <m.div variants={item}>
           <Suspense fallback={<Skeleton className="h-[350px] w-full" />}><FrequencyChart stats={stats} /></Suspense>
         </m.div>
