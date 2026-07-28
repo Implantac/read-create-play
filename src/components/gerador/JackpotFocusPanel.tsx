@@ -43,10 +43,26 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
   const [running, setRunning] = useState(false);
   const [rows, setRows] = useState<Row[]>([]);
   const { saveBet } = useSavedBets(selectedLottery);
+  const navigate = useNavigate();
 
   const jackpot = useMemo(() => JACKPOT_BY_LOTTERY[selectedLottery], [selectedLottery]);
 
   if (!jackpot) return null;
+
+  const unionBase = useMemo(() => {
+    const set = new Set<number>();
+    rows.forEach((r) => r.numbers.forEach((n) => set.add(n)));
+    return Array.from(set).sort((a, b) => a - b);
+  }, [rows]);
+
+  const sendToFechamento = () => {
+    if (unionBase.length < config.pick + 1) {
+      toast.error(`União do Top ${rows.length} tem só ${unionBase.length} números. Rode novamente ou salve individualmente.`);
+      return;
+    }
+    navigate("/fechamento-universal", { state: { baseNumbers: unionBase, fromGerador: true } });
+    toast.success(`Base de ${unionBase.length} números enviada ao Fechamento Universal.`);
+  };
 
   const run = () => {
     if (draws.length === 0) {
