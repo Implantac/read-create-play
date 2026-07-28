@@ -15,6 +15,7 @@ import { evaluateBetQuality } from "@/engine/stats/bet-quality";
 import { computeFrequencyStats } from "@/engine/stats/statistics";
 import { toast } from "sonner";
 import { DrawTestDialog } from "@/components/lottery/DrawTestDialog";
+import { QuickBacktestDialog } from "@/components/lottery/QuickBacktestDialog";
 
 type HistoryWindow = "all" | "10" | "20" | "50";
 const WINDOW_OPTIONS: { value: HistoryWindow; label: string; hint: string }[] = [
@@ -372,6 +373,7 @@ const GeradorPage = () => {
                             <p className="text-[10px] font-medium uppercase text-emerald-400/90 tracking-wider mt-1">{res.score >= 90 ? 'Excelente' : res.score >= 75 ? 'Alta Convergência' : 'Estável'}</p>
                           </div>
                           <DrawTestDialog numbers={res.numbers} />
+                          <QuickBacktestDialog numbers={res.numbers} lotteryId={selectedLottery} />
                           <Button
                             variant="outline"
                             size="icon"
