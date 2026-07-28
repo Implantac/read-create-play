@@ -479,6 +479,115 @@ export function strategyConsensus(
   };
 }
 
+// ═══════════════════════════════════════════
+// ESTRATÉGIA 10 — LOTOFÁCIL JACKPOT (15 PONTOS)
+// Estratégia exclusiva para Lotofácil: maximiza probabilidade dos 15
+// acertos combinando (1) repetição forte do sorteio anterior (~9 dezenas),
+// (2) equilíbrio moldura/miolo (8-11 de borda + 4-7 de centro), (3)
+// distribuição por coluna/linha da grade 5×5, (4) viés oficial de dezenas
+// quentes, (5) primos e múltiplos de 3, e (6) atraso moderado para não
+// perder retornos de ciclo. Pool enxuto de 18 dezenas — deixa apenas 7
+// fora, maximizando cobertura estatística do universo.
+// ═══════════════════════════════════════════
+export const LOTOFACIL_FRAME = new Set<number>([
+  1, 2, 3, 4, 5,          // linha 1
+  6, 10,                  // linha 2 (col 1 e 5)
+  11, 15,                 // linha 3 (col 1 e 5)
+  16, 20,                 // linha 4 (col 1 e 5)
+  21, 22, 23, 24, 25,     // linha 5
+]);
+export const LOTOFACIL_CENTER = new Set<number>([7, 8, 9, 12, 13, 14, 17, 18, 19]);
+export const lotofacilCol = (n: number) => ((n - 1) % 5) + 1; // 1..5
+export const lotofacilRow = (n: number) => Math.floor((n - 1) / 5) + 1; // 1..5
+
+export function strategyLotofacilJackpot(
+  stats: NumberStats[],
+  draws: DrawResult[],
+  topN: number = 18
+): StrategyResult {
+  const rules = getLotteryRules("lotofacil");
+  const lastDraw = draws[0]?.numbers ?? [];
+  const lastSet = new Set(lastDraw);
+  const hotBias = new Set(rules.knownBiases?.hotNumbers ?? []);
+  const coldBias = new Set(rules.knownBiases?.coldNumbers ?? []);
+  const mult3 = new Set([3, 6, 9, 12, 15, 18, 21, 24]);
+
+  // Alvo de repetição: meio da faixa histórica (7-11 → 9)
+  const repTarget = 9;
+
+  const scored = stats.map(s => {
+    const recent20 = computeRecentFrequency(s.number, draws, 20);
+    const recent5 = computeRecentFrequency(s.number, draws, 5);
+    let score = s.frequency * 0.20;
+
+    // (1) Repetição do anterior — sinal mais forte da Lotofácil
+    if (lastSet.has(s.number)) score += 4.5;
+
+    // (2) Momentum recente
+    score += recent5 * 0.8 + recent20 * 0.35;
+
+    // (3) Viés oficial (dezenas históricas fortes)
+    if (hotBias.has(s.number)) score += 2.0;
+    if (coldBias.has(s.number)) score -= 0.8;
+
+    // (4) Números com atraso moderado (ciclo prestes a fechar) ganham bônus
+    if (s.lastSeen >= 3 && s.lastSeen <= 8) score += 1.2;
+    if (s.lastSeen > 12) score += 0.6; // retorno de ciclo antigo
+
+    // (5) Estrutura mátemática — primos e múltiplos de 3 costumam bater 4-6
+    if (PRIMES.has(s.number)) score += 0.7;
+    if (mult3.has(s.number)) score += 0.5;
+    if (FIBONACCI.has(s.number)) score += 0.4;
+
+    // (6) Bônus leve para dezenas de moldura (viés físico do sorteio)
+    if (LOTOFACIL_FRAME.has(s.number)) score += 0.35;
+
+    return { number: s.number, score };
+  });
+
+  // Garante presença mínima de dezenas do sorteio anterior no pool
+  const repeats = scored
+    .filter(s => lastSet.has(s.number))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, Math.min(repTarget + 1, lastDraw.length));
+
+  const nonRepeats = scored
+    .filter(s => !lastSet.has(s.number))
+    .sort((a, b) => b.score - a.score);
+
+  const merged = [...repeats, ...nonRepeats];
+  const candidates = merged.slice(0, topN).map(s => s.number).sort((a, b) => a - b);
+
+  // Boost de peso final para dezenas repetidas garantirem alta representação
+  const weights = new Map<number, number>();
+  scored.forEach(s => {
+    const w = Math.max(0.1, s.score) * (lastSet.has(s.number) ? 1.35 : 1.0);
+    weights.set(s.number, w);
+  });
+
+  const inFrame = candidates.filter(n => LOTOFACIL_FRAME.has(n)).length;
+  const inCenter = candidates.filter(n => LOTOFACIL_CENTER.has(n)).length;
+  const repInPool = candidates.filter(n => lastSet.has(n)).length;
+
+  return {
+    id: "lotofacil_jackpot",
+    name: "🎯 Lotofácil Jackpot (15 pontos)",
+    description: `Estratégia exclusiva para Lotofácil. Combina repetição forte do último sorteio (~${repTarget} dezenas), equilíbrio moldura/miolo, distribuição na grade 5×5, viés oficial, primos e múltiplos de 3. Foco: caçar os 15 acertos.`,
+    candidateNumbers: candidates,
+    weights,
+    metrics: {
+      poolSize: candidates.length,
+      inFrame,
+      inCenter,
+      repeatsInPool: repInPool,
+      repeatTarget: repTarget,
+      hotHits: candidates.filter(n => hotBias.has(n)).length,
+    },
+  };
+}
+
+
+
 
 
 
@@ -537,7 +646,7 @@ export function runIntelligentPipeline(
   pipeline.push({ step: "Candidatos", detail: `${strategy.candidateNumbers.length} números selecionados`, count: strategy.candidateNumbers.length });
 
   // Etapa 4 — Criar combinações com filtros (pool ampliado p/ filtro histórico)
-  const rawGames = generateFilteredCombinations(strategy, rules.pick, Math.max(gameCount * 30, gameCount + 10), rules);
+  const rawGames = generateFilteredCombinations(strategy, rules.pick, Math.max(gameCount * 30, gameCount + 10), rules, draws);
   pipeline.push({ step: "Combinações", detail: `${rawGames.length} jogos brutos`, count: rawGames.length });
 
   // Etapa 5 — Ranking por score estrutural + validação histórica (hit-rate real)
@@ -638,10 +747,16 @@ function executeStrategy(
     case "repetition": return strategyRepetition(stats, draws, lotteryId, pool);
     case "hot_cold": return strategyHotCold(stats, draws, lotteryId, pool);
     case "consensus": return strategyConsensus(stats, draws, lotteryId, pool);
+    case "lotofacil_jackpot":
+      // Estratégia exclusiva Lotofácil — fallback silencioso p/ consensus em outras loterias
+      return lotteryId === "lotofacil"
+        ? strategyLotofacilJackpot(stats, draws, 18)
+        : strategyConsensus(stats, draws, lotteryId, pool);
     case "fibonacci": return strategyBalance(stats, lotteryId, pool);
     case "predictive": return strategyHotCold(stats, draws, lotteryId, pool);
     default: return strategyConsensus(stats, draws, lotteryId, pool);
   }
+
 }
 
 
@@ -666,8 +781,10 @@ function generateFilteredCombinations(
   strategy: StrategyResult,
   pick: number,
   count: number,
-  rules: LotteryRules
+  rules: LotteryRules,
+  draws: DrawResult[] = []
 ): number[][] {
+
   // Pool primário: candidatos da estratégia. Se for pequeno demais,
   // completa com o universo inteiro para nunca retornar zero jogos.
   let pool = strategy.candidateNumbers.slice();
@@ -733,9 +850,36 @@ function generateFilteredCombinations(
         else curSeq = 1;
       }
       if (maxSeq > (rules.maxRecommendedSequence || 3)) continue;
+
+      // ═══ Filtros exclusivos LOTOFÁCIL (grade 5×5, pick 15) ═══
+      if (pick === 15 && rules.totalNumbers === 25) {
+        // (a) Moldura x Miolo
+        if (rules.idealFrameRange) {
+          const frameCount = game.filter(n => LOTOFACIL_FRAME.has(n)).length;
+          const [fLo, fHi] = rules.idealFrameRange;
+          if (frameCount < fLo - 1 || frameCount > fHi + 1) continue;
+        }
+        // (b) Distribuição por coluna — no mínimo 2 dezenas em cada uma das 5 colunas
+        const colHist = [0, 0, 0, 0, 0];
+        for (const n of game) colHist[lotofacilCol(n) - 1]++;
+        if (colHist.some(c => c < 2)) continue;
+        // (c) Distribuição por linha — no mínimo 2 dezenas em cada uma das 5 linhas
+        const rowHist = [0, 0, 0, 0, 0];
+        for (const n of game) rowHist[lotofacilRow(n) - 1]++;
+        if (rowHist.some(r => r < 2)) continue;
+        // (d) Repetição do sorteio anterior (viés estatístico mais forte)
+        const prev = draws[0]?.numbers;
+        if (prev && prev.length && rules.avgRepeatFromPrevious) {
+          const [rLo, rHi] = rules.avgRepeatFromPrevious;
+          const prevSet = new Set(prev);
+          const rep = game.filter(n => prevSet.has(n)).length;
+          if (rep < rLo - 1 || rep > rHi + 1) continue;
+        }
+      }
     }
 
     games.push(game);
+
   }
 
   // Garantia final: se ainda assim não houver jogos, gera amostras aleatórias uniformes
@@ -837,7 +981,9 @@ export function getAllStrategyIds(): string[] {
     "repetition",
     "hot_cold",
     "consensus",
+    "lotofacil_jackpot",
   ];
+
 
 }
 
@@ -853,7 +999,8 @@ export function getStrategyInfo(id: string): { id: string; name: string; descrip
     repetition:   { name: "Repetição do Anterior", description: "Aproveita o viés de repetição do último sorteio + frequência recente." },
     hot_cold:     { name: "Quente-Frio",           description: "Combina viés oficial + atraso + frequência recente. Ideal p/ universos grandes." },
     consensus:    { name: "Consenso Multi-Estratégia", description: "Agrega 6 estratégias por Borda Count ponderado. Números convergentes ganham boost. Máxima assertividade." },
-
+    lotofacil_jackpot: { name: "🎯 Lotofácil Jackpot (15 pontos)", description: "Exclusiva Lotofácil: repetição forte do anterior, moldura×miolo, grade 5×5 balanceada, viés oficial, primos e múltiplos de 3. Caça os 15 acertos." },
   };
+
   return { id, ...(map[id] || map.hot_cold) };
 }
