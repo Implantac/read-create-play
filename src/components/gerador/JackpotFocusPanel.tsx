@@ -58,6 +58,28 @@ function computeLotofacilSignals(nums: number[], draws: DrawResult[]): Row["sign
   ];
 }
 
+function computeDecadeSignals(nums: number[], draws: DrawResult[], config: LotteryConfig): Row["signals"] {
+  const sum = nums.reduce((a, b) => a + b, 0);
+  const decades = new Set(nums.map((n) => Math.floor((n - 1) / 10)));
+  const totalDecades = Math.ceil(config.numbers / 10);
+  const odd = nums.filter((n) => n % 2 === 1).length;
+  const sorted = [...nums].sort((a, b) => a - b);
+  const hasConsec = sorted.some((n, i) => i > 0 && n - sorted[i - 1] === 1);
+  const last = draws[0]?.numbers ?? [];
+  const reps = last.filter((n) => nums.includes(n)).length;
+  // ideal sum ≈ pick * (maxNumber + 1) / 2, tolerate ±15%
+  const idealSum = (config.pick * (config.numbers + 1)) / 2;
+  const sumOk = Math.abs(sum - idealSum) / idealSum <= 0.15;
+  const parityOk = odd >= Math.floor(config.pick / 2) - 1 && odd <= Math.ceil(config.pick / 2) + 1;
+  return [
+    { label: `Soma ${sum}`, ok: sumOk, hint: `Ideal ≈ ${Math.round(idealSum)} (±15%)` },
+    { label: `${decades.size}/${totalDecades} dez.`, ok: decades.size >= Math.min(totalDecades, config.pick - 1), hint: "Cobertura de dezenas" },
+    { label: `${odd}P/${config.pick - odd}I`, ok: parityOk, hint: "Equilíbrio par/ímpar" },
+    { label: hasConsec ? "Consec. ✓" : "Sem consec.", ok: true, hint: "Padrão observado (informativo)" },
+    { label: `Repete ${reps}`, ok: reps <= Math.ceil(config.pick / 2), hint: "Repetição moderada do último sorteio" },
+  ];
+}
+
 const BATCH_BY_LOTTERY: Record<string, number> = {
   lotofacil: 30, // filtros mais rígidos → lote maior p/ selecionar top 3 de alta qualidade
   megasena: 12,
@@ -116,7 +138,9 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
           if (seen.has(key)) continue;
           seen.add(key);
           const q = evaluateBetQuality(g, stats, config, draws);
-          const signals = selectedLottery === "lotofacil" ? computeLotofacilSignals(g, draws) : undefined;
+          const signals = selectedLottery === "lotofacil"
+            ? computeLotofacilSignals(g, draws)
+            : computeDecadeSignals(g, draws, config);
           scored.push({ numbers: g, score: q.overall, grade: q.grade, strengths: q.strengths ?? [], signals });
         }
         scored.sort((a, b) => b.score - a.score);
