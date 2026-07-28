@@ -646,7 +646,7 @@ export function runIntelligentPipeline(
   pipeline.push({ step: "Candidatos", detail: `${strategy.candidateNumbers.length} números selecionados`, count: strategy.candidateNumbers.length });
 
   // Etapa 4 — Criar combinações com filtros (pool ampliado p/ filtro histórico)
-  const rawGames = generateFilteredCombinations(strategy, rules.pick, Math.max(gameCount * 30, gameCount + 10), rules);
+  const rawGames = generateFilteredCombinations(strategy, rules.pick, Math.max(gameCount * 30, gameCount + 10), rules, draws);
   pipeline.push({ step: "Combinações", detail: `${rawGames.length} jogos brutos`, count: rawGames.length });
 
   // Etapa 5 — Ranking por score estrutural + validação histórica (hit-rate real)
