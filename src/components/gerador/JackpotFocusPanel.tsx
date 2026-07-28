@@ -36,7 +36,15 @@ interface Row {
   strengths: string[];
 }
 
-const BATCH = 10;
+const BATCH_BY_LOTTERY: Record<string, number> = {
+  lotofacil: 30, // filtros mais rígidos → lote maior p/ selecionar top 3 de alta qualidade
+  megasena: 12,
+  quina: 12,
+  duplasena: 12,
+  timemania: 12,
+  diadesorte: 10,
+  lotomania: 8,
+};
 const TOP_N = 3;
 
 export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Props) {
@@ -46,6 +54,7 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
   const navigate = useNavigate();
 
   const jackpot = useMemo(() => JACKPOT_BY_LOTTERY[selectedLottery], [selectedLottery]);
+  const BATCH = BATCH_BY_LOTTERY[selectedLottery] ?? 10;
 
   if (!jackpot) return null;
 
