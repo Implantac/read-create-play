@@ -138,7 +138,9 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
           if (seen.has(key)) continue;
           seen.add(key);
           const q = evaluateBetQuality(g, stats, config, draws);
-          const signals = selectedLottery === "lotofacil" ? computeLotofacilSignals(g, draws) : undefined;
+          const signals = selectedLottery === "lotofacil"
+            ? computeLotofacilSignals(g, draws)
+            : computeDecadeSignals(g, draws, config);
           scored.push({ numbers: g, score: q.overall, grade: q.grade, strengths: q.strengths ?? [], signals });
         }
         scored.sort((a, b) => b.score - a.score);
