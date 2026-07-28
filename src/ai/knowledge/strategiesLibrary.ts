@@ -876,9 +876,10 @@ function generateFilteredCombinations(
           if (rep < rLo - 1 || rep > rHi + 1) continue;
         }
       }
-
+    }
 
     games.push(game);
+
   }
 
   // Garantia final: se ainda assim não houver jogos, gera amostras aleatórias uniformes
