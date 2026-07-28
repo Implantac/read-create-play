@@ -810,6 +810,207 @@ export function strategyDuplaSenaJackpot(
   };
 }
 
+// ═══════════════════════════════════════════
+// TIMEMANIA JACKPOT — caça aos 7 acertos (10 dezenas em 80)
+// ═══════════════════════════════════════════
+export function strategyTimemaniaJackpot(
+  stats: NumberStats[],
+  draws: DrawResult[],
+  topN: number = 24
+): StrategyResult {
+  const rules = getLotteryRules("timemania");
+  const lastDraw = draws[0]?.numbers ?? [];
+  const lastSet = new Set(lastDraw);
+  const hotBias = new Set(rules.knownBiases?.hotNumbers ?? []);
+  const coldBias = new Set(rules.knownBiases?.coldNumbers ?? []);
+
+  const scored = stats.map(s => {
+    const recent20 = computeRecentFrequency(s.number, draws, 20);
+    const recent5 = computeRecentFrequency(s.number, draws, 5);
+    let score = s.frequency * 0.25;
+
+    if (hotBias.has(s.number)) score += 2.8;
+    if (coldBias.has(s.number)) score -= 1.0;
+
+    score += recent5 * 1.15 + recent20 * 0.4;
+
+    // Ciclos médios da Timemania: 5-15
+    if (s.lastSeen >= 4 && s.lastSeen <= 15) score += 1.4;
+    if (s.lastSeen > 25) score += 0.4;
+
+    // Repetição média: 2-5 dezenas
+    if (lastSet.has(s.number)) score += 0.3;
+
+    if (PRIMES.has(s.number)) score += 0.3;
+    if (FIBONACCI.has(s.number)) score += 0.2;
+
+    return { number: s.number, score };
+  });
+
+  // 4 quartis do universo 80 (1-20, 21-40, 41-60, 61-80)
+  const quartiles: Array<Array<{ number: number; score: number }>> = [[], [], [], []];
+  scored.forEach(s => {
+    const q = Math.min(3, Math.floor((s.number - 1) / 20));
+    quartiles[q].push(s);
+  });
+  quartiles.forEach(q => q.sort((a, b) => b.score - a.score));
+
+  const perQuartile = Math.max(4, Math.floor(topN / 4));
+  const merged = quartiles.flatMap(q => q.slice(0, perQuartile));
+  const dedup = Array.from(new Map(merged.map(m => [m.number, m])).values())
+    .sort((a, b) => b.score - a.score)
+    .slice(0, topN);
+
+  const candidates = dedup.map(s => s.number).sort((a, b) => a - b);
+  const weights = new Map<number, number>();
+  scored.forEach(s => weights.set(s.number, Math.max(0.1, s.score)));
+
+  return {
+    id: "timemania_jackpot",
+    name: "⚽ Timemania Jackpot (7 acertos)",
+    description: "Estratégia exclusiva Timemania. Pool de 24 dezenas distribuído pelos 4 quartis do volante 80, viés oficial, atraso qualificado e boost de repetição (média 2-5).",
+    candidateNumbers: candidates,
+    weights,
+    metrics: {
+      poolSize: candidates.length,
+      quartilesCovered: quartiles.filter((_, i) => candidates.some(n => Math.floor((n - 1) / 20) === i)).length,
+      hotHits: candidates.filter(n => hotBias.has(n)).length,
+    },
+  };
+}
+
+// ═══════════════════════════════════════════
+// DIA DE SORTE JACKPOT — caça aos 7 acertos (31 dezenas)
+// ═══════════════════════════════════════════
+export function strategyDiaDeSorteJackpot(
+  stats: NumberStats[],
+  draws: DrawResult[],
+  topN: number = 16
+): StrategyResult {
+  const rules = getLotteryRules("diadesorte");
+  const lastDraw = draws[0]?.numbers ?? [];
+  const lastSet = new Set(lastDraw);
+  const hotBias = new Set(rules.knownBiases?.hotNumbers ?? []);
+  const coldBias = new Set(rules.knownBiases?.coldNumbers ?? []);
+
+  const scored = stats.map(s => {
+    const recent20 = computeRecentFrequency(s.number, draws, 20);
+    const recent5 = computeRecentFrequency(s.number, draws, 5);
+    let score = s.frequency * 0.3;
+
+    if (hotBias.has(s.number)) score += 2.5;
+    if (coldBias.has(s.number)) score -= 0.8;
+
+    score += recent5 * 1.2 + recent20 * 0.45;
+
+    // Ciclos curtos (universo de 31): 3-10
+    if (s.lastSeen >= 2 && s.lastSeen <= 10) score += 1.6;
+    if (s.lastSeen > 16) score += 0.4;
+
+    // Repetição média 2-4
+    if (lastSet.has(s.number)) score += 0.2;
+
+    if (PRIMES.has(s.number)) score += 0.4;
+    if (FIBONACCI.has(s.number)) score += 0.3;
+
+    return { number: s.number, score };
+  });
+
+  // Balancear metades do volante (1-15, 16-31)
+  const lowHalf = scored.filter(s => s.number <= 15).sort((a, b) => b.score - a.score);
+  const highHalf = scored.filter(s => s.number > 15).sort((a, b) => b.score - a.score);
+  const half = Math.floor(topN / 2);
+  const merged = [...lowHalf.slice(0, half), ...highHalf.slice(0, topN - half)]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, topN);
+
+  const candidates = merged.map(s => s.number).sort((a, b) => a - b);
+  const weights = new Map<number, number>();
+  scored.forEach(s => weights.set(s.number, Math.max(0.1, s.score)));
+
+  return {
+    id: "diadesorte_jackpot",
+    name: "☀️ Dia de Sorte Jackpot (7 acertos)",
+    description: "Estratégia exclusiva Dia de Sorte. Pool de 16 dezenas balanceado nas metades do volante 31, viés oficial, atraso curto e boost em primos/Fibonacci.",
+    candidateNumbers: candidates,
+    weights,
+    metrics: {
+      poolSize: candidates.length,
+      hotHits: candidates.filter(n => hotBias.has(n)).length,
+      primesHits: candidates.filter(n => PRIMES.has(n)).length,
+    },
+  };
+}
+
+// ═══════════════════════════════════════════
+// LOTOMANIA JACKPOT — caça aos 20 acertos (50 dezenas em 100)
+// ═══════════════════════════════════════════
+export function strategyLotomaniaJackpot(
+  stats: NumberStats[],
+  draws: DrawResult[],
+  topN: number = 65
+): StrategyResult {
+  const rules = getLotteryRules("lotomania");
+  const lastDraw = draws[0]?.numbers ?? [];
+  const lastSet = new Set(lastDraw);
+  const hotBias = new Set(rules.knownBiases?.hotNumbers ?? []);
+  const coldBias = new Set(rules.knownBiases?.coldNumbers ?? []);
+
+  const scored = stats.map(s => {
+    const recent20 = computeRecentFrequency(s.number, draws, 20);
+    const recent5 = computeRecentFrequency(s.number, draws, 5);
+    let score = s.frequency * 0.2;
+
+    if (hotBias.has(s.number)) score += 2.2;
+    if (coldBias.has(s.number)) score -= 0.8;
+
+    score += recent5 * 1.0 + recent20 * 0.5;
+
+    // Ciclos médios (universo grande): 3-12
+    if (s.lastSeen >= 2 && s.lastSeen <= 12) score += 1.2;
+    if (s.lastSeen > 20) score += 0.3;
+
+    // Repetição alta é o normal (20-30 dezenas)
+    if (lastSet.has(s.number)) score += 0.5;
+
+    if (PRIMES.has(s.number)) score += 0.25;
+    if (FIBONACCI.has(s.number)) score += 0.2;
+
+    return { number: s.number, score };
+  });
+
+  // Distribuir por 10 dezenas (1-10, 11-20 ... 91-100) — cobertura larga
+  const decades: Array<Array<{ number: number; score: number }>> = Array.from({ length: 10 }, () => []);
+  scored.forEach(s => {
+    const d = Math.min(9, Math.floor((s.number - 1) / 10));
+    decades[d].push(s);
+  });
+  decades.forEach(d => d.sort((a, b) => b.score - a.score));
+
+  const perDecade = Math.max(5, Math.floor(topN / 10));
+  const merged = decades.flatMap(d => d.slice(0, perDecade));
+  const dedup = Array.from(new Map(merged.map(m => [m.number, m])).values())
+    .sort((a, b) => b.score - a.score)
+    .slice(0, topN);
+
+  const candidates = dedup.map(s => s.number).sort((a, b) => a - b);
+  const weights = new Map<number, number>();
+  scored.forEach(s => weights.set(s.number, Math.max(0.1, s.score)));
+
+  return {
+    id: "lotomania_jackpot",
+    name: "🔥 Lotomania Jackpot (20 acertos)",
+    description: "Estratégia exclusiva Lotomania. Pool amplo de 65 dezenas distribuído pelas 10 dezenas do volante 100, viés oficial, boost de repetição alta e cobertura estatística.",
+    candidateNumbers: candidates,
+    weights,
+    metrics: {
+      poolSize: candidates.length,
+      decadesCovered: decades.filter(d => candidates.some(n => Math.floor((n - 1) / 10) === decades.indexOf(d))).length,
+      hotHits: candidates.filter(n => hotBias.has(n)).length,
+    },
+  };
+}
+
 
 
 
@@ -987,6 +1188,18 @@ function executeStrategy(
     case "duplasena_jackpot":
       return lotteryId === "duplasena"
         ? strategyDuplaSenaJackpot(stats, draws, 20)
+        : strategyConsensus(stats, draws, lotteryId, pool);
+    case "timemania_jackpot":
+      return lotteryId === "timemania"
+        ? strategyTimemaniaJackpot(stats, draws, 24)
+        : strategyConsensus(stats, draws, lotteryId, pool);
+    case "diadesorte_jackpot":
+      return lotteryId === "diadesorte"
+        ? strategyDiaDeSorteJackpot(stats, draws, 16)
+        : strategyConsensus(stats, draws, lotteryId, pool);
+    case "lotomania_jackpot":
+      return lotteryId === "lotomania"
+        ? strategyLotomaniaJackpot(stats, draws, 65)
         : strategyConsensus(stats, draws, lotteryId, pool);
 
     case "fibonacci": return strategyBalance(stats, lotteryId, pool);
@@ -1222,6 +1435,9 @@ export function getAllStrategyIds(): string[] {
     "mega_jackpot",
     "quina_jackpot",
     "duplasena_jackpot",
+    "timemania_jackpot",
+    "diadesorte_jackpot",
+    "lotomania_jackpot",
   ];
 
 
@@ -1244,6 +1460,9 @@ export function getStrategyInfo(id: string): { id: string; name: string; descrip
     mega_jackpot: { name: "🔥 Mega Jackpot (Sena)", description: "Exclusiva Mega-Sena: pool enxuto de 22 dezenas, foco na faixa 51-60, atraso qualificado, viés oficial e baixa repetição. Caça os 6 acertos." },
     quina_jackpot: { name: "⭐ Quina Jackpot (5 acertos)", description: "Exclusiva Quina: pool de 18 dezenas distribuído pelos 4 quartis do volante, viés oficial, atraso qualificado e baixa repetição." },
     duplasena_jackpot: { name: "🎲 Dupla Sena Jackpot", description: "Exclusiva Dupla Sena: pool de 20 dezenas balanceado nas metades do volante, aproveitando os 2 sorteios por concurso." },
+    timemania_jackpot: { name: "⚽ Timemania Jackpot (7 acertos)", description: "Exclusiva Timemania: pool de 24 dezenas distribuído pelos 4 quartis do volante 80, viés oficial e boost de repetição." },
+    diadesorte_jackpot: { name: "☀️ Dia de Sorte Jackpot (7 acertos)", description: "Exclusiva Dia de Sorte: pool de 16 dezenas balanceado nas metades do volante 31, primos e Fibonacci." },
+    lotomania_jackpot: { name: "🔥 Lotomania Jackpot (20 acertos)", description: "Exclusiva Lotomania: pool amplo de 65 dezenas distribuído pelas 10 dezenas do volante 100, boost de repetição alta." },
   };
 
 

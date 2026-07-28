@@ -83,6 +83,15 @@ const GeradorPage = () => {
     ...(selectedLottery === "duplasena"
       ? [{ id: "duplasena_jackpot", name: "🎲 Dupla Sena Jackpot", desc: "Exclusiva Dupla Sena: pool de 20 dezenas balanceado nas metades do volante, aproveitando os 2 sorteios por concurso, viés oficial e atraso qualificado." }]
       : []),
+    ...(selectedLottery === "timemania"
+      ? [{ id: "timemania_jackpot", name: "⚽ Timemania Jackpot (7 acertos)", desc: "Exclusiva Timemania: pool de 24 dezenas distribuído pelos 4 quartis do volante 80, viés oficial, atraso qualificado e boost de repetição." }]
+      : []),
+    ...(selectedLottery === "diadesorte"
+      ? [{ id: "diadesorte_jackpot", name: "☀️ Dia de Sorte Jackpot (7 acertos)", desc: "Exclusiva Dia de Sorte: pool de 16 dezenas balanceado nas metades do volante 31, viés oficial, atraso curto e boost em primos/Fibonacci." }]
+      : []),
+    ...(selectedLottery === "lotomania"
+      ? [{ id: "lotomania_jackpot", name: "🔥 Lotomania Jackpot (20 acertos)", desc: "Exclusiva Lotomania: pool amplo de 65 dezenas distribuído pelas 10 dezenas do volante 100, viés oficial e boost de repetição alta (média 20-30)." }]
+      : []),
 
     { id: "balance", name: "Aposta Equilibrada", desc: "Distribuição estatística otimizada por rede neural." },
     { id: "hot_cold", name: "Quente-Frio", desc: "Combina viés oficial, atraso e frequência recente. Ideal para qualquer loteria." },
