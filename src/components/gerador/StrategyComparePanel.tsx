@@ -146,6 +146,34 @@ export function StrategyComparePanel({ stats, draws, config, selectedLottery, st
             })}
           </div>
         )}
+
+        {rows.length > 1 && (
+          <div className="rounded-lg border border-border/60 bg-muted/20 p-3 flex flex-col md:flex-row md:items-center gap-3 justify-between">
+            <div className="text-xs text-muted-foreground">
+              União das estratégias: <span className="font-mono tabular-nums text-foreground font-semibold">{unionNumbers.length}</span> dezenas ·
+              {" "}diversidade{" "}
+              <span className="font-mono tabular-nums text-foreground font-semibold">
+                {Math.round(((unionNumbers.length - config.pick) / (rows.length * config.pick - config.pick)) * 100) || 0}%
+              </span>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-2"
+              disabled={unionNumbers.length < config.pick}
+              onClick={() => {
+                if (unionNumbers.length < config.pick) {
+                  toast.error(`Base insuficiente (${unionNumbers.length}/${config.pick}).`);
+                  return;
+                }
+                navigate("/fechamento-universal", { state: { baseNumbers: unionNumbers, fromGerador: true } });
+              }}
+            >
+              <Layers className="w-4 h-4" />
+              Fechamento com União ({unionNumbers.length})
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
