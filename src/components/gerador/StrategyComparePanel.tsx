@@ -72,6 +72,28 @@ export function StrategyComparePanel({ stats, draws, config, selectedLottery, st
 
   const best = rows[0];
 
+  const exportCsv = () => {
+    if (rows.length === 0) return;
+    const header = ["rank", "estrategia", "score", "grade", "numeros"];
+    const lines = rows.map((r, i) => [
+      i + 1,
+      `"${r.name.replace(/"/g, '""')}"`,
+      r.score,
+      r.grade,
+      `"${r.numbers.map((n) => String(n).padStart(2, "0")).join(" ")}"`,
+    ].join(","));
+    const csv = [header.join(","), ...lines].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `comparador-${selectedLottery}-${Date.now()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("CSV exportado!");
+  };
+
+
   return (
     <Card className="border-border/60">
       <CardContent className="p-5 space-y-4">
