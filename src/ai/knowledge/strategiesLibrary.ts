@@ -511,41 +511,72 @@ export function strategyLotofacilJackpot(
   const hotBias = new Set(rules.knownBiases?.hotNumbers ?? []);
   const coldBias = new Set(rules.knownBiases?.coldNumbers ?? []);
   const mult3 = new Set([3, 6, 9, 12, 15, 18, 21, 24]);
+  const corners = new Set([1, 5, 21, 25]);
 
   // Alvo de repetição: meio da faixa histórica (7-11 → 9)
   const repTarget = 9;
 
+  // ═══ Fechamento de ciclo 1-25: dezenas ausentes nos últimos ~12 sorteios têm
+  // altíssima pressão estatística (ciclo médio Lotofácil ≈ 28-32 sorteios) ═══
+  const cycleWindow = draws.slice(0, 12);
+  const seenInCycle = new Set<number>();
+  cycleWindow.forEach(d => d.numbers.forEach(n => seenInCycle.add(n)));
+  const cycleMissing = new Set<number>();
+  for (let n = 1; n <= 25; n++) if (!seenInCycle.has(n)) cycleMissing.add(n);
+
+  // ═══ Co-ocorrência com âncoras (repetidas do último sorteio) ═══
+  const coOccur = new Map<number, number>();
+  const coWindow = draws.slice(0, 40);
+  coWindow.forEach(d => {
+    const set = new Set(d.numbers);
+    for (const anchor of lastSet) {
+      if (!set.has(anchor)) continue;
+      for (const n of d.numbers) {
+        if (n === anchor) continue;
+        coOccur.set(n, (coOccur.get(n) ?? 0) + 1);
+      }
+    }
+  });
+  const maxCo = Math.max(1, ...Array.from(coOccur.values()));
+
   const scored = stats.map(s => {
     const recent20 = computeRecentFrequency(s.number, draws, 20);
+    const recent10 = computeRecentFrequency(s.number, draws, 10);
     const recent5 = computeRecentFrequency(s.number, draws, 5);
     let score = s.frequency * 0.20;
 
     // (1) Repetição do anterior — sinal mais forte da Lotofácil
-    if (lastSet.has(s.number)) score += 4.5;
+    if (lastSet.has(s.number)) score += 5.0;
 
-    // (2) Momentum recente
-    score += recent5 * 0.8 + recent20 * 0.35;
+    // (2) Momentum recente (janela curta pesa mais em cobertura alta)
+    score += recent5 * 1.0 + recent10 * 0.55 + recent20 * 0.25;
 
     // (3) Viés oficial (dezenas históricas fortes)
-    if (hotBias.has(s.number)) score += 2.0;
-    if (coldBias.has(s.number)) score -= 0.8;
+    if (hotBias.has(s.number)) score += 2.2;
+    if (coldBias.has(s.number)) score -= 0.9;
 
-    // (4) Números com atraso moderado (ciclo prestes a fechar) ganham bônus
-    if (s.lastSeen >= 3 && s.lastSeen <= 8) score += 1.2;
-    if (s.lastSeen > 12) score += 0.6; // retorno de ciclo antigo
+    // (4) Ciclo — dezenas ausentes ganham forte pressão de retorno
+    if (cycleMissing.has(s.number)) score += 2.0;
+    if (s.lastSeen >= 3 && s.lastSeen <= 8) score += 1.3;
+    if (s.lastSeen > 12) score += 0.8;
 
-    // (5) Estrutura mátemática — primos e múltiplos de 3 costumam bater 4-6
+    // (5) Co-ocorrência com âncoras
+    const co = coOccur.get(s.number) ?? 0;
+    score += (co / maxCo) * 1.5;
+
+    // (6) Estrutura matemática — primos e múltiplos de 3 batem 4-6 dezenas/média
     if (PRIMES.has(s.number)) score += 0.7;
     if (mult3.has(s.number)) score += 0.5;
     if (FIBONACCI.has(s.number)) score += 0.4;
 
-    // (6) Bônus leve para dezenas de moldura (viés físico do sorteio)
-    if (LOTOFACIL_FRAME.has(s.number)) score += 0.35;
+    // (7) Moldura + cantos (viés físico + âncoras)
+    if (LOTOFACIL_FRAME.has(s.number)) score += 0.4;
+    if (corners.has(s.number)) score += 0.3;
 
     return { number: s.number, score };
   });
 
-  // Garante presença mínima de dezenas do sorteio anterior no pool
+  // Composição do pool: repetidas garantidas + melhores não-repetidas
   const repeats = scored
     .filter(s => lastSet.has(s.number))
     .sort((a, b) => b.score - a.score)
@@ -556,23 +587,43 @@ export function strategyLotofacilJackpot(
     .sort((a, b) => b.score - a.score);
 
   const merged = [...repeats, ...nonRepeats];
-  const candidates = merged.slice(0, topN).map(s => s.number).sort((a, b) => a - b);
+  let candidates = merged.slice(0, topN).map(s => s.number);
 
-  // Boost de peso final para dezenas repetidas garantirem alta representação
+  // Garante presença mínima em cada coluna 1..5 (grade balanceada)
+  const scoreMap = new Map(scored.map(s => [s.number, s.score]));
+  for (let col = 1; col <= 5; col++) {
+    const colNums = candidates.filter(n => lotofacilCol(n) === col);
+    if (colNums.length === 0) {
+      const bestOfCol = scored
+        .filter(s => lotofacilCol(s.number) === col && !candidates.includes(s.number))
+        .sort((a, b) => b.score - a.score)[0];
+      if (bestOfCol) {
+        const worst = [...candidates]
+          .sort((a, b) => (scoreMap.get(a) ?? 0) - (scoreMap.get(b) ?? 0))
+          .find(n => lotofacilCol(n) !== col);
+        if (worst != null) {
+          candidates = candidates.filter(n => n !== worst).concat(bestOfCol.number);
+        }
+      }
+    }
+  }
+  candidates = candidates.sort((a, b) => a - b);
+
   const weights = new Map<number, number>();
   scored.forEach(s => {
-    const w = Math.max(0.1, s.score) * (lastSet.has(s.number) ? 1.35 : 1.0);
+    const w = Math.max(0.1, s.score) * (lastSet.has(s.number) ? 1.4 : 1.0);
     weights.set(s.number, w);
   });
 
   const inFrame = candidates.filter(n => LOTOFACIL_FRAME.has(n)).length;
   const inCenter = candidates.filter(n => LOTOFACIL_CENTER.has(n)).length;
   const repInPool = candidates.filter(n => lastSet.has(n)).length;
+  const cycleClosersInPool = candidates.filter(n => cycleMissing.has(n)).length;
 
   return {
     id: "lotofacil_jackpot",
     name: "🎯 Lotofácil Jackpot (15 pontos)",
-    description: `Estratégia exclusiva para Lotofácil. Combina repetição forte do último sorteio (~${repTarget} dezenas), equilíbrio moldura/miolo, distribuição na grade 5×5, viés oficial, primos e múltiplos de 3. Foco: caçar os 15 acertos.`,
+    description: `Caça-15 exclusiva. Repetição forte do último sorteio (~${repTarget}), fechamento de ciclo, co-ocorrência com âncoras, moldura×miolo, grade 5×5 e cantos. Otimizada para o prêmio principal.`,
     candidateNumbers: candidates,
     weights,
     metrics: {
@@ -582,6 +633,8 @@ export function strategyLotofacilJackpot(
       repeatsInPool: repInPool,
       repeatTarget: repTarget,
       hotHits: candidates.filter(n => hotBias.has(n)).length,
+      cycleClosers: cycleClosersInPool,
+      cycleMissingTotal: cycleMissing.size,
     },
   };
 }
