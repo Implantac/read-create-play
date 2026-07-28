@@ -95,6 +95,10 @@ export function StrategyComparePanel({ stats, draws, config, selectedLottery, st
           <div className="space-y-2">
             {rows.map((r, i) => {
               const isBest = r.id === best.id;
+              const overlap = isBest
+                ? r.numbers.length
+                : r.numbers.filter((n) => best.numbers.includes(n)).length;
+              const overlapPct = Math.round((overlap / config.pick) * 100);
               return (
                 <div
                   key={r.id}
@@ -121,6 +125,11 @@ export function StrategyComparePanel({ stats, draws, config, selectedLottery, st
                     <Badge variant="outline" className="font-mono tabular-nums">
                       {r.score}/100 · {r.grade}
                     </Badge>
+                    {!isBest && (
+                      <Badge variant="secondary" className="font-mono tabular-nums text-[10px]" title="Sobreposição com o vencedor">
+                        ∩ {overlap} · {overlapPct}%
+                      </Badge>
+                    )}
                     <Button
                       size="icon"
                       variant="outline"
