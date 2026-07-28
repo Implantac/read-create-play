@@ -133,6 +133,10 @@ const EstatisticasPage = () => {
         </Suspense>
       )}
 
+      <Suspense fallback={<Skeleton className="h-[320px] w-full" />}>
+        <CoOccurrencePanel draws={draws} totalNumbers={config.numbers} window={100} />
+      </Suspense>
+
       <m.div variants={container} initial="hidden" animate="show" className="grid lg:grid-cols-2 gap-6">
 
         <m.div variants={item}>
