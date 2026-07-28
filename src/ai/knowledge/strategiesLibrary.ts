@@ -666,6 +666,150 @@ export function strategyMegaJackpot(
   };
 }
 
+// ═══════════════════════════════════════════
+// QUINA JACKPOT — caça aos 5 acertos
+// ═══════════════════════════════════════════
+export function strategyQuinaJackpot(
+  stats: NumberStats[],
+  draws: DrawResult[],
+  topN: number = 18
+): StrategyResult {
+  const rules = getLotteryRules("quina");
+  const lastDraw = draws[0]?.numbers ?? [];
+  const lastSet = new Set(lastDraw);
+  const hotBias = new Set(rules.knownBiases?.hotNumbers ?? []);
+  const coldBias = new Set(rules.knownBiases?.coldNumbers ?? []);
+
+  const scored = stats.map(s => {
+    const recent20 = computeRecentFrequency(s.number, draws, 20);
+    const recent5 = computeRecentFrequency(s.number, draws, 5);
+    let score = s.frequency * 0.22;
+
+    // Viés oficial da Quina
+    if (hotBias.has(s.number)) score += 3.0;
+    if (coldBias.has(s.number)) score -= 1.0;
+
+    // Frequência recente pesa mais em universos grandes (80 dezenas)
+    score += recent5 * 1.2 + recent20 * 0.35;
+
+    // Atraso qualificado — Quina tem ciclos médios de 6-14 sorteios
+    if (s.lastSeen >= 5 && s.lastSeen <= 14) score += 1.6;
+    if (s.lastSeen > 25) score += 0.5;
+
+    // Penaliza repetição do último (Quina ~1-3 repetidos)
+    if (lastSet.has(s.number)) score -= 0.5;
+
+    // Primos/Fibonacci — bias comum em números pequenos
+    if (PRIMES.has(s.number)) score += 0.35;
+    if (FIBONACCI.has(s.number)) score += 0.25;
+
+    return { number: s.number, score };
+  });
+
+  // Distribuir por 4 quartis do universo (1-20, 21-40, 41-60, 61-80)
+  const quartiles: Array<Array<{ number: number; score: number }>> = [[], [], [], []];
+  scored.forEach(s => {
+    const q = Math.min(3, Math.floor((s.number - 1) / 20));
+    quartiles[q].push(s);
+  });
+  quartiles.forEach(q => q.sort((a, b) => b.score - a.score));
+
+  const perQuartile = Math.max(3, Math.floor(topN / 4));
+  const merged = quartiles.flatMap(q => q.slice(0, perQuartile));
+  const remainingSlots = topN - merged.length;
+  const rest = scored
+    .filter(s => !merged.find(m => m.number === s.number))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, Math.max(0, remainingSlots));
+
+  const finalPool = [...merged, ...rest]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, topN)
+    .map(s => s.number)
+    .sort((a, b) => a - b);
+
+  const weights = new Map<number, number>();
+  scored.forEach(s => weights.set(s.number, Math.max(0.1, s.score)));
+
+  return {
+    id: "quina_jackpot",
+    name: "⭐ Quina Jackpot (5 acertos)",
+    description: "Estratégia exclusiva Quina. Pool de 18 dezenas distribuído pelos 4 quartis do volante, viés oficial, atraso qualificado e baixa repetição. Caça os 5 acertos.",
+    candidateNumbers: finalPool,
+    weights,
+    metrics: {
+      poolSize: finalPool.length,
+      quartilesCovered: quartiles.filter((_, i) => finalPool.some(n => Math.floor((n - 1) / 20) === i)).length,
+      hotHits: finalPool.filter(n => hotBias.has(n)).length,
+    },
+  };
+}
+
+// ═══════════════════════════════════════════
+// DUPLA SENA JACKPOT — caça aos 6 acertos (2 sorteios/concurso)
+// ═══════════════════════════════════════════
+export function strategyDuplaSenaJackpot(
+  stats: NumberStats[],
+  draws: DrawResult[],
+  topN: number = 20
+): StrategyResult {
+  const rules = getLotteryRules("duplasena");
+  const lastDraw = draws[0]?.numbers ?? [];
+  const lastSet = new Set(lastDraw);
+  const hotBias = new Set(rules.knownBiases?.hotNumbers ?? []);
+  const coldBias = new Set(rules.knownBiases?.coldNumbers ?? []);
+
+  const scored = stats.map(s => {
+    const recent20 = computeRecentFrequency(s.number, draws, 20);
+    const recent5 = computeRecentFrequency(s.number, draws, 5);
+    let score = s.frequency * 0.28;
+
+    if (hotBias.has(s.number)) score += 2.8;
+    if (coldBias.has(s.number)) score -= 1.0;
+
+    score += recent5 * 1.1 + recent20 * 0.4;
+
+    // Atraso qualificado — Dupla Sena tem 2 sorteios, então ciclo médio menor
+    if (s.lastSeen >= 3 && s.lastSeen <= 10) score += 1.5;
+    if (s.lastSeen > 18) score += 0.4;
+
+    if (lastSet.has(s.number)) score -= 0.5;
+
+    if (PRIMES.has(s.number)) score += 0.35;
+    if (FIBONACCI.has(s.number)) score += 0.25;
+
+    return { number: s.number, score };
+  });
+
+  // Balancear metade baixa (1-25) e alta (26-50)
+  const lowHalf = scored.filter(s => s.number <= 25).sort((a, b) => b.score - a.score);
+  const highHalf = scored.filter(s => s.number > 25).sort((a, b) => b.score - a.score);
+  const half = Math.floor(topN / 2);
+  const merged = [...lowHalf.slice(0, half), ...highHalf.slice(0, topN - half)]
+    .sort((a, b) => b.score - a.score);
+
+  const candidates = merged.slice(0, topN).map(s => s.number).sort((a, b) => a - b);
+
+  const weights = new Map<number, number>();
+  scored.forEach(s => weights.set(s.number, Math.max(0.1, s.score)));
+
+  const decades = [0, 0, 0, 0, 0];
+  candidates.forEach(n => decades[Math.min(4, Math.floor((n - 1) / 10))]++);
+
+  return {
+    id: "duplasena_jackpot",
+    name: "🎲 Dupla Sena Jackpot (2 sorteios)",
+    description: "Estratégia exclusiva Dupla Sena. Pool de 20 dezenas balanceado nas metades do volante, aproveitando os 2 sorteios por concurso, viés oficial e atraso qualificado.",
+    candidateNumbers: candidates,
+    weights,
+    metrics: {
+      poolSize: candidates.length,
+      decadesCovered: decades.filter(d => d > 0).length,
+      hotHits: candidates.filter(n => hotBias.has(n)).length,
+    },
+  };
+}
+
 
 
 
