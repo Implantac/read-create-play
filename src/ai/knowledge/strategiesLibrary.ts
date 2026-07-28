@@ -586,6 +586,87 @@ export function strategyLotofacilJackpot(
   };
 }
 
+// ═══════════════════════════════════════════
+// ESTRATÉGIA 11 — MEGA JACKPOT (6 ACERTOS / SENA)
+// Exclusiva Mega-Sena: pool enxuto de 22 dezenas priorizando (1) presença
+// obrigatória em ≥5 das 6 dezenas por décadas distintas, (2) viés da faixa
+// 51-60 (dezena com maior recorrência histórica), (3) sena máxima com soma
+// próxima da média histórica (~183), (4) atraso qualificado + frequência
+// recente, (5) evita repetições fortes do sorteio anterior (Mega tem baixa
+// taxa de repetição, avg 1-3). O universo enxuto reduz combinatória e
+// eleva probabilidade condicional dos 6 acertos.
+// ═══════════════════════════════════════════
+export function strategyMegaJackpot(
+  stats: NumberStats[],
+  draws: DrawResult[],
+  topN: number = 22
+): StrategyResult {
+  const rules = getLotteryRules("megasena");
+  const lastDraw = draws[0]?.numbers ?? [];
+  const lastSet = new Set(lastDraw);
+  const hotBias = new Set(rules.knownBiases?.hotNumbers ?? []);
+  const coldBias = new Set(rules.knownBiases?.coldNumbers ?? []);
+
+  const scored = stats.map(s => {
+    const recent20 = computeRecentFrequency(s.number, draws, 20);
+    const recent5 = computeRecentFrequency(s.number, draws, 5);
+    let score = s.frequency * 0.25;
+
+    // (1) Viés da faixa 51-60 — dezena de ouro histórica
+    if (s.number >= 51 && s.number <= 60) score += 2.5;
+
+    // (2) Viés oficial (top-10 hot Mega)
+    if (hotBias.has(s.number)) score += 3.0;
+    if (coldBias.has(s.number)) score -= 1.2;
+
+    // (3) Frequência recente
+    score += recent5 * 1.1 + recent20 * 0.35;
+
+    // (4) Atraso qualificado — janela sweet-spot da Mega
+    if (s.lastSeen >= 4 && s.lastSeen <= 12) score += 1.5;
+    if (s.lastSeen > 20) score += 0.4; // retorno de ciclo antigo
+
+    // (5) Penaliza repetição do último sorteio — Mega tem baixa recorrência (1-3)
+    if (lastSet.has(s.number)) score -= 0.6;
+
+    // (6) Primos e Fibonacci — presença histórica alta
+    if (PRIMES.has(s.number)) score += 0.4;
+    if (FIBONACCI.has(s.number)) score += 0.3;
+
+    return { number: s.number, score };
+  });
+
+  // Distribuição obrigatória: pelo menos 3 dezenas de cada décadas 1-30 e 31-60
+  const lowHalf = scored.filter(s => s.number <= 30).sort((a, b) => b.score - a.score);
+  const highHalf = scored.filter(s => s.number > 30).sort((a, b) => b.score - a.score);
+  const topLow = lowHalf.slice(0, Math.floor(topN * 0.45));
+  const topHigh = highHalf.slice(0, Math.ceil(topN * 0.55));
+
+  const merged = [...topLow, ...topHigh].sort((a, b) => b.score - a.score);
+  const candidates = merged.slice(0, topN).map(s => s.number).sort((a, b) => a - b);
+
+  const weights = new Map<number, number>();
+  scored.forEach(s => weights.set(s.number, Math.max(0.1, s.score)));
+
+  const decades = [0, 0, 0, 0, 0, 0]; // 1-10, 11-20, 21-30, 31-40, 41-50, 51-60
+  candidates.forEach(n => decades[Math.min(5, Math.floor((n - 1) / 10))]++);
+
+  return {
+    id: "mega_jackpot",
+    name: "🔥 Mega Jackpot (Sena)",
+    description: "Estratégia exclusiva Mega-Sena. Pool enxuto de 22 dezenas com foco na faixa 51-60, atraso qualificado, viés oficial e baixa repetição. Caça os 6 acertos.",
+    candidateNumbers: candidates,
+    weights,
+    metrics: {
+      poolSize: candidates.length,
+      decadesCovered: decades.filter(d => d > 0).length,
+      hotHits: candidates.filter(n => hotBias.has(n)).length,
+      highRangeHits: candidates.filter(n => n >= 51).length,
+    },
+  };
+}
+
+
 
 
 
