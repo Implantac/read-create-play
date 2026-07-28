@@ -850,7 +850,33 @@ function generateFilteredCombinations(
         else curSeq = 1;
       }
       if (maxSeq > (rules.maxRecommendedSequence || 3)) continue;
-    }
+
+      // ═══ Filtros exclusivos LOTOFÁCIL (grade 5×5, pick 15) ═══
+      if (pick === 15 && rules.totalNumbers === 25) {
+        // (a) Moldura x Miolo
+        if (rules.idealFrameRange) {
+          const frameCount = game.filter(n => LOTOFACIL_FRAME.has(n)).length;
+          const [fLo, fHi] = rules.idealFrameRange;
+          if (frameCount < fLo - 1 || frameCount > fHi + 1) continue;
+        }
+        // (b) Distribuição por coluna — no mínimo 2 dezenas em cada uma das 5 colunas
+        const colHist = [0, 0, 0, 0, 0];
+        for (const n of game) colHist[lotofacilCol(n) - 1]++;
+        if (colHist.some(c => c < 2)) continue;
+        // (c) Distribuição por linha — no mínimo 2 dezenas em cada uma das 5 linhas
+        const rowHist = [0, 0, 0, 0, 0];
+        for (const n of game) rowHist[lotofacilRow(n) - 1]++;
+        if (rowHist.some(r => r < 2)) continue;
+        // (d) Repetição do sorteio anterior (viés estatístico mais forte)
+        const prev = draws[0]?.numbers;
+        if (prev && prev.length && rules.avgRepeatFromPrevious) {
+          const [rLo, rHi] = rules.avgRepeatFromPrevious;
+          const prevSet = new Set(prev);
+          const rep = game.filter(n => prevSet.has(n)).length;
+          if (rep < rLo - 1 || rep > rHi + 1) continue;
+        }
+      }
+
 
     games.push(game);
   }
