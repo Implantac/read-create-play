@@ -613,11 +613,13 @@ function executeStrategy(
     case "coverage": return strategyCoverage(stats, lotteryId, Math.max(pool, Math.ceil(pool * 1.1)));
     case "repetition": return strategyRepetition(stats, draws, lotteryId, pool);
     case "hot_cold": return strategyHotCold(stats, draws, lotteryId, pool);
+    case "consensus": return strategyConsensus(stats, draws, lotteryId, pool);
     case "fibonacci": return strategyBalance(stats, lotteryId, pool);
     case "predictive": return strategyHotCold(stats, draws, lotteryId, pool);
-    default: return strategyHotCold(stats, draws, lotteryId, pool);
+    default: return strategyConsensus(stats, draws, lotteryId, pool);
   }
 }
+
 
 function computeRecentFrequency(num: number, draws: DrawResult[], window: number): number {
   const recent = draws.slice(0, window);
