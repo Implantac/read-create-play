@@ -71,8 +71,10 @@ const GeradorPage = () => {
 
   const STRATEGIES = [
     { id: "consensus", name: "Consenso Multi-Estratégia", desc: "Agrega 6 estratégias por Borda Count ponderado. Números com convergência em múltiplos modelos ganham boost. Recomendada." },
+    ...(selectedLottery === "lotofacil"
+      ? [{ id: "lotofacil_jackpot", name: "🎯 Lotofácil Jackpot (15 pontos)", desc: "Exclusiva Lotofácil: repetição forte do anterior, moldura×miolo, grade 5×5 balanceada, viés oficial, primos e múltiplos de 3. Caça os 15 acertos." }]
+      : []),
     { id: "balance", name: "Aposta Equilibrada", desc: "Distribuição estatística otimizada por rede neural." },
-
     { id: "hot_cold", name: "Quente-Frio", desc: "Combina viés oficial, atraso e frequência recente. Ideal para qualquer loteria." },
     { id: "repetition", name: "Repetição do Anterior", desc: "Aproveita o viés de repetição do último sorteio (ex.: 8-10 dezenas na Lotofácil)." },
     { id: "frequency", name: "Frequência Histórica", desc: "Prioriza números mais sorteados, com boost por frequência recente." },
@@ -84,6 +86,7 @@ const GeradorPage = () => {
     { id: "aggressive", name: "Aposta IA Premium", desc: "Modelos avançados para busca de convergência máxima." },
     { id: "conservative", name: "Aposta Conservadora", desc: "Baseada em frequência histórica estável e ciclos de retorno." },
   ];
+
 
   const handleGenerate = async () => {
     if (scopedDraws.length === 0) {
