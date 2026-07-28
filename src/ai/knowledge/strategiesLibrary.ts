@@ -1189,6 +1189,18 @@ function executeStrategy(
       return lotteryId === "duplasena"
         ? strategyDuplaSenaJackpot(stats, draws, 20)
         : strategyConsensus(stats, draws, lotteryId, pool);
+    case "timemania_jackpot":
+      return lotteryId === "timemania"
+        ? strategyTimemaniaJackpot(stats, draws, 24)
+        : strategyConsensus(stats, draws, lotteryId, pool);
+    case "diadesorte_jackpot":
+      return lotteryId === "diadesorte"
+        ? strategyDiaDeSorteJackpot(stats, draws, 16)
+        : strategyConsensus(stats, draws, lotteryId, pool);
+    case "lotomania_jackpot":
+      return lotteryId === "lotomania"
+        ? strategyLotomaniaJackpot(stats, draws, 65)
+        : strategyConsensus(stats, draws, lotteryId, pool);
 
     case "fibonacci": return strategyBalance(stats, lotteryId, pool);
     case "predictive": return strategyHotCold(stats, draws, lotteryId, pool);
