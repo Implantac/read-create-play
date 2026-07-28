@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { DrawTestDialog } from "@/components/lottery/DrawTestDialog";
 import { QuickBacktestDialog } from "@/components/lottery/QuickBacktestDialog";
 import { StrategyComparePanel } from "@/components/gerador/StrategyComparePanel";
+import { JackpotFocusPanel } from "@/components/gerador/JackpotFocusPanel";
 
 type HistoryWindow = "all" | "10" | "20" | "50";
 const WINDOW_OPTIONS: { value: HistoryWindow; label: string; hint: string }[] = [
