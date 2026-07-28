@@ -373,6 +373,7 @@ const GeradorPage = () => {
                             <p className="text-[10px] font-medium uppercase text-emerald-400/90 tracking-wider mt-1">{res.score >= 90 ? 'Excelente' : res.score >= 75 ? 'Alta Convergência' : 'Estável'}</p>
                           </div>
                           <DrawTestDialog numbers={res.numbers} />
+                          <QuickBacktestDialog numbers={res.numbers} lotteryId={selectedLottery} />
                           <Button
                             variant="outline"
                             size="icon"
