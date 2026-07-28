@@ -222,6 +222,24 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
                   </Button>
                 </div>
               </div>
+              {r.signals && r.signals.length > 0 && (
+                <div className="md:col-span-full w-full flex flex-wrap gap-1.5 pt-1 border-t border-border/40 mt-1">
+                  {r.signals.map((s, si) => (
+                    <span
+                      key={si}
+                      title={s.hint}
+                      className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${
+                        s.ok
+                          ? "border-primary/40 bg-primary/10 text-primary"
+                          : "border-destructive/30 bg-destructive/5 text-destructive/80"
+                      }`}
+                    >
+                      {s.label}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
             ))}
           </div>
         )}
