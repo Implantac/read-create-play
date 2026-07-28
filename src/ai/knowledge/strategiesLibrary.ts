@@ -812,7 +812,9 @@ export function getAllStrategyIds(): string[] {
     "coverage",
     "repetition",
     "hot_cold",
+    "consensus",
   ];
+
 }
 
 /** Get strategy info by ID */
