@@ -34,6 +34,28 @@ interface Row {
   score: number;
   grade: string;
   strengths: string[];
+  signals?: { label: string; ok: boolean; hint: string }[];
+}
+
+const LOTOFACIL_CORNERS = [1, 5, 21, 25];
+
+function computeLotofacilSignals(nums: number[], draws: DrawResult[]): Row["signals"] {
+  const set = new Set(nums);
+  const frame = new Set([1,2,3,4,5,21,22,23,24,25,6,11,16,10,15,20]);
+  const frameCount = nums.filter((n) => frame.has(n)).length;
+  const last = draws[0]?.numbers ?? [];
+  const reps = last.filter((n) => set.has(n)).length;
+  const sorted = [...nums].sort((a, b) => a - b);
+  const hasPair = sorted.some((n, i) => i > 0 && n - sorted[i - 1] === 1);
+  const cols = new Set(nums.map((n) => (n - 1) % 5));
+  const hasCorner = LOTOFACIL_CORNERS.some((c) => set.has(c));
+  return [
+    { label: `Moldura ${frameCount}`, ok: frameCount >= 8 && frameCount <= 11, hint: "Ideal 8-11" },
+    { label: `Repete ${reps}`, ok: reps >= 7 && reps <= 11, hint: "Ideal 7-11 do sorteio anterior" },
+    { label: hasPair ? "Consec. ✓" : "Consec. ✗", ok: hasPair, hint: "≥1 par consecutivo (~97% dos sorteios)" },
+    { label: `${cols.size}/5 col.`, ok: cols.size === 5, hint: "Cobertura das 5 colunas" },
+    { label: hasCorner ? "Canto ✓" : "Canto ✗", ok: hasCorner, hint: "Âncora física (1, 5, 21, 25)" },
+  ];
 }
 
 const BATCH_BY_LOTTERY: Record<string, number> = {
@@ -94,7 +116,8 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
           if (seen.has(key)) continue;
           seen.add(key);
           const q = evaluateBetQuality(g, stats, config, draws);
-          scored.push({ numbers: g, score: q.overall, grade: q.grade, strengths: q.strengths ?? [] });
+          const signals = selectedLottery === "lotofacil" ? computeLotofacilSignals(g, draws) : undefined;
+          scored.push({ numbers: g, score: q.overall, grade: q.grade, strengths: q.strengths ?? [], signals });
         }
         scored.sort((a, b) => b.score - a.score);
         setRows(scored.slice(0, TOP_N));
@@ -155,49 +178,68 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
             {rows.map((r, i) => (
               <div
                 key={i}
-                className={`rounded-lg border p-3 flex flex-col md:flex-row md:items-center gap-3 ${
+                className={`rounded-lg border p-3 flex flex-col gap-2 ${
                   i === 0 ? "border-primary/50 bg-primary/[0.05]" : "border-border/60 bg-card"
                 }`}
               >
-                <div className="flex items-center gap-2 min-w-[90px]">
-                  <span className="text-xs font-mono tabular-nums text-muted-foreground w-5">#{i + 1}</span>
-                  {i === 0 && <Trophy className="w-3.5 h-3.5 text-primary" />}
-                </div>
-                <div className="flex flex-wrap gap-1 flex-1">
-                  {r.numbers.map((n) => (
-                    <span
-                      key={n}
-                      className="w-7 h-7 rounded-full bg-muted/40 border border-border/60 flex items-center justify-center text-[11px] font-mono tabular-nums font-semibold"
+                <div className="flex flex-col md:flex-row md:items-center gap-3">
+                  <div className="flex items-center gap-2 min-w-[90px]">
+                    <span className="text-xs font-mono tabular-nums text-muted-foreground w-5">#{i + 1}</span>
+                    {i === 0 && <Trophy className="w-3.5 h-3.5 text-primary" />}
+                  </div>
+                  <div className="flex flex-wrap gap-1 flex-1">
+                    {r.numbers.map((n) => (
+                      <span
+                        key={n}
+                        className="w-7 h-7 rounded-full bg-muted/40 border border-border/60 flex items-center justify-center text-[11px] font-mono tabular-nums font-semibold"
+                      >
+                        {String(n).padStart(2, "0")}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Badge variant="outline" className="font-mono tabular-nums">
+                      {r.score}/100 · {r.grade}
+                    </Badge>
+                    <QuickBacktestDialog
+                      numbers={r.numbers}
+                      lotteryId={selectedLottery}
+                      trigger={
+                        <Button size="icon" variant="outline" title="Backtest histórico">
+                          <History className="w-4 h-4" />
+                        </Button>
+                      }
+                    />
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      title="Salvar jogo"
+                      onClick={async () => {
+                        await saveBet({ numbers: r.numbers, strategy: jackpot.name, score: r.score, grade: r.grade });
+                        toast.success("Jogo salvo!");
+                      }}
                     >
-                      {String(n).padStart(2, "0")}
-                    </span>
-                  ))}
+                      <Save className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <Badge variant="outline" className="font-mono tabular-nums">
-                    {r.score}/100 · {r.grade}
-                  </Badge>
-                  <QuickBacktestDialog
-                    numbers={r.numbers}
-                    lotteryId={selectedLottery}
-                    trigger={
-                      <Button size="icon" variant="outline" title="Backtest histórico">
-                        <History className="w-4 h-4" />
-                      </Button>
-                    }
-                  />
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    title="Salvar jogo"
-                    onClick={async () => {
-                      await saveBet({ numbers: r.numbers, strategy: jackpot.name, score: r.score, grade: r.grade });
-                      toast.success("Jogo salvo!");
-                    }}
-                  >
-                    <Save className="w-4 h-4" />
-                  </Button>
-                </div>
+                {r.signals && r.signals.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 pt-1 border-t border-border/40">
+                    {r.signals.map((s, si) => (
+                      <span
+                        key={si}
+                        title={s.hint}
+                        className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${
+                          s.ok
+                            ? "border-primary/40 bg-primary/10 text-primary"
+                            : "border-destructive/30 bg-destructive/5 text-destructive/80"
+                        }`}
+                      >
+                        {s.label}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
