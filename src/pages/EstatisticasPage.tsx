@@ -38,6 +38,7 @@ const item = {
 };
 
 const CycleThermometer = lazy(() => import("@/components/lottery/analysis/CycleThermometer").then(m => ({ default: m.CycleThermometer })));
+const CoOccurrencePanel = lazy(() => import("@/components/lottery/analysis/CoOccurrencePanel").then(m => ({ default: m.CoOccurrencePanel })));
 
 const EstatisticasPage = () => {
   const { config, draws, syncing, syncDraws, syncAllLotteries, selectedLottery } = useLotteryContext();
