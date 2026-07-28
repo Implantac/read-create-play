@@ -70,7 +70,9 @@ const GeradorPage = () => {
   }, [scopedDraws, stats, config.numbers]);
 
   const STRATEGIES = [
+    { id: "consensus", name: "Consenso Multi-Estratégia", desc: "Agrega 6 estratégias por Borda Count ponderado. Números com convergência em múltiplos modelos ganham boost. Recomendada." },
     { id: "balance", name: "Aposta Equilibrada", desc: "Distribuição estatística otimizada por rede neural." },
+
     { id: "hot_cold", name: "Quente-Frio", desc: "Combina viés oficial, atraso e frequência recente. Ideal para qualquer loteria." },
     { id: "repetition", name: "Repetição do Anterior", desc: "Aproveita o viés de repetição do último sorteio (ex.: 8-10 dezenas na Lotofácil)." },
     { id: "frequency", name: "Frequência Histórica", desc: "Prioriza números mais sorteados, com boost por frequência recente." },
