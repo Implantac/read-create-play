@@ -731,18 +731,29 @@ function selectDiverseGames(
 
 /** Get all available strategy IDs */
 export function getAllStrategyIds(): string[] {
-  return ["frequency", "delay", "balance", "dispersion", "anti_pattern", "coverage"];
+  return [
+    "frequency",
+    "delay",
+    "balance",
+    "dispersion",
+    "anti_pattern",
+    "coverage",
+    "repetition",
+    "hot_cold",
+  ];
 }
 
 /** Get strategy info by ID */
 export function getStrategyInfo(id: string): { id: string; name: string; description: string } {
   const map: Record<string, { name: string; description: string }> = {
-    frequency: { name: "Frequência Histórica", description: "Prioriza números mais sorteados" },
-    delay: { name: "Números Atrasados", description: "Foca em números que não saem há tempo" },
-    balance: { name: "Equilíbrio Estrutural", description: "Distribui pares/ímpares e altos/baixos" },
-    dispersion: { name: "Dispersão", description: "Evita concentração no volante" },
-    anti_pattern: { name: "Anti-Padrões", description: "Evita sequências e padrões óbvios" },
-    coverage: { name: "Cobertura Máxima", description: "Maximiza cobertura do volante" },
+    frequency:    { name: "Frequência Histórica", description: "Prioriza números mais sorteados, com boost por frequência recente." },
+    delay:        { name: "Números Atrasados",    description: "Foca em números que não saem há tempo, ponderando ciclos." },
+    balance:      { name: "Equilíbrio Estrutural", description: "Distribui pares/ímpares, altos/baixos, primos e Fibonacci." },
+    dispersion:   { name: "Dispersão no Volante", description: "Espalha as dezenas por todas as faixas do volante." },
+    anti_pattern: { name: "Anti-Padrões",         description: "Evita sequências e padrões visuais óbvios (baixa concorrência)." },
+    coverage:     { name: "Cobertura Máxima",     description: "Combina frequência, atraso, primos e Fibonacci para cobrir mais faixas." },
+    repetition:   { name: "Repetição do Anterior", description: "Aproveita o viés de repetição do último sorteio + frequência recente." },
+    hot_cold:     { name: "Quente-Frio",           description: "Combina viés oficial + atraso + frequência recente. Ideal p/ universos grandes." },
   };
-  return { id, ...(map[id] || map.frequency) };
+  return { id, ...(map[id] || map.hot_cold) };
 }
