@@ -781,8 +781,10 @@ function generateFilteredCombinations(
   strategy: StrategyResult,
   pick: number,
   count: number,
-  rules: LotteryRules
+  rules: LotteryRules,
+  draws: DrawResult[] = []
 ): number[][] {
+
   // Pool primário: candidatos da estratégia. Se for pequeno demais,
   // completa com o universo inteiro para nunca retornar zero jogos.
   let pool = strategy.candidateNumbers.slice();
