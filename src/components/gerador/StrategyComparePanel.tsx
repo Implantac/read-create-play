@@ -1,8 +1,9 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Scale, Save, Trophy } from "lucide-react";
+import { Loader2, Scale, Save, Trophy, Layers } from "lucide-react";
 import { toast } from "sonner";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { evaluateBetQuality } from "@/engine/stats/bet-quality";
@@ -30,10 +31,16 @@ export function StrategyComparePanel({ stats, draws, config, selectedLottery, st
   const [running, setRunning] = useState(false);
   const [rows, setRows] = useState<Row[]>([]);
   const { saveBet } = useSavedBets(selectedLottery);
+  const navigate = useNavigate();
 
   const pool = useMemo(
     () => strategies.filter((s) => ["balance", "hot_cold", "repetition", "frequency", "delay", "coverage"].includes(s.id)),
     [strategies]
+  );
+
+  const unionNumbers = useMemo(
+    () => [...new Set(rows.flatMap((r) => r.numbers))].sort((a, b) => a - b),
+    [rows]
   );
 
   const run = () => {
@@ -88,6 +95,10 @@ export function StrategyComparePanel({ stats, draws, config, selectedLottery, st
           <div className="space-y-2">
             {rows.map((r, i) => {
               const isBest = r.id === best.id;
+              const overlap = isBest
+                ? r.numbers.length
+                : r.numbers.filter((n) => best.numbers.includes(n)).length;
+              const overlapPct = Math.round((overlap / config.pick) * 100);
               return (
                 <div
                   key={r.id}
@@ -114,6 +125,11 @@ export function StrategyComparePanel({ stats, draws, config, selectedLottery, st
                     <Badge variant="outline" className="font-mono tabular-nums">
                       {r.score}/100 · {r.grade}
                     </Badge>
+                    {!isBest && (
+                      <Badge variant="secondary" className="font-mono tabular-nums text-[10px]" title="Sobreposição com o vencedor">
+                        ∩ {overlap} · {overlapPct}%
+                      </Badge>
+                    )}
                     <Button
                       size="icon"
                       variant="outline"
@@ -128,6 +144,34 @@ export function StrategyComparePanel({ stats, draws, config, selectedLottery, st
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {rows.length > 1 && (
+          <div className="rounded-lg border border-border/60 bg-muted/20 p-3 flex flex-col md:flex-row md:items-center gap-3 justify-between">
+            <div className="text-xs text-muted-foreground">
+              União das estratégias: <span className="font-mono tabular-nums text-foreground font-semibold">{unionNumbers.length}</span> dezenas ·
+              {" "}diversidade{" "}
+              <span className="font-mono tabular-nums text-foreground font-semibold">
+                {Math.round(((unionNumbers.length - config.pick) / (rows.length * config.pick - config.pick)) * 100) || 0}%
+              </span>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-2"
+              disabled={unionNumbers.length < config.pick}
+              onClick={() => {
+                if (unionNumbers.length < config.pick) {
+                  toast.error(`Base insuficiente (${unionNumbers.length}/${config.pick}).`);
+                  return;
+                }
+                navigate("/fechamento-universal", { state: { baseNumbers: unionNumbers, fromGerador: true } });
+              }}
+            >
+              <Layers className="w-4 h-4" />
+              Fechamento com União ({unionNumbers.length})
+            </Button>
           </div>
         )}
       </CardContent>
