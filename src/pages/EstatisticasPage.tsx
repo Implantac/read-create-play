@@ -37,8 +37,10 @@ const item = {
   show: { opacity: 1, y: 0 },
 };
 
+const CycleThermometer = lazy(() => import("@/components/lottery/analysis/CycleThermometer").then(m => ({ default: m.CycleThermometer })));
+
 const EstatisticasPage = () => {
-  const { config, draws, syncing, syncDraws, syncAllLotteries } = useLotteryContext();
+  const { config, draws, syncing, syncDraws, syncAllLotteries, selectedLottery } = useLotteryContext();
   const [period, setPeriod] = useState(100);
 
   const filteredDraws = useMemo(() => {
