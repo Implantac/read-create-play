@@ -417,6 +417,13 @@ const GeradorPage = () => {
                 ))}
               </div>
 
+              <JackpotFocusPanel
+                stats={scopedStats}
+                draws={scopedDraws}
+                config={config}
+                selectedLottery={selectedLottery}
+              />
+
               <StrategyComparePanel
                 stats={scopedStats}
                 draws={scopedDraws}
@@ -424,6 +431,7 @@ const GeradorPage = () => {
                 selectedLottery={selectedLottery}
                 strategies={STRATEGIES}
               />
+
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
                 <Button variant="premium" size="lg" className="px-8 gap-2" onClick={handleSaveAll}>
