@@ -1435,6 +1435,9 @@ export function getAllStrategyIds(): string[] {
     "mega_jackpot",
     "quina_jackpot",
     "duplasena_jackpot",
+    "timemania_jackpot",
+    "diadesorte_jackpot",
+    "lotomania_jackpot",
   ];
 
 
