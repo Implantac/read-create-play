@@ -1087,7 +1087,9 @@ export function getStrategyInfo(id: string): { id: string; name: string; descrip
     hot_cold:     { name: "Quente-Frio",           description: "Combina viés oficial + atraso + frequência recente. Ideal p/ universos grandes." },
     consensus:    { name: "Consenso Multi-Estratégia", description: "Agrega 6 estratégias por Borda Count ponderado. Números convergentes ganham boost. Máxima assertividade." },
     lotofacil_jackpot: { name: "🎯 Lotofácil Jackpot (15 pontos)", description: "Exclusiva Lotofácil: repetição forte do anterior, moldura×miolo, grade 5×5 balanceada, viés oficial, primos e múltiplos de 3. Caça os 15 acertos." },
+    mega_jackpot: { name: "🔥 Mega Jackpot (Sena)", description: "Exclusiva Mega-Sena: pool enxuto de 22 dezenas, foco na faixa 51-60, atraso qualificado, viés oficial e baixa repetição. Caça os 6 acertos." },
   };
+
 
   return { id, ...(map[id] || map.hot_cold) };
 }
