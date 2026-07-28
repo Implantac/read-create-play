@@ -31,10 +31,16 @@ export function StrategyComparePanel({ stats, draws, config, selectedLottery, st
   const [running, setRunning] = useState(false);
   const [rows, setRows] = useState<Row[]>([]);
   const { saveBet } = useSavedBets(selectedLottery);
+  const navigate = useNavigate();
 
   const pool = useMemo(
     () => strategies.filter((s) => ["balance", "hot_cold", "repetition", "frequency", "delay", "coverage"].includes(s.id)),
     [strategies]
+  );
+
+  const unionNumbers = useMemo(
+    () => [...new Set(rows.flatMap((r) => r.numbers))].sort((a, b) => a - b),
+    [rows]
   );
 
   const run = () => {
