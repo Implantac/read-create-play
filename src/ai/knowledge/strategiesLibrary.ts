@@ -533,16 +533,19 @@ function executeStrategy(
   draws: DrawResult[],
   lotteryId: string
 ): StrategyResult {
+  const pool = getStrategyPoolSize(lotteryId);
   switch (strategyId) {
-    case "frequency": return strategyFrequency(stats, draws);
-    case "delay": return strategyDelay(stats, draws);
-    case "balance": return strategyBalance(stats, lotteryId);
-    case "dispersion": return strategyDispersion(stats, lotteryId);
-    case "anti_pattern": return strategyAntiPattern(stats, draws, lotteryId);
-    case "coverage": return strategyCoverage(stats, lotteryId);
-    case "fibonacci": return strategyBalance(stats, lotteryId); // Fibonacci focus included in balance
-    case "predictive": return strategyBalance(stats, lotteryId); // Predictive ensemble
-    default: return strategyFrequency(stats, draws);
+    case "frequency": return strategyFrequency(stats, draws, pool);
+    case "delay": return strategyDelay(stats, draws, pool);
+    case "balance": return strategyBalance(stats, lotteryId, pool);
+    case "dispersion": return strategyDispersion(stats, lotteryId, pool);
+    case "anti_pattern": return strategyAntiPattern(stats, draws, lotteryId, pool);
+    case "coverage": return strategyCoverage(stats, lotteryId, Math.max(pool, Math.ceil(pool * 1.1)));
+    case "repetition": return strategyRepetition(stats, draws, lotteryId, pool);
+    case "hot_cold": return strategyHotCold(stats, draws, lotteryId, pool);
+    case "fibonacci": return strategyBalance(stats, lotteryId, pool);
+    case "predictive": return strategyHotCold(stats, draws, lotteryId, pool);
+    default: return strategyHotCold(stats, draws, lotteryId, pool);
   }
 }
 
@@ -610,9 +613,16 @@ function generateFilteredCombinations(
     seen.add(key);
 
     if (!relax) {
+      // Filtro de paridade: usa a faixa ideal por loteria (idealParityRange),
+      // com tolerância de ±1. Cai no fallback proporcional se a loteria não definir.
       const evenCount = game.filter(n => n % 2 === 0).length;
-      const evenRatio = evenCount / pick;
-      if (evenRatio < 0.25 || evenRatio > 0.75) continue;
+      if (rules.idealParityRange) {
+        const [evenLo, evenHi] = rules.idealParityRange;
+        if (evenCount < evenLo - 1 || evenCount > evenHi + 1) continue;
+      } else {
+        const evenRatio = evenCount / pick;
+        if (evenRatio < 0.25 || evenRatio > 0.75) continue;
+      }
 
       const sum = game.reduce((a, b) => a + b, 0);
       if (rules.idealSumRange) {
