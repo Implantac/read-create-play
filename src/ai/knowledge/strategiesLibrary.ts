@@ -980,6 +980,14 @@ function executeStrategy(
       return lotteryId === "megasena"
         ? strategyMegaJackpot(stats, draws, 22)
         : strategyConsensus(stats, draws, lotteryId, pool);
+    case "quina_jackpot":
+      return lotteryId === "quina"
+        ? strategyQuinaJackpot(stats, draws, 18)
+        : strategyConsensus(stats, draws, lotteryId, pool);
+    case "duplasena_jackpot":
+      return lotteryId === "duplasena"
+        ? strategyDuplaSenaJackpot(stats, draws, 20)
+        : strategyConsensus(stats, draws, lotteryId, pool);
 
     case "fibonacci": return strategyBalance(stats, lotteryId, pool);
     case "predictive": return strategyHotCold(stats, draws, lotteryId, pool);
