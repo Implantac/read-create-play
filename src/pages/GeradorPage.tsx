@@ -15,6 +15,7 @@ import { evaluateBetQuality } from "@/engine/stats/bet-quality";
 import { computeFrequencyStats } from "@/engine/stats/statistics";
 import { toast } from "sonner";
 import { DrawTestDialog } from "@/components/lottery/DrawTestDialog";
+import { QuickBacktestDialog } from "@/components/lottery/QuickBacktestDialog";
 
 type HistoryWindow = "all" | "10" | "20" | "50";
 const WINDOW_OPTIONS: { value: HistoryWindow; label: string; hint: string }[] = [
