@@ -1,14 +1,16 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Trophy, Save, Flame } from "lucide-react";
+import { Loader2, Trophy, Save, Flame, Layers, History } from "lucide-react";
 import { toast } from "sonner";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { evaluateBetQuality } from "@/engine/stats/bet-quality";
 import type { NumberStats } from "@/engine/stats/statistics";
 import type { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { useSavedBets } from "@/hooks/useSavedBets";
+import { QuickBacktestDialog } from "@/components/lottery/QuickBacktestDialog";
 
 interface Props {
   stats: NumberStats[];
@@ -41,10 +43,26 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
   const [running, setRunning] = useState(false);
   const [rows, setRows] = useState<Row[]>([]);
   const { saveBet } = useSavedBets(selectedLottery);
+  const navigate = useNavigate();
 
   const jackpot = useMemo(() => JACKPOT_BY_LOTTERY[selectedLottery], [selectedLottery]);
 
   if (!jackpot) return null;
+
+  const unionBase = useMemo(() => {
+    const set = new Set<number>();
+    rows.forEach((r) => r.numbers.forEach((n) => set.add(n)));
+    return Array.from(set).sort((a, b) => a - b);
+  }, [rows]);
+
+  const sendToFechamento = () => {
+    if (unionBase.length < config.pick + 1) {
+      toast.error(`União do Top ${rows.length} tem só ${unionBase.length} números. Rode novamente ou salve individualmente.`);
+      return;
+    }
+    navigate("/fechamento-universal", { state: { baseNumbers: unionBase, fromGerador: true } });
+    toast.success(`Base de ${unionBase.length} números enviada ao Fechamento Universal.`);
+  };
 
   const run = () => {
     if (draws.length === 0) {
@@ -105,11 +123,16 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {rows.length > 0 && (
-              <Button size="sm" variant="outline" onClick={saveAll} className="gap-2">
-                <Save className="w-4 h-4" /> Salvar Top {rows.length}
-              </Button>
+              <>
+                <Button size="sm" variant="outline" onClick={sendToFechamento} className="gap-2">
+                  <Layers className="w-4 h-4" /> Enviar união ao Fechamento ({unionBase.length})
+                </Button>
+                <Button size="sm" variant="outline" onClick={saveAll} className="gap-2">
+                  <Save className="w-4 h-4" /> Salvar Top {rows.length}
+                </Button>
+              </>
             )}
             <Button size="sm" variant="premium" onClick={run} disabled={running} className="gap-2">
               {running ? <Loader2 className="w-4 h-4 animate-spin" /> : <Flame className="w-4 h-4" />}
@@ -145,9 +168,19 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
                   <Badge variant="outline" className="font-mono tabular-nums">
                     {r.score}/100 · {r.grade}
                   </Badge>
+                  <QuickBacktestDialog
+                    numbers={r.numbers}
+                    lotteryId={selectedLottery}
+                    trigger={
+                      <Button size="icon" variant="outline" title="Backtest histórico">
+                        <History className="w-4 h-4" />
+                      </Button>
+                    }
+                  />
                   <Button
                     size="icon"
                     variant="outline"
+                    title="Salvar jogo"
                     onClick={async () => {
                       await saveBet({ numbers: r.numbers, strategy: jackpot.name, score: r.score, grade: r.grade });
                       toast.success("Jogo salvo!");
