@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { DrawTestDialog } from "@/components/lottery/DrawTestDialog";
 import { QuickBacktestDialog } from "@/components/lottery/QuickBacktestDialog";
 import { StrategyComparePanel } from "@/components/gerador/StrategyComparePanel";
+import { JackpotFocusPanel } from "@/components/gerador/JackpotFocusPanel";
 
 type HistoryWindow = "all" | "10" | "20" | "50";
 const WINDOW_OPTIONS: { value: HistoryWindow; label: string; hint: string }[] = [
@@ -416,6 +417,13 @@ const GeradorPage = () => {
                 ))}
               </div>
 
+              <JackpotFocusPanel
+                stats={scopedStats}
+                draws={scopedDraws}
+                config={config}
+                selectedLottery={selectedLottery}
+              />
+
               <StrategyComparePanel
                 stats={scopedStats}
                 draws={scopedDraws}
@@ -423,6 +431,7 @@ const GeradorPage = () => {
                 selectedLottery={selectedLottery}
                 strategies={STRATEGIES}
               />
+
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
                 <Button variant="premium" size="lg" className="px-8 gap-2" onClick={handleSaveAll}>
