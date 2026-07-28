@@ -1446,6 +1446,27 @@ function computeGameScore(
   const maxFreq = Math.max(...stats.map(s => s.frequency));
   score += (avgFreq / maxFreq) * 25;
 
+  // ═══ Bônus exclusivo LOTOFÁCIL (até +20 pontos) ═══
+  if (pick === 15 && rules.totalNumbers === 25) {
+    // Moldura na faixa ideal (8-11) → +8
+    const frameCount = game.filter(n => LOTOFACIL_FRAME.has(n)).length;
+    if (rules.idealFrameRange) {
+      const [fLo, fHi] = rules.idealFrameRange;
+      if (frameCount >= fLo && frameCount <= fHi) score += 8;
+    }
+    // Par consecutivo presente (~97% dos sorteios) → +5
+    let hasCons = false;
+    for (let i = 1; i < game.length; i++) {
+      if (game[i] - game[i - 1] === 1) { hasCons = true; break; }
+    }
+    if (hasCons) score += 5;
+    // Canto presente (âncora física) → +3
+    if (game.some(n => n === 1 || n === 5 || n === 21 || n === 25)) score += 3;
+    // Cobertura completa das 5 colunas → +4
+    const cols = new Set(game.map(n => ((n - 1) % 5) + 1));
+    if (cols.size === 5) score += 4;
+  }
+
   return Math.round(score * 10) / 10;
 }
 
