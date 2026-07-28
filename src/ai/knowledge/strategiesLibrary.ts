@@ -310,6 +310,110 @@ export function strategyCoverage(
 }
 
 // ═══════════════════════════════════════════
+// ESTRATÉGIA 7 — REPETIÇÃO DO SORTEIO ANTERIOR
+// Alavanca o viés estatístico mais forte de várias loterias: uma parte
+// das dezenas do sorteio anterior tende a reaparecer. Lotofácil: 8-10
+// repetem; Mega: 1-3; Timemania: 3-5; etc. Combina isso com frequência
+// recente para priorizar dezenas "ainda em movimento".
+// ═══════════════════════════════════════════
+export function strategyRepetition(
+  stats: NumberStats[],
+  draws: DrawResult[],
+  lotteryId: string,
+  topN?: number
+): StrategyResult {
+  const rules = getLotteryRules(lotteryId);
+  const n = topN ?? getStrategyPoolSize(lotteryId);
+  const lastDraw = draws[0]?.numbers ?? [];
+  const lastSet = new Set(lastDraw);
+  const [repLo, repHi] = rules.avgRepeatFromPrevious ?? [
+    Math.floor(rules.pick * 0.3),
+    Math.floor(rules.pick * 0.6),
+  ];
+  const repeatTarget = Math.round((repLo + repHi) / 2);
+
+  const scored = stats.map(s => {
+    const inLast = lastSet.has(s.number) ? 1 : 0;
+    const recent = computeRecentFrequency(s.number, draws, 15);
+    const score = inLast * 5 + recent * 0.6 + s.frequency * 0.2 - s.lastSeen * 0.1;
+    return { number: s.number, score };
+  });
+  scored.sort((a, b) => b.score - a.score);
+
+  const candidates = scored.slice(0, n).map(s => s.number).sort((a, b) => a - b);
+  const weights = new Map<number, number>();
+  scored.forEach(s => weights.set(s.number, Math.max(0.1, s.score)));
+
+  return {
+    id: "repetition",
+    name: "Repetição do Anterior",
+    description: `Prioriza dezenas do último sorteio + frequência recente. Alvo médio: manter ~${repeatTarget} dezenas repetidas.`,
+    candidateNumbers: candidates,
+    weights,
+    metrics: {
+      lastDrawSize: lastDraw.length,
+      repeatTarget,
+      repeatLow: repLo,
+      repeatHigh: repHi,
+      inLastCandidates: candidates.filter(x => lastSet.has(x)).length,
+    },
+  };
+}
+
+// ═══════════════════════════════════════════
+// ESTRATÉGIA 8 — QUENTE-FRIO (VIÉS OFICIAL + ATRASO)
+// Combina o viés histórico documentado por modalidade (hotNumbers do
+// knowledge base) com dezenas atrasadas e frequência recente. É o
+// híbrido mais robusto para universos grandes (Quina, Mega, Timemania).
+// ═══════════════════════════════════════════
+export function strategyHotCold(
+  stats: NumberStats[],
+  draws: DrawResult[],
+  lotteryId: string,
+  topN?: number
+): StrategyResult {
+  const rules = getLotteryRules(lotteryId);
+  const n = topN ?? getStrategyPoolSize(lotteryId);
+  const hotBias = new Set(rules.knownBiases?.hotNumbers ?? []);
+  const coldBias = new Set(rules.knownBiases?.coldNumbers ?? []);
+
+  // Threshold de atraso: 1.5× ciclo esperado da modalidade
+  const expectedCycle = Math.max(6, Math.round(rules.totalNumbers / Math.max(1, rules.pick)));
+  const overdueMin = Math.round(expectedCycle * 1.5);
+
+  const scored = stats.map(s => {
+    const recent = computeRecentFrequency(s.number, draws, 20);
+    let score = s.frequency * 0.25;
+    if (hotBias.has(s.number)) score += 3.0;
+    if (recent >= 4) score += 2.5;
+    if (s.lastSeen >= overdueMin) score += 2.0;
+    if (coldBias.has(s.number) && s.lastSeen < overdueMin) score -= 1.5;
+    return { number: s.number, score };
+  });
+  scored.sort((a, b) => b.score - a.score);
+
+  const candidates = scored.slice(0, n).map(s => s.number).sort((a, b) => a - b);
+  const weights = new Map<number, number>();
+  scored.forEach(s => weights.set(s.number, Math.max(0.1, s.score)));
+
+  return {
+    id: "hot_cold",
+    name: "Quente-Frio",
+    description: "Combina viés histórico oficial + números atrasados + frequência recente. Estratégia híbrida ideal para universos grandes.",
+    candidateNumbers: candidates,
+    weights,
+    metrics: {
+      hotBiasSize: hotBias.size,
+      overdueMin,
+      overdueCandidates: candidates.filter(x => (stats.find(s => s.number === x)?.lastSeen ?? 0) >= overdueMin).length,
+      hotHits: candidates.filter(x => hotBias.has(x)).length,
+    },
+  };
+}
+
+
+
+// ═══════════════════════════════════════════
 // PIPELINE DE GERAÇÃO INTELIGENTE (6 ETAPAS)
 // ═══════════════════════════════════════════
 export interface IntelligentPipelineResult {
