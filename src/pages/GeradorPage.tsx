@@ -77,6 +77,12 @@ const GeradorPage = () => {
     ...(selectedLottery === "megasena"
       ? [{ id: "mega_jackpot", name: "🔥 Mega Jackpot (Sena)", desc: "Exclusiva Mega-Sena: pool enxuto de 22 dezenas, foco na faixa 51-60, atraso qualificado, viés oficial e baixa repetição. Caça os 6 acertos." }]
       : []),
+    ...(selectedLottery === "quina"
+      ? [{ id: "quina_jackpot", name: "⭐ Quina Jackpot (5 acertos)", desc: "Exclusiva Quina: pool de 18 dezenas distribuído pelos 4 quartis do volante, viés oficial, atraso qualificado e baixa repetição. Caça os 5 acertos." }]
+      : []),
+    ...(selectedLottery === "duplasena"
+      ? [{ id: "duplasena_jackpot", name: "🎲 Dupla Sena Jackpot", desc: "Exclusiva Dupla Sena: pool de 20 dezenas balanceado nas metades do volante, aproveitando os 2 sorteios por concurso, viés oficial e atraso qualificado." }]
+      : []),
 
     { id: "balance", name: "Aposta Equilibrada", desc: "Distribuição estatística otimizada por rede neural." },
     { id: "hot_cold", name: "Quente-Frio", desc: "Combina viés oficial, atraso e frequência recente. Ideal para qualquer loteria." },
