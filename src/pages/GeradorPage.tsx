@@ -74,6 +74,10 @@ const GeradorPage = () => {
     ...(selectedLottery === "lotofacil"
       ? [{ id: "lotofacil_jackpot", name: "🎯 Lotofácil Jackpot (15 pontos)", desc: "Exclusiva Lotofácil: repetição forte do anterior, moldura×miolo, grade 5×5 balanceada, viés oficial, primos e múltiplos de 3. Caça os 15 acertos." }]
       : []),
+    ...(selectedLottery === "megasena"
+      ? [{ id: "mega_jackpot", name: "🔥 Mega Jackpot (Sena)", desc: "Exclusiva Mega-Sena: pool enxuto de 22 dezenas, foco na faixa 51-60, atraso qualificado, viés oficial e baixa repetição. Caça os 6 acertos." }]
+      : []),
+
     { id: "balance", name: "Aposta Equilibrada", desc: "Distribuição estatística otimizada por rede neural." },
     { id: "hot_cold", name: "Quente-Frio", desc: "Combina viés oficial, atraso e frequência recente. Ideal para qualquer loteria." },
     { id: "repetition", name: "Repetição do Anterior", desc: "Aproveita o viés de repetição do último sorteio (ex.: 8-10 dezenas na Lotofácil)." },
