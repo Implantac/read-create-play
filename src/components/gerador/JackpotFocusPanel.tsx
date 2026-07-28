@@ -168,9 +168,19 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
                   <Badge variant="outline" className="font-mono tabular-nums">
                     {r.score}/100 · {r.grade}
                   </Badge>
+                  <QuickBacktestDialog
+                    numbers={r.numbers}
+                    lotteryId={selectedLottery}
+                    trigger={
+                      <Button size="icon" variant="outline" title="Backtest histórico">
+                        <History className="w-4 h-4" />
+                      </Button>
+                    }
+                  />
                   <Button
                     size="icon"
                     variant="outline"
+                    title="Salvar jogo"
                     onClick={async () => {
                       await saveBet({ numbers: r.numbers, strategy: jackpot.name, score: r.score, grade: r.grade });
                       toast.success("Jogo salvo!");
