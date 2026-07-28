@@ -239,7 +239,6 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
                   ))}
                 </div>
               )}
-            </div>
             ))}
           </div>
         )}
