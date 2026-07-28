@@ -1460,6 +1460,9 @@ export function getStrategyInfo(id: string): { id: string; name: string; descrip
     mega_jackpot: { name: "🔥 Mega Jackpot (Sena)", description: "Exclusiva Mega-Sena: pool enxuto de 22 dezenas, foco na faixa 51-60, atraso qualificado, viés oficial e baixa repetição. Caça os 6 acertos." },
     quina_jackpot: { name: "⭐ Quina Jackpot (5 acertos)", description: "Exclusiva Quina: pool de 18 dezenas distribuído pelos 4 quartis do volante, viés oficial, atraso qualificado e baixa repetição." },
     duplasena_jackpot: { name: "🎲 Dupla Sena Jackpot", description: "Exclusiva Dupla Sena: pool de 20 dezenas balanceado nas metades do volante, aproveitando os 2 sorteios por concurso." },
+    timemania_jackpot: { name: "⚽ Timemania Jackpot (7 acertos)", description: "Exclusiva Timemania: pool de 24 dezenas distribuído pelos 4 quartis do volante 80, viés oficial e boost de repetição." },
+    diadesorte_jackpot: { name: "☀️ Dia de Sorte Jackpot (7 acertos)", description: "Exclusiva Dia de Sorte: pool de 16 dezenas balanceado nas metades do volante 31, primos e Fibonacci." },
+    lotomania_jackpot: { name: "🔥 Lotomania Jackpot (20 acertos)", description: "Exclusiva Lotomania: pool amplo de 65 dezenas distribuído pelas 10 dezenas do volante 100, boost de repetição alta." },
   };
 
 
