@@ -18,6 +18,32 @@ export interface StrategyResult {
 }
 
 // ═══════════════════════════════════════════
+// POOL DE CANDIDATOS POR LOTERIA
+// Cada modalidade tem escala e mecânica próprias — um pool fixo (topN=18)
+// não serve para todas. Lotomania precisa de 50+ para conseguir gerar um
+// jogo; Super Sete só tem 10 dígitos por coluna. Esta tabela é a fonte
+// única da verdade para o tamanho do pool.
+// ═══════════════════════════════════════════
+const LOTTERY_POOL_SIZE: Record<string, number> = {
+  lotofacil: 20,       // 25 total, marca 15 → deixa ~5 fora
+  megasena: 18,        // 60 total, marca 6  → 3× o pick
+  quina: 22,           // 80 total, marca 5
+  lotomania: 65,       // 100 total, marca 50 → precisa ser > pick
+  duplasena: 18,       // 50 total, marca 6
+  timemania: 24,       // 80 total, marca 10
+  diadesorte: 16,      // 31 total, marca 7
+  supersete: 10,       // universo pequeno = usa todo o pool
+  maismilionaria: 20,  // 50 total, marca 6
+};
+
+export function getStrategyPoolSize(lotteryId: string): number {
+  const explicit = LOTTERY_POOL_SIZE[lotteryId];
+  if (explicit) return explicit;
+  const rules = getLotteryRules(lotteryId);
+  return Math.min(rules.totalNumbers, Math.max(rules.pick + 6, Math.round(rules.pick * 1.2)));
+}
+
+// ═══════════════════════════════════════════
 // ESTRATÉGIA 1 — FREQUÊNCIA
 // Selecionar números com maior ocorrência histórica
 // ═══════════════════════════════════════════
