@@ -69,6 +69,13 @@ const GeradorPage = () => {
 
   const STRATEGIES = [
     { id: "balance", name: "Aposta Equilibrada", desc: "Distribuição estatística otimizada por rede neural." },
+    { id: "hot_cold", name: "Quente-Frio", desc: "Combina viés oficial, atraso e frequência recente. Ideal para qualquer loteria." },
+    { id: "repetition", name: "Repetição do Anterior", desc: "Aproveita o viés de repetição do último sorteio (ex.: 8-10 dezenas na Lotofácil)." },
+    { id: "frequency", name: "Frequência Histórica", desc: "Prioriza números mais sorteados, com boost por frequência recente." },
+    { id: "delay", name: "Números Atrasados", desc: "Foca em números que não saem há tempo, ponderando ciclos." },
+    { id: "dispersion", name: "Dispersão no Volante", desc: "Espalha as dezenas por todas as faixas do volante." },
+    { id: "anti_pattern", name: "Anti-Padrões", desc: "Evita sequências e padrões visuais óbvios (baixa concorrência em rateio)." },
+    { id: "coverage", name: "Cobertura Máxima", desc: "Combina frequência, atraso, primos e Fibonacci para cobrir mais faixas." },
     { id: "predictive", name: "Estatística Preditiva", desc: "Foco em tendências de alta probabilidade baseadas em IA." },
     { id: "aggressive", name: "Aposta IA Premium", desc: "Modelos avançados para busca de convergência máxima." },
     { id: "conservative", name: "Aposta Conservadora", desc: "Baseada em frequência histórica estável e ciclos de retorno." },
