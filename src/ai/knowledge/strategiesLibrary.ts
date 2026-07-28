@@ -1067,7 +1067,9 @@ export function getAllStrategyIds(): string[] {
     "hot_cold",
     "consensus",
     "lotofacil_jackpot",
+    "mega_jackpot",
   ];
+
 
 
 }
