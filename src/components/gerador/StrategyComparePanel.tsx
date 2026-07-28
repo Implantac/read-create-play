@@ -85,10 +85,17 @@ export function StrategyComparePanel({ stats, draws, config, selectedLottery, st
               <p className="text-xs text-muted-foreground">Gera 1 jogo por estratégia e ranqueia pelo Titan Score.</p>
             </div>
           </div>
-          <Button size="sm" variant="premium" onClick={run} disabled={running} className="gap-2">
-            {running ? <Loader2 className="w-4 h-4 animate-spin" /> : <Scale className="w-4 h-4" />}
-            {running ? "Analisando..." : "Comparar Agora"}
-          </Button>
+          <div className="flex items-center gap-2">
+            {rows.length > 0 && (
+              <Button size="sm" variant="outline" onClick={exportCsv} className="gap-2">
+                <Download className="w-4 h-4" /> CSV
+              </Button>
+            )}
+            <Button size="sm" variant="premium" onClick={run} disabled={running} className="gap-2">
+              {running ? <Loader2 className="w-4 h-4 animate-spin" /> : <Scale className="w-4 h-4" />}
+              {running ? "Analisando..." : "Comparar Agora"}
+            </Button>
+          </div>
         </div>
 
         {rows.length > 0 && (
