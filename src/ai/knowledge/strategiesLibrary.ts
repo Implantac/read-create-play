@@ -18,6 +18,32 @@ export interface StrategyResult {
 }
 
 // ═══════════════════════════════════════════
+// POOL DE CANDIDATOS POR LOTERIA
+// Cada modalidade tem escala e mecânica próprias — um pool fixo (topN=18)
+// não serve para todas. Lotomania precisa de 50+ para conseguir gerar um
+// jogo; Super Sete só tem 10 dígitos por coluna. Esta tabela é a fonte
+// única da verdade para o tamanho do pool.
+// ═══════════════════════════════════════════
+const LOTTERY_POOL_SIZE: Record<string, number> = {
+  lotofacil: 20,       // 25 total, marca 15 → deixa ~5 fora
+  megasena: 18,        // 60 total, marca 6  → 3× o pick
+  quina: 22,           // 80 total, marca 5
+  lotomania: 65,       // 100 total, marca 50 → precisa ser > pick
+  duplasena: 18,       // 50 total, marca 6
+  timemania: 24,       // 80 total, marca 10
+  diadesorte: 16,      // 31 total, marca 7
+  supersete: 10,       // universo pequeno = usa todo o pool
+  maismilionaria: 20,  // 50 total, marca 6
+};
+
+export function getStrategyPoolSize(lotteryId: string): number {
+  const explicit = LOTTERY_POOL_SIZE[lotteryId];
+  if (explicit) return explicit;
+  const rules = getLotteryRules(lotteryId);
+  return Math.min(rules.totalNumbers, Math.max(rules.pick + 6, Math.round(rules.pick * 1.2)));
+}
+
+// ═══════════════════════════════════════════
 // ESTRATÉGIA 1 — FREQUÊNCIA
 // Selecionar números com maior ocorrência histórica
 // ═══════════════════════════════════════════
@@ -284,6 +310,110 @@ export function strategyCoverage(
 }
 
 // ═══════════════════════════════════════════
+// ESTRATÉGIA 7 — REPETIÇÃO DO SORTEIO ANTERIOR
+// Alavanca o viés estatístico mais forte de várias loterias: uma parte
+// das dezenas do sorteio anterior tende a reaparecer. Lotofácil: 8-10
+// repetem; Mega: 1-3; Timemania: 3-5; etc. Combina isso com frequência
+// recente para priorizar dezenas "ainda em movimento".
+// ═══════════════════════════════════════════
+export function strategyRepetition(
+  stats: NumberStats[],
+  draws: DrawResult[],
+  lotteryId: string,
+  topN?: number
+): StrategyResult {
+  const rules = getLotteryRules(lotteryId);
+  const n = topN ?? getStrategyPoolSize(lotteryId);
+  const lastDraw = draws[0]?.numbers ?? [];
+  const lastSet = new Set(lastDraw);
+  const [repLo, repHi] = rules.avgRepeatFromPrevious ?? [
+    Math.floor(rules.pick * 0.3),
+    Math.floor(rules.pick * 0.6),
+  ];
+  const repeatTarget = Math.round((repLo + repHi) / 2);
+
+  const scored = stats.map(s => {
+    const inLast = lastSet.has(s.number) ? 1 : 0;
+    const recent = computeRecentFrequency(s.number, draws, 15);
+    const score = inLast * 5 + recent * 0.6 + s.frequency * 0.2 - s.lastSeen * 0.1;
+    return { number: s.number, score };
+  });
+  scored.sort((a, b) => b.score - a.score);
+
+  const candidates = scored.slice(0, n).map(s => s.number).sort((a, b) => a - b);
+  const weights = new Map<number, number>();
+  scored.forEach(s => weights.set(s.number, Math.max(0.1, s.score)));
+
+  return {
+    id: "repetition",
+    name: "Repetição do Anterior",
+    description: `Prioriza dezenas do último sorteio + frequência recente. Alvo médio: manter ~${repeatTarget} dezenas repetidas.`,
+    candidateNumbers: candidates,
+    weights,
+    metrics: {
+      lastDrawSize: lastDraw.length,
+      repeatTarget,
+      repeatLow: repLo,
+      repeatHigh: repHi,
+      inLastCandidates: candidates.filter(x => lastSet.has(x)).length,
+    },
+  };
+}
+
+// ═══════════════════════════════════════════
+// ESTRATÉGIA 8 — QUENTE-FRIO (VIÉS OFICIAL + ATRASO)
+// Combina o viés histórico documentado por modalidade (hotNumbers do
+// knowledge base) com dezenas atrasadas e frequência recente. É o
+// híbrido mais robusto para universos grandes (Quina, Mega, Timemania).
+// ═══════════════════════════════════════════
+export function strategyHotCold(
+  stats: NumberStats[],
+  draws: DrawResult[],
+  lotteryId: string,
+  topN?: number
+): StrategyResult {
+  const rules = getLotteryRules(lotteryId);
+  const n = topN ?? getStrategyPoolSize(lotteryId);
+  const hotBias = new Set(rules.knownBiases?.hotNumbers ?? []);
+  const coldBias = new Set(rules.knownBiases?.coldNumbers ?? []);
+
+  // Threshold de atraso: 1.5× ciclo esperado da modalidade
+  const expectedCycle = Math.max(6, Math.round(rules.totalNumbers / Math.max(1, rules.pick)));
+  const overdueMin = Math.round(expectedCycle * 1.5);
+
+  const scored = stats.map(s => {
+    const recent = computeRecentFrequency(s.number, draws, 20);
+    let score = s.frequency * 0.25;
+    if (hotBias.has(s.number)) score += 3.0;
+    if (recent >= 4) score += 2.5;
+    if (s.lastSeen >= overdueMin) score += 2.0;
+    if (coldBias.has(s.number) && s.lastSeen < overdueMin) score -= 1.5;
+    return { number: s.number, score };
+  });
+  scored.sort((a, b) => b.score - a.score);
+
+  const candidates = scored.slice(0, n).map(s => s.number).sort((a, b) => a - b);
+  const weights = new Map<number, number>();
+  scored.forEach(s => weights.set(s.number, Math.max(0.1, s.score)));
+
+  return {
+    id: "hot_cold",
+    name: "Quente-Frio",
+    description: "Combina viés histórico oficial + números atrasados + frequência recente. Estratégia híbrida ideal para universos grandes.",
+    candidateNumbers: candidates,
+    weights,
+    metrics: {
+      hotBiasSize: hotBias.size,
+      overdueMin,
+      overdueCandidates: candidates.filter(x => (stats.find(s => s.number === x)?.lastSeen ?? 0) >= overdueMin).length,
+      hotHits: candidates.filter(x => hotBias.has(x)).length,
+    },
+  };
+}
+
+
+
+// ═══════════════════════════════════════════
 // PIPELINE DE GERAÇÃO INTELIGENTE (6 ETAPAS)
 // ═══════════════════════════════════════════
 export interface IntelligentPipelineResult {
@@ -403,16 +533,19 @@ function executeStrategy(
   draws: DrawResult[],
   lotteryId: string
 ): StrategyResult {
+  const pool = getStrategyPoolSize(lotteryId);
   switch (strategyId) {
-    case "frequency": return strategyFrequency(stats, draws);
-    case "delay": return strategyDelay(stats, draws);
-    case "balance": return strategyBalance(stats, lotteryId);
-    case "dispersion": return strategyDispersion(stats, lotteryId);
-    case "anti_pattern": return strategyAntiPattern(stats, draws, lotteryId);
-    case "coverage": return strategyCoverage(stats, lotteryId);
-    case "fibonacci": return strategyBalance(stats, lotteryId); // Fibonacci focus included in balance
-    case "predictive": return strategyBalance(stats, lotteryId); // Predictive ensemble
-    default: return strategyFrequency(stats, draws);
+    case "frequency": return strategyFrequency(stats, draws, pool);
+    case "delay": return strategyDelay(stats, draws, pool);
+    case "balance": return strategyBalance(stats, lotteryId, pool);
+    case "dispersion": return strategyDispersion(stats, lotteryId, pool);
+    case "anti_pattern": return strategyAntiPattern(stats, draws, lotteryId, pool);
+    case "coverage": return strategyCoverage(stats, lotteryId, Math.max(pool, Math.ceil(pool * 1.1)));
+    case "repetition": return strategyRepetition(stats, draws, lotteryId, pool);
+    case "hot_cold": return strategyHotCold(stats, draws, lotteryId, pool);
+    case "fibonacci": return strategyBalance(stats, lotteryId, pool);
+    case "predictive": return strategyHotCold(stats, draws, lotteryId, pool);
+    default: return strategyHotCold(stats, draws, lotteryId, pool);
   }
 }
 
@@ -480,9 +613,16 @@ function generateFilteredCombinations(
     seen.add(key);
 
     if (!relax) {
+      // Filtro de paridade: usa a faixa ideal por loteria (idealParityRange),
+      // com tolerância de ±1. Cai no fallback proporcional se a loteria não definir.
       const evenCount = game.filter(n => n % 2 === 0).length;
-      const evenRatio = evenCount / pick;
-      if (evenRatio < 0.25 || evenRatio > 0.75) continue;
+      if (rules.idealParityRange) {
+        const [evenLo, evenHi] = rules.idealParityRange;
+        if (evenCount < evenLo - 1 || evenCount > evenHi + 1) continue;
+      } else {
+        const evenRatio = evenCount / pick;
+        if (evenRatio < 0.25 || evenRatio > 0.75) continue;
+      }
 
       const sum = game.reduce((a, b) => a + b, 0);
       if (rules.idealSumRange) {
@@ -591,18 +731,29 @@ function selectDiverseGames(
 
 /** Get all available strategy IDs */
 export function getAllStrategyIds(): string[] {
-  return ["frequency", "delay", "balance", "dispersion", "anti_pattern", "coverage"];
+  return [
+    "frequency",
+    "delay",
+    "balance",
+    "dispersion",
+    "anti_pattern",
+    "coverage",
+    "repetition",
+    "hot_cold",
+  ];
 }
 
 /** Get strategy info by ID */
 export function getStrategyInfo(id: string): { id: string; name: string; description: string } {
   const map: Record<string, { name: string; description: string }> = {
-    frequency: { name: "Frequência Histórica", description: "Prioriza números mais sorteados" },
-    delay: { name: "Números Atrasados", description: "Foca em números que não saem há tempo" },
-    balance: { name: "Equilíbrio Estrutural", description: "Distribui pares/ímpares e altos/baixos" },
-    dispersion: { name: "Dispersão", description: "Evita concentração no volante" },
-    anti_pattern: { name: "Anti-Padrões", description: "Evita sequências e padrões óbvios" },
-    coverage: { name: "Cobertura Máxima", description: "Maximiza cobertura do volante" },
+    frequency:    { name: "Frequência Histórica", description: "Prioriza números mais sorteados, com boost por frequência recente." },
+    delay:        { name: "Números Atrasados",    description: "Foca em números que não saem há tempo, ponderando ciclos." },
+    balance:      { name: "Equilíbrio Estrutural", description: "Distribui pares/ímpares, altos/baixos, primos e Fibonacci." },
+    dispersion:   { name: "Dispersão no Volante", description: "Espalha as dezenas por todas as faixas do volante." },
+    anti_pattern: { name: "Anti-Padrões",         description: "Evita sequências e padrões visuais óbvios (baixa concorrência)." },
+    coverage:     { name: "Cobertura Máxima",     description: "Combina frequência, atraso, primos e Fibonacci para cobrir mais faixas." },
+    repetition:   { name: "Repetição do Anterior", description: "Aproveita o viés de repetição do último sorteio + frequência recente." },
+    hot_cold:     { name: "Quente-Frio",           description: "Combina viés oficial + atraso + frequência recente. Ideal p/ universos grandes." },
   };
-  return { id, ...(map[id] || map.frequency) };
+  return { id, ...(map[id] || map.hot_cold) };
 }
