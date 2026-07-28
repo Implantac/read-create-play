@@ -123,11 +123,16 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {rows.length > 0 && (
-              <Button size="sm" variant="outline" onClick={saveAll} className="gap-2">
-                <Save className="w-4 h-4" /> Salvar Top {rows.length}
-              </Button>
+              <>
+                <Button size="sm" variant="outline" onClick={sendToFechamento} className="gap-2">
+                  <Layers className="w-4 h-4" /> Enviar união ao Fechamento ({unionBase.length})
+                </Button>
+                <Button size="sm" variant="outline" onClick={saveAll} className="gap-2">
+                  <Save className="w-4 h-4" /> Salvar Top {rows.length}
+                </Button>
+              </>
             )}
             <Button size="sm" variant="premium" onClick={run} disabled={running} className="gap-2">
               {running ? <Loader2 className="w-4 h-4 animate-spin" /> : <Flame className="w-4 h-4" />}
