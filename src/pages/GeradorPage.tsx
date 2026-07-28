@@ -37,7 +37,7 @@ const GeradorPage = () => {
   const navigate = useNavigate();
   
   const [step, setStep] = useState(1);
-  const [strategy, setStrategy] = useState<string>("balance");
+  const [strategy, setStrategy] = useState<string>("consensus");
 
   useEffect(() => {
     if (location.state?.fromOnboarding) {
