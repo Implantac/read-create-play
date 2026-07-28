@@ -828,6 +828,8 @@ export function getStrategyInfo(id: string): { id: string; name: string; descrip
     coverage:     { name: "Cobertura Máxima",     description: "Combina frequência, atraso, primos e Fibonacci para cobrir mais faixas." },
     repetition:   { name: "Repetição do Anterior", description: "Aproveita o viés de repetição do último sorteio + frequência recente." },
     hot_cold:     { name: "Quente-Frio",           description: "Combina viés oficial + atraso + frequência recente. Ideal p/ universos grandes." },
+    consensus:    { name: "Consenso Multi-Estratégia", description: "Agrega 6 estratégias por Borda Count ponderado. Números convergentes ganham boost. Máxima assertividade." },
+
   };
   return { id, ...(map[id] || map.hot_cold) };
 }
