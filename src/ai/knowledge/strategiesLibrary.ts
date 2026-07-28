@@ -536,17 +536,40 @@ export function runIntelligentPipeline(
   const strategy = executeStrategy(strategyId, safeStats, draws, lotteryId);
   pipeline.push({ step: "Candidatos", detail: `${strategy.candidateNumbers.length} números selecionados`, count: strategy.candidateNumbers.length });
 
-  // Etapa 4 — Criar combinações com filtros
-  const rawGames = generateFilteredCombinations(strategy, rules.pick, Math.max(gameCount * 20, gameCount + 5), rules);
+  // Etapa 4 — Criar combinações com filtros (pool ampliado p/ filtro histórico)
+  const rawGames = generateFilteredCombinations(strategy, rules.pick, Math.max(gameCount * 30, gameCount + 10), rules);
   pipeline.push({ step: "Combinações", detail: `${rawGames.length} jogos brutos`, count: rawGames.length });
 
-  // Etapa 5 — Ranking por score
-  const scored = rawGames.map(game => ({
-    game,
-    score: computeGameScore(game, safeStats, rules, avgSum),
-  }));
+  // Etapa 5 — Ranking por score estrutural + validação histórica (hit-rate real)
+  const backtestWindow = Math.min(30, recentDraws.length);
+  const backtestDraws = recentDraws.slice(0, backtestWindow);
+  const expectedHits = backtestWindow > 0 ? (rules.pick * rules.pick) / rules.totalNumbers : 0;
+  const hitThreshold = Math.ceil(rules.pick * 0.6);
+
+  const scored = rawGames.map(game => {
+    const structural = computeGameScore(game, safeStats, rules, avgSum);
+    const set = new Set(game);
+    let totalHits = 0;
+    let strongHits = 0;
+    for (const d of backtestDraws) {
+      const hits = d.numbers.filter(n => set.has(n)).length;
+      totalHits += hits;
+      if (hits >= hitThreshold) strongHits++;
+    }
+    const avgHits = backtestWindow > 0 ? totalHits / backtestWindow : 0;
+    // Lift: quanto o jogo supera o valor esperado por acaso puro
+    const lift = expectedHits > 0 ? (avgHits / expectedHits) : 1;
+    // Score final: 70% estrutural + 30% lift histórico + bônus por acertos fortes
+    const historyBonus = Math.min(20, (lift - 1) * 30) + Math.min(10, strongHits * 3);
+    const score = Math.round(structural * 0.7 + (50 + historyBonus) * 0.3);
+    return { game, score, avgHits: Number(avgHits.toFixed(2)), lift: Number(lift.toFixed(2)), strongHits };
+  });
   scored.sort((a, b) => b.score - a.score);
-  pipeline.push({ step: "Ranking", detail: `Score máx: ${scored[0]?.score.toFixed(1) || 0}`, count: scored.length });
+  pipeline.push({
+    step: "Validação Histórica",
+    detail: `Backtest em ${backtestWindow} sorteios · lift médio ${(scored.reduce((s, x) => s + x.lift, 0) / Math.max(1, scored.length)).toFixed(2)}×`,
+    count: scored.length,
+  });
 
   // Etapa 6 — Retornar top N jogos diversos (garante mínimo)
   let selected = selectDiverseGames(scored, gameCount, rules.pick);
@@ -554,6 +577,7 @@ export function runIntelligentPipeline(
     selected = scored.slice(0, gameCount);
   }
   pipeline.push({ step: "Seleção", detail: `${selected.length} jogos finais`, count: selected.length });
+
 
   return {
     strategy,
