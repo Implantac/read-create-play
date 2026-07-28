@@ -999,7 +999,8 @@ export function getStrategyInfo(id: string): { id: string; name: string; descrip
     repetition:   { name: "Repetição do Anterior", description: "Aproveita o viés de repetição do último sorteio + frequência recente." },
     hot_cold:     { name: "Quente-Frio",           description: "Combina viés oficial + atraso + frequência recente. Ideal p/ universos grandes." },
     consensus:    { name: "Consenso Multi-Estratégia", description: "Agrega 6 estratégias por Borda Count ponderado. Números convergentes ganham boost. Máxima assertividade." },
-
+    lotofacil_jackpot: { name: "🎯 Lotofácil Jackpot (15 pontos)", description: "Exclusiva Lotofácil: repetição forte do anterior, moldura×miolo, grade 5×5 balanceada, viés oficial, primos e múltiplos de 3. Caça os 15 acertos." },
   };
+
   return { id, ...(map[id] || map.hot_cold) };
 }
