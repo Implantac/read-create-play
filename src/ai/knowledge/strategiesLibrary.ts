@@ -829,10 +829,14 @@ function executeStrategy(
     case "hot_cold": return strategyHotCold(stats, draws, lotteryId, pool);
     case "consensus": return strategyConsensus(stats, draws, lotteryId, pool);
     case "lotofacil_jackpot":
-      // Estratégia exclusiva Lotofácil — fallback silencioso p/ consensus em outras loterias
       return lotteryId === "lotofacil"
         ? strategyLotofacilJackpot(stats, draws, 18)
         : strategyConsensus(stats, draws, lotteryId, pool);
+    case "mega_jackpot":
+      return lotteryId === "megasena"
+        ? strategyMegaJackpot(stats, draws, 22)
+        : strategyConsensus(stats, draws, lotteryId, pool);
+
     case "fibonacci": return strategyBalance(stats, lotteryId, pool);
     case "predictive": return strategyHotCold(stats, draws, lotteryId, pool);
     default: return strategyConsensus(stats, draws, lotteryId, pool);
