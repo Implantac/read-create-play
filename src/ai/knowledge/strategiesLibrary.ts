@@ -1220,6 +1220,8 @@ export function getAllStrategyIds(): string[] {
     "consensus",
     "lotofacil_jackpot",
     "mega_jackpot",
+    "quina_jackpot",
+    "duplasena_jackpot",
   ];
 
 
