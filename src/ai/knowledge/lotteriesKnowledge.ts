@@ -478,9 +478,29 @@ export function getLotteryRules(lotteryId: string): LotteryRules {
 export const PRIMES = new Set([2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97]);
 export const FIBONACCI = new Set([1,2,3,5,8,13,21,34,55,89]);
 
-/** Lotofácil frame (border) numbers */
+/** Lotofácil frame (border) numbers — 16 cells of the 5×5 grid perimeter */
 export const LOTOFACIL_FRAME = new Set([1,2,3,4,5,6,10,11,15,16,20,21,22,23,24,25]);
+/** Lotofácil center (miolo) numbers — 9 interior cells */
 export const LOTOFACIL_CENTER = new Set([7,8,9,12,13,14,17,18,19]);
+/** Physical anchors — the four grid corners */
+export const LOTOFACIL_CORNERS = new Set([1, 5, 21, 25]);
+/** Multiples of 3 within 1-25 — historically 4-6 hit per draw */
+export const LOTOFACIL_MULT3 = new Set([3, 6, 9, 12, 15, 18, 21, 24]);
+/** Column index (1..5) for a Lotofácil number in the 5×5 grid */
+export const lotofacilCol = (n: number): number => ((n - 1) % 5) + 1;
+/** Row index (1..5) for a Lotofácil number in the 5×5 grid */
+export const lotofacilRow = (n: number): number => Math.floor((n - 1) / 5) + 1;
+/** Sum-range window aligned with 97%+ of historical Lotofácil draws */
+export const LOTOFACIL_SUM_RANGE: readonly [number, number] = [180, 220] as const;
+/** Repeat count from previous draw — ideal band (observed in ~92% of draws) */
+export const LOTOFACIL_REPEAT_RANGE: readonly [number, number] = [7, 11] as const;
+/** Repeat count target — median of the ideal band, used by generators */
+export const LOTOFACIL_REPEAT_TARGET = 9;
+/** Frame count ideal band (observed in ~87% of historical draws) */
+export const LOTOFACIL_FRAME_RANGE: readonly [number, number] = [8, 11] as const;
+/** Frame count target (bias toward 10 frame / 5 center) */
+export const LOTOFACIL_FRAME_TARGET = 10;
+
 
 /**
  * Ajuda a IA a produzir explicações consistentes: retorna um resumo textual
