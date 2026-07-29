@@ -126,7 +126,7 @@ const JogosSalvosPage = () => {
         <StatsCard title="Premiações Recentes" value={savedBets.reduce((s, b) => s + computePerformance(b).totalPrizes, 0)} />
       </div>
 
-      <PostDrawAuditPanel bets={savedBets} draws={draws} />
+      <PostDrawAuditPanel bets={savedBets} draws={draws} config={config} />
 
       <div className="space-y-3">
         {savedBets.map((bet) => {
