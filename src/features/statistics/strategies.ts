@@ -459,9 +459,10 @@ export function generateByStrategy(
 
       const selected = [...core, ...repeated];
 
-      // 3) Complemento setorial priorizando balance frame/miolo (Lotofácil 10:5)
-      const targetFrame = isLotofacil ? 10 : Infinity;
+      // 3) Complemento setorial priorizando balance frame/miolo (constantes centralizadas)
+      const targetFrame = isLotofacil ? LOTOFACIL_FRAME_TARGET : Infinity;
       const targetCenter = isLotofacil ? 5 : Infinity;
+
       const countFrame = (arr: number[]) => arr.filter(n => LOTOFACIL_FRAME.has(n)).length;
       const countCenter = (arr: number[]) => arr.filter(n => LOTOFACIL_CENTER.has(n)).length;
 
