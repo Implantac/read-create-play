@@ -127,6 +127,12 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
       .sort((a, b) => b.c - a.c || a.n - b.n);
   }, [rows]);
 
+  const anchorBase = useMemo(() => {
+    if (rows.length === 0) return [] as number[];
+    const threshold = Math.max(1, Math.ceil((minPresencePct / 100) * rows.length));
+    return consensus.filter((c) => c.c >= threshold).map((c) => c.n).sort((a, b) => a - b);
+  }, [consensus, rows.length, minPresencePct]);
+
   const [showBacktest, setShowBacktest] = useState(false);
   const aggregate = useMemo(() => {
     if (!showBacktest || rows.length === 0 || draws.length === 0) return null;
