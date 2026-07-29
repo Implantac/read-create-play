@@ -13,6 +13,8 @@ import type { NumberStats } from "@/engine/stats/statistics";
 import type { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { QuickBacktestDialog } from "@/components/lottery/QuickBacktestDialog";
+import { countHits } from "@/engine/validation/backtestRunner";
+import { getPrizeTiers } from "@/services/api/lottery";
 
 interface Props {
   stats: NumberStats[];
@@ -123,6 +125,37 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
       .sort((a, b) => b.c - a.c || a.n - b.n);
   }, [rows]);
 
+  const [showBacktest, setShowBacktest] = useState(false);
+  const aggregate = useMemo(() => {
+    if (!showBacktest || rows.length === 0 || draws.length === 0) return null;
+    const window = draws.slice(0, Math.min(50, draws.length));
+    const tiers = getPrizeTiers(selectedLottery);
+    const tierHits = new Map<number, number>();
+    let totalHits = 0;
+    let best = { concurso: 0, hits: 0, rowIndex: 0 };
+    let comparisons = 0;
+    for (const d of window) {
+      for (let i = 0; i < rows.length; i++) {
+        const h = countHits(rows[i].numbers, d.numbers);
+        totalHits += h;
+        comparisons++;
+        if (h > best.hits) best = { concurso: d.concurso, hits: h, rowIndex: i };
+        if (tiers.some((t) => t.hits === h)) {
+          tierHits.set(h, (tierHits.get(h) ?? 0) + 1);
+        }
+      }
+    }
+    return {
+      window: window.length,
+      avgHits: comparisons ? totalHits / comparisons : 0,
+      best,
+      tierHits: Array.from(tierHits.entries())
+        .map(([hits, count]) => ({ hits, count, label: tiers.find((t) => t.hits === hits)?.label ?? `${hits} acertos` }))
+        .sort((a, b) => b.hits - a.hits),
+    };
+  }, [showBacktest, rows, draws, selectedLottery]);
+
+
   const sendToFechamento = () => {
     if (unionBase.length < config.pick + 1) {
       toast.error(`União do Top ${rows.length} tem só ${unionBase.length} números. Rode novamente ou salve individualmente.`);
@@ -215,6 +248,9 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
                 <Button size="sm" variant="outline" onClick={saveAll} className="gap-2">
                   <Save className="w-4 h-4" /> Salvar Top {rows.length}
                 </Button>
+                <Button size="sm" variant="outline" onClick={() => setShowBacktest((v) => !v)} className="gap-2">
+                  <History className="w-4 h-4" /> {showBacktest ? "Ocultar" : "Backtest"} agregado
+                </Button>
               </>
             )}
             <Button size="sm" variant="premium" onClick={run} disabled={running} className="gap-2">
@@ -256,6 +292,45 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
             </div>
           </div>
         )}
+
+        {showBacktest && aggregate && (
+          <div className="rounded-lg border border-primary/30 bg-primary/[0.03] p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wide text-primary flex items-center gap-1.5">
+                <History className="w-3.5 h-3.5" />
+                Backtest agregado · últimos {aggregate.window} concursos × Top {rows.length}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+              <div className="rounded border border-border/60 bg-card p-2">
+                <div className="text-muted-foreground text-[10px] uppercase">Média de acertos</div>
+                <div className="font-mono tabular-nums text-base font-semibold">{aggregate.avgHits.toFixed(2)}</div>
+              </div>
+              <div className="rounded border border-border/60 bg-card p-2">
+                <div className="text-muted-foreground text-[10px] uppercase">Melhor jogo</div>
+                <div className="font-mono tabular-nums text-base font-semibold">
+                  {aggregate.best.hits} pts <span className="text-muted-foreground text-[10px]">#{aggregate.best.rowIndex + 1} · c.{aggregate.best.concurso}</span>
+                </div>
+              </div>
+              <div className="rounded border border-border/60 bg-card p-2">
+                <div className="text-muted-foreground text-[10px] uppercase">Faixas premiadas</div>
+                <div className="font-mono tabular-nums text-base font-semibold">
+                  {aggregate.tierHits.reduce((s, t) => s + t.count, 0)}
+                </div>
+              </div>
+            </div>
+            {aggregate.tierHits.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {aggregate.tierHits.map((t) => (
+                  <Badge key={t.hits} variant="outline" className="text-[10px] font-mono">
+                    {t.label}: {t.count}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
 
         {rows.length > 0 && (
           <div className="space-y-2">
