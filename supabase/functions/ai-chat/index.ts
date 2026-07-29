@@ -246,17 +246,38 @@ DIRETRIZES DE RESPOSTA:
         continue; // outra rodada
       }
 
-      // resposta final
+      // Sem tool calls: adiciona o texto do assistant no histórico e sai do loop
+      chatMessages.push({ role: "assistant", content: msg.content ?? "" });
+      // Remove essa última mensagem do assistant — vamos re-gerar em modo stream
+      // para o cliente receber SSE token-a-token com o mesmo contexto.
+      chatMessages.pop();
+      break;
+    }
+
+    // Fase 2: streaming SSE da resposta final (sem tools) para o cliente
+    const finalResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-pro",
+        stream: true,
+        messages: chatMessages,
+      }),
+    });
+
+    if (!finalResponse.ok || !finalResponse.body) {
       return new Response(
-        JSON.stringify({ content: msg.content ?? "", toolRoundsUsed: round }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        JSON.stringify({ error: "Falha ao iniciar streaming final." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    return new Response(
-      JSON.stringify({ error: "Limite de rodadas de ferramentas atingido" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    return new Response(finalResponse.body, {
+      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+    });
   } catch (e) {
     console.error("ai-chat error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erro desconhecido" }), {
