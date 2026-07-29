@@ -173,6 +173,15 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
     toast.success(`Base de ${unionBase.length} números enviada ao Fechamento Universal.`);
   };
 
+  const sendAnchorsToFechamento = () => {
+    if (anchorBase.length < config.pick + 1) {
+      toast.error(`Consenso ≥${minPresencePct}% tem só ${anchorBase.length} números. Reduza o limiar.`);
+      return;
+    }
+    navigate("/fechamento-universal", { state: { baseNumbers: anchorBase, fromGerador: true } });
+    toast.success(`Base de consenso (${anchorBase.length} números ≥${minPresencePct}%) enviada ao Fechamento.`);
+  };
+
   const run = () => {
     if (draws.length === 0) {
       toast.error("Sincronize os concursos primeiro.");
