@@ -92,15 +92,20 @@ const BATCH_BY_LOTTERY: Record<string, number> = {
   lotomania: 8,
 };
 const TOP_N = 3;
+const ACUMULOU_MULT = 2; // dobra o lote no Modo Acumulou
+const ACUMULOU_TOP = 5; // devolve top 5 quando acumulado
 
 export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Props) {
   const [running, setRunning] = useState(false);
   const [rows, setRows] = useState<Row[]>([]);
+  const [acumulou, setAcumulou] = useState(false);
   const { saveBet } = useSavedBets(selectedLottery);
   const navigate = useNavigate();
 
   const jackpot = useMemo(() => JACKPOT_BY_LOTTERY[selectedLottery], [selectedLottery]);
-  const BATCH = BATCH_BY_LOTTERY[selectedLottery] ?? 10;
+  const baseBatch = BATCH_BY_LOTTERY[selectedLottery] ?? 10;
+  const BATCH = acumulou ? baseBatch * ACUMULOU_MULT : baseBatch;
+  const topN = acumulou ? ACUMULOU_TOP : TOP_N;
 
   if (!jackpot) return null;
 
