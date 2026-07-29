@@ -18,6 +18,8 @@ import { countHits } from "@/engine/validation/backtestRunner";
 import { getPrizeTiers } from "@/services/api/lottery";
 import { useEnginePerformance } from "@/hooks/useEnginePerformance";
 import { pickBestMatrix } from "@/engine/closing/autoMatrix";
+import { computeLotofacilSignals } from "@/ai/lotofacil/signals";
+
 
 interface Props {
   stats: NumberStats[];
@@ -44,26 +46,8 @@ interface Row {
   signals?: { label: string; ok: boolean; hint: string }[];
 }
 
-const LOTOFACIL_CORNERS = [1, 5, 21, 25];
+// Sinais Lotofácil são delegados a `@/ai/lotofacil/signals` (fonte única).
 
-function computeLotofacilSignals(nums: number[], draws: DrawResult[]): Row["signals"] {
-  const set = new Set(nums);
-  const frame = new Set([1,2,3,4,5,21,22,23,24,25,6,11,16,10,15,20]);
-  const frameCount = nums.filter((n) => frame.has(n)).length;
-  const last = draws[0]?.numbers ?? [];
-  const reps = last.filter((n) => set.has(n)).length;
-  const sorted = [...nums].sort((a, b) => a - b);
-  const hasPair = sorted.some((n, i) => i > 0 && n - sorted[i - 1] === 1);
-  const cols = new Set(nums.map((n) => (n - 1) % 5));
-  const hasCorner = LOTOFACIL_CORNERS.some((c) => set.has(c));
-  return [
-    { label: `Moldura ${frameCount}`, ok: frameCount >= 8 && frameCount <= 11, hint: "Ideal 8-11" },
-    { label: `Repete ${reps}`, ok: reps >= 7 && reps <= 11, hint: "Ideal 7-11 do sorteio anterior" },
-    { label: hasPair ? "Consec. ✓" : "Consec. ✗", ok: hasPair, hint: "≥1 par consecutivo (~97% dos sorteios)" },
-    { label: `${cols.size}/5 col.`, ok: cols.size === 5, hint: "Cobertura das 5 colunas" },
-    { label: hasCorner ? "Canto ✓" : "Canto ✗", ok: hasCorner, hint: "Âncora física (1, 5, 21, 25)" },
-  ];
-}
 
 function computeDecadeSignals(nums: number[], draws: DrawResult[], config: LotteryConfig): Row["signals"] {
   const sum = nums.reduce((a, b) => a + b, 0);
