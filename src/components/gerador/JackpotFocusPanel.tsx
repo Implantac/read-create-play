@@ -16,6 +16,8 @@ import { useSavedBets } from "@/hooks/useSavedBets";
 import { QuickBacktestDialog } from "@/components/lottery/QuickBacktestDialog";
 import { countHits } from "@/engine/validation/backtestRunner";
 import { getPrizeTiers } from "@/services/api/lottery";
+import { useEnginePerformance } from "@/hooks/useEnginePerformance";
+import { pickBestMatrix } from "@/engine/closing/autoMatrix";
 
 interface Props {
   stats: NumberStats[];
@@ -104,6 +106,7 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
   const [acumulou, setAcumulou] = useState(false);
   const [minPresencePct, setMinPresencePct] = useState(60); // 0-100
   const { saveBet } = useSavedBets(selectedLottery);
+  const { logGeneration } = useEnginePerformance();
   const navigate = useNavigate();
 
   const jackpot = useMemo(() => JACKPOT_BY_LOTTERY[selectedLottery], [selectedLottery]);
@@ -182,6 +185,15 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
     toast.success(`Base de consenso (${anchorBase.length} números ≥${minPresencePct}%) enviada ao Fechamento.`);
   };
 
+  const autoCloseSuggestion = useMemo(() => {
+    if (anchorBase.length < config.pick + 1) return null;
+    return pickBestMatrix({
+      lotteryId: selectedLottery,
+      availableBaseSize: anchorBase.length,
+      budget: 100,
+    });
+  }, [anchorBase.length, selectedLottery, config.pick]);
+
   const run = () => {
     if (draws.length === 0) {
       toast.error("Sincronize os concursos primeiro.");
@@ -209,7 +221,21 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
           scored.push({ numbers: g, score: q.overall, grade: q.grade, strengths: q.strengths ?? [], signals });
         }
         scored.sort((a, b) => b.score - a.score);
-        setRows(scored.slice(0, topN));
+        const top = scored.slice(0, topN);
+        setRows(top);
+        // Registra o lote no log de performance do motor (fire-and-forget)
+        logGeneration({
+          lotteryId: selectedLottery,
+          games: top.map((r) => r.numbers),
+          config: {
+            strategy: jackpot.id,
+            acumulou,
+            batch: BATCH,
+            topN,
+            minPresencePct,
+          },
+          label: `${jackpot.name}${acumulou ? " · Acumulou" : ""} · Consenso ${minPresencePct}%`,
+        }).catch(() => {});
       } catch (e) {
         console.error("[JackpotFocus]", e);
         toast.error("Falha ao gerar lote jackpot.");
@@ -336,6 +362,20 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
                   <Target className="w-4 h-4" /> Enviar consenso ao Fechamento
                 </Button>
               </div>
+              {autoCloseSuggestion?.best && (
+                <div className="flex items-center justify-between gap-2 rounded-md border border-primary/25 bg-primary/[0.04] px-2 py-1.5 text-[11px]">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Trophy className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span className="font-semibold">Fechamento auto:</span>
+                    <span className="truncate">
+                      {autoCloseSuggestion.best.name} · {autoCloseSuggestion.best.gameCount} jogos · garantia {autoCloseSuggestion.best.guarantee} pts
+                    </span>
+                  </div>
+                  <span className="font-mono tabular-nums text-primary shrink-0">
+                    R$ {autoCloseSuggestion.best.cost.toFixed(2)}
+                  </span>
+                </div>
+              )}
               <p className="text-[10px] text-muted-foreground">
                 A base de consenso é mais enxuta que a união do Top {rows.length}: só entram dezenas presentes em pelo menos {minPresencePct}% dos jogos, gerando fechamentos com menor custo e maior densidade estatística.
               </p>

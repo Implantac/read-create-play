@@ -1,7 +1,7 @@
 import {
   BarChart3, Sparkles, History, Zap, Grid3X3,
   Brain, ShieldCheck, Crown, PieChart, Lock,
-  MessageCircle, User, Wallet
+  MessageCircle, User, Wallet, Command
 } from "lucide-react";
 import { NavLink } from "@/components/layout/NavLink";
 import { prefetchRoute } from "@/lib/routePrefetch";
@@ -31,6 +31,7 @@ const workflowGroups: { label: string; items: { title: string; url: string; icon
     label: "Operacional",
     items: [
       { title: "Central de Inteligência", url: "/dashboard", icon: BarChart3, tooltip: "Terminal central de inteligência e resumo de fluxos." },
+      { title: "Painel de Comando", url: "/comando", icon: Command, tooltip: "Todos os sinais críticos consolidados para decisão rápida.", badge: "PRO" },
       { title: "Titan AI Center", url: "/ia-chat", icon: MessageCircle, tooltip: "O motor de inteligência central do seu ecossistema.", badge: "NEW" },
       { title: "Gerador Estratégico", url: "/gerador", icon: Sparkles, tooltip: "Geração assistida de coleções inteligentes (Loto Data)." },
       { title: "Análise VIP", url: "/lotofacil-premium", icon: Crown, tooltip: "Ambiente profissional exclusivo.", badge: "PREMIUM" },
