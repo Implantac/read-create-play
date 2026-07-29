@@ -247,6 +247,8 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
                 </Button>
                 <Button size="sm" variant="outline" onClick={saveAll} className="gap-2">
                   <Save className="w-4 h-4" /> Salvar Top {rows.length}
+                <Button size="sm" variant="outline" onClick={() => setShowBacktest((v) => !v)} className="gap-2">
+                  <History className="w-4 h-4" /> {showBacktest ? "Ocultar" : "Backtest"} agregado
                 </Button>
               </>
             )}
