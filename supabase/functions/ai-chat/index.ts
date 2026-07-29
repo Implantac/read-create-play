@@ -178,6 +178,7 @@ DIRETRIZES DE RESPOSTA:
       ...messages.map((m) => ({ role: m.role, content: String(m.content ?? "") })),
     ];
 
+    // Fase 1: loop não-stream para resolver tool calls (máx 4 rodadas)
     for (let round = 0; round < 4; round++) {
       const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
