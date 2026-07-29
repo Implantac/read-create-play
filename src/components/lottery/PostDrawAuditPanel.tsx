@@ -22,7 +22,7 @@ interface Props {
   config?: LotteryConfig;
 }
 
-export function PostDrawAuditPanel({ bets, draws }: Props) {
+export function PostDrawAuditPanel({ bets, draws, config }: Props) {
   const last = draws[0];
 
   const analysis = useMemo(() => {
