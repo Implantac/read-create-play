@@ -15,6 +15,7 @@ import { StatsCard } from "@/components/common/StatsCard";
 import { DrawTestDialog } from "@/components/lottery/DrawTestDialog";
 import { QuickBacktestDialog } from "@/components/lottery/QuickBacktestDialog";
 import { ClosingHistoryPanel } from "@/components/closing/ClosingHistoryPanel";
+import { PostDrawAuditPanel } from "@/components/lottery/PostDrawAuditPanel";
 import { exportToCsv, exportToExcel } from "@/utils/export";
 import { toast } from "sonner";
 
@@ -124,6 +125,8 @@ const JogosSalvosPage = () => {
         <StatsCard title="Total de Jogos" value={savedBets.length} />
         <StatsCard title="Premiações Recentes" value={savedBets.reduce((s, b) => s + computePerformance(b).totalPrizes, 0)} />
       </div>
+
+      <PostDrawAuditPanel bets={savedBets} draws={draws} />
 
       <div className="space-y-3">
         {savedBets.map((bet) => {
