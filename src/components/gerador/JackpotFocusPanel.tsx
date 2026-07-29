@@ -125,6 +125,37 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
       .sort((a, b) => b.c - a.c || a.n - b.n);
   }, [rows]);
 
+  const [showBacktest, setShowBacktest] = useState(false);
+  const aggregate = useMemo(() => {
+    if (!showBacktest || rows.length === 0 || draws.length === 0) return null;
+    const window = draws.slice(0, Math.min(50, draws.length));
+    const tiers = getPrizeTiers(selectedLottery);
+    const tierHits = new Map<number, number>();
+    let totalHits = 0;
+    let best = { concurso: 0, hits: 0, rowIndex: 0 };
+    let comparisons = 0;
+    for (const d of window) {
+      for (let i = 0; i < rows.length; i++) {
+        const h = countHits(rows[i].numbers, d.numbers);
+        totalHits += h;
+        comparisons++;
+        if (h > best.hits) best = { concurso: d.concurso, hits: h, rowIndex: i };
+        if (tiers.some((t) => t.hits === h)) {
+          tierHits.set(h, (tierHits.get(h) ?? 0) + 1);
+        }
+      }
+    }
+    return {
+      window: window.length,
+      avgHits: comparisons ? totalHits / comparisons : 0,
+      best,
+      tierHits: Array.from(tierHits.entries())
+        .map(([hits, count]) => ({ hits, count, label: tiers.find((t) => t.hits === hits)?.label ?? `${hits} acertos` }))
+        .sort((a, b) => b.hits - a.hits),
+    };
+  }, [showBacktest, rows, draws, selectedLottery]);
+
+
   const sendToFechamento = () => {
     if (unionBase.length < config.pick + 1) {
       toast.error(`União do Top ${rows.length} tem só ${unionBase.length} números. Rode novamente ou salve individualmente.`);
