@@ -180,10 +180,24 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
               <h3 className="text-base font-semibold tracking-tight flex items-center gap-2">
                 Modo Caça-Jackpot
                 <Badge variant="outline" className="text-[10px] font-normal">{jackpot.hint}</Badge>
+                {acumulou && (
+                  <Badge className="text-[10px] font-normal bg-amber-500/20 text-amber-500 border-amber-500/40 gap-1">
+                    <Zap className="w-3 h-3" /> ACUMULOU
+                  </Badge>
+                )}
               </h3>
               <p className="text-xs text-muted-foreground">
-                Gera {BATCH} jogos com {jackpot.name} e devolve os {TOP_N} melhores pelo Titan Score.
+                Gera {BATCH} jogos com {jackpot.name} e devolve os {topN} melhores pelo Titan Score.
+                {acumulou && " • Lote dobrado + Top 5 para caçar o prêmio principal."}
               </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-2 px-2 py-1 rounded-md border border-amber-500/30 bg-amber-500/[0.03]">
+              <Zap className={`w-3.5 h-3.5 ${acumulou ? "text-amber-500" : "text-muted-foreground"}`} />
+              <Label htmlFor="acumulou-mode" className="text-xs cursor-pointer">Modo Acumulou</Label>
+              <Switch id="acumulou-mode" checked={acumulou} onCheckedChange={setAcumulou} />
+            </div>
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
