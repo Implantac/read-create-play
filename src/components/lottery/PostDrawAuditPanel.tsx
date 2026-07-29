@@ -12,12 +12,14 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ClipboardList, Target, TrendingDown, TrendingUp, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { DrawResult } from "@/data/lotteries";
+import type { DrawResult, LotteryConfig } from "@/data/lotteries";
 import type { SavedBet } from "@/hooks/useSavedBets";
+import { ShapExplanationCard } from "./ShapExplanationCard";
 
 interface Props {
   bets: SavedBet[];
   draws: DrawResult[];
+  config?: LotteryConfig;
 }
 
 export function PostDrawAuditPanel({ bets, draws }: Props) {
