@@ -138,6 +138,10 @@ const EstatisticasPage = () => {
         <CoOccurrencePanel draws={draws} totalNumbers={config.numbers} window={100} />
       </Suspense>
 
+      <Suspense fallback={<Skeleton className="h-[420px] w-full" />}>
+        <WinnerProfilePanel draws={draws} lotteryId={selectedLottery} totalNumbers={config.numbers} pick={config.pick} />
+      </Suspense>
+
       <m.div variants={container} initial="hidden" animate="show" className="grid lg:grid-cols-2 gap-6">
 
         <m.div variants={item}>
