@@ -13,6 +13,8 @@ import type { NumberStats } from "@/engine/stats/statistics";
 import type { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { useSavedBets } from "@/hooks/useSavedBets";
 import { QuickBacktestDialog } from "@/components/lottery/QuickBacktestDialog";
+import { countHits } from "@/engine/validation/backtestRunner";
+import { getPrizeTiers } from "@/services/api/lottery";
 
 interface Props {
   stats: NumberStats[];
