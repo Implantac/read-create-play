@@ -31,7 +31,7 @@ interface Props {
 }
 
 function computeFeatures(numbers: number[], config: LotteryConfig, draws: DrawResult[]) {
-  const max = config.max ?? 25;
+  const max = config.numbers ?? 25;
   const pick = numbers.length || 1;
   const set = new Set(numbers);
   const sorted = [...numbers].sort((a, b) => a - b);
