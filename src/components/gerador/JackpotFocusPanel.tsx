@@ -151,7 +151,7 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
           scored.push({ numbers: g, score: q.overall, grade: q.grade, strengths: q.strengths ?? [], signals });
         }
         scored.sort((a, b) => b.score - a.score);
-        setRows(scored.slice(0, TOP_N));
+        setRows(scored.slice(0, topN));
       } catch (e) {
         console.error("[JackpotFocus]", e);
         toast.error("Falha ao gerar lote jackpot.");
