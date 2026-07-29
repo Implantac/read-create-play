@@ -597,25 +597,36 @@ export function strategyLotofacilJackpot(
   const merged = [...repeats, ...nonRepeats];
   let candidates = merged.slice(0, topN).map(s => s.number);
 
-  // Garante presença mínima em cada coluna 1..5 (grade balanceada)
+  // Garante presença mínima em cada coluna E cada linha 1..5 (grade balanceada
+  // — antes só colunas eram checadas; linhas ficavam ao acaso).
   const scoreMap = new Map(scored.map(s => [s.number, s.score]));
-  for (let col = 1; col <= 5; col++) {
-    const colNums = candidates.filter(n => lotofacilCol(n) === col);
-    if (colNums.length === 0) {
-      const bestOfCol = scored
-        .filter(s => lotofacilCol(s.number) === col && !candidates.includes(s.number))
+  const enforceAxis = (axisFn: (n: number) => number, axisName: "col" | "row") => {
+    for (let axis = 1; axis <= 5; axis++) {
+      const inAxis = candidates.filter(n => axisFn(n) === axis);
+      if (inAxis.length > 0) continue;
+      const bestOfAxis = scored
+        .filter(s => axisFn(s.number) === axis && !candidates.includes(s.number))
         .sort((a, b) => b.score - a.score)[0];
-      if (bestOfCol) {
-        const worst = [...candidates]
-          .sort((a, b) => (scoreMap.get(a) ?? 0) - (scoreMap.get(b) ?? 0))
-          .find(n => lotofacilCol(n) !== col);
-        if (worst != null) {
-          candidates = candidates.filter(n => n !== worst).concat(bestOfCol.number);
-        }
+      if (!bestOfAxis) continue;
+      // Descarta o pior candidato que não é único em seu eixo (evita zerar outro eixo)
+      const worst = [...candidates]
+        .sort((a, b) => (scoreMap.get(a) ?? 0) - (scoreMap.get(b) ?? 0))
+        .find(n => {
+          if (axisFn(n) === axis) return false;
+          // Só remove se o eixo do descartado tem outra dezena representando
+          const siblings = candidates.filter(x => axisFn(x) === axisFn(n));
+          return siblings.length > 1;
+        });
+      if (worst != null) {
+        candidates = candidates.filter(n => n !== worst).concat(bestOfAxis.number);
       }
+      void axisName;
     }
-  }
+  };
+  enforceAxis(lotofacilCol, "col");
+  enforceAxis(lotofacilRow, "row");
   candidates = candidates.sort((a, b) => a - b);
+
 
   const weights = new Map<number, number>();
   scored.forEach(s => {
