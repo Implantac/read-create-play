@@ -25,7 +25,7 @@ import { pickBestMatrix } from "@/engine/closing/autoMatrix";
 import { toast } from "sonner";
 
 export default function ComandoApostadorPage() {
-  const { selectedLottery, lotteryConfig, draws, stats } = useLotteryContext();
+  const { selectedLottery, config: lotteryConfig, draws, stats } = useLotteryContext();
   const navigate = useNavigate();
   const [budget, setBudget] = useState<number>(50);
   const [baseSize, setBaseSize] = useState<number>(lotteryConfig?.pick ? lotteryConfig.pick + 3 : 18);
@@ -66,7 +66,7 @@ export default function ComandoApostadorPage() {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-4">
-        <CycleThermometer draws={draws} totalNumbers={lotteryConfig.numbers} pick={lotteryConfig.pick} />
+        <CycleThermometer draws={draws} totalNumbers={lotteryConfig.numbers} />
         <WinnerProfilePanel
           draws={draws}
           lotteryId={selectedLottery}

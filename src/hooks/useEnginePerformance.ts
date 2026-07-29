@@ -92,8 +92,8 @@ export function useEnginePerformance(lotteryId?: string) {
           lottery_id: params.lotteryId,
           preset_hash: hash,
           preset_label: params.label ?? null,
-          config: params.config,
-          games: params.games,
+          config: params.config as any,
+          games: params.games as any,
         })
         .select()
         .single();

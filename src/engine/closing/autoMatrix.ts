@@ -14,7 +14,6 @@ import {
   WHEELING_MATRICES,
   type WheelingMatrixId,
 } from "@/ai/engines/wheelingMatrices";
-import { getLotteryConfig } from "@/data/lotteries";
 
 export interface AutoMatrixOption {
   id: WheelingMatrixId;
@@ -35,12 +34,20 @@ export interface AutoMatrixResult {
   reason?: string;
 }
 
-/**
- * Retorna o preço unitário do bilhete oficial da loteria (valores 2024/2026).
- */
+/** Preço unitário oficial do bilhete simples (2024/2026). */
+const UNIT_PRICE: Record<string, number> = {
+  lotofacil: 3.5,
+  megasena: 5,
+  quina: 2.5,
+  duplasena: 3,
+  timemania: 3.5,
+  diadesorte: 2.5,
+  lotomania: 3,
+  supersete: 2.5,
+};
+
 function unitPrice(lotteryId: string): number {
-  const cfg = getLotteryConfig(lotteryId);
-  return cfg?.basePrice ?? 5;
+  return UNIT_PRICE[lotteryId] ?? 5;
 }
 
 export function pickBestMatrix(params: {
