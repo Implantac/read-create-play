@@ -1,7 +1,14 @@
 import { NumberStats, generateSmartBet } from "./engine";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { getConsensusRanking, runAllModels, runQuantumAnalysis, runRandomForest, runXGBoost, runNeuralNetwork, runBayesianInference, runMarkovChain } from "@/engine/ai/ml-models";
-import { LOTOFACIL_FRAME, LOTOFACIL_CENTER } from "@/ai/knowledge/lotteriesKnowledge";
+import {
+  LOTOFACIL_FRAME,
+  LOTOFACIL_CENTER,
+  LOTOFACIL_FRAME_TARGET,
+  LOTOFACIL_REPEAT_TARGET,
+  LOTOFACIL_SUM_RANGE,
+} from "@/ai/knowledge/lotteriesKnowledge";
+
 
 export type Strategy =
   | "smart"
@@ -287,9 +294,10 @@ export function generateByStrategy(
       const sectorSize = Math.ceil(config.numbers / sectorCount);
       const selected: number[] = [...core];
 
-      // Alvo frame/miolo para Lotofácil: 10 frame + 5 miolo (padrão histórico 87% aderência)
-      const targetFrame = isLotofacil ? 10 : Infinity;
+      // Alvo frame/miolo para Lotofácil (constante centralizada)
+      const targetFrame = isLotofacil ? LOTOFACIL_FRAME_TARGET : Infinity;
       const targetCenter = isLotofacil ? 5 : Infinity;
+
       const countFrame = (arr: number[]) => arr.filter(n => LOTOFACIL_FRAME.has(n)).length;
       const countCenter = (arr: number[]) => arr.filter(n => LOTOFACIL_CENTER.has(n)).length;
 
@@ -327,18 +335,19 @@ export function generateByStrategy(
         if (!selected.includes(n)) selected.push(n);
       }
 
-      // Ajuste fino de soma-alvo para Lotofácil (180–220)
+      // Ajuste fino de soma-alvo para Lotofácil (faixa centralizada)
       if (isLotofacil && selected.length === pick) {
+        const [sumLo, sumHi] = LOTOFACIL_SUM_RANGE;
         let sum = selected.reduce((a, b) => a + b, 0);
         let guard = 0;
-        while ((sum < 180 || sum > 220) && guard++ < 8) {
-          const idx = sum < 180
+        while ((sum < sumLo || sum > sumHi) && guard++ < 8) {
+          const idx = sum < sumLo
             ? selected.indexOf(Math.min(...selected))
             : selected.indexOf(Math.max(...selected));
           if (idx < 0) break;
           const candidates = stats
             .filter(s => !selected.includes(s.number))
-            .sort((a, b) => (sum < 180 ? b.number - a.number : a.number - b.number));
+            .sort((a, b) => (sum < sumLo ? b.number - a.number : a.number - b.number));
           if (!candidates.length) break;
           selected[idx] = candidates[0].number;
           sum = selected.reduce((a, b) => a + b, 0);
@@ -348,10 +357,11 @@ export function generateByStrategy(
     }
 
     case "repetition": {
-      // Repetidas + Núcleo (v2): alvo 8 repetidas (não 9) + filtro frame 10:5 + soma-alvo 180–220
+      // Repetidas + Núcleo (v3): alvo unificado = LOTOFACIL_REPEAT_TARGET + frame 10:5 + soma centralizada
       const isLotofacil = config.id === "lotofacil";
       const lastDraw = draws[0]?.numbers ?? [];
-      const repeatTarget = isLotofacil ? 8 : Math.round(pick * 0.55);
+      const repeatTarget = isLotofacil ? LOTOFACIL_REPEAT_TARGET : Math.round(pick * 0.55);
+
 
       // Rankeia repetidas do último sorteio combinando score + preferência de ciclo (evita "quentes duas vezes")
       const lastRanked = lastDraw
@@ -365,9 +375,10 @@ export function generateByStrategy(
         .slice(0, repeatTarget)
         .map(s => s.number);
 
-      // Complemento com filtro frame/miolo coeso (Lotofácil): completar 10 frame / 5 miolo
-      const targetFrame = isLotofacil ? 10 : Infinity;
+      // Complemento com filtro frame/miolo coeso (Lotofácil): constantes centralizadas
+      const targetFrame = isLotofacil ? LOTOFACIL_FRAME_TARGET : Infinity;
       const targetCenter = isLotofacil ? 5 : Infinity;
+
       const countFrame = (arr: number[]) => arr.filter(n => LOTOFACIL_FRAME.has(n)).length;
       const countCenter = (arr: number[]) => arr.filter(n => LOTOFACIL_CENTER.has(n)).length;
 
@@ -395,19 +406,19 @@ export function generateByStrategy(
         if (!selected.includes(n)) selected.push(n);
       }
 
-      // Ajuste fino de soma-alvo (180–220) para Lotofácil
+      // Ajuste fino de soma-alvo (faixa centralizada) para Lotofácil
       if (isLotofacil && selected.length === pick) {
+        const [sumLo, sumHi] = LOTOFACIL_SUM_RANGE;
         let sum = selected.reduce((a, b) => a + b, 0);
         let guard = 0;
-        while ((sum < 180 || sum > 220) && guard++ < 8) {
-          // Só permite trocar posições do complemento (mantém repetidas intactas)
+        while ((sum < sumLo || sum > sumHi) && guard++ < 8) {
           const swappable = selected.filter(n => !lastRanked.includes(n));
           if (!swappable.length) break;
-          const target = sum < 180 ? Math.min(...swappable) : Math.max(...swappable);
+          const target = sum < sumLo ? Math.min(...swappable) : Math.max(...swappable);
           const idx = selected.indexOf(target);
           const candidates = stats
             .filter(s => !selected.includes(s.number))
-            .sort((a, b) => (sum < 180 ? b.number - a.number : a.number - b.number));
+            .sort((a, b) => (sum < sumLo ? b.number - a.number : a.number - b.number));
           if (!candidates.length) break;
           selected[idx] = candidates[0].number;
           sum = selected.reduce((a, b) => a + b, 0);
@@ -421,9 +432,11 @@ export function generateByStrategy(
       const isLotofacil = config.id === "lotofacil";
       const lastDraw = draws[0]?.numbers ?? [];
 
-      // Distribuição alvo (Lotofácil): 6 fixos + 7 repetidas + 2 setoriais = 15
+      // Distribuição alvo Lotofácil: 6 fixos + REPEAT_TARGET-2 repetidas + resto setorial
+      // (Antes: 6+7+2. Agora usa REPEAT_TARGET central: 6+7+2 ainda vale para target=9)
       const coreCount = isLotofacil ? 6 : Math.max(1, Math.floor(pick * 0.4));
-      const repeatCount = isLotofacil ? 7 : Math.round(pick * 0.45);
+      const repeatCount = isLotofacil ? Math.max(6, LOTOFACIL_REPEAT_TARGET - 2) : Math.round(pick * 0.45);
+
 
       // 1) Núcleo fixo: top-N por score global (independente do último sorteio)
       const core = [...stats]
@@ -446,9 +459,10 @@ export function generateByStrategy(
 
       const selected = [...core, ...repeated];
 
-      // 3) Complemento setorial priorizando balance frame/miolo (Lotofácil 10:5)
-      const targetFrame = isLotofacil ? 10 : Infinity;
+      // 3) Complemento setorial priorizando balance frame/miolo (constantes centralizadas)
+      const targetFrame = isLotofacil ? LOTOFACIL_FRAME_TARGET : Infinity;
       const targetCenter = isLotofacil ? 5 : Infinity;
+
       const countFrame = (arr: number[]) => arr.filter(n => LOTOFACIL_FRAME.has(n)).length;
       const countCenter = (arr: number[]) => arr.filter(n => LOTOFACIL_CENTER.has(n)).length;
 

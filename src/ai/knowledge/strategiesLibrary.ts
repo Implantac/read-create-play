@@ -5,7 +5,18 @@
 
 import { NumberStats } from "@/engine/stats/statistics";
 import { DrawResult } from "@/data/lotteries";
-import { getLotteryRules, PRIMES, FIBONACCI } from "./lotteriesKnowledge";
+import {
+  getLotteryRules,
+  PRIMES,
+  FIBONACCI,
+  LOTOFACIL_FRAME as LF_FRAME_SHARED,
+  LOTOFACIL_CENTER as LF_CENTER_SHARED,
+  LOTOFACIL_CORNERS,
+  LOTOFACIL_MULT3,
+  LOTOFACIL_REPEAT_TARGET,
+  lotofacilCol as sharedCol,
+  lotofacilRow as sharedRow,
+} from "./lotteriesKnowledge";
 import type { LotteryRules } from "../core/aiTypes";
 
 export interface StrategyResult {
@@ -489,16 +500,12 @@ export function strategyConsensus(
 // perder retornos de ciclo. Pool enxuto de 18 dezenas — deixa apenas 7
 // fora, maximizando cobertura estatística do universo.
 // ═══════════════════════════════════════════
-export const LOTOFACIL_FRAME = new Set<number>([
-  1, 2, 3, 4, 5,          // linha 1
-  6, 10,                  // linha 2 (col 1 e 5)
-  11, 15,                 // linha 3 (col 1 e 5)
-  16, 20,                 // linha 4 (col 1 e 5)
-  21, 22, 23, 24, 25,     // linha 5
-]);
-export const LOTOFACIL_CENTER = new Set<number>([7, 8, 9, 12, 13, 14, 17, 18, 19]);
-export const lotofacilCol = (n: number) => ((n - 1) % 5) + 1; // 1..5
-export const lotofacilRow = (n: number) => Math.floor((n - 1) / 5) + 1; // 1..5
+// Fonte única compartilhada com `lotteriesKnowledge` — mantidos re-exports
+// para compatibilidade de arquivos que ainda podem importar daqui.
+export const LOTOFACIL_FRAME = LF_FRAME_SHARED;
+export const LOTOFACIL_CENTER = LF_CENTER_SHARED;
+export const lotofacilCol = sharedCol;
+export const lotofacilRow = sharedRow;
 
 export function strategyLotofacilJackpot(
   stats: NumberStats[],
@@ -510,11 +517,12 @@ export function strategyLotofacilJackpot(
   const lastSet = new Set(lastDraw);
   const hotBias = new Set(rules.knownBiases?.hotNumbers ?? []);
   const coldBias = new Set(rules.knownBiases?.coldNumbers ?? []);
-  const mult3 = new Set([3, 6, 9, 12, 15, 18, 21, 24]);
-  const corners = new Set([1, 5, 21, 25]);
+  const mult3 = LOTOFACIL_MULT3;
+  const corners = LOTOFACIL_CORNERS;
 
-  // Alvo de repetição: meio da faixa histórica (7-11 → 9)
-  const repTarget = 9;
+  // Alvo de repetição — constante centralizada (mediana da faixa 7-11)
+  const repTarget = LOTOFACIL_REPEAT_TARGET;
+
 
   // ═══ Fechamento de ciclo 1-25: dezenas ausentes nos últimos ~12 sorteios têm
   // altíssima pressão estatística (ciclo médio Lotofácil ≈ 28-32 sorteios) ═══
@@ -589,25 +597,36 @@ export function strategyLotofacilJackpot(
   const merged = [...repeats, ...nonRepeats];
   let candidates = merged.slice(0, topN).map(s => s.number);
 
-  // Garante presença mínima em cada coluna 1..5 (grade balanceada)
+  // Garante presença mínima em cada coluna E cada linha 1..5 (grade balanceada
+  // — antes só colunas eram checadas; linhas ficavam ao acaso).
   const scoreMap = new Map(scored.map(s => [s.number, s.score]));
-  for (let col = 1; col <= 5; col++) {
-    const colNums = candidates.filter(n => lotofacilCol(n) === col);
-    if (colNums.length === 0) {
-      const bestOfCol = scored
-        .filter(s => lotofacilCol(s.number) === col && !candidates.includes(s.number))
+  const enforceAxis = (axisFn: (n: number) => number, axisName: "col" | "row") => {
+    for (let axis = 1; axis <= 5; axis++) {
+      const inAxis = candidates.filter(n => axisFn(n) === axis);
+      if (inAxis.length > 0) continue;
+      const bestOfAxis = scored
+        .filter(s => axisFn(s.number) === axis && !candidates.includes(s.number))
         .sort((a, b) => b.score - a.score)[0];
-      if (bestOfCol) {
-        const worst = [...candidates]
-          .sort((a, b) => (scoreMap.get(a) ?? 0) - (scoreMap.get(b) ?? 0))
-          .find(n => lotofacilCol(n) !== col);
-        if (worst != null) {
-          candidates = candidates.filter(n => n !== worst).concat(bestOfCol.number);
-        }
+      if (!bestOfAxis) continue;
+      // Descarta o pior candidato que não é único em seu eixo (evita zerar outro eixo)
+      const worst = [...candidates]
+        .sort((a, b) => (scoreMap.get(a) ?? 0) - (scoreMap.get(b) ?? 0))
+        .find(n => {
+          if (axisFn(n) === axis) return false;
+          // Só remove se o eixo do descartado tem outra dezena representando
+          const siblings = candidates.filter(x => axisFn(x) === axisFn(n));
+          return siblings.length > 1;
+        });
+      if (worst != null) {
+        candidates = candidates.filter(n => n !== worst).concat(bestOfAxis.number);
       }
+      void axisName;
     }
-  }
+  };
+  enforceAxis(lotofacilCol, "col");
+  enforceAxis(lotofacilRow, "row");
   candidates = candidates.sort((a, b) => a - b);
+
 
   const weights = new Map<number, number>();
   scored.forEach(s => {
