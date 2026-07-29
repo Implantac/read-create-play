@@ -1,130 +1,103 @@
-# Motor Universal de Fechamentos (Titan Loterias)
+## Plano: Camada de Síntese do Apostador Profissional
 
-Módulo genérico, agnóstico de modalidade, que gera fechamentos **dinamicamente** (sem matrizes fixas em banco), valida garantia matemática, simula histórico e recomenda via IA.
+Implementar as 5 lacunas identificadas, entregando a "camada executiva" que faltava sobre o motor Titan.
 
-## Princípios
+---
 
-- Um único núcleo (`ClosingEngine`) parametrizado por `LotterySpec { total, drawn, pick, guarantee, maxGames, ticketPrice }`.
-- Zero código específico por loteria — Lotofácil, Mega, Quina, Lotomania, Dupla, Dia de Sorte, Super Sete, Timemania e futuras.
-- Motor 100% desacoplado da UI, exposto por API pura (funções TS puras + Web Workers).
-- Sem dependência de planilhas ou matrizes prontas; a “biblioteca clássica” será **gerada e cacheada** pelo próprio motor (não importada).
+### 1. Painel de Comando do Apostador (`/comando`)
 
-## Arquitetura (Hexagonal / DDD-lite)
+Nova página de decisão única que consolida sinais críticos em uma tela.
 
-```text
-src/engine/closing/
-  domain/            LotterySpec, ClosingRequest, ClosingResult, Guarantee, Score
-  core/
-    ClosingEngine.ts         # orquestrador (fachada da API)
-    CoveringDesignEngine.ts  # C(v,k,t) — cobertura combinatória
-    GreedyOptimizer.ts       # set-cover guloso + lazy greedy
-    LocalSearch.ts           # hill-climbing + tabu
-    SimulatedAnnealing.ts
-    GeneticOptimizer.ts      # GA completo (pop, fitness, xover, mut, elitismo)
-    BeamSearch.ts
-    BranchAndBound.ts
-    MonteCarloEngine.ts
-    ConstraintSolver.ts      # filtros: pares/ímpares, soma, moldura, miolo, linhas, colunas, primos, Fibonacci, múltiplos, freq, atraso, fixas, excluídas
-  analysis/
-    CoverageCalculator.ts    # cobertura real / perdida / redundante
-    ValidationEngine.ts      # prova a garantia matemática
-    StatisticsAnalyzer.ts    # freq, atraso, dispersão, entropia
-    ProbabilityEngine.ts     # p(k acertos), binomial/hipergeométrica
-    ScoreEngine.ts           # nota final (cobertura, diversidade, redundância, eficiência, tempo)
-  ai/
-    AIRecommendationEngine.ts # recomenda tipo, tamanho, cobertura, custo-benefício
-    HistoricalBacktester.ts   # 50/100/500/1000/todos
-  io/
-    importers/ (csv, xlsx, txt, json, xml)
-    exporters/ (csv, xlsx, pdf, json)
-  workers/
-    genetic.worker.ts
-    montecarlo.worker.ts
-    backtest.worker.ts
-  index.ts                    # API pública
+**Componente novo**: `src/pages/ComandoApostadorPage.tsx`
+- **Card Veredito**: badge grande "APOSTAR AGORA" / "AGUARDAR" / "MODO ACUMULOU" com base em score composto (fase do ciclo + sinal hot/cold + alinhamento winner profile).
+- **Ciclo 1-25**: mini-termômetro reutilizando `CycleThermometer` em modo compacto (props `compact`).
+- **Top 3 Âncoras**: dezenas com maior lift do dia (via `computeAnchors` em `src/engine/anchors.ts` — arquivo novo, pega pares/trincas + termômetro).
+- **Sizing por Banca**: consulta `useBankroll()` e sugere quantidade de jogos (Kelly fracionário já existe).
+- **Botão Rápido**: "Gerar Top 3 do Consenso" que dispara o pipeline Caça-Jackpot e leva pra `/gerador` com resultados pré-carregados via query param.
+
+Registrar rota em `src/App.tsx` e adicionar item no `SidebarNav`.
+
+### 2. Fechamento Automático a partir do Consenso
+
+**Arquivo novo**: `src/engine/closing/autoMatrix.ts`
+- `pickMatrix({ baseSize, budget, lotteryId, targetGuarantee })` — retorna matriz ideal (ex.: 16→13, 18→14) consultando `src/ai/engines/wheelingMatrices.ts` + custo por jogo.
+- Escolhe a maior matriz cujo custo total ≤ `budget` e cuja garantia ≥ alvo.
+
+**UI**: novo botão "🤖 Fechar Automático" em `JackpotFocusPanel.tsx` ao lado do "Enviar Base Âncora". Ao clicar:
+- Lê banca diária de `user_roi_tracking` (últimos 30d) ou usa slider manual como fallback.
+- Chama `pickMatrix`, gera jogos via wheeling engine, navega para `/fechamentos` com estado pré-populado.
+
+### 3. Comparador Rápido "Sua Aposta vs. Consenso Titan"
+
+**Componente novo**: `src/components/lottery/QuickCompareBet.tsx`
+- Input de dezenas (colar/digitar) com validação por modalidade.
+- Calcula, em tempo real:
+  - Nº de âncoras Titan presentes (do último consenso gerado — armazenar em `sessionStorage` chave `titan:last-consensus`).
+  - Score do Winner Profile (reutiliza `scoreAgainstWinnerProfile` de `WinnerProfilePanel`).
+  - Sugestão de troca de até 3 dezenas (algoritmo guloso: remove menores scores, adiciona maiores âncoras).
+- Renderizado em card na página `/comando` e também no rodapé de `/gerador`.
+
+### 4. Histórico de Performance do Motor
+
+**Migração DB**: nova tabela `engine_performance_log`
 ```
-
-### API pública (contratos)
-
-```ts
-generateClosing(req: ClosingRequest): Promise<ClosingResult>
-validateClosing(games, spec, guarantee): ValidationReport
-simulateClosing(games, spec, opts): MonteCarloReport
-calculateCoverage(games, spec, t): CoverageReport
-optimizeClosing(games, spec, strategy): ClosingResult
-calculateGuarantee(games, spec): Guarantee
-compareClosings(a, b, spec): ComparisonReport
-generateGames(spec, constraints): number[][]
-backtest(games, spec, window): BacktestReport
-recommend(spec, profile): AIRecommendation
+id, user_id, lottery_id, preset_hash, config jsonb,
+generated_at, evaluated_concurso int,
+avg_hits real, max_hits int, tiers_hit jsonb,
+created_at
 ```
+GRANT completo + RLS por `auth.uid()`.
 
-Nenhuma função consulta banco; persistência (histórico, favoritos, versões do editor) fica em edge functions separadas.
+**Hook novo**: `src/hooks/useEnginePerformance.ts`
+- `logGeneration(config, games)` — grava snapshot na tabela ao gerar Top no Caça-Jackpot.
+- `evaluateAgainstLatest()` — cruza com `lottery_draws` mais recente e atualiza métricas.
+- Roda automaticamente após `post-sync-notify` (adicionar chamada RPC lá).
 
-## Tipos de fechamento suportados
+**Painel novo**: `src/components/gerador/EnginePerformancePanel.tsx`
+- Timeline dos últimos 20 lotes gerados: config, concurso alvo, acertos.
+- Agrega por preset: "Modo Acumulou + Cycle 1-25 Closing: 11+ acertos em 32% dos casos".
+- Aparece abaixo do Caça-Jackpot em `/gerador`.
 
-Todos implementados como **estratégias plugáveis** sobre o mesmo núcleo de cobertura, combinando um `Selector` (define o pool de dezenas / restrições) com o `Optimizer`:
+### 5. Alerta Pré-Sorteio T-2h
 
-Escolhidas · Eliminadas · Econômico · Garantido · Balanceado · Grupos · Pares/Ímpares · Moldura · Miolo · Linhas · Colunas · Fibonacci · Primos · Múltiplos · Soma · Frequência · Atraso · IA · Híbrido · Filtros personalizados.
+**Edge Function nova**: `supabase/functions/pre-draw-alert/index.ts`
+- Recebe cron trigger, itera modalidades com sorteio hoje.
+- Calcula sinal contextual (fase do ciclo, hot/cold do dia) reusando lógica de `alerts-scan`.
+- Para cada usuário com push habilitado + categoria `pre_draw` ligada, envia notificação via `send-push`.
 
-## Algoritmos
+**Cron via supabase--insert** (não migration, contém URL/anon key):
+```sql
+select cron.schedule(
+  'pre-draw-alert-hourly',
+  '0 * * * *',
+  $$ select net.http_post(...pre-draw-alert...) $$
+);
+```
+A função internamente checa se está a 2h de um sorteio antes de disparar.
 
-- **Guloso set-cover** com lazy evaluation → baseline rápido.
-- **Local Search / Hill Climbing / Tabu** → refino do guloso.
-- **Simulated Annealing** → escape de ótimos locais.
-- **Genético**: população, fitness multiobjetivo (cobertura, diversidade, redundância, score estatístico, score IA), torneio, crossover uniforme, mutação adaptativa, elitismo, parada por estagnação.
-- **Beam Search / Branch & Bound** → instâncias pequenas com prova de otimalidade.
-- **Monte Carlo**: milhões de simulações contra sorteios sintéticos e reais, com gráficos de convergência e distribuição.
+**UI**: adicionar categoria `pre_draw` no `PushNotificationsCard.tsx`.
 
-## Validação e Score
+---
 
-`ValidationEngine` prova a garantia percorrendo todos os `C(pick, guarantee)` alvos e checando cobertura. `ScoreEngine` produz nota 0–100 ponderando cobertura, diversidade, redundância, eficiência (jogos/cobertura) e tempo.
+### Ordem de execução
 
-## Backtesting histórico
+1. Migração `engine_performance_log` (aprovação de DB primeiro).
+2. `autoMatrix.ts` + engine helpers puros.
+3. `QuickCompareBet` (isolado, sem deps novas).
+4. `ComandoApostadorPage` + rota + sidebar.
+5. Integração no `JackpotFocusPanel` (Fechar Automático).
+6. `EnginePerformancePanel` + hook + integração no post-sync-notify.
+7. Edge Function `pre-draw-alert` + cron + toggle no card de push.
 
-Worker dedicado: janela de 50/100/500/1000/todos concursos, saída com acertos por faixa (ex.: 11–15 na Lotofácil), ROI, aproveitamento, heatmap de dezenas, ranking entre estratégias.
+### Detalhes técnicos
 
-## IA de recomendação
+- Ciclo 1-25: reutilizar `computeCyclePressure` já existente em `CycleThermometer`; expor via `src/engine/lotofacil/cycle.ts` (extrair do componente).
+- Consenso persistido: `sessionStorage.setItem('titan:last-consensus', JSON.stringify({ lotteryId, anchors, minPresence, ts }))`.
+- Sizing por banca: já temos `bankrollEngine.ts`; adicionar `suggestGameCount(budget, ticketCost, riskProfile)` que retorna `{ count, kellyFraction, warning }`.
+- Anti-loop no cron: `pre-draw-alert` guarda `last_notified_concurso` em `user_alert_configs.triggers` para não repetir na mesma janela.
 
-`AIRecommendationEngine` combina heurística (perfil de risco, orçamento, garantia desejada) com chamada opcional a edge function `ai-closing-recommendation` (já existe) para justificar a escolha em linguagem natural. Nunca substitui o motor matemático — apenas escolhe parâmetros.
+### Fora do escopo
 
-## Performance
-
-- Bitset `Uint32Array` para representar jogos e alvos de cobertura.
-- Memoization de `C(n,k)` e de coberturas parciais.
-- Workers para GA / Monte Carlo / Backtest (não bloqueiam UI).
-- Cache LRU por `(specHash, requestHash)` em memória + IndexedDB.
-- Parada antecipada quando garantia é atingida.
-
-## UI (mínimo viável, reaproveitando `FechamentoUniversalPage`)
-
-- Wizard: modalidade → dezenas escolhidas/excluídas → tipo de fechamento → garantia/orçamento → gerar.
-- Painel executivo: cobertura, garantia, eficiência, redução combinatória, score, ranking, comparação.
-- Editor visual de matrizes (criar, editar, duplicar, versionar, importar/exportar CSV/XLSX/TXT/JSON/XML).
-- Simulador histórico com gráficos.
-- Biblioteca de fechamentos clássicos **gerados on-demand** (17×8, 18×12, 19×5/20, 20×25, 21×50, 22×100, 23×200, 24×400 …), cacheados.
-
-## Qualidade
-
-- TypeScript estrito, funções puras no núcleo, DI para optimizers.
-- Vitest cobrindo: prova de garantia, cobertura, monotonicidade do guloso, invariantes do GA, backtest determinístico com seed.
-- Documentação por módulo (`README.md` dentro de `engine/closing/`).
-
-## Roteiro de entrega (fases)
-
-Escopo grande — proponho entregar em fases sequenciais, cada uma testável isoladamente. **Cada fase = 1 turno de implementação.**
-
-1. **Fase 1 — Núcleo matemático** (`domain`, `CoveringDesignEngine`, `GreedyOptimizer`, `CoverageCalculator`, `ValidationEngine`, `ProbabilityEngine`, `index.ts` da API) + testes. Já entrega `generateClosing` funcional para os 20 tipos via `ConstraintSolver` básico.
-2. **Fase 2 — Otimizadores avançados**: `LocalSearch`, `SimulatedAnnealing`, `GeneticOptimizer`, `BeamSearch`, `BranchAndBound`, workers.
-3. **Fase 3 — Monte Carlo + Backtesting histórico** com worker e gráficos.
-4. **Fase 4 — ScoreEngine, StatisticsAnalyzer, AIRecommendationEngine** (+ edge function `ai-closing-recommendation` já existente).
-5. **Fase 5 — IO**: importers/exporters (CSV, XLSX, TXT, JSON, XML) e editor visual de matrizes com versionamento.
-6. **Fase 6 — Painel executivo** e integração final na `FechamentoUniversalPage` (comparação, ranking, dashboards).
-
-## Perguntas antes de codar
-
-1. Confirma que quer entregar em **6 fases sequenciais** (uma por turno) ou prefere um MVP mais enxuto (Fases 1+3+6) primeiro?
-2. Para o editor visual + versionamento de matrizes salvas do usuário, posso criar tabelas novas no backend (`closing_matrices`, `closing_matrix_versions`) com RLS por `user_id`? (não são matrizes-fonte do motor, são criações do usuário.)
-3. A “biblioteca de fechamentos clássicos” deve ser **gerada pelo motor e cacheada** (recomendado, mantém a promessa de zero matrizes fixas) ou você quer também aceitar upload de matrizes externas como referência?
-
-Ao aprovar, começo pela **Fase 1** já no próximo turno.
+- Não altero pipeline central de scoring nem `strategiesLibrary.ts`.
+- Não mexo em `useLotteryContext` (isolamento por modalidade preservado).
+- Não toco em RLS de tabelas existentes.
