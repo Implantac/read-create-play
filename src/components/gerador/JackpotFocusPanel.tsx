@@ -19,6 +19,7 @@ import { getPrizeTiers } from "@/services/api/lottery";
 import { useEnginePerformance } from "@/hooks/useEnginePerformance";
 import { pickBestMatrix } from "@/engine/closing/autoMatrix";
 import { computeLotofacilSignals } from "@/ai/lotofacil/signals";
+import { JackpotConfidencePanel } from "@/components/gerador/JackpotConfidencePanel";
 
 
 interface Props {
@@ -286,6 +287,14 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
             </Button>
           </div>
         </div>
+
+        <JackpotConfidencePanel
+          strategyId={`${selectedLottery}:${jackpot.id}`}
+          strategyName={jackpot.name}
+          config={config}
+          draws={draws}
+          topOne={rows[0]?.numbers}
+        />
 
         {rows.length > 0 && consensus.length > 0 && (
           <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
