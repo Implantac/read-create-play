@@ -221,7 +221,21 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
           scored.push({ numbers: g, score: q.overall, grade: q.grade, strengths: q.strengths ?? [], signals });
         }
         scored.sort((a, b) => b.score - a.score);
-        setRows(scored.slice(0, topN));
+        const top = scored.slice(0, topN);
+        setRows(top);
+        // Registra o lote no log de performance do motor (fire-and-forget)
+        logGeneration({
+          lotteryId: selectedLottery,
+          games: top.map((r) => r.numbers),
+          config: {
+            strategy: jackpot.id,
+            acumulou,
+            batch: BATCH,
+            topN,
+            minPresencePct,
+          },
+          label: `${jackpot.name}${acumulou ? " · Acumulou" : ""} · Consenso ${minPresencePct}%`,
+        }).catch(() => {});
       } catch (e) {
         console.error("[JackpotFocus]", e);
         toast.error("Falha ao gerar lote jackpot.");
