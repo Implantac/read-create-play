@@ -1,7 +1,14 @@
 import { NumberStats, generateSmartBet } from "./engine";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
 import { getConsensusRanking, runAllModels, runQuantumAnalysis, runRandomForest, runXGBoost, runNeuralNetwork, runBayesianInference, runMarkovChain } from "@/engine/ai/ml-models";
-import { LOTOFACIL_FRAME, LOTOFACIL_CENTER } from "@/ai/knowledge/lotteriesKnowledge";
+import {
+  LOTOFACIL_FRAME,
+  LOTOFACIL_CENTER,
+  LOTOFACIL_FRAME_TARGET,
+  LOTOFACIL_REPEAT_TARGET,
+  LOTOFACIL_SUM_RANGE,
+} from "@/ai/knowledge/lotteriesKnowledge";
+
 
 export type Strategy =
   | "smart"
