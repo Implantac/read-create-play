@@ -290,11 +290,12 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
             <div className="flex flex-wrap gap-1">
               {consensus.map(({ n, c }) => {
                 const pct = c / rows.length;
+                const isAnchor = anchorBase.includes(n);
                 return (
                   <span
                     key={n}
-                    title={`Aparece em ${c}/${rows.length} jogos`}
-                    className="w-8 h-8 rounded-full border flex items-center justify-center text-[11px] font-mono tabular-nums font-semibold"
+                    title={`Aparece em ${c}/${rows.length} jogos (${Math.round(pct * 100)}%)${isAnchor ? " · âncora" : ""}`}
+                    className={`w-8 h-8 rounded-full border flex items-center justify-center text-[11px] font-mono tabular-nums font-semibold transition-all ${isAnchor ? "ring-2 ring-primary/60" : ""}`}
                     style={{
                       backgroundColor: `hsl(var(--primary) / ${0.08 + pct * 0.55})`,
                       borderColor: `hsl(var(--primary) / ${0.25 + pct * 0.5})`,
@@ -306,6 +307,38 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
                   </span>
                 );
               })}
+            </div>
+
+            <div className="mt-3 pt-3 border-t border-border/40 space-y-2">
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex items-center gap-2 flex-1 min-w-[220px]">
+                  <Target className="w-3.5 h-3.5 text-primary shrink-0" />
+                  <Label className="text-xs shrink-0">Limiar de consenso</Label>
+                  <Slider
+                    value={[minPresencePct]}
+                    min={33}
+                    max={100}
+                    step={1}
+                    onValueChange={(v) => setMinPresencePct(v[0])}
+                    className="flex-1 max-w-[220px]"
+                  />
+                  <Badge variant="outline" className="text-[10px] font-mono tabular-nums shrink-0">
+                    ≥{minPresencePct}% · {anchorBase.length} dezenas
+                  </Badge>
+                </div>
+                <Button
+                  size="sm"
+                  variant="premium"
+                  onClick={sendAnchorsToFechamento}
+                  disabled={anchorBase.length < config.pick + 1}
+                  className="gap-2"
+                >
+                  <Target className="w-4 h-4" /> Enviar consenso ao Fechamento
+                </Button>
+              </div>
+              <p className="text-[10px] text-muted-foreground">
+                A base de consenso é mais enxuta que a união do Top {rows.length}: só entram dezenas presentes em pelo menos {minPresencePct}% dos jogos, gerando fechamentos com menor custo e maior densidade estatística.
+              </p>
             </div>
           </div>
         )}
