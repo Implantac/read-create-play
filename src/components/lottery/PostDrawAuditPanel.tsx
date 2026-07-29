@@ -12,15 +12,17 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ClipboardList, Target, TrendingDown, TrendingUp, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { DrawResult } from "@/data/lotteries";
+import type { DrawResult, LotteryConfig } from "@/data/lotteries";
 import type { SavedBet } from "@/hooks/useSavedBets";
+import { ShapExplanationCard } from "./ShapExplanationCard";
 
 interface Props {
   bets: SavedBet[];
   draws: DrawResult[];
+  config?: LotteryConfig;
 }
 
-export function PostDrawAuditPanel({ bets, draws }: Props) {
+export function PostDrawAuditPanel({ bets, draws, config }: Props) {
   const last = draws[0];
 
   const analysis = useMemo(() => {
@@ -100,6 +102,15 @@ export function PostDrawAuditPanel({ bets, draws }: Props) {
           <KPI icon={Trophy} label="Melhor jogo" value={`${best.hits.length} acertos`} />
           <KPI icon={TrendingUp} label="Jogos analisados" value={perBet.length.toString()} />
         </div>
+
+        {config && best?.bet?.numbers?.length > 0 && (
+          <ShapExplanationCard
+            numbers={best.bet.numbers}
+            config={config}
+            draws={draws}
+            title={`Diagnóstico do melhor jogo (${best.hits.length} acertos)`}
+          />
+        )}
 
         {/* Top skipped drawn numbers */}
         {topSkipped.length > 0 && (
