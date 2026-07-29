@@ -28,7 +28,7 @@ const DRAW_RANGE_OPTIONS = [
 ];
 
 const JogosSalvosPage = () => {
-  const { selectedLottery } = useLotteryContext();
+  const { selectedLottery, config } = useLotteryContext();
   const { savedBets, loading, deleteBet } = useSavedBets(selectedLottery);
   const { draws, drawsWithPrizes } = useLotteryContext();
   const [drawRange, setDrawRange] = useState("10");
