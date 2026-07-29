@@ -224,6 +224,39 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
           </div>
         </div>
 
+        {rows.length > 0 && consensus.length > 0 && (
+          <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Consenso Top {rows.length} — dezenas âncora
+              </span>
+              <span className="text-[10px] text-muted-foreground">
+                intensidade = presença nos jogos
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {consensus.map(({ n, c }) => {
+                const pct = c / rows.length;
+                return (
+                  <span
+                    key={n}
+                    title={`Aparece em ${c}/${rows.length} jogos`}
+                    className="w-8 h-8 rounded-full border flex items-center justify-center text-[11px] font-mono tabular-nums font-semibold"
+                    style={{
+                      backgroundColor: `hsl(var(--primary) / ${0.08 + pct * 0.55})`,
+                      borderColor: `hsl(var(--primary) / ${0.25 + pct * 0.5})`,
+                      color: pct >= 0.66 ? "hsl(var(--primary))" : undefined,
+                    }}
+                  >
+                    {String(n).padStart(2, "0")}
+                    <sup className="text-[8px] ml-0.5 opacity-70">{c}</sup>
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {rows.length > 0 && (
           <div className="space-y-2">
             {rows.map((r, i) => (
