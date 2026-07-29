@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Trophy, Save, Flame, Layers, History, Zap } from "lucide-react";
+import { Loader2, Trophy, Save, Flame, Layers, History, Zap, Target } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { evaluateBetQuality } from "@/engine/stats/bet-quality";
@@ -101,6 +102,7 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
   const [running, setRunning] = useState(false);
   const [rows, setRows] = useState<Row[]>([]);
   const [acumulou, setAcumulou] = useState(false);
+  const [minPresencePct, setMinPresencePct] = useState(60); // 0-100
   const { saveBet } = useSavedBets(selectedLottery);
   const navigate = useNavigate();
 
@@ -124,6 +126,12 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
       .map(([n, c]) => ({ n, c }))
       .sort((a, b) => b.c - a.c || a.n - b.n);
   }, [rows]);
+
+  const anchorBase = useMemo(() => {
+    if (rows.length === 0) return [] as number[];
+    const threshold = Math.max(1, Math.ceil((minPresencePct / 100) * rows.length));
+    return consensus.filter((c) => c.c >= threshold).map((c) => c.n).sort((a, b) => a - b);
+  }, [consensus, rows.length, minPresencePct]);
 
   const [showBacktest, setShowBacktest] = useState(false);
   const aggregate = useMemo(() => {
@@ -163,6 +171,15 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
     }
     navigate("/fechamento-universal", { state: { baseNumbers: unionBase, fromGerador: true } });
     toast.success(`Base de ${unionBase.length} números enviada ao Fechamento Universal.`);
+  };
+
+  const sendAnchorsToFechamento = () => {
+    if (anchorBase.length < config.pick + 1) {
+      toast.error(`Consenso ≥${minPresencePct}% tem só ${anchorBase.length} números. Reduza o limiar.`);
+      return;
+    }
+    navigate("/fechamento-universal", { state: { baseNumbers: anchorBase, fromGerador: true } });
+    toast.success(`Base de consenso (${anchorBase.length} números ≥${minPresencePct}%) enviada ao Fechamento.`);
   };
 
   const run = () => {
@@ -273,11 +290,12 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
             <div className="flex flex-wrap gap-1">
               {consensus.map(({ n, c }) => {
                 const pct = c / rows.length;
+                const isAnchor = anchorBase.includes(n);
                 return (
                   <span
                     key={n}
-                    title={`Aparece em ${c}/${rows.length} jogos`}
-                    className="w-8 h-8 rounded-full border flex items-center justify-center text-[11px] font-mono tabular-nums font-semibold"
+                    title={`Aparece em ${c}/${rows.length} jogos (${Math.round(pct * 100)}%)${isAnchor ? " · âncora" : ""}`}
+                    className={`w-8 h-8 rounded-full border flex items-center justify-center text-[11px] font-mono tabular-nums font-semibold transition-all ${isAnchor ? "ring-2 ring-primary/60" : ""}`}
                     style={{
                       backgroundColor: `hsl(var(--primary) / ${0.08 + pct * 0.55})`,
                       borderColor: `hsl(var(--primary) / ${0.25 + pct * 0.5})`,
@@ -289,6 +307,38 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
                   </span>
                 );
               })}
+            </div>
+
+            <div className="mt-3 pt-3 border-t border-border/40 space-y-2">
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex items-center gap-2 flex-1 min-w-[220px]">
+                  <Target className="w-3.5 h-3.5 text-primary shrink-0" />
+                  <Label className="text-xs shrink-0">Limiar de consenso</Label>
+                  <Slider
+                    value={[minPresencePct]}
+                    min={33}
+                    max={100}
+                    step={1}
+                    onValueChange={(v) => setMinPresencePct(v[0])}
+                    className="flex-1 max-w-[220px]"
+                  />
+                  <Badge variant="outline" className="text-[10px] font-mono tabular-nums shrink-0">
+                    ≥{minPresencePct}% · {anchorBase.length} dezenas
+                  </Badge>
+                </div>
+                <Button
+                  size="sm"
+                  variant="premium"
+                  onClick={sendAnchorsToFechamento}
+                  disabled={anchorBase.length < config.pick + 1}
+                  className="gap-2"
+                >
+                  <Target className="w-4 h-4" /> Enviar consenso ao Fechamento
+                </Button>
+              </div>
+              <p className="text-[10px] text-muted-foreground">
+                A base de consenso é mais enxuta que a união do Top {rows.length}: só entram dezenas presentes em pelo menos {minPresencePct}% dos jogos, gerando fechamentos com menor custo e maior densidade estatística.
+              </p>
             </div>
           </div>
         )}
