@@ -5,7 +5,18 @@
 
 import { NumberStats } from "@/engine/stats/statistics";
 import { DrawResult } from "@/data/lotteries";
-import { getLotteryRules, PRIMES, FIBONACCI } from "./lotteriesKnowledge";
+import {
+  getLotteryRules,
+  PRIMES,
+  FIBONACCI,
+  LOTOFACIL_FRAME as LF_FRAME_SHARED,
+  LOTOFACIL_CENTER as LF_CENTER_SHARED,
+  LOTOFACIL_CORNERS,
+  LOTOFACIL_MULT3,
+  LOTOFACIL_REPEAT_TARGET,
+  lotofacilCol as sharedCol,
+  lotofacilRow as sharedRow,
+} from "./lotteriesKnowledge";
 import type { LotteryRules } from "../core/aiTypes";
 
 export interface StrategyResult {
