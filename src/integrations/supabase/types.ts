@@ -361,6 +361,57 @@ export type Database = {
           },
         ]
       }
+      engine_performance_log: {
+        Row: {
+          avg_hits: number | null
+          config: Json
+          created_at: string
+          evaluated_at: string | null
+          evaluated_concurso: number | null
+          games: Json
+          generated_at: string
+          id: string
+          lottery_id: string
+          max_hits: number | null
+          preset_hash: string
+          preset_label: string | null
+          tiers_hit: Json | null
+          user_id: string
+        }
+        Insert: {
+          avg_hits?: number | null
+          config?: Json
+          created_at?: string
+          evaluated_at?: string | null
+          evaluated_concurso?: number | null
+          games?: Json
+          generated_at?: string
+          id?: string
+          lottery_id: string
+          max_hits?: number | null
+          preset_hash: string
+          preset_label?: string | null
+          tiers_hit?: Json | null
+          user_id: string
+        }
+        Update: {
+          avg_hits?: number | null
+          config?: Json
+          created_at?: string
+          evaluated_at?: string | null
+          evaluated_concurso?: number | null
+          games?: Json
+          generated_at?: string
+          id?: string
+          lottery_id?: string
+          max_hits?: number | null
+          preset_hash?: string
+          preset_label?: string | null
+          tiers_hit?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       generation_history: {
         Row: {
           created_at: string
