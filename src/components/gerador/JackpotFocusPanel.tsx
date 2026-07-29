@@ -293,6 +293,45 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
           </div>
         )}
 
+        {showBacktest && aggregate && (
+          <div className="rounded-lg border border-primary/30 bg-primary/[0.03] p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wide text-primary flex items-center gap-1.5">
+                <History className="w-3.5 h-3.5" />
+                Backtest agregado · últimos {aggregate.window} concursos × Top {rows.length}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+              <div className="rounded border border-border/60 bg-card p-2">
+                <div className="text-muted-foreground text-[10px] uppercase">Média de acertos</div>
+                <div className="font-mono tabular-nums text-base font-semibold">{aggregate.avgHits.toFixed(2)}</div>
+              </div>
+              <div className="rounded border border-border/60 bg-card p-2">
+                <div className="text-muted-foreground text-[10px] uppercase">Melhor jogo</div>
+                <div className="font-mono tabular-nums text-base font-semibold">
+                  {aggregate.best.hits} pts <span className="text-muted-foreground text-[10px]">#{aggregate.best.rowIndex + 1} · c.{aggregate.best.concurso}</span>
+                </div>
+              </div>
+              <div className="rounded border border-border/60 bg-card p-2">
+                <div className="text-muted-foreground text-[10px] uppercase">Faixas premiadas</div>
+                <div className="font-mono tabular-nums text-base font-semibold">
+                  {aggregate.tierHits.reduce((s, t) => s + t.count, 0)}
+                </div>
+              </div>
+            </div>
+            {aggregate.tierHits.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {aggregate.tierHits.map((t) => (
+                  <Badge key={t.hits} variant="outline" className="text-[10px] font-mono">
+                    {t.label}: {t.count}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+
         {rows.length > 0 && (
           <div className="space-y-2">
             {rows.map((r, i) => (
