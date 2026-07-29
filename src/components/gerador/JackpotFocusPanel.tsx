@@ -102,6 +102,7 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
   const [running, setRunning] = useState(false);
   const [rows, setRows] = useState<Row[]>([]);
   const [acumulou, setAcumulou] = useState(false);
+  const [minPresencePct, setMinPresencePct] = useState(60); // 0-100
   const { saveBet } = useSavedBets(selectedLottery);
   const navigate = useNavigate();
 
