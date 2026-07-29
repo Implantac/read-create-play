@@ -500,16 +500,12 @@ export function strategyConsensus(
 // perder retornos de ciclo. Pool enxuto de 18 dezenas — deixa apenas 7
 // fora, maximizando cobertura estatística do universo.
 // ═══════════════════════════════════════════
-export const LOTOFACIL_FRAME = new Set<number>([
-  1, 2, 3, 4, 5,          // linha 1
-  6, 10,                  // linha 2 (col 1 e 5)
-  11, 15,                 // linha 3 (col 1 e 5)
-  16, 20,                 // linha 4 (col 1 e 5)
-  21, 22, 23, 24, 25,     // linha 5
-]);
-export const LOTOFACIL_CENTER = new Set<number>([7, 8, 9, 12, 13, 14, 17, 18, 19]);
-export const lotofacilCol = (n: number) => ((n - 1) % 5) + 1; // 1..5
-export const lotofacilRow = (n: number) => Math.floor((n - 1) / 5) + 1; // 1..5
+// Fonte única compartilhada com `lotteriesKnowledge` — mantidos re-exports
+// para compatibilidade de arquivos que ainda podem importar daqui.
+export const LOTOFACIL_FRAME = LF_FRAME_SHARED;
+export const LOTOFACIL_CENTER = LF_CENTER_SHARED;
+export const lotofacilCol = sharedCol;
+export const lotofacilRow = sharedRow;
 
 export function strategyLotofacilJackpot(
   stats: NumberStats[],
@@ -521,11 +517,12 @@ export function strategyLotofacilJackpot(
   const lastSet = new Set(lastDraw);
   const hotBias = new Set(rules.knownBiases?.hotNumbers ?? []);
   const coldBias = new Set(rules.knownBiases?.coldNumbers ?? []);
-  const mult3 = new Set([3, 6, 9, 12, 15, 18, 21, 24]);
-  const corners = new Set([1, 5, 21, 25]);
+  const mult3 = LOTOFACIL_MULT3;
+  const corners = LOTOFACIL_CORNERS;
 
-  // Alvo de repetição: meio da faixa histórica (7-11 → 9)
-  const repTarget = 9;
+  // Alvo de repetição — constante centralizada (mediana da faixa 7-11)
+  const repTarget = LOTOFACIL_REPEAT_TARGET;
+
 
   // ═══ Fechamento de ciclo 1-25: dezenas ausentes nos últimos ~12 sorteios têm
   // altíssima pressão estatística (ciclo médio Lotofácil ≈ 28-32 sorteios) ═══
