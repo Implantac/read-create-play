@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Trophy, Save, Flame, Layers, History } from "lucide-react";
+import { Loader2, Trophy, Save, Flame, Layers, History, Zap } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { runIntelligentPipeline } from "@/ai/knowledge/strategiesLibrary";
 import { evaluateBetQuality } from "@/engine/stats/bet-quality";
@@ -90,15 +92,20 @@ const BATCH_BY_LOTTERY: Record<string, number> = {
   lotomania: 8,
 };
 const TOP_N = 3;
+const ACUMULOU_MULT = 2; // dobra o lote no Modo Acumulou
+const ACUMULOU_TOP = 5; // devolve top 5 quando acumulado
 
 export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Props) {
   const [running, setRunning] = useState(false);
   const [rows, setRows] = useState<Row[]>([]);
+  const [acumulou, setAcumulou] = useState(false);
   const { saveBet } = useSavedBets(selectedLottery);
   const navigate = useNavigate();
 
   const jackpot = useMemo(() => JACKPOT_BY_LOTTERY[selectedLottery], [selectedLottery]);
-  const BATCH = BATCH_BY_LOTTERY[selectedLottery] ?? 10;
+  const baseBatch = BATCH_BY_LOTTERY[selectedLottery] ?? 10;
+  const BATCH = acumulou ? baseBatch * ACUMULOU_MULT : baseBatch;
+  const topN = acumulou ? ACUMULOU_TOP : TOP_N;
 
   if (!jackpot) return null;
 
@@ -144,7 +151,7 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
           scored.push({ numbers: g, score: q.overall, grade: q.grade, strengths: q.strengths ?? [], signals });
         }
         scored.sort((a, b) => b.score - a.score);
-        setRows(scored.slice(0, TOP_N));
+        setRows(scored.slice(0, topN));
       } catch (e) {
         console.error("[JackpotFocus]", e);
         toast.error("Falha ao gerar lote jackpot.");
@@ -173,13 +180,25 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
               <h3 className="text-base font-semibold tracking-tight flex items-center gap-2">
                 Modo Caça-Jackpot
                 <Badge variant="outline" className="text-[10px] font-normal">{jackpot.hint}</Badge>
+                {acumulou && (
+                  <Badge className="text-[10px] font-normal bg-amber-500/20 text-amber-500 border-amber-500/40 gap-1">
+                    <Zap className="w-3 h-3" /> ACUMULOU
+                  </Badge>
+                )}
               </h3>
               <p className="text-xs text-muted-foreground">
-                Gera {BATCH} jogos com {jackpot.name} e devolve os {TOP_N} melhores pelo Titan Score.
+                Gera {BATCH} jogos com {jackpot.name} e devolve os {topN} melhores pelo Titan Score.
+                {acumulou && " • Lote dobrado + Top 5 para caçar o prêmio principal."}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-2 px-2 py-1 rounded-md border border-amber-500/30 bg-amber-500/[0.03]">
+              <Zap className={`w-3.5 h-3.5 ${acumulou ? "text-amber-500" : "text-muted-foreground"}`} />
+              <Label htmlFor="acumulou-mode" className="text-xs cursor-pointer">Modo Acumulou</Label>
+              <Switch id="acumulou-mode" checked={acumulou} onCheckedChange={setAcumulou} />
+            </div>
+
             {rows.length > 0 && (
               <>
                 <Button size="sm" variant="outline" onClick={sendToFechamento} className="gap-2">
