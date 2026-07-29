@@ -362,6 +362,20 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
                   <Target className="w-4 h-4" /> Enviar consenso ao Fechamento
                 </Button>
               </div>
+              {autoCloseSuggestion?.best && (
+                <div className="flex items-center justify-between gap-2 rounded-md border border-primary/25 bg-primary/[0.04] px-2 py-1.5 text-[11px]">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Trophy className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span className="font-semibold">Fechamento auto:</span>
+                    <span className="truncate">
+                      {autoCloseSuggestion.best.name} · {autoCloseSuggestion.best.gameCount} jogos · garantia {autoCloseSuggestion.best.guarantee} pts
+                    </span>
+                  </div>
+                  <span className="font-mono tabular-nums text-primary shrink-0">
+                    R$ {autoCloseSuggestion.best.cost.toFixed(2)}
+                  </span>
+                </div>
+              )}
               <p className="text-[10px] text-muted-foreground">
                 A base de consenso é mais enxuta que a união do Top {rows.length}: só entram dezenas presentes em pelo menos {minPresencePct}% dos jogos, gerando fechamentos com menor custo e maior densidade estatística.
               </p>
