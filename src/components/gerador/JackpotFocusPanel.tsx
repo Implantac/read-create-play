@@ -115,6 +115,14 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
     return Array.from(set).sort((a, b) => a - b);
   }, [rows]);
 
+  const consensus = useMemo(() => {
+    const freq = new Map<number, number>();
+    rows.forEach((r) => r.numbers.forEach((n) => freq.set(n, (freq.get(n) ?? 0) + 1)));
+    return Array.from(freq.entries())
+      .map(([n, c]) => ({ n, c }))
+      .sort((a, b) => b.c - a.c || a.n - b.n);
+  }, [rows]);
+
   const sendToFechamento = () => {
     if (unionBase.length < config.pick + 1) {
       toast.error(`União do Top ${rows.length} tem só ${unionBase.length} números. Rode novamente ou salve individualmente.`);
