@@ -198,9 +198,7 @@ export function JackpotFocusPanel({ stats, draws, config, selectedLottery }: Pro
               <Label htmlFor="acumulou-mode" className="text-xs cursor-pointer">Modo Acumulou</Label>
               <Switch id="acumulou-mode" checked={acumulou} onCheckedChange={setAcumulou} />
             </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
+
             {rows.length > 0 && (
               <>
                 <Button size="sm" variant="outline" onClick={sendToFechamento} className="gap-2">
