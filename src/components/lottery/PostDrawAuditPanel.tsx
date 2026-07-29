@@ -103,6 +103,15 @@ export function PostDrawAuditPanel({ bets, draws, config }: Props) {
           <KPI icon={TrendingUp} label="Jogos analisados" value={perBet.length.toString()} />
         </div>
 
+        {config && best?.bet?.numbers?.length > 0 && (
+          <ShapExplanationCard
+            numbers={best.bet.numbers}
+            config={config}
+            draws={draws}
+            title={`Diagnóstico do melhor jogo (${best.hits.length} acertos)`}
+          />
+        )}
+
         {/* Top skipped drawn numbers */}
         {topSkipped.length > 0 && (
           <div className="rounded-lg border border-border/50 bg-card/40 p-3">
