@@ -36,7 +36,7 @@ export function Testimonials() {
           viewport={{ once: true }}
           className="text-center mb-16 space-y-4"
         >
-          <h2 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic">
+          <h2 className="text-2xl md:text-4xl font-black tracking-tighter uppercase italic">
             {t("landing.testimonials.title").split(", ").map((word, i) => i === 1 ? <span key={i} className="gradient-brand-text">{word} </span> : word + ", ")}
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-70">
