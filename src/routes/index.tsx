@@ -1,3 +1,5 @@
+Você sendo um apostador profissional ds loterias brasileiras, como você havalia o projeto?
+
 Pela evolução do Titan e pelo que já discutimos anteriormente, eu dividiria a resposta em duas partes:
 
 o que falta tecnicamente;
