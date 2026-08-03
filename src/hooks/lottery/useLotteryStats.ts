@@ -31,8 +31,8 @@ export function useLotteryStats(draws: DrawResult[], config: LotteryConfig, time
     }
 
     return draws.filter(d => {
-      if (!d.data) return false;
-      const drawDate = new Date(d.data);
+      if (!d.date) return false;
+      const drawDate = new Date(d.date);
       return isWithinInterval(drawDate, interval);
     });
   }, [draws, timeRange, customInterval]);
