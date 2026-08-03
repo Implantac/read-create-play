@@ -9,7 +9,7 @@ export function FAQSection() {
     <section className="py-24 md:py-40 relative bg-black/20">
       <div className="container mx-auto px-6 max-w-4xl">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight md:tracking-tighter uppercase italic leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight md:tracking-tighter uppercase italic leading-tight">
             Perguntas <span className="gradient-brand-text">Frequentes</span>
           </h2>
         </div>
