@@ -83,7 +83,7 @@ export const TitanCommandCenter = () => {
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 relative z-10">
         <div>
-          <h2 className="text-2xl font-black text-foreground flex items-center gap-3 tracking-tighter italic uppercase">
+          <h2 className="text-xl font-black text-foreground flex items-center gap-3 tracking-tighter italic uppercase">
             <Terminal className="w-7 h-7 text-primary" />
             Titan <span className="text-primary">Command</span> Center
           </h2>
