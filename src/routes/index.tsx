@@ -1,4 +1,4 @@
-Você sendo um apostador profissional ds loterias brasileiras, como você havalia o projeto?
+Fix the TypeScript build errors in src/routes/index.tsx so the project compiles cleanly.
 
 Pela evolução do Titan e pelo que já discutimos anteriormente, eu dividiria a resposta em duas partes:
 
