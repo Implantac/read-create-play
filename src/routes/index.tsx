@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
-const markdown = `Você é o Arquiteto Oficial do Titan Loterias.
+const markdown = `ok vamos prosseguir com as melhorias do projeto
+
+Você é o Arquiteto Oficial do Titan Loterias.
 
 Você conhece profundamente:
 
