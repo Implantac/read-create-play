@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { useBetGenerator } from "@/hooks/logic/useBetGenerator";
 import { AnimatePresence, motion } from "framer-motion";
@@ -10,19 +10,48 @@ import { TitanAIModule } from "@/components/lottery/TitanAIModule";
 import { TitanStatsModule } from "@/components/lottery/TitanStatsModule";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, BrainCircuit, Target, History } from "lucide-react";
+import { Sparkles, BrainCircuit, Target, History, Calendar, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ComplianceDisclaimer } from "@/components/common/ComplianceDisclaimer";
 import { GamificationCard } from "@/components/GamificationCard";
 import { NeuralMissionCenter } from "@/components/NeuralMissionCenter";
 import { useNavigate } from "react-router-dom";
 import { prefetchRoute } from "@/lib/routePrefetch";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel
+} from "@/components/ui/dropdown-menu";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 const DashboardPage = () => {
-  const { stats, draws, selectedLottery } = useLotteryContext();
+  const { 
+    stats, 
+    draws, 
+    selectedLottery, 
+    timeRange, 
+    setTimeRange, 
+    customInterval, 
+    setCustomInterval 
+  } = useLotteryContext();
   const { luckyGame, generating, generateGame } = useBetGenerator();
   const [showBriefing, setShowBriefing] = useState(false);
   const navigate = useNavigate();
+
+  const timeRangeLabel = useMemo(() => {
+    switch (timeRange) {
+      case "today": return "Hoje";
+      case "week": return "Esta Semana";
+      case "month": return "Este Mês";
+      case "custom": return "Personalizado";
+      case "all": return "Todo Período";
+      default: return "Filtrar";
+    }
+  }, [timeRange]);
 
   return (
     <div className="space-y-10 animate-in fade-in duration-500 max-w-7xl mx-auto px-4 sm:px-6 pb-20">
@@ -47,7 +76,35 @@ const DashboardPage = () => {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 items-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2 border-primary/20 bg-primary/5 hover:bg-primary/10">
+                  <Calendar className="w-4 h-4 text-primary" />
+                  <span className="hidden sm:inline">{timeRangeLabel}</span>
+                  <Filter className="w-3 h-3 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 glass-card border-primary/20">
+                <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-muted-foreground">Filtro Temporal</DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-primary/10" />
+                <DropdownMenuItem onClick={() => setTimeRange("all")} className="gap-2 text-xs">
+                  Todo o Período
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTimeRange("today")} className="gap-2 text-xs">
+                  Hoje
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTimeRange("week")} className="gap-2 text-xs">
+                  Esta Semana
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTimeRange("month")} className="gap-2 text-xs">
+                  Este Mês
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <div className="w-px h-8 bg-border/40 mx-1 hidden sm:block" />
+
             <Button
               variant="outline"
               size="sm"

@@ -40,6 +40,8 @@ const LotteryContext = createContext<LotteryContextType | null>(null);
 export function LotteryProvider({ children }: { children: ReactNode }) {
   const [selectedLottery, setSelectedLottery] = useState("lotofacil");
   const [viewMode, setViewMode] = useState<"simple" | "advanced">("simple");
+  const [timeRange, setTimeRange] = useState<TimeRange>("all");
+  const [customInterval, setCustomInterval] = useState<{ start: Date; end: Date } | undefined>(undefined);
   const config = useMemo(() => LOTTERIES.find(l => l.id === selectedLottery) || LOTTERIES[0], [selectedLottery]);
   const { draws, drawsWithPrizes, loading, syncing, lastSyncAt, syncError, count, syncDraws, syncAllLotteries, addDraw } = useLotteryDraws(selectedLottery);
   
@@ -56,7 +58,7 @@ export function LotteryProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(intervalId);
   }, [selectedLottery, syncDraws, draws.length, loading]);
 
-  const { stats, sumData, hotNumbers, coldNumbers, farol, cycle } = useLotteryStats(draws, config);
+  const { stats, sumData, hotNumbers, coldNumbers, farol, cycle } = useLotteryStats(draws, config, timeRange, customInterval);
 
   return (
     <LotteryContext.Provider value={{
@@ -81,7 +83,11 @@ export function LotteryProvider({ children }: { children: ReactNode }) {
       farol,
       cycle,
       viewMode,
-      setViewMode
+      setViewMode,
+      timeRange,
+      setTimeRange,
+      customInterval,
+      setCustomInterval
     }}>
       {children}
     </LotteryContext.Provider>
