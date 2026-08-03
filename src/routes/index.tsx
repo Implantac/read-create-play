@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
-const markdown = `leia e analise antes de implementar qualquer coisa, crie um plano elaborado e aguarde aprovação
+const markdown = `revise o projeto de ponta a ponta
+leia e analise antes de implementar qualquer coisa, crie um plano elaborado e aguarde aprovação
 # PROMPT MESTRE – EVOLUÇÃO DO TITAN LOTERIAS PARA UMA PLATAFORMA 10/10
 
 ## MISSÃO
