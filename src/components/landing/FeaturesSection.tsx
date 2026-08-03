@@ -64,7 +64,7 @@ export function FeaturesSection({ featuresRef, featuresRotateX, fadeUp }: Featur
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(160,84,45,0.05),transparent)] pointer-events-none" />
       <motion.div style={{ rotateX: featuresRotateX }} className="container mx-auto px-6">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-24 space-y-4">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight md:tracking-tighter uppercase italic leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight md:tracking-tighter uppercase italic leading-tight">
             CENTRO DE <span className="gradient-brand-text">INTELIGÊNCIA</span> TITAN
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-70">

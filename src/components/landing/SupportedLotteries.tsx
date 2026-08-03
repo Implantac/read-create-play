@@ -23,7 +23,7 @@ export function SupportedLotteries() {
           <Badge variant="outline" className="px-4 py-1 text-[10px] font-black tracking-widest uppercase border-primary/30 text-primary">
             Ecossistema Completo
           </Badge>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight md:tracking-tighter uppercase italic leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight md:tracking-tighter uppercase italic leading-tight">
             Loterias <span className="gradient-brand-text">Suportadas</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto font-medium opacity-60">
