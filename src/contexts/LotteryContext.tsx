@@ -5,6 +5,8 @@ import { FarolStats, CycleStats } from "@/engine/stats/farol-engine";
 import { useLotteryDraws, DrawResultWithPrizes } from "@/hooks/useLotteryDraws";
 import { useLotteryStats } from "@/hooks/lottery/useLotteryStats";
 
+import { TimeRange } from "@/hooks/lottery/useLotteryStats";
+
 interface LotteryContextType {
   selectedLottery: string;
   setSelectedLottery: (id: string) => void;
@@ -27,6 +29,10 @@ interface LotteryContextType {
   cycle: CycleStats | null;
   viewMode: "simple" | "advanced";
   setViewMode: (mode: "simple" | "advanced") => void;
+  timeRange: TimeRange;
+  setTimeRange: (range: TimeRange) => void;
+  customInterval: { start: Date; end: Date } | undefined;
+  setCustomInterval: (interval: { start: Date; end: Date } | undefined) => void;
 }
 
 const LotteryContext = createContext<LotteryContextType | null>(null);
