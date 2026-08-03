@@ -403,6 +403,8 @@ estatísticas
 
 evolução
 
+Adicione drill-down para detalhar as estatísticas por tipo de loteria ou prêmio selecionado dentro do dashboard.
+
 tudo atualizado automaticamente.
 
 ---
