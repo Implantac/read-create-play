@@ -1,8 +1,9 @@
 import {
   BarChart3, Sparkles, History, Zap, Grid3X3,
   Brain, ShieldCheck, Crown, PieChart, Lock,
-  MessageCircle, User, Wallet, Command
+  MessageCircle, User, Wallet, Command, FileCode
 } from "lucide-react";
+
 import { NavLink } from "@/components/layout/NavLink";
 import { prefetchRoute } from "@/lib/routePrefetch";
 import { usePlanAccess } from "@/hooks/usePlanAccess";
@@ -55,6 +56,11 @@ const accountItems = [
   { title: "Meu Perfil", url: "/perfil", icon: User },
   { title: "Upgrade Vitalício", url: "/planos", icon: Crown },
 ];
+
+const adminItems = [
+  { title: "Master Prompt", url: "/master-prompt", icon: FileCode, tooltip: "Documentação estratégica e diretrizes do sistema." },
+];
+
 
 const PLAN_LABELS: Record<string, string> = {
   free: "Gratuito",
@@ -209,7 +215,37 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {(isAdmin || isSuperAdmin) && (
+          <SidebarGroup className="px-2">
+            <SidebarGroupLabel className="text-[9px] uppercase tracking-[0.2em] font-black text-muted-foreground/50 mb-3 px-4">
+              Administração
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu className="gap-1">
+                {adminItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild className="h-auto p-0">
+                      <NavLink
+                        to={item.url}
+                        onMouseEnter={() => prefetchRoute(item.url)}
+                        onFocus={() => prefetchRoute(item.url)}
+                        onTouchStart={() => prefetchRoute(item.url)}
+                        className="flex items-center w-full rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-primary/8 text-sidebar-foreground"
+                        activeClassName="bg-primary/15 text-primary font-semibold border-l-2 border-primary"
+                      >
+                        <item.icon className="mr-3 h-4 w-4 shrink-0" />
+                        {!collapsed && <span>{item.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
+
 
       {!collapsed && (
         <SidebarFooter className="p-4 border-t border-border/10 bg-secondary/10 space-y-4">
