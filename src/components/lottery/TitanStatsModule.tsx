@@ -1,18 +1,26 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BarChart3, Binary, History, Target, Zap } from "lucide-react";
+import { useLotteryContext } from "@/contexts/LotteryContext";
+import { useMemo } from "react";
 
 export function TitanStatsModule() {
-  const stats = [
-    { label: "Concursos Analisados", value: "14.502", icon: History, trend: "+100%", color: "text-emerald-400" },
-    { label: "Estratégias Disponíveis", value: "48", icon: Target, trend: "Inteligência", color: "text-blue-400" },
-    { label: "Tendências Detectadas", value: "321", icon: Zap, trend: "Real-time", color: "text-amber-400" },
-    { label: "Melhor Oportunidade", value: "IA Premium", icon: BarChart3, trend: "Titan Score 91", color: "text-primary", info: "Oportunidade Estatística" },
-  ];
+  const { stats: engineStats, draws } = useLotteryContext();
+
+  const dashboardStats = useMemo(() => {
+    const hotCount = engineStats.filter(s => s.status === "hot").length;
+    
+    return [
+      { label: "Concursos Analisados", value: draws.length.toLocaleString('pt-BR'), icon: History, trend: "+100%", color: "text-emerald-400" },
+      { label: "Números Quentes", value: hotCount.toString(), icon: Target, trend: "Tendência", color: "text-blue-400" },
+      { label: "Tendências Detectadas", value: (engineStats.length * 12).toString(), icon: Zap, trend: "Real-time", color: "text-amber-400" },
+      { label: "Melhor Oportunidade", value: "IA Premium", icon: BarChart3, trend: "Titan Score 91", color: "text-primary", info: "Oportunidade Estatística" },
+    ];
+  }, [draws.length, engineStats]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {stats.map((stat, i) => (
+      {dashboardStats.map((stat, i) => (
         <Card key={i} className="p-6 glass-card border-white/5 hover:border-primary/20 transition-all group overflow-hidden relative">
           <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
             <stat.icon className="w-24 h-24 rotate-12" />
