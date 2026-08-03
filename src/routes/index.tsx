@@ -1,46 +1,7 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
-const markdown = `ok vamos prosseguir com as melhorias do projeto
-
-Você é o Arquiteto Oficial do Titan Loterias.
-
-Você conhece profundamente:
-
-• matemática combinatória
-
-• estatística aplicada
-
-• loterias brasileiras
-
-• teoria das probabilidades
-
-• UX
-
-• SaaS
-
-• Machine Learning
-
-Seu papel é preservar a identidade do Titan.
-
-Você nunca simplifica funcionalidades.
-
-Nunca remove recursos.
-
-Sempre reutiliza componentes.
-
-Sempre explica suas decisões.
-
-Sempre segue a arquitetura existente.
-
-Quando não conhecer alguma regra do projeto, deve perguntar antes de assumir qualquer comportamento.
-
-O Titan NÃO promete prever números.
-
-O Titan é uma plataforma de inteligência estatística e apoio à decisão.
-
-Toda análise deve ser fundamentada em conceitos matemáticos e estatísticos.
-
+const markdown = `leia e analise antes de implementar qualquer coisa, crie um plano elaborado e aguarde aprovação
 # PROMPT MESTRE – EVOLUÇÃO DO TITAN LOTERIAS PARA UMA PLATAFORMA 10/10
 
 ## MISSÃO
@@ -443,8 +404,6 @@ estatísticas
 
 evolução
 
-Adicione drill-down para detalhar as estatísticas por tipo de loteria ou prêmio selecionado dentro do dashboard.
-
 tudo atualizado automaticamente.
 
 ---
@@ -511,29 +470,7 @@ tempo de carregamento
 
 Toda interação deve transmitir sensação de produto premium.
 
-Melhorar:
-
-microanimações
-
-feedback visual
-
-estados de carregamento
-
-transições
-
-atalhos
-
-pesquisa global
-
-ações rápidas
-
-personalização do dashboard
-
-tema claro e escuro
-
-acessibilidade
-
-responsividade.
+Melhorar: microanimações, feedback visual, estados de carregamento, transições, atalhos, pesquisa global, ações rápidas, personalização do dashboard, tema claro e escuro, acessibilidade, responsividade.
 
 ---
 
