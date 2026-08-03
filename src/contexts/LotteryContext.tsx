@@ -5,6 +5,8 @@ import { FarolStats, CycleStats } from "@/engine/stats/farol-engine";
 import { useLotteryDraws, DrawResultWithPrizes } from "@/hooks/useLotteryDraws";
 import { useLotteryStats } from "@/hooks/lottery/useLotteryStats";
 
+import { TimeRange } from "@/hooks/lottery/useLotteryStats";
+
 interface LotteryContextType {
   selectedLottery: string;
   setSelectedLottery: (id: string) => void;
@@ -27,6 +29,10 @@ interface LotteryContextType {
   cycle: CycleStats | null;
   viewMode: "simple" | "advanced";
   setViewMode: (mode: "simple" | "advanced") => void;
+  timeRange: TimeRange;
+  setTimeRange: (range: TimeRange) => void;
+  customInterval: { start: Date; end: Date } | undefined;
+  setCustomInterval: (interval: { start: Date; end: Date } | undefined) => void;
 }
 
 const LotteryContext = createContext<LotteryContextType | null>(null);
@@ -34,6 +40,8 @@ const LotteryContext = createContext<LotteryContextType | null>(null);
 export function LotteryProvider({ children }: { children: ReactNode }) {
   const [selectedLottery, setSelectedLottery] = useState("lotofacil");
   const [viewMode, setViewMode] = useState<"simple" | "advanced">("simple");
+  const [timeRange, setTimeRange] = useState<TimeRange>("all");
+  const [customInterval, setCustomInterval] = useState<{ start: Date; end: Date } | undefined>(undefined);
   const config = useMemo(() => LOTTERIES.find(l => l.id === selectedLottery) || LOTTERIES[0], [selectedLottery]);
   const { draws, drawsWithPrizes, loading, syncing, lastSyncAt, syncError, count, syncDraws, syncAllLotteries, addDraw } = useLotteryDraws(selectedLottery);
   
@@ -50,7 +58,7 @@ export function LotteryProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(intervalId);
   }, [selectedLottery, syncDraws, draws.length, loading]);
 
-  const { stats, sumData, hotNumbers, coldNumbers, farol, cycle } = useLotteryStats(draws, config);
+  const { stats, sumData, hotNumbers, coldNumbers, farol, cycle } = useLotteryStats(draws, config, timeRange, customInterval);
 
   return (
     <LotteryContext.Provider value={{
@@ -75,7 +83,11 @@ export function LotteryProvider({ children }: { children: ReactNode }) {
       farol,
       cycle,
       viewMode,
-      setViewMode
+      setViewMode,
+      timeRange,
+      setTimeRange,
+      customInterval,
+      setCustomInterval
     }}>
       {children}
     </LotteryContext.Provider>
