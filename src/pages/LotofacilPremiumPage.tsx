@@ -15,6 +15,7 @@ import {
 import { m, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { LotterySyncStatus } from "@/components/lottery/LotterySyncStatus";
 import { StatsCard } from "@/components/common/StatsCard";
 import { StrategyBriefingPanel } from "@/components/lottery/analysis/StrategyBriefingPanel";
 import { BettingBudgetPlanner } from "@/components/BettingBudgetPlanner";
