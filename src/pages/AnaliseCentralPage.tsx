@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { m, AnimatePresence } from "framer-motion";
+import { LotterySyncStatus } from "@/components/lottery/LotterySyncStatus";
 
 // Lazy imports for sub-pages components
 const EstatisticasView = lazy(() => import("@/pages/EstatisticasPage"));
