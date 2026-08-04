@@ -146,7 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, 10000);
 
     return () => {
-      mounted = False;
+      mounted = false;
       subscription.unsubscribe();
       clearTimeout(timeout);
     };
