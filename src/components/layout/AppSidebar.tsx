@@ -58,9 +58,7 @@ const accountItems = [
   { title: "Upgrade Vitalício", url: "/planos", icon: Crown },
 ];
 
-const adminItems = [
-  { title: "Master Prompt", url: "/master-prompt", icon: FileCode, tooltip: "Documentação estratégica e diretrizes do sistema." },
-];
+const adminItems: any[] = [];
 
 
 const PLAN_LABELS: Record<string, string> = {
@@ -217,7 +215,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {(isAdmin || isSuperAdmin) && (
+        {(isAdmin || isSuperAdmin) && adminItems.length > 0 && (
           <SidebarGroup className="px-2">
             <SidebarGroupLabel className="text-[9px] uppercase tracking-[0.2em] font-black text-muted-foreground/50 mb-3 px-4">
               Administração

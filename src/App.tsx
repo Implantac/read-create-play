@@ -53,7 +53,7 @@ const ComandoApostadorPage = lazy(() => import("@/pages/ComandoApostadorPage"));
 const ClosingSharePage = lazy(() => import("@/pages/ClosingSharePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const OAuthConsentPage = lazy(() => import("@/pages/OAuthConsentPage"));
-const MasterPromptPage = lazy(() => import("@/routes/index"));
+
 const CentralEstudosPage = lazy(() => import("@/pages/CentralEstudosPage"));
 
 
@@ -121,7 +121,7 @@ const AppContent = () => {
         <Route path="/pwa-test" element={<PwaOfflineTestPage />} />
         <Route path="/f/:shareId" element={<ClosingSharePage />} />
         <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
-        <Route path="/master-prompt" element={<MasterPromptPage />} />
+        
         <Route path="/estudos" element={<CentralEstudosPage />} />
 
         
