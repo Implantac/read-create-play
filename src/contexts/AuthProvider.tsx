@@ -81,18 +81,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const authStorageKey = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`;
-    let initialLoad = true;
+    let mounted = true;
+
+    console.log("[Auth] Effect starting...");
+
+    // Initial session check
+    supabase.auth.getSession().then(async ({ data: { session: nextSession }, error }) => {
+      if (!mounted) return;
+      
+      console.log("[Auth] Initial getSession result:", nextSession ? "session found" : "no session", error?.message || "");
+
+      if (error) {
+        console.error("[Auth] Session fetch error:", error);
+        if (error.message.includes("refresh_token") || error.message.includes("invalid")) {
+          localStorage.removeItem(authStorageKey);
+        }
+        setLoading(false);
+        return;
+      }
+
+      if (nextSession?.user) {
+        setSession(nextSession);
+        await loadUserData(nextSession.user.id, nextSession.access_token, nextSession.user.email);
+      }
+      
+      setLoading(false);
+      console.log("[Auth] Initial session check complete");
+    }).catch(err => {
+      if (!mounted) return;
+      console.error("[Auth] Fatal getSession error:", err);
+      setLoading(false);
+    });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, nextSession) => {
-        console.log(`[Auth] State change: ${event}`);
+        if (!mounted) return;
+        
+        console.log(`[Auth] Event: ${event}`);
         setSession(nextSession);
         
         if (nextSession?.user) {
           try {
             await loadUserData(nextSession.user.id, undefined, nextSession.user.email);
           } catch (err) {
-            console.error("[Auth] Error loading user data:", err);
+            console.error("[Auth] Data sync error:", err);
           }
         } else {
           setProfile(null);
@@ -101,52 +133,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUserRole("user");
         }
         
-        // Critical: Ensure loading is cleared even if event is initial
         setLoading(false);
-        initialLoad = false;
       }
     );
 
-    supabase.auth
-      .getSession()
-      .then(async ({ data: { session: nextSession }, error }) => {
-        if (error) {
-          console.error("[Auth] Initial session fetch error:", error);
-          const message = error.message.toLowerCase();
-          const isInvalidRefreshToken =
-            message.includes("invalid refresh token") ||
-            message.includes("refresh token not found");
-
-          if (isInvalidRefreshToken) {
-            localStorage.removeItem(authStorageKey);
-          }
-
-          setSession(null);
-          setProfile(null);
-          return;
-        }
-
-        if (nextSession?.user) {
-          console.log("[Auth] Found initial session for user:", nextSession.user.id);
-          setSession(nextSession);
-          await loadUserData(nextSession.user.id, nextSession.access_token, nextSession.user.email);
-        } else {
-          console.log("[Auth] No initial session found");
-        }
-      })
-      .catch((err) => {
-        console.error("[Auth] Fatal session fetch error:", err);
-        localStorage.removeItem(authStorageKey);
-        setSession(null);
-        setProfile(null);
-      })
-      .finally(() => {
-        initialLoad = false;
+    // Safety timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      if (mounted && loading) {
+        console.warn("[Auth] Loading stuck for 10s, forcing unlock");
         setLoading(false);
-        console.log("[Auth] Initial auth flow complete");
-      });
+      }
+    }, 10000);
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, [loadUserData]);
 
   const signOut = async () => {
