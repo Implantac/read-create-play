@@ -49,8 +49,11 @@ export function LotteryProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (loading) return;
 
-    // Trigger immediate sync if we have no draws
+    // Trigger immediate sync for ALL lotteries on mount to catch up
     if (draws.length === 0) {
+      console.log(`[AutoSync] Initial global sync`);
+      syncAllLotteries();
+    } else {
       console.log(`[AutoSync] Initial sync for ${selectedLottery}`);
       syncDraws(true);
     }
