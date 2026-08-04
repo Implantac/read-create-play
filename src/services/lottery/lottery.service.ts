@@ -10,7 +10,7 @@ export class LotteryService {
     return LotteryApi.fetchDraws(lotteryId, limitCount);
   }
 
-  static async syncLottery(lotteryId?: string) {
-    return LotteryApi.syncLottery(lotteryId);
+  static async syncLottery(lotteryId?: string, fullSync = false) {
+    return LotteryApi.syncLottery(lotteryId, fullSync);
   }
 }

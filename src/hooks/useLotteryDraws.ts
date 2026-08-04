@@ -20,7 +20,7 @@ export function useLotteryDraws(lotteryId: string) {
   });
 
   const syncMutation = useMutation({
-    mutationFn: (isSilent: boolean = false) => LotteryService.syncLottery(), // Always sync everything to ensure catchup
+    mutationFn: (isSilent: boolean = false) => LotteryService.syncLottery(undefined, true), // Always sync everything with full_sync flag
     onMutate: () => {
       setSyncing(true);
       setSyncError(null);

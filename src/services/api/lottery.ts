@@ -87,9 +87,12 @@ export async function fetchDraws(lotteryId: string, limitCount = 500) {
   };
 }
 
-export async function syncLottery(lotteryId?: string) {
+export async function syncLottery(lotteryId?: string, fullSync = false) {
   const { data, error } = await supabase.functions.invoke("sync-lottery-draws", {
-    body: lotteryId ? { lottery_id: lotteryId } : {},
+    body: { 
+      ...(lotteryId ? { lottery_id: lotteryId } : {}),
+      full_sync: fullSync
+    },
   });
   if (error) throw error;
   return data;
