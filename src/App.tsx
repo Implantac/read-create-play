@@ -122,6 +122,7 @@ const AppContent = () => {
         <Route path="/f/:shareId" element={<ClosingSharePage />} />
         <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
         <Route path="/master-prompt" element={<MasterPromptPage />} />
+        <Route path="/estudos" element={<CentralEstudosPage />} />
 
         
         {/* Protected */}
