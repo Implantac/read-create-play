@@ -235,16 +235,6 @@ export default function LotofacilPremiumPage() {
 
         <div className="flex items-center gap-3">
           <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => syncDraws()}
-            disabled={syncing}
-            className="h-12 px-6 rounded-xl border-border/40 bg-background/40 backdrop-blur-sm text-[10px] font-black uppercase tracking-widest gap-2 hover:bg-secondary/20 transition-all shadow-sm"
-          >
-            {syncing ? <RefreshCw className="w-4 h-4 animate-spin text-primary" /> : <RefreshCw className="w-4 h-4 opacity-60" />}
-            {syncing ? "Sincronizando..." : "Sincronizar"}
-          </Button>
-          <Button 
             onClick={exportBI}
             className="h-12 px-8 rounded-xl gradient-brand text-primary-foreground font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20 gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all"
           >
@@ -253,6 +243,8 @@ export default function LotofacilPremiumPage() {
           </Button>
         </div>
       </div>
+
+      <LotterySyncStatus />
 
       <LotteryContextBanner />
 
