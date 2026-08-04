@@ -84,11 +84,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let initialLoad = true;
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, nextSession) => {
+      async (event, nextSession) => {
+        console.log(`[Auth] State change: ${event}`);
         setSession(nextSession);
+        
         if (nextSession?.user) {
-          if (!initialLoad) {
+          try {
             await loadUserData(nextSession.user.id, undefined, nextSession.user.email);
+          } catch (err) {
+            console.error("[Auth] Error loading user data:", err);
           }
         } else {
           setProfile(null);
@@ -96,7 +100,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setIsSuperAdmin(false);
           setUserRole("user");
         }
-        if (!initialLoad) setLoading(false);
+        
+        // Critical: Ensure loading is cleared even if event is initial
+        setLoading(false);
+        initialLoad = false;
       }
     );
 
@@ -104,6 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .getSession()
       .then(async ({ data: { session: nextSession }, error }) => {
         if (error) {
+          console.error("[Auth] Initial session fetch error:", error);
           const message = error.message.toLowerCase();
           const isInvalidRefreshToken =
             message.includes("invalid refresh token") ||
@@ -118,12 +126,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        setSession(nextSession);
         if (nextSession?.user) {
+          console.log("[Auth] Found initial session for user:", nextSession.user.id);
+          setSession(nextSession);
           await loadUserData(nextSession.user.id, nextSession.access_token, nextSession.user.email);
+        } else {
+          console.log("[Auth] No initial session found");
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("[Auth] Fatal session fetch error:", err);
         localStorage.removeItem(authStorageKey);
         setSession(null);
         setProfile(null);
@@ -131,6 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => {
         initialLoad = false;
         setLoading(false);
+        console.log("[Auth] Initial auth flow complete");
       });
 
     return () => subscription.unsubscribe();
