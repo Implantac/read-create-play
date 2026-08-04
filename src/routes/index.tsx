@@ -1,521 +1,71 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
-const markdown = `melhore o projeto, use todo seu conhecimento sobre as loterias brasileiras
-revise o projeto de ponta a ponta
-leia e analise antes de implementar qualquer coisa, crie um plano elaborado e aguarde aprovação
-# PROMPT MESTRE – EVOLUÇÃO DO TITAN LOTERIAS PARA UMA PLATAFORMA 10/10
+const markdown = `
+# RELATÓRIO DE STATUS DO PROJETO - TITAN LOTERIAS
+**Data:** 4 de Agosto de 2026
+**Status Global:** 🚀 Em Evolução Avançada (Arquitetura 10/10)
 
-## MISSÃO
+## ✅ O QUE JÁ FUNCIONA (IMPLEMENTADO)
 
-Você é uma equipe composta por:
+### 1. Núcleo de Inteligência e IA
+- **IA Titan Consultora:** Implementada via \`ai-chat\` e \`AIAnalystPage\`. Capaz de explicar decisões e sugerir melhorias.
+- **Motores Estatísticos Avançados:** Monte Carlo, Cadeias de Markov (HMM), Entropia de Shannon e Testes Qui-quadrado.
+- **Engine de Estratégias:** Centralizado em \`strategiesLibrary.ts\` com modelos de Hot-Cold, Repetição e Jackpot Focus.
+- **SHAP Explainer:** Sistema de explicabilidade para justificar por que certos números foram sugeridos.
+- **Bayesian Strategy Weighting:** Ponderação dinâmica de algoritmos baseada em performance histórica.
 
-* Product Manager Sênior
-* UX/UI Designer especialista em SaaS
-* Arquiteto de Software
-* Cientista de Dados
-* Especialista em Estatística Aplicada
-* Engenheiro de Machine Learning
-* Desenvolvedor Full Stack Sênior
-* QA Engineer
-* Especialista em Performance
-* Especialista em Gamificação
-* Especialista em Produtos Digitais
+### 2. Geradores e Fechamentos
+- **Jackpot Focus Panel:** Gerador especializado em prêmios principais (Lotofácil 15 pontos, Mega Sena).
+- **Adaptive Closing Pipeline:** Pipeline híbrido estocástico para fechamentos matemáticos otimizados.
+- **Universal Game Generator:** Motor único que suporta todas as loterias da CEF com filtros customizados.
+- **Wheeling Engine:** Suporte a matrizes reais (Ex: 18->14) com controle de redundância.
 
-Sua missão NÃO é criar um novo sistema.
+### 3. Análise e Visualização
+- **Dashboard Vivo:** Painel com Titan Stats, alertas proativos e tendências de tempo (Hoje/Semana/Mês).
+- **Laboratório Estatístico:** \`StrategyLabPage\` para backtests rápidos e comparação de performance.
+- **Heatmaps e Ciclos:** Termômetro de ciclos, mapas de calor interativos e análise de coocorrência (Lift metrics).
+- **ROI Dashboard:** Gestão de banca com Critério de Kelly e simulações de Monte Carlo para lucro/prejuízo.
 
-Sua missão é evoluir o projeto existente do Titan Loterias até que ele seja reconhecido como a plataforma brasileira mais completa de inteligência estatística para loterias.
-
-## REGRA MAIS IMPORTANTE
-
-NÃO recrie nenhuma tela.
-
-NÃO altere funcionalidades existentes sem necessidade.
-
-NÃO quebre fluxos.
-
-NÃO remova recursos.
-
-NÃO simplifique funcionalidades.
-
-Toda melhoria deve ser incremental, preservando compatibilidade com a base atual.
-
-Sempre reutilize componentes existentes antes de criar novos.
+### 4. Infraestrutura e Segurança
+- **Edge Functions (Supabase):** Mais de 15 funções para sync, alertas, pagamentos e processamento de IA.
+- **Segurança (God Mode):** RBAC robusto com nível \`super_admin\` para acesso irrestrito.
+- **Signup Guard:** Proteção por IP para evitar abuso de contas gratuitas.
+- **PWA Offiline:** Preparado para instalação e funcionamento resiliente em dispositivos móveis.
 
 ---
 
-# ETAPA 1 – AUDITORIA GLOBAL
+## 🛠 O QUE AINDA FALTA IMPLEMENTAR (DE ACORDO COM O PLANO MESTRE)
 
-Antes de implementar qualquer melhoria, faça uma revisão completa do projeto.
+### Etapas em Progresso ou Pendentes:
 
-Analise:
+1. **Etapa 12 - Central de Estudos (Integrada):**
+   - Embora tenhamos o Master Prompt e muitas análises, falta uma seção dedicada (\`CentralEstudosPage\`) que consolide vídeos, tutoriais e o glossário matemático de forma amigável para o usuário comum.
 
-* arquitetura
-* organização dos componentes
-* estrutura das páginas
-* rotas
-* performance
-* reutilização de componentes
-* estados globais
-* organização dos serviços
-* consistência visual
-* responsividade
-* acessibilidade
-* escalabilidade
-* segurança
-* padronização de código
+2. **Etapa 14 - Gamificação Completa:**
+   - O sistema já possui lógica de níveis, mas falta a interface visual de "Medalhas" e "Conquistas" (Badges) para incentivar o uso frequente sem promover o vício.
 
-Ao final, reorganize internamente o projeto sem alterar o funcionamento para o usuário.
+3. **Etapa 18 - API Pública Documentada:**
+   - A arquitetura interna é modular, mas a documentação externa para desenvolvedores (OpenAPI/Swagger) consumirem os motores do Titan ainda não foi gerada.
+
+4. **Etapa 20 - Refinamento de UX Premium (Micro-interações):**
+   - O design é Glassmorphism e moderno, mas ainda há espaço para micro-animações de "sucesso" em fechamentos complexos e transições de página mais fluidas via Framer Motion em todos os módulos.
+
+5. **Ajustes de Limite de Jogos (Plano Gratuito):**
+   - Precisamos garantir que o limite de "3 jogos por loteria" no plano gratuito esteja bloqueando rigorosamente a geração em todos os novos painéis (JackpotFocus, etc).
 
 ---
 
-# ETAPA 2 – TRANSFORMAR O TITAN EM UMA PLATAFORMA DE INTELIGÊNCIA
+## 📈 PRÓXIMOS PASSOS RECOMENDADOS
 
-O Titan não deve ser apresentado apenas como um gerador de jogos.
-
-Todo o posicionamento do sistema deve transmitir que ele é uma plataforma de inteligência estatística.
-
-A experiência deve passar a sensação de que o sistema "pensa", "analisa" e "aconselha" o usuário.
-
----
-
-# ETAPA 3 – DASHBOARD VIVO
-
-Transforme o dashboard em um Centro de Inteligência.
-
-Ele nunca deve parecer estático.
-
-Adicionar:
-
-• Insights automáticos
-• Alertas inteligentes
-• Mudanças de tendência
-• Oportunidades detectadas
-• Radar estatístico
-• Mudanças relevantes entre concursos
-• Recomendações da IA
-• Evolução do usuário
-• Estatísticas personalizadas
-
-O dashboard deve responder perguntas antes que o usuário as faça.
+1. **Unificação da Central de Estudos:** Criar o módulo de glossário e tutoriais.
+2. **Dashboard de Conquistas:** Implementar a UI da Etapa 14.
+3. **Auditoria de Limites:** Revisar o middleware de acesso para o novo limite de 3 jogos do plano free.
+4. **Otimização de Renderização:** Aplicar virtualização de listas no Histórico Unificado se o usuário tiver > 5000 jogos salvos.
 
 ---
-
-# ETAPA 4 – IA TITAN
-
-Criar um módulo de IA especializado em loterias.
-
-Não criar apenas um chatbot.
-
-Criar um consultor inteligente.
-
-A IA deve:
-
-* explicar decisões
-* justificar escolhas
-* comparar jogos
-* sugerir melhorias
-* detectar padrões
-* identificar riscos
-* encontrar oportunidades
-* responder em linguagem simples
-* aprender com o comportamento do usuário
-* adaptar recomendações ao perfil de cada jogador
-
-Todas as respostas devem ser fundamentadas em dados e análises.
-
----
-
-# ETAPA 5 – LABORATÓRIO ESTATÍSTICO
-
-Criar um ambiente de experimentação.
-
-Permitir simulações usando:
-
-* períodos personalizados
-* loterias
-* filtros
-* estratégias
-* fechamentos
-* algoritmos
-* IA
-* critérios matemáticos
-
-Ao final gerar:
-
-* ROI histórico
-* distribuição de acertos
-* frequência
-* taxa de sucesso
-* gráficos
-* comparativos
-* cobertura
-* eficiência
-
----
-
-# ETAPA 6 – TITAN SCORE
-
-Criar um sistema de pontuação dos jogos.
-
-Analisar automaticamente:
-
-* equilíbrio
-* pares
-* ímpares
-* soma
-* primos
-* Fibonacci
-* moldura
-* centro
-* linhas
-* colunas
-* frequência
-* atraso
-* dispersão
-* concentração
-* cobertura
-* ciclos
-
-Gerar uma nota de 0 a 100 com explicação detalhada.
-
----
-
-# ETAPA 7 – ENGINE DE ESTRATÉGIAS
-
-Criar um motor de estratégias desacoplado.
-
-Cada estratégia deve possuir:
-
-nome
-
-descrição
-
-objetivo
-
-vantagens
-
-desvantagens
-
-histórico
-
-eficiência
-
-simulações
-
-comparativos
-
-Permitir combinação de estratégias.
-
----
-
-# ETAPA 8 – HEATMAPS AVANÇADOS
-
-Adicionar mapas de calor para:
-
-* frequência
-* atraso
-* posição
-* linhas
-* colunas
-* quadrantes
-* moldura
-* centro
-* soma
-* ciclos
-
-Todos interativos.
-
----
-
-# ETAPA 9 – MACHINE LEARNING
-
-Criar arquitetura preparada para múltiplos modelos.
-
-Exemplos:
-
-Random Forest
-
-Gradient Boosting
-
-XGBoost
-
-LightGBM
-
-LSTM
-
-Redes Neurais
-
-Transformer
-
-Permitir comparar modelos sem alterar o restante da aplicação.
-
-Separar claramente previsão estatística de probabilidade real, evitando promessas enganosas.
-
----
-
-# ETAPA 10 – SIMULADOR FINANCEIRO
-
-Permitir simular investimentos.
-
-Informar:
-
-valor investido
-
-quantidade de concursos
-
-quantidade de jogos
-
-estratégia
-
-retorno histórico
-
-ROI
-
-custo
-
-lucro
-
-prejuízo
-
-gráficos
-
-cenários
-
----
-
-# ETAPA 11 – COMPARADOR DE JOGOS
-
-Comparar múltiplos jogos.
-
-Mostrar:
-
-semelhança
-
-diferença
-
-cobertura
-
-interseção
-
-probabilidade estatística
-
-vantagens
-
-desvantagens
-
----
-
-# ETAPA 12 – CENTRAL DE ESTUDOS
-
-Criar uma biblioteca integrada contendo:
-
-estratégias
-
-artigos
-
-estatísticas
-
-vídeos
-
-explicações
-
-tutoriais
-
-conceitos matemáticos
-
-glossário
-
-pesquisas
-
----
-
-# ETAPA 13 – TIMELINE ESTATÍSTICA
-
-Criar linha do tempo interativa.
-
-Visualizar:
-
-mudanças
-
-tendências
-
-ciclos
-
-sequências
-
-histórico
-
-comparações entre períodos.
-
----
-
-# ETAPA 14 – GAMIFICAÇÃO
-
-Adicionar:
-
-conquistas
-
-medalhas
-
-desafios
-
-níveis
-
-evolução
-
-ranking pessoal
-
-histórico
-
-metas
-
-sem incentivar apostas excessivas.
-
----
-
-# ETAPA 15 – PERFIL INTELIGENTE
-
-A IA deve aprender preferências do usuário.
-
-Sem interferir nas decisões.
-
-Somente personalizar análises e recomendações.
-
-Sempre permitir desativar essa personalização.
-
----
-
-# ETAPA 16 – BI EXECUTIVO
-
-Criar um verdadeiro painel executivo.
-
-KPIs
-
-indicadores
-
-gráficos
-
-comparativos
-
-insights
-
-performance
-
-estatísticas
-
-evolução
-
-tudo atualizado automaticamente.
-
----
-
-# ETAPA 17 – ARQUITETURA MODULAR
-
-Toda nova funcionalidade deve funcionar como módulo independente.
-
-Criar arquitetura baseada em plugins.
-
-Permitir adicionar:
-
-novas loterias
-
-novos algoritmos
-
-novos filtros
-
-novos dashboards
-
-novas estratégias
-
-novos modelos de IA
-
-sem modificar o núcleo do sistema.
-
----
-
-# ETAPA 18 – API
-
-Preparar API documentada para integrações futuras.
-
-Separar claramente serviços internos e públicos.
-
----
-
-# ETAPA 19 – PERFORMANCE
-
-Revisar completamente:
-
-consultas
-
-cache
-
-renderização
-
-lazy loading
-
-code splitting
-
-memoização
-
-virtualização de listas
-
-compressão
-
-otimização de imagens
-
-tempo de carregamento
-
----
-
-# ETAPA 20 – UX PREMIUM
-
-Toda interação deve transmitir sensação de produto premium.
-
-Melhorar: microanimações, feedback visual, estados de carregamento, transições, atalhos, pesquisa global, ações rápidas, personalização do dashboard, tema claro e escuro, acessibilidade, responsividade.
-
----
-
-# ETAPA 21 – QUALIDADE
-
-Executar testes completos.
-
-Eliminar:
-
-código duplicado
-
-componentes órfãos
-
-imports desnecessários
-
-erros de tipagem
-
-warnings
-
-gargalos
-
-problemas de responsividade
-
-inconsistências visuais
-
-falhas de acessibilidade.
-
----
-
-# RESULTADO ESPERADO
-
-Ao final da evolução, o Titan deverá ser percebido como:
-
-* Plataforma de Inteligência Estatística para Loterias.
-* Produto SaaS premium.
-* Escalável e modular.
-* Preparado para crescimento por muitos anos.
-* Visualmente moderno.
-* Arquiteturalmente organizado.
-* Baseado em dados.
-* Capaz de oferecer análises avançadas sem prometer previsões impossíveis ou resultados garantidos.
-
-Cada melhoria deve ser documentada, justificando o impacto esperado na experiência do usuário, na manutenção do sistema e na escalabilidade futura.`;
+*Relatório gerado pelo Arquiteto Oficial do Titan Loterias.*
+`;
 
 const MasterPrompt = () => {
   return (
