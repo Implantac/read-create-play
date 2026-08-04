@@ -1,7 +1,8 @@
 import {
   BarChart3, Sparkles, History, Zap, Grid3X3,
   Brain, ShieldCheck, Crown, PieChart, Lock,
-  MessageCircle, User, Wallet, Command, FileCode
+  MessageCircle, User, Wallet, Command, FileCode,
+  BookOpen
 } from "lucide-react";
 
 import { NavLink } from "@/components/layout/NavLink";
