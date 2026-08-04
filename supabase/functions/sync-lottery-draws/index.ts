@@ -107,7 +107,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const MAX_RANGE = 500;
+    const MAX_RANGE = 1000; // Increased range to catch up on old data
     const body = await req.json().catch(() => ({}));
     const targetLottery = typeof body.lottery_id === "string" ? body.lottery_id : null;
     const rawFrom = Number(body.from_concurso);
@@ -122,6 +122,7 @@ serve(async (req) => {
     const results: { lottery: string; inserted: number; errors: number; latest: number }[] = [];
 
     for (const lottery of lotteriesFilter) {
+      console.log(`[sync] Processing ${lottery.id}...`);
       let inserted = 0;
       let errors = 0;
       let latestConcurso = 0;
@@ -188,7 +189,8 @@ serve(async (req) => {
           .limit(1);
 
         const lastStored = existing?.[0]?.concurso || 0;
-        const startFrom = Math.max(fromConcurso, lastStored + 1);
+        console.log(`[sync] ${lottery.id}: last stored concurso: ${lastStored}, latest API: ${latestConcurso}`);
+        const startFrom = fromConcurso || (lastStored + 1);
         const requestedEnd = toConcurso || latestConcurso;
         const hardCap = Math.min(requestedEnd, latestConcurso, startFrom + MAX_RANGE - 1);
         const endAt = hardCap;
@@ -230,6 +232,7 @@ serve(async (req) => {
             .filter((r) => r.numbers.length > 0);
 
           if (rows.length > 0) {
+            console.log(`[sync] ${lottery.id}: attempting to upsert ${rows.length} rows (from ${rows[0].concurso} to ${rows[rows.length-1].concurso})`);
             const { error } = await supabase
               .from("lottery_draws")
               .upsert(rows, { onConflict: "lottery_id,concurso" });

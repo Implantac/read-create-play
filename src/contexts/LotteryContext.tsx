@@ -49,8 +49,11 @@ export function LotteryProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (loading) return;
 
-    // Trigger immediate sync if we have no draws
+    // Trigger immediate sync for ALL lotteries on mount to catch up
     if (draws.length === 0) {
+      console.log(`[AutoSync] Initial global sync`);
+      syncAllLotteries();
+    } else {
       console.log(`[AutoSync] Initial sync for ${selectedLottery}`);
       syncDraws(true);
     }
@@ -58,7 +61,7 @@ export function LotteryProvider({ children }: { children: ReactNode }) {
     const intervalId = setInterval(() => {
       console.log(`[AutoSync] Triggering background sync for ${selectedLottery}`);
       syncDraws(true);
-    }, 5 * 60 * 1000); // 5 minutes (reduced from 10)
+    }, 120 * 1000); // 2 minutes (30s was causing too much pressure)
 
     return () => clearInterval(intervalId);
   }, [selectedLottery, syncDraws, draws.length, loading]);
