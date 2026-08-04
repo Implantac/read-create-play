@@ -54,6 +54,8 @@ const ClosingSharePage = lazy(() => import("@/pages/ClosingSharePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const OAuthConsentPage = lazy(() => import("@/pages/OAuthConsentPage"));
 const MasterPromptPage = lazy(() => import("@/routes/index"));
+const CentralEstudosPage = lazy(() => import("@/pages/CentralEstudosPage"));
+
 
 
 
