@@ -60,6 +60,8 @@ const AnaliseCentralPage = () => {
         <LotteryContextBanner />
       </div>
 
+      <LotterySyncStatus />
+
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-8">
         <div className="flex items-center justify-between gap-4 overflow-x-auto pb-6 scrollbar-hide sticky top-20 z-30 bg-background/40 backdrop-blur-xl px-1 -mx-1 pt-2">
           <TabsList>
