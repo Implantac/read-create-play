@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { m, AnimatePresence } from "framer-motion";
+import { LotterySyncStatus } from "@/components/lottery/LotterySyncStatus";
 
 // Lazy imports for sub-pages components
 const EstatisticasView = lazy(() => import("@/pages/EstatisticasPage"));
@@ -58,6 +59,8 @@ const AnaliseCentralPage = () => {
         <div className="absolute -inset-1 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-[2rem] blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-1000 pointer-events-none" />
         <LotteryContextBanner />
       </div>
+
+      <LotterySyncStatus />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-8">
         <div className="flex items-center justify-between gap-4 overflow-x-auto pb-6 scrollbar-hide sticky top-20 z-30 bg-background/40 backdrop-blur-xl px-1 -mx-1 pt-2">

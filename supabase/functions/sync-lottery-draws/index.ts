@@ -100,7 +100,7 @@ serve(async (req) => {
   }
 
   try {
-    const auth = await requireUserAuth(req, { requireAdmin: true });
+    const auth = await requireUserAuth(req);
     if (auth instanceof Response) return auth;
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;

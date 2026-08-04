@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { DrawResult } from "@/data/lotteries";
-import { fetchLatestDraw, LatestDrawResult } from "@/services/api/lottery";;
-import { DrawPrizeData } from "@/hooks/useLotteryDraws";
+import { fetchLatestDraw, LatestDrawResult } from "@/services/api/lottery";
 import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw, Wifi, WifiOff, Clock, CheckCircle2, Trophy, Users, DollarSign, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -32,13 +31,15 @@ export function AutoUpdater({ lotteryId, onNewDraw, latestConcurso, syncDraws }:
           setLastCheck(new Date());
           setIsOnline(true);
           
-          if (syncResult.result?.inserted > 0) {
-            // Data was already updated and onNewDraw will be triggered by the context update
-            // but we can also fetch the latest result here for the UI
+          // result.results is the array returned by sync-lottery-draws Edge Function
+          const results = syncResult.result?.results || [];
+          const lotteryResult = results.find((r: any) => r.lottery === lotteryId);
+          
+          if (lotteryResult && lotteryResult.inserted > 0) {
+             console.log(`[AutoUpdater] ${lotteryResult.inserted} new draws inserted for ${lotteryId}`);
           }
         } else {
           setIsOnline(false);
-          // Don't show toast error here as syncDraws might have already shown one or we want it silent
         }
       }
 
