@@ -190,7 +190,7 @@ serve(async (req) => {
 
         const lastStored = existing?.[0]?.concurso || 0;
         console.log(`[sync] ${lottery.id}: last stored concurso: ${lastStored}, latest API: ${latestConcurso}`);
-        const startFrom = Math.max(fromConcurso, lastStored + 1);
+        const startFrom = fromConcurso || (lastStored + 1);
         const requestedEnd = toConcurso || latestConcurso;
         const hardCap = Math.min(requestedEnd, latestConcurso, startFrom + MAX_RANGE - 1);
         const endAt = hardCap;

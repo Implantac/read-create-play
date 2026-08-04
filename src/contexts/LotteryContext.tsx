@@ -61,7 +61,7 @@ export function LotteryProvider({ children }: { children: ReactNode }) {
     const intervalId = setInterval(() => {
       console.log(`[AutoSync] Triggering background sync for ${selectedLottery}`);
       syncDraws(true);
-    }, 30 * 1000); // 30 seconds for professional bettors precision
+    }, 120 * 1000); // 2 minutes (30s was causing too much pressure)
 
     return () => clearInterval(intervalId);
   }, [selectedLottery, syncDraws, draws.length, loading]);
