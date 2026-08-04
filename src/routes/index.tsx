@@ -43,8 +43,8 @@ Este relatório consolida o progresso atual e serve como base para a montagem do
 
 ### Etapas em Progresso ou Pendentes:
 
-1. **Etapa 12 - Central de Estudos (Integrada):**
-   - Embora tenhamos o Master Prompt e muitas análises, falta uma seção dedicada (\`CentralEstudosPage\`) que consolide vídeos, tutoriais e o glossário matemático de forma amigável para o usuário comum.
+1. **Etapa 12 - Central de Estudos (Integrada):** ✅
+   - Módulo \`CentralEstudosPage.tsx\` implementado com Glossário Matemático, Tutoriais e FAQ. Disponível via rota \`/estudos\`.
 
 2. **Etapa 14 - Gamificação Completa:**
    - O sistema já possui lógica de níveis, mas falta a interface visual de "Medalhas" e "Conquistas" (Badges) para incentivar o uso frequente sem promover o vício.

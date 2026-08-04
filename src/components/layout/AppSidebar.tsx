@@ -1,7 +1,8 @@
 import {
   BarChart3, Sparkles, History, Zap, Grid3X3,
   Brain, ShieldCheck, Crown, PieChart, Lock,
-  MessageCircle, User, Wallet, Command, FileCode
+  MessageCircle, User, Wallet, Command, FileCode,
+  BookOpen
 } from "lucide-react";
 
 import { NavLink } from "@/components/layout/NavLink";
@@ -36,7 +37,7 @@ const workflowGroups: { label: string; items: { title: string; url: string; icon
       { title: "Titan AI Center", url: "/ia-chat", icon: MessageCircle, tooltip: "O motor de inteligência central do seu ecossistema.", badge: "NEW" },
       { title: "Gerador Estratégico", url: "/gerador", icon: Sparkles, tooltip: "Geração assistida de coleções inteligentes (Loto Data)." },
       { title: "Análise VIP", url: "/lotofacil-premium", icon: Crown, tooltip: "Ambiente profissional exclusivo.", badge: "PREMIUM" },
-
+      { title: "Central de Estudos", url: "/estudos", icon: BookOpen, tooltip: "Tutoriais, glossário e guias matemáticos do Titan.", badge: "NEW" },
     ],
   },
   {
