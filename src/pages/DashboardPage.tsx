@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, BrainCircuit, Target, History, Calendar, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ComplianceDisclaimer } from "@/components/common/ComplianceDisclaimer";
+import { LotterySyncStatus } from "@/components/lottery/LotterySyncStatus";
 import { GamificationCard } from "@/components/GamificationCard";
 import { NeuralMissionCenter } from "@/components/NeuralMissionCenter";
 import { useNavigate } from "react-router-dom";
@@ -133,7 +134,10 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      <TitanStatsModule />
+      <div className="space-y-6">
+        <LotterySyncStatus />
+        <TitanStatsModule />
+      </div>
 
       <RecommendationCard
         luckyGame={luckyGame}
