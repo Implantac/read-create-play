@@ -45,15 +45,20 @@ export function LotteryProvider({ children }: { children: ReactNode }) {
   const config = useMemo(() => LOTTERIES.find(l => l.id === selectedLottery) || LOTTERIES[0], [selectedLottery]);
   const { draws, drawsWithPrizes, loading, syncing, lastSyncAt, syncError, count, syncDraws, syncAllLotteries, addDraw } = useLotteryDraws(selectedLottery);
   
-  // Implement periodic sync (every 10 minutes)
+  // Implement periodic sync (every 5 minutes)
   useEffect(() => {
-    // Only auto-sync if we have data and it's not the first load
-    if (draws.length === 0 || loading) return;
+    if (loading) return;
+
+    // Trigger immediate sync if we have no draws
+    if (draws.length === 0) {
+      console.log(`[AutoSync] Initial sync for ${selectedLottery}`);
+      syncDraws(true);
+    }
 
     const intervalId = setInterval(() => {
       console.log(`[AutoSync] Triggering background sync for ${selectedLottery}`);
       syncDraws(true);
-    }, 10 * 60 * 1000); // 10 minutes
+    }, 5 * 60 * 1000); // 5 minutes (reduced from 10)
 
     return () => clearInterval(intervalId);
   }, [selectedLottery, syncDraws, draws.length, loading]);
