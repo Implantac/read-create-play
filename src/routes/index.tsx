@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
-const markdown = `melhore o projeto, use todo seu conhecimento sobre as loterias brasileiras
+const markdown = `revise o proneto de ponta a ponta e me de um realtório de tudo que já funciona e o que ainda falta implementar de acordo com os planos anteriores
+melhore o projeto, use todo seu conhecimento sobre as loterias brasileiras
 revise o projeto de ponta a ponta
 leia e analise antes de implementar qualquer coisa, crie um plano elaborado e aguarde aprovação
 # PROMPT MESTRE – EVOLUÇÃO DO TITAN LOTERIAS PARA UMA PLATAFORMA 10/10
