@@ -107,7 +107,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const MAX_RANGE = 500;
+    const MAX_RANGE = 1000; // Increased range to catch up on old data
     const body = await req.json().catch(() => ({}));
     const targetLottery = typeof body.lottery_id === "string" ? body.lottery_id : null;
     const rawFrom = Number(body.from_concurso);
