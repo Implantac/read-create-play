@@ -14,13 +14,13 @@ export function useLotteryDraws(lotteryId: string) {
 
   const { data, isLoading: loading, refetch } = useQuery({
     queryKey: ["lottery-draws", lotteryId],
-    queryFn: () => LotteryService.fetchDraws(lotteryId, 500),
+    queryFn: () => LotteryService.fetchDraws(lotteryId, 2000),
     staleTime: 5 * 60 * 1000, 
     gcTime: 30 * 60 * 1000,
   });
 
   const syncMutation = useMutation({
-    mutationFn: (isSilent: boolean = false) => LotteryService.syncLottery(), // Always sync everything to ensure catchup
+    mutationFn: (isSilent: boolean = false) => LotteryService.syncLottery(undefined, true), // Always sync everything with full_sync flag
     onMutate: () => {
       setSyncing(true);
       setSyncError(null);
@@ -55,7 +55,7 @@ export function useLotteryDraws(lotteryId: string) {
   const syncAllLotteries = useCallback(async () => {
     setSyncing(true);
     try {
-      await LotteryService.syncLottery();
+      await LotteryService.syncLottery(undefined, true);
       queryClient.invalidateQueries({ queryKey: ["lottery-draws"] });
       toast.success("Sincronização iniciada");
     } catch (e) {

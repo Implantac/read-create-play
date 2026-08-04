@@ -192,8 +192,10 @@ serve(async (req) => {
         console.log(`[sync] ${lottery.id}: last stored concurso: ${lastStored}, latest API: ${latestConcurso}`);
         const startFrom = fromConcurso || (lastStored + 1);
         const requestedEnd = toConcurso || latestConcurso;
-        const hardCap = Math.min(requestedEnd, latestConcurso, startFrom + MAX_RANGE - 1);
-        const endAt = hardCap;
+        
+        // Increase range significantly for initial syncs
+        const RANGE = (lastStored === 0 || body.full_sync) ? 2000 : MAX_RANGE;
+        const endAt = Math.min(requestedEnd, latestConcurso, startFrom + RANGE - 1);
 
         if (startFrom > endAt) {
           console.log(`${lottery.id}: already up to date (${lastStored})`);
@@ -203,7 +205,7 @@ serve(async (req) => {
 
         console.log(`${lottery.id}: fetching ${startFrom} to ${endAt}`);
 
-        const batchSize = 10;
+        const batchSize = 15; // Increased batch size for faster sync
         for (let batch = startFrom; batch <= endAt; batch += batchSize) {
           const promises: Promise<CaixaResult | null>[] = [];
           for (let c = batch; c < Math.min(batch + batchSize, endAt + 1); c++) {
@@ -245,7 +247,7 @@ serve(async (req) => {
             }
           }
 
-          await new Promise((r) => setTimeout(r, 200));
+          await new Promise((r) => setTimeout(r, 100)); // Reduced delay for faster sync
         }
       } catch (e) {
         console.error(`Error syncing ${lottery.id}:`, e);

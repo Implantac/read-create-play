@@ -52,7 +52,7 @@ export function LotteryProvider({ children }: { children: ReactNode }) {
     // Trigger immediate sync for ALL lotteries on mount to catch up
     if (draws.length === 0) {
       console.log(`[AutoSync] Initial global sync`);
-      syncAllLotteries();
+      syncAllLotteries(); // useLotteryDraws syncAllLotteries will now trigger full sync internally if called via this context if needed, but we rely on syncDraws(true) below
     } else {
       console.log(`[AutoSync] Initial sync for ${selectedLottery}`);
       syncDraws(true);
@@ -61,7 +61,7 @@ export function LotteryProvider({ children }: { children: ReactNode }) {
     const intervalId = setInterval(() => {
       console.log(`[AutoSync] Triggering background sync for ${selectedLottery}`);
       syncDraws(true);
-    }, 120 * 1000); // 2 minutes (30s was causing too much pressure)
+    }, 60 * 1000); // 60 seconds (1 minute) for professional bettors precision
 
     return () => clearInterval(intervalId);
   }, [selectedLottery, syncDraws, draws.length, loading]);
