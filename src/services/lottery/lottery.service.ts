@@ -6,7 +6,7 @@ export type { PrizeTierInfo, DrawPrizeData, DrawResultWithPrizes };
  * @deprecated Use LotteryApi from @/services/api/lottery
  */
 export class LotteryService {
-  static async fetchDraws(lotteryId: string, limitCount = 500) {
+  static async fetchDraws(lotteryId: string, limitCount = 2000) {
     return LotteryApi.fetchDraws(lotteryId, limitCount);
   }
 

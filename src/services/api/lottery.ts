@@ -38,7 +38,7 @@ export interface MatchResult {
  * Lottery API Service
  * Centralizes all communication with Supabase and external lottery APIs.
  */
-export async function fetchDraws(lotteryId: string, limitCount = 500) {
+export async function fetchDraws(lotteryId: string, limitCount = 2000) {
   let allData: any[] = [];
   let from = 0;
   const pageSize = 1000;

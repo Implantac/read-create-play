@@ -247,7 +247,7 @@ serve(async (req) => {
             }
           }
 
-          await new Promise((r) => setTimeout(r, 200));
+          await new Promise((r) => setTimeout(r, 100)); // Reduced delay for faster sync
         }
       } catch (e) {
         console.error(`Error syncing ${lottery.id}:`, e);
