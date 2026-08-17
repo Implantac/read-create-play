@@ -162,6 +162,7 @@ export function runBacktest(
     lift: evidence.lift,
     pValue: evidence.pValue,
     isSignificant: evidence.isSignificant,
+    confidenceInterval: evidence.confidenceInterval,
     shuffledLift,
     signalIntegrity
   };

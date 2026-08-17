@@ -8,9 +8,10 @@ export interface StrategyMetrics {
   winRate: number;
   volatility: number;
   maxConsecutiveLosses: number;
-  lift?: number;
-  pValue?: number;
-  isSignificant?: boolean;
-  shuffledLift?: number; // Lift against shuffled timeline
-  signalIntegrity?: number; // Ratio of real lift vs shuffled lift (0-1)
+  lift: number;
+  pValue: number;
+  isSignificant: boolean;
+  confidenceInterval?: [number, number]; // IC95%
+  shuffledLift?: number; 
+  signalIntegrity?: number; 
 }

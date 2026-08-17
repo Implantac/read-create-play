@@ -83,9 +83,16 @@ export function StrategyComparisonCard({ name, metrics, isBest }: StrategyCompar
               <span className="text-muted-foreground flex items-center gap-1">
                 <Brain className="w-3 h-3" /> Lift Estatístico
               </span>
-              <span className={cn("font-mono font-bold", metrics.lift > 1 ? "text-primary" : "text-muted-foreground")}>
-                {metrics.lift.toFixed(2)}x
-              </span>
+              <div className="flex flex-col items-end">
+                <span className={cn("font-mono font-bold", metrics.lift > 1 ? "text-primary" : "text-muted-foreground")}>
+                  {metrics.lift.toFixed(2)}x
+                </span>
+                {metrics.confidenceInterval && (
+                  <span className="text-[8px] text-muted-foreground font-mono">
+                    IC95% [{metrics.confidenceInterval[0].toFixed(2)}-{metrics.confidenceInterval[1].toFixed(2)}]
+                  </span>
+                )}
+              </div>
             </div>
           )}
           
@@ -115,10 +122,17 @@ export function StrategyComparisonCard({ name, metrics, isBest }: StrategyCompar
           </div>
         )}
         
-        {metrics.isSignificant && (
+        {metrics.isSignificant ? (
           <div className="flex items-center gap-2 p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
             <Sparkles className="w-3 h-3 text-emerald-500" />
-            <span className="text-[9px] text-emerald-400 font-bold uppercase">Supera o Acaso (p &lt; 0.05)</span>
+            <div className="flex flex-col">
+              <span className="text-[9px] text-emerald-400 font-bold uppercase">Significativo (p={metrics.pValue.toFixed(4)})</span>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/20 border border-border/50">
+            <Info className="w-3 h-3 text-muted-foreground" />
+            <span className="text-[9px] text-muted-foreground font-bold uppercase">Não Significativo (p={metrics.pValue.toFixed(4)})</span>
           </div>
         )}
       </CardContent>

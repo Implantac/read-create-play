@@ -11,10 +11,20 @@ export interface EvidenceReport {
   isSignificant: boolean;
   pValue: number;
   lift: number;
-  confidenceInterval: [number, number];
+  confidenceInterval: [number, number]; // IC95%
   zScore: number;
   sampleSize: number;
   effectSize: "negligible" | "small" | "medium" | "large";
+}
+
+export interface Hypothesis {
+  id: string;
+  name: string;
+  description: string;
+  expectedLift: number;
+  indicator: string;
+  status: "tested" | "pending";
+  result?: EvidenceReport;
 }
 
 /**
