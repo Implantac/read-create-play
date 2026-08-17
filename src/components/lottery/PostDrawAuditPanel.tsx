@@ -188,10 +188,35 @@ export function PostDrawAuditPanel({ bets, draws, config }: Props) {
               ))}
           </div>
         </ScrollArea>
+
+        {best?.bet && (
+          <div className="pt-2 mt-2 border-t border-border/40 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-primary" />
+              <span className="text-xs font-semibold">Decisão Titan:</span>
+              <span className="text-[11px] text-muted-foreground italic">
+                {best.hits.length >= 11 ? "Preset validado. Manter estratégia." : "Ajuste de presenças sugerido."}
+              </span>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 text-[11px] gap-2"
+              onClick={() => {
+                // Navega para o gerador com a base do melhor jogo para refinamento
+                const base = best.bet.numbers.join(",");
+                window.location.href = `/gerador?base=${base}&refine=true`;
+              }}
+            >
+              <Target className="w-3.5 h-3.5" /> Refinar Estratégia
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
 }
+
 
 function KPI({
   icon: Icon,
