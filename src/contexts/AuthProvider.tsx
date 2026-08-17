@@ -94,17 +94,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const initAuth = async () => {
       try {
-        // Parallel init: Check current session and listen for changes
-        const sessionPromise = supabase.auth.getSession();
-        
+        // Step 1: Subscribe to changes immediately
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, nextSession) => {
             if (!mounted) return;
             
+            const hasUser = !!nextSession?.user;
             setSession(nextSession);
             
-            if (nextSession?.user) {
-              loadUserData(nextSession.user.id, nextSession.access_token, nextSession.user.email)
+            if (hasUser) {
+              // Only block loading for essential data
+              loadUserData(nextSession.user!.id, nextSession!.access_token, nextSession!.user.email)
                 .finally(() => {
                   if (mounted) setLoading(false);
                 });
@@ -118,27 +118,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         );
 
-        // Safety timeout reducer to 4s for faster recovery
-        const timeout = setTimeout(() => {
-          if (mounted && loading) {
-            setLoading(false);
-          }
-        }, 4000);
-
-        const { data: { session: initialSession }, error } = await sessionPromise;
-        clearTimeout(timeout);
-
+        // Step 2: Get initial session
+        const { data: { session: initialSession }, error } = await supabase.auth.getSession();
+        
         if (mounted) {
           if (error) {
-            console.error("[Auth] Initial session error:", error);
+            console.error("[Auth] Session error:", error);
             if (error.message.includes("refresh_token") || error.message.includes("invalid")) {
               localStorage.removeItem(authStorageKey);
             }
             setLoading(false);
           } else if (initialSession?.user) {
             setSession(initialSession);
-            await loadUserData(initialSession.user.id, initialSession.access_token, initialSession.user.email);
-            setLoading(false);
+            // Non-blocking load
+            loadUserData(initialSession.user.id, initialSession.access_token, initialSession.user.email)
+              .finally(() => {
+                if (mounted) setLoading(false);
+              });
           } else {
             setLoading(false);
           }
@@ -146,7 +142,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         return subscription;
       } catch (err) {
-        console.error("[Auth] Fatal init error:", err);
+        console.error("[Auth] Init crash:", err);
         if (mounted) setLoading(false);
         return null;
       }
