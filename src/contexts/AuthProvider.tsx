@@ -118,6 +118,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
             
             setLoading(false);
+            if (nextSession?.user) {
+              loadUserData(nextSession.user.id, nextSession.access_token, nextSession.user.email)
+                .finally(() => {
+                  if (mounted) setLoading(false);
+                });
+            } else {
+              setLoading(false);
+            }
           }
         );
 
