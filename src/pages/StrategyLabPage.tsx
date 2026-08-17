@@ -160,12 +160,13 @@ export default function StrategyLabPage() {
           }, ...prev].slice(0, 10));
         }
 
+        const testWindowSize = 200; // Aumentado para maior significância
         const randomGames = generateRandomGames(config, gamesPerStrategy);
         const randomBacktest = runBacktest(
           "random_baseline",
           "Random Baseline (Sorteio Puro)",
           randomGames,
-          draws.slice(-100),
+          draws.slice(-testWindowSize),
           config,
           LOTTERY_BET_COST[config.id] || 3.5,
           1000,
@@ -177,10 +178,10 @@ export default function StrategyLabPage() {
             sg.strategyId,
             sg.strategyName,
             sg.games,
-            draws.slice(-100), // Backtest nos últimos 100 para performance
+            draws.slice(-testWindowSize),
             config,
             LOTTERY_BET_COST[config.id] || 3.5,
-            1000, // Banca inicial padrão
+            1000, 
             enableShuffledBacktest
           );
         });
