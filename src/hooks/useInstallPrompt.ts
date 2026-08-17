@@ -47,16 +47,29 @@ export function useInstallPrompt() {
     };
 
     const handleBeforeInstallPrompt = (event: Event) => {
+      console.log("[PWA] beforeinstallprompt event captured");
       event.preventDefault();
-      setDeferredPrompt(event as BeforeInstallPromptEvent);
+      const promptEvent = event as BeforeInstallPromptEvent;
+      // Store it and log state
+      setDeferredPrompt(promptEvent);
+      
+      // Notify components immediately if needed
+      window.dispatchEvent(new CustomEvent('pwa-prompt-ready'));
     };
 
     const handleInstalled = () => {
+      console.log("[PWA] App installed successfully");
       setDeferredPrompt(null);
       setIsInstalled(true);
     };
 
     syncInstalledState();
+    
+    // Check if the event was already fired before listener was attached
+    if ('BeforeInstallPromptEvent' in window) {
+      console.log("[PWA] BeforeInstallPromptEvent supported");
+    }
+
     displayModeQuery.addEventListener?.("change", syncInstalledState);
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
     window.addEventListener("appinstalled", handleInstalled);

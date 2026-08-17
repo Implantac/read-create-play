@@ -14,18 +14,32 @@ export const AutoInstallPrompt = () => {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (isInstalled || isPreviewHost || isInIframe) return;
-    if (!canPromptInstall && !needsManualInstall) return;
+    const checkVisibility = () => {
+      if (isPreviewHost || isInIframe || isInstalled) return;
 
-    try {
-      const dismissed = Number(localStorage.getItem(DISMISS_KEY) || 0);
-      if (dismissed && Date.now() - dismissed < DISMISS_MS) return;
-    } catch {
-      /* ignore */
-    }
+      if (!canPromptInstall && !needsManualInstall) {
+        return;
+      }
 
-    const t = setTimeout(() => setVisible(true), 1500);
-    return () => clearTimeout(t);
+      try {
+        const dismissed = Number(localStorage.getItem(DISMISS_KEY) || 0);
+        if (dismissed && Date.now() - dismissed < DISMISS_MS) return;
+      } catch {
+        /* ignore */
+      }
+
+      setVisible(true);
+    };
+
+    const t = setTimeout(checkVisibility, 1500);
+    
+    // Also listen for the custom event in case it fires after the timeout
+    window.addEventListener('pwa-prompt-ready', checkVisibility);
+    
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener('pwa-prompt-ready', checkVisibility);
+    };
   }, [canPromptInstall, needsManualInstall, isInstalled, isPreviewHost, isInIframe]);
 
   const dismiss = () => {
