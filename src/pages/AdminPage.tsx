@@ -20,7 +20,7 @@ import {
 import {
   Users, Crown, TrendingUp, Search, Shield, Loader2, RefreshCw, Ban, CheckCircle2,
   ShieldCheck, AlertTriangle, History, UserCog, Eye, Grid3X3, DollarSign,
-  ArrowUpRight, Target, FlaskConical
+  ArrowUpRight, Target, FlaskConical, Smartphone
 } from "lucide-react";
 import { AdminBacktestPanel } from "@/components/admin/AdminBacktestPanel";
 import { PWAAnalyticsPanel } from "@/components/admin/PWAAnalyticsPanel";
