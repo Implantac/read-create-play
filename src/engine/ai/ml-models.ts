@@ -159,8 +159,8 @@ function buildBreakdown(
 // MODELS — deterministic (no Math.random in scoring)
 // ═══════════════════════════════════════════════════════
 
-// Random Forest — frequency, recency, trend, cycle, parity features
-export function runRandomForest(stats: NumberStats[], config: LotteryConfig): ModelResult {
+// FrequencyTrendScore — frequency, recency, trend, cycle, parity features
+export function runFrequencyTrendScore(stats: NumberStats[], config: LotteryConfig): ModelResult {
   const scored: MLPrediction[] = stats.map(s => {
     const freqScore = s.percentage * 0.25;
     const recencyScore = Math.max(0, (50 - s.lastSeen) / 50) * 20;
@@ -180,23 +180,23 @@ export function runRandomForest(stats: NumberStats[], config: LotteryConfig): Mo
       number: s.number,
       score: raw,
       rank: 0,
-      model: "Statistical Multi-Factor",
+      model: "FrequencyTrendScore",
       breakdown: buildBreakdown(freqScore, recencyScore + recentTrend, trendBonus, cycleBonus, momentumBonus, gapConsistency, parityBonus + rangeBonus + consecutiveBonus),
     };
   });
 
   normalizeAndRank(scored);
   return {
-    name: "Statistical Multi-Factor",
-    description: "Heurística ponderada: frequência, tendência, ciclo, momentum e consistência de gaps",
+    name: "FrequencyTrendScore",
+    description: "Heurística ponderada (antigo Random Forest): frequência, tendência, ciclo e momentum",
     predictions: scored,
     accuracy: null, 
     confidence: 0,
   };
 }
 
-// XGBoost — gradient boosting with deep feature engineering
-export function runXGBoost(stats: NumberStats[], config: LotteryConfig): ModelResult {
+// MultiFactorScore — gradient pattern engine logic
+export function runMultiFactorScore(stats: NumberStats[], config: LotteryConfig): ModelResult {
   const scored: MLPrediction[] = stats.map(s => {
     const freqWeight = Math.pow(s.percentage, 1.15) * 0.3;
     const delayPenalty = s.lastSeen > 20 ? -s.lastSeen * 0.2 : s.lastSeen * 0.4;
@@ -216,23 +216,23 @@ export function runXGBoost(stats: NumberStats[], config: LotteryConfig): ModelRe
       number: s.number,
       score: raw,
       rank: 0,
-      model: "Gradient Pattern Engine",
+      model: "MultiFactorScore",
       breakdown: buildBreakdown(freqWeight, recency + delayPenalty, trendFeature + hotColdBonus, cycleFeature, momentumAccel, gapFeature + stdDevFeature, positionFeature),
     };
   });
 
   normalizeAndRank(scored);
   return {
-    name: "Gradient Pattern Engine",
-    description: "Algoritmo de gradiente com features de tendência, ciclo, momentum e desvio padrão de gaps",
+    name: "MultiFactorScore",
+    description: "Algoritmo de pontuação multi-fatorial (antigo XGBoost) com desvio padrão e ciclos",
     predictions: scored,
     accuracy: null,
     confidence: 0,
   };
 }
 
-// Neural Network (LSTM) — deep pattern recognition
-export function runNeuralNetwork(stats: NumberStats[], config: LotteryConfig): ModelResult {
+// TemporalPatternScore — non-linear pattern recognition
+export function runTemporalPatternScore(stats: NumberStats[], config: LotteryConfig): ModelResult {
   const scored: MLPrediction[] = stats.map(s => {
     const layer1 = Math.tanh(s.percentage * 0.08 - 0.8) * 15 + 15;
     const layer2 = Math.tanh((s.recentFreq - 3) * 0.4) * 12;
@@ -251,15 +251,15 @@ export function runNeuralNetwork(stats: NumberStats[], config: LotteryConfig): M
       number: s.number,
       score: raw,
       rank: 0,
-      model: "Temporal Pattern Score",
+      model: "TemporalPatternScore",
       breakdown: buildBreakdown(layer1, layer2 + layer3, trendNeuron, cycleNeuron, momentumNeuron, gapAttention, embedding + consecutiveAttention),
     };
   });
 
   normalizeAndRank(scored);
   return {
-    name: "Temporal Pattern Score",
-    description: "Decomposição não-linear com attention em gaps, tendência e momentum",
+    name: "TemporalPatternScore",
+    description: "Decomposição não-linear (antigo Neural Network/LSTM) com attention em gaps",
     predictions: scored,
     accuracy: null,
     confidence: 0,
@@ -267,7 +267,7 @@ export function runNeuralNetwork(stats: NumberStats[], config: LotteryConfig): M
 }
 
 // Bayesian Inference — posterior with rich priors
-export function runBayesianInference(stats: NumberStats[], config: LotteryConfig): ModelResult {
+export function runBayesianScore(stats: NumberStats[], config: LotteryConfig): ModelResult {
   const totalDraws = stats.reduce((sum, s) => sum + s.frequency, 0) / config.pick;
   const uniformPrior = 1 / config.numbers;
 
@@ -288,15 +288,15 @@ export function runBayesianInference(stats: NumberStats[], config: LotteryConfig
       number: s.number,
       score: raw,
       rank: 0,
-      model: "Inferência Bayesiana",
+      model: "BayesianScore",
       breakdown: buildBreakdown(likelihood * 100, recentLikelihood * 100, trendLikelihood * 100, (cyclePrior - 1) * 100, (momentumPrior - 1) * 100, (gapPrior - 1) * 100, delayFactor * 100),
     };
   });
 
   normalizeAndRank(scored);
   return {
-    name: "Inferência Bayesiana",
-    description: "Atualização bayesiana com priors de ciclo, consistência de gaps, momentum e tendência",
+    name: "BayesianScore",
+    description: "Atualização bayesiana (antigo Bayesian Inference) com priors de ciclo e momentum",
     predictions: scored,
     accuracy: null,
     confidence: 0,
@@ -304,7 +304,7 @@ export function runBayesianInference(stats: NumberStats[], config: LotteryConfig
 }
 
 // Markov Chain — transition probabilities with cycle detection
-export function runMarkovChain(stats: NumberStats[], config: LotteryConfig): ModelResult {
+export function runTransitionScore(stats: NumberStats[], config: LotteryConfig): ModelResult {
   const scored: MLPrediction[] = stats.map(s => {
     const transitionProb = s.lastSeen <= 3 ? 0.75 : s.lastSeen <= 10 ? 0.5 : s.lastSeen <= 20 ? 0.25 : 0.1;
     const steadyState = s.percentage / 100;
@@ -321,15 +321,15 @@ export function runMarkovChain(stats: NumberStats[], config: LotteryConfig): Mod
       number: s.number,
       score: raw,
       rank: 0,
-      model: "Cadeia de Markov",
+      model: "TransitionScore",
       breakdown: buildBreakdown(steadyState * 25, transitionProb * 35, trendTransition * 5, cycleTransition * 10, 0, gapRegularity * 5, mixingFactor * 15 + periodicBonus * 10),
     };
   });
 
   normalizeAndRank(scored);
   return {
-    name: "Cadeia de Markov",
-    description: "Transições com detecção de periodicidade, regularidade de ciclos e tendência temporal",
+    name: "TransitionScore",
+    description: "Transições de estado (antigo Markov Chain) com detecção de periodicidade",
     predictions: scored,
     accuracy: null,
     confidence: 0,
@@ -339,7 +339,7 @@ export function runMarkovChain(stats: NumberStats[], config: LotteryConfig): Mod
 // ═══════════════════════════════════════════════════════
 // ENSEMBLE — weights calibrated by backtesting performance
 // Quantum Analysis — Multi-dimensional pattern detection
-export function runQuantumAnalysis(stats: NumberStats[], config: LotteryConfig): ModelResult {
+export function runMultiDimensionalPatternScore(stats: NumberStats[], config: LotteryConfig): ModelResult {
   const scored: MLPrediction[] = stats.map(s => {
     const frequencyEnergy = Math.log10(s.frequency + 1) * 20;
     const timeDecay = Math.exp(-s.lastSeen * 0.05) * 15;
@@ -355,15 +355,15 @@ export function runQuantumAnalysis(stats: NumberStats[], config: LotteryConfig):
       number: s.number,
       score: raw,
       rank: 0,
-      model: "Multi-Factor Pattern Engine",
+      model: "MultiDimensionalPatternScore",
       breakdown: buildBreakdown(frequencyEnergy, timeDecay, momentumSpin, cycleResonance, momentumSpin, gapEntanglement, positionWave + hotColdInteraction),
     };
   });
 
   normalizeAndRank(scored);
   return {
-    name: "Multi-Factor Pattern Engine",
-    description: "Detecção de padrões multi-dimensionais usando ressonância de ciclos e estados estatísticos",
+    name: "MultiDimensionalPatternScore",
+    description: "Detecção de padrões multi-dimensionais (antigo Quantum) usando ressonância",
     predictions: scored,
     accuracy: null,
     confidence: 0,
@@ -374,23 +374,23 @@ export function runQuantumAnalysis(stats: NumberStats[], config: LotteryConfig):
 
 export function runEnsembleVoting(stats: NumberStats[], config: LotteryConfig, modelWeights?: Record<string, number>): ModelResult {
   const defaultWeights: Record<string, number> = {
-    "Statistical Multi-Factor": 0.18,
-    "Gradient Pattern Engine": 0.22,
-    "Temporal Pattern Score": 0.18,
-    "Inferência Bayesiana": 0.12,
-    "Cadeia de Markov": 0.08,
-    "Multi-Factor Pattern Engine": 0.22,
+    "FrequencyTrendScore": 0.18,
+    "MultiFactorScore": 0.22,
+    "TemporalPatternScore": 0.18,
+    "BayesianScore": 0.12,
+    "TransitionScore": 0.08,
+    "MultiDimensionalPatternScore": 0.22,
   };
 
   const weights = modelWeights || defaultWeights;
 
   const models = [
-    { result: runRandomForest(stats, config), name: "Statistical Multi-Factor" },
-    { result: runXGBoost(stats, config), name: "Gradient Pattern Engine" },
-    { result: runNeuralNetwork(stats, config), name: "Temporal Pattern Score" },
-    { result: runBayesianInference(stats, config), name: "Inferência Bayesiana" },
-    { result: runMarkovChain(stats, config), name: "Cadeia de Markov" },
-    { result: runQuantumAnalysis(stats, config), name: "Multi-Factor Pattern Engine" },
+    { result: runFrequencyTrendScore(stats, config), name: "FrequencyTrendScore" },
+    { result: runMultiFactorScore(stats, config), name: "MultiFactorScore" },
+    { result: runTemporalPatternScore(stats, config), name: "TemporalPatternScore" },
+    { result: runBayesianScore(stats, config), name: "BayesianScore" },
+    { result: runTransitionScore(stats, config), name: "TransitionScore" },
+    { result: runMultiDimensionalPatternScore(stats, config), name: "MultiDimensionalPatternScore" },
   ];
 
   const numberScores: Record<number, { total: number; agreement: number; breakdownAccum: ScoreBreakdown }> = {};
