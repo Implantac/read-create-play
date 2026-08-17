@@ -96,6 +96,11 @@ function backtestStrategy(
     redundancyIndex * 10
   );
 
+  // Lift calculation
+  const expectedHits = (config.pick * config.pick) / config.numbers;
+  const lift = expectedHits > 0 ? avgHits / expectedHits : 1;
+  const accuracy = draws.length >= 50 ? Math.min(98, Math.max(0, (lift / 2 + consistency / 2) * 100)) : null;
+
   return {
     avgHits,
     bestHits,
@@ -108,6 +113,8 @@ function backtestStrategy(
     diversityScore,
     redundancyIndex,
     globalScore,
+    accuracy,
+    lift,
   };
 }
 

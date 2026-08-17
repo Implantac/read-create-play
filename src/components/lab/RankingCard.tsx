@@ -13,6 +13,7 @@ export function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }:
   const scorePercent = Math.min(100, r.metrics.globalScore);
   const gradeColor = r.metrics.globalScore >= 70 ? "text-green-500" :
                      r.metrics.globalScore >= 40 ? "text-amber-500" : "text-destructive";
+  const accuracyText = r.metrics.accuracy !== null ? `${r.metrics.accuracy.toFixed(1)}%` : "N/A";
 
   return (
     <Card className={`bg-card/80 backdrop-blur border-border transition-all hover:shadow-md ${

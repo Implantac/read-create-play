@@ -252,9 +252,11 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
         prizedCount: prized,
         closeMissCount: close,
         expectedHits: Math.round(expHits * 100) / 100,
+        lift: expHits > 0 ? Math.round((avg / expHits) * 100) / 100 : 1,
       };
-      if (prized > 0) s.explanation.push(`📊 Bateria faixa premiada em ${prized}/${valWindow.length} sorteios (últimos 100)`);
-      if (close > 0) s.explanation.push(`🎯 Quase ganhou em ${close} sorteios (faltou 1 nº)`);
+      const liftVal = s.validation.lift || 1;
+      if (prized > 0) s.explanation.push(`📊 Premiação: ${prized}/${valWindow.length} (Lift: ${liftVal.toFixed(2)}x)`);
+      if (close > 0) s.explanation.push(`🎯 Quase lá: ${close} sorteios (erro ±1)`);
     }
   }
 
