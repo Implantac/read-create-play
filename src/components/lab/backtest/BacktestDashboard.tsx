@@ -1,12 +1,12 @@
 import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { FlaskConical, History, TrendingUp, Info } from "lucide-react";
+import { FlaskConical, History, TrendingUp, Info, Activity } from "lucide-react";
 import { StrategyComparisonCard } from "./StrategyComparisonCard";
 import { BacktestResult } from "@/engine/strategy-lab/backtest-engine";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  CartesianGrid
+  CartesianGrid, LineChart, Line, Legend
 } from "recharts";
 
 interface BacktestDashboardProps {
