@@ -23,6 +23,7 @@ import {
   ArrowUpRight, Target, FlaskConical
 } from "lucide-react";
 import { AdminBacktestPanel } from "@/components/admin/AdminBacktestPanel";
+import { PWAAnalyticsPanel } from "@/components/admin/PWAAnalyticsPanel";
 
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -331,16 +332,20 @@ export default function AdminPage() {
       </div>
 
       <Tabs defaultValue="users" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5 max-w-2xl">
+        <TabsList className="grid w-full grid-cols-6 max-w-3xl">
           <TabsTrigger value="users" className="gap-1.5"><Users className="w-4 h-4" /> Usuários</TabsTrigger>
           <TabsTrigger value="revenue" className="gap-1.5"><DollarSign className="w-4 h-4" /> Receita</TabsTrigger>
           <TabsTrigger value="usage" className="gap-1.5"><TrendingUp className="w-4 h-4" /> Uso</TabsTrigger>
           <TabsTrigger value="audit" className="gap-1.5"><History className="w-4 h-4" /> Auditoria</TabsTrigger>
+          <TabsTrigger value="pwa" className="gap-1.5"><Smartphone className="w-4 h-4" /> PWA</TabsTrigger>
           <TabsTrigger value="backtest" className="gap-1.5"><FlaskConical className="w-4 h-4" /> Backtest</TabsTrigger>
         </TabsList>
 
 
         {/* USERS TAB */}
+        <TabsContent value="pwa">
+          <PWAAnalyticsPanel />
+        </TabsContent>
         <TabsContent value="users">
           {/* Plan distribution */}
           <Card className="bg-card/60 border-border/50 mb-4">
