@@ -72,78 +72,77 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const loadUserData = useCallback(async (userId: string, accessToken?: string, email?: string | null) => {
+    // Carrega dados essenciais primeiro
     await Promise.all([
       fetchProfile(userId, email),
       checkAdmin(userId, email),
-      ...(accessToken ? [syncSubscription(accessToken)] : []),
     ]);
+    
+    // Carrega subscrição em background para não travar o login
+    if (accessToken) {
+      syncSubscription(accessToken).catch(err => 
+        console.error("[Auth] Background subscription sync failed:", err)
+      );
+    }
   }, [fetchProfile, checkAdmin, syncSubscription]);
 
   useEffect(() => {
     const authStorageKey = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`;
     let mounted = true;
 
-    console.log("[Auth] Effect starting...");
+    // console.log("[Auth] Effect starting...");
 
     const initAuth = async () => {
       try {
-        // Parallel init: Check current session and listen for changes
-        const sessionPromise = supabase.auth.getSession();
-        
+        // Step 1: Subscribe to changes immediately
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, nextSession) => {
             if (!mounted) return;
             
-            console.log(`[Auth] Event: ${event}`);
+            const hasUser = !!nextSession?.user;
             setSession(nextSession);
             
-            if (nextSession?.user) {
-              try {
-                await loadUserData(nextSession.user.id, nextSession.access_token, nextSession.user.email);
-              } catch (err) {
-                console.error("[Auth] Data sync error during event:", err);
-              }
+            if (hasUser) {
+              // Only block loading for essential data
+              loadUserData(nextSession.user!.id, nextSession!.access_token, nextSession!.user.email)
+                .finally(() => {
+                  if (mounted) setLoading(false);
+                });
             } else {
               setProfile(null);
               setIsAdmin(false);
               setIsSuperAdmin(false);
               setUserRole("user");
+              setLoading(false);
             }
-            
-            setLoading(false);
           }
         );
 
-        // Safety timeout to force loading = false even if Supabase initialization hangs
-        const timeout = setTimeout(() => {
-          if (mounted) {
-            console.warn("[Auth] Initial init timeout - forcing loading state to false");
-            setLoading(false);
-          }
-        }, 8000);
-
-        const { data: { session: initialSession }, error } = await sessionPromise;
-        clearTimeout(timeout);
-
+        // Step 2: Get initial session
+        const { data: { session: initialSession }, error } = await supabase.auth.getSession();
         
         if (mounted) {
           if (error) {
-            console.error("[Auth] Initial session error:", error);
+            console.error("[Auth] Session error:", error);
             if (error.message.includes("refresh_token") || error.message.includes("invalid")) {
               localStorage.removeItem(authStorageKey);
             }
+            setLoading(false);
           } else if (initialSession?.user) {
             setSession(initialSession);
-            await loadUserData(initialSession.user.id, initialSession.access_token, initialSession.user.email);
+            // Non-blocking load
+            loadUserData(initialSession.user.id, initialSession.access_token, initialSession.user.email)
+              .finally(() => {
+                if (mounted) setLoading(false);
+              });
+          } else {
+            setLoading(false);
           }
-          
-          setLoading(false);
-          console.log("[Auth] Initialization complete");
         }
 
         return subscription;
       } catch (err) {
-        console.error("[Auth] Fatal init error:", err);
+        console.error("[Auth] Init crash:", err);
         if (mounted) setLoading(false);
         return null;
       }
@@ -151,13 +150,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const subPromise = initAuth();
 
-    // Safety timeout to prevent infinite loading
+    // Final safety timeout (redundant but safe)
     const timeout = setTimeout(() => {
       if (mounted && loading) {
-        console.warn("[Auth] Loading stuck for 10s, forcing unlock");
         setLoading(false);
       }
-    }, 10000);
+    }, 6000);
 
     return () => {
       mounted = false;
