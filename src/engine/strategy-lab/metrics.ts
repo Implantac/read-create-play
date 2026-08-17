@@ -6,4 +6,6 @@ export interface StrategyMetrics {
   totalSpent: number;
   totalWon: number;
   winRate: number;
+  volatility: number;
+  maxConsecutiveLosses: number;
 }

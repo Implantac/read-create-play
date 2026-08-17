@@ -118,14 +118,26 @@ export function BacktestDashboard({ results }: BacktestDashboardProps) {
               </ResponsiveContainer>
             </div>
 
-            <div className="mt-6 flex items-center gap-3 p-4 rounded-[1.5rem] bg-muted/20 border border-border/50">
-              <Info className="w-5 h-5 text-primary shrink-0" />
-              <p className="text-[11px] text-muted-foreground leading-relaxed">
-                <span className="font-bold text-foreground uppercase">Análise de Risco:</span> Esta curva representa a evolução de uma banca inicial de R$ 1.000,00 apostando {selectedResult.metrics.totalSpent / selectedResult.history.length / 3.5} jogos por concurso. 
-                O <span className="text-primary font-bold">Drawdown</span> de {selectedResult.metrics.drawdown.toFixed(1)}% indica a maior queda sofrida. 
-                Estratégias com <span className="text-rose-400 font-bold">Probabilidade de Quebra</span> acima de 10% devem ser operadas com extrema cautela ou 
-                Kelly defensivo.
-              </p>
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-[1.5rem] bg-muted/20 border border-border/50">
+              <div className="flex items-start gap-3">
+                <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  <span className="font-bold text-foreground uppercase">Análise de Risco:</span> Esta curva representa a evolução de uma banca inicial de R$ 1.000,00 apostando {selectedResult.metrics.totalSpent / selectedResult.history.length / 3.5} jogos por concurso. 
+                  O <span className="text-primary font-bold">Drawdown</span> de {selectedResult.metrics.drawdown.toFixed(1)}% indica a maior queda sofrida.
+                </p>
+              </div>
+              <div className="flex flex-col justify-center border-l border-border/20 pl-4">
+                 <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-[9px] uppercase font-black text-muted-foreground">Volatilidade</p>
+                      <p className="text-sm font-mono font-bold text-foreground">{selectedResult.metrics.volatility.toFixed(2)}%</p>
+                    </div>
+                    <div>
+                      <p className="text-[9px] uppercase font-black text-muted-foreground">Max Loss Streak</p>
+                      <p className="text-sm font-mono font-bold text-rose-400">{selectedResult.metrics.maxConsecutiveLosses} conc.</p>
+                    </div>
+                 </div>
+              </div>
             </div>
           </CardContent>
         </Card>
