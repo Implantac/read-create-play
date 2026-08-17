@@ -8,4 +8,7 @@ export interface StrategyMetrics {
   winRate: number;
   volatility: number;
   maxConsecutiveLosses: number;
+  lift?: number;
+  pValue?: number;
+  isSignificant?: boolean;
 }
