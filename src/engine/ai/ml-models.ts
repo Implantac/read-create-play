@@ -190,7 +190,7 @@ export function runRandomForest(stats: NumberStats[], config: LotteryConfig): Mo
     name: "Statistical Multi-Factor",
     description: "Heurística ponderada: frequência, tendência, ciclo, momentum e consistência de gaps",
     predictions: scored,
-    accuracy: 0, 
+    accuracy: null, 
     confidence: 0,
   };
 }
@@ -226,7 +226,7 @@ export function runXGBoost(stats: NumberStats[], config: LotteryConfig): ModelRe
     name: "Gradient Pattern Engine",
     description: "Algoritmo de gradiente com features de tendência, ciclo, momentum e desvio padrão de gaps",
     predictions: scored,
-    accuracy: 0,
+    accuracy: null,
     confidence: 0,
   };
 }
@@ -261,7 +261,7 @@ export function runNeuralNetwork(stats: NumberStats[], config: LotteryConfig): M
     name: "Temporal Pattern Score",
     description: "Decomposição não-linear com attention em gaps, tendência e momentum",
     predictions: scored,
-    accuracy: 0,
+    accuracy: null,
     confidence: 0,
   };
 }
@@ -298,7 +298,7 @@ export function runBayesianInference(stats: NumberStats[], config: LotteryConfig
     name: "Inferência Bayesiana",
     description: "Atualização bayesiana com priors de ciclo, consistência de gaps, momentum e tendência",
     predictions: scored,
-    accuracy: 0,
+    accuracy: null,
     confidence: 0,
   };
 }
@@ -331,7 +331,7 @@ export function runMarkovChain(stats: NumberStats[], config: LotteryConfig): Mod
     name: "Cadeia de Markov",
     description: "Transições com detecção de periodicidade, regularidade de ciclos e tendência temporal",
     predictions: scored,
-    accuracy: 0,
+    accuracy: null,
     confidence: 0,
   };
 }
@@ -365,7 +365,7 @@ export function runQuantumAnalysis(stats: NumberStats[], config: LotteryConfig):
     name: "Multi-Factor Pattern Engine",
     description: "Detecção de padrões multi-dimensionais usando ressonância de ciclos e estados estatísticos",
     predictions: scored,
-    accuracy: 0,
+    accuracy: null,
     confidence: 0,
   };
 }
@@ -488,7 +488,7 @@ export function runAllModels(
       result.backtestDetails = bt;
       calibratedWeights[name] = bt.liftOverChance > 1 ? bt.liftOverChance - 1 : 0.01;
     } else {
-      result.accuracy = 0;
+      result.accuracy = null;
       result.confidence = 0;
       calibratedWeights[name] = 0.1;
     }
@@ -515,7 +515,7 @@ export function runAllModels(
     ensemble.confidence = metrics.confidence;
     ensemble.backtestDetails = bt;
   } else {
-    ensemble.accuracy = 0;
+    ensemble.accuracy = null;
     ensemble.confidence = 0;
   }
   results.push(ensemble);
