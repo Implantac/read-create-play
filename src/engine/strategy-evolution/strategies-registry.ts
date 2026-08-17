@@ -86,7 +86,7 @@ export const STRATEGY_REGISTRY: StrategyDefinition[] = [
     params: { ...DEFAULT_PARAMS, trendWeight: 0.5, cycleWeight: 0.6 },
   },
   {
-    id: "quantum_analysis", name: "Multi-Factor Pattern Engine", description: "Padrões multi-dimensionais e ressonância de ciclos",
+    id: "quantum_analysis", name: "Multi-Factor Pattern Engine", description: "Detecção de padrões multi-dimensionais usando ressonância de ciclos e estados estatísticos",
     category: "ai", baseStrategy: "quantum", supportedLotteries: [],
     params: { ...DEFAULT_PARAMS },
   },

@@ -180,7 +180,7 @@ export function runRandomForest(stats: NumberStats[], config: LotteryConfig): Mo
       number: s.number,
       score: raw,
       rank: 0,
-      model: "Random Forest",
+      model: "Statistical Multi-Factor",
       breakdown: buildBreakdown(freqScore, recencyScore + recentTrend, trendBonus, cycleBonus, momentumBonus, gapConsistency, parityBonus + rangeBonus + consecutiveBonus),
     };
   });
@@ -216,7 +216,7 @@ export function runXGBoost(stats: NumberStats[], config: LotteryConfig): ModelRe
       number: s.number,
       score: raw,
       rank: 0,
-      model: "XGBoost",
+      model: "Gradient Pattern Engine",
       breakdown: buildBreakdown(freqWeight, recency + delayPenalty, trendFeature + hotColdBonus, cycleFeature, momentumAccel, gapFeature + stdDevFeature, positionFeature),
     };
   });
@@ -251,7 +251,7 @@ export function runNeuralNetwork(stats: NumberStats[], config: LotteryConfig): M
       number: s.number,
       score: raw,
       rank: 0,
-      model: "Neural Network",
+      model: "Temporal Pattern Score",
       breakdown: buildBreakdown(layer1, layer2 + layer3, trendNeuron, cycleNeuron, momentumNeuron, gapAttention, embedding + consecutiveAttention),
     };
   });
@@ -288,7 +288,7 @@ export function runBayesianInference(stats: NumberStats[], config: LotteryConfig
       number: s.number,
       score: raw,
       rank: 0,
-      model: "Bayesian",
+      model: "Inferência Bayesiana",
       breakdown: buildBreakdown(likelihood * 100, recentLikelihood * 100, trendLikelihood * 100, (cyclePrior - 1) * 100, (momentumPrior - 1) * 100, (gapPrior - 1) * 100, delayFactor * 100),
     };
   });
@@ -321,7 +321,7 @@ export function runMarkovChain(stats: NumberStats[], config: LotteryConfig): Mod
       number: s.number,
       score: raw,
       rank: 0,
-      model: "Markov",
+      model: "Cadeia de Markov",
       breakdown: buildBreakdown(steadyState * 25, transitionProb * 35, trendTransition * 5, cycleTransition * 10, 0, gapRegularity * 5, mixingFactor * 15 + periodicBonus * 10),
     };
   });
@@ -355,7 +355,7 @@ export function runQuantumAnalysis(stats: NumberStats[], config: LotteryConfig):
       number: s.number,
       score: raw,
       rank: 0,
-      model: "Quantum",
+      model: "Multi-Factor Pattern Engine",
       breakdown: buildBreakdown(frequencyEnergy, timeDecay, momentumSpin, cycleResonance, momentumSpin, gapEntanglement, positionWave + hotColdInteraction),
     };
   });
@@ -439,7 +439,7 @@ export function runEnsembleVoting(stats: NumberStats[], config: LotteryConfig, m
   normalizeAndRank(scored);
 
   const weightDesc = Object.entries(weights).map(([k, v]) => {
-    const short = k.replace("Rede Neural (LSTM)", "LSTM").replace("Inferência Bayesiana", "Bayes").replace("Cadeia de Markov", "Markov").replace("Random Forest", "RF");
+    const short = k.replace("Temporal Pattern Score", "TPS").replace("Inferência Bayesiana", "Bayes").replace("Cadeia de Markov", "Markov").replace("Statistical Multi-Factor", "SMF").replace("Gradient Pattern Engine", "GPE").replace("Multi-Factor Pattern Engine", "MFPE");
     return `${short}(${Math.round(v * 100)}%)`;
   }).join(" + ");
 
