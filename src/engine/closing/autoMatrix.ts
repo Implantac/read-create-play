@@ -34,7 +34,8 @@ export function pickBestMatrix({
   const affordable = available
     .map(m => ({
       ...m,
-      cost: m.gameCount * costPerGame
+      gameCount: m.games.length,
+      cost: m.games.length * costPerGame
     }))
     .filter(m => m.cost <= budget && m.baseSize <= availableBaseSize)
     .sort((a, b) => {
