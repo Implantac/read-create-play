@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { trackPWAEvent } from "@/lib/pwa-tracking";
 
 type DetectedPlatform = "android" | "ios" | null;
 
@@ -89,12 +90,20 @@ export function useInstallPrompt() {
       const choice = await deferredPrompt.userChoice;
 
       setDeferredPrompt(null);
-      return choice.outcome === "accepted";
-    } catch {
+      
+      if (choice.outcome === "accepted") {
+        trackPWAEvent('prompt_accepted', platform);
+        return true;
+      } else {
+        trackPWAEvent('prompt_dismissed', platform);
+        return false;
+      }
+    } catch (err) {
+      console.error("[PWA] Install error:", err);
       setDeferredPrompt(null);
       return false;
     }
-  }, [deferredPrompt]);
+  }, [deferredPrompt, platform]);
 
   return {
     install,
