@@ -20,6 +20,8 @@ export interface LabAnalysis {
   roi: number;
   sharpeRatio: number;
   expectedValue: number;
+  volatility: number;
+  maxConsecutiveLosses: number;
 }
 
 export function runBacktest(
@@ -87,8 +89,27 @@ export function runBacktest(
     if (dd > maxDrawdown) maxDrawdown = dd;
   }
 
-  // Calculate Ruin Probability (Simplified Monte Carlo approximation)
-  // If at any point equity <= 0, it's a ruin
+  // Calculate Volatility and Sharpe Ratio
+  const returns = history.map((h, i) => {
+    const prevEquity = i === 0 ? initialBankroll : history[i - 1].equity;
+    return (h.equity - prevEquity) / prevEquity;
+  });
+  const avgReturn = returns.reduce((a, b) => a + b, 0) / returns.length;
+  const variance = returns.reduce((a, b) => a + Math.pow(b - avgReturn, 2), 0) / returns.length;
+  const volatility = Math.sqrt(variance);
+  
+  // Max consecutive losses
+  let maxConsecutiveLosses = 0;
+  let currentLossStreak = 0;
+  for (const h of history) {
+    if (!h.isPrize) {
+      currentLossStreak++;
+      maxConsecutiveLosses = Math.max(maxConsecutiveLosses, currentLossStreak);
+    } else {
+      currentLossStreak = 0;
+    }
+  }
+
   const ruinCount = history.filter(h => h.equity <= 0).length;
   const ruinProbability = history.length > 0 ? ruinCount / history.length : 0;
 
@@ -99,7 +120,9 @@ export function runBacktest(
     avgHits: history.reduce((s, h) => s + h.hits, 0) / (history.length || 1),
     totalSpent,
     totalWon,
-    winRate: (history.filter(h => h.isPrize).length / (history.length || 1)) * 100
+    winRate: (history.filter(h => h.isPrize).length / (history.length || 1)) * 100,
+    volatility: volatility * 100,
+    maxConsecutiveLosses
   };
 
   return {
