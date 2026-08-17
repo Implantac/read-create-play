@@ -11,8 +11,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import {
   AlertTriangle, Wallet, ShieldCheck, TrendingDown, TrendingUp,
-  Target, Trash2, Plus, PiggyBank, Zap, LineChart, Calculator,
+  Target, Trash2, Plus, PiggyBank, Zap, LineChart, Calculator, Trophy
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { LOTTERIES } from "@/data/lotteries";
 import {
   buildBankrollPlan,
