@@ -14,28 +14,32 @@ export const AutoInstallPrompt = () => {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    // No preview environments or iframes
-    if (isPreviewHost || isInIframe) return;
+    const checkVisibility = () => {
+      if (isPreviewHost || isInIframe || isInstalled) return;
+
+      if (!canPromptInstall && !needsManualInstall) {
+        return;
+      }
+
+      try {
+        const dismissed = Number(localStorage.getItem(DISMISS_KEY) || 0);
+        if (dismissed && Date.now() - dismissed < DISMISS_MS) return;
+      } catch {
+        /* ignore */
+      }
+
+      setVisible(true);
+    };
+
+    const t = setTimeout(checkVisibility, 1500);
     
-    // Don't show if already installed
-    if (isInstalled) return;
-
-    // We can show the prompt if we have the event or if it's iOS (manual install)
-    if (!canPromptInstall && !needsManualInstall) {
-      console.log("[PWA] Prompt not ready yet:", { canPromptInstall, needsManualInstall });
-      return;
-    }
-
-    try {
-      const dismissed = Number(localStorage.getItem(DISMISS_KEY) || 0);
-      if (dismissed && Date.now() - dismissed < DISMISS_MS) return;
-    } catch {
-      /* ignore */
-    }
-
-    console.log("[PWA] Showing install prompt");
-    const t = setTimeout(() => setVisible(true), 1500);
-    return () => clearTimeout(t);
+    // Also listen for the custom event in case it fires after the timeout
+    window.addEventListener('pwa-prompt-ready', checkVisibility);
+    
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener('pwa-prompt-ready', checkVisibility);
+    };
   }, [canPromptInstall, needsManualInstall, isInstalled, isPreviewHost, isInIframe]);
 
   const dismiss = () => {

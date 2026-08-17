@@ -49,8 +49,12 @@ export function useInstallPrompt() {
     const handleBeforeInstallPrompt = (event: Event) => {
       console.log("[PWA] beforeinstallprompt event captured");
       event.preventDefault();
-      // Ensure we cast correctly and don't lose the event
-      setDeferredPrompt(event as BeforeInstallPromptEvent);
+      const promptEvent = event as BeforeInstallPromptEvent;
+      // Store it and log state
+      setDeferredPrompt(promptEvent);
+      
+      // Notify components immediately if needed
+      window.dispatchEvent(new CustomEvent('pwa-prompt-ready'));
     };
 
     const handleInstalled = () => {
