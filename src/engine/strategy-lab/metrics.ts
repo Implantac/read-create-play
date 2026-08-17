@@ -11,4 +11,6 @@ export interface StrategyMetrics {
   lift?: number;
   pValue?: number;
   isSignificant?: boolean;
+  shuffledLift?: number; // Lift against shuffled timeline
+  signalIntegrity?: number; // Ratio of real lift vs shuffled lift (0-1)
 }

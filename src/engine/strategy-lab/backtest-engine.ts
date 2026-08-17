@@ -33,7 +33,8 @@ export function runBacktest(
   draws: DrawResult[],
   config: LotteryConfig,
   ticketCost: number,
-  initialBankroll: number = 1000
+  initialBankroll: number = 1000,
+  enableShuffledTest: boolean = false
 ): BacktestResult {
   const history: BacktestResult["history"] = [];
   let currentBankroll = initialBankroll;
@@ -119,6 +120,35 @@ export function runBacktest(
   const totalSlots = sortedDraws.length * games.length * config.pick;
   const evidence = analyzeEvidence(totalObservedHits, totalSlots, config);
 
+  // --- Shuffled Backtest (Integrity Check) ---
+  let shuffledLift: number | undefined;
+  let signalIntegrity: number | undefined;
+
+  if (enableShuffledTest) {
+    // Shuffling the temporal dimension (draw results) to see if strategy still "wins"
+    // If it does, the signal might be overfitting or lucky rather than capturing temporal patterns
+    const shuffledDraws = [...sortedDraws].sort(() => Math.random() - 0.5);
+    let shuffledHits = 0;
+    
+    for (const draw of shuffledDraws) {
+      const drawSet = new Set(draw.numbers);
+      for (const game of games) {
+        shuffledHits += game.filter(n => drawSet.has(n)).length;
+      }
+    }
+    
+    const shuffledEvidence = analyzeEvidence(shuffledHits, totalSlots, config);
+    shuffledLift = shuffledEvidence.lift;
+    
+    // Integrity: How much of our lift is lost when we shuffle?
+    // High integrity (close to 1.0) means the signal depends on the specific sequence of draws (temporal).
+    // Low integrity means the strategy works regardless of order (likely just picking high-frequency numbers).
+    // Note: If both lifts are ~1, integrity is high but strategy is just random.
+    signalIntegrity = evidence.lift > 1 
+      ? Math.max(0, Math.min(1, (evidence.lift - 1) / ((evidence.lift - 1) + (shuffledLift - 1) + 0.0001)))
+      : 1;
+  }
+
   const metrics: StrategyMetrics = {
     roi,
     drawdown: maxDrawdown * 100,
@@ -131,7 +161,9 @@ export function runBacktest(
     maxConsecutiveLosses,
     lift: evidence.lift,
     pValue: evidence.pValue,
-    isSignificant: evidence.isSignificant
+    isSignificant: evidence.isSignificant,
+    shuffledLift,
+    signalIntegrity
   };
 
   return {

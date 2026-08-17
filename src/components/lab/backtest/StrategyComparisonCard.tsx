@@ -88,7 +88,25 @@ export function StrategyComparisonCard({ name, metrics, isBest }: StrategyCompar
               </span>
             </div>
           )}
+          
+          {metrics.signalIntegrity !== undefined && (
+            <div className="flex justify-between items-center text-[10px]">
+              <span className="text-muted-foreground flex items-center gap-1">
+                <Brain className="w-3 h-3" /> Integridade Temporal
+              </span>
+              <span className={cn("font-mono font-bold", metrics.signalIntegrity > 0.7 ? "text-emerald-400" : metrics.signalIntegrity > 0.4 ? "text-amber-400" : "text-rose-400")}>
+                {(metrics.signalIntegrity * 100).toFixed(0)}%
+              </span>
+            </div>
+          )}
         </div>
+
+        {metrics.signalIntegrity !== undefined && metrics.signalIntegrity < 0.4 && (
+          <div className="flex items-center gap-2 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+            <AlertTriangle className="w-3 h-3 text-amber-500" />
+            <span className="text-[9px] text-amber-400 font-bold uppercase">Sinal Suspeito (Overfitting?)</span>
+          </div>
+        )}
 
         {metrics.ruinProbability > 15 && (
           <div className="flex items-center gap-2 p-2 rounded-lg bg-rose-500/10 border border-rose-500/20">
