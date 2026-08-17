@@ -26,6 +26,10 @@ export interface LabAnalysis {
   maxConsecutiveLosses: number;
 }
 
+/**
+ * Executa um Walk-Forward Backtest rigoroso.
+ * Garante que o modelo só tenha acesso a dados do passado em cada passo temporal.
+ */
 export function runBacktest(
   strategyId: string,
   strategyName: string,
