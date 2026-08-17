@@ -27,7 +27,7 @@ export interface ModelResult {
   name: string;
   description: string;
   predictions: MLPrediction[];
-  accuracy: number;      // backtesting-based
+  accuracy: number | null;      // backtesting-based
   confidence: number;    // backtesting-based
   backtestDetails?: BacktestMetrics;
 }
@@ -57,13 +57,13 @@ function normalizeAndRank(scored: MLPrediction[]): void {
 
 function backtestModel(
   modelFn: (stats: NumberStats[], config: LotteryConfig) => ModelResult,
-  allDraws: DrawResult[],
+  sortedDraws: DrawResult[], // Must be sorted ASC
   config: LotteryConfig,
   computeStatsFn: (draws: DrawResult[], totalNumbers: number) => NumberStats[],
   windowSize: number = 100,
-  testSize: number = 30
+  testSize: number = 50
 ): BacktestMetrics {
-  const maxTestable = Math.min(testSize, allDraws.length - windowSize);
+  const maxTestable = Math.min(testSize, sortedDraws.length - windowSize);
   const expectedByChance = (15 / config.numbers) * config.pick;
   if (maxTestable <= 0) {
     return { totalDrawsTested: 0, avgHitsInTop15: 0, top15HitRate: 0, top5Precision: 0, consistency: 0, liftOverChance: 0, expectedByChance };
@@ -73,9 +73,9 @@ function backtestModel(
   const top5Hits: number[] = [];
 
   for (let i = 0; i < maxTestable; i++) {
-    // Use draws [i+1 .. i+windowSize] as training, draw[i] as test
-    const trainingDraws = allDraws.slice(i + 1, i + 1 + windowSize);
-    const testDraw = allDraws[i];
+    // Walk-forward: training on indices [i...i+windowSize-1], testing on [i+windowSize]
+    const trainingDraws = sortedDraws.slice(i, i + windowSize);
+    const testDraw = sortedDraws[i + windowSize];
 
     if (!testDraw || trainingDraws.length < 50) continue;
 
@@ -116,18 +116,21 @@ function backtestModel(
   };
 }
 
-function computeAccuracyFromBacktest(bt: BacktestMetrics, config: LotteryConfig): { accuracy: number; confidence: number } {
-  if (bt.totalDrawsTested === 0) {
-    return { accuracy: 50, confidence: 30 };
+function computeAccuracyFromBacktest(bt: BacktestMetrics, config: LotteryConfig): { accuracy: number | null; confidence: number } {
+  if (bt.totalDrawsTested < 10) {
+    return { accuracy: null, confidence: 0 };
   }
-  // Accuracy: how many of top15 predictions hit on average, relative to expected by chance
-  const expectedByChance = (15 / config.numbers) * config.pick;
-  const liftOverChance = bt.avgHitsInTop15 / (expectedByChance || 1);
-  const accuracy = Math.min(95, Math.max(35, Math.round(50 + (liftOverChance - 1) * 30 + bt.top5Precision * 10)));
-
-  // Confidence: based on consistency and sample size
-  const sampleFactor = Math.min(1, bt.totalDrawsTested / 25);
-  const confidence = Math.min(95, Math.max(30, Math.round(bt.consistency * 0.6 + bt.top15HitRate * 0.3 + sampleFactor * 10)));
+  
+  // Precision@15: average percentage of hits in top 15
+  const precisionAt15 = bt.avgHitsInTop15 / 15;
+  const lift = bt.liftOverChance;
+  
+  // Accuracy is now a combined metric of precision and lift
+  const accuracy = Math.min(98, Math.max(0, Math.round((precisionAt15 * 0.6 + (lift / 2) * 0.4) * 100)));
+  
+  // Confidence: based on consistency and sample size (robust if > 100 draws)
+  const sampleFactor = Math.min(1, bt.totalDrawsTested / 100);
+  const confidence = Math.min(95, Math.max(0, Math.round(bt.consistency * 0.7 * sampleFactor + sampleFactor * 30)));
 
   return { accuracy, confidence };
 }
@@ -184,10 +187,10 @@ export function runRandomForest(stats: NumberStats[], config: LotteryConfig): Mo
 
   normalizeAndRank(scored);
   return {
-    name: "Random Forest",
-    description: "Ensemble de árvores com features: frequência, tendência, ciclo, momentum e consistência de gaps",
+    name: "Statistical Multi-Factor",
+    description: "Heurística ponderada: frequência, tendência, ciclo, momentum e consistência de gaps",
     predictions: scored,
-    accuracy: 0, // will be filled by backtesting
+    accuracy: null, 
     confidence: 0,
   };
 }
@@ -220,10 +223,10 @@ export function runXGBoost(stats: NumberStats[], config: LotteryConfig): ModelRe
 
   normalizeAndRank(scored);
   return {
-    name: "XGBoost",
-    description: "Gradient Boosting com features de tendência, ciclo, momentum e desvio padrão de gaps",
+    name: "Gradient Pattern Engine",
+    description: "Algoritmo de gradiente com features de tendência, ciclo, momentum e desvio padrão de gaps",
     predictions: scored,
-    accuracy: 0,
+    accuracy: null,
     confidence: 0,
   };
 }
@@ -255,10 +258,10 @@ export function runNeuralNetwork(stats: NumberStats[], config: LotteryConfig): M
 
   normalizeAndRank(scored);
   return {
-    name: "Rede Neural (LSTM)",
-    description: "LSTM 3 camadas com attention em gaps, tendência, momentum e padrões de consecutividade",
+    name: "Temporal Pattern Score",
+    description: "Decomposição não-linear com attention em gaps, tendência e momentum",
     predictions: scored,
-    accuracy: 0,
+    accuracy: null,
     confidence: 0,
   };
 }
@@ -359,10 +362,10 @@ export function runQuantumAnalysis(stats: NumberStats[], config: LotteryConfig):
 
   normalizeAndRank(scored);
   return {
-    name: "Análise Quantum",
+    name: "Multi-Factor Pattern Engine",
     description: "Detecção de padrões multi-dimensionais usando ressonância de ciclos e estados estatísticos",
     predictions: scored,
-    accuracy: 0,
+    accuracy: null,
     confidence: 0,
   };
 }
@@ -460,12 +463,12 @@ export function runAllModels(
   computeStatsFn?: (draws: DrawResult[], totalNumbers: number) => NumberStats[]
 ): ModelResult[] {
   const modelFns: Array<{ fn: (s: NumberStats[], c: LotteryConfig) => ModelResult; name: string }> = [
-    { fn: runRandomForest, name: "Random Forest" },
-    { fn: runXGBoost, name: "XGBoost" },
-    { fn: runNeuralNetwork, name: "Rede Neural (LSTM)" },
+    { fn: runRandomForest, name: "Statistical Multi-Factor" },
+    { fn: runXGBoost, name: "Gradient Pattern Engine" },
+    { fn: runNeuralNetwork, name: "Temporal Pattern Score" },
     { fn: runBayesianInference, name: "Inferência Bayesiana" },
     { fn: runMarkovChain, name: "Cadeia de Markov" },
-    { fn: runQuantumAnalysis, name: "Análise Quantum" },
+    { fn: runQuantumAnalysis, name: "Multi-Factor Pattern Engine" },
   ];
 
   const results: ModelResult[] = [];
@@ -505,16 +508,17 @@ export function runAllModels(
 
   // Run ensemble with calibrated weights
   const ensemble = runEnsembleVoting(stats, config, totalWeight > 0 ? calibratedWeights : undefined);
-  if (draws && draws.length > 80 && computeStatsFn) {
+  if (draws && draws.length > 100 && computeStatsFn) {
     const ensembleFn = (s: NumberStats[], c: LotteryConfig) => runEnsembleVoting(s, c, totalWeight > 0 ? calibratedWeights : undefined);
-    const bt = backtestModel(ensembleFn, draws, config, computeStatsFn, 80, 25);
+    const sortedDraws = [...draws].sort((a, b) => a.concurso - b.concurso);
+    const bt = backtestModel(ensembleFn, sortedDraws, config, computeStatsFn, 100, 50);
     const metrics = computeAccuracyFromBacktest(bt, config);
     ensemble.accuracy = metrics.accuracy;
     ensemble.confidence = metrics.confidence;
     ensemble.backtestDetails = bt;
   } else {
-    ensemble.accuracy = 67;
-    ensemble.confidence = 72;
+    ensemble.accuracy = null;
+    ensemble.confidence = 0;
   }
   results.push(ensemble);
 
@@ -524,11 +528,11 @@ export function runAllModels(
 export function getConsensusRanking(models: ModelResult[]): MLPrediction[] {
   const numberScores: Record<number, { total: number; count: number; topCount: number; breakdown: ScoreBreakdown }> = {};
 
-  // Use accuracy-based weights for consensus
-  const totalAccuracy = models.reduce((s, m) => s + m.accuracy, 0) || models.length;
+  // Use accuracy-based weights for consensus (if accuracy is null, use 50 as baseline)
+  const totalAccuracy = models.reduce((s, m) => s + (m.accuracy ?? 50), 0) || models.length;
 
   models.forEach(model => {
-    const modelWeight = model.accuracy / totalAccuracy;
+    const modelWeight = (model.accuracy ?? 50) / totalAccuracy;
     const top15 = new Set(model.predictions.slice(0, 15).map(p => p.number));
     model.predictions.forEach(p => {
       if (!numberScores[p.number]) {
