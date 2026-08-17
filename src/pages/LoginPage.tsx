@@ -35,12 +35,17 @@ export default function LoginPage() {
         throw error;
       }
 
+      // Check if session exists (standard login)
       if (data?.session) {
-        // Force a small delay to ensure AuthProvider processes the state change
-        // OR rely on the navigate being triggered after we know we have a session.
         toast({ title: "Bem-vindo!", description: "Login realizado com sucesso." });
-        navigate(nextPath, { replace: true });
+        
+        // Use a slight delay to allow AuthProvider to hydrate state if needed,
+        // but replace history so user cannot go back to login
+        setTimeout(() => {
+          navigate(nextPath, { replace: true });
+        }, 100);
       }
+
     } catch (error: any) {
       console.error("Login error:", error);
       toast({ 

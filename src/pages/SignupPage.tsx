@@ -77,7 +77,7 @@ export default function SignupPage() {
       console.warn("signup-guard falhou, prosseguindo:", err);
     }
 
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -89,12 +89,22 @@ export default function SignupPage() {
         emailRedirectTo: `${window.location.origin}${nextPath}`,
       },
     });
+
     setLoading(false);
+
     if (error) {
       toast({ title: "Erro ao cadastrar", description: error.message, variant: "destructive" });
     } else {
-      setSent(true);
+      // Se o auto-confirm estiver ligado ou não for necessária confirmação, 
+      // o Supabase pode retornar uma sessão imediatamente.
+      if (signUpData?.session) {
+        toast({ title: "Conta criada!", description: "Bem-vindo ao Titan Loterias." });
+        navigate(nextPath, { replace: true });
+      } else {
+        setSent(true);
+      }
     }
+
   };
 
   if (sent) {
