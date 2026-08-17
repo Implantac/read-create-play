@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,8 +23,10 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [urlParams] = useSearchParams();
   const nextPath = safeNext(urlParams.get("next"));
+
 
   // Get referral code from URL
   const searchParams = new URLSearchParams(window.location.search);
@@ -77,7 +79,7 @@ export default function SignupPage() {
       console.warn("signup-guard falhou, prosseguindo:", err);
     }
 
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -89,12 +91,22 @@ export default function SignupPage() {
         emailRedirectTo: `${window.location.origin}${nextPath}`,
       },
     });
+
     setLoading(false);
+
     if (error) {
       toast({ title: "Erro ao cadastrar", description: error.message, variant: "destructive" });
     } else {
-      setSent(true);
+      // Se o auto-confirm estiver ligado ou não for necessária confirmação, 
+      // o Supabase pode retornar uma sessão imediatamente.
+      if (signUpData?.session) {
+        toast({ title: "Conta criada!", description: "Bem-vindo ao Titan Loterias." });
+        navigate(nextPath, { replace: true });
+      } else {
+        setSent(true);
+      }
     }
+
   };
 
   if (sent) {

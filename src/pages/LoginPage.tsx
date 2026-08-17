@@ -28,12 +28,33 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
-      toast({ title: "Erro ao entrar", description: error.message, variant: "destructive" });
-    } else {
-      navigate(nextPath);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      
+      if (error) {
+        throw error;
+      }
+
+      // Check if session exists (standard login)
+      if (data?.session) {
+        toast({ title: "Bem-vindo!", description: "Login realizado com sucesso." });
+        
+        // Use a slight delay to allow AuthProvider to hydrate state if needed,
+        // but replace history so user cannot go back to login
+        setTimeout(() => {
+          navigate(nextPath, { replace: true });
+        }, 100);
+      }
+
+    } catch (error: any) {
+      console.error("Login error:", error);
+      toast({ 
+        title: "Erro ao entrar", 
+        description: error.message || "Verifique suas credenciais.", 
+        variant: "destructive" 
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
