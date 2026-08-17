@@ -72,11 +72,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const loadUserData = useCallback(async (userId: string, accessToken?: string, email?: string | null) => {
+    // Carrega dados essenciais primeiro
     await Promise.all([
       fetchProfile(userId, email),
       checkAdmin(userId, email),
-      ...(accessToken ? [syncSubscription(accessToken)] : []),
     ]);
+    
+    // Carrega subscrição em background para não travar o login
+    if (accessToken) {
+      syncSubscription(accessToken).catch(err => 
+        console.error("[Auth] Background subscription sync failed:", err)
+      );
+    }
   }, [fetchProfile, checkAdmin, syncSubscription]);
 
   useEffect(() => {
