@@ -371,8 +371,8 @@ export default function StrategyLabPage() {
               <CardHeader className="pb-3 cursor-pointer hover:bg-muted/5 transition-colors">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground">
-                    <Settings2 className="w-4 h-4 text-primary" />
-                    Configuração do Laboratório
+                    <FlaskConical className="w-4 h-4 text-primary" />
+                    Configuração do Backtest
                   </CardTitle>
                   <div className="flex items-center gap-2">
                     {!configOpen && selectedStrategies.length > 0 && (
