@@ -300,7 +300,7 @@ export default function StrategyLabPage() {
             <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic leading-none">
               Laboratório de <span className="gradient-brand-text">Estratégias</span>
             </h1>
-            <p className="text-sm text-muted-foreground font-medium max-w-md">Motor autoevolutivo para testes de integridade e simulação de backtesting real.</p>
+            <p className="text-sm text-muted-foreground font-medium max-w-md">Terminal quantitativo para validação temporal e detecção de sobreajuste estatístico.</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             {result && (
