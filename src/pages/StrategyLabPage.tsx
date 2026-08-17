@@ -36,6 +36,7 @@ import {
   Settings2,
   Activity, CircleDot, Brain, FileDown, RefreshCw,
 } from "lucide-react";
+import { generateRandomGames } from "@/engine/stats/baseline-benchmark";
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip,
