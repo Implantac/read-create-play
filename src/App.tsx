@@ -10,9 +10,11 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminGuard } from "@/components/AdminGuard";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { lazy, Suspense, useEffect } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
 import { ReferralSystem } from "@/lib/referral-system";
 import { AutoInstallPrompt } from "@/components/pwa/AutoInstallPrompt";
+import * as Sentry from "@sentry/react";
+import { Button } from "@/components/ui/button";
 
 const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
 const GeradorPage = lazy(() => import("@/pages/GeradorPage"));
