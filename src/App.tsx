@@ -94,6 +94,27 @@ const PageLoader = () => (
   </div>
 );
 
+const ErrorFallback = ({ error, resetError }: { error: Error; resetError: () => void }) => (
+  <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4 text-center">
+    <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mb-6">
+      <AlertCircle className="w-8 h-8 text-destructive" />
+    </div>
+    <h1 className="text-2xl font-bold mb-2">Ops! Algo deu errado.</h1>
+    <p className="text-muted-foreground mb-6 max-w-md">
+      Ocorreu um erro inesperado no sistema. Nossa equipe técnica já foi notificada automaticamente.
+    </p>
+    <div className="flex gap-4">
+      <Button onClick={() => window.location.reload()}>Recarregar Página</Button>
+      <Button variant="outline" onClick={resetError}>Tentar Novamente</Button>
+    </div>
+    {import.meta.env.DEV && (
+      <pre className="mt-8 p-4 bg-muted rounded text-left text-xs overflow-auto max-w-full">
+        {error.message}
+      </pre>
+    )}
+  </div>
+);
+
 const AppContent = () => {
   const location = useLocation();
 
