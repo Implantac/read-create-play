@@ -1,6 +1,6 @@
 import { NumberStats, generateSmartBet } from "./engine";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { getConsensusRanking, runAllModels, runQuantumAnalysis, runRandomForest, runXGBoost, runNeuralNetwork, runBayesianInference, runMarkovChain } from "@/engine/ai/ml-models";
+import { getConsensusRanking, runAllModels, runMultiDimensionalPatternScore, runFrequencyTrendScore, runMultiFactorScore, runTemporalPatternScore, runBayesianScore, runTransitionScore } from "@/engine/ai/ml-models";
 import {
   LOTOFACIL_FRAME,
   LOTOFACIL_CENTER,
@@ -687,42 +687,42 @@ export function generateByStrategy(
     }
 
     case "quantum": {
-      const result = runQuantumAnalysis(stats, config);
+      const result = runMultiDimensionalPatternScore(stats, config);
       const topPool = result.predictions.slice(0, Math.min(pick * 2, result.predictions.length));
       const shuffled = [...topPool].sort(() => Math.random() - 0.5);
       return shuffled.slice(0, pick).map(p => p.number).sort((a, b) => a - b);
     }
 
     case "randomForest": {
-      const result = runRandomForest(stats, config);
+      const result = runFrequencyTrendScore(stats, config);
       const topPool = result.predictions.slice(0, Math.min(pick * 2, result.predictions.length));
       const shuffled = [...topPool].sort(() => Math.random() - 0.5);
       return shuffled.slice(0, pick).map(p => p.number).sort((a, b) => a - b);
     }
 
     case "xgboost": {
-      const result = runXGBoost(stats, config);
+      const result = runMultiFactorScore(stats, config);
       const topPool = result.predictions.slice(0, Math.min(pick * 2, result.predictions.length));
       const shuffled = [...topPool].sort(() => Math.random() - 0.5);
       return shuffled.slice(0, pick).map(p => p.number).sort((a, b) => a - b);
     }
 
     case "lstm": {
-      const result = runNeuralNetwork(stats, config);
+      const result = runTemporalPatternScore(stats, config);
       const topPool = result.predictions.slice(0, Math.min(pick * 2, result.predictions.length));
       const shuffled = [...topPool].sort(() => Math.random() - 0.5);
       return shuffled.slice(0, pick).map(p => p.number).sort((a, b) => a - b);
     }
 
     case "bayesian": {
-      const result = runBayesianInference(stats, config);
+      const result = runBayesianScore(stats, config);
       const topPool = result.predictions.slice(0, Math.min(pick * 2, result.predictions.length));
       const shuffled = [...topPool].sort(() => Math.random() - 0.5);
       return shuffled.slice(0, pick).map(p => p.number).sort((a, b) => a - b);
     }
 
     case "markov_model": {
-      const result = runMarkovChain(stats, config);
+      const result = runTransitionScore(stats, config);
       const topPool = result.predictions.slice(0, Math.min(pick * 2, result.predictions.length));
       const shuffled = [...topPool].sort(() => Math.random() - 0.5);
       return shuffled.slice(0, pick).map(p => p.number).sort((a, b) => a - b);
