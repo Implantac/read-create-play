@@ -1,6 +1,6 @@
 import { NumberStats, generateSmartBet } from "./engine";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { getConsensusRanking, runAllModels, runQuantumAnalysis, runRandomForest, runXGBoost, runNeuralNetwork, runBayesianInference, runMarkovChain } from "@/engine/ai/ml-models";
+import { getConsensusRanking, runAllModels, runMultiDimensionalPatternScore, runFrequencyTrendScore, runMultiFactorScore, runTemporalPatternScore, runBayesianScore, runTransitionScore } from "@/engine/ai/ml-models";
 import {
   LOTOFACIL_FRAME,
   LOTOFACIL_CENTER,
