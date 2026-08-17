@@ -160,12 +160,13 @@ export default function StrategyLabPage() {
           }, ...prev].slice(0, 10));
         }
 
+        const testWindowSize = 200; // Aumentado para maior significância
         const randomGames = generateRandomGames(config, gamesPerStrategy);
         const randomBacktest = runBacktest(
           "random_baseline",
           "Random Baseline (Sorteio Puro)",
           randomGames,
-          draws.slice(-100),
+          draws.slice(-testWindowSize),
           config,
           LOTTERY_BET_COST[config.id] || 3.5,
           1000,
@@ -177,10 +178,10 @@ export default function StrategyLabPage() {
             sg.strategyId,
             sg.strategyName,
             sg.games,
-            draws.slice(-100), // Backtest nos últimos 100 para performance
+            draws.slice(-testWindowSize),
             config,
             LOTTERY_BET_COST[config.id] || 3.5,
-            1000, // Banca inicial padrão
+            1000, 
             enableShuffledBacktest
           );
         });
@@ -299,7 +300,7 @@ export default function StrategyLabPage() {
             <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic leading-none">
               Laboratório de <span className="gradient-brand-text">Estratégias</span>
             </h1>
-            <p className="text-sm text-muted-foreground font-medium max-w-md">Motor autoevolutivo para testes de integridade e simulação de backtesting real.</p>
+            <p className="text-sm text-muted-foreground font-medium max-w-md">Terminal quantitativo para validação temporal e detecção de sobreajuste estatístico.</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             {result && (
@@ -370,8 +371,8 @@ export default function StrategyLabPage() {
               <CardHeader className="pb-3 cursor-pointer hover:bg-muted/5 transition-colors">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground">
-                    <Settings2 className="w-4 h-4 text-primary" />
-                    Configuração do Laboratório
+                    <FlaskConical className="w-4 h-4 text-primary" />
+                    Configuração do Backtest
                   </CardTitle>
                   <div className="flex items-center gap-2">
                     {!configOpen && selectedStrategies.length > 0 && (

@@ -13,7 +13,7 @@ export function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }:
   const scorePercent = Math.min(100, r.metrics.globalScore);
   const gradeColor = r.metrics.globalScore >= 70 ? "text-green-500" :
                      r.metrics.globalScore >= 40 ? "text-amber-500" : "text-destructive";
-  const accuracyText = r.metrics.accuracy !== null ? `${r.metrics.accuracy.toFixed(1)}%` : "N/A";
+  const performanceText = r.metrics.accuracy !== null ? `${r.metrics.accuracy.toFixed(0)}` : "N/A";
 
   return (
     <Card className={`bg-card/80 backdrop-blur border-border transition-all hover:shadow-md ${
@@ -62,7 +62,7 @@ export function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }:
                 <MetricPill label="Lift" value={`${r.metrics.lift.toFixed(2)}x`} highlight={r.metrics.lift > 1.05} />
               )}
               {r.metrics.accuracy !== null && (
-                <MetricPill label="Acc" value={`${r.metrics.accuracy.toFixed(0)}%`} highlight={r.metrics.accuracy > 70} />
+                <MetricPill label="Score" value={performanceText} highlight={r.metrics.accuracy > 70} />
               )}
             </div>
           </div>

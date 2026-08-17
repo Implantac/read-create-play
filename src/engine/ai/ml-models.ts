@@ -117,22 +117,22 @@ function backtestModel(
 }
 
 function computeAccuracyFromBacktest(bt: BacktestMetrics, config: LotteryConfig): { accuracy: number | null; confidence: number } {
-  if (bt.totalDrawsTested < 10) {
+  if (bt.totalDrawsTested < 20) {
     return { accuracy: null, confidence: 0 };
   }
   
-  // Precision@15: average percentage of hits in top 15
   const precisionAt15 = bt.avgHitsInTop15 / 15;
   const lift = bt.liftOverChance;
   
-  // Accuracy is now a combined metric of precision and lift
-  const accuracy = Math.min(98, Math.max(0, Math.round((precisionAt15 * 0.6 + (lift / 2) * 0.4) * 100)));
+  // Score based on statistical lift and precision
+  // Not a classification accuracy, but a performance index
+  const score = Math.min(98, Math.max(0, Math.round((precisionAt15 * 0.6 + (lift / 2) * 0.4) * 100)));
   
-  // Confidence: based on consistency and sample size (robust if > 100 draws)
+  // Confidence: based on consistency and sample size
   const sampleFactor = Math.min(1, bt.totalDrawsTested / 100);
   const confidence = Math.min(95, Math.max(0, Math.round(bt.consistency * 0.7 * sampleFactor + sampleFactor * 30)));
 
-  return { accuracy, confidence };
+  return { accuracy: score, confidence };
 }
 
 // ═══════════════════════════════════════════════════════
@@ -298,7 +298,7 @@ export function runBayesianInference(stats: NumberStats[], config: LotteryConfig
     name: "Inferência Bayesiana",
     description: "Atualização bayesiana com priors de ciclo, consistência de gaps, momentum e tendência",
     predictions: scored,
-    accuracy: 0,
+    accuracy: null,
     confidence: 0,
   };
 }
@@ -331,7 +331,7 @@ export function runMarkovChain(stats: NumberStats[], config: LotteryConfig): Mod
     name: "Cadeia de Markov",
     description: "Transições com detecção de periodicidade, regularidade de ciclos e tendência temporal",
     predictions: scored,
-    accuracy: 0,
+    accuracy: null,
     confidence: 0,
   };
 }
@@ -374,23 +374,23 @@ export function runQuantumAnalysis(stats: NumberStats[], config: LotteryConfig):
 
 export function runEnsembleVoting(stats: NumberStats[], config: LotteryConfig, modelWeights?: Record<string, number>): ModelResult {
   const defaultWeights: Record<string, number> = {
-    "Random Forest": 0.18,
-    "XGBoost": 0.22,
-    "Rede Neural (LSTM)": 0.18,
+    "Statistical Multi-Factor": 0.18,
+    "Gradient Pattern Engine": 0.22,
+    "Temporal Pattern Score": 0.18,
     "Inferência Bayesiana": 0.12,
     "Cadeia de Markov": 0.08,
-    "Análise Quantum": 0.22,
+    "Multi-Factor Pattern Engine": 0.22,
   };
 
   const weights = modelWeights || defaultWeights;
 
   const models = [
-    { result: runRandomForest(stats, config), name: "Random Forest" },
-    { result: runXGBoost(stats, config), name: "XGBoost" },
-    { result: runNeuralNetwork(stats, config), name: "Rede Neural (LSTM)" },
+    { result: runRandomForest(stats, config), name: "Statistical Multi-Factor" },
+    { result: runXGBoost(stats, config), name: "Gradient Pattern Engine" },
+    { result: runNeuralNetwork(stats, config), name: "Temporal Pattern Score" },
     { result: runBayesianInference(stats, config), name: "Inferência Bayesiana" },
     { result: runMarkovChain(stats, config), name: "Cadeia de Markov" },
-    { result: runQuantumAnalysis(stats, config), name: "Análise Quantum" },
+    { result: runQuantumAnalysis(stats, config), name: "Multi-Factor Pattern Engine" },
   ];
 
   const numberScores: Record<number, { total: number; agreement: number; breakdownAccum: ScoreBreakdown }> = {};

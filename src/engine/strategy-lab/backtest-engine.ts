@@ -125,8 +125,7 @@ export function runBacktest(
   let signalIntegrity: number | undefined;
 
   if (enableShuffledTest) {
-    // Shuffling the temporal dimension (draw results) to see if strategy still "wins"
-    // If it does, the signal might be overfitting or lucky rather than capturing temporal patterns
+    // Shuffling the temporal dimension to detect false signals and overfitting
     const shuffledDraws = [...sortedDraws].sort(() => Math.random() - 0.5);
     let shuffledHits = 0;
     
@@ -140,12 +139,13 @@ export function runBacktest(
     const shuffledEvidence = analyzeEvidence(shuffledHits, totalSlots, config);
     shuffledLift = shuffledEvidence.lift;
     
-    // Integrity: How much of our lift is lost when we shuffle?
-    // High integrity (close to 1.0) means the signal depends on the specific sequence of draws (temporal).
-    // Low integrity means the strategy works regardless of order (likely just picking high-frequency numbers).
-    // Note: If both lifts are ~1, integrity is high but strategy is just random.
-    signalIntegrity = evidence.lift > 1 
-      ? Math.max(0, Math.min(1, (evidence.lift - 1) / ((evidence.lift - 1) + (shuffledLift - 1) + 0.0001)))
+    // Integrity: If real lift is higher than shuffled lift, it indicates temporal pattern detection.
+    // If they are similar, the strategy might be exploiting static frequency or just being lucky.
+    const realExcess = Math.max(0, evidence.lift - 1);
+    const shuffledExcess = Math.max(0, (shuffledLift || 1) - 1);
+    
+    signalIntegrity = realExcess > 0 
+      ? Math.max(0, Math.min(1, realExcess / (realExcess + shuffledExcess + 0.0001)))
       : 1;
   }
 

@@ -91,7 +91,7 @@ function backtestStrategy(
   const totalSlots = totalComparisons * config.pick;
   const evidence = analyzeEvidence(totalHits, totalSlots, config);
   const lift = evidence.lift;
-  const accuracy = draws.length >= 50 ? Math.min(98, Math.max(0, Math.round((lift / 2 + consistency / 2) * 100))) : null;
+  const accuracy = draws.length >= 20 ? Math.min(98, Math.max(0, Math.round((Math.max(0, lift - 1) * 2 + consistency / 2) * 100))) : null;
 
   // Global composite score
   const globalScore = Math.min(100,
