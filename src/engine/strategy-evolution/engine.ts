@@ -6,6 +6,7 @@
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { NumberStats, computeFrequencyStats } from "@/features/statistics/engine";
 import { generateByStrategy, Strategy } from "@/features/statistics/strategies";
+import { analyzeEvidence } from "@/engine/stats/evidence-engine";
 import {
   StrategyDefinition,
   StrategyMetrics,
@@ -86,6 +87,12 @@ function backtestStrategy(
   const allNums = new Set(games.flat());
   const coverageScore = (allNums.size / config.numbers) * 100;
 
+  // Evidence Engine integration
+  const totalSlots = totalComparisons * config.pick;
+  const evidence = analyzeEvidence(totalHits, totalSlots, config);
+  const lift = evidence.lift;
+  const accuracy = draws.length >= 50 ? Math.min(98, Math.max(0, Math.round((lift / 2 + consistency / 2) * 100))) : null;
+
   // Global composite score
   const globalScore = Math.min(100,
     avgHits * 8 +
@@ -95,11 +102,6 @@ function backtestStrategy(
     (totalPrizes > 0 ? 15 : 0) -
     redundancyIndex * 10
   );
-
-  // Lift calculation
-  const expectedHits = (config.pick * config.pick) / config.numbers;
-  const lift = expectedHits > 0 ? avgHits / expectedHits : 1;
-  const accuracy = draws.length >= 50 ? Math.min(98, Math.max(0, (lift / 2 + consistency / 2) * 100)) : null;
 
   return {
     avgHits,
@@ -164,6 +166,7 @@ function buildExplanation(def: StrategyDefinition, m: StrategyMetrics, rank: num
   if (m.avgHits > 0) parts.push(`média de ${m.avgHits.toFixed(2)} acertos`);
   if (m.totalPrizes > 0) parts.push(`${m.totalPrizes} premiações detectadas`);
   if (m.diversityScore > 70) parts.push("boa diversidade entre jogos");
+  if (m.lift > 1.05) parts.push(`evidência estatística positiva (${m.lift.toFixed(2)}x)`);
 
   return parts.join(", ") + ".";
 }
