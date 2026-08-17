@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown, AlertTriangle, Wallet } from "lucide-react";
+import { TrendingUp, TrendingDown, AlertTriangle, Wallet, Activity } from "lucide-react";
 import { StrategyMetrics } from "@/engine/strategy-lab/metrics";
 import { cn } from "@/lib/utils";
 
@@ -65,6 +65,12 @@ export function StrategyComparisonCard({ name, metrics, isBest }: StrategyCompar
               <Wallet className="w-3 h-3" /> Total Gasto
             </span>
             <span className="font-mono text-foreground opacity-80">R$ {metrics.totalSpent.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between items-center text-[10px]">
+            <span className="text-muted-foreground flex items-center gap-1">
+              <Activity className="w-3 h-3" /> Volatilidade
+            </span>
+            <span className="font-mono text-foreground opacity-80">{metrics.volatility.toFixed(2)}%</span>
           </div>
         </div>
 
