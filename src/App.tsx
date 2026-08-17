@@ -127,7 +127,8 @@ const AppContent = () => {
   }, [location]);
 
   return (
-    <Suspense fallback={<PageLoader />}>
+    <Sentry.ErrorBoundary fallback={({ error, resetError }) => <ErrorFallback error={error} resetError={resetError} />}>
+      <Suspense fallback={<PageLoader />}>
       <AutoInstallPrompt />
       <Routes>
         {/* Public */}
