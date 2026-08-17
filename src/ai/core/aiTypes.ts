@@ -74,6 +74,7 @@ export interface ScoredGame {
     prizedCount: number;        // sorteios em que o jogo bateria alguma faixa premiada
     closeMissCount: number;     // sorteios em que faltou 1 nº para uma faixa premiada
     expectedHits: number;       // baseline (pick²/total)
+    lift?: number;              // Lift real observado (evidência estatística)
   };
 }
 

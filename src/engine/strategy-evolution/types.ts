@@ -60,6 +60,8 @@ export interface StrategyMetrics {
   diversityScore: number;     // 0-100
   redundancyIndex: number;    // 0-1
   globalScore: number;        // 0-100 composite
+  accuracy: number | null;    // Real accuracy based on lift/consistency
+  lift: number;               // Statistical lift over random baseline
 }
 
 export interface RankingEntry {
