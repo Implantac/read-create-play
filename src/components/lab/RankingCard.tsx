@@ -58,6 +58,12 @@ export function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }:
               <MetricPill label="Melhor" value={`${r.metrics.bestHits}/${pick}`} />
               <MetricPill label="Consist." value={`${(r.metrics.consistency * 100).toFixed(0)}%`} />
               <MetricPill label="Prêmios" value={r.metrics.totalPrizes.toString()} highlight={r.metrics.totalPrizes > 0} />
+              {r.metrics.lift !== undefined && (
+                <MetricPill label="Lift" value={`${r.metrics.lift.toFixed(2)}x`} highlight={r.metrics.lift > 1.05} />
+              )}
+              {r.metrics.accuracy !== null && (
+                <MetricPill label="Acc" value={`${r.metrics.accuracy.toFixed(0)}%`} highlight={r.metrics.accuracy > 70} />
+              )}
             </div>
           </div>
           <Button variant="ghost" size="sm" className="h-9 w-9 p-0 shrink-0 rounded-lg" onClick={onToggle}>
