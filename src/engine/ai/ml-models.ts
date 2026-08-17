@@ -463,12 +463,12 @@ export function runAllModels(
   computeStatsFn?: (draws: DrawResult[], totalNumbers: number) => NumberStats[]
 ): ModelResult[] {
   const modelFns: Array<{ fn: (s: NumberStats[], c: LotteryConfig) => ModelResult; name: string }> = [
-    { fn: runRandomForest, name: "Statistical Multi-Factor" },
-    { fn: runXGBoost, name: "Gradient Pattern Engine" },
-    { fn: runNeuralNetwork, name: "Temporal Pattern Score" },
-    { fn: runBayesianInference, name: "Inferência Bayesiana" },
-    { fn: runMarkovChain, name: "Cadeia de Markov" },
-    { fn: runQuantumAnalysis, name: "Multi-Factor Pattern Engine" },
+    { fn: runFrequencyTrendScore, name: "FrequencyTrendScore" },
+    { fn: runMultiFactorScore, name: "MultiFactorScore" },
+    { fn: runTemporalPatternScore, name: "TemporalPatternScore" },
+    { fn: runBayesianScore, name: "BayesianScore" },
+    { fn: runTransitionScore, name: "TransitionScore" },
+    { fn: runMultiDimensionalPatternScore, name: "MultiDimensionalPatternScore" },
   ];
 
   const results: ModelResult[] = [];
