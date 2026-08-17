@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { trackPWAEvent } from "@/lib/pwa-tracking";
 import { Link } from "react-router-dom";
 import { Download, X, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ export const AutoInstallPrompt = () => {
     useInstallPrompt();
   const [visible, setVisible] = useState(false);
   const [busy, setBusy] = useState(false);
+  const trackedShown = useRef(false);
 
   useEffect(() => {
     const checkVisibility = () => {
@@ -28,6 +30,10 @@ export const AutoInstallPrompt = () => {
         /* ignore */
       }
 
+      if (!trackedShown.current) {
+        trackPWAEvent('prompt_shown', platform);
+        trackedShown.current = true;
+      }
       setVisible(true);
     };
 
@@ -43,6 +49,7 @@ export const AutoInstallPrompt = () => {
   }, [canPromptInstall, needsManualInstall, isInstalled, isPreviewHost, isInIframe]);
 
   const dismiss = () => {
+    trackPWAEvent('prompt_dismissed', platform);
     try {
       localStorage.setItem(DISMISS_KEY, String(Date.now()));
     } catch {
