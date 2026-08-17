@@ -14,8 +14,17 @@ export const AutoInstallPrompt = () => {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (isInstalled || isPreviewHost || isInIframe) return;
-    if (!canPromptInstall && !needsManualInstall) return;
+    // No preview environments or iframes
+    if (isPreviewHost || isInIframe) return;
+    
+    // Don't show if already installed
+    if (isInstalled) return;
+
+    // We can show the prompt if we have the event or if it's iOS (manual install)
+    if (!canPromptInstall && !needsManualInstall) {
+      console.log("[PWA] Prompt not ready yet:", { canPromptInstall, needsManualInstall });
+      return;
+    }
 
     try {
       const dismissed = Number(localStorage.getItem(DISMISS_KEY) || 0);
@@ -24,6 +33,7 @@ export const AutoInstallPrompt = () => {
       /* ignore */
     }
 
+    console.log("[PWA] Showing install prompt");
     const t = setTimeout(() => setVisible(true), 1500);
     return () => clearTimeout(t);
   }, [canPromptInstall, needsManualInstall, isInstalled, isPreviewHost, isInIframe]);
