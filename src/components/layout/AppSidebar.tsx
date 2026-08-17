@@ -2,7 +2,7 @@ import {
   BarChart3, Sparkles, History, Zap, Grid3X3,
   Brain, ShieldCheck, Crown, PieChart, Lock,
   MessageCircle, User, Wallet, Command, FileCode,
-  BookOpen
+  BookOpen, FlaskConical
 } from "lucide-react";
 
 import { NavLink } from "@/components/layout/NavLink";
@@ -43,7 +43,8 @@ const workflowGroups: { label: string; items: { title: string; url: string; icon
   {
     label: "Inteligência",
     items: [
-        { title: "Estratégias ML", url: "/estrategias", icon: Brain, tooltip: "Laboratório de estratégias e Machine Learning." },
+        { title: "Estratégias ML", url: "/estrategias", icon: Brain, tooltip: "Painel de modelos e simulações clássicas." },
+        { title: "Strategy Lab", url: "/strategy-lab", icon: FlaskConical, tooltip: "Laboratório evolutivo com teste de integridade temporal (Shuffled).", badge: "NEW" },
         { title: "IA Autônoma", url: "/ia-autonoma", icon: Zap, tooltip: "Predição preditiva baseada em redes neurais." },
         { title: "Central Analítica", url: "/analise", icon: PieChart, tooltip: "Estatísticas avançadas, tendências e farol neural." },
         { title: "Fechamentos", url: "/fechamentos", icon: Grid3X3, requiredFeature: "fechamentos", tooltip: "Fechamentos matemáticos de alta performance." },
