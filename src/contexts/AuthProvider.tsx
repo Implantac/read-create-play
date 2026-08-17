@@ -101,59 +101,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           async (event, nextSession) => {
             if (!mounted) return;
             
-            // console.log(`[Auth] Event: ${event}`);
             setSession(nextSession);
             
-            if (nextSession?.user) {
-              try {
-                await loadUserData(nextSession.user.id, nextSession.access_token, nextSession.user.email);
-              } catch (err) {
-                console.error("[Auth] Data sync error during event:", err);
-              }
-            } else {
-              setProfile(null);
-              setIsAdmin(false);
-              setIsSuperAdmin(false);
-              setUserRole("user");
-            }
-            
-            setLoading(false);
             if (nextSession?.user) {
               loadUserData(nextSession.user.id, nextSession.access_token, nextSession.user.email)
                 .finally(() => {
                   if (mounted) setLoading(false);
                 });
             } else {
+              setProfile(null);
+              setIsAdmin(false);
+              setIsSuperAdmin(false);
+              setUserRole("user");
               setLoading(false);
             }
           }
         );
 
-        // Safety timeout to force loading = false even if Supabase initialization hangs
+        // Safety timeout reducer to 4s for faster recovery
         const timeout = setTimeout(() => {
-          if (mounted) {
-            // console.warn("[Auth] Initial init timeout - forcing loading state to false");
+          if (mounted && loading) {
             setLoading(false);
           }
-        }, 8000);
+        }, 4000);
 
         const { data: { session: initialSession }, error } = await sessionPromise;
         clearTimeout(timeout);
 
-        
         if (mounted) {
           if (error) {
             console.error("[Auth] Initial session error:", error);
             if (error.message.includes("refresh_token") || error.message.includes("invalid")) {
               localStorage.removeItem(authStorageKey);
             }
+            setLoading(false);
           } else if (initialSession?.user) {
             setSession(initialSession);
             await loadUserData(initialSession.user.id, initialSession.access_token, initialSession.user.email);
+            setLoading(false);
+          } else {
+            setLoading(false);
           }
-          
-          setLoading(false);
-          // console.log("[Auth] Initialization complete");
         }
 
         return subscription;
@@ -166,13 +154,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const subPromise = initAuth();
 
-    // Safety timeout to prevent infinite loading
+    // Final safety timeout (redundant but safe)
     const timeout = setTimeout(() => {
       if (mounted && loading) {
-        // console.warn("[Auth] Loading stuck for 10s, forcing unlock");
         setLoading(false);
       }
-    }, 10000);
+    }, 6000);
 
     return () => {
       mounted = false;
