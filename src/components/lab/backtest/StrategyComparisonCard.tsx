@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown, AlertTriangle, Wallet, Activity, Sparkles, Brain } from "lucide-react";
+import { TrendingUp, TrendingDown, AlertTriangle, Wallet, Activity, Sparkles, Brain, Info } from "lucide-react";
 import { StrategyMetrics } from "@/engine/strategy-lab/metrics";
 import { cn } from "@/lib/utils";
 
