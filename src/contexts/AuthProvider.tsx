@@ -83,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const authStorageKey = `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`;
     let mounted = true;
 
-    console.log("[Auth] Effect starting...");
+    // console.log("[Auth] Effect starting...");
 
     const initAuth = async () => {
       try {
@@ -94,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           async (event, nextSession) => {
             if (!mounted) return;
             
-            console.log(`[Auth] Event: ${event}`);
+            // console.log(`[Auth] Event: ${event}`);
             setSession(nextSession);
             
             if (nextSession?.user) {
@@ -117,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Safety timeout to force loading = false even if Supabase initialization hangs
         const timeout = setTimeout(() => {
           if (mounted) {
-            console.warn("[Auth] Initial init timeout - forcing loading state to false");
+            // console.warn("[Auth] Initial init timeout - forcing loading state to false");
             setLoading(false);
           }
         }, 8000);
@@ -138,7 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
           
           setLoading(false);
-          console.log("[Auth] Initialization complete");
+          // console.log("[Auth] Initialization complete");
         }
 
         return subscription;
@@ -154,7 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Safety timeout to prevent infinite loading
     const timeout = setTimeout(() => {
       if (mounted && loading) {
-        console.warn("[Auth] Loading stuck for 10s, forcing unlock");
+        // console.warn("[Auth] Loading stuck for 10s, forcing unlock");
         setLoading(false);
       }
     }, 10000);
