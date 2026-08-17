@@ -109,6 +109,22 @@ export function computeDefensiveKellyPct(
 }
 
 /**
+ * Suggests game count for a specific draw based on budget and risk.
+ */
+export function suggestGameCount(budget: number, ticketCost: number, riskProfile: RiskProfile): { count: number; kellyFraction: number; warning?: string } {
+  // Conservative sizing: spend at most 20% of draw budget in one bet if aggressive, 10% if conservative
+  const riskScale = RISK_MULTIPLIER[riskProfile];
+  const maxSpend = budget * riskScale * 0.5;
+  const count = Math.max(1, Math.floor(maxSpend / ticketCost));
+  return {
+    count,
+    kellyFraction: riskScale,
+    warning: maxSpend < ticketCost ? "Orçamento muito baixo para o ticket unitário desta modalidade." : undefined
+  };
+}
+
+
+/**
  * Constrói alocação por modalidade combinando:
  *  1) ROI histórico do usuário (peso maior se positivo)
  *  2) Volatilidade (peso menor se voláteis)
