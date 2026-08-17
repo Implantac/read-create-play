@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Command, Trophy, Wallet, Target, TrendingUp } from "lucide-react";
+import { Command, Trophy, Wallet, Target, TrendingUp, Info as InfoIcon } from "lucide-react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { CycleThermometer } from "@/components/lottery/analysis/CycleThermometer";
 import { WinnerProfilePanel } from "@/components/lottery/analysis/WinnerProfilePanel";
@@ -131,9 +131,9 @@ export default function ComandoApostadorPage() {
                     {matrixSuggestion.best.description}
                   </p>
                   <div className="grid grid-cols-3 gap-2 text-xs">
-                    <Info label="Base" value={`${matrixSuggestion.best.baseSize} dez.`} />
-                    <Info label="Jogos" value={String(matrixSuggestion.best.gameCount)} />
-                    <Info label="Garantia" value={`${matrixSuggestion.best.guarantee} pts`} />
+                    <InfoRow label="Base" value={`${matrixSuggestion.best.baseSize} dez.`} />
+                    <InfoRow label="Jogos" value={String(matrixSuggestion.best.gameCount)} />
+                    <InfoRow label="Garantia" value={`${matrixSuggestion.best.guarantee} pts`} />
                   </div>
                   <Button
                     size="sm"
@@ -193,7 +193,7 @@ export default function ComandoApostadorPage() {
   );
 }
 
-function Info({ label, value }: { label: string; value: string }) {
+function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded border border-border/60 bg-card/60 p-2">
       <p className="text-[10px] uppercase text-muted-foreground">{label}</p>
