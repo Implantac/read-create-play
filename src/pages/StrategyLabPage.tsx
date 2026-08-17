@@ -71,7 +71,6 @@ export default function StrategyLabPage() {
   const [configOpen, setConfigOpen] = useState(true);
   const [customDrawRange, setCustomDrawRange] = useState<[number, number] | null>(null);
   const [enableShuffledBacktest, setEnableShuffledBacktest] = useState(true);
-  const [enableShuffledBacktest, setEnableShuffledBacktest] = useState(true);
 
   const available = useMemo(() => getStrategiesForLottery(config.id), [config.id]);
 
