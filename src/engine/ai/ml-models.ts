@@ -478,21 +478,19 @@ export function runAllModels(
     const result = fn(stats, config);
 
     // Run backtesting if draws are available
-    if (draws && draws.length > 80 && computeStatsFn) {
-      const bt = backtestModel(fn, draws, config, computeStatsFn, 80, 25);
+    if (draws && draws.length > 100 && computeStatsFn) {
+      // Sort draws by concurso ASC for walk-forward validation
+      const sortedDraws = [...draws].sort((a, b) => a.concurso - b.concurso);
+      const bt = backtestModel(fn, sortedDraws, config, computeStatsFn, 100, 50);
       const metrics = computeAccuracyFromBacktest(bt, config);
       result.accuracy = metrics.accuracy;
       result.confidence = metrics.confidence;
       result.backtestDetails = bt;
-      calibratedWeights[name] = bt.avgHitsInTop15 > 0 ? bt.avgHitsInTop15 : 0.5;
+      calibratedWeights[name] = bt.liftOverChance > 1 ? bt.liftOverChance - 1 : 0.01;
     } else {
-      // Fallback: use deterministic heuristic accuracy based on model characteristics
-      const baseAccuracy: Record<string, number> = {
-        "Random Forest": 62, "XGBoost": 65, "Rede Neural (LSTM)": 60,
-        "Inferência Bayesiana": 61, "Cadeia de Markov": 58, "Análise Quantum": 68
-      };
-      result.accuracy = baseAccuracy[name] || 60;
-      result.confidence = result.accuracy - 5;
+      result.accuracy = null;
+      result.confidence = 0;
+      calibratedWeights[name] = 0.1;
     }
 
     results.push(result);
