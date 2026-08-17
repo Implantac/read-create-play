@@ -176,7 +176,7 @@ export function MLPanel({ stats, config, draws }: Props) {
                   <p className="text-xs font-semibold text-foreground mb-2 truncate">{model.name}</p>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
                     <Target className="w-3 h-3 shrink-0" />
-                    Acurácia: <span className="text-foreground font-mono">{model.accuracy.toFixed(1)}%</span>
+                    Performance: <span className="text-foreground font-mono">{model.accuracy !== null ? model.accuracy.toFixed(1) : "N/A"}</span>
                   </div>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Percent className="w-3 h-3 shrink-0" />
