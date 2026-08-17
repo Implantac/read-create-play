@@ -114,7 +114,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         );
 
+        // Safety timeout to force loading = false even if Supabase initialization hangs
+        const timeout = setTimeout(() => {
+          if (mounted) {
+            console.warn("[Auth] Initial init timeout - forcing loading state to false");
+            setLoading(false);
+          }
+        }, 8000);
+
         const { data: { session: initialSession }, error } = await sessionPromise;
+        clearTimeout(timeout);
+
         
         if (mounted) {
           if (error) {
