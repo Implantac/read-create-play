@@ -86,11 +86,13 @@ export function useInstallPrompt() {
     if (!deferredPrompt) return false;
 
     try {
-      await deferredPrompt.prompt();
-      const choice = await deferredPrompt.userChoice;
-
+      // Create a reference to the current prompt to avoid multiple triggers
+      const prompt = deferredPrompt;
       setDeferredPrompt(null);
       
+      await prompt.prompt();
+      const choice = await prompt.userChoice;
+
       if (choice.outcome === "accepted") {
         trackPWAEvent('prompt_accepted', platform);
         return true;
@@ -100,7 +102,6 @@ export function useInstallPrompt() {
       }
     } catch (err) {
       console.error("[PWA] Install error:", err);
-      setDeferredPrompt(null);
       return false;
     }
   }, [deferredPrompt, platform]);
