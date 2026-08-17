@@ -70,11 +70,17 @@ export function EnginePerformancePanel({ lotteryId }: Props) {
                     </p>
                   </div>
                 </div>
-                <div className="flex-1 grid grid-cols-3 gap-2 text-xs">
+                <div className="flex-1 grid grid-cols-4 gap-2 text-xs">
                   <div>
                     <p className="text-[10px] uppercase text-muted-foreground">Média</p>
                     <p className="font-mono tabular-nums text-sm font-semibold">
                       {p.avgHits.toFixed(2)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase text-muted-foreground">Lift</p>
+                    <p className="font-mono tabular-nums text-sm font-semibold text-primary">
+                      {(p.avgHits / ((15/25)*15)).toFixed(2)}x
                     </p>
                   </div>
                   <div>

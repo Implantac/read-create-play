@@ -4,8 +4,21 @@
  * apresentando métricas de coverage, paridade e dispersão.
  */
 
-import type { DrawResult } from "@/data/lotteries";
+import type { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { getLotteryRules } from "@/ai/knowledge/lotteriesKnowledge";
+
+export function generateRandomGames(config: LotteryConfig, count: number): number[][] {
+  const games: number[][] = [];
+  for (let i = 0; i < count; i++) {
+    const game: number[] = [];
+    while (game.length < config.pick) {
+      const n = Math.floor(Math.random() * config.numbers) + 1;
+      if (!game.includes(n)) game.push(n);
+    }
+    games.push(game.sort((a, b) => a - b));
+  }
+  return games;
+}
 
 export interface GameMetrics {
   parityEven: number;

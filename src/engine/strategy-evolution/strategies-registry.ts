@@ -86,22 +86,22 @@ export const STRATEGY_REGISTRY: StrategyDefinition[] = [
     params: { ...DEFAULT_PARAMS, trendWeight: 0.5, cycleWeight: 0.6 },
   },
   {
-    id: "quantum_analysis", name: "Análise Quantum", description: "Padrões multi-dimensionais e ressonância de ciclos",
+    id: "quantum_analysis", name: "Multi-Factor Pattern Engine", description: "Padrões multi-dimensionais e ressonância de ciclos",
     category: "ai", baseStrategy: "quantum", supportedLotteries: [],
     params: { ...DEFAULT_PARAMS },
   },
   {
-    id: "rf_model", name: "Random Forest", description: "Ensemble de árvores para detecção de features complexas",
+    id: "rf_model", name: "Statistical Multi-Factor", description: "Heurística ponderada para detecção de features complexas",
     category: "ai", baseStrategy: "randomForest", supportedLotteries: [],
     params: { ...DEFAULT_PARAMS },
   },
   {
-    id: "xgboost_model", name: "XGBoost", description: "Gradient Boosting de alto desempenho e precisão",
+    id: "xgboost_model", name: "Gradient Pattern Engine", description: "Algoritmo de gradiente de alto desempenho e precisão",
     category: "ai", baseStrategy: "xgboost", supportedLotteries: [],
     params: { ...DEFAULT_PARAMS },
   },
   {
-    id: "lstm_nn", name: "Rede Neural (LSTM)", description: "Memória de longo prazo para sequências numéricas",
+    id: "lstm_nn", name: "Temporal Pattern Score", description: "Análise de padrões temporais para sequências numéricas",
     category: "ai", baseStrategy: "lstm", supportedLotteries: [],
     params: { ...DEFAULT_PARAMS },
   },

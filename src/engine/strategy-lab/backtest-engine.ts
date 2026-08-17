@@ -1,6 +1,8 @@
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { NumberStats } from "@/engine/stats/statistics";
 import { StrategyMetrics } from "./metrics";
+import { analyzeEvidence } from "@/engine/stats/evidence-engine";
+import { generateRandomGames } from "@/engine/stats/baseline-benchmark";
 
 export interface BacktestResult {
   strategyId: string;
@@ -113,6 +115,10 @@ export function runBacktest(
   const ruinCount = history.filter(h => h.equity <= 0).length;
   const ruinProbability = history.length > 0 ? ruinCount / history.length : 0;
 
+  const totalObservedHits = Object.entries(hitCounts).reduce((acc, [hits, count]) => acc + (Number(hits) * count), 0);
+  const totalSlots = sortedDraws.length * games.length * config.pick;
+  const evidence = analyzeEvidence(totalObservedHits, totalSlots, config);
+
   const metrics: StrategyMetrics = {
     roi,
     drawdown: maxDrawdown * 100,
@@ -122,7 +128,10 @@ export function runBacktest(
     totalWon,
     winRate: (history.filter(h => h.isPrize).length / (history.length || 1)) * 100,
     volatility: volatility * 100,
-    maxConsecutiveLosses
+    maxConsecutiveLosses,
+    lift: evidence.lift,
+    pValue: evidence.pValue,
+    isSignificant: evidence.isSignificant
   };
 
   return {

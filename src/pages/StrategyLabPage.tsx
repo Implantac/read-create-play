@@ -36,6 +36,7 @@ import {
   Settings2,
   Activity, CircleDot, Brain, FileDown, RefreshCw,
 } from "lucide-react";
+import { generateRandomGames } from "@/engine/stats/baseline-benchmark";
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip,
@@ -158,6 +159,17 @@ export default function StrategyLabPage() {
           }, ...prev].slice(0, 10));
         }
 
+        const randomGames = generateRandomGames(config, gamesPerStrategy);
+        const randomBacktest = runBacktest(
+          "random_baseline",
+          "Random Baseline (Sorteio Puro)",
+          randomGames,
+          draws.slice(-100),
+          config,
+          LOTTERY_BET_COST[config.id] || 3.5,
+          1000
+        );
+
         const backtests: BacktestResult[] = res.generatedGames.map(sg => {
           return runBacktest(
             sg.strategyId,
@@ -168,9 +180,11 @@ export default function StrategyLabPage() {
             LOTTERY_BET_COST[config.id] || 3.5,
             1000 // Banca inicial padrão
           );
-        }).sort((a, b) => b.metrics.roi - a.metrics.roi);
+        });
 
-        setBacktestResults(backtests);
+        // Add random baseline and sort
+        const finalBacktests = [randomBacktest, ...backtests].sort((a, b) => b.metrics.roi - a.metrics.roi);
+        setBacktestResults(finalBacktests);
         toast.success(`${formatNumber(res.rankings.length)} estratégias testadas em ${formatNumber(res.elapsedMs)}ms`);
         setActiveTab("backtest");
       } catch (err) {
