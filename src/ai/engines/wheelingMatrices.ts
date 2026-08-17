@@ -336,6 +336,13 @@ export const WHEELING_MATRICES = {
 
 export type WheelingMatrixId = keyof typeof WHEELING_MATRICES;
 
+export function getMatricesForLottery(lotteryId: string) {
+  return Object.entries(WHEELING_MATRICES)
+    .filter(([_, m]) => m.lottery === lotteryId)
+    .map(([id, m]) => ({ ...m, id: id as WheelingMatrixId }));
+}
+
+
 export function applyWheelingMatrix(
   matrixId: WheelingMatrixId,
   baseNumbers: number[]

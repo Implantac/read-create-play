@@ -65,6 +65,7 @@ export function PushNotificationsCard() {
                 <p className="text-sm font-medium">Quais alertas você quer receber?</p>
                 {[
                   { key: "draws" as const, label: "Novos sorteios oficiais", desc: "Quando um novo concurso é sorteado" },
+                  { key: "pre_draw" as const, label: "Alertas T-2h", desc: "Sinais críticos antes do sorteio oficial" },
                   { key: "results" as const, label: "Resultado das suas apostas", desc: "Acertos e prêmios das apostas salvas" },
                   { key: "closings" as const, label: "Fechamentos e otimizações", desc: "Sugestões e melhorias dos seus fechamentos" },
                   { key: "system" as const, label: "Sistema e atualizações", desc: "Novidades da plataforma" },

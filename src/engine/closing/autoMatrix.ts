@@ -1,110 +1,82 @@
-/**
- * Auto Matrix Picker
- * -----------------------------------------------------------------------------
- * Escolhe a matriz de desdobramento mais eficiente para um determinado
- * orçamento, tamanho da base disponível e loteria. Retorna a matriz vencedora
- * mais um ranking das top alternativas.
- *
- * Heurística: filtra matrizes compatíveis (mesma loteria, baseSize <= base do
- * usuário, custo total dentro do orçamento), então ordena por
- *   score = garantia * 100  +  eficiência%  -  custo/orçamento * 30
- * priorizando garantia matemática elevada, boa eficiência e custo aderente.
- */
-import {
-  WHEELING_MATRICES,
-  type WheelingMatrixId,
-} from "@/ai/engines/wheelingMatrices";
+import { LOTTERY_BET_COST } from "@/engine/betting-budget";
+import { getMatricesForLottery, WHEELING_MATRICES } from "@/ai/engines/wheelingMatrices";
 
-export interface AutoMatrixOption {
-  id: WheelingMatrixId;
-  name: string;
-  description: string;
-  baseSize: number;
-  guarantee: number;
-  gameCount: number;
-  efficiency: string;
-  probability: string;
-  cost: number;
-  score: number;
-}
-
-export interface AutoMatrixResult {
-  best: AutoMatrixOption | null;
-  alternatives: AutoMatrixOption[];
-  reason?: string;
-}
-
-/** Preço unitário oficial do bilhete simples (2024/2026). */
-const UNIT_PRICE: Record<string, number> = {
-  lotofacil: 3.5,
-  megasena: 5,
-  quina: 2.5,
-  duplasena: 3,
-  timemania: 3.5,
-  diadesorte: 2.5,
-  lotomania: 3,
-  supersete: 2.5,
-};
-
-function unitPrice(lotteryId: string): number {
-  return UNIT_PRICE[lotteryId] ?? 5;
-}
-
-export function pickBestMatrix(params: {
+interface PickMatrixParams {
   lotteryId: string;
   availableBaseSize: number;
   budget: number;
-}): AutoMatrixResult {
-  const { lotteryId, availableBaseSize, budget } = params;
-  const price = unitPrice(lotteryId);
+  targetGuarantee?: number;
+}
 
-  const parseEff = (s: string) => {
-    const m = /(\d+)/.exec(s ?? "");
-    return m ? parseInt(m[1], 10) : 70;
-  };
+export interface MatrixSuggestion {
+  id: string;
+  name: string;
+  description: string;
+  baseSize: number;
+  gameCount: number;
+  guarantee: number;
+  cost: number;
+}
 
-  const options: AutoMatrixOption[] = (
-    Object.entries(WHEELING_MATRICES) as [WheelingMatrixId, typeof WHEELING_MATRICES[WheelingMatrixId]][]
-  )
-    .filter(([, m]) => m.lottery === lotteryId)
-    .filter(([, m]) => m.baseSize <= availableBaseSize)
-    .map(([id, m]) => {
-      const cost = m.games.length * price;
-      const eff = parseEff(m.efficiency);
-      const budgetFit = budget > 0 ? Math.min(1, cost / budget) : 1;
-      const score =
-        m.guarantee * 100 + eff - budgetFit * 30 + (cost <= budget ? 15 : -25);
-      return {
-        id,
-        name: m.name,
-        description: m.description,
-        baseSize: m.baseSize,
-        guarantee: m.guarantee,
-        gameCount: m.games.length,
-        efficiency: m.efficiency,
-        probability: m.probability,
-        cost,
-        score: Math.round(score * 10) / 10,
-      };
-    })
-    .sort((a, b) => b.score - a.score);
+/**
+ * Picks the best wheeling matrix based on base size and budget.
+ */
+export function pickBestMatrix({
+  lotteryId,
+  availableBaseSize,
+  budget,
+  targetGuarantee = 14
+}: PickMatrixParams): { best: MatrixSuggestion | null; alternatives: MatrixSuggestion[]; reason: string } {
+  const costPerGame = LOTTERY_BET_COST[lotteryId] || 3.0;
+  const available = getMatricesForLottery(lotteryId);
 
-  if (options.length === 0) {
+  // Filter matrices that fit within budget and use no more than available base size
+  const affordable = available
+    .map(m => ({
+      ...m,
+      gameCount: m.games.length,
+      cost: m.games.length * costPerGame
+    }))
+    .filter(m => m.cost <= budget && m.baseSize <= availableBaseSize)
+    .sort((a, b) => {
+      // Priority 1: Higher guarantee
+      if (b.guarantee !== a.guarantee) return b.guarantee - a.guarantee;
+      // Priority 2: Larger base size (better coverage)
+      if (b.baseSize !== a.baseSize) return b.baseSize - a.baseSize;
+      // Priority 3: Cheaper cost
+      return a.cost - b.cost;
+    });
+
+  if (affordable.length === 0) {
     return {
       best: null,
       alternatives: [],
-      reason: `Nenhuma matriz disponível para ${lotteryId} com base ≥${availableBaseSize}.`,
+      reason: budget < costPerGame ? "Orçamento insuficiente para 1 jogo." : "Nenhuma matriz encontrada para este orçamento e tamanho de base."
     };
   }
 
-  const within = options.filter((o) => o.cost <= budget);
-  const best = within[0] ?? options[0];
+  const best = affordable[0];
+  const alternatives = affordable.slice(1, 5);
+
   return {
-    best,
-    alternatives: options.filter((o) => o.id !== best.id).slice(0, 4),
-    reason:
-      within.length === 0
-        ? `Nenhuma matriz cabe no orçamento R$ ${budget.toFixed(2)}. Sugerimos a mais próxima.`
-        : undefined,
+    best: {
+      id: best.id,
+      name: best.name,
+      description: best.description,
+      baseSize: best.baseSize,
+      gameCount: best.gameCount,
+      guarantee: best.guarantee,
+      cost: best.cost
+    },
+    alternatives: alternatives.map(a => ({
+      id: a.id,
+      name: a.name,
+      description: a.description,
+      baseSize: a.baseSize,
+      gameCount: a.gameCount,
+      guarantee: a.guarantee,
+      cost: a.cost
+    })),
+    reason: "Matriz otimizada para o seu orçamento atual."
   };
 }
