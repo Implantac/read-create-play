@@ -400,6 +400,65 @@ export default function GestaoBancaPage() {
         </CardContent>
       </Card>
 
+      {/* ROI Portfolio View */}
+      <Card className="glass-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Trophy className="h-4 w-4 text-primary" />
+            Portfólio por Modalidade
+          </CardTitle>
+          <p className="text-xs text-muted-foreground mt-1">ROI real baseado no seu histórico de apostas.</p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            {roiData.map((r) => {
+              const lot = LOTTERIES.find((l) => l.id === r.lotteryId);
+              const roiPct = r.roi * 100;
+              return (
+                <div key={r.lotteryId} className="rounded-xl border border-border/40 bg-background/30 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{lot?.icon || "🍀"}</span>
+                      <span className="text-sm font-bold">{lot?.name || r.lotteryId}</span>
+                    </div>
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        "font-mono text-[10px]",
+                        roiPct > 0 ? "border-emerald-500/50 text-emerald-400 bg-emerald-500/10" :
+                        roiPct < -50 ? "border-destructive/50 text-destructive bg-destructive/10" : ""
+                      )}
+                    >
+                      {roiPct > 0 ? "+" : ""}{roiPct.toFixed(1)}% ROI
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase">Gasto</p>
+                      <p className="font-mono">{brl(r.totalSpent)}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase">Retorno</p>
+                      <p className="font-mono">{brl(r.totalWon)}</p>
+                    </div>
+                  </div>
+                  <div className="pt-2 border-t border-border/40 flex items-center justify-between text-[10px] text-muted-foreground">
+                    <span>{r.bets} apostas</span>
+                    <span>{(r.hitRate * 100).toFixed(1)}% acerto</span>
+                  </div>
+                </div>
+              );
+            })}
+            {roiData.length === 0 && (
+              <div className="col-span-full py-10 text-center text-sm text-muted-foreground italic">
+                Nenhum dado de ROI disponível. Registre suas sessões no diário abaixo.
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+
       {/* Session Tracking */}
       <Card className="glass-card">
         <CardHeader className="flex-row items-center justify-between">
