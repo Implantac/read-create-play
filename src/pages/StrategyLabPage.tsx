@@ -70,6 +70,7 @@ export default function StrategyLabPage() {
   const [labHistory, setLabHistory] = useState<{ timestamp: number; winner: string; score: number }[]>([]);
   const [configOpen, setConfigOpen] = useState(true);
   const [customDrawRange, setCustomDrawRange] = useState<[number, number] | null>(null);
+  const [enableShuffledBacktest, setEnableShuffledBacktest] = useState(true);
 
   const available = useMemo(() => getStrategiesForLottery(config.id), [config.id]);
 
@@ -489,9 +490,34 @@ export default function StrategyLabPage() {
                               {p}
                             </Button>
                           ))}
+                      </div>
+                    </div>
+
+                    <Separator className="bg-border/30" />
+
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest text-primary border-primary/20 bg-primary/5">Integrity Guard</Badge>
+                      </div>
+                      <div className="flex items-start gap-4">
+                        <Checkbox 
+                          id="shuffled-backtest" 
+                          checked={enableShuffledBacktest}
+                          onCheckedChange={(checked) => setEnableShuffledBacktest(!!checked)}
+                          className="mt-1"
+                        />
+                        <div className="space-y-1">
+                          <label htmlFor="shuffled-backtest" className="text-xs font-black uppercase tracking-wider cursor-pointer text-foreground flex items-center gap-2">
+                            Shuffled Backtest (Integridade Temporal)
+                            <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[8px] font-bold">RECOMENDADO</Badge>
+                          </label>
+                          <p className="text-[10px] text-muted-foreground leading-relaxed italic">
+                            Embaralha a ordem dos sorteios para detectar se a estratégia realmente captura tendências temporais ou se apenas deu sorte em números frequentes (combate o overfitting).
+                          </p>
                         </div>
                       </div>
                     </div>
+                  </div>
                   </div>
                 </div>
 
