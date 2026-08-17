@@ -168,7 +168,8 @@ export default function StrategyLabPage() {
           draws.slice(-100),
           config,
           LOTTERY_BET_COST[config.id] || 3.5,
-          1000
+          1000,
+          false // Don't shuffle random
         );
 
         const backtests: BacktestResult[] = res.generatedGames.map(sg => {
@@ -179,7 +180,8 @@ export default function StrategyLabPage() {
             draws.slice(-100), // Backtest nos últimos 100 para performance
             config,
             LOTTERY_BET_COST[config.id] || 3.5,
-            1000 // Banca inicial padrão
+            1000, // Banca inicial padrão
+            enableShuffledBacktest
           );
         });
 
