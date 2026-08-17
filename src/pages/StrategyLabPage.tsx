@@ -9,6 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BacktestDashboard } from "@/components/lab/backtest/BacktestDashboard";
+import { runBacktest, BacktestResult } from "@/engine/strategy-lab/backtest-engine";
+import { LOTTERY_BET_COST } from "@/engine/betting-budget";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -61,6 +64,7 @@ export default function StrategyLabPage() {
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState(0);
   const [activeTab, setActiveTab] = useState("ranking");
+  const [backtestResults, setBacktestResults] = useState<BacktestResult[]>([]);
   const [showDetails, setShowDetails] = useState<string | null>(null);
   const [labHistory, setLabHistory] = useState<{ timestamp: number; winner: string; score: number }[]>([]);
   const [configOpen, setConfigOpen] = useState(true);
@@ -154,8 +158,21 @@ export default function StrategyLabPage() {
           }, ...prev].slice(0, 10));
         }
 
+        const backtests: BacktestResult[] = res.generatedGames.map(sg => {
+          return runBacktest(
+            sg.strategyId,
+            sg.strategyName,
+            sg.games,
+            draws.slice(-100), // Backtest nos últimos 100 para performance
+            config,
+            LOTTERY_BET_COST[config.id] || 3.5,
+            1000 // Banca inicial padrão
+          );
+        }).sort((a, b) => b.metrics.roi - a.metrics.roi);
+
+        setBacktestResults(backtests);
         toast.success(`${formatNumber(res.rankings.length)} estratégias testadas em ${formatNumber(res.elapsedMs)}ms`);
-        setActiveTab("bestgames");
+        setActiveTab("backtest");
       } catch (err) {
         console.error(err);
         toast.error("Erro ao executar laboratório");
@@ -614,7 +631,11 @@ export default function StrategyLabPage() {
               {/* Main Tabs */}
               <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <div className="overflow-x-auto -mx-1 px-1 scrollbar-thin">
-                  <TabsList className="inline-flex w-full min-w-[560px] sm:min-w-0 sm:grid sm:grid-cols-7 h-11">
+                  <TabsList className="inline-flex w-full min-w-[640px] sm:min-w-0 sm:grid sm:grid-cols-8 h-11">
+                    <TabsTrigger value="backtest" className="text-xs gap-1 data-[state=active]:shadow-sm">
+                      <FlaskConical className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Backtest</span>
+                    </TabsTrigger>
                     <TabsTrigger value="bestgames" className="text-xs gap-1 data-[state=active]:shadow-sm">
                       <Star className="w-3.5 h-3.5" />
                       <span className="hidden sm:inline">Melhores</span>
@@ -645,6 +666,10 @@ export default function StrategyLabPage() {
                     </TabsTrigger>
                   </TabsList>
                 </div>
+
+                <TabsContent value="backtest" className="mt-6 space-y-6">
+                  <BacktestDashboard results={backtestResults} />
+                </TabsContent>
 
                 <TabsContent value="bestgames" className="mt-4 space-y-4">
                   <BestGamesPanel
