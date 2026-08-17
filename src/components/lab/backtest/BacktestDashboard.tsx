@@ -22,19 +22,96 @@ export function BacktestDashboard({ results }: BacktestDashboardProps) {
     results.find(r => r.strategyId === selectedStrategyId) || results[0]
   , [results, selectedStrategyId]);
 
+  const comparisonData = useMemo(() => {
+    if (results.length < 2) return null;
+    const top3 = results.slice(0, 3);
+    const timeline: any[] = [];
+    
+    // Assumindo que todos os backtests têm o mesmo número de concursos
+    const length = top3[0].history.length;
+    for (let i = 0; i < length; i++) {
+      const entry: any = { concurso: top3[0].history[i].concurso };
+      top3.forEach((res, idx) => {
+        entry[`strat_${idx}`] = res.history[i].equity;
+      });
+      timeline.push(entry);
+    }
+    return { timeline, strategies: top3 };
+  }, [results]);
+
   if (results.length === 0) return null;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between px-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-1">
         <div className="flex items-center gap-2">
           <FlaskConical className="w-5 h-5 text-primary" />
           <h2 className="text-xl font-black uppercase tracking-tighter italic">Simulador de Robustez</h2>
         </div>
-        <Badge variant="outline" className="text-[10px] font-mono border-primary/20 bg-primary/5 text-primary">
-          Backtest 100+ Concursos
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="text-[10px] font-mono border-primary/20 bg-primary/5 text-primary">
+            Backtest 100+ Concursos
+          </Badge>
+          <Badge variant="outline" className="text-[10px] font-mono border-rose-500/20 bg-rose-500/5 text-rose-400">
+            Professional Grade
+          </Badge>
+        </div>
       </div>
+
+      {comparisonData && (
+        <Card className="bg-card/40 border-border/40 backdrop-blur-md overflow-hidden">
+          <CardHeader className="pb-2 bg-muted/5">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-bold flex items-center gap-2">
+                <Activity className="w-4 h-4 text-primary" />
+                Benchmark: Top 3 Estratégias
+              </CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <div className="h-[250px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={comparisonData.timeline}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.1} />
+                  <XAxis dataKey="concurso" hide />
+                  <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10, fontFamily: "JetBrains Mono" }} hide />
+                  <Tooltip 
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-background/95 backdrop-blur-md border border-border p-3 rounded-xl shadow-2xl text-xs space-y-2">
+                            <p className="font-bold text-primary">Concurso {payload[0].payload.concurso}</p>
+                            {payload.map((p: any, i: number) => (
+                              <div key={i} className="flex items-center justify-between gap-4">
+                                <span className="text-muted-foreground">{comparisonData.strategies[i].strategyName}:</span>
+                                <span className="font-mono font-bold" style={{ color: p.color }}>R$ {p.value.toFixed(2)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  {comparisonData.strategies.map((s, i) => (
+                    <Line 
+                      key={s.strategyId}
+                      type="monotone"
+                      dataKey={`strat_${i}`}
+                      name={s.strategyName}
+                      stroke={i === 0 ? "hsl(var(--primary))" : i === 1 ? "hsl(var(--secondary))" : "#10b981"}
+                      strokeWidth={i === 0 ? 3 : 2}
+                      dot={false}
+                      strokeDasharray={i === 2 ? "5 5" : ""}
+                    />
+                  ))}
+                  <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {results.map((res) => (
