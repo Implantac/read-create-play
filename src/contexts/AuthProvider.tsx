@@ -85,57 +85,61 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     console.log("[Auth] Effect starting...");
 
-    // Initial session check
-    supabase.auth.getSession().then(async ({ data: { session: nextSession }, error }) => {
-      if (!mounted) return;
-      
-      console.log("[Auth] Initial getSession result:", nextSession ? "session found" : "no session", error?.message || "");
-
-      if (error) {
-        console.error("[Auth] Session fetch error:", error);
-        if (error.message.includes("refresh_token") || error.message.includes("invalid")) {
-          localStorage.removeItem(authStorageKey);
-        }
-        setLoading(false);
-        return;
-      }
-
-      if (nextSession?.user) {
-        setSession(nextSession);
-        await loadUserData(nextSession.user.id, nextSession.access_token, nextSession.user.email);
-      }
-      
-      setLoading(false);
-      console.log("[Auth] Initial session check complete");
-    }).catch(err => {
-      if (!mounted) return;
-      console.error("[Auth] Fatal getSession error:", err);
-      setLoading(false);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, nextSession) => {
-        if (!mounted) return;
+    const initAuth = async () => {
+      try {
+        // Parallel init: Check current session and listen for changes
+        const sessionPromise = supabase.auth.getSession();
         
-        console.log(`[Auth] Event: ${event}`);
-        setSession(nextSession);
-        
-        if (nextSession?.user) {
-          try {
-            await loadUserData(nextSession.user.id, undefined, nextSession.user.email);
-          } catch (err) {
-            console.error("[Auth] Data sync error:", err);
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (event, nextSession) => {
+            if (!mounted) return;
+            
+            console.log(`[Auth] Event: ${event}`);
+            setSession(nextSession);
+            
+            if (nextSession?.user) {
+              try {
+                await loadUserData(nextSession.user.id, nextSession.access_token, nextSession.user.email);
+              } catch (err) {
+                console.error("[Auth] Data sync error during event:", err);
+              }
+            } else {
+              setProfile(null);
+              setIsAdmin(false);
+              setIsSuperAdmin(false);
+              setUserRole("user");
+            }
+            
+            setLoading(false);
           }
-        } else {
-          setProfile(null);
-          setIsAdmin(false);
-          setIsSuperAdmin(false);
-          setUserRole("user");
-        }
+        );
+
+        const { data: { session: initialSession }, error } = await sessionPromise;
         
-        setLoading(false);
+        if (mounted) {
+          if (error) {
+            console.error("[Auth] Initial session error:", error);
+            if (error.message.includes("refresh_token") || error.message.includes("invalid")) {
+              localStorage.removeItem(authStorageKey);
+            }
+          } else if (initialSession?.user) {
+            setSession(initialSession);
+            await loadUserData(initialSession.user.id, initialSession.access_token, initialSession.user.email);
+          }
+          
+          setLoading(false);
+          console.log("[Auth] Initialization complete");
+        }
+
+        return subscription;
+      } catch (err) {
+        console.error("[Auth] Fatal init error:", err);
+        if (mounted) setLoading(false);
+        return null;
       }
-    );
+    };
+
+    const subPromise = initAuth();
 
     // Safety timeout to prevent infinite loading
     const timeout = setTimeout(() => {
@@ -147,7 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
+      subPromise.then(sub => sub?.unsubscribe());
       clearTimeout(timeout);
     };
   }, [loadUserData]);

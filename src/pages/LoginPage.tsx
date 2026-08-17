@@ -28,12 +28,28 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
-      toast({ title: "Erro ao entrar", description: error.message, variant: "destructive" });
-    } else {
-      navigate(nextPath);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      
+      if (error) {
+        throw error;
+      }
+
+      if (data?.session) {
+        // Force a small delay to ensure AuthProvider processes the state change
+        // OR rely on the navigate being triggered after we know we have a session.
+        toast({ title: "Bem-vindo!", description: "Login realizado com sucesso." });
+        navigate(nextPath, { replace: true });
+      }
+    } catch (error: any) {
+      console.error("Login error:", error);
+      toast({ 
+        title: "Erro ao entrar", 
+        description: error.message || "Verifique suas credenciais.", 
+        variant: "destructive" 
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
