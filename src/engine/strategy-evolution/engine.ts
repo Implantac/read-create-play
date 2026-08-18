@@ -89,10 +89,9 @@ function backtestStrategy(
   const coverageScore = (allNums.size / config.numbers) * 100;
 
   // Evidence Engine integration
-  const totalSlots = totalComparisons * config.pick;
-  const evidence = analyzeEvidence(totalHits, totalSlots, config);
+  const evidence = analyzeEvidence(totalHits, games, draws, config, 1000);
   const lift = evidence.lift;
-  const monteCarloData = runMonteCarloSim(totalSlots, config, 1000);
+  const monteCarloData = runMonteCarloSim(games, draws, config, 200);
   const accuracy = draws.length >= 20 ? Math.min(98, Math.max(0, Math.round((Math.max(0, lift - 1) * 2 + consistency / 2) * 100))) : null;
 
   // Global composite score
@@ -119,8 +118,12 @@ function backtestStrategy(
     globalScore,
     accuracy,
     lift,
+    pValue: evidence.pValue,
+    zScore: evidence.zScore,
     confidenceInterval: evidence.confidenceInterval,
     monteCarloData,
+    evidenceGrade: evidence.grade,
+    evidenceExplanation: evidence.explanation
   };
 }
 
