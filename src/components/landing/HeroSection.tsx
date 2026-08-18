@@ -1,4 +1,5 @@
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Brain, Shield, Zap } from "lucide-react";
@@ -21,6 +22,7 @@ export function HeroSection({
   handleCtaClick,
   fadeUp,
 }: HeroSectionProps) {
+  const { t } = useTranslation();
   return (
     <section 
       ref={heroRef} 
@@ -47,7 +49,7 @@ export function HeroSection({
           >
             <Brain className="w-4 h-4 text-primary animate-pulse" />
             <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.4em] text-primary italic drop-shadow-sm">
-              Neural Core v7.5 Alpha • Acesso de Elite
+              {t('landing.hero.subtitle')}
             </span>
           </motion.div>
 
@@ -59,8 +61,7 @@ export function HeroSection({
             className="space-y-6 md:space-y-10"
           >
             <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[9.5rem] font-black tracking-tighter uppercase italic leading-[0.8] drop-shadow-2xl text-white">
-              <span className="block mb-2 md:mb-6">CIÊNCIA DE</span>
-              <span className="gradient-brand-text drop-shadow-[0_0_30px_rgba(201,168,76,0.3)]">DADOS REAL</span>
+              {t('landing.hero.title')}
             </h1>
             <p className="text-lg md:text-2xl text-muted-foreground max-w-3xl mx-auto font-medium italic opacity-70 leading-relaxed px-4 md:px-0">
               Processamento neural de elite aplicado a loterias oficiais. Decisões baseadas em evidências históricas, não em palpites.
