@@ -80,7 +80,7 @@ export function FeaturesSection({ featuresRef, featuresRotateX, fadeUp }: Featur
             <motion.div key={f.title} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} whileHover={{ y: -16, scale: 1.02 }} className={`relative rounded-[2.5rem] glass-card border-white/5 p-12 transition-all duration-700 hover:shadow-premium-hover ${colorMap[f.color]} group overflow-hidden shadow-premium`}>
               <div className="absolute inset-0 bg-gradient-to-b from-white/[0.04] to-transparent pointer-events-none" />
               <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-10 group-hover:scale-110 group-hover:bg-primary/20 group-hover:shadow-gold-glow transition-all duration-500 relative z-10 shadow-inner">
-                <f.icon className="w-10 h-10 text-primary" />
+                <f.icon className="w-10 h-10 text-primary group-hover:rotate-6 transition-transform duration-500" />
               </div>
               <h3 className="text-2xl md:text-3xl font-black text-foreground uppercase tracking-tight italic mb-6 leading-none">{f.title}</h3>
               <p className="text-sm md:text-base text-muted-foreground leading-relaxed font-medium opacity-80 italic">{f.description}</p>
