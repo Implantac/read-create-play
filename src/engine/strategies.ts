@@ -26,7 +26,12 @@ export type Strategy =
   | "repetition"
   | "coreRepetition"
   | "coreSectors"
+  | "markov"
+  | "poisson"
+  | "cluster"
+  | "expert"
   | "hybrid";
+
 
 
 export interface StrategyInfo {
