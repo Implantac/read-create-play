@@ -53,7 +53,7 @@ export const StatsCard = memo(({
           {title}
         </CardTitle>
         {Icon && (
-          <div className="h-9 w-9 rounded-lg bg-primary/10 border border-primary/15 flex items-center justify-center group-hover:bg-primary/15 group-hover:border-primary/30 transition-colors">
+          <div className="h-9 w-9 rounded-lg bg-primary/10 border border-primary/15 flex items-center justify-center group-hover:bg-primary/20 group-hover:border-primary/40 group-hover:shadow-gold-glow transition-all">
             <Icon className="h-4 w-4 text-primary" />
           </div>
         )}
