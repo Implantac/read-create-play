@@ -48,7 +48,7 @@ const Indicator = ({ label, value, suffix = "", description, trend, icon: Icon }
         trend === "down" ? "text-destructive bg-destructive/10 border-destructive/20" : 
         "text-muted-foreground bg-secondary/50 border-border/60"
       }`}>
-        {trend === "up" ? "STABLE" : trend === "down" ? "VOLATILE" : "NEUTRAL"}
+        {trend === "up" ? "STABLE" : trend === "down" ? "VOLATILE" : "ACTIVE"}
       </div>
     )}
   </div>

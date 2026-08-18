@@ -80,7 +80,7 @@ export function TitanAIModule() {
               <item.icon className="w-3 h-3 text-primary" />
               {item.label}
             </div>
-            <p className="text-sm font-black uppercase tracking-tight italic">{item.value}</p>
+            <p className="text-sm font-black uppercase tracking-tight italic text-emerald-400">{item.value}</p>
           </div>
         ))}
       </div>
