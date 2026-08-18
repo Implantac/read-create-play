@@ -1,13 +1,19 @@
-import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { analyzeEvidence, EvidenceReport } from "../stats/evidence-engine";
+import { DrawResult, LotteryConfig } from "@/data/lotteries";
+import { EvidenceEngine, EvidenceReport } from "./EvidenceEngine";
+
+export interface BacktestOptions {
+  windowSize: number;
+  testSize: number;
+  mode: "rolling" | "expanding";
+}
 
 export interface BacktestResult {
   folds: number;
   avgLift: number;
-  avgROI: number;
-  drawdown: number;
+  avgPrecisionAtK: number;
+  maxDrawdown: number;
   report: EvidenceReport;
-  temporalIntegrity: boolean;
+  mode: string;
 }
 
 export class WalkForwardBacktest {
@@ -15,46 +21,49 @@ export class WalkForwardBacktest {
     private draws: DrawResult[],
     private config: LotteryConfig
   ) {
-    // Garantir ordem cronológica
     this.draws.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   }
 
-  /**
-   * Executa backtest walk-forward em múltiplos folds.
-   * Evita data leakage usando apenas o passado para prever o futuro.
-   */
   run(
-    modelFn: (pastDraws: DrawResult[]) => number[],
-    windowSize: number = 100,
-    testStep: number = 10
+    modelFn: (trainingData: DrawResult[]) => number[],
+    options: BacktestOptions
   ): BacktestResult {
-    // Implementação da lógica de folds conforme regra 8
-    let totalHits = 0;
-    let totalSamples = 0;
+    const engine = new EvidenceEngine(this.config);
+    const baseline = engine.generateRandomBaseline(1000);
     
-    // Simplificado para esta fase, mas respeitando o fluxo
-    for (let i = windowSize; i < this.draws.length; i += testStep) {
-      const trainingData = this.draws.slice(0, i);
-      const testData = this.draws.slice(i, Math.min(i + testStep, this.draws.length));
-      
+    let totalHits = 0;
+    let totalPicks = 0;
+    let foldCount = 0;
+
+    for (let i = options.windowSize; i < this.draws.length; i++) {
+      if (foldCount >= options.testSize) break;
+
+      const trainStart = options.mode === "rolling" ? i - options.windowSize : 0;
+      const trainingData = this.draws.slice(trainStart, i);
+      const testDraw = this.draws[i];
+
+      if (!testDraw) break;
+
       const prediction = modelFn(trainingData);
+      const drawSet = new Set(testDraw.numbers);
       
-      testData.forEach(draw => {
-        const hits = prediction.filter(n => draw.numbers.includes(n)).length;
-        totalHits += hits;
-        totalSamples += prediction.length;
+      prediction.forEach(n => {
+        if (drawSet.has(n)) totalHits++;
       });
+      
+      totalPicks += prediction.length;
+      foldCount++;
     }
 
-    const report = analyzeEvidence(totalHits, totalSamples, this.config);
+    const report = engine.compareAgainstBaseline(totalHits, foldCount, baseline);
 
     return {
-      folds: Math.floor((this.draws.length - windowSize) / testStep),
+      folds: foldCount,
       avgLift: report.lift,
-      avgROI: 0, // A ser implementado com BankrollManager
-      drawdown: 0,
+      avgPrecisionAtK: totalHits / (totalPicks || 1),
+      maxDrawdown: 0, // Simplified
       report,
-      temporalIntegrity: true
+      mode: options.mode
     };
   }
 }
