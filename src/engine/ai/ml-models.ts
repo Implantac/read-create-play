@@ -441,7 +441,7 @@ export function runEnsembleVoting(stats: NumberStats[], config: LotteryConfig, m
   normalizeAndRank(scored);
 
   const weightDesc = Object.entries(weights).map(([k, v]) => {
-    const short = k.replace("Temporal Pattern Score", "TPS").replace("Inferência Bayesiana", "Bayes").replace("Cadeia de Markov", "Markov").replace("Statistical Multi-Factor", "SMF").replace("Gradient Pattern Engine", "GPE").replace("Multi-Factor Pattern Engine", "MFPE");
+    const short = k.replace("MultiDimensionalPatternScore", "MDPS").replace("FrequencyTrendScore", "FTS").replace("MultiFactorScore", "MFS").replace("TemporalPatternScore", "TPS").replace("BayesianScore", "Bayes").replace("TransitionScore", "Markov");
     return `${short}(${Math.round(v * 100)}%)`;
   }).join(" + ");
 
