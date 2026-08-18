@@ -4,14 +4,6 @@ import { useTranslation } from "react-i18next";
 export function HowItWorksSection() {
   const { t } = useTranslation();
 
-  const steps = [
-    { step: "01", title: t("landing.how_it_works.step1.title"), desc: t("landing.how_it_works.step1.desc") },
-    { step: "02", title: t("landing.how_it_works.step2.title"), desc: t("landing.how_it_works.step2.desc") },
-    { step: "03", title: t("landing.how_it_works.step3.title"), desc: t("landing.how_it_works.step3.desc") },
-    { step: "04", title: t("landing.how_it_works.step4.title"), desc: t("landing.how_it_works.step4.desc") },
-    { step: "05", title: t("landing.how_it_works.step5.title"), desc: t("landing.how_it_works.step5.desc") }
-  ];
-
   return (
     <section className="py-24 md:py-48 relative overflow-hidden bg-background">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_50%,rgba(201,168,76,0.05),transparent_70%)] pointer-events-none" />
@@ -42,32 +34,32 @@ export function HowItWorksSection() {
                     <p className="text-sm md:text-base text-muted-foreground leading-relaxed italic opacity-80 font-medium">Consolidamos todos os concursos oficiais em uma base de dados única, pronta para análise temporal profunda.</p>
                   </div>
                 </div>
-                <div className="flex gap-6 items-start group">
-                  <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">02</span>
-                  <div className="space-y-1">
-                    <h3 className="text-xl font-bold uppercase italic">Processamento com IA</h3>
-                    <p className="text-muted-foreground leading-relaxed">O Titan AI Core cruza milhões de combinações em busca de padrões estatísticos e anomalias de frequência.</p>
+                <div className="flex gap-8 items-start group">
+                  <span className="text-6xl font-black text-primary/5 group-hover:text-primary/20 transition-colors italic leading-none select-none">02</span>
+                  <div className="space-y-2">
+                    <h3 className="text-xl md:text-2xl font-black uppercase italic tracking-tight group-hover:text-primary transition-colors">Processamento Neural</h3>
+                    <p className="text-sm md:text-base text-muted-foreground leading-relaxed italic opacity-80 font-medium">O Titan AI Core v7.5 cruza milhões de combinações em busca de padrões estatísticos e anomalias de frequência.</p>
                   </div>
                 </div>
-                <div className="flex gap-6 items-start group">
-                  <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">03</span>
-                  <div className="space-y-1">
-                    <h3 className="text-xl font-bold uppercase italic">Detecção de Padrões</h3>
-                    <p className="text-muted-foreground leading-relaxed">Redes neurais especializadas identificam dezenas quentes, frias, ciclos de retorno e tendências emergentes.</p>
+                <div className="flex gap-8 items-start group">
+                  <span className="text-6xl font-black text-primary/5 group-hover:text-primary/20 transition-colors italic leading-none select-none">03</span>
+                  <div className="space-y-2">
+                    <h3 className="text-xl md:text-2xl font-black uppercase italic tracking-tight group-hover:text-primary transition-colors">Detecção de Padrões</h3>
+                    <p className="text-sm md:text-base text-muted-foreground leading-relaxed italic opacity-80 font-medium">Redes neurais especializadas identificam dezenas quentes, frias, ciclos de retorno e tendências emergentes.</p>
                   </div>
                 </div>
-                <div className="flex gap-6 items-start group">
-                  <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">04</span>
-                  <div className="space-y-1">
-                    <h3 className="text-xl font-bold uppercase italic">Estratégia Matemática</h3>
-                    <p className="text-muted-foreground leading-relaxed">Aplicamos filtros de dispersão, equilíbrio estrutural e fechamentos matemáticos para maximizar sua cobertura.</p>
+                <div className="flex gap-8 items-start group">
+                  <span className="text-6xl font-black text-primary/5 group-hover:text-primary/20 transition-colors italic leading-none select-none">04</span>
+                  <div className="space-y-2">
+                    <h3 className="text-xl md:text-2xl font-black uppercase italic tracking-tight group-hover:text-primary transition-colors">Estratégia Quantitativa</h3>
+                    <p className="text-sm md:text-base text-muted-foreground leading-relaxed italic opacity-80 font-medium">Aplicamos filtros de dispersão, equilíbrio estrutural e fechamentos matemáticos para maximizar sua cobertura.</p>
                   </div>
                 </div>
-                <div className="flex gap-6 items-start group">
-                  <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">05</span>
-                  <div className="space-y-1">
-                    <h3 className="text-xl font-bold uppercase italic">Apostas Estratégicas</h3>
-                    <p className="text-muted-foreground leading-relaxed">Você recebe combinações prontas com o Titan Score — decisões baseadas em dados, não em palpite.</p>
+                <div className="flex gap-8 items-start group">
+                  <span className="text-6xl font-black text-primary/5 group-hover:text-primary/20 transition-colors italic leading-none select-none">05</span>
+                  <div className="space-y-2">
+                    <h3 className="text-xl md:text-2xl font-black uppercase italic tracking-tight group-hover:text-primary transition-colors">Output Estratégico</h3>
+                    <p className="text-sm md:text-base text-muted-foreground leading-relaxed italic opacity-80 font-medium">Você recebe combinações prontas com o Titan Score — decisões baseadas em evidências, não em palpite.</p>
                   </div>
                 </div>
             </div>
