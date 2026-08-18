@@ -504,7 +504,7 @@ export default function GestaoBancaPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-2 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-2 items-end">
             <div className="space-y-1">
               <Label className="text-[10px] uppercase">Modalidade</Label>
               <select
@@ -530,20 +530,21 @@ export default function GestaoBancaPage() {
               <Input value={entry.note}
                 onChange={(e) => setEntry({ ...entry, note: e.target.value })} placeholder="Opcional" />
             </div>
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={syncRealROI}
-              disabled={roiLoading || !roiData.length}
-              className="h-10 border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10"
-            >
-              <Zap className="h-4 w-4 mr-2" />
-              Sincronizar ROI Real
-            </Button>
-            <Button onClick={addSession} className="h-10">
-              <Plus className="h-4 w-4 mr-1" /> Registrar
-            </Button>
+            <div className="flex items-center gap-2 md:col-span-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={syncRealROI}
+                disabled={roiLoading || !roiData.length}
+                className="flex-1 h-10 border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10"
+              >
+                <Zap className="h-4 w-4 mr-2" />
+                Sincronizar ROI
+              </Button>
+              <Button onClick={addSession} className="flex-1 h-10">
+                <Plus className="h-4 w-4 mr-1" /> Registrar
+              </Button>
+            </div>
           </div>
 
           {sessions.length === 0 ? (
