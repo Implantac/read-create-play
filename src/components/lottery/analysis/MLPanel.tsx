@@ -140,12 +140,12 @@ export function MLPanel({ stats, config, draws }: Props) {
     <div className="rounded-xl bg-card border border-border p-5">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-            <Brain className="w-4 h-4 text-neon-purple" />
-            Modelos de Machine Learning
-          </h3>
+        <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+          <Brain className="w-4 h-4 text-neon-purple" />
+          Modelos e Scores Estatísticos
+        </h3>
           <p className="text-xs text-muted-foreground mt-0.5">
-            6 modelos com backtesting real e breakdown de fatores
+            6 modelos com evidência histórica real e breakdown de fatores
           </p>
         </div>
         <Button
@@ -162,7 +162,7 @@ export function MLPanel({ stats, config, draws }: Props) {
       {running && (
         <div className="flex flex-col items-center py-12 gap-3">
           <div className="w-8 h-8 border-2 border-neon-purple border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-muted-foreground">Backtesting e calibração dos 6 modelos...</p>
+          <p className="text-sm text-muted-foreground">Cálculo de evidência e calibração dos 6 modelos...</p>
         </div>
       )}
 
@@ -249,7 +249,7 @@ export function MLPanel({ stats, config, draws }: Props) {
 
       {!models && !running && (
         <div className="text-center py-8 text-muted-foreground text-sm">
-          Clique em "Executar Modelos" para rodar os 6 algoritmos de ML com backtesting real
+          Clique em "Executar Modelos" para rodar os 6 algoritmos estatísticos com evidência histórica real
         </div>
       )}
     </div>
