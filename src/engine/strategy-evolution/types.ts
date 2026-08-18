@@ -62,7 +62,9 @@ export interface StrategyMetrics {
   globalScore: number;        // 0-100 composite
   accuracy: number | null;    // Real accuracy based on lift/consistency
   lift: number;               // Statistical lift over random baseline
+  confidenceInterval?: [number, number]; // IC95% for Lift
 }
+
 
 export interface RankingEntry {
   rank: number;

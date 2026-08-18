@@ -5,8 +5,9 @@
 
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { NumberStats, computeFrequencyStats } from "@/features/statistics/engine";
-import { generateByStrategy, Strategy } from "@/features/statistics/strategies";
+import { generateByStrategy, Strategy } from "@/engine/strategies";
 import { analyzeEvidence } from "@/engine/stats/evidence-engine";
+
 import {
   StrategyDefinition,
   StrategyMetrics,
@@ -117,8 +118,10 @@ function backtestStrategy(
     globalScore,
     accuracy,
     lift,
+    confidenceInterval: evidence.confidenceInterval,
   };
 }
+
 
 function getCostForLottery(lotteryId: string): number {
   // Preços oficiais Caixa — vigentes desde nov/2024
