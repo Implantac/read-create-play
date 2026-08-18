@@ -35,8 +35,9 @@ import {
   Star, Hash, Dices,
   Settings2,
   Activity, CircleDot, Brain, FileDown, RefreshCw,
-  Microscope, Database, Binary
+  Microscope, Database, Binary, Search
 } from "lucide-react";
+
 import { EvidenceEngine } from "@/engine/evidence/EvidenceEngine";
 import { runFrequencyTrendScore } from "@/engine/ai/ml-models";
 
