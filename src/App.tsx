@@ -10,6 +10,8 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminGuard } from "@/components/AdminGuard";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { lazy, Suspense, useEffect } from "react";
+import { sentryTest } from "@/lib/sentry-test";
+
 import { Loader2, AlertCircle } from "lucide-react";
 import { ReferralSystem } from "@/lib/referral-system";
 import { AutoInstallPrompt } from "@/components/pwa/AutoInstallPrompt";
