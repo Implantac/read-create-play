@@ -45,7 +45,9 @@ export function ComparisonTablePanel({ rankings, pick }: { rankings: RankingEntr
     { key: "consistency", label: "Consistência", format: (v: number) => `${(v * 100).toFixed(0)}%`, max: 1 },
     { key: "diversityScore", label: "Diversidade", format: (v: number) => `${v.toFixed(0)}%`, max: 100 },
     { key: "coverageScore", label: "Cobertura", format: (v: number) => `${v.toFixed(0)}%`, max: 100 },
+    { key: "lift", label: "Lift", format: (v: number) => `${v.toFixed(2)}x`, max: 2 },
     { key: "totalPrizes", label: "Prêmios", format: (v: number) => v.toString(), max: Math.max(1, ...rankings.map(r => r.metrics.totalPrizes)) },
+
     { key: "redundancyIndex", label: "Redundância", format: (v: number) => `${(v * 100).toFixed(0)}%`, max: 1 },
   ];
 
@@ -97,7 +99,9 @@ export function ComparisonTablePanel({ rankings, pick }: { rankings: RankingEntr
                   <th className="py-3 px-2 text-center text-muted-foreground font-medium hidden sm:table-cell">Consist.</th>
                   <th className="py-3 px-2 text-center text-muted-foreground font-medium hidden md:table-cell">Divers.</th>
                   <th className="py-3 px-2 text-center text-muted-foreground font-medium hidden md:table-cell">Cobert.</th>
+                  <th className="py-3 px-2 text-center text-muted-foreground font-medium">Lift</th>
                   <th className="py-3 px-2 text-center text-muted-foreground font-medium">Prêmios</th>
+
                 </tr>
               </thead>
               <tbody>
@@ -152,7 +156,16 @@ export function ComparisonTablePanel({ rankings, pick }: { rankings: RankingEntr
                       <td className="py-2.5 px-2 text-center font-mono text-foreground hidden sm:table-cell">{(r.metrics.consistency * 100).toFixed(0)}%</td>
                       <td className="py-2.5 px-2 text-center font-mono text-foreground hidden md:table-cell">{r.metrics.diversityScore.toFixed(0)}%</td>
                       <td className="py-2.5 px-2 text-center font-mono text-foreground hidden md:table-cell">{r.metrics.coverageScore.toFixed(0)}%</td>
+                      <td className="py-2.5 px-2 text-center font-mono text-foreground">
+                        {r.metrics.lift.toFixed(2)}x
+                        {r.metrics.confidenceInterval && (
+                          <div className="text-[8px] opacity-50">
+                            [{r.metrics.confidenceInterval[0].toFixed(2)}-{r.metrics.confidenceInterval[1].toFixed(2)}]
+                          </div>
+                        )}
+                      </td>
                       <td className="py-2.5 px-2 text-center">
+
                         <span className={`font-mono font-bold ${r.metrics.totalPrizes > 0 ? "text-primary" : "text-muted-foreground"}`}>
                           {r.metrics.totalPrizes}
                         </span>

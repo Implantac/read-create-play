@@ -162,18 +162,23 @@ function buildBreakdown(
 // ═══════════════════════════════════════════════════════
 
 // FrequencyTrendScore — frequency, recency, trend, cycle, parity features
-export function runFrequencyTrendScore(stats: NumberStats[], config: LotteryConfig): ModelResult {
+export function runFrequencyTrendScore(
+  stats: NumberStats[], 
+  config: LotteryConfig,
+  excludedFeatures: string[] = []
+): ModelResult {
   const scored: MLPrediction[] = stats.map(s => {
-    const freqScore = s.percentage * 0.25;
-    const recencyScore = Math.max(0, (50 - s.lastSeen) / 50) * 20;
-    const recentTrend = s.recentFreq * 1.5;
-    const trendBonus = s.trend * 0.8;
-    const cycleBonus = s.cycleScore > 1.2 ? s.cycleScore * 5 : 0;
-    const momentumBonus = s.momentum > 0 ? s.momentum * 0.15 : s.momentum * 0.05;
-    const gapConsistency = s.stdDev < s.avgGap * 0.5 ? 3 : 0;
-    const parityBonus = s.number % 2 === 0 ? 1 : 0;
-    const rangeBonus = s.number <= config.numbers * 0.6 ? 1.5 : 0;
-    const consecutiveBonus = s.consecutivePairs * 0.5;
+    const freqScore = excludedFeatures.includes("frequency") ? 0 : s.percentage * 0.25;
+    const recencyScore = excludedFeatures.includes("recency") ? 0 : Math.max(0, (50 - s.lastSeen) / 50) * 20;
+    const recentTrend = excludedFeatures.includes("trend") ? 0 : s.recentFreq * 1.5;
+    const trendBonus = excludedFeatures.includes("trend") ? 0 : s.trend * 0.8;
+    const cycleBonus = excludedFeatures.includes("cycle") ? 0 : (s.cycleScore > 1.2 ? s.cycleScore * 5 : 0);
+    const momentumBonus = excludedFeatures.includes("momentum") ? 0 : (s.momentum > 0 ? s.momentum * 0.15 : s.momentum * 0.05);
+    const gapConsistency = excludedFeatures.includes("consistency") ? 0 : (s.stdDev < s.avgGap * 0.5 ? 3 : 0);
+    const parityBonus = excludedFeatures.includes("parity") ? 0 : (s.number % 2 === 0 ? 1 : 0);
+    const rangeBonus = excludedFeatures.includes("range") ? 0 : (s.number <= config.numbers * 0.6 ? 1.5 : 0);
+    const consecutiveBonus = excludedFeatures.includes("consecutive") ? 0 : s.consecutivePairs * 0.5;
+
 
     const raw = Math.max(0, freqScore + recencyScore + recentTrend + trendBonus + cycleBonus +
       momentumBonus + gapConsistency + parityBonus + rangeBonus + consecutiveBonus);

@@ -5,8 +5,9 @@
 
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { NumberStats, computeFrequencyStats } from "@/features/statistics/engine";
-import { generateByStrategy, Strategy } from "@/features/statistics/strategies";
+import { generateByStrategy, Strategy } from "@/engine/strategies";
 import { analyzeEvidence } from "@/engine/stats/evidence-engine";
+
 import {
   StrategyDefinition,
   StrategyMetrics,
@@ -117,8 +118,10 @@ function backtestStrategy(
     globalScore,
     accuracy,
     lift,
+    confidenceInterval: evidence.confidenceInterval,
   };
 }
+
 
 function getCostForLottery(lotteryId: string): number {
   // Preços oficiais Caixa — vigentes desde nov/2024
@@ -326,7 +329,7 @@ export function runStrategyLab(
     const seen = new Set<string>();
 
     for (let i = 0; i < labConfig.gamesPerStrategy * 3 && games.length < labConfig.gamesPerStrategy; i++) {
-      const game = generateByStrategy(def.baseStrategy, stats, config);
+      const game = generateByStrategy(def.baseStrategy as any, stats, config);
       const sorted = [...game].sort((a, b) => a - b);
       const key = sorted.join(",");
       if (!seen.has(key)) {
