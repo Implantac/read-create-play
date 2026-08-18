@@ -123,32 +123,34 @@ export default function LandingPage() {
         fadeUp={fadeUp}
       />
 
-      <section className="py-16 border-y border-white/5 bg-black/20 overflow-hidden relative">
+      <section className="py-24 border-y border-white/5 bg-black/40 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 pointer-events-none" />
         <div className="container mx-auto px-6 relative z-10">
-          <div className="flex flex-col items-center mb-12">
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 text-center mb-4 opacity-70">
+          <div className="flex flex-col items-center mb-16">
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary italic text-center mb-6">
               Poder de processamento e inteligência analítica de elite
             </p>
-            <div className="h-px w-20 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+            <div className="h-px w-24 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-24">
             {[
               { label: "Concursos Analisados", value: "24.500+" },
               { label: "Apostas Geradas", value: "1,2M+" },
               { label: "Loterias Suportadas", value: "09" },
               { label: "Apostadores Ativos", value: "4.800+" },
             ].map((stat, i) => (
-              <div key={i} className="text-center p-6 rounded-3xl bg-white/5 border border-white/5 backdrop-blur-sm group hover:border-primary/20 transition-all">
-                <p className="text-3xl md:text-5xl font-black tracking-tighter italic gradient-brand-text mb-2">{stat.value}</p>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">{stat.label}</p>
+              <div key={i} className="text-center p-8 rounded-[2rem] glass-card border-white/5 group hover:border-primary/20 transition-all shadow-premium hover:shadow-premium-hover">
+                <p className="text-4xl md:text-5xl font-black tracking-tighter italic gradient-brand-text mb-2 drop-shadow-sm">{stat.value}</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 italic">{stat.label}</p>
               </div>
             ))}
           </div>
 
           <Suspense fallback={<SectionFallback />}>
-            <LotteryLogosCarousel />
+            <div className="py-8 border-t border-white/5">
+              <LotteryLogosCarousel />
+            </div>
           </Suspense>
         </div>
       </section>

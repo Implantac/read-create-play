@@ -55,10 +55,10 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             animate="visible"
             custom={1}
             variants={fadeUp}
-            className="text-3xl md:text-[4rem] lg:text-[5.5rem] font-black tracking-tighter uppercase italic leading-[0.85] mb-8"
+            className="text-4xl md:text-[5rem] lg:text-[7.5rem] font-black tracking-tighter uppercase italic leading-[0.8] mb-12"
           >
             <span className="block text-foreground drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)]">PARE DE APOSTAR NO ESCURO.</span>
-            <span className="block gradient-brand-text not-italic leading-none">APOSTE COM CIÊNCIA.</span>
+            <span className="block gradient-brand-text not-italic leading-none drop-shadow-[0_0_30px_rgba(201,168,76,0.2)]">APOSTE COM CIÊNCIA.</span>
           </motion.h1>
           
           <motion.p 

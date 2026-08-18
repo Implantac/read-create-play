@@ -23,17 +23,17 @@ export function Navbar() {
   const onHoverSignup = useCallback(() => { prefetchSignup(); }, []);
 
   return (
-    <nav className="fixed top-0 inset-x-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/5 h-20 md:h-24 flex items-center">
+    <nav className="fixed top-0 inset-x-0 z-50 bg-background/60 backdrop-blur-2xl border-b border-white/5 h-20 md:h-24 flex items-center transition-all">
       <div className="container mx-auto px-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-4 group">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl shadow-primary/20 group-hover:shadow-primary/40 group-hover:scale-110 transition-all duration-700 overflow-hidden border border-white/10 bg-background/50">
-            <img src="/logo.png" alt="Titan Loterias" className="w-14 h-14 object-contain" />
+          <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center shadow-2xl shadow-primary/20 group-hover:shadow-primary/40 group-hover:scale-105 transition-all duration-700 overflow-hidden border border-white/10 bg-background/50">
+            <img src="/logo.png" alt="Titan Loterias" className="w-10 h-10 md:w-12 md:h-12 object-contain" />
           </div>
           <div className="flex flex-col">
-            <span className="text-2xl font-black tracking-tighter uppercase italic leading-none">
+            <span className="text-xl md:text-2xl font-black tracking-tighter uppercase italic leading-none">
               Titan<span className="gradient-brand-text ml-0.5">Loterias</span>
             </span>
-            <span className="text-[10px] font-black tracking-[0.3em] uppercase opacity-40 mt-1">Neural Core v7.5 Alpha</span>
+            <span className="text-[9px] md:text-[10px] font-black tracking-[0.3em] uppercase opacity-40 mt-1 italic">Neural Core v7.5 Alpha</span>
           </div>
         </Link>
         <div className="hidden lg:flex items-center gap-10">
