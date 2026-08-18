@@ -4,6 +4,9 @@ import { computeFrequencyStats, computeSumDistribution, NumberStats } from "@/en
 import { FarolStats, CycleStats } from "@/engine/stats/farol-engine";
 import { useLotteryDraws, DrawResultWithPrizes } from "@/hooks/useLotteryDraws";
 import { useLotteryStats } from "@/hooks/lottery/useLotteryStats";
+import { DataProvider, DataOrigin } from "@/engine/data-provider/DataProvider";
+import { OfficialProvider, LocalCacheProvider, ImportProvider, MockProvider } from "@/engine/data-provider/Providers";
+
 
 import { TimeRange } from "@/hooks/lottery/useLotteryStats";
 
