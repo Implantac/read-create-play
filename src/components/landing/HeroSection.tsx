@@ -58,7 +58,7 @@ export function HeroSection({
             animate="visible"
             className="space-y-6 md:space-y-10"
           >
-            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[9.5rem] font-black tracking-tighter uppercase italic leading-[0.8] drop-shadow-2xl">
+            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[9.5rem] font-black tracking-tighter uppercase italic leading-[0.8] drop-shadow-2xl text-white">
               <span className="block mb-2 md:mb-6">CIÊNCIA DE</span>
               <span className="gradient-brand-text drop-shadow-[0_0_30px_rgba(201,168,76,0.3)]">DADOS REAL</span>
             </h1>
