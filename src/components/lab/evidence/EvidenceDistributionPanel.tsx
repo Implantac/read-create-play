@@ -116,11 +116,37 @@ export function EvidenceDistributionPanel({ rankings }: EvidenceDistributionPane
         <Card className="bg-card/40 border-border/40 backdrop-blur-md">
           <CardHeader>
             <CardTitle className="text-sm font-bold flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-primary" />
-              Métricas de Confiança
+              <ShieldAlert className="w-4 h-4 text-primary" />
+              Métricas de Confiança (H0 Baseline)
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
+            {topStrategy.metrics.monteCarloStats && (
+              <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-muted/20 border border-border/50">
+                <div className="space-y-1">
+                  <p className="text-[9px] uppercase font-black text-muted-foreground">Média H0</p>
+                  <p className="font-mono text-xs">{topStrategy.metrics.monteCarloStats.mean.toFixed(4)}x</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[9px] uppercase font-black text-muted-foreground">Mediana H0</p>
+                  <p className="font-mono text-xs">{topStrategy.metrics.monteCarloStats.median.toFixed(4)}x</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[9px] uppercase font-black text-muted-foreground">P5 (Ruído)</p>
+                  <p className="font-mono text-xs">{topStrategy.metrics.monteCarloStats.p5.toFixed(4)}x</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[9px] uppercase font-black text-muted-foreground">P95 (Sinal)</p>
+                  <p className="font-mono text-xs">{topStrategy.metrics.monteCarloStats.p95.toFixed(4)}x</p>
+                </div>
+                <div className="col-span-2 pt-2 border-t border-border/30">
+                  <p className="text-[8px] text-muted-foreground italic">
+                    Baseado em {topStrategy.metrics.monteCarloStats.iterations.toLocaleString()} iterações aleatórias.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
               <div className="flex justify-between items-center text-[10px] uppercase font-black text-muted-foreground">
                 <span>Grau de Evidência</span>

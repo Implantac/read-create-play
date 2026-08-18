@@ -68,6 +68,13 @@ export interface StrategyMetrics {
   monteCarloData?: number[];              // Monte Carlo distribution samples
   evidenceGrade?: string;     // E0-E4
   evidenceExplanation?: string;
+  monteCarloStats?: {
+    mean: number;
+    median: number;
+    p5: number;
+    p95: number;
+    iterations: number;
+  };
 }
 
 

@@ -88,8 +88,8 @@ function backtestStrategy(
   const allNums = new Set(games.flat());
   const coverageScore = (allNums.size / config.numbers) * 100;
 
-  // Evidence Engine integration
-  const evidence = analyzeEvidence(totalHits, games, draws, config, 10000);
+  // Evidence Engine integration with requested 100k iterations
+  const evidence = analyzeEvidence(totalHits, games, draws, config, 100000);
   const lift = evidence.lift;
   const monteCarloData = runMonteCarloSim(games, draws, config, 1000);
   const accuracy = draws.length >= 20 ? Math.min(98, Math.max(0, Math.round(((Math.max(1, lift) - 1) * 20 + consistency * 40)))) : null;
@@ -122,6 +122,7 @@ function backtestStrategy(
     zScore: evidence.zScore,
     confidenceInterval: evidence.confidenceInterval,
     monteCarloData,
+    monteCarloStats: evidence.monteCarloStats,
     evidenceGrade: evidence.grade,
     evidenceExplanation: evidence.explanation
   };
