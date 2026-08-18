@@ -489,7 +489,7 @@ export function runAllModels(
       const sortedDraws = [...draws].sort((a, b) => a.concurso - b.concurso);
       const bt = backtestModel(fn, sortedDraws, config, computeStatsFn, 100, 50);
       const metrics = computeAccuracyFromBacktest(bt, config);
-      result.accuracy = metrics.accuracy;
+      result.accuracy = metrics.performanceScore;
       result.confidence = metrics.confidence;
       result.backtestDetails = bt;
       calibratedWeights[name] = bt.liftOverChance > 1 ? bt.liftOverChance - 1 : 0.01;
@@ -517,7 +517,7 @@ export function runAllModels(
     const sortedDraws = [...draws].sort((a, b) => a.concurso - b.concurso);
     const bt = backtestModel(ensembleFn, sortedDraws, config, computeStatsFn, 100, 50);
     const metrics = computeAccuracyFromBacktest(bt, config);
-    ensemble.accuracy = metrics.accuracy;
+    ensemble.accuracy = metrics.performanceScore;
     ensemble.confidence = metrics.confidence;
     ensemble.backtestDetails = bt;
   } else {
