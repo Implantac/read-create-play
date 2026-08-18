@@ -1,46 +1,32 @@
-# Auditoria da Engine Quantitativa - Titan Loterias
+# Auditoria do Motor Quantitativo (QUANT_ENGINE_AUDIT)
 
-Este documento mapeia os problemas identificados no motor estatístico e de IA/ML do projeto antes da refatoração.
+**Data:** 18/08/2026
+**Responsável:** Lovable Agent
+**Status:** Iniciado
 
-## Problemas Identificados
+## 1. Mapeamento de Estrutura
 
-### 1. Nomenclatura ML Imprecisa
-- **Arquivo:** `src/engine/ai/ml-models.ts`
-- **Funções:** `runRandomForest`, `runXGBoost`, `runNeuralNetwork`, `runQuantumAnalysis`.
-- **Gravidade:** Alta
-- **Impacto:** O usuário é levado a acreditar que existem modelos treinados e complexos, quando são heurísticas determinísticas com pesos fixos.
-- **Solução Proposta:** Renomear para nomes que descrevam o método estatístico/heurístico real (ex: `FrequencyTrendScore`, `GradientPatternEngine`).
+- **src/engine/ai**: Contém `ml-models.ts` com nomes conceituais, mas lógica ainda baseada em heurísticas manuais.
+- **src/engine/stats**: Possui `evidence-engine.ts`, `statistics.ts` e `baseline-benchmark.ts`. Lógica sólida, mas precisa de integração profunda com o gerador.
+- **src/engine/lotteries**: Atualmente apenas `LotofacilEngine.ts` implementado. Outras modalidades usam lógica genérica.
+- **src/engine/math**: `hp-math-engine.ts` e `combinatorial-optimizer.ts`.
+- **src/generators**: Múltiplos arquivos (`intelligent-generator.ts`, `professional-generator.ts`, `universalGameGenerator.ts`) causando fragmentação de lógica.
 
-### 2. Cálculo de Acurácia e Confiança
-- **Arquivo:** `src/engine/ai/ml-models.ts` e `src/engine/strategy-evolution/engine.ts`
-- **Funções:** `computeAccuracyFromBacktest`, `backtestStrategy`.
-- **Gravidade:** Média
-- **Impacto:** Métricas de "acurácia" em loteria são perigosas se não forem normalizadas contra o baseline. O termo "acurácia" sugere predição binária correta.
-- **Solução Proposta:** Substituir por `Performance Index`, `Lift` e métricas de precisão em K (Precision@K).
+## 2. Problemas Identificados
 
-### 3. Falta de Baselines de Comparação
-- **Arquivo:** `src/engine/strategy-lab/backtest-engine.ts`
-- **Gravidade:** Alta
-- **Impacto:** Não é possível saber se uma estratégia é realmente superior a escolher números aleatoriamente ou pela frequência simples.
-- **Solução Proposta:** Implementar Baselines A (Aleatório), B (Uniforme) e C (Frequência Simples) em todos os backtests.
+| Problema | Arquivo | Função | Gravidade | Impacto | Solução Proposta |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Nomenclatura ML vs Realidade | `src/engine/ai/ml-models.ts` | Várias | Média | Percepção do usuário | Implementar Model Registry para separar Heurística de ML real. |
+| Fragmentação de Geradores | `src/engine/` | `universalGameGenerator.ts`, etc. | Alta | Manutenibilidade | Unificar em um `UniversalLotteryEngine` com drivers por modalidade. |
+| Métricas Heurísticas como Probabilidade | `src/engine/ai/ml-models.ts` | `normalizeAndRank` | Alta | Honestidade Científica | Substituir score 0-100 por Confidence Signal e Consensus. |
+| Ausência de Lottery Engines Específicos | `src/engine/lotteries/` | - | Alta | Especialização | Criar engines para Mega, Quina, Lotomania, Dupla, Time, Dia e Sete. |
+| Falta de Teste de Data Leakage | `tests/` | - | Crítica | Validação | Criar suíte `tests/quant/leakage.test.ts`. |
+| Acerto vs ROI | `src/engine/performance/` | `PerformanceMetrics.ts` | Média | Gestão de Expectativa | Integrar ROI financeiro em todos os backtests. |
 
-### 4. Lógica de Premiação e ROI Genérica
-- **Arquivo:** `src/engine/strategy-lab/backtest-engine.ts`
-- **Gravidade:** Média
-- **Impacto:** As regras de premiação estão hardcoded e incompletas para algumas modalidades.
-- **Solução Proposta:** Criar `LotteryEngine` específicas para cada modalidade (Mega, Loto, etc) que encapsulem as regras de prêmio, custo e estrutura.
+## 3. Plano de Ação
 
-### 5. Risco de Data Leakage no Backtest
-- **Arquivo:** `src/engine/ai/ml-models.ts` (Função `backtestModel`)
-- **Gravidade:** Crítica
-- **Impacto:** Se a ordenação temporal não for rigorosa, o modelo pode "espiar" o futuro.
-- **Solução Proposta:** Garantir ordenação ASC por concurso/data e implementar Walk-Forward formal.
-
-### 6. Duplicação de Lógica de Backtest
-- **Arquivos:** `src/engine/strategy-evolution/engine.ts` e `src/engine/strategy-lab/backtest-engine.ts`
-- **Gravidade:** Média
-- **Impacto:** Inconsistência de resultados entre diferentes partes do sistema.
-- **Solução Proposta:** Centralizar o motor de backtest em `src/engine/evidence/backtest.ts`.
-
----
-*Auditoria realizada em 2026-08-17*
+1.  **Model Registry**: Centralizar definições de modelos em `src/engine/ml/modelRegistry.ts`.
+2.  **Evidence Engine Expansion**: Mover e expandir `src/engine/stats/evidence-engine.ts` para `src/engine/evidence/` com suporte a IC95% e Baselines.
+3.  **Lottery Engines**: Implementar os motores específicos em `src/engine/lotteries/`.
+4.  **Backtest Walk-Forward**: Refatorar o motor de backtest para garantir folds temporais e ausência de leakage.
+5.  **Performance metrics**: Criar `src/engine/performance/bankroll.ts` para gestão financeira.
