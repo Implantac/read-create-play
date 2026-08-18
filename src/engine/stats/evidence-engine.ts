@@ -35,7 +35,7 @@ export interface Hypothesis {
  * Maps p-value and lift to a professional Evidence Grade.
  */
 function calculateGrade(pValue: number, lift: number): EvidenceGrade {
-  if (pValue >= 0.10) return "E0"; // No evidence
+  if (pValue >= 0.10 || lift <= 1.0) return "E0"; // No evidence or negative lift
   if (pValue >= 0.05) return "E1"; // Weak/Exploratory
   if (lift > 1.05 && pValue < 0.01) return "E4"; // Robust
   if (lift > 1.03 && pValue < 0.05) return "E3"; // Strong
@@ -53,15 +53,15 @@ function getGradeExplanation(grade: EvidenceGrade): string {
 }
 
 /**
- * Rigorous evidence analysis using Simulation-based P-Value (Paired Permutation).
- * Avoids simple Bernoulli assumptions which are incorrect for sampling without replacement.
+ * Rigorous evidence analysis using Paired Permutation Test and simulation-based P-Value.
+ * Replaces simple Bernoulli assumptions with real-world sampling without replacement simulations.
  */
 export function analyzeEvidence(
   observedHits: number,
   games: number[][],
   draws: DrawResult[],
   config: LotteryConfig,
-  iterations: number = 5000
+  iterations: number = 10000
 ): EvidenceReport {
   const sampleSize = games.length * draws.length;
   if (sampleSize === 0) {
@@ -72,17 +72,11 @@ export function analyzeEvidence(
     };
   }
 
-  // Calculate Observed Lift
-  // Expected hit rate for random pick: pick * (pick / numbers) is WRONG for mean hits.
-  // The mean of Hypergeometric(N, K, n) is n * (K / N). 
-  // For lottery: config.pick * (config.pick / config.numbers)
   const p_null = config.pick / config.numbers;
-  const expectedHitsPerGame = config.pick * p_null;
-  const totalExpectedHits = sampleSize * p_null;
-  const p_obs = observedHits / sampleSize;
-  const lift = p_obs / p_null;
+  const p_obs = observedHits / (sampleSize * config.pick);
+  const lift = p_obs / (p_null || 0.0001);
 
-  // Simulation-based P-Value (Paired Testing)
+  // Simulation-based P-Value (Paired Permutation Test)
   // We compare the strategy's hits against hits from random games on the SAME draws.
   let extremeCount = 0;
   const simulationLifts: number[] = [];
@@ -99,12 +93,13 @@ export function analyzeEvidence(
       }
     }
     
-    const simLift = (simHits / sampleSize) / p_null;
+    const simP = simHits / (sampleSize * config.pick);
+    const simLift = simP / (p_null || 0.0001);
     simulationLifts.push(simLift);
     if (simHits >= observedHits) extremeCount++;
   }
 
-  const pValue = extremeCount / iterations;
+  const pValue = Math.max(0.0001, extremeCount / iterations);
   
   // Calculate Z-Score from the simulation distribution
   const simMean = simulationLifts.reduce((a, b) => a + b, 0) / iterations;
@@ -112,17 +107,17 @@ export function analyzeEvidence(
   const simStdev = Math.sqrt(simVar) || 0.0001;
   const zScore = (lift - simMean) / simStdev;
 
-  // Confidence Interval (Bootstrap percentile method)
+  // Confidence Interval (Bootstrap percentile method from simulations)
   simulationLifts.sort((a, b) => a - b);
   const ci: [number, number] = [
-    simulationLifts[Math.floor(iterations * 0.025)],
-    simulationLifts[Math.floor(iterations * 0.975)]
+    simulationLifts[Math.floor(iterations * 0.025)] || lift,
+    simulationLifts[Math.floor(iterations * 0.975)] || lift
   ];
 
   const grade = calculateGrade(pValue, lift);
 
   return {
-    isSignificant: pValue < 0.05,
+    isSignificant: pValue < 0.05 && lift > 1.0,
     pValue,
     lift,
     confidenceInterval: ci,
