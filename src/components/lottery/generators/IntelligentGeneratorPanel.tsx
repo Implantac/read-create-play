@@ -69,7 +69,15 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
         lotteryId: config.id,
         count: topResults,
         riskProfile: "balanced",
-        filters: {},
+        filters: {
+          avoidSequences: true,
+          balanceParity: true,
+          balanceHighLow: true,
+          prioritizeHot: true,
+          prioritizeCold: false,
+          frameCenter: true,
+          limitRepetition: true
+        },
         stats: scopedStats,
         draws: scopedDraws,
         minScore: 30
@@ -146,11 +154,11 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
 
         {bets.length > 0 && (
           <div className="grid gap-4">
-            {bets.map((bet) => (
-              <div key={bet.rank} className="space-y-2">
-                <div onClick={() => setExpandedBet(expandedBet === bet.rank ? null : (bet.rank ?? null))} className="cursor-pointer relative">
+            {bets.map((bet, idx) => (
+              <div key={idx} className="space-y-2">
+                <div onClick={() => setExpandedBet(expandedBet === idx ? null : idx)} className="cursor-pointer relative">
                   <BetCard
-                    rank={bet.rank}
+                    rank={idx + 1}
                     numbers={bet.numbers}
                     score={bet.titanScore}
                     grade={bet.quality.grade}
@@ -161,12 +169,12 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
                     onSave={onSaveBet ? () => onSaveBet(bet.numbers, "IA-Titan", bet.titanScore, bet.quality.grade) : undefined}
                   />
                   <div className="absolute top-4 right-4 text-muted-foreground opacity-40">
-                    {expandedBet === bet.rank ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    {expandedBet === idx ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   </div>
                 </div>
                 
                 <AnimatePresence>
-                  {expandedBet === bet.rank && (
+                  {expandedBet === idx && (
                     <m.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}

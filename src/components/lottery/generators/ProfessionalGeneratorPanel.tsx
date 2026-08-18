@@ -29,8 +29,16 @@ export function ProfessionalGeneratorPanel({ stats, config, draws, onSaveBet }: 
       const result = GameOrchestrator.generate({
         lotteryId: config.id,
         count: betsPerStrategy * 5,
-        riskProfile: "agressivo",
-        filters: {},
+        riskProfile: "aggressive",
+        filters: {
+          avoidSequences: true,
+          balanceParity: true,
+          balanceHighLow: true,
+          prioritizeHot: true,
+          prioritizeCold: true,
+          frameCenter: true,
+          limitRepetition: true
+        },
         stats,
         draws,
         minScore: 40
@@ -73,10 +81,10 @@ export function ProfessionalGeneratorPanel({ stats, config, draws, onSaveBet }: 
 
         {bets.length > 0 && (
           <div className="grid gap-4">
-            {bets.map((bet) => (
+            {bets.map((bet, idx) => (
               <BetCard
-                key={bet.rank}
-                rank={bet.rank}
+                key={idx}
+                rank={idx + 1}
                 numbers={bet.numbers}
                 score={bet.titanScore}
                 grade={bet.quality.grade}
