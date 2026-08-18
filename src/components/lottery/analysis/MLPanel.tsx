@@ -137,7 +137,7 @@ export function MLPanel({ stats, config, draws }: Props) {
   };
 
   return (
-    <div className="rounded-xl bg-card border border-border p-5">
+    <div className="rounded-xl bg-card border border-border p-3 sm:p-5">
       <div className="flex items-center justify-between mb-4">
         <div>
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
@@ -170,7 +170,7 @@ export function MLPanel({ stats, config, draws }: Props) {
         <AnimatePresence>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             {/* Model stats cards */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+            <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 mb-4">
               {models.map((model) => (
                 <div key={model.name} className="rounded-lg bg-secondary/50 border border-border p-3">
                   <p className="text-xs font-semibold text-foreground mb-2 truncate">{model.name}</p>
