@@ -7,7 +7,6 @@ export class MegaSenaEngine {
   static validateIntegrity(game: number[]): boolean {
     if (game.length < 6 || game.length > 15) return false;
     const sum = game.reduce((a, b) => a + b, 0);
-    // Soma teórica mínima: 1+2+3+4+5+6=21. Máxima: 55+56+57+58+59+60=345.
     if (sum < 50 || sum > 320) return false;
     return true;
   }
@@ -18,10 +17,22 @@ export class MegaSenaEngine {
     const lowCount = game.filter(n => n <= 30).length;
     const highCount = game.length - lowCount;
 
+    // Quadrantes (Mega-Sena: 60 números, 6x10 grid)
+    const quadrants = [0, 0, 0, 0];
+    game.forEach(n => {
+      const row = Math.floor((n - 1) / 10);
+      const col = (n - 1) % 10;
+      if (row < 3 && col < 5) quadrants[0]++;
+      else if (row < 3 && col >= 5) quadrants[1]++;
+      else if (row >= 3 && col < 5) quadrants[2]++;
+      else if (row >= 3 && col >= 5) quadrants[3]++;
+    });
+
     return {
       parity: `${game.length - evens}I:${evens}P`,
       sum,
-      highLow: `${lowCount}B:${highCount}A`
+      highLow: `${lowCount}B:${highCount}A`,
+      quadrants
     };
   }
 }
@@ -36,7 +47,30 @@ export class QuinaEngine {
     if (sum < 40 || sum > 380) return false;
     return true;
   }
+
+  static analyze(game: number[]) {
+    const evens = game.filter(n => n % 2 === 0).length;
+    const sum = game.reduce((a, b) => a + b, 0);
+    
+    // Quadrantes (Quina: 80 números, 8x10 grid)
+    const quadrants = [0, 0, 0, 0];
+    game.forEach(n => {
+      const row = Math.floor((n - 1) / 10);
+      const col = (n - 1) % 10;
+      if (row < 4 && col < 5) quadrants[0]++;
+      else if (row < 4 && col >= 5) quadrants[1]++;
+      else if (row >= 4 && col < 5) quadrants[2]++;
+      else if (row >= 4 && col >= 5) quadrants[3]++;
+    });
+
+    return {
+      parity: `${game.length - evens}I:${evens}P`,
+      sum,
+      quadrants
+    };
+  }
 }
+
 
 /**
  * Motor Quantitativo Especializado para Lotomania.
