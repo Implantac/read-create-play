@@ -330,7 +330,7 @@ export function runStrategyLab(
   const evalDraws = draws.slice(trainCount);
 
   // Compute stats only from Train data to avoid leakage
-  const stats = computeFrequencyStats(trainDraws, config.numbers);
+  const trainStats = computeFrequencyStats(trainDraws, config.numbers);
 
   // Generate games and backtest each strategy on Eval data
   const results: { def: StrategyDefinition; metrics: StrategyMetrics; games: number[][] }[] = [];
