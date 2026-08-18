@@ -79,7 +79,7 @@ export function strategyFrequency(
   return {
     id: "frequency",
     name: "Frequência Histórica",
-    description: "Prioriza números com maior ocorrência nos concursos anteriores, ponderando frequência total e recente.",
+    description: "Prioriza dezenas com maior ocorrência histórica. O score reflete a força do sinal de frequência pura.",
     candidateNumbers: candidates,
     weights,
     metrics: {
@@ -113,7 +113,7 @@ export function strategyDelay(
   return {
     id: "delay",
     name: "Números Atrasados",
-    description: "Prioriza números que estão há mais concursos sem ser sorteados, considerando ciclos históricos de retorno.",
+    description: "Analisa dezenas com atraso significativo em relação ao seu ciclo médio. O score indica a maturidade do atraso.",
     candidateNumbers: candidates,
     weights,
     metrics: {
@@ -358,7 +358,7 @@ export function strategyRepetition(
   return {
     id: "repetition",
     name: "Repetição do Anterior",
-    description: `Prioriza dezenas do último sorteio + frequência recente. Alvo médio: manter ~${repeatTarget} dezenas repetidas.`,
+    description: `Analisa a tendência de repetição do último concurso. Alvo estatístico: ~${repeatTarget} dezenas repetidas.`,
     candidateNumbers: candidates,
     weights,
     metrics: {
@@ -410,7 +410,7 @@ export function strategyHotCold(
   return {
     id: "hot_cold",
     name: "Quente-Frio",
-    description: "Combina viés histórico oficial + números atrasados + frequência recente. Estratégia híbrida ideal para universos grandes.",
+    description: "Modelo híbrido que combina viés histórico documentado com maturidade de atraso e sinal de frequência recente.",
     candidateNumbers: candidates,
     weights,
     metrics: {
