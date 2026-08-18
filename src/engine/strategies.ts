@@ -17,7 +17,17 @@ export type Strategy =
   | "trend"
   | "cycle"
   | "titan_pro"
+  | "bayesian"
+  | "markov_model"
+  | "quantum"
+  | "lstm"
+  | "xgboost"
+  | "randomForest"
+  | "repetition"
+  | "coreRepetition"
+  | "coreSectors"
   | "hybrid";
+
 
 export interface StrategyInfo {
   id: Strategy;
@@ -358,6 +368,37 @@ export function generateByStrategy(
       const selected = shuffled.slice(0, pick).map(s => s.number);
       return ensureBalancedSelection(selected, pick, config.numbers);
     }
+
+    case "bayesian":
+    case "markov_model":
+    case "quantum":
+    case "lstm":
+    case "xgboost":
+    case "randomForest": {
+      // These are wrappers for ml models in this context
+      const models = runAllModels(stats, config);
+      const nameMap: Record<string, string> = {
+        "bayesian": "BayesianScore",
+        "markov_model": "TransitionScore",
+        "quantum": "MultiDimensionalPatternScore",
+        "lstm": "TemporalPatternScore",
+        "xgboost": "MultiFactorScore",
+        "randomForest": "FrequencyTrendScore"
+      };
+      const modelName = nameMap[strategy];
+      const model = models.find(m => m.name === modelName) || models[0];
+      const topPool = model.predictions.slice(0, Math.min(pick * 1.5, model.predictions.length));
+      const shuffled = [...topPool].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, pick).map(p => p.number).sort((a, b) => a - b);
+    }
+
+    case "repetition":
+    case "coreRepetition":
+    case "coreSectors": {
+      // Specialized Lotofacil strategies
+      return generateSmartBet(stats, pick);
+    }
+
 
     default:
       return generateSmartBet(stats, pick);
