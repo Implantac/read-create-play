@@ -48,7 +48,7 @@ export const StatsCard = memo(({
       )}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground italic">
           {title}
         </CardTitle>
         {Icon && (
@@ -59,7 +59,7 @@ export const StatsCard = memo(({
       </CardHeader>
 
       <CardContent>
-        <div className="text-3xl font-bold tracking-tight text-foreground font-mono tabular-nums">
+        <div className="text-3xl font-black tracking-tighter text-foreground font-mono tabular-nums italic">
           {value}
         </div>
 
