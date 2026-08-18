@@ -30,7 +30,7 @@ export function FeaturesSection({ featuresRef, featuresRotateX, fadeUp }: Featur
     {
       icon: Sparkles,
       title: "Titan AI Core",
-      description: "Redes neurais e modelos estatísticos aplicados aos sorteios brasileiros para identificar padrões que escapam da análise humana.",
+      description: "Redes neurais avançadas e modelos preditivos aplicados aos sorteios brasileiros para identificar padrões que escapam da análise humana.",
       color: "blue" as const,
     },
     {

@@ -46,7 +46,7 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
           </span>
-          <span className="text-[11px] font-black uppercase tracking-[0.4em] text-primary italic">INTELIGÊNCIA ARTIFICIAL APLICADA ÀS LOTERIAS</span>
+          <span className="text-[11px] font-black uppercase tracking-[0.4em] text-primary italic">INTELIGÊNCIA ARTIFICIAL DE ELITE APLICADA ÀS LOTERIAS</span>
         </motion.div>
 
         <div className="space-y-8">
