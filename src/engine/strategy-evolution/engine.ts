@@ -94,7 +94,7 @@ function backtestStrategy(
   const monteCarloData = runMonteCarloSim(games, draws, config, 1000);
   const accuracy = draws.length >= 20 ? Math.min(98, Math.max(0, Math.round(((lift - 1) * 20 + consistency * 40)))) : null;
 
-  // Global composite score
+  // Global composite score (audit note: proprietary composite metric for internal ranking)
   const globalScore = Math.min(100,
     avgHits * 8 +
     consistency * 20 +
