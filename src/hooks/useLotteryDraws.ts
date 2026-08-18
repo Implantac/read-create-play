@@ -1,26 +1,48 @@
 import { DrawResult } from "@/data/lotteries";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import { LotteryService, DrawResultWithPrizes, DrawPrizeData, PrizeTierInfo } from "@/services/lottery/lottery.service";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { DataProvider, DataOrigin } from "@/engine/data-provider/DataProvider";
+
 
 export type { PrizeTierInfo, DrawPrizeData, DrawResultWithPrizes };
 
-export function useLotteryDraws(lotteryId: string) {
+export function useLotteryDraws(lotteryId: string, origin: DataOrigin = "official") {
   const queryClient = useQueryClient();
   const [syncing, setSyncing] = useState(false);
   const [lastSyncAt, setLastSyncAt] = useState<Date | null>(null);
   const [syncError, setSyncError] = useState<string | null>(null);
 
   const { data, isLoading: loading, refetch } = useQuery({
-    queryKey: ["lottery-draws", lotteryId],
-    queryFn: () => LotteryService.fetchDraws(lotteryId, 2000),
+    queryKey: ["lottery-draws", lotteryId, origin],
+    queryFn: async () => {
+      const result = await DataProvider.fetchDraws(lotteryId, 2000);
+      
+      // If official, we use the full service logic for prizes
+      if (origin === "official") {
+        return LotteryService.fetchDraws(lotteryId, 2000);
+      }
+      
+      return {
+        draws: result.draws,
+        drawsWithPrizes: [],
+        totalCount: result.draws.length
+      };
+    },
+
     staleTime: 5 * 60 * 1000, 
     gcTime: 30 * 60 * 1000,
   });
 
   const syncMutation = useMutation({
-    mutationFn: (isSilent: boolean = false) => LotteryService.syncLottery(undefined, true), // Always sync everything with full_sync flag
+    mutationFn: (isSilent: boolean = false) => {
+      if (origin !== "official") {
+        throw new Error(`Sincronização não disponível para origem: ${origin}`);
+      }
+      return LotteryService.syncLottery(undefined, true);
+    },
+
     onMutate: () => {
       setSyncing(true);
       setSyncError(null);

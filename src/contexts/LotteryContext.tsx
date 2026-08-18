@@ -21,6 +21,8 @@ interface LotteryContextType {
   lastSyncAt: Date | null;
   syncError: string | null;
   count: number;
+  dataOrigin: DataOrigin;
+  setDataOrigin: (origin: DataOrigin) => void;
   syncDraws: (isSilent?: boolean) => Promise<{ success: boolean; result?: any; error?: string }>;
   syncAllLotteries: () => void;
   addDraw: (draw: DrawResult) => void;
@@ -36,6 +38,7 @@ interface LotteryContextType {
   setTimeRange: (range: TimeRange) => void;
   customInterval: { start: Date; end: Date } | undefined;
   setCustomInterval: (interval: { start: Date; end: Date } | undefined) => void;
+
 }
 
 const LotteryContext = createContext<LotteryContextType | null>(null);
@@ -45,8 +48,24 @@ export function LotteryProvider({ children }: { children: ReactNode }) {
   const [viewMode, setViewMode] = useState<"simple" | "advanced">("simple");
   const [timeRange, setTimeRange] = useState<TimeRange>("all");
   const [customInterval, setCustomInterval] = useState<{ start: Date; end: Date } | undefined>(undefined);
+  const [dataOrigin, setDataOriginState] = useState<DataOrigin>("official");
+
+  // Initialize DataProvider
+  useEffect(() => {
+    DataProvider.register(OfficialProvider);
+    DataProvider.register(LocalCacheProvider);
+    DataProvider.register(ImportProvider);
+    DataProvider.register(MockProvider);
+  }, []);
+
+  const setDataOrigin = useCallback((origin: DataOrigin) => {
+    DataProvider.setActiveOrigin(origin);
+    setDataOriginState(origin);
+  }, []);
+
   const config = useMemo(() => LOTTERIES.find(l => l.id === selectedLottery) || LOTTERIES[0], [selectedLottery]);
-  const { draws, drawsWithPrizes, loading, syncing, lastSyncAt, syncError, count, syncDraws, syncAllLotteries, addDraw } = useLotteryDraws(selectedLottery);
+  const { draws, drawsWithPrizes, loading, syncing, lastSyncAt, syncError, count, syncDraws, syncAllLotteries, addDraw } = useLotteryDraws(selectedLottery, dataOrigin);
+
   
   // Implement periodic sync (every 5 minutes)
   useEffect(() => {
@@ -84,6 +103,9 @@ export function LotteryProvider({ children }: { children: ReactNode }) {
       syncError,
       count, 
       syncDraws, 
+      dataOrigin,
+      setDataOrigin,
+
 
       syncAllLotteries, 
       addDraw, 
