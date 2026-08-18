@@ -32,6 +32,25 @@ export class EvidenceEngine {
   }
 
   /**
+   * Quantifies the contribution of individual indicators.
+   * Shortcut for the FeatureAblation engine.
+   */
+  async runAblation(
+    baseModel: (data: DrawResult[], excluded: string[]) => number[],
+    indicators: string[],
+    draws: DrawResult[]
+  ) {
+    const { FeatureAblation } = await import("./ablation");
+    const engine = new FeatureAblation(draws, this.config);
+    return engine.runAblationStudy(baseModel, indicators, {
+      windowSize: 100,
+      testSize: 50,
+      mode: "rolling"
+    });
+  }
+
+
+  /**
    * Generates a random baseline using Monte Carlo simulations
    */
   generateRandomBaseline(iterations: number = 10000): BaselineStats {
