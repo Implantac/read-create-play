@@ -27,6 +27,9 @@ interface EvidenceDistributionPanelProps {
 export function EvidenceDistributionPanel({ rankings, onIterationsChange, currentIterations }: EvidenceDistributionPanelProps) {
   const topStrategy = rankings[0];
 
+  const [customIterations, setCustomIterations] = useState<string>(currentIterations?.toString() || "100000");
+  const [showCustom, setShowCustom] = useState(false);
+
   const distributionData = useMemo(() => {
     if (!topStrategy?.metrics.monteCarloData) return [];
     
