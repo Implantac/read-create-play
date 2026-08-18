@@ -230,16 +230,16 @@
 
   /* Glass surfaces — restrained, premium */
   .glass-panel {
-    @apply bg-background/75 backdrop-blur-xl border-border/40;
-    box-shadow: var(--shadow-premium);
+    @apply bg-black/60 backdrop-blur-2xl border-white/5;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
   }
   .glass-card {
-    @apply bg-card/70 backdrop-blur-xl border border-border/50 transition-all duration-300;
-    box-shadow: var(--shadow-premium);
+    @apply bg-black/40 backdrop-blur-2xl border border-white/5 transition-all duration-500;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
   }
   .glass-card:hover {
-    @apply border-primary/30 -translate-y-0.5;
-    box-shadow: var(--shadow-premium-hover);
+    @apply border-primary/40 -translate-y-2;
+    box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.6), 0 0 25px 0 rgba(201, 168, 76, 0.15), inset 0 1px 1px 0 rgba(255, 255, 255, 0.08);
   }
 
   /* Premium card variant with subtle gold border */
@@ -334,16 +334,16 @@
 
 /* Custom UI Tweaks */
 .glass-panel {
-  @apply border-border/40 bg-background/80 backdrop-blur-xl shadow-premium;
+  @apply bg-black/80 backdrop-blur-2xl border-white/10 shadow-2xl;
 }
 
 .glass-card {
-  @apply border border-border/50 bg-card/70 backdrop-blur-xl transition-all duration-300;
-  box-shadow: var(--shadow-premium);
+  @apply bg-black/50 backdrop-blur-2xl border border-white/5 transition-all duration-500;
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
 }
 
 .glass-card:hover {
-  @apply border-primary/30 shadow-premium-hover -translate-y-0.5;
+  @apply border-primary/50 shadow-premium-hover -translate-y-2;
 }
 
 /* Typography refinements */

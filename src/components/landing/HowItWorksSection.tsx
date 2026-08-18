@@ -4,61 +4,62 @@ import { useTranslation } from "react-i18next";
 export function HowItWorksSection() {
   const { t } = useTranslation();
 
-  const steps = [
-    { step: "01", title: t("landing.how_it_works.step1.title"), desc: t("landing.how_it_works.step1.desc") },
-    { step: "02", title: t("landing.how_it_works.step2.title"), desc: t("landing.how_it_works.step2.desc") },
-    { step: "03", title: t("landing.how_it_works.step3.title"), desc: t("landing.how_it_works.step3.desc") },
-    { step: "04", title: t("landing.how_it_works.step4.title"), desc: t("landing.how_it_works.step4.desc") },
-    { step: "05", title: t("landing.how_it_works.step5.title"), desc: t("landing.how_it_works.step5.desc") }
-  ];
-
   return (
-    <section className="py-24 md:py-40 relative overflow-hidden">
-      <div className="container mx-auto px-6">
+    <section className="py-24 md:py-48 relative overflow-hidden bg-background">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_50%,rgba(201,168,76,0.05),transparent_70%)] pointer-events-none" />
+      <div className="container mx-auto px-6 relative z-10">
         <div className="grid lg:grid-cols-2 gap-20 items-center">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="space-y-8"
+            className="space-y-12"
           >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight md:tracking-tighter uppercase italic leading-tight">
-              Como a <span className="gradient-brand-text">Inteligência</span> Funciona
-            </h2>
             <div className="space-y-6">
-                <div className="flex gap-6 items-start group">
-                  <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">01</span>
-                  <div className="space-y-1">
-                    <h3 className="text-xl font-bold uppercase italic">Coleta de Históricos</h3>
-                    <p className="text-muted-foreground leading-relaxed">Consolidamos todos os concursos oficiais em uma base de dados única, pronta para análise temporal profunda.</p>
+              <div className="inline-flex items-center px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.4em] bg-primary/10 text-primary border border-primary/20 italic">
+                Metodologia Científica
+              </div>
+              <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-[0.85] drop-shadow-xl">
+                COMO A <span className="gradient-brand-text">INTELIGÊNCIA</span> FUNCIONA
+              </h2>
+              <p className="text-muted-foreground text-lg italic opacity-70 max-w-xl">
+                Um pipeline de 5 camadas projetado para extrair valor máximo de dados históricos.
+              </p>
+            </div>
+            <div className="space-y-10">
+                <div className="flex gap-8 items-start group">
+                  <span className="text-6xl font-black text-primary/5 group-hover:text-primary/20 transition-colors italic leading-none select-none">01</span>
+                  <div className="space-y-2">
+                    <h3 className="text-xl md:text-2xl font-black uppercase italic tracking-tight group-hover:text-primary transition-colors">Coleta de Históricos</h3>
+                    <p className="text-sm md:text-base text-muted-foreground leading-relaxed italic opacity-80 font-medium">Consolidamos todos os concursos oficiais em uma base de dados única, pronta para análise temporal profunda.</p>
                   </div>
                 </div>
-                <div className="flex gap-6 items-start group">
-                  <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">02</span>
-                  <div className="space-y-1">
-                    <h3 className="text-xl font-bold uppercase italic">Processamento com IA</h3>
-                    <p className="text-muted-foreground leading-relaxed">O Titan AI Core cruza milhões de combinações em busca de padrões estatísticos e anomalias de frequência.</p>
+                <div className="flex gap-8 items-start group">
+                  <span className="text-6xl font-black text-primary/5 group-hover:text-primary/20 transition-colors italic leading-none select-none">02</span>
+                  <div className="space-y-2">
+                    <h3 className="text-xl md:text-2xl font-black uppercase italic tracking-tight group-hover:text-primary transition-colors">Processamento Neural</h3>
+                    <p className="text-sm md:text-base text-muted-foreground leading-relaxed italic opacity-80 font-medium">O Titan AI Core v7.5 cruza milhões de combinações em busca de padrões estatísticos e anomalias de frequência.</p>
                   </div>
                 </div>
-                <div className="flex gap-6 items-start group">
-                  <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">03</span>
-                  <div className="space-y-1">
-                    <h3 className="text-xl font-bold uppercase italic">Detecção de Padrões</h3>
-                    <p className="text-muted-foreground leading-relaxed">Redes neurais especializadas identificam dezenas quentes, frias, ciclos de retorno e tendências emergentes.</p>
+                <div className="flex gap-8 items-start group">
+                  <span className="text-6xl font-black text-primary/5 group-hover:text-primary/20 transition-colors italic leading-none select-none">03</span>
+                  <div className="space-y-2">
+                    <h3 className="text-xl md:text-2xl font-black uppercase italic tracking-tight group-hover:text-primary transition-colors">Detecção de Padrões</h3>
+                    <p className="text-sm md:text-base text-muted-foreground leading-relaxed italic opacity-80 font-medium">Redes neurais especializadas identificam dezenas quentes, frias, ciclos de retorno e tendências emergentes.</p>
                   </div>
                 </div>
-                <div className="flex gap-6 items-start group">
-                  <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">04</span>
-                  <div className="space-y-1">
-                    <h3 className="text-xl font-bold uppercase italic">Estratégia Matemática</h3>
-                    <p className="text-muted-foreground leading-relaxed">Aplicamos filtros de dispersão, equilíbrio estrutural e fechamentos matemáticos para maximizar sua cobertura.</p>
+                <div className="flex gap-8 items-start group">
+                  <span className="text-6xl font-black text-primary/5 group-hover:text-primary/20 transition-colors italic leading-none select-none">04</span>
+                  <div className="space-y-2">
+                    <h3 className="text-xl md:text-2xl font-black uppercase italic tracking-tight group-hover:text-primary transition-colors">Estratégia Quantitativa</h3>
+                    <p className="text-sm md:text-base text-muted-foreground leading-relaxed italic opacity-80 font-medium">Aplicamos filtros de dispersão, equilíbrio estrutural e fechamentos matemáticos para maximizar sua cobertura.</p>
                   </div>
                 </div>
-                <div className="flex gap-6 items-start group">
-                  <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">05</span>
-                  <div className="space-y-1">
-                    <h3 className="text-xl font-bold uppercase italic">Apostas Estratégicas</h3>
-                    <p className="text-muted-foreground leading-relaxed">Você recebe combinações prontas com o Titan Score — decisões baseadas em dados, não em palpite.</p>
+                <div className="flex gap-8 items-start group">
+                  <span className="text-6xl font-black text-primary/5 group-hover:text-primary/20 transition-colors italic leading-none select-none">05</span>
+                  <div className="space-y-2">
+                    <h3 className="text-xl md:text-2xl font-black uppercase italic tracking-tight group-hover:text-primary transition-colors">Output Estratégico</h3>
+                    <p className="text-sm md:text-base text-muted-foreground leading-relaxed italic opacity-80 font-medium">Você recebe combinações prontas com o Titan Score — decisões baseadas em evidências, não em palpite.</p>
                   </div>
                 </div>
             </div>
@@ -67,7 +68,7 @@ export function HowItWorksSection() {
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="relative aspect-video glass-panel rounded-[2.5rem] border border-white/10 p-4 shadow-2xl group overflow-hidden"
+            className="relative aspect-square md:aspect-video glass-card rounded-[3rem] border-white/5 p-8 shadow-premium group overflow-hidden"
           >
             <div className="absolute inset-0 bg-primary/5 opacity-50 group-hover:opacity-70 transition-opacity" />
             <div className="relative h-full border border-white/5 rounded-[2rem] bg-black/40 backdrop-blur-md overflow-hidden flex flex-col">

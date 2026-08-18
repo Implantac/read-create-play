@@ -1,69 +1,54 @@
 import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 
-interface Ball {
-  number: number;
-  x: number;
-  y: number;
-  size: number;
-  duration: number;
-  delay: number;
-  color: string;
+interface FloatingBallProps {
+  count?: number;
 }
 
-const BALL_COLORS = [
-  "from-primary/15 to-primary/5 border-primary/10",
-  "from-neon-blue/15 to-neon-blue/5 border-neon-blue/10",
-  "from-accent/15 to-accent/5 border-accent/10",
-  "from-neon-purple/15 to-neon-purple/5 border-neon-purple/10",
-  "from-neon-cyan/15 to-neon-cyan/5 border-neon-cyan/10",
-  "from-neon-red/12 to-neon-red/4 border-neon-red/8",
-];
+export function FloatingLotteryBalls({ count = 15 }: FloatingBallProps) {
+  const [balls, setBalls] = useState<any[]>([]);
 
-export function FloatingLotteryBalls() {
-  const balls = useMemo<Ball[]>(() => {
-    const items: Ball[] = [];
-    for (let i = 0; i < 8; i++) {
-      items.push({
-        number: Math.floor(Math.random() * 60) + 1,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size: 28 + Math.random() * 24,
-        duration: 8 + Math.random() * 10,
-        delay: Math.random() * -12,
-        color: BALL_COLORS[i % BALL_COLORS.length],
-      });
-    }
-    return items;
-  }, []);
+  useEffect(() => {
+    const newBalls = Array.from({ length: count }).map((_, i) => ({
+      id: i,
+      size: Math.random() * 60 + 20,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      duration: Math.random() * 20 + 20,
+      delay: Math.random() * 10,
+      value: Math.floor(Math.random() * 60) + 1,
+      color: Math.random() > 0.5 ? "text-primary/20" : "text-primary/10",
+      blur: Math.random() * 4 + 1
+    }));
+    setBalls(newBalls);
+  }, [count]);
 
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
-      {balls.map((ball, i) => (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-[5]">
+      {balls.map((ball) => (
         <motion.div
-          key={i}
-          className={`absolute rounded-full bg-gradient-to-br border backdrop-blur-[1px] flex items-center justify-center font-mono font-bold text-foreground/10 select-none ${ball.color}`}
-          style={{
-            width: ball.size,
-            height: ball.size,
-            left: `${ball.x}%`,
-            top: `${ball.y}%`,
-            fontSize: ball.size * 0.35,
-          }}
-          animate={{
-            y: [0, -30, 10, -20, 0],
-            x: [0, 15, -10, 5, 0],
-            rotate: [0, 8, -5, 3, 0],
-            scale: [1, 1.05, 0.97, 1.02, 1],
+          key={ball.id}
+          initial={{ y: "110%", x: `${ball.left}%`, opacity: 0 }}
+          animate={{ 
+            y: "-10%",
+            x: [`${ball.left}%`, `${ball.left + (Math.random() * 10 - 5)}%`, `${ball.left}%`],
+            opacity: [0, 1, 1, 0]
           }}
           transition={{
             duration: ball.duration,
             repeat: Infinity,
-            ease: "easeInOut",
             delay: ball.delay,
+            ease: "linear"
           }}
+          style={{
+            position: "absolute",
+            width: ball.size,
+            height: ball.size,
+            filter: `blur(${ball.blur}px)`,
+          }}
+          className={`flex items-center justify-center rounded-full border border-primary/10 bg-primary/5 ${ball.color} font-mono font-black text-xs shadow-inner`}
         >
-          {ball.number}
+          {ball.value.toString().padStart(2, '0')}
         </motion.div>
       ))}
     </div>

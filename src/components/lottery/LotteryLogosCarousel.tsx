@@ -16,7 +16,7 @@ const duplicated = [...industries, ...industries];
 
 export function LotteryLogosCarousel() {
   return (
-    <section className="py-8 border-b border-border/20 bg-card/20 backdrop-blur-sm overflow-hidden">
+    <section className="py-8 bg-transparent overflow-hidden">
       <div className="container mx-auto px-4 mb-6">
         <p className="text-center text-[10px] uppercase tracking-[0.4em] text-muted-foreground font-black opacity-50">
           Sincronização com Resultados Oficiais

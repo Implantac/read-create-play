@@ -1,4 +1,4 @@
-import { useScroll, useTransform } from "framer-motion";
+import { useScroll, useTransform, motion } from "framer-motion";
 import { useRef, useCallback, lazy, Suspense, useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
@@ -123,32 +123,47 @@ export default function LandingPage() {
         fadeUp={fadeUp}
       />
 
-      <section className="py-16 border-y border-white/5 bg-black/20 overflow-hidden relative">
+      <section className="py-32 md:py-64 border-y border-white/5 bg-black/40 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 pointer-events-none" />
         <div className="container mx-auto px-6 relative z-10">
-          <div className="flex flex-col items-center mb-12">
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 text-center mb-4 opacity-70">
-              Poder de processamento e inteligência analítica de elite
-            </p>
-            <div className="h-px w-20 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+          <div className="flex flex-col items-center mb-24">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="inline-flex items-center px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-[0.4em] bg-primary/10 text-primary border border-primary/20 mb-8 italic drop-shadow-md"
+            >
+              Potencial Neural de Elite
+            </motion.div>
+            <div className="h-px w-32 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-12 mb-32">
             {[
               { label: "Concursos Analisados", value: "24.500+" },
               { label: "Apostas Geradas", value: "1,2M+" },
               { label: "Loterias Suportadas", value: "09" },
               { label: "Apostadores Ativos", value: "4.800+" },
             ].map((stat, i) => (
-              <div key={i} className="text-center p-6 rounded-3xl bg-white/5 border border-white/5 backdrop-blur-sm group hover:border-primary/20 transition-all">
-                <p className="text-3xl md:text-5xl font-black tracking-tighter italic gradient-brand-text mb-2">{stat.value}</p>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">{stat.label}</p>
-              </div>
+              <motion.div 
+                key={i} 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="text-center p-10 rounded-[3rem] glass-card border-white/5 group hover:border-primary/40 transition-all duration-500 shadow-premium hover:shadow-premium-hover relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                <p className="text-5xl md:text-7xl font-black tracking-tighter italic gradient-brand-text mb-4 drop-shadow-2xl relative z-10">{stat.value}</p>
+                <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60 italic relative z-10">{stat.label}</p>
+              </motion.div>
             ))}
           </div>
 
           <Suspense fallback={<SectionFallback />}>
-            <LotteryLogosCarousel />
+            <div className="py-12 border-t border-white/5">
+              <LotteryLogosCarousel />
+            </div>
           </Suspense>
         </div>
       </section>
@@ -169,23 +184,25 @@ export default function LandingPage() {
         <ScreensShowcase />
       </Suspense>
 
-      <section className="py-24 md:py-48 relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-primary/10 rounded-full blur-[120px] opacity-20 pointer-events-none" />
+      <section className="py-32 md:py-64 relative overflow-hidden bg-background">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[140vw] h-[800px] bg-primary/10 rounded-full blur-[140px] opacity-20 pointer-events-none" />
         <div className="container mx-auto px-6 relative z-10">
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.4em] bg-primary/10 text-primary border border-primary/20 mb-6 backdrop-blur-sm">
+          <div className="text-center mb-32">
+            <div className="inline-flex items-center px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-[0.4em] bg-primary/10 text-primary border border-primary/20 mb-8 italic drop-shadow-md">
               Sincronização em Tempo Real
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight md:tracking-tighter uppercase italic leading-[0.95] md:leading-[0.85] mb-6">
-              Central <span className="gradient-brand-text">Neural Titan</span>
+            <h2 className="text-4xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.8] mb-10 drop-shadow-2xl text-white">
+              Central <span className="gradient-brand-text drop-shadow-[0_0_20px_rgba(201,168,76,0.3)]">Neural Titan</span>
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-60">
-              Acompanhe em tempo real o processamento dos concursos oficiais e a detecção de padrões estatísticos pela nossa IA.
+            <p className="text-muted-foreground max-w-3xl mx-auto font-medium text-xl opacity-70 italic leading-relaxed px-4">
+              Acompanhe em tempo real o processamento dos concursos oficiais e a detecção de padrões estatísticos pela nossa inteligência de elite.
             </p>
           </div>
           <div className="max-w-6xl mx-auto">
             <Suspense fallback={<SectionFallback />}>
-              <TitanCommandCenter />
+              <div className="shadow-2xl shadow-primary/10 rounded-[3rem]">
+                <TitanCommandCenter />
+              </div>
             </Suspense>
           </div>
         </div>

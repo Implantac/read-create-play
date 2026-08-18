@@ -33,14 +33,14 @@ const resources = {
       "landing": {
         "hero": {
           "badge": "TITAN INTEL • INTELIGÊNCIA ESTATÍSTICA APLICADA",
-          "title": "INTELIGÊNCIA ARTIFICIAL PARA",
-          "subtitle": "LOTERIAS BRASILEIRAS",
+          "title": "CIÊNCIA DE DADOS REAL",
+          "subtitle": "Neural Core v7.5 Alpha • Acesso de Elite",
           "description": "Analise mais de 24 mil concursos oficiais, revele padrões que passam despercebidos e monte apostas com base em estatística, probabilidade e IA — não em achismo.",
           "cta_primary": "Testar Gratuitamente",
           "cta_secondary": "Conhecer os Recursos"
         },
         "features": {
-          "title": "Centro de Inteligência Titan",
+          "title": "CENTRO DE INTELIGÊNCIA TITAN",
           "subtitle": "Muito além de um gerador de números: uma plataforma completa de inteligência estatística aplicada às loterias brasileiras.",
           "items": {
             "xray": {
@@ -49,11 +49,11 @@ const resources = {
             },
             "ia": {
               "title": "Titan AI Core",
-              "description": "Redes neurais e modelos estatísticos aplicados aos sorteios brasileiros para identificar padrões que escapam da análise humana."
+              "description": "Redes neurais avançadas e modelos preditivos aplicados aos sorteios brasileiros para identificar padrões que escapam da análise humana."
             },
             "optimizer": {
               "title": "Motor de Probabilidade",
-              "description": "Gere apostas apoiadas em Monte Carlo, Cadeias de Markov e distribuições balanceadas — foco em consistência estatística, não em sorte."
+              "description": "Apostas geradas com Monte Carlo, Cadeias de Markov e distribuições balanceadas — foco em consistência estatística, não em sorte."
             },
             "backtest": {
               "title": "Simulador de Performance",
