@@ -24,7 +24,7 @@ export function FloatingLotteryBalls({ count = 15 }: FloatingBallProps) {
   }, [count]);
 
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-[5]">
       {balls.map((ball) => (
         <motion.div
           key={ball.id}

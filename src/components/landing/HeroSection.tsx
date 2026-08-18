@@ -28,9 +28,9 @@ export function HeroSection({
     >
       {/* Dynamic Background */}
       <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-background z-10" />
         <FloatingLotteryBalls count={20} />
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background z-10" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140vw] h-[100vh] bg-primary/5 rounded-full blur-[120px] opacity-20 z-0 animate-pulse" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140vw] h-[100vh] bg-primary/10 rounded-full blur-[160px] opacity-20 z-0 animate-pulse" />
       </div>
 
       <motion.div 

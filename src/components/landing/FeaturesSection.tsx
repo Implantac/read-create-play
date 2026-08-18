@@ -61,7 +61,7 @@ export function FeaturesSection({ featuresRef, featuresRotateX, fadeUp }: Featur
 
   return (
     <section ref={featuresRef} className="py-24 md:py-48 relative overflow-hidden bg-background" style={{ perspective: "1500px" }}>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(201,168,76,0.08),transparent_60%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(201,168,76,0.12),transparent_70%)] pointer-events-none" />
       <motion.div style={{ rotateX: featuresRotateX }} className="container mx-auto px-6 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-32 space-y-8">
           <div className="inline-flex items-center px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.4em] bg-primary/10 text-primary border border-primary/20 italic">
