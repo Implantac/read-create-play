@@ -539,10 +539,10 @@ export function getConsensusRanking(models: ModelResult[]): MLPrediction[] {
   const numberScores: Record<number, { total: number; count: number; topCount: number; breakdown: ScoreBreakdown }> = {};
 
   // Use accuracy-based weights for consensus (if accuracy is null, use 50 as baseline)
-  const totalAccuracy = models.reduce((s, m) => s + (m.accuracy ?? 50), 0) || models.length;
+  const totalScore = models.reduce((s, m) => s + (m.performanceScore ?? 50), 0) || models.length;
 
   models.forEach(model => {
-    const modelWeight = (model.accuracy ?? 50) / totalAccuracy;
+    const modelWeight = (model.performanceScore ?? 50) / totalScore;
     const top15 = new Set(model.predictions.slice(0, 15).map(p => p.number));
     model.predictions.forEach(p => {
       if (!numberScores[p.number]) {
