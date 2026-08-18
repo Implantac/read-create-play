@@ -88,8 +88,9 @@ function backtestStrategy(
   const allNums = new Set(games.flat());
   const coverageScore = (allNums.size / config.numbers) * 100;
 
-  // Evidence Engine integration with requested 100k iterations
-  const evidence = analyzeEvidence(totalHits, games, draws, config, 100000);
+  // Evidence Engine integration with selectable iterations
+  const iterations = 100000; // default for internal backtest, but LabConfig can override
+  const evidence = analyzeEvidence(totalHits, games, draws, config, iterations);
   const lift = evidence.lift;
   const monteCarloData = runMonteCarloSim(games, draws, config, 1000);
   const accuracy = draws.length >= 20 ? Math.min(98, Math.max(0, Math.round(((Math.max(1, lift) - 1) * 20 + consistency * 40)))) : null;
@@ -351,6 +352,17 @@ export function runStrategyLab(
     }
 
     const metrics = backtestStrategy(def, games, evalDraws, config);
+    // Overwrite iterations if provided in config
+    if (labConfig.monteCarloIterations) {
+      const customEvidence = analyzeEvidence(metrics.avgHits * evalDraws.length * games.length, games, evalDraws, config, labConfig.monteCarloIterations);
+      metrics.pValue = customEvidence.pValue;
+      metrics.zScore = customEvidence.zScore;
+      metrics.lift = customEvidence.lift;
+      metrics.confidenceInterval = customEvidence.confidenceInterval;
+      metrics.monteCarloStats = customEvidence.monteCarloStats;
+      metrics.evidenceGrade = customEvidence.grade;
+      metrics.evidenceExplanation = customEvidence.explanation;
+    }
     results.push({ def, metrics, games });
   }
 

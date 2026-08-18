@@ -106,6 +106,7 @@ export interface LabConfig {
   gamesPerStrategy: number;
   drawRange: [number, number];
   profile: EvolutionProfile;
+  monteCarloIterations?: number;
 }
 
 export interface StrategyGames {

@@ -79,6 +79,7 @@ export default function StrategyLabPage() {
   const [enableShuffledBacktest, setEnableShuffledBacktest] = useState(true);
   const [ablationResults, setAblationResults] = useState<any[]>([]);
   const [runningAblation, setRunningAblation] = useState(false);
+  const [monteCarloIterations, setMonteCarloIterations] = useState<number>(100000);
 
 
 
@@ -156,6 +157,7 @@ export default function StrategyLabPage() {
           gamesPerStrategy,
           drawRange,
           profile,
+          monteCarloIterations,
         };
         const res = runStrategyLab(labConfig, draws, config);
         setResult(res);
@@ -822,7 +824,13 @@ export default function StrategyLabPage() {
                 </TabsContent>
 
                 <TabsContent value="evidence" className="mt-6 space-y-6">
-                  {result && <EvidenceDistributionPanel rankings={result.rankings} />}
+                  {result && (
+                    <EvidenceDistributionPanel 
+                      rankings={result.rankings} 
+                      onIterationsChange={setMonteCarloIterations}
+                      currentIterations={monteCarloIterations}
+                    />
+                  )}
                   <div className="grid lg:grid-cols-2 gap-6">
 
                     <Card className="bg-card/40 border-border/40 backdrop-blur-md overflow-hidden relative">
