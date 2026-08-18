@@ -29,7 +29,7 @@ export interface ModelResult {
   name: string;
   description: string;
   predictions: MLPrediction[];
-  accuracy: number | null;      // backtesting-based
+  performanceScore: number | null;      // backtesting-based Composite Score
   confidence: number;    // backtesting-based
   backtestDetails?: BacktestMetrics;
 }
@@ -196,7 +196,8 @@ export function runFrequencyTrendScore(
     name: "FrequencyTrendScore",
     description: "FrequencyTrendScore: Heurística ponderada de frequência, tendência, ciclo e momentum",
     predictions: scored,
-    accuracy: null, 
+    performanceScore: null, 
+
     confidence: 0,
   };
 }
@@ -232,7 +233,8 @@ export function runMultiFactorScore(stats: NumberStats[], config: LotteryConfig)
     name: "MultiFactorScore",
     description: "MultiFactorScore: Algoritmo de pontuação multi-fatorial estatístico com desvio padrão e ciclos",
     predictions: scored,
-    accuracy: null,
+    performanceScore: null,
+
     confidence: 0,
   };
 }
@@ -267,7 +269,8 @@ export function runTemporalPatternScore(stats: NumberStats[], config: LotteryCon
     name: "TemporalPatternScore",
     description: "TemporalPatternScore: Decomposição não-linear estatística com attention em gaps",
     predictions: scored,
-    accuracy: null,
+    performanceScore: null,
+
     confidence: 0,
   };
 }
@@ -304,7 +307,8 @@ export function runBayesianScore(stats: NumberStats[], config: LotteryConfig): M
     name: "BayesianScore",
     description: "Atualização bayesiana (antigo Bayesian Inference) com priors de ciclo e momentum",
     predictions: scored,
-    accuracy: null,
+    performanceScore: null,
+
     confidence: 0,
   };
 }
@@ -337,7 +341,8 @@ export function runTransitionScore(stats: NumberStats[], config: LotteryConfig):
     name: "TransitionScore",
     description: "Transições de estado (antigo Markov Chain) com detecção de periodicidade",
     predictions: scored,
-    accuracy: null,
+    performanceScore: null,
+
     confidence: 0,
   };
 }
@@ -371,7 +376,8 @@ export function runMultiDimensionalPatternScore(stats: NumberStats[], config: Lo
     name: "MultiDimensionalPatternScore",
     description: "Detecção de padrões multi-dimensionais (antigo Quantum) usando ressonância",
     predictions: scored,
-    accuracy: null,
+    performanceScore: null,
+
     confidence: 0,
   };
 }
@@ -453,7 +459,7 @@ export function runEnsembleVoting(stats: NumberStats[], config: LotteryConfig, m
     name: "Votação por Consenso",
     description: `Consenso de modelos com pesos calibrados por Lift histórico: ${weightDesc}`,
     predictions: scored,
-    accuracy: null,
+    performanceScore: null,
     confidence: 0,
   };
 }
@@ -489,12 +495,12 @@ export function runAllModels(
       const sortedDraws = [...draws].sort((a, b) => a.concurso - b.concurso);
       const bt = backtestModel(fn, sortedDraws, config, computeStatsFn, 100, 50);
       const metrics = computeAccuracyFromBacktest(bt, config);
-      result.accuracy = metrics.performanceScore;
+      result.performanceScore = metrics.performanceScore;
       result.confidence = metrics.confidence;
       result.backtestDetails = bt;
       calibratedWeights[name] = bt.liftOverChance > 1 ? bt.liftOverChance - 1 : 0.01;
     } else {
-      result.accuracy = null;
+      result.performanceScore = null;
       result.confidence = 0;
       calibratedWeights[name] = 0.1;
     }
@@ -517,11 +523,11 @@ export function runAllModels(
     const sortedDraws = [...draws].sort((a, b) => a.concurso - b.concurso);
     const bt = backtestModel(ensembleFn, sortedDraws, config, computeStatsFn, 100, 50);
     const metrics = computeAccuracyFromBacktest(bt, config);
-    ensemble.accuracy = metrics.performanceScore;
+    ensemble.performanceScore = metrics.performanceScore;
     ensemble.confidence = metrics.confidence;
     ensemble.backtestDetails = bt;
   } else {
-    ensemble.accuracy = null;
+    ensemble.performanceScore = null;
     ensemble.confidence = 0;
   }
   results.push(ensemble);
