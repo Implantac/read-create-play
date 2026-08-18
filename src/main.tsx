@@ -10,7 +10,9 @@ import { registerServiceWorker } from "./pwa/registerSW";
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN || import.meta.env.SENTRY_DSN;
 
-if (SENTRY_DSN && import.meta.env.PROD) {
+if (SENTRY_DSN) {
+  console.log("🚀 Sentry Initializing with DSN:", SENTRY_DSN.substring(0, 20) + "...");
+
   Sentry.init({
     dsn: SENTRY_DSN,
     integrations: [
