@@ -94,6 +94,30 @@ export default function GestaoBancaPage() {
     setSelected((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
   };
 
+  const syncRealROI = () => {
+    if (!roiData || roiData.length === 0) {
+      toast.info("Nenhum dado real de ROI encontrado para sincronizar.");
+      return;
+    }
+
+    const newSessions: BankrollSession[] = roiData.map(lotROI => ({
+      id: `sync-${lotROI.lotteryId}-${Date.now()}`,
+      date: new Date().toISOString(),
+      lotteryId: lotROI.lotteryId,
+      spent: lotROI.totalSpent,
+      won: lotROI.totalWon,
+      note: "Sincronizado automaticamente do histórico real"
+    }));
+
+    // Evita duplicatas simples verificando se já existe uma sessão sincronizada hoje para aquela loteria
+    setSessions(prev => {
+      const filtered = prev.filter(s => !s.id.startsWith("sync-"));
+      return [...newSessions, ...filtered];
+    });
+
+    toast.success("ROI real sincronizado com a banca!");
+  };
+
   const addSession = () => {
     const spent = Number(entry.spent);
     const won = Number(entry.won || 0);
@@ -506,6 +530,17 @@ export default function GestaoBancaPage() {
               <Input value={entry.note}
                 onChange={(e) => setEntry({ ...entry, note: e.target.value })} placeholder="Opcional" />
             </div>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={syncRealROI}
+              disabled={roiLoading || !roiData.length}
+              className="h-10 border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10"
+            >
+              <Zap className="h-4 w-4 mr-2" />
+              Sincronizar ROI Real
+            </Button>
             <Button onClick={addSession} className="h-10">
               <Plus className="h-4 w-4 mr-1" /> Registrar
             </Button>
