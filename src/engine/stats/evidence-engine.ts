@@ -6,18 +6,10 @@
  */
 
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
+import { EvidenceGrade, EvidenceResult } from "@/engine/contracts/quant";
 
-export type EvidenceGrade = "E0" | "E1" | "E2" | "E3" | "E4";
-
-export interface EvidenceReport {
+export interface EvidenceReport extends EvidenceResult {
   isSignificant: boolean;
-  pValue: number;
-  lift: number;
-  confidenceInterval: [number, number]; // IC95%
-  zScore: number;
-  sampleSize: number;
-  effectSize: "negligible" | "small" | "medium" | "large";
-  grade: EvidenceGrade;
   explanation: string;
   monteCarloStats?: {
     mean: number;
@@ -130,14 +122,18 @@ export function analyzeEvidence(
   const p95 = simulationLifts[Math.floor(iterations * 0.95)];
 
   return {
-    isSignificant: pValue < 0.05 && lift > 1.0,
-    pValue,
-    lift,
+    metric: "Performance Score",
+    observed: lift,
+    baseline: simMean,
+    effectSize: Math.abs(zScore),
     confidenceInterval: ci,
-    zScore,
+    pValue,
     sampleSize,
-    effectSize: Math.abs(zScore) > 3 ? "large" : Math.abs(zScore) > 2 ? "medium" : "small",
-    grade,
+    method: "Paired Permutation Test (100k)",
+    conclusion: grade,
+    isSignificant: pValue < 0.05 && lift > 1.0,
+    lift,
+    zScore,
     explanation: getGradeExplanation(grade),
     monteCarloStats: {
       mean,
