@@ -8,7 +8,7 @@ import "./lovable-badge-hide.css";
 import "./i18n";
 import { registerServiceWorker } from "./pwa/registerSW";
 
-const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
+const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN || import.meta.env.SENTRY_DSN;
 
 if (SENTRY_DSN && import.meta.env.PROD) {
   Sentry.init({
