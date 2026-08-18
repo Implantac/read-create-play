@@ -60,27 +60,30 @@ export function FeaturesSection({ featuresRef, featuresRotateX, fadeUp }: Featur
   ];
 
   return (
-    <section ref={featuresRef} className="py-24 md:py-40 relative" style={{ perspective: "1200px" }}>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(160,84,45,0.05),transparent)] pointer-events-none" />
-      <motion.div style={{ rotateX: featuresRotateX }} className="container mx-auto px-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-24 space-y-4">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight md:tracking-tighter uppercase italic leading-tight">
-            CENTRO DE <span className="gradient-brand-text">INTELIGÊNCIA</span> TITAN
+    <section ref={featuresRef} className="py-24 md:py-48 relative overflow-hidden bg-background" style={{ perspective: "1500px" }}>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(201,168,76,0.08),transparent_60%)] pointer-events-none" />
+      <motion.div style={{ rotateX: featuresRotateX }} className="container mx-auto px-6 relative z-10">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-32 space-y-8">
+          <div className="inline-flex items-center px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.4em] bg-primary/10 text-primary border border-primary/20 italic">
+            Tecnologia de Elite
+          </div>
+          <h2 className="text-4xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.8] drop-shadow-2xl">
+            CENTRO DE <span className="gradient-brand-text drop-shadow-[0_0_20px_rgba(201,168,76,0.3)]">INTELIGÊNCIA</span> TITAN
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-70">
+          <p className="text-muted-foreground max-w-3xl mx-auto font-medium text-xl opacity-70 italic leading-relaxed px-4">
             Muito além de um gerador de números: uma plataforma completa de inteligência estatística aplicada às loterias brasileiras.
           </p>
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((f, i) => (
-            <motion.div key={f.title} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} whileHover={{ y: -12, scale: 1.02 }} className={`relative rounded-[2rem] glass-card border border-white/10 p-10 transition-all duration-500 hover:shadow-2xl ${colorMap[f.color]} group overflow-hidden`}>
-              <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
-              <div className="w-16 h-16 rounded-2xl bg-background/50 border border-white/10 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-primary/30 transition-all duration-500 shadow-inner relative z-10">
-                <f.icon className="w-8 h-8" />
+            <motion.div key={f.title} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} whileHover={{ y: -16, scale: 1.02 }} className={`relative rounded-[2.5rem] glass-card border-white/5 p-12 transition-all duration-700 hover:shadow-premium-hover ${colorMap[f.color]} group overflow-hidden shadow-premium`}>
+              <div className="absolute inset-0 bg-gradient-to-b from-white/[0.04] to-transparent pointer-events-none" />
+              <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-10 group-hover:scale-110 group-hover:bg-primary/20 group-hover:shadow-gold-glow transition-all duration-500 relative z-10 shadow-inner">
+                <f.icon className="w-10 h-10 text-primary" />
               </div>
-              <h3 className="text-2xl font-black text-foreground uppercase tracking-tight italic mb-4">{f.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed font-medium opacity-80">{f.description}</p>
+              <h3 className="text-2xl md:text-3xl font-black text-foreground uppercase tracking-tight italic mb-6 leading-none">{f.title}</h3>
+              <p className="text-sm md:text-base text-muted-foreground leading-relaxed font-medium opacity-80 italic">{f.description}</p>
             </motion.div>
           ))}
         </div>
