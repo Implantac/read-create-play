@@ -84,15 +84,15 @@ export default function ComandoApostadorPage() {
           consensusNumbers={consensus}
         />
 
-        <Card>
+        <Card className="glass-card border-primary/20 shadow-premium">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
+            <CardTitle className="flex items-center gap-2 text-base font-black uppercase italic tracking-tighter">
               <Wallet className="h-4 w-4 text-primary" />
               Fechamento Automático
-              <Badge variant="outline" className="ml-auto text-[10px]">por orçamento</Badge>
+              <Badge variant="outline" className="ml-auto text-[10px] font-black tracking-widest bg-primary/5 text-primary">por orçamento</Badge>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <Label className="text-xs">Orçamento (R$)</Label>
@@ -119,15 +119,16 @@ export default function ComandoApostadorPage() {
 
             {matrixSuggestion?.best ? (
               <div className="space-y-2">
-                <div className="rounded-lg border border-primary/40 bg-primary/[0.05] p-3">
+                <div className="rounded-2xl border border-primary/40 bg-primary/[0.05] p-4 shadow-inner relative overflow-hidden group/item">
+                  <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover/item:opacity-100 transition-opacity pointer-events-none" />
                   <div className="flex items-center gap-2 mb-1">
-                    <Trophy className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-semibold">{matrixSuggestion.best.name}</span>
-                    <Badge variant="outline" className="ml-auto text-[10px] font-mono">
+                    <Trophy className="h-4 w-4 text-primary group-hover/item:rotate-12 transition-transform" />
+                    <span className="text-sm font-black uppercase italic tracking-tight">{matrixSuggestion.best.name}</span>
+                    <Badge variant="outline" className="ml-auto text-[10px] font-black font-mono tracking-widest bg-background/50 border-primary/20">
                       R$ {matrixSuggestion.best.cost.toFixed(2)}
                     </Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground mb-2">
+                  <p className="text-[11px] text-muted-foreground font-medium mb-4 leading-relaxed opacity-80">
                     {matrixSuggestion.best.description}
                   </p>
                   <div className="grid grid-cols-3 gap-2 text-xs">
@@ -138,7 +139,7 @@ export default function ComandoApostadorPage() {
                   <Button
                     size="sm"
                     variant="premium"
-                    className="w-full mt-2 gap-2"
+                    className="w-full mt-4 gap-2 font-black uppercase tracking-widest h-11 rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
                     onClick={() => {
                       navigate("/fechamento-universal", { state: { fromComando: true } });
                       toast.success(`Sugestão: ${matrixSuggestion.best!.name}. Ajuste sua base no Fechamento Universal.`);
@@ -179,7 +180,7 @@ export default function ComandoApostadorPage() {
 
       <EnginePerformancePanel lotteryId={selectedLottery} />
 
-      <Card className="border-primary/20 bg-primary/[0.02]">
+      <Card className="border-primary/20 bg-primary/[0.02] glass-card shadow-premium">
         <CardContent className="p-4 flex items-center gap-3">
           <TrendingUp className="h-5 w-5 text-primary shrink-0" />
           <p className="text-xs text-muted-foreground">
