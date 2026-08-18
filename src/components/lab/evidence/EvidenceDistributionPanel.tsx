@@ -40,7 +40,7 @@ export function EvidenceDistributionPanel({ rankings }: EvidenceDistributionPane
 
   if (!topStrategy) return null;
 
-  const isSignificant = topStrategy.metrics.lift > (topStrategy.metrics.confidenceInterval?.[1] || 1.05);
+  const isSignificant = topStrategy.metrics.pValue < 0.05;
 
   return (
     <div className="space-y-6">
