@@ -1,5 +1,7 @@
 import { NumberStats } from "@/engine/stats/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
+import { ModelRegistry, ModelDefinition } from "../ml/modelRegistry";
+
 
 export interface ScoreBreakdown {
   frequency: number;
