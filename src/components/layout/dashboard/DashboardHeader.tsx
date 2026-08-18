@@ -12,18 +12,18 @@ export function DashboardHeader({ statsCount, drawsCount }: DashboardHeaderProps
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-            <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Neural Core Alpha</span>
+            <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">Neural Core • v7.5 Alpha</span>
           </div>
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10">
             <Activity className="w-3 h-3 text-muted-foreground animate-pulse" />
             <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">Sincronização 100%</span>
           </div>
         </div>
-        <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-tight">
-          Sua Melhor <span className="gradient-brand-text">Oportunidade</span> Hoje
+        <h1 className="text-4xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.9] drop-shadow-2xl">
+          Sua Melhor <span className="gradient-brand-text drop-shadow-[0_0_15px_rgba(255,178,0,0.3)]">Oportunidade</span> Hoje
         </h1>
         <p className="text-sm text-muted-foreground font-medium max-w-lg leading-relaxed">
-          O motor Titan AI processou {statsCount} dezenas e {drawsCount} concursos. Receba agora sua recomendação de alta convergência.
+          O motor Titan AI processou <span className="text-primary font-black italic">{statsCount}</span> dezenas e <span className="text-primary font-black italic">{drawsCount}</span> concursos. Recomendação de alta convergência detectada.
         </p>
       </div>
     </div>
