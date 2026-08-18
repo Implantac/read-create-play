@@ -49,7 +49,7 @@ export function EvidenceDistributionPanel({ rankings }: EvidenceDistributionPane
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-bold flex items-center gap-2">
-                <Binary className="w-4 h-4 text-primary" />
+                <TrendingUp className="w-4 h-4 text-primary" />
                 Distribuição Monte Carlo: {topStrategy.strategyName}
               </CardTitle>
               <Badge variant={isSignificant ? "default" : "outline"} className={isSignificant ? "bg-emerald-500/20 text-emerald-500 border-emerald-500/30" : ""}>
