@@ -54,7 +54,7 @@ function normalizeAndRank(scored: MLPrediction[]): void {
 }
 
 // ═══════════════════════════════════════════════════════
-// BACKTESTING ENGINE — Compute real accuracy from historical data
+// BACKTESTING ENGINE — Compute real performance from historical data
 // ═══════════════════════════════════════════════════════
 
 function backtestModel(
@@ -538,7 +538,7 @@ export function runAllModels(
 export function getConsensusRanking(models: ModelResult[]): MLPrediction[] {
   const numberScores: Record<number, { total: number; count: number; topCount: number; breakdown: ScoreBreakdown }> = {};
 
-  // Use accuracy-based weights for consensus (if accuracy is null, use 50 as baseline)
+  // Use performance-based weights for consensus (if score is null, use 50 as baseline)
   const totalScore = models.reduce((s, m) => s + (m.performanceScore ?? 50), 0) || models.length;
 
   models.forEach(model => {
