@@ -55,6 +55,7 @@ import { BestGamesPanel } from "@/components/lab/BestGamesPanel";
 import { GeneratedGamesPanel } from "@/components/lab/GeneratedGamesPanel";
 import { CombinationAnalysisPanel } from "@/components/lab/CombinationAnalysisPanel";
 import { ComparisonTablePanel } from "@/components/lab/ComparisonTablePanel";
+import { EvidenceDistributionPanel } from "@/components/lab/evidence/EvidenceDistributionPanel";
 
 // ═══════════════════════════════════════════════════════
 // MAIN PAGE
@@ -721,6 +722,10 @@ export default function StrategyLabPage() {
                       <Brain className="w-3.5 h-3.5" />
                       <span className="hidden sm:inline">Evolução</span>
                     </TabsTrigger>
+                    <TabsTrigger value="evidence" className="text-xs gap-1 data-[state=active]:shadow-sm">
+                      <Binary className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Evidência</span>
+                    </TabsTrigger>
                     <TabsTrigger value="comparison" className="text-xs gap-1 data-[state=active]:shadow-sm">
                       <Layers className="w-3.5 h-3.5" />
                       <span className="hidden sm:inline">Tabela</span>
@@ -817,6 +822,7 @@ export default function StrategyLabPage() {
                 </TabsContent>
 
                 <TabsContent value="evidence" className="mt-6 space-y-6">
+                  {result && <EvidenceDistributionPanel rankings={result.rankings} />}
                   <div className="grid lg:grid-cols-2 gap-6">
 
                     <Card className="bg-card/40 border-border/40 backdrop-blur-md overflow-hidden relative">
