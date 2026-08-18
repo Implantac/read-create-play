@@ -8,12 +8,23 @@ import {
 import { RankingEntry } from "@/engine/strategy-evolution/types";
 import { TrendingUp, AlertCircle, Info, CheckCircle2, ShieldAlert } from "lucide-react";
 import { formatNumber } from "@/utils/formatters";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface EvidenceDistributionPanelProps {
   rankings: RankingEntry[];
 }
 
-export function EvidenceDistributionPanel({ rankings }: EvidenceDistributionPanelProps) {
+export function EvidenceDistributionPanel({ rankings, onIterationsChange, currentIterations }: { 
+  rankings: RankingEntry[];
+  onIterationsChange?: (val: number) => void;
+  currentIterations?: number;
+}) {
   const topStrategy = rankings[0];
 
   const distributionData = useMemo(() => {
@@ -117,8 +128,22 @@ export function EvidenceDistributionPanel({ rankings }: EvidenceDistributionPane
           <CardHeader>
             <CardTitle className="text-sm font-bold flex items-center gap-2">
               <ShieldAlert className="w-4 h-4 text-primary" />
-              Métricas de Confiança (H0 Baseline)
+              Confiança (H0 Baseline)
             </CardTitle>
+            {onIterationsChange && (
+              <Select 
+                value={currentIterations?.toString()} 
+                onValueChange={(val) => onIterationsChange(parseInt(val))}
+              >
+                <SelectTrigger className="h-7 w-[110px] text-[10px] font-bold bg-background/50 border-white/10 italic">
+                  <SelectValue placeholder="Iterações" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10000" className="text-[10px] font-medium">10.000 (Rápido)</SelectItem>
+                  <SelectItem value="100000" className="text-[10px] font-medium">100.000 (Elite)</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
           </CardHeader>
           <CardContent className="space-y-6">
             {topStrategy.metrics.monteCarloStats && (

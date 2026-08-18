@@ -79,6 +79,7 @@ export default function StrategyLabPage() {
   const [enableShuffledBacktest, setEnableShuffledBacktest] = useState(true);
   const [ablationResults, setAblationResults] = useState<any[]>([]);
   const [runningAblation, setRunningAblation] = useState(false);
+  const [monteCarloIterations, setMonteCarloIterations] = useState<number>(100000);
 
 
 
@@ -156,6 +157,7 @@ export default function StrategyLabPage() {
           gamesPerStrategy,
           drawRange,
           profile,
+          monteCarloIterations,
         };
         const res = runStrategyLab(labConfig, draws, config);
         setResult(res);
