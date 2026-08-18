@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -6,7 +6,7 @@ import {
   ResponsiveContainer, ReferenceLine, AreaChart, Area 
 } from "recharts";
 import { RankingEntry } from "@/engine/strategy-evolution/types";
-import { TrendingUp, AlertCircle, Info, CheckCircle2, ShieldAlert } from "lucide-react";
+import { TrendingUp, AlertCircle, Info, CheckCircle2, ShieldAlert, Plus } from "lucide-react";
 import { formatNumber } from "@/utils/formatters";
 import {
   Select,
@@ -15,16 +15,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface EvidenceDistributionPanelProps {
   rankings: RankingEntry[];
-}
-
-export function EvidenceDistributionPanel({ rankings, onIterationsChange, currentIterations }: { 
-  rankings: RankingEntry[];
   onIterationsChange?: (val: number) => void;
   currentIterations?: number;
-}) {
+}
+
+export function EvidenceDistributionPanel({ rankings, onIterationsChange, currentIterations }: EvidenceDistributionPanelProps) {
   const topStrategy = rankings[0];
 
   const distributionData = useMemo(() => {
