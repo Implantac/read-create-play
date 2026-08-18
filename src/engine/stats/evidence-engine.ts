@@ -35,7 +35,7 @@ export interface Hypothesis {
  * Maps p-value and lift to a professional Evidence Grade.
  */
 function calculateGrade(pValue: number, lift: number): EvidenceGrade {
-  if (pValue >= 0.10) return "E0"; // No evidence
+  if (pValue >= 0.10 || lift <= 1.0) return "E0"; // No evidence or negative lift
   if (pValue >= 0.05) return "E1"; // Weak/Exploratory
   if (lift > 1.05 && pValue < 0.01) return "E4"; // Robust
   if (lift > 1.03 && pValue < 0.05) return "E3"; // Strong

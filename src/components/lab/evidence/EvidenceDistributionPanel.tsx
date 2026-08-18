@@ -53,7 +53,7 @@ export function EvidenceDistributionPanel({ rankings }: EvidenceDistributionPane
                 Distribuição Monte Carlo: {topStrategy.strategyName}
               </CardTitle>
               <Badge variant={isSignificant ? "default" : "outline"} className={isSignificant ? "bg-emerald-500/20 text-emerald-500 border-emerald-500/30" : ""}>
-                {isSignificant ? "Sinal Validado" : "Ruído Estatístico"}
+                {isSignificant ? "Sinal Superior ao Acaso" : "Ruído Estatístico"}
               </Badge>
             </div>
           </CardHeader>

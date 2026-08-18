@@ -127,7 +127,7 @@ function computeAccuracyFromBacktest(bt: BacktestMetrics, config: LotteryConfig)
   const lift = bt.liftOverChance;
   
   // Composite Performance Score based on precision and lift
-  const score = Math.min(98, Math.max(0, Math.round((precisionAt15 * 0.6 + (lift / 2) * 0.4) * 100)));
+  const score = Math.min(98, Math.max(0, Math.round((precisionAt15 * 0.6 + (Math.max(1, lift) / 2) * 0.4) * 100)));
   
   // Confidence: based on consistency and sample size
   const sampleFactor = Math.min(1, bt.totalDrawsTested / 100);
