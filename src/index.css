@@ -319,3 +319,27 @@
 #lovable-badge {
   display: none !important;
 }
+
+/* Custom UI Tweaks */
+.glass-panel {
+  @apply border-border/40 bg-background/80 backdrop-blur-xl shadow-premium;
+}
+
+.glass-card {
+  @apply border border-border/50 bg-card/70 backdrop-blur-xl transition-all duration-300;
+  box-shadow: var(--shadow-premium);
+}
+
+.glass-card:hover {
+  @apply border-primary/30 shadow-premium-hover -translate-y-0.5;
+}
+
+/* Typography refinements */
+.font-mono {
+  font-feature-settings: "tnum", "lnum";
+}
+
+/* A11y & Focus */
+*:focus-visible {
+  @apply outline-none ring-2 ring-primary/60 ring-offset-2 ring-offset-background rounded-sm;
+}
