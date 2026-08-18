@@ -1,4 +1,4 @@
-import { DrawResult, LotteryConfig } from "@/data/lotteries";
+import { DrawResult, LotteryConfig, LOTTERIES } from "@/data/lotteries";
 import { NumberStats } from "@/engine/stats/statistics";
 import { generateGames } from "@/ai/generators/universalGameGenerator";
 import { scoreGame } from "@/ai/engines/rankingEngine";
@@ -28,10 +28,21 @@ export interface OrchestratorConfig {
  */
 export class GameOrchestrator {
   /**
+   * Converte LotteryRules (AI) para LotteryConfig (UI/Data) para compatibilidade de tipos.
+   */
+  private static getLotteryConfig(lotteryId: string): LotteryConfig {
+    const config = LOTTERIES.find(l => l.id === lotteryId);
+    if (!config) {
+      throw new Error(`Lottery config not found for ${lotteryId}`);
+    }
+    return config;
+  }
+
+  /**
    * Gera jogos otimizados combinando sinais estatísticos e filtros estruturais.
    */
   static generate(config: OrchestratorConfig): OrchestratedGame[] {
-    const rules = getLotteryRules(config.lotteryId);
+    const lotteryConfig = this.getLotteryConfig(config.lotteryId);
     
     // 1. Geração base via Universal Generator (Monte Carlo + Sinais Posteriores)
     const baseGames = generateGames({
@@ -58,7 +69,7 @@ export class GameOrchestrator {
       const quality = evaluateBetQuality(
         game.numbers,
         config.stats,
-        rules,
+        lotteryConfig,
         config.draws
       );
 
@@ -82,8 +93,8 @@ export class GameOrchestrator {
    */
   static validate(numbers: number[], lotteryId: string, stats: NumberStats[], draws: DrawResult[]): OrchestratedGame {
     const scored = scoreGame(numbers, lotteryId, stats, draws, "balanced");
-    const rules = getLotteryRules(lotteryId);
-    const quality = evaluateBetQuality(numbers, stats, rules, draws);
+    const lotteryConfig = this.getLotteryConfig(lotteryId);
+    const quality = evaluateBetQuality(numbers, stats, lotteryConfig, draws);
 
     return {
       ...scored,
@@ -92,3 +103,4 @@ export class GameOrchestrator {
     };
   }
 }
+
