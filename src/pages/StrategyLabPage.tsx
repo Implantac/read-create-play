@@ -802,8 +802,12 @@ export default function StrategyLabPage() {
                         </div>
                       </CardContent>
                     </Card>
+                  </div>
+                </TabsContent>
+
                 <TabsContent value="evidence" className="mt-6 space-y-6">
                   <div className="grid lg:grid-cols-2 gap-6">
+
                     <Card className="bg-card/40 border-border/40 backdrop-blur-md overflow-hidden relative">
                       <div className="absolute top-0 right-0 p-4">
                         <Button 
