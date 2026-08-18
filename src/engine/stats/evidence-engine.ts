@@ -19,6 +19,13 @@ export interface EvidenceReport {
   effectSize: "negligible" | "small" | "medium" | "large";
   grade: EvidenceGrade;
   explanation: string;
+  monteCarloStats?: {
+    mean: number;
+    median: number;
+    p5: number;
+    p95: number;
+    iterations: number;
+  };
 }
 
 export interface Hypothesis {
@@ -61,7 +68,7 @@ export function analyzeEvidence(
   games: number[][],
   draws: DrawResult[],
   config: LotteryConfig,
-  iterations: number = 10000
+  iterations: number = 100000
 ): EvidenceReport {
   const sampleSize = games.length * draws.length;
   if (sampleSize === 0) {
@@ -116,6 +123,12 @@ export function analyzeEvidence(
 
   const grade = calculateGrade(pValue, lift);
 
+  // Advanced Monte Carlo Baseline Stats
+  const mean = simulationLifts.reduce((a, b) => a + b, 0) / iterations;
+  const median = simulationLifts[Math.floor(iterations * 0.5)];
+  const p5 = simulationLifts[Math.floor(iterations * 0.05)];
+  const p95 = simulationLifts[Math.floor(iterations * 0.95)];
+
   return {
     isSignificant: pValue < 0.05 && lift > 1.0,
     pValue,
@@ -125,7 +138,14 @@ export function analyzeEvidence(
     sampleSize,
     effectSize: Math.abs(zScore) > 3 ? "large" : Math.abs(zScore) > 2 ? "medium" : "small",
     grade,
-    explanation: getGradeExplanation(grade)
+    explanation: getGradeExplanation(grade),
+    monteCarloStats: {
+      mean,
+      median,
+      p5,
+      p95,
+      iterations
+    }
   };
 }
 
