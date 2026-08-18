@@ -118,23 +118,22 @@ function backtestModel(
   };
 }
 
-function computeAccuracyFromBacktest(bt: BacktestMetrics, config: LotteryConfig): { accuracy: number | null; confidence: number } {
+function computeAccuracyFromBacktest(bt: BacktestMetrics, config: LotteryConfig): { performanceScore: number | null; confidence: number } {
   if (bt.totalDrawsTested < 20) {
-    return { accuracy: null, confidence: 0 };
+    return { performanceScore: null, confidence: 0 };
   }
   
   const precisionAt15 = bt.avgHitsInTop15 / 15;
   const lift = bt.liftOverChance;
   
-  // Composite Score baseado em sinal estatístico real (Lift e Precisão)
-  // Calibrado empiricamente: 60% peso em precisão top15, 40% em Lift vs Baseline
+  // Composite Performance Score based on precision and lift
   const score = Math.min(98, Math.max(0, Math.round((precisionAt15 * 0.6 + (lift / 2) * 0.4) * 100)));
   
   // Confidence: based on consistency and sample size
   const sampleFactor = Math.min(1, bt.totalDrawsTested / 100);
   const confidence = Math.min(95, Math.max(0, Math.round(bt.consistency * 0.7 * sampleFactor + sampleFactor * 30)));
 
-  return { accuracy: score, confidence };
+  return { performanceScore: score, confidence };
 }
 
 // ═══════════════════════════════════════════════════════

@@ -172,13 +172,13 @@ export function EvidenceDistributionPanel({ rankings }: EvidenceDistributionPane
                   <ShieldAlert className="w-5 h-5 text-amber-500" />
                 )}
                 <span className="text-xs font-bold uppercase tracking-tighter">
-                  {isSignificant ? "Sinal Validado" : "Sinal Incerto"}
+                  {isSignificant ? "Sinal Superior ao Acaso" : "Sem Vantagem Estatística"}
                 </span>
               </div>
               <span className="text-[10px] text-center opacity-70 leading-tight">
                 {isSignificant 
-                  ? "A performance observada ultrapassa a variância aleatória esperada."
-                  : "A performance pode ser atribuída à sorte ou variância estatística."}
+                  ? `A performance observada (${topStrategy.metrics.lift.toFixed(2)}x) supera a variância simulada com p < 0.05.`
+                  : "A performance observada está dentro da variância esperada para seleções aleatórias."}
               </span>
             </div>
           </CardContent>

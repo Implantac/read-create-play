@@ -89,9 +89,9 @@ function backtestStrategy(
   const coverageScore = (allNums.size / config.numbers) * 100;
 
   // Evidence Engine integration
-  const evidence = analyzeEvidence(totalHits, games, draws, config, 1000);
+  const evidence = analyzeEvidence(totalHits, games, draws, config, 10000);
   const lift = evidence.lift;
-  const monteCarloData = runMonteCarloSim(games, draws, config, 200);
+  const monteCarloData = runMonteCarloSim(games, draws, config, 1000);
   const accuracy = draws.length >= 20 ? Math.min(98, Math.max(0, Math.round((Math.max(0, lift - 1) * 2 + consistency / 2) * 100))) : null;
 
   // Global composite score
