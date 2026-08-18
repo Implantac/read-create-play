@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { WalkForwardBacktest } from '../../src/engine/evidence/backtest';
-import { LOTOFACIL_CONFIG } from '../../src/data/lotteries';
+import { LOTTERIES } from '../../src/data/lotteries';
+
+const LOTOFACIL_CONFIG = LOTTERIES.find(l => l.id === 'lotofacil')!;
+
 
 describe('WalkForwardBacktest', () => {
   const mockDraws = Array.from({ length: 200 }, (_, i) => ({

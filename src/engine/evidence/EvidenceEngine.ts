@@ -25,7 +25,11 @@ export interface BaselineStats {
  * Provides baselines (Random, Frequency) to compare models against.
  */
 export class EvidenceEngine {
-  constructor(private config: LotteryConfig) {}
+  constructor(private config: LotteryConfig) {
+    if (!config || typeof config.pick !== 'number') {
+      throw new Error(`Invalid LotteryConfig passed to EvidenceEngine: ${JSON.stringify(config)}`);
+    }
+  }
 
   /**
    * Generates a random baseline using Monte Carlo simulations

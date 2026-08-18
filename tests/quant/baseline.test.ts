@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { EvidenceEngine } from '../../src/engine/evidence/EvidenceEngine';
-import { LOTOFACIL_CONFIG } from '../../src/data/lotteries';
+import { LOTTERIES } from '../../src/data/lotteries';
+
+const LOTOFACIL_CONFIG = LOTTERIES.find(l => l.id === 'lotofacil')!;
+
 
 describe('EvidenceEngine', () => {
   const engine = new EvidenceEngine(LOTOFACIL_CONFIG);
