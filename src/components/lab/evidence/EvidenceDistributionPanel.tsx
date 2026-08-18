@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -6,7 +6,7 @@ import {
   ResponsiveContainer, ReferenceLine, AreaChart, Area 
 } from "recharts";
 import { RankingEntry } from "@/engine/strategy-evolution/types";
-import { TrendingUp, AlertCircle, Info, CheckCircle2, ShieldAlert } from "lucide-react";
+import { TrendingUp, AlertCircle, Info, CheckCircle2, ShieldAlert, Plus } from "lucide-react";
 import { formatNumber } from "@/utils/formatters";
 import {
   Select,
@@ -15,17 +15,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface EvidenceDistributionPanelProps {
   rankings: RankingEntry[];
-}
-
-export function EvidenceDistributionPanel({ rankings, onIterationsChange, currentIterations }: { 
-  rankings: RankingEntry[];
   onIterationsChange?: (val: number) => void;
   currentIterations?: number;
-}) {
+}
+
+export function EvidenceDistributionPanel({ rankings, onIterationsChange, currentIterations }: EvidenceDistributionPanelProps) {
   const topStrategy = rankings[0];
+
+  const [customIterations, setCustomIterations] = useState<string>(currentIterations?.toString() || "100000");
+  const [showCustom, setShowCustom] = useState(false);
 
   const distributionData = useMemo(() => {
     if (!topStrategy?.metrics.monteCarloData) return [];
@@ -131,18 +134,60 @@ export function EvidenceDistributionPanel({ rankings, onIterationsChange, curren
               Confiança (H0 Baseline)
             </CardTitle>
             {onIterationsChange && (
-              <Select 
-                value={currentIterations?.toString()} 
-                onValueChange={(val) => onIterationsChange(parseInt(val))}
-              >
-                <SelectTrigger className="h-7 w-[110px] text-[10px] font-bold bg-background/50 border-white/10 italic">
-                  <SelectValue placeholder="Iterações" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10000" className="text-[10px] font-medium">10.000 (Rápido)</SelectItem>
-                  <SelectItem value="100000" className="text-[10px] font-medium">100.000 (Elite)</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex items-center gap-2">
+                {!showCustom ? (
+                  <Select 
+                    value={currentIterations?.toString()} 
+                    onValueChange={(val) => {
+                      if (val === "custom") {
+                        setShowCustom(true);
+                      } else {
+                        onIterationsChange(parseInt(val));
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="h-7 w-[110px] text-[10px] font-bold bg-background/50 border-white/10 italic">
+                      <SelectValue placeholder="Iterações" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="10000" className="text-[10px] font-medium">10.000 (Rápido)</SelectItem>
+                      <SelectItem value="100000" className="text-[10px] font-medium">100.000 (Elite)</SelectItem>
+                      <SelectItem value="custom" className="text-[10px] font-medium italic">+ Customizar...</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <Input 
+                      type="number" 
+                      value={customIterations}
+                      onChange={(e) => setCustomIterations(e.target.value)}
+                      className="h-7 w-20 text-[10px] font-bold bg-background/50 border-white/10 px-2"
+                      placeholder="Qtd..."
+                    />
+                    <Button 
+                      size="icon" 
+                      className="h-7 w-7" 
+                      onClick={() => {
+                        const val = parseInt(customIterations);
+                        if (val > 0) {
+                          onIterationsChange(val);
+                          setShowCustom(false);
+                        }
+                      }}
+                    >
+                      <CheckCircle2 className="w-3 h-3" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-7 w-7 text-muted-foreground" 
+                      onClick={() => setShowCustom(false)}
+                    >
+                      <Plus className="w-3 h-3 rotate-45" />
+                    </Button>
+                  </div>
+                )}
+              </div>
             )}
           </CardHeader>
           <CardContent className="space-y-6">
