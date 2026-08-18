@@ -683,9 +683,13 @@ export default function StrategyLabPage() {
               {/* Main Tabs */}
               <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <div className="overflow-x-auto -mx-1 px-1 scrollbar-thin">
-                  <TabsList className="inline-flex w-full min-w-[640px] sm:min-w-0 sm:grid sm:grid-cols-9 h-11">
+                  <TabsList className="inline-flex w-full min-w-[700px] sm:min-w-0 sm:grid sm:grid-cols-10 h-11">
+                    <TabsTrigger value="evidence" className="text-xs gap-1 data-[state=active]:shadow-sm">
+                      <Microscope className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Evidência</span>
+                    </TabsTrigger>
                     <TabsTrigger value="hypotheses" className="text-xs gap-1 data-[state=active]:shadow-sm">
-                      <Target className="w-3.5 h-3.5" />
+                      <Search className="w-3.5 h-3.5" />
                       <span className="hidden sm:inline">Hipóteses</span>
                     </TabsTrigger>
                     <TabsTrigger value="backtest" className="text-xs gap-1 data-[state=active]:shadow-sm">
@@ -722,6 +726,7 @@ export default function StrategyLabPage() {
                     </TabsTrigger>
                   </TabsList>
                 </div>
+
 
                 <TabsContent value="hypotheses" className="mt-6 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
