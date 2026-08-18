@@ -7,7 +7,7 @@ import { GeneratorFiltersPanel } from "@/components/lottery/generators/Generator
 import { HistoricalValidationBadge } from "@/components/lottery/HistoricalValidationBadge";
 import { GameAnalysisBlock } from "@/components/lottery/analysis/GameAnalysisBlock";
 import { AnimatePresence } from "framer-motion";
-import { Sparkles, RefreshCw, Flame, Snowflake, Shuffle, Hash, Sigma, Ratio, Grid3X3, Clock, BarChart3, TrendingUp, Repeat, Layers, Brain, Zap } from "lucide-react";
+import { Sparkles, RefreshCw, Flame, Snowflake, Shuffle, Hash, Sigma, Ratio, Grid3X3, Clock, BarChart3, TrendingUp, Repeat, Layers, Brain, Zap, Binary, Microscope, Globe, Activity, Cpu, Network, Database, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useLotteryContext } from "@/contexts/LotteryContext";
@@ -25,7 +25,12 @@ const ICON_MAP: Record<Strategy, any> = {
   trend: TrendingUp, fibonacci: Sigma, primes: Hash, golden: Ratio,
   sectors: Grid3X3, lowDelay: Clock, pattern: BarChart3, cycle: Repeat,
   ml: Brain, hybrid: Layers, titan_pro: Zap,
+  bayesian: Microscope, markov_model: Activity, quantum: Cpu,
+  lstm: Network, xgboost: Database, randomForest: Binary,
+  repetition: RefreshCw, coreRepetition: RefreshCw, coreSectors: Grid3X3,
+  markov: Activity, poisson: Sigma, cluster: LayoutGrid, expert: Globe
 };
+
 
 const CATEGORY_LABELS = { basic: "Básicas", math: "Matemáticas", ai: "Inteligência Artificial" };
 

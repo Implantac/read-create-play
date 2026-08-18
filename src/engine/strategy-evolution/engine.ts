@@ -329,7 +329,7 @@ export function runStrategyLab(
     const seen = new Set<string>();
 
     for (let i = 0; i < labConfig.gamesPerStrategy * 3 && games.length < labConfig.gamesPerStrategy; i++) {
-      const game = generateByStrategy(def.baseStrategy, stats, config);
+      const game = generateByStrategy(def.baseStrategy as any, stats, config);
       const sorted = [...game].sort((a, b) => a - b);
       const key = sorted.join(",");
       if (!seen.has(key)) {
