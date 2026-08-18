@@ -315,3 +315,7 @@
 }
 
 .animate-scroll { animation: scroll 30s linear infinite; }
+
+#lovable-badge {
+  display: none !important;
+}
