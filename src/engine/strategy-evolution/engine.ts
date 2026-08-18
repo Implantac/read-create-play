@@ -6,7 +6,7 @@
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { NumberStats, computeFrequencyStats } from "@/features/statistics/engine";
 import { generateByStrategy, Strategy } from "@/engine/strategies";
-import { analyzeEvidence } from "@/engine/stats/evidence-engine";
+import { analyzeEvidence, runMonteCarloSim } from "@/engine/stats/evidence-engine";
 
 import {
   StrategyDefinition,
@@ -92,6 +92,7 @@ function backtestStrategy(
   const totalSlots = totalComparisons * config.pick;
   const evidence = analyzeEvidence(totalHits, totalSlots, config);
   const lift = evidence.lift;
+  const monteCarloData = runMonteCarloSim(totalSlots, config, 1000);
   const accuracy = draws.length >= 20 ? Math.min(98, Math.max(0, Math.round((Math.max(0, lift - 1) * 2 + consistency / 2) * 100))) : null;
 
   // Global composite score
@@ -119,6 +120,7 @@ function backtestStrategy(
     accuracy,
     lift,
     confidenceInterval: evidence.confidenceInterval,
+    monteCarloData,
   };
 }
 

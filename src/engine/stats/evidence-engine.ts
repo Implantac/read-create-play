@@ -111,3 +111,25 @@ export function compareStrategiesSignificance(
   if (pValue >= 0.05) return { pValue, better: "none" };
   return { pValue, better: z > 0 ? "A" : "B" };
 }
+
+/**
+ * Runs a Monte Carlo simulation for a specific strategy/lottery configuration
+ */
+export function runMonteCarloSim(
+  sampleSize: number,
+  config: any,
+  iterations: number = 1000
+): number[] {
+  const p_null = config.pick / config.numbers;
+  const distribution: number[] = [];
+  
+  for (let i = 0; i < iterations; i++) {
+    let hits = 0;
+    for (let j = 0; j < sampleSize; j++) {
+      if (Math.random() < p_null) hits++;
+    }
+    distribution.push(hits / sampleSize / p_null); // relative lift
+  }
+  
+  return distribution.sort((a, b) => a - b);
+}

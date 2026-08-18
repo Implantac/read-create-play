@@ -63,6 +63,7 @@ export interface StrategyMetrics {
   accuracy: number | null;    // Real accuracy based on lift/consistency
   lift: number;               // Statistical lift over random baseline
   confidenceInterval?: [number, number]; // IC95% for Lift
+  monteCarloData?: number[];              // Monte Carlo distribution samples
 }
 
 
