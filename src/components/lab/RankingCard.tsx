@@ -61,8 +61,8 @@ export function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }:
               {r.metrics.lift !== undefined && (
                 <MetricPill label="Lift" value={`${r.metrics.lift.toFixed(2)}x`} highlight={r.metrics.lift > 1.05} />
               )}
-              {r.metrics.accuracy !== null && (
-                <MetricPill label="Score" value={performanceText} highlight={r.metrics.accuracy > 70} />
+              {r.metrics.performanceScore !== null && (
+                <MetricPill label="Score" value={performanceText} highlight={r.metrics.performanceScore > 70} />
               )}
             </div>
           </div>
