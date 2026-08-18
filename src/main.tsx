@@ -9,6 +9,11 @@ import "./i18n";
 import { registerServiceWorker } from "./pwa/registerSW";
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN || import.meta.env.SENTRY_DSN;
+console.log("DEBUG: SENTRY_DSN present:", !!SENTRY_DSN);
+if (SENTRY_DSN) {
+  (window as any).Sentry = Sentry;
+}
+
 
 if (SENTRY_DSN) {
   console.log("🚀 Sentry Initializing with DSN:", SENTRY_DSN.substring(0, 20) + "...");
