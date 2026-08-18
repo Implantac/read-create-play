@@ -16,7 +16,7 @@ export class WalkForwardBacktest {
     private config: LotteryConfig
   ) {
     // Garantir ordem cronológica
-    this.draws.sort((a, b) => a.date.getTime() - b.date.getTime());
+    this.draws.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   }
 
   /**
