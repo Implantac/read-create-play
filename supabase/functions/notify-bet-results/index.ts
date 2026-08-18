@@ -1,12 +1,13 @@
-// Titan Loterias — Notify Bet Results
-// Compara saved_bets de cada usuário contra o sorteio mais recente (ou concurso especificado)
-// e dispara push notification personalizado com acertos + faixa de prêmio.
+// Titan Loterias — Notify Bet Results & ROI Tracker
+// Compara saved_bets de cada usuário contra o sorteio mais recente (ou concurso especificado),
+// dispara push notification personalizado e ATUALIZA o rastreamento de ROI Real.
 //
 // Modos:
 //   1) Autenticado (usuário logado): {lottery_id, concurso?} → analisa apenas as apostas do próprio user
 //   2) Service key (x-service-key): {lottery_id, concurso?} → fan-out para TODOS os usuários com apostas
 //
-// Idempotência: usa tag `results-{lottery}-{concurso}-{user}` — send-push agrupa por tag no SW.
+// Idempotência: usa tag `results-{lottery}-{concurso}-{user}` para push e Unique Index no DB para ROI.
+
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -15,7 +16,31 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-service-key",
 };
 
-// Faixas premiadas por loteria (min hits para ser considerado prêmio relevante)
+// Custos oficiais por aposta simples
+const LOTTERY_BET_COST: Record<string, number> = {
+  megasena: 6.0,
+  lotofacil: 3.5,
+  quina: 3.0,
+  lotomania: 3.5,
+  duplasena: 3.0,
+  timemania: 4.5,
+  diadesorte: 3.0,
+  supersete: 2.5,
+  maismilionaria: 6.0,
+};
+
+// Mapeamento de acertos para faixa de premiação (faixa 1 = prêmio principal)
+const HITS_TO_FAIXA: Record<string, Record<number, number>> = {
+  megasena:   { 6: 1, 5: 2, 4: 3 },
+  lotofacil:  { 15: 1, 14: 2, 13: 3, 12: 4, 11: 5 },
+  quina:      { 5: 1, 4: 2, 3: 3, 2: 4 },
+  lotomania:  { 20: 1, 19: 2, 18: 3, 17: 4, 16: 5, 15: 6, 0: 7 },
+  duplasena:  { 6: 1, 5: 2, 4: 3, 3: 4 },
+  timemania:  { 7: 1, 6: 2, 5: 3, 4: 4, 3: 5 },
+  diadesorte: { 7: 1, 6: 2, 5: 3, 4: 4 },
+  supersete:  { 7: 1, 6: 2, 5: 3, 4: 4, 3: 5 },
+};
+
 const PRIZE_THRESHOLDS: Record<string, { min: number; name: string; emojiTiers: Record<number, string> }> = {
   megasena:   { min: 4,  name: "Mega-Sena",  emojiTiers: { 4: "🎯", 5: "🏆", 6: "💰👑" } },
   lotofacil:  { min: 11, name: "Lotofácil",  emojiTiers: { 11: "🎯", 12: "🥉", 13: "🥈", 14: "🥇", 15: "💰👑" } },
@@ -109,7 +134,7 @@ Deno.serve(async (req) => {
     // Busca o sorteio-alvo
     let drawQuery = admin
       .from("lottery_draws")
-      .select("concurso, numbers, draw_date")
+      .select("concurso, numbers, draw_date, prize_tiers")
       .eq("lottery_id", lotteryId);
     if (concurso) drawQuery = drawQuery.eq("concurso", concurso);
     else drawQuery = drawQuery.order("concurso", { ascending: false }).limit(1);
@@ -125,6 +150,7 @@ Deno.serve(async (req) => {
     }
     concurso = draw.concurso;
     const drawSet = new Set<number>(draw.numbers as number[]);
+    const prizeTiers = (draw.prize_tiers as any)?.premiacoes || [];
 
     // Busca apostas
     let betsQuery = admin
@@ -142,53 +168,125 @@ Deno.serve(async (req) => {
     if (betsErr) throw betsErr;
 
     if (!bets || bets.length === 0) {
-      return new Response(JSON.stringify({ ok: true, concurso, checked: 0, pushed: 0 }), {
+      return new Response(JSON.stringify({ ok: true, concurso, checked: 0, pushed: 0, roi_updated: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const info = PRIZE_THRESHOLDS[lotteryId];
+    const hitToFaixa = HITS_TO_FAIXA[lotteryId] || {};
+    const standardCost = LOTTERY_BET_COST[lotteryId] || 3.0;
 
-    // Agrupa por usuário
-    const byUser = new Map<string, { hits: number; best: number; totalWinners: number; games: number; bestLabel?: string }>();
+    // Agrupa por usuário para processar ROI e Push
+    const byUser = new Map<string, { 
+      hits: number; 
+      best: number; 
+      totalWinners: number; 
+      games: number; 
+      bestLabel?: string;
+      totalWon: number;
+      betIds: string[];
+    }>();
+
     for (const bet of bets) {
       const nums = (bet.numbers || []) as number[];
       const hits = nums.filter((n) => drawSet.has(n)).length;
-      const entry = byUser.get(bet.user_id) || { hits: 0, best: 0, totalWinners: 0, games: 0 };
+      
+      const entry = byUser.get(bet.user_id) || { 
+        hits: 0, 
+        best: 0, 
+        totalWinners: 0, 
+        games: 0, 
+        totalWon: 0, 
+        betIds: [] 
+      };
+      
       entry.games += 1;
+      entry.betIds.push(bet.id);
+      
+      // Calcula prêmio para esta aposta
+      const faixa = hitToFaixa[hits];
+      if (faixa) {
+        const tier = prizeTiers.find((t: any) => t.faixa === faixa);
+        if (tier) {
+          entry.totalWon += Number(tier.valorPremio) || 0;
+        }
+      }
+
       if (hits > entry.best) {
         entry.best = hits;
         entry.bestLabel = bet.label || undefined;
       }
+      
       if (hits >= info.min) entry.totalWinners += 1;
+      
       byUser.set(bet.user_id, entry);
     }
 
     let pushed = 0;
+    let roiUpdated = 0;
+    
+    // Data do sorteio para o ROI (bet_date)
+    const betDate = draw.draw_date || new Date().toISOString().split("T")[0];
+
     for (const [userId, entry] of byUser) {
-      if (entry.best < info.min) continue; // sem prêmio → não notifica
-      const emoji = info.emojiTiers[entry.best] || "🎯";
-      const title = `${info.name} #${concurso}: ${entry.best} acertos! ${emoji}`;
-      const winnersStr = entry.totalWinners > 1
-        ? ` Você tem ${entry.totalWinners} apostas premiadas.`
-        : "";
-      const labelStr = entry.bestLabel ? ` (${entry.bestLabel})` : "";
-      const bodyText = `Seu melhor jogo${labelStr} acertou ${entry.best} números.${winnersStr} Confira o detalhamento e o prêmio estimado.`;
-      const tag = `results-${lotteryId}-${concurso}-${userId}`;
-      const ok = await firePush(
-        supabaseUrl,
-        serviceRole,
-        userId,
-        title,
-        bodyText,
-        `/jogos-salvos?lottery=${lotteryId}`,
-        tag,
-      );
-      if (ok) pushed++;
+      // 1. Atualiza ROI Real
+      const amountSpent = entry.games * standardCost;
+      const amountWon = entry.totalWon;
+
+      try {
+        const { error: roiError } = await admin
+          .from("user_roi_tracking")
+          .upsert({
+            user_id: userId,
+            lottery_id: lotteryId,
+            bet_date: betDate,
+            amount_spent: amountSpent,
+            amount_won: amountWon,
+            game_ids: entry.betIds,
+          }, { 
+            onConflict: "user_id,lottery_id,bet_date" 
+          });
+        
+        if (!roiError) roiUpdated++;
+        else console.warn(`[roi] Update failed for ${userId}:`, roiError);
+      } catch (e) {
+        console.error(`[roi] Fatal for ${userId}:`, e);
+      }
+
+      // 2. Dispara Push se houver prêmio relevante
+      if (entry.best >= info.min) {
+        const emoji = info.emojiTiers[entry.best] || "🎯";
+        const title = `${info.name} #${concurso}: ${entry.best} acertos! ${emoji}`;
+        const winnersStr = entry.totalWinners > 1
+          ? ` Você tem ${entry.totalWinners} apostas premiadas.`
+          : "";
+        const labelStr = entry.bestLabel ? ` (${entry.bestLabel})` : "";
+        const bodyText = `Seu melhor jogo${labelStr} acertou ${entry.best} números.${winnersStr} Confira o detalhamento e o prêmio real na sua banca.`;
+        const tag = `results-${lotteryId}-${concurso}-${userId}`;
+        
+        const ok = await firePush(
+          supabaseUrl,
+          serviceRole,
+          userId,
+          title,
+          bodyText,
+          `/jogos-salvos?lottery=${lotteryId}`,
+          tag,
+        );
+        if (ok) pushed++;
+      }
     }
 
     return new Response(
-      JSON.stringify({ ok: true, concurso, checked: bets.length, users: byUser.size, pushed }),
+      JSON.stringify({ 
+        ok: true, 
+        concurso, 
+        checked: bets.length, 
+        users: byUser.size, 
+        pushed, 
+        roi_updated: roiUpdated 
+      }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
