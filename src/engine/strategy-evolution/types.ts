@@ -62,8 +62,12 @@ export interface StrategyMetrics {
   globalScore: number;        // 0-100 composite
   accuracy: number | null;    // Real accuracy based on lift/consistency
   lift: number;               // Statistical lift over random baseline
+  pValue: number;             // Real simulation-based P-Value
+  zScore: number;             // Real Z-Score from distribution
   confidenceInterval?: [number, number]; // IC95% for Lift
   monteCarloData?: number[];              // Monte Carlo distribution samples
+  evidenceGrade?: string;     // E0-E4
+  evidenceExplanation?: string;
 }
 
 
