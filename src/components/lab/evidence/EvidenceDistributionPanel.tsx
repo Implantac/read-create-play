@@ -5,8 +5,8 @@ import {
   XAxis, YAxis, Tooltip, 
   ResponsiveContainer, ReferenceLine, AreaChart, Area 
 } from "recharts";
-import { RankingEntry } from "@/engine/strategy-evolution";
-import { Binary, TrendingUp, AlertCircle, Info } from "lucide-react";
+import { RankingEntry } from "@/engine/strategy-evolution/types";
+import { TrendingUp, AlertCircle, Info, CheckCircle2, ShieldAlert } from "lucide-react";
 import { formatNumber } from "@/utils/formatters";
 
 interface EvidenceDistributionPanelProps {
