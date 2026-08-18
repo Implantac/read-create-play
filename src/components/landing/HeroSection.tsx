@@ -1,127 +1,122 @@
-import { motion, MotionValue } from "framer-motion";
-import { useTranslation } from "react-i18next";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowRight, Brain, Shield, Zap } from "lucide-react";
 import { FloatingLotteryBalls } from "@/components/lottery/FloatingLotteryBalls";
-import { prefetchRoute } from "@/lib/routePrefetch";
-
-const prefetchSignup = () => prefetchRoute("/signup");
-const prefetchLogin = () => prefetchRoute("/login");
 
 interface HeroSectionProps {
   heroRef: React.RefObject<HTMLDivElement>;
-  heroY: MotionValue<number>;
-  heroOpacity: MotionValue<number>;
-  heroScale: MotionValue<number>;
+  heroY: any;
+  heroOpacity: any;
+  heroScale: any;
   handleCtaClick: (e: React.MouseEvent, to: string) => void;
   fadeUp: any;
 }
 
-export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaClick, fadeUp }: HeroSectionProps) {
-  const { t } = useTranslation();
-
+export function HeroSection({
+  heroRef,
+  heroY,
+  heroOpacity,
+  heroScale,
+  handleCtaClick,
+  fadeUp,
+}: HeroSectionProps) {
   return (
-    <section ref={heroRef} className="relative min-h-screen flex items-center justify-center pt-32 pb-40 px-6 overflow-hidden bg-background">
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[140vw] h-[140vw] md:w-[1200px] md:h-[1200px] bg-primary/20 rounded-full blur-[160px] opacity-20 animate-pulse" />
-        <div className="absolute bottom-1/4 left-1/4 w-[100vw] h-[100vw] md:w-[800px] md:h-[800px] bg-accent/10 rounded-full blur-[140px] opacity-10" />
+    <section 
+      ref={heroRef} 
+      className="relative min-h-[90vh] md:min-h-screen flex items-center justify-center pt-24 pb-12 overflow-hidden bg-background"
+    >
+      {/* Dynamic Background */}
+      <div className="absolute inset-0 z-0">
+        <FloatingLotteryBalls count={20} />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background z-10" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140vw] h-[100vh] bg-primary/5 rounded-full blur-[120px] opacity-20 z-0 animate-pulse" />
       </div>
-
-      <FloatingLotteryBalls />
 
       <motion.div 
         style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
-        className="container max-w-screen-2xl mx-auto relative z-10 text-center space-y-16"
+        className="container mx-auto px-6 relative z-20"
       >
-        <motion.div 
-          initial="hidden"
-          animate="visible"
-          custom={0}
-          variants={fadeUp}
-          className="inline-flex items-center gap-3 px-6 py-2.5 rounded-2xl bg-primary/5 border border-primary/20 backdrop-blur-md shadow-2xl mb-4"
-        >
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
-          </span>
-          <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.4em] text-primary italic text-center">INTELIGÊNCIA ARTIFICIAL DE ELITE APLICADA ÀS LOTERIAS</span>
-        </motion.div>
-
-        <div className="space-y-8">
-          <motion.h1 
+        <div className="max-w-6xl mx-auto text-center space-y-10 md:space-y-16">
+          <motion.div 
+            variants={fadeUp} 
+            custom={0}
             initial="hidden"
             animate="visible"
+            className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-md shadow-premium"
+          >
+            <Brain className="w-4 h-4 text-primary animate-pulse" />
+            <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.4em] text-primary italic drop-shadow-sm">
+              Neural Core v7.5 Alpha • Acesso de Elite
+            </span>
+          </motion.div>
+
+          <motion.div 
+            variants={fadeUp} 
             custom={1}
-            variants={fadeUp}
-            className="text-4xl md:text-[5rem] lg:text-[7.5rem] font-black tracking-tighter uppercase italic leading-[0.8] mb-12"
-          >
-            <span className="block text-foreground drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)]">PARE DE APOSTAR NO ESCURO.</span>
-            <span className="block gradient-brand-text not-italic leading-none drop-shadow-[0_0_30px_rgba(201,168,76,0.2)]">APOSTE COM CIÊNCIA.</span>
-          </motion.h1>
-          
-          <motion.p 
             initial="hidden"
             animate="visible"
+            className="space-y-6 md:space-y-10"
+          >
+            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[9.5rem] font-black tracking-tighter uppercase italic leading-[0.8] drop-shadow-2xl">
+              <span className="block mb-2 md:mb-6">CIÊNCIA DE</span>
+              <span className="gradient-brand-text drop-shadow-[0_0_30px_rgba(201,168,76,0.3)]">DADOS REAL</span>
+            </h1>
+            <p className="text-lg md:text-2xl text-muted-foreground max-w-3xl mx-auto font-medium italic opacity-70 leading-relaxed px-4 md:px-0">
+              Processamento neural de elite aplicado a loterias oficiais. Decisões baseadas em evidências históricas, não em palpites.
+            </p>
+          </motion.div>
+
+          <motion.div 
+            variants={fadeUp} 
             custom={2}
-            variants={fadeUp}
-            className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed px-4"
+            initial="hidden"
+            animate="visible"
+            className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6 md:pt-10"
           >
-            Mais de <span className="text-foreground font-black italic underline decoration-primary/30 underline-offset-4">24 mil concursos oficiais</span> analisados por modelos matemáticos e rigor estatístico. Descubra padrões, monte apostas estratégicas e tome decisões baseadas em sinais — não em achismo.
-          </motion.p>
-        </div>
+            <Button 
+              size="lg" 
+              onClick={(e) => handleCtaClick(e, "/signup")}
+              className="group h-16 md:h-20 px-10 md:px-16 rounded-[2rem] text-lg md:text-xl font-black uppercase tracking-widest gradient-brand text-primary-foreground shadow-2xl shadow-primary/20 hover:scale-[1.05] active:scale-[0.98] transition-all duration-500 w-full sm:w-auto"
+            >
+              Entrar na Rede Titan
+              <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-2 transition-transform" />
+            </Button>
+            <Button 
+              variant="outline" 
+              size="lg" 
+              onClick={(e) => handleCtaClick(e, "/planos")}
+              className="h-16 md:h-20 px-10 md:px-16 rounded-[2rem] text-lg md:text-xl font-black uppercase tracking-widest border-2 border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary/40 italic transition-all duration-500 w-full sm:w-auto"
+            >
+              Ver Planos Elite
+            </Button>
+          </motion.div>
 
-        <motion.div 
-          initial="hidden"
-          animate="visible"
-          custom={3}
-          variants={fadeUp}
-          className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 pt-16 px-4"
-        >
-          <Button 
-            size="lg" 
-            variant="premium"
-            onClick={(e) => handleCtaClick(e, "/signup")}
-            onMouseEnter={prefetchSignup}
-            onFocus={prefetchSignup}
-            onTouchStart={prefetchSignup}
-            className="group w-full sm:w-auto h-20 px-12 text-sm font-black uppercase tracking-widest rounded-2xl shadow-[0_30px_60px_-12px_hsl(var(--primary)/0.5)] hover:shadow-[0_40px_80px_-12px_hsl(var(--primary)/0.7)] transition-all hover:scale-[1.02] active:scale-[0.98] border border-white/20"
+          <motion.div 
+            variants={fadeUp} 
+            custom={3}
+            initial="hidden"
+            animate="visible"
+            className="flex flex-wrap items-center justify-center gap-8 md:gap-16 pt-16 md:pt-24 opacity-40 grayscale hover:grayscale-0 transition-all duration-700"
           >
-            Testar Gratuitamente
-            <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </Button>
-
-          <Link
-            to="/login"
-            onMouseEnter={prefetchLogin}
-            onFocus={prefetchLogin}
-            onTouchStart={prefetchLogin}
-            className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-primary transition-colors italic px-4 py-2"
-          >
-            Já tenho conta
-          </Link>
-        </motion.div>
-
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          custom={4}
-          variants={fadeUp}
-          className="flex flex-col items-center gap-3 pt-20 opacity-70"
-        >
-          <div className="flex -space-x-3">
-            <div className="w-9 h-9 rounded-full border-2 border-background bg-gradient-to-br from-primary/40 to-primary/10" />
-            <div className="w-9 h-9 rounded-full border-2 border-background bg-gradient-to-br from-accent/40 to-accent/10" />
-            <div className="w-9 h-9 rounded-full border-2 border-background bg-gradient-to-br from-neon-blue/40 to-neon-blue/10" />
-            <div className="w-9 h-9 rounded-full border-2 border-background bg-primary/20 flex items-center justify-center text-[9px] font-black text-primary tracking-tight">
-              +4k
+            <div className="flex items-center gap-3">
+              <Shield className="w-6 h-6 text-primary" />
+              <span className="text-[10px] md:text-xs font-black uppercase tracking-widest">Segurança Bancária</span>
             </div>
-          </div>
-          <p className="text-[10px] uppercase tracking-[0.25em] font-bold text-muted-foreground">
-            Mais de 4.800 apostadores já confiam no Titan
-          </p>
-        </motion.div>
+            <div className="flex items-center gap-3">
+              <Zap className="w-6 h-6 text-primary" />
+              <span className="text-[10px] md:text-xs font-black uppercase tracking-widest">Tempo Real</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Brain className="w-6 h-6 text-primary" />
+              <span className="text-[10px] md:text-xs font-black uppercase tracking-widest">IA Preditiva</span>
+            </div>
+          </motion.div>
+        </div>
       </motion.div>
+      
+      {/* Visual Decoration */}
+      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-background to-transparent z-30" />
     </section>
   );
 }
