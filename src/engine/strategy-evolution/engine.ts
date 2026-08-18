@@ -89,10 +89,9 @@ function backtestStrategy(
   const coverageScore = (allNums.size / config.numbers) * 100;
 
   // Evidence Engine integration
-  const totalSlots = totalComparisons * config.pick;
-  const evidence = analyzeEvidence(totalHits, totalSlots, config);
+  const evidence = analyzeEvidence(totalHits, games, draws, config, 1000);
   const lift = evidence.lift;
-  const monteCarloData = runMonteCarloSim(totalSlots, config, 1000);
+  const monteCarloData = runMonteCarloSim(games, draws, config, 200);
   const accuracy = draws.length >= 20 ? Math.min(98, Math.max(0, Math.round((Math.max(0, lift - 1) * 2 + consistency / 2) * 100))) : null;
 
   // Global composite score
@@ -119,8 +118,12 @@ function backtestStrategy(
     globalScore,
     accuracy,
     lift,
+    pValue: evidence.pValue,
+    zScore: evidence.zScore,
     confidenceInterval: evidence.confidenceInterval,
     monteCarloData,
+    evidenceGrade: evidence.grade,
+    evidenceExplanation: evidence.explanation
   };
 }
 
@@ -313,8 +316,7 @@ export function runStrategyLab(
     };
   }
 
-  // Compute stats from available draws
-  const stats = computeFrequencyStats(draws, config.numbers);
+  // Initial stats are deferred to avoid leakage.
 
   // Get strategies
   const available = getStrategiesForLottery(labConfig.lotteryId);
@@ -322,16 +324,23 @@ export function runStrategyLab(
     ? labConfig.strategies.map(id => getStrategy(id)).filter(Boolean) as StrategyDefinition[]
     : available;
 
-  // Generate games and backtest each strategy
+  // Split data: 70% Train, 30% Evaluation (Paired)
+  const trainCount = Math.floor(draws.length * 0.7);
+  const trainDraws = draws.slice(0, trainCount);
+  const evalDraws = draws.slice(trainCount);
+
+  // Compute stats only from Train data to avoid leakage
+  const trainStats = computeFrequencyStats(trainDraws, config.numbers);
+
+  // Generate games and backtest each strategy on Eval data
   const results: { def: StrategyDefinition; metrics: StrategyMetrics; games: number[][] }[] = [];
 
   for (const def of selectedDefs) {
-    // Generate games using the strategy
     const games: number[][] = [];
     const seen = new Set<string>();
 
     for (let i = 0; i < labConfig.gamesPerStrategy * 3 && games.length < labConfig.gamesPerStrategy; i++) {
-      const game = generateByStrategy(def.baseStrategy as any, stats, config);
+      const game = generateByStrategy(def.baseStrategy as any, trainStats, config);
       const sorted = [...game].sort((a, b) => a - b);
       const key = sorted.join(",");
       if (!seen.has(key)) {
@@ -340,7 +349,7 @@ export function runStrategyLab(
       }
     }
 
-    const metrics = backtestStrategy(def, games, draws, config);
+    const metrics = backtestStrategy(def, games, evalDraws, config);
     results.push({ def, metrics, games });
   }
 
