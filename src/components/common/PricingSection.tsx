@@ -45,7 +45,7 @@ export function PricingSection() {
       description: "Conheça a plataforma sem custo.",
       features: [
         "Acesso a todas as loterias oficiais",
-        "Limite de 3 jogos salvos para cada loteria",
+        "Limite de 3 jogos salvos por cada modalidade",
         "Gerador básico com estatística essencial",
         "Resultados oficiais em tempo real",
         "Conferidor de apostas ilimitado",
