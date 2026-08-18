@@ -219,7 +219,7 @@ export default function GestaoBancaPage() {
         {/* Configuração */}
         <Card className="glass-card">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
+            <CardTitle className="flex items-center gap-2 text-base font-black uppercase italic tracking-tighter">
               <ShieldCheck className="h-4 w-4 text-primary" />
               Parâmetros de Banca
             </CardTitle>
@@ -227,7 +227,7 @@ export default function GestaoBancaPage() {
           <CardContent className="space-y-5">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs uppercase tracking-wider">Banca Total</Label>
+                <Label className="text-[10px] font-black uppercase tracking-[0.2em] italic">Banca Total</Label>
                 <Input
                   type="number"
                   min={0}
@@ -236,7 +236,7 @@ export default function GestaoBancaPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs uppercase tracking-wider">Aporte Mensal</Label>
+                <Label className="text-[10px] font-black uppercase tracking-[0.2em] italic">Aporte Mensal</Label>
                 <Input
                   type="number"
                   min={0}
@@ -246,8 +246,8 @@ export default function GestaoBancaPage() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-xs uppercase tracking-wider">Perfil de Risco</Label>
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black uppercase tracking-[0.2em] italic">Perfil de Risco</Label>
               <div className="grid grid-cols-3 gap-2">
                 {(["conservador", "moderado", "agressivo"] as RiskProfile[]).map((r) => (
                   <button
@@ -297,7 +297,7 @@ export default function GestaoBancaPage() {
             <Separator />
 
             <div>
-              <Label className="text-xs uppercase tracking-wider">Modalidades Operadas</Label>
+              <Label className="text-[10px] font-black uppercase tracking-[0.2em] italic">Modalidades Operadas</Label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
                 {LOTTERIES.map((l) => {
                   const active = selected.includes(l.id);
@@ -612,18 +612,19 @@ function KpiCard({
   icon: typeof Wallet;
 }) {
   const toneClass = {
-    positive: "text-emerald-500 border-emerald-500/30 bg-emerald-500/5",
-    negative: "text-destructive border-destructive/30 bg-destructive/5",
-    warning: "text-amber-400 border-amber-500/30 bg-amber-500/5",
-    neutral: "text-primary border-primary/30 bg-primary/5",
+    positive: "text-emerald-400 border-emerald-500/20 bg-emerald-500/5",
+    negative: "text-destructive border-destructive/20 bg-destructive/5",
+    warning: "text-amber-400 border-amber-500/20 bg-amber-500/5",
+    neutral: "text-primary border-primary/20 bg-primary/5",
   }[tone];
   return (
-    <div className={`rounded-xl border p-4 ${toneClass}`}>
-      <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold opacity-80">
+    <div className={`rounded-2xl border p-4 glass-card shadow-premium ${toneClass} relative overflow-hidden group`}>
+      <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] italic opacity-80 mb-2">
         <Icon className="h-3.5 w-3.5" /> {label}
       </div>
-      <p className="font-mono text-xl font-black mt-1">{value}</p>
-      <p className="text-[10px] opacity-70 mt-0.5">{detail}</p>
+      <p className="font-mono text-2xl font-black italic tracking-tighter leading-none">{value}</p>
+      <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mt-2">{detail}</p>
     </div>
   );
 }
@@ -637,11 +638,11 @@ function SliderRow({
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
-        <Label className="text-xs uppercase tracking-wider">{label}</Label>
-        <span className="font-mono text-sm font-bold text-primary">{value}{suffix}</span>
+        <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground italic">{label}</Label>
+        <span className="font-mono text-sm font-black text-primary italic">{value}{suffix}</span>
       </div>
-      <Slider value={[value]} min={min} max={max} step={1} onValueChange={(v) => onChange(v[0])} />
-      {hint && <p className="text-[10px] text-muted-foreground">{hint}</p>}
+      <Slider value={[value]} min={min} max={max} step={1} onValueChange={(v) => onChange(v[0])} className="py-2" />
+      {hint && <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground opacity-50">{hint}</p>}
     </div>
   );
 }

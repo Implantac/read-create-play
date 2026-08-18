@@ -291,6 +291,10 @@
     height: 1px;
     background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.4), transparent);
   }
+
+  .shadow-gold-glow {
+    box-shadow: 0 0 20px -5px hsl(var(--primary) / 0.4);
+  }
 }
 
 @property --border-angle {
@@ -315,6 +319,14 @@
 }
 
 .animate-scroll { animation: scroll 30s linear infinite; }
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float { animation: float 6s ease-in-out infinite; }
 
 #lovable-badge {
   display: none !important;

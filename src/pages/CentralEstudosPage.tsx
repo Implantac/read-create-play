@@ -102,17 +102,17 @@ const CentralEstudosPage = () => {
       </div>
 
       <Tabs defaultValue="glossary" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-secondary/20 p-1 rounded-xl">
-          <TabsTrigger value="glossary" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-lg">
-            <BookOpen className="w-4 h-4 mr-2" />
+        <TabsList className="grid w-full grid-cols-3 bg-secondary/10 p-1 rounded-xl border border-border/40 backdrop-blur-md">
+          <TabsTrigger value="glossary" className="rounded-lg data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-lg font-black uppercase tracking-widest text-[10px] italic">
+            <BookOpen className="w-3.5 h-3.5 mr-2" />
             Glossário
           </TabsTrigger>
-          <TabsTrigger value="tutorials" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-lg">
-            <Video className="w-4 h-4 mr-2" />
+          <TabsTrigger value="tutorials" className="rounded-lg data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-lg font-black uppercase tracking-widest text-[10px] italic">
+            <Video className="w-3.5 h-3.5 mr-2" />
             Tutoriais
           </TabsTrigger>
-          <TabsTrigger value="faq" className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-lg">
-            <HelpCircle className="w-4 h-4 mr-2" />
+          <TabsTrigger value="faq" className="rounded-lg data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-lg font-black uppercase tracking-widest text-[10px] italic">
+            <HelpCircle className="w-3.5 h-3.5 mr-2" />
             Ajuda & FAQ
           </TabsTrigger>
         </TabsList>
@@ -120,14 +120,14 @@ const CentralEstudosPage = () => {
         <TabsContent value="glossary" className="mt-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {glossaryItems.map((item, index) => (
-              <Card key={index} className="bg-secondary/10 border-border/40 hover:border-primary/40 transition-all duration-300 group overflow-hidden">
+              <Card key={index} className="glass-card border-border/40 hover:border-primary/40 transition-all duration-300 group overflow-hidden shadow-premium hover:shadow-premium-hover">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start mb-2">
                     <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest bg-primary/5 text-primary border-primary/20">
                       {item.category}
                     </Badge>
                   </div>
-                  <CardTitle className="text-lg font-bold group-hover:text-primary transition-colors">{item.term}</CardTitle>
+                  <CardTitle className="text-lg font-black uppercase italic tracking-tighter group-hover:text-primary transition-colors">{item.term}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground leading-relaxed">
@@ -153,7 +153,7 @@ const CentralEstudosPage = () => {
         <TabsContent value="tutorials" className="mt-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {tutorials.map((video, index) => (
-              <Card key={index} className="bg-secondary/5 border-border/40 hover:border-primary/20 transition-all group cursor-pointer overflow-hidden">
+              <Card key={index} className="glass-card border-border/40 hover:border-primary/20 transition-all group cursor-pointer overflow-hidden shadow-premium hover:shadow-premium-hover">
                 <div className="aspect-video bg-black/40 flex items-center justify-center relative group-hover:bg-black/20 transition-all">
                   <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center border border-primary/40 group-hover:scale-110 transition-transform shadow-2xl shadow-primary/20">
                     <Zap className="w-8 h-8 text-primary fill-primary/20" />
@@ -163,7 +163,7 @@ const CentralEstudosPage = () => {
                   </div>
                 </div>
                 <CardHeader>
-                  <CardTitle className="text-xl font-bold flex items-center gap-2">
+                  <CardTitle className="text-xl font-black uppercase italic tracking-tighter flex items-center gap-2">
                     {video.title}
                   </CardTitle>
                   <CardDescription className="leading-relaxed">
@@ -181,15 +181,15 @@ const CentralEstudosPage = () => {
         </TabsContent>
 
         <TabsContent value="faq" className="mt-6">
-          <Card className="bg-secondary/5 border-border/40 overflow-hidden">
-            <CardHeader className="border-b border-border/10 bg-secondary/10">
-              <CardTitle className="text-xl font-bold">Dúvidas Frequentes</CardTitle>
-              <CardDescription>Respostas rápidas para as perguntas mais comuns dos nossos usuários.</CardDescription>
+          <Card className="glass-card border-border/40 overflow-hidden shadow-premium">
+            <CardHeader className="border-b border-border/10 bg-secondary/5">
+              <CardTitle className="text-xl font-black uppercase italic tracking-tighter">Dúvidas Frequentes</CardTitle>
+              <CardDescription className="font-mono text-[10px] uppercase tracking-widest">Respostas rápidas para as perguntas mais comuns dos nossos usuários.</CardDescription>
             </CardHeader>
             <CardContent className="p-0">
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="item-1" className="px-6 border-border/10">
-                  <AccordionTrigger className="hover:no-underline font-bold text-sm">O Titan garante 15 pontos na Lotofácil?</AccordionTrigger>
+                  <AccordionTrigger className="hover:no-underline font-black uppercase italic tracking-tighter text-sm">O Titan garante 15 pontos na Lotofácil?</AccordionTrigger>
                   <AccordionContent className="text-muted-foreground text-sm leading-relaxed pb-6">
                     Não. O Titan é uma ferramenta de auxílio à decisão baseada em inteligência estatística. Ele aumenta suas chances matemáticas ao eliminar jogos improváveis e aplicar filtros profissionais, mas o fator sorte é inerente a qualquer loteria oficial.
                   </AccordionContent>

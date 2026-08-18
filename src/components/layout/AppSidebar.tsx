@@ -101,7 +101,7 @@ export function AppSidebar() {
                 )}
               </div>
               <p className="text-[9px] text-muted-foreground font-black tracking-[0.3em] uppercase opacity-40 mt-0.5">
-                Intelligence Core • v4.0 Elite
+                Neural Core • v7.5 Alpha
               </p>
             </div>
           )}

@@ -134,7 +134,7 @@ export function AppHeader({
                     {profile?.full_name || user?.email?.split("@")[0] || "Usuário"}
                   </span>
                   <span className="text-[10px] text-muted-foreground mt-0.5">
-                    {profile?.full_name ? user?.email?.split("@")[0] : "Conta ativa"}
+                    {profile?.role === 'super_admin' ? "GOD MODE" : "Conta ativa"}
                   </span>
                 </div>
               </Button>
