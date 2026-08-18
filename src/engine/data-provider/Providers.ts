@@ -1,4 +1,4 @@
-import { DataProviderSource, DataOrigin } from "./DataProvider";
+import { DataProviderSource } from "./DataProvider";
 import { LotteryService } from "@/services/lottery/lottery.service";
 import { DrawResult } from "@/data/lotteries";
 
@@ -31,14 +31,14 @@ export const MockProvider: DataProviderSource = {
   name: "Dados Simulados (Monte Carlo)",
   isAvailable: () => true,
   fetchDraws: async (lotteryId, limit = 50) => {
-    // Basic mock generator for testing UI/Backtests without network
     const mockDraws: DrawResult[] = [];
     const now = new Date();
-    for (let i = 0; i < limit; i++) {
+    // Deterministic mock generation based on index to keep results stable
+    for (let i = 0; i < (limit || 50); i++) {
       const date = new Date(now);
-      date.setDate(date.getDate() - i * 3);
+      date.setDate(date.getDate() - i);
       mockDraws.push({
-        concurso: 2000 - i,
+        concurso: 3000 - i,
         date: date.toISOString(),
         numbers: Array.from({ length: 15 }, (_, j) => (j + i) % 25 + 1).sort((a,b) => a-b)
       });

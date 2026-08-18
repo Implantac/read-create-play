@@ -14,8 +14,10 @@ export class DataProvider {
   private static activeOrigin: DataOrigin = "official";
 
   static register(source: DataProviderSource) {
+    if (this.sources.some(s => s.origin === source.origin)) return;
     this.sources.push(source);
   }
+
 
   static setActiveOrigin(origin: DataOrigin) {
     this.activeOrigin = origin;
