@@ -1,4 +1,6 @@
 import { Database, Loader2, RefreshCw, Zap, Brain, User, LogOut } from "lucide-react";
+import { DataOriginIndicator } from "@/components/common/DataOriginIndicator";
+
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { LotterySelector } from "@/components/lottery/LotterySelector";
 import { Button } from "@/components/ui/button";
@@ -61,6 +63,8 @@ export function AppHeader({
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
+          <DataOriginIndicator />
+
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary/40 border border-border/40 cursor-default">
