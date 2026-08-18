@@ -86,16 +86,16 @@ export function PricingSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-20 space-y-4"
+          className="text-center mb-32 space-y-8"
         >
-          <Badge variant="outline" className="px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.3em] bg-primary/10 text-primary border-primary/20 mb-4">
+          <Badge variant="outline" className="px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.4em] bg-primary/10 text-primary border-primary/20 italic drop-shadow-md">
             Escolha seu Nível de Operação
           </Badge>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight md:tracking-tighter uppercase italic leading-tight">
-            PLANOS <span className="gradient-brand-text">TITAN</span>
+          <h2 className="text-4xl md:text-8xl font-black tracking-tighter uppercase italic leading-[0.8] drop-shadow-2xl">
+            PLANOS <span className="gradient-brand-text drop-shadow-[0_0_20px_rgba(201,168,76,0.3)]">TITAN</span>
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto font-medium text-lg opacity-70">
-            Um pagamento único, acesso vitalício ao ecossistema completo. Sem mensalidades, sem renovações, sem letras miúdas.
+          <p className="text-muted-foreground max-w-3xl mx-auto font-medium text-xl italic opacity-70 leading-relaxed px-4">
+            Um pagamento único, acesso vitalício de elite. Sem mensalidades, sem renovações, sem burocracia.
           </p>
         </motion.div>
 

@@ -17,17 +17,18 @@ const lotteries = [
 
 export function SupportedLotteries() {
   return (
-    <section className="py-24 bg-black/40 relative">
-      <div className="container mx-auto px-6">
-        <div className="text-center mb-16 space-y-4">
-          <Badge variant="outline" className="px-4 py-1 text-[10px] font-black tracking-widest uppercase border-primary/30 text-primary">
-            Ecossistema Completo
+    <section className="py-24 md:py-48 bg-black/20 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_100%_100%,rgba(201,168,76,0.05),transparent_70%)] pointer-events-none" />
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="text-center mb-32 space-y-8">
+          <Badge variant="outline" className="px-5 py-2 text-[10px] font-black tracking-[0.4em] uppercase border-primary/20 text-primary bg-primary/5 italic">
+            Ecossistema Neural v7.5
           </Badge>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight md:tracking-tighter uppercase italic leading-tight">
-            Loterias <span className="gradient-brand-text">Suportadas</span>
+          <h2 className="text-4xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.85] drop-shadow-2xl">
+            LOTERIAS <span className="gradient-brand-text drop-shadow-[0_0_20px_rgba(201,168,76,0.3)]">SUPORTADAS</span>
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto font-medium opacity-60">
-            Cada modalidade possui seu próprio núcleo de processamento, estratégias exclusivas e análise estatística dedicada.
+          <p className="text-muted-foreground max-w-3xl mx-auto font-medium text-lg italic opacity-70 px-4">
+            Cada modalidade opera em um ambiente isolado com processamento neural dedicado e algoritmos otimizados para sua mecânica específica.
           </p>
         </div>
 
@@ -40,10 +41,10 @@ export function SupportedLotteries() {
               transition={{ delay: i * 0.05 }}
               viewport={{ once: true }}
             >
-              <Card className="p-6 h-full glass-card border-white/5 hover:border-primary/30 transition-all group relative overflow-hidden">
-                <div className={`absolute top-0 right-0 w-24 h-24 ${lottery.color} opacity-5 blur-[40px] group-hover:opacity-20 transition-opacity`} />
-                <div className="text-3xl mb-4 group-hover:scale-110 transition-transform duration-500">{lottery.icon}</div>
-                <h3 className="font-black uppercase tracking-tight italic text-lg mb-4">{lottery.name}</h3>
+              <Card className="p-10 h-full glass-card border-white/5 hover:border-primary/40 transition-all duration-500 group relative overflow-hidden shadow-premium hover:shadow-premium-hover rounded-[2.5rem]">
+                <div className={`absolute -top-12 -right-12 w-32 h-32 ${lottery.color} opacity-10 blur-[50px] group-hover:opacity-30 transition-opacity duration-700`} />
+                <div className="text-4xl mb-6 group-hover:scale-125 group-hover:rotate-12 transition-all duration-500 drop-shadow-lg">{lottery.icon}</div>
+                <h3 className="font-black uppercase tracking-tighter italic text-xl mb-6 group-hover:text-primary transition-colors leading-none">{lottery.name}</h3>
                 
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">

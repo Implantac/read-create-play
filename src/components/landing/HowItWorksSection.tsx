@@ -13,24 +13,33 @@ export function HowItWorksSection() {
   ];
 
   return (
-    <section className="py-24 md:py-40 relative overflow-hidden">
-      <div className="container mx-auto px-6">
+    <section className="py-24 md:py-48 relative overflow-hidden bg-background">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_50%,rgba(201,168,76,0.05),transparent_70%)] pointer-events-none" />
+      <div className="container mx-auto px-6 relative z-10">
         <div className="grid lg:grid-cols-2 gap-20 items-center">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="space-y-8"
+            className="space-y-12"
           >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight md:tracking-tighter uppercase italic leading-tight">
-              Como a <span className="gradient-brand-text">Inteligência</span> Funciona
-            </h2>
             <div className="space-y-6">
-                <div className="flex gap-6 items-start group">
-                  <span className="text-5xl font-black text-primary/10 group-hover:text-primary transition-colors italic leading-none">01</span>
-                  <div className="space-y-1">
-                    <h3 className="text-xl font-bold uppercase italic">Coleta de Históricos</h3>
-                    <p className="text-muted-foreground leading-relaxed">Consolidamos todos os concursos oficiais em uma base de dados única, pronta para análise temporal profunda.</p>
+              <div className="inline-flex items-center px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.4em] bg-primary/10 text-primary border border-primary/20 italic">
+                Metodologia Científica
+              </div>
+              <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-[0.85] drop-shadow-xl">
+                COMO A <span className="gradient-brand-text">INTELIGÊNCIA</span> FUNCIONA
+              </h2>
+              <p className="text-muted-foreground text-lg italic opacity-70 max-w-xl">
+                Um pipeline de 5 camadas projetado para extrair valor máximo de dados históricos.
+              </p>
+            </div>
+            <div className="space-y-10">
+                <div className="flex gap-8 items-start group">
+                  <span className="text-6xl font-black text-primary/5 group-hover:text-primary/20 transition-colors italic leading-none select-none">01</span>
+                  <div className="space-y-2">
+                    <h3 className="text-xl md:text-2xl font-black uppercase italic tracking-tight group-hover:text-primary transition-colors">Coleta de Históricos</h3>
+                    <p className="text-sm md:text-base text-muted-foreground leading-relaxed italic opacity-80 font-medium">Consolidamos todos os concursos oficiais em uma base de dados única, pronta para análise temporal profunda.</p>
                   </div>
                 </div>
                 <div className="flex gap-6 items-start group">
@@ -67,7 +76,7 @@ export function HowItWorksSection() {
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="relative aspect-video glass-panel rounded-[2.5rem] border border-white/10 p-4 shadow-2xl group overflow-hidden"
+            className="relative aspect-square md:aspect-video glass-card rounded-[3rem] border-white/5 p-8 shadow-premium group overflow-hidden"
           >
             <div className="absolute inset-0 bg-primary/5 opacity-50 group-hover:opacity-70 transition-opacity" />
             <div className="relative h-full border border-white/5 rounded-[2rem] bg-black/40 backdrop-blur-md overflow-hidden flex flex-col">
