@@ -12,18 +12,18 @@ export const TitanCommandCenter = () => {
   const selectedLottery = ctx?.selectedLottery ?? "lotofacil";
   const [uptime, setUptime] = React.useState(0);
   const [logs, setLogs] = React.useState<string[]>([
-    "Initializing Titan Neural Core...",
+    "Initializing Evidence Core...",
     "Syncing official historical data...",
-    "Neural Core v7.5 Alpha established."
+    "Quantitative Terminal v7.5 Alpha established."
   ]);
 
   React.useEffect(() => {
     const timer = setInterval(() => setUptime(u => u + 1), 1000);
     const logInterval = setInterval(() => {
       const events = [
-        "Neural weights redistributed",
+        "Statistical signals recalibrated",
         "Entropy variance detected",
-        "Processing quantum patterns",
+        "Processing historical patterns",
         "Alpha signal stabilized",
         "Cache invalidated",
         "P2P handshake verified"
@@ -85,10 +85,10 @@ export const TitanCommandCenter = () => {
         <div>
           <h2 className="text-xl font-black text-foreground flex items-center gap-3 tracking-tighter italic uppercase">
             <Terminal className="w-7 h-7 text-primary" />
-            Titan <span className="text-primary">Command</span> Center
+            Titan <span className="text-primary">Quant</span> Center
           </h2>
           <p className="text-xs text-muted-foreground font-mono uppercase tracking-widest mt-1">
-            Titan Loterias • Inteligência Aplicada às Loterias Brasileiras
+            Terminal Quantitativo • Rigor Estatístico Baseado em Evidências
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -108,7 +108,7 @@ export const TitanCommandCenter = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-              <Activity className="w-3 h-3" /> Tendência Neural
+              <Activity className="w-3 h-3" /> Tendência de Sinal
             </span>
             <span className="text-[10px] font-mono text-emerald-500">OPTIMAL</span>
           </div>
@@ -128,7 +128,7 @@ export const TitanCommandCenter = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-            <Zap className="w-3 h-3" /> Predição Alpha IA
+            <Zap className="w-3 h-3" /> Confiança do Sinal Alpha
             </span>
             <span className="text-[10px] font-mono text-primary">{entropyData.entropy.toFixed(1)}%</span>
           </div>
@@ -143,7 +143,7 @@ export const TitanCommandCenter = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-2">
-              <ShieldCheck className="w-3 h-3" /> Log de Inteligência Ativo
+              <ShieldCheck className="w-3 h-3" /> Log de Evidências Ativo
             </span>
           </div>
           <div className="font-mono text-[9px] text-primary/60 space-y-1 h-24 overflow-hidden mask-fade-bottom">
@@ -153,7 +153,7 @@ export const TitanCommandCenter = () => {
                 {log}
               </p>
             ))}
-            <p className="animate-pulse text-primary/40 mt-1">{`> monitoring --official-data --mode=intelligence`}</p>
+            <p className="animate-pulse text-primary/40 mt-1">{`> monitoring --official-data --mode=quantitative`}</p>
           </div>
         </div>
       </div>

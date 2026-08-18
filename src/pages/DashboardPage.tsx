@@ -73,7 +73,7 @@ const DashboardPage = () => {
               Central de <span className="gradient-brand-text">Inteligência</span>
             </h1>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Análise de históricos oficiais, padrões estatísticos e IA aplicada às loterias brasileiras para gerar apostas mais estratégicas.
+              Terminal quantitativo de análise e otimização de apostas baseado em evidências matemáticas e rigor estatístico.
             </p>
           </div>
 

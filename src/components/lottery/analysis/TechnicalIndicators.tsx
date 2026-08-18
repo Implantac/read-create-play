@@ -59,9 +59,9 @@ export const TechnicalIndicators = ({ analytics }: { analytics: AnalyticsSnapsho
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
       <Indicator 
-        label="Momentum IA" 
+        label="Momentum do Sinal" 
         value={analytics.momentumIndex.toFixed(2)} 
-        description="Força das tendências de curto prazo baseada na aceleração das dezenas 'quentes'."
+        description="Força das tendências de curto prazo baseada na aceleração das dezenas detectadas."
         icon={Zap}
         trend={analytics.momentumIndex > 50 ? "up" : "neutral"}
       />
@@ -95,10 +95,10 @@ export const TechnicalIndicators = ({ analytics }: { analytics: AnalyticsSnapsho
         icon={BarChart}
       />
       <Indicator 
-        label="Expectativa Alpha" 
+        label="Confiança Alpha" 
         value={(100 - analytics.saturationScore).toFixed(1)} 
         suffix="α"
-        description="Potencial de ganho teórico baseado na ineficiência estatística detectada."
+        description="Confiança do sinal teórico baseado na ineficiência estatística detectada."
         icon={TrendingUp}
       />
     </div>

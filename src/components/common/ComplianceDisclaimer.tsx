@@ -29,7 +29,7 @@ export function ComplianceDisclaimer({ compact = false }: Props) {
           Aviso de Transparência
         </p>
         <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">
-          Análises baseadas em dados históricos, estatística, probabilidade e inteligência artificial.
+          Análises baseadas em sinais, scores, evidências históricas e rigor estatístico.
           <strong className="text-foreground"> Não há garantia de premiação.</strong> Este é um sistema de suporte à decisão profissional. Jogue com responsabilidade.
         </p>
       </div>

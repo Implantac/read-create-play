@@ -34,13 +34,25 @@ export const MockProvider: DataProviderSource = {
     const mockDraws: DrawResult[] = [];
     const now = new Date();
     // Deterministic mock generation based on index to keep results stable
+    // Use a fixed seed-like pattern for Monte Carlo sanity
     for (let i = 0; i < (limit || 50); i++) {
       const date = new Date(now);
       date.setDate(date.getDate() - i);
+      
+      // Simulação estatística uniforme para baseline (Regra 7)
+      const numbers: number[] = [];
+      const universeSize = lotteryId === "lotofacil" ? 25 : lotteryId === "megasena" ? 60 : 80;
+      const pickSize = lotteryId === "lotofacil" ? 15 : lotteryId === "megasena" ? 6 : 5;
+      
+      while (numbers.length < pickSize) {
+        const n = ((i * 7 + numbers.length * 13) % universeSize) + 1;
+        if (!numbers.includes(n)) numbers.push(n);
+      }
+      
       mockDraws.push({
         concurso: 3000 - i,
         date: date.toISOString(),
-        numbers: Array.from({ length: 15 }, (_, j) => (j + i) % 25 + 1).sort((a,b) => a-b)
+        numbers: numbers.sort((a,b) => a-b)
       });
     }
     return mockDraws;

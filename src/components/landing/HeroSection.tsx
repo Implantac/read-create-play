@@ -68,7 +68,7 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             variants={fadeUp}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed"
           >
-            Mais de <span className="text-foreground font-bold">24 mil concursos oficiais</span> analisados por IA, estatística avançada e modelos matemáticos. Descubra padrões, monte apostas estratégicas e tome decisões baseadas em dados — não em achismo.
+            Mais de <span className="text-foreground font-bold">24 mil concursos oficiais</span> analisados por modelos matemáticos e rigor estatístico. Descubra padrões, monte apostas estratégicas e tome decisões baseadas em sinais — não em achismo.
           </motion.p>
         </div>
 
