@@ -183,13 +183,13 @@ export function EvidenceDistributionPanel({ rankings, onIterationsChange, curren
                       className="h-7 w-7 text-muted-foreground" 
                       onClick={() => setShowCustom(false)}
                     >
-                    <XAxis className="w-3 h-3 rotate-45" />
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
-        </CardHeader>
+                      <Plus className="w-3 h-3 rotate-45" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardHeader>
           <CardContent className="space-y-6">
             {topStrategy.metrics.monteCarloStats && (
               <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-muted/20 border border-border/50">
