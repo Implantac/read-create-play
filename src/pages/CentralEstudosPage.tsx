@@ -127,7 +127,7 @@ const CentralEstudosPage = () => {
                       {item.category}
                     </Badge>
                   </div>
-                  <CardTitle className="text-lg font-bold group-hover:text-primary transition-colors">{item.term}</CardTitle>
+                  <CardTitle className="text-lg font-black uppercase italic tracking-tighter group-hover:text-primary transition-colors">{item.term}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground leading-relaxed">
