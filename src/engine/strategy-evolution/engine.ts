@@ -317,7 +317,7 @@ export function runStrategyLab(
   }
 
   // Compute stats from all available draws for initial context (unused for game gen below)
-  const _initialStats = computeFrequencyStats(draws, config.numbers);
+  // We will compute stats from Train data later to avoid leakage.
 
   // Get strategies
   const available = getStrategiesForLottery(labConfig.lotteryId);
