@@ -100,11 +100,15 @@ export function EvidenceDistributionPanel({ rankings }: EvidenceDistributionPane
             </div>
             <div className="mt-6 p-4 rounded-xl bg-muted/20 border border-border/50 flex items-start gap-3">
               <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-              <p className="text-[11px] text-muted-foreground leading-relaxed">
-                Este gráfico mostra a distribuição de performance de 1.000 carteiras aleatórias comparadas à estratégia real. 
-                Se a linha <span className="text-primary font-bold">Real ({topStrategy.metrics.lift.toFixed(2)}x)</span> estiver à direita da massa principal, 
-                a estratégia demonstra vantagem estatística auditable.
-              </p>
+              <div className="space-y-2">
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  Este gráfico mostra a distribuição de performance de 1.000 simulações aleatórias pareadas contra os mesmos concursos.
+                  A linha <span className="text-primary font-bold">Real ({topStrategy.metrics.lift.toFixed(2)}x)</span> indica o desempenho observado.
+                </p>
+                <p className="text-[10px] text-amber-500/80 italic">
+                  Nota: A distribuição observada acima da referência simulada indica correlação histórica, mas não constitui garantia de vantagem preditiva futura.
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -117,6 +121,22 @@ export function EvidenceDistributionPanel({ rankings }: EvidenceDistributionPane
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-[10px] uppercase font-black text-muted-foreground">
+                <span>Grau de Evidência</span>
+                <Badge variant="outline" className={`font-mono text-[10px] ${
+                  topStrategy.metrics.evidenceGrade === 'E4' ? 'border-emerald-500 text-emerald-500' :
+                  topStrategy.metrics.evidenceGrade === 'E3' ? 'border-blue-500 text-blue-500' :
+                  topStrategy.metrics.evidenceGrade === 'E0' ? 'border-destructive text-destructive' : ''
+                }`}>
+                  {topStrategy.metrics.evidenceGrade || 'E0'}
+                </Badge>
+              </div>
+              <p className="text-[10px] text-muted-foreground italic leading-tight">
+                {topStrategy.metrics.evidenceExplanation}
+              </p>
+            </div>
+
             <div className="space-y-1">
               <div className="flex justify-between text-[10px] uppercase font-black text-muted-foreground">
                 <span>Lift Observado</span>
@@ -127,27 +147,17 @@ export function EvidenceDistributionPanel({ rankings }: EvidenceDistributionPane
               </div>
             </div>
 
-            <div className="space-y-1">
-              <div className="flex justify-between text-[10px] uppercase font-black text-muted-foreground">
-                <span>IC95% Superior</span>
-                <span className="text-foreground">{topStrategy.metrics.confidenceInterval?.[1].toFixed(3)}x</span>
-              </div>
-              <div className="h-1.5 rounded-full bg-muted/20 overflow-hidden">
-                <div className="h-full bg-muted-foreground/40" style={{ width: `${Math.min(100, (topStrategy.metrics.confidenceInterval?.[1] || 1 / 1.5) * 100)}%` }} />
-              </div>
-            </div>
-
             <div className="pt-4 border-t border-border/50 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] uppercase font-black text-muted-foreground">Z-Score</span>
+                <span className="text-[10px] uppercase font-black text-muted-foreground">Z-Score (Real)</span>
                 <Badge variant="outline" className="font-mono text-[10px]">
-                  {((topStrategy.metrics.lift - 1) / 0.05).toFixed(2)}
+                  {topStrategy.metrics.zScore.toFixed(2)}
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[10px] uppercase font-black text-muted-foreground">P-Value</span>
-                <span className={`font-mono text-[10px] font-bold ${topStrategy.metrics.lift > 1.05 ? "text-emerald-500" : "text-amber-500"}`}>
-                  {topStrategy.metrics.lift > 1.1 ? "< 0.001" : topStrategy.metrics.lift > 1.05 ? "0.042" : "0.315"}
+                <span className="text-[10px] uppercase font-black text-muted-foreground">P-Value (Simulado)</span>
+                <span className={`font-mono text-[10px] font-bold ${topStrategy.metrics.pValue < 0.05 ? "text-emerald-500" : "text-amber-500"}`}>
+                  {topStrategy.metrics.pValue < 0.001 ? "< 0.001" : topStrategy.metrics.pValue.toFixed(3)}
                 </span>
               </div>
             </div>
