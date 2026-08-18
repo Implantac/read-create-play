@@ -44,10 +44,11 @@ export const StatsCard = memo(({
     <Card
       className={cn(
         "overflow-hidden group relative hover:shadow-premium-hover hover:-translate-y-0.5 transition-all duration-300",
+        "p-3 sm:p-6",
         className,
       )}
     >
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-0 sm:p-0 mb-1 sm:mb-2">
         <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground italic">
           {title}
         </CardTitle>
@@ -58,8 +59,8 @@ export const StatsCard = memo(({
         )}
       </CardHeader>
 
-      <CardContent>
-        <div className="text-3xl font-black tracking-tighter text-foreground font-mono tabular-nums italic">
+      <CardContent className="p-0 sm:p-0">
+        <div className="text-xl sm:text-3xl font-black tracking-tighter text-foreground font-mono tabular-nums italic">
           {value}
         </div>
 

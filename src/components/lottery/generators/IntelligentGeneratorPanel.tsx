@@ -91,14 +91,14 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
 
   return (
     <Card className="border-primary/30 bg-card/80 backdrop-blur">
-      <CardHeader>
+      <CardHeader className="p-4 sm:p-6">
         <CardTitle className="flex items-center gap-2 text-primary">
           <Brain className="h-6 w-6" />
           Gerador Titan (FAROL)
           <Badge variant="outline" className="ml-2 font-mono">v7.0 PRO</Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
         {/* History window selector — controls the analysis base */}
         <div className="p-4 rounded-lg bg-muted/30 border border-border/50 space-y-3">
           <div className="flex items-center gap-2">
@@ -129,7 +129,7 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-3 gap-4 p-4 rounded-lg bg-muted/30 border border-border/50">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-lg bg-muted/30 border border-border/50">
           <div className="space-y-2">
             <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Candidatos: {totalBets}</Label>
             <Slider value={[totalBets]} onValueChange={v => setTotalBets(v[0])} min={50} max={1000} step={50} />
