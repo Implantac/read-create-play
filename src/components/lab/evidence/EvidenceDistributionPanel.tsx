@@ -162,12 +162,25 @@ export function EvidenceDistributionPanel({ rankings }: EvidenceDistributionPane
               </div>
             </div>
 
-            {!isSignificant && (
-              <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center gap-2">
-                <AlertCircle className="w-3 h-3 text-rose-500" />
-                <span className="text-[9px] text-rose-400 font-bold uppercase">Sinal fraco (Alta variância)</span>
+            <div className={`p-4 rounded-xl border flex flex-col items-center justify-center gap-2 ${
+              isSignificant ? "bg-emerald-500/10 border-emerald-500/20" : "bg-amber-500/10 border-amber-500/20"
+            }`}>
+              <div className="flex items-center gap-2">
+                {isSignificant ? (
+                  <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                ) : (
+                  <ShieldAlert className="w-5 h-5 text-amber-500" />
+                )}
+                <span className="text-xs font-bold uppercase tracking-tighter">
+                  {isSignificant ? "Sinal Validado" : "Sinal Incerto"}
+                </span>
               </div>
-            )}
+              <span className="text-[10px] text-center opacity-70 leading-tight">
+                {isSignificant 
+                  ? "A performance observada ultrapassa a variância aleatória esperada."
+                  : "A performance pode ser atribuída à sorte ou variância estatística."}
+              </span>
+            </div>
           </CardContent>
         </Card>
       </div>
