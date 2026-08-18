@@ -10,8 +10,6 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminGuard } from "@/components/AdminGuard";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { lazy, Suspense, useEffect } from "react";
-import { sentryTest } from "@/lib/sentry-test";
-
 import { Loader2, AlertCircle } from "lucide-react";
 import { ReferralSystem } from "@/lib/referral-system";
 import { AutoInstallPrompt } from "@/components/pwa/AutoInstallPrompt";
@@ -57,11 +55,7 @@ const ComandoApostadorPage = lazy(() => import("@/pages/ComandoApostadorPage"));
 const ClosingSharePage = lazy(() => import("@/pages/ClosingSharePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const OAuthConsentPage = lazy(() => import("@/pages/OAuthConsentPage"));
-
 const CentralEstudosPage = lazy(() => import("@/pages/CentralEstudosPage"));
-
-
-
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -147,9 +141,7 @@ const AppContent = () => {
         <Route path="/pwa-test" element={<PwaOfflineTestPage />} />
         <Route path="/f/:shareId" element={<ClosingSharePage />} />
         <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
-        
         <Route path="/estudos" element={<CentralEstudosPage />} />
-
         
         {/* Protected */}
         <Route element={<ProtectedRoute><LotteryProvider><AppLayout /></LotteryProvider></ProtectedRoute>}>
