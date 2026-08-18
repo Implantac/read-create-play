@@ -108,7 +108,6 @@ export interface LabConfig {
   profile: EvolutionProfile;
   monteCarloIterations?: number;
 }
-}
 
 export interface StrategyGames {
   strategyId: string;
