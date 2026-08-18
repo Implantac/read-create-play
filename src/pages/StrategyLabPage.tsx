@@ -35,7 +35,11 @@ import {
   Star, Hash, Dices,
   Settings2,
   Activity, CircleDot, Brain, FileDown, RefreshCw,
+  Microscope, Database, Binary
 } from "lucide-react";
+import { EvidenceEngine } from "@/engine/evidence/EvidenceEngine";
+import { runFrequencyTrendScore } from "@/engine/ai/ml-models";
+
 import { generateRandomGames } from "@/engine/stats/baseline-benchmark";
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
@@ -71,6 +75,9 @@ export default function StrategyLabPage() {
   const [configOpen, setConfigOpen] = useState(true);
   const [customDrawRange, setCustomDrawRange] = useState<[number, number] | null>(null);
   const [enableShuffledBacktest, setEnableShuffledBacktest] = useState(true);
+  const [ablationResults, setAblationResults] = useState<any[]>([]);
+  const [runningAblation, setRunningAblation] = useState(false);
+
   const [ablationResults, setAblationResults] = useState<any[]>([]);
   const [runningAblation, setRunningAblation] = useState(false);
 
