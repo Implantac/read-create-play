@@ -19,7 +19,7 @@ export function DashboardHeader({ statsCount, drawsCount }: DashboardHeaderProps
             <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">Sincronização 100%</span>
           </div>
         </div>
-        <h1 className="text-4xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.9] drop-shadow-2xl">
+        <h1 className="text-4xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.9] drop-shadow-2xl animate-float">
           Sua Melhor <span className="gradient-brand-text drop-shadow-[0_0_15px_rgba(255,178,0,0.3)]">Oportunidade</span> Hoje
         </h1>
         <p className="text-sm text-muted-foreground font-medium max-w-lg leading-relaxed">
