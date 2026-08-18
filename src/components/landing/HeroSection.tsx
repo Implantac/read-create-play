@@ -22,18 +22,17 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
   const { t } = useTranslation();
 
   return (
-    <section ref={heroRef} className="relative min-h-[100vh] flex items-center justify-center pt-24 pb-32 px-6 overflow-hidden">
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] bg-primary/10 rounded-full blur-[160px] opacity-20 animate-pulse" />
-        <div className="absolute bottom-1/4 left-1/4 w-[800px] h-[800px] bg-accent/10 rounded-full blur-[140px] opacity-10" />
-        
+    <section ref={heroRef} className="relative min-h-screen flex items-center justify-center pt-32 pb-40 px-6 overflow-hidden bg-background">
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[140vw] h-[140vw] md:w-[1200px] md:h-[1200px] bg-primary/20 rounded-full blur-[160px] opacity-20 animate-pulse" />
+        <div className="absolute bottom-1/4 left-1/4 w-[100vw] h-[100vw] md:w-[800px] md:h-[800px] bg-accent/10 rounded-full blur-[140px] opacity-10" />
       </div>
 
       <FloatingLotteryBalls />
 
       <motion.div 
         style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
-        className="container max-w-screen-2xl mx-auto relative z-10 text-center space-y-12"
+        className="container max-w-screen-2xl mx-auto relative z-10 text-center space-y-16"
       >
         <motion.div 
           initial="hidden"
@@ -46,7 +45,7 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
           </span>
-          <span className="text-[11px] font-black uppercase tracking-[0.4em] text-primary italic">INTELIGÊNCIA ARTIFICIAL DE ELITE APLICADA ÀS LOTERIAS</span>
+          <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.4em] text-primary italic text-center">INTELIGÊNCIA ARTIFICIAL DE ELITE APLICADA ÀS LOTERIAS</span>
         </motion.div>
 
         <div className="space-y-8">
@@ -66,9 +65,9 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             animate="visible"
             custom={2}
             variants={fadeUp}
-            className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed"
+            className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed px-4"
           >
-            Mais de <span className="text-foreground font-bold">24 mil concursos oficiais</span> analisados por modelos matemáticos e rigor estatístico. Descubra padrões, monte apostas estratégicas e tome decisões baseadas em sinais — não em achismo.
+            Mais de <span className="text-foreground font-black italic underline decoration-primary/30 underline-offset-4">24 mil concursos oficiais</span> analisados por modelos matemáticos e rigor estatístico. Descubra padrões, monte apostas estratégicas e tome decisões baseadas em sinais — não em achismo.
           </motion.p>
         </div>
 
@@ -77,7 +76,7 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
           animate="visible"
           custom={3}
           variants={fadeUp}
-          className="flex flex-col sm:flex-row items-center justify-center gap-8 pt-10"
+          className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 pt-16 px-4"
         >
           <Button 
             size="lg" 
@@ -86,7 +85,7 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
             onMouseEnter={prefetchSignup}
             onFocus={prefetchSignup}
             onTouchStart={prefetchSignup}
-            className="group h-20 px-12 text-sm font-black uppercase tracking-widest rounded-2xl shadow-[0_30px_60px_-12px_hsl(var(--primary)/0.5)] hover:shadow-[0_40px_80px_-12px_hsl(var(--primary)/0.7)] transition-all hover:scale-[1.02] active:scale-[0.98]"
+            className="group w-full sm:w-auto h-20 px-12 text-sm font-black uppercase tracking-widest rounded-2xl shadow-[0_30px_60px_-12px_hsl(var(--primary)/0.5)] hover:shadow-[0_40px_80px_-12px_hsl(var(--primary)/0.7)] transition-all hover:scale-[1.02] active:scale-[0.98] border border-white/20"
           >
             Testar Gratuitamente
             <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -108,7 +107,7 @@ export function HeroSection({ heroRef, heroY, heroOpacity, heroScale, handleCtaC
           animate="visible"
           custom={4}
           variants={fadeUp}
-          className="flex flex-col items-center gap-3 pt-8 opacity-70"
+          className="flex flex-col items-center gap-3 pt-20 opacity-70"
         >
           <div className="flex -space-x-3">
             <div className="w-9 h-9 rounded-full border-2 border-background bg-gradient-to-br from-primary/40 to-primary/10" />
