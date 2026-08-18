@@ -112,6 +112,12 @@ export default function StrategyLabPage() {
     }
   }, [available]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    if (result && result.config.monteCarloIterations !== monteCarloIterations) {
+      runLab();
+    }
+  }, [monteCarloIterations]);
+
   const drawRange = useMemo((): [number, number] => {
     if (customDrawRange) return customDrawRange;
     if (!draws || draws.length === 0) return [1, 1];
