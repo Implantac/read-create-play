@@ -10,6 +10,9 @@ import { EvidenceGrade, EvidenceResult } from "@/engine/contracts/quant";
 
 export interface EvidenceReport extends EvidenceResult {
   isSignificant: boolean;
+  lift: number;
+  zScore: number;
+  grade: EvidenceGrade;
   explanation: string;
   monteCarloStats?: {
     mean: number;
