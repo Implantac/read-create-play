@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { NumberStats, computeFrequencyStats } from "@/engine/stats/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { IntelligentBet, GenerationSummary, generateIntelligentBets, computeGenerationSummary } from "@/engine/intelligent-generator";
+import { GameOrchestrator, OrchestratedGame } from "@/engine/core/GameOrchestrator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,7 +37,7 @@ interface Props {
 
 export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: Props) {
   const { hotNumbers, coldNumbers } = useLotteryContext();
-  const [bets, setBets] = useState<IntelligentBet[]>([]);
+  const [bets, setBets] = useState<OrchestratedGame[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [totalBets, setTotalBets] = useState(300);
   const [topResults, setTopResults] = useState(20);
@@ -65,12 +65,14 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
     }
     setIsGenerating(true);
     setTimeout(() => {
-      const results = generateIntelligentBets(scopedStats, config, scopedDraws, {
-        totalBets,
-        topResults,
-        strategies: ["hot", "lowDelay", "trend", "cycle", "balanced", "smart", "hybrid", "ml", "sectors", "pattern"],
-        simulateHistory,
-        minScore: 30,
+      const results = GameOrchestrator.generate({
+        lotteryId: config.id,
+        count: topResults,
+        riskProfile: "balanced",
+        filters: {},
+        stats: scopedStats,
+        draws: scopedDraws,
+        minScore: 30
       });
       setBets(results);
       setIsGenerating(false);
@@ -150,13 +152,13 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
                   <BetCard
                     rank={bet.rank}
                     numbers={bet.numbers}
-                    score={bet.score}
+                    score={bet.titanScore}
                     grade={bet.quality.grade}
-                    strategyLabel={bet.strategyLabel}
-                    insights={bet.analysis.insights.slice(0, 2)}
+                    strategyLabel="Otimizado"
+                    insights={bet.explanation.slice(0, 2)}
                     hotNumbers={hotNumbers}
                     coldNumbers={coldNumbers}
-                    onSave={onSaveBet ? () => onSaveBet(bet.numbers, `IA-${bet.strategyLabel}`, bet.score, bet.quality.grade) : undefined}
+                    onSave={onSaveBet ? () => onSaveBet(bet.numbers, "IA-Titan", bet.titanScore, bet.quality.grade) : undefined}
                   />
                   <div className="absolute top-4 right-4 text-muted-foreground opacity-40">
                     {expandedBet === bet.rank ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -172,8 +174,9 @@ export function IntelligentGeneratorPanel({ stats, config, draws, onSaveBet }: P
                       className="overflow-hidden"
                     >
                       <AIAnalystBriefing 
-                        confidence={Math.round(bet.score * 0.95 + 5)} 
-                        reasons={bet.analysis.insights} 
+                        confidence={Math.round(bet.titanScore * 0.95 + 5)} 
+                        reasons={bet.explanation} 
+
                       />
                     </m.div>
                   )}
