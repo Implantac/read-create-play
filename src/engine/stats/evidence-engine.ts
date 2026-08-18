@@ -68,8 +68,19 @@ export function analyzeEvidence(
   const sampleSize = games.length * draws.length;
   if (sampleSize === 0) {
     return {
-      isSignificant: false, pValue: 1, lift: 1, confidenceInterval: [1, 1],
-      zScore: 0, sampleSize: 0, effectSize: "negligible", grade: "E0",
+      metric: "Performance Score",
+      observed: 1,
+      baseline: 1,
+      effectSize: 0,
+      confidenceInterval: [1, 1],
+      pValue: 1,
+      sampleSize: 0,
+      method: "Permutation",
+      conclusion: "E0",
+      isSignificant: false,
+      lift: 1,
+      zScore: 0,
+      grade: "E0",
       explanation: "Amostra insuficiente."
     };
   }
