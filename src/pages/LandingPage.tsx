@@ -123,32 +123,45 @@ export default function LandingPage() {
         fadeUp={fadeUp}
       />
 
-      <section className="py-24 border-y border-white/5 bg-black/40 relative overflow-hidden">
+      <section className="py-32 md:py-64 border-y border-white/5 bg-black/40 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 pointer-events-none" />
         <div className="container mx-auto px-6 relative z-10">
-          <div className="flex flex-col items-center mb-16">
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary italic text-center mb-6">
-              Poder de processamento e inteligência analítica de elite
-            </p>
-            <div className="h-px w-24 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+          <div className="flex flex-col items-center mb-24">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="inline-flex items-center px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-[0.4em] bg-primary/10 text-primary border border-primary/20 mb-8 italic drop-shadow-md"
+            >
+              Potencial Neural de Elite
+            </motion.div>
+            <div className="h-px w-32 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-24">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-12 mb-32">
             {[
               { label: "Concursos Analisados", value: "24.500+" },
               { label: "Apostas Geradas", value: "1,2M+" },
               { label: "Loterias Suportadas", value: "09" },
               { label: "Apostadores Ativos", value: "4.800+" },
             ].map((stat, i) => (
-              <div key={i} className="text-center p-8 rounded-[2rem] glass-card border-white/5 group hover:border-primary/20 transition-all shadow-premium hover:shadow-premium-hover">
-                <p className="text-4xl md:text-5xl font-black tracking-tighter italic gradient-brand-text mb-2 drop-shadow-sm">{stat.value}</p>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60 italic">{stat.label}</p>
-              </div>
+              <motion.div 
+                key={i} 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="text-center p-10 rounded-[3rem] glass-card border-white/5 group hover:border-primary/40 transition-all duration-500 shadow-premium hover:shadow-premium-hover relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                <p className="text-5xl md:text-7xl font-black tracking-tighter italic gradient-brand-text mb-4 drop-shadow-2xl relative z-10">{stat.value}</p>
+                <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60 italic relative z-10">{stat.label}</p>
+              </motion.div>
             ))}
           </div>
 
           <Suspense fallback={<SectionFallback />}>
-            <div className="py-8 border-t border-white/5">
+            <div className="py-12 border-t border-white/5">
               <LotteryLogosCarousel />
             </div>
           </Suspense>
