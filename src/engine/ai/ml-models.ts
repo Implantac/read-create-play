@@ -126,8 +126,8 @@ function computeAccuracyFromBacktest(bt: BacktestMetrics, config: LotteryConfig)
   const precisionAt15 = bt.avgHitsInTop15 / 15;
   const lift = bt.liftOverChance;
   
-  // Score based on statistical lift and precision
-  // Not a classification accuracy, but a performance index
+  // Score baseado em sinal estatístico real (Lift e Precisão)
+  // Não é uma acurácia de classificação, mas um índice de força do sinal
   const score = Math.min(98, Math.max(0, Math.round((precisionAt15 * 0.6 + (lift / 2) * 0.4) * 100)));
   
   // Confidence: based on consistency and sample size
@@ -446,10 +446,10 @@ export function runEnsembleVoting(stats: NumberStats[], config: LotteryConfig, m
   }).join(" + ");
 
   return {
-    name: "Ensemble Voting",
-    description: `Votação ponderada com bônus de concordância: ${weightDesc}`,
+    name: "Votação por Consenso",
+    description: `Consenso de modelos com pesos calibrados por Lift histórico: ${weightDesc}`,
     predictions: scored,
-    accuracy: 0,
+    accuracy: null,
     confidence: 0,
   };
 }
