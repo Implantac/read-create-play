@@ -139,7 +139,7 @@ export function runBacktest(
       }
     }
     
-    const shuffledEvidence = analyzeEvidence(shuffledHits, totalSlots, config);
+    const shuffledEvidence = analyzeEvidence(shuffledHits, games, shuffledDraws, config, 1000);
     shuffledLift = shuffledEvidence.lift;
     
     // Integrity: If real lift is higher than shuffled lift, it indicates temporal pattern detection.
