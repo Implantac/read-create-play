@@ -134,18 +134,60 @@ export function EvidenceDistributionPanel({ rankings, onIterationsChange, curren
               Confiança (H0 Baseline)
             </CardTitle>
             {onIterationsChange && (
-              <Select 
-                value={currentIterations?.toString()} 
-                onValueChange={(val) => onIterationsChange(parseInt(val))}
-              >
-                <SelectTrigger className="h-7 w-[110px] text-[10px] font-bold bg-background/50 border-white/10 italic">
-                  <SelectValue placeholder="Iterações" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10000" className="text-[10px] font-medium">10.000 (Rápido)</SelectItem>
-                  <SelectItem value="100000" className="text-[10px] font-medium">100.000 (Elite)</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex items-center gap-2">
+                {!showCustom ? (
+                  <Select 
+                    value={currentIterations?.toString()} 
+                    onValueChange={(val) => {
+                      if (val === "custom") {
+                        setShowCustom(true);
+                      } else {
+                        onIterationsChange(parseInt(val));
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="h-7 w-[110px] text-[10px] font-bold bg-background/50 border-white/10 italic">
+                      <SelectValue placeholder="Iterações" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="10000" className="text-[10px] font-medium">10.000 (Rápido)</SelectItem>
+                      <SelectItem value="100000" className="text-[10px] font-medium">100.000 (Elite)</SelectItem>
+                      <SelectItem value="custom" className="text-[10px] font-medium italic">+ Customizar...</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <Input 
+                      type="number" 
+                      value={customIterations}
+                      onChange={(e) => setCustomIterations(e.target.value)}
+                      className="h-7 w-20 text-[10px] font-bold bg-background/50 border-white/10 px-2"
+                      placeholder="Qtd..."
+                    />
+                    <Button 
+                      size="icon" 
+                      className="h-7 w-7" 
+                      onClick={() => {
+                        const val = parseInt(customIterations);
+                        if (val > 0) {
+                          onIterationsChange(val);
+                          setShowCustom(false);
+                        }
+                      }}
+                    >
+                      <CheckCircle2 className="w-3 h-3" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-7 w-7 text-muted-foreground" 
+                      onClick={() => setShowCustom(false)}
+                    >
+                      <XAxis className="w-3 h-3 rotate-45" />
+                    </Button>
+                  </div>
+                )}
+              </div>
             )}
           </CardHeader>
           <CardContent className="space-y-6">
