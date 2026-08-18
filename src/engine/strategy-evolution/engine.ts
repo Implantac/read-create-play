@@ -325,11 +325,18 @@ export function runStrategyLab(
     ? labConfig.strategies.map(id => getStrategy(id)).filter(Boolean) as StrategyDefinition[]
     : available;
 
-  // Generate games and backtest each strategy
+  // Split data: 70% Train, 30% Evaluation (Paired)
+  const trainCount = Math.floor(draws.length * 0.7);
+  const trainDraws = draws.slice(0, trainCount);
+  const evalDraws = draws.slice(trainCount);
+
+  // Compute stats only from Train data to avoid leakage
+  const stats = computeFrequencyStats(trainDraws, config.numbers);
+
+  // Generate games and backtest each strategy on Eval data
   const results: { def: StrategyDefinition; metrics: StrategyMetrics; games: number[][] }[] = [];
 
   for (const def of selectedDefs) {
-    // Generate games using the strategy
     const games: number[][] = [];
     const seen = new Set<string>();
 
@@ -343,7 +350,7 @@ export function runStrategyLab(
       }
     }
 
-    const metrics = backtestStrategy(def, games, draws, config);
+    const metrics = backtestStrategy(def, games, evalDraws, config);
     results.push({ def, metrics, games });
   }
 
