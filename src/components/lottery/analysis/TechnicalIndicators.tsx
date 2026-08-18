@@ -14,7 +14,7 @@ interface IndicatorProps {
 }
 
 const Indicator = ({ label, value, suffix = "", description, trend, icon: Icon }: IndicatorProps) => (
-  <div className="flex items-center justify-between p-4 rounded-2xl bg-secondary/10 border border-border/40 hover:border-primary/30 transition-all duration-300 group/indicator relative overflow-hidden">
+  <div className="flex items-center justify-between p-4 rounded-2xl bg-secondary/10 border border-border/40 hover:border-primary/40 transition-all duration-500 group/indicator relative overflow-hidden hover:shadow-premium">
     <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover/indicator:opacity-100 transition-opacity" />
     <div className="flex items-center gap-4 relative z-10">
       <div className="w-10 h-10 rounded-xl bg-background/50 border border-border/60 flex items-center justify-center text-muted-foreground group-hover/indicator:text-primary group-hover/indicator:border-primary/30 transition-all duration-500 shadow-inner group-hover/indicator:rotate-3">
@@ -22,7 +22,7 @@ const Indicator = ({ label, value, suffix = "", description, trend, icon: Icon }
       </div>
       <div>
         <div className="flex items-center gap-1.5 mb-0.5">
-          <span className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground opacity-70 group-hover/indicator:opacity-100 group-hover/indicator:text-primary/80 transition-all">{label}</span>
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-60 group-hover/indicator:opacity-100 group-hover/indicator:text-primary transition-all italic">{label}</span>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -37,7 +37,7 @@ const Indicator = ({ label, value, suffix = "", description, trend, icon: Icon }
           </TooltipProvider>
         </div>
         <div className="flex items-baseline gap-1">
-          <span className="text-base font-black font-mono text-foreground tracking-tight italic group-hover/indicator:text-primary transition-colors">{value}</span>
+          <span className="text-lg font-black font-mono text-foreground tracking-tighter italic group-hover/indicator:text-primary transition-colors">{value}</span>
           {suffix && <span className="text-[10px] font-black text-muted-foreground uppercase opacity-40">{suffix}</span>}
         </div>
       </div>
