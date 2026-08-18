@@ -93,7 +93,7 @@ function backtestStrategy(
   const evidence = analyzeEvidence(totalHits, games, draws, config, iterations);
   const lift = evidence.lift;
   const monteCarloData = runMonteCarloSim(games, draws, config, 1000);
-  const accuracy = draws.length >= 20 ? Math.min(98, Math.max(0, Math.round(((Math.max(1, lift) - 1) * 20 + consistency * 40)))) : null;
+  const performanceScore = draws.length >= 20 ? Math.min(98, Math.max(0, Math.round(((Math.max(1, lift) - 1) * 20 + consistency * 40)))) : null;
 
   // Global composite score (audit note: proprietary composite metric for internal ranking)
   const globalScore = Math.min(100,
@@ -117,7 +117,7 @@ function backtestStrategy(
     diversityScore,
     redundancyIndex,
     globalScore,
-    accuracy,
+    performanceScore,
     lift,
     pValue: evidence.pValue,
     zScore: evidence.zScore,

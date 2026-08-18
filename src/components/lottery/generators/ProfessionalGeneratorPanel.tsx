@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { NumberStats } from "@/engine/stats/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
-import { ProfessionalBet, generateProfessionalBets, getClosurePresetsForLottery, selectBaseNumbersForClosure, generateClosure } from "@/engine/professional-generator";
+import { GameOrchestrator, OrchestratedGame } from "@/engine/core/GameOrchestrator";
 import { BetCard } from "@/components/lottery/BetCard";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,14 +19,30 @@ interface Props {
 
 export function ProfessionalGeneratorPanel({ stats, config, draws, onSaveBet }: Props) {
   const { hotNumbers, coldNumbers } = useLotteryContext();
-  const [bets, setBets] = useState<ProfessionalBet[]>([]);
+  const [bets, setBets] = useState<OrchestratedGame[]>([]);
   const [generating, setGenerating] = useState(false);
   const [betsPerStrategy, setBetsPerStrategy] = useState(2);
 
   const handleGenerate = () => {
     setGenerating(true);
     setTimeout(() => {
-      const result = generateProfessionalBets(stats, config, draws, betsPerStrategy);
+      const result = GameOrchestrator.generate({
+        lotteryId: config.id,
+        count: betsPerStrategy * 5,
+        riskProfile: "aggressive",
+        filters: {
+          avoidSequences: true,
+          balanceParity: true,
+          balanceHighLow: true,
+          prioritizeHot: true,
+          prioritizeCold: true,
+          frameCenter: true,
+          limitRepetition: true
+        },
+        stats,
+        draws,
+        minScore: 40
+      });
       setBets(result);
       setGenerating(false);
       toast.success(`${result.length} apostas profissionais geradas!`);
@@ -65,17 +81,17 @@ export function ProfessionalGeneratorPanel({ stats, config, draws, onSaveBet }: 
 
         {bets.length > 0 && (
           <div className="grid gap-4">
-            {bets.map((bet) => (
+            {bets.map((bet, idx) => (
               <BetCard
-                key={bet.rank}
-                rank={bet.rank}
+                key={idx}
+                rank={idx + 1}
                 numbers={bet.numbers}
-                score={bet.statisticalScore}
+                score={bet.titanScore}
                 grade={bet.quality.grade}
-                strategyLabel={bet.strategyLabel}
+                strategyLabel="Profissional"
                 hotNumbers={hotNumbers}
                 coldNumbers={coldNumbers}
-                onSave={onSaveBet ? () => onSaveBet(bet.numbers, bet.strategyLabel, bet.statisticalScore, bet.quality.grade) : undefined}
+                onSave={onSaveBet ? () => onSaveBet(bet.numbers, "Profissional", bet.titanScore, bet.quality.grade) : undefined}
               />
             ))}
           </div>

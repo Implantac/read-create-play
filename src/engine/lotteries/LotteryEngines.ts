@@ -7,7 +7,9 @@ export class MegaSenaEngine {
   static validateIntegrity(game: number[]): boolean {
     if (game.length < 6 || game.length > 15) return false;
     const sum = game.reduce((a, b) => a + b, 0);
-    if (sum < 50 || sum > 320) return false;
+    // Mega-Sena range 1-60. 6 numbers.
+    // Min sum: 1+2+3+4+5+6 = 21. Max: 55+56+57+58+59+60 = 345.
+    if (sum < 21 || sum > 345) return false;
     return true;
   }
 
@@ -44,7 +46,8 @@ export class QuinaEngine {
   static validateIntegrity(game: number[]): boolean {
     if (game.length < 5 || game.length > 15) return false;
     const sum = game.reduce((a, b) => a + b, 0);
-    if (sum < 40 || sum > 380) return false;
+    // Quina 1-80. Min: 1+2+3+4+5 = 15. Max: 76+77+78+79+80 = 390.
+    if (sum < 15 || sum > 390) return false;
     return true;
   }
 
@@ -71,10 +74,8 @@ export class QuinaEngine {
   }
 }
 
-
 /**
  * Motor Quantitativo Especializado para Lotomania.
- * Inclui suporte nativo ao conceito de jogo espelho (Regra 17).
  */
 export class LotomaniaEngine {
   static validateIntegrity(game: number[]): boolean {
@@ -85,25 +86,27 @@ export class LotomaniaEngine {
   static getMirror(game: number[]): number[] {
     const gameSet = new Set(game);
     const mirror: number[] = [];
-    // Lotomania: 00 a 99 (representado como 1-100 ou 0-99 conforme o sistema)
-    // Aqui assumimos 0-99 para facilitar o espelho puro.
     for (let i = 0; i < 100; i++) {
       if (!gameSet.has(i)) mirror.push(i);
     }
     return mirror;
   }
+
+  static analyze(game: number[]) {
+    const evens = game.filter(n => n % 2 === 0).length;
+    const sum = game.reduce((a, b) => a + b, 0);
+    return { parity: `${50 - evens}I:${evens}P`, sum };
+  }
 }
 
 /**
  * Motor Quantitativo Especializado para Dupla Sena.
- * Considera os dois sorteios como eventos independentes (Regra 18).
  */
 export class DuplaSenaEngine {
   static validateIntegrity(game: number[]): boolean {
     return game.length >= 6 && game.length <= 15;
   }
 
-  /** Analisa performance comparativa entre sorteio 1 e 2 */
   static compareSorteios(game: number[], s1: number[], s2: number[]) {
     const hits1 = game.filter(n => s1.includes(n)).length;
     const hits2 = game.filter(n => s2.includes(n)).length;
@@ -113,14 +116,12 @@ export class DuplaSenaEngine {
 
 /**
  * Motor Quantitativo Especializado para Timemania.
- * Separa dezenas de "Time do Coração" (Regra 19).
  */
 export class TimemaniaEngine {
   static validateIntegrity(game: number[]): boolean {
     return game.length === 10;
   }
 
-  /** O Time do Coração deve ser tratado como variável independente */
   static analyzeWithTeam(game: number[], teamId: number, draw: number[], winningTeamId: number) {
     const hits = game.filter(n => draw.includes(n)).length;
     const teamHit = teamId === winningTeamId;
@@ -130,7 +131,6 @@ export class TimemaniaEngine {
 
 /**
  * Motor Quantitativo Especializado para Dia de Sorte.
- * Separa dezenas de "Mês da Sorte" (Regra 20).
  */
 export class DiaDeSorteEngine {
   static validateIntegrity(game: number[]): boolean {
@@ -140,15 +140,12 @@ export class DiaDeSorteEngine {
 
 /**
  * Motor Quantitativo Especializado para Super Sete.
- * Engine completamente independente para 7 colunas (Regra 21).
  */
 export class SuperSeteEngine {
-  // 7 colunas (0-9)
   static validateIntegrity(game: number[]): boolean {
     return game.length === 7;
   }
 
-  /** Super Sete não é uma escolha de N entre M, mas uma escolha de 1 em 7 colunas de 10 */
   static analyzePositional(game: number[], draw: number[]) {
     const hits = game.filter((n, i) => n === draw[i]).length;
     return { hits };
