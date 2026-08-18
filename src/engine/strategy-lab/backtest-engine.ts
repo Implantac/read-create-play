@@ -121,8 +121,7 @@ export function runBacktest(
   const ruinProbability = history.length > 0 ? ruinCount / history.length : 0;
 
   const totalObservedHits = Object.entries(hitCounts).reduce((acc, [hits, count]) => acc + (Number(hits) * count), 0);
-  const totalSlots = sortedDraws.length * games.length * config.pick;
-  const evidence = analyzeEvidence(totalObservedHits, totalSlots, config);
+  const evidence = analyzeEvidence(totalObservedHits, games, sortedDraws, config, 1000);
 
   // --- Shuffled Backtest (Integrity Check) ---
   let shuffledLift: number | undefined;
