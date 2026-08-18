@@ -137,6 +137,7 @@ export function analyzeEvidence(
     isSignificant: pValue < 0.05 && lift > 1.0,
     lift,
     zScore,
+    grade,
     explanation: getGradeExplanation(grade),
     monteCarloStats: {
       mean,
