@@ -20,8 +20,8 @@ export function LotterySelector({ selected, onSelect }: Props) {
             onClick={() => onSelect(lottery.id)}
             className={`relative px-5 py-2.5 rounded-2xl font-black text-[10px] transition-all duration-500 border flex items-center gap-3 whitespace-nowrap shadow-xl active:scale-95 ${
               isActive
-                ? "bg-primary/20 border-primary/40 text-primary ring-1 ring-primary/20 shadow-primary/5"
-                : "bg-secondary/40 border-border/40 text-muted-foreground hover:text-foreground hover:bg-secondary/60 hover:border-border/60"
+                ? "bg-primary/20 border-primary/40 text-primary ring-1 ring-primary/20 shadow-primary/10 shadow-gold-glow"
+                : "bg-secondary/20 border-border/40 text-muted-foreground hover:text-foreground hover:bg-secondary/40 hover:border-border/60"
             }`}
           >
             <span className="text-xl shrink-0 drop-shadow-md group-hover:scale-110 transition-transform">{lottery.icon}</span>
