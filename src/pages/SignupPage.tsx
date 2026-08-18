@@ -62,21 +62,32 @@ export default function SignupPage() {
 
     // IP guard: bloqueia múltiplas contas gratuitas do mesmo IP
     try {
-      const { data: guard } = await supabase.functions.invoke("signup-guard", {
+      const { data: guard, error: guardError } = await supabase.functions.invoke("signup-guard", {
         body: { email, mode: "check" },
       });
+      
+      if (guardError) throw guardError;
+
       if (guard && guard.allowed === false) {
         setLoading(false);
         toast({
-          title: "Cadastro não permitido",
-          description: guard.message || "Já existe uma conta gratuita associada a esta conexão.",
+          title: "Limite de Contas Atingido",
+          description: "Detectamos múltiplas contas gratuitas associadas a esta conexão de rede. Para garantir a segurança e sustentabilidade da plataforma, limite o número de contas por IP ou assine um plano Vitalício.",
           variant: "destructive",
         });
         return;
       }
-    } catch (err) {
-      // Falha do guard não deve travar cadastro legítimo
-      console.warn("signup-guard falhou, prosseguindo:", err);
+    } catch (err: any) {
+      console.warn("signup-guard falhou ou bloqueou:", err);
+      if (err.status === 403 || err.status === 429 || err.message?.includes("IP")) {
+        setLoading(false);
+        toast({
+          title: "Proteção contra Abuso",
+          description: "Seu endereço IP foi temporariamente sinalizado pelo nosso sistema de segurança. Tente novamente mais tarde ou mude sua conexão.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     const { data: signUpData, error } = await supabase.auth.signUp({
