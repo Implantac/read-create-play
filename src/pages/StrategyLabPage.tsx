@@ -78,8 +78,6 @@ export default function StrategyLabPage() {
   const [ablationResults, setAblationResults] = useState<any[]>([]);
   const [runningAblation, setRunningAblation] = useState(false);
 
-  const [ablationResults, setAblationResults] = useState<any[]>([]);
-  const [runningAblation, setRunningAblation] = useState(false);
 
 
   const available = useMemo(() => getStrategiesForLottery(config.id), [config.id]);
