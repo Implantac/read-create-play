@@ -1,5 +1,7 @@
 import { NumberStats } from "@/engine/stats/statistics";
 import { LotteryConfig, DrawResult } from "@/data/lotteries";
+import { ModelRegistry, ModelDefinition } from "../ml/modelRegistry";
+
 
 export interface ScoreBreakdown {
   frequency: number;
@@ -188,7 +190,7 @@ export function runFrequencyTrendScore(stats: NumberStats[], config: LotteryConf
   normalizeAndRank(scored);
   return {
     name: "FrequencyTrendScore",
-    description: "Heurística ponderada (antigo Random Forest): frequência, tendência, ciclo e momentum",
+    description: "FrequencyTrendScore: Heurística ponderada de frequência, tendência, ciclo e momentum",
     predictions: scored,
     accuracy: null, 
     confidence: 0,
@@ -224,7 +226,7 @@ export function runMultiFactorScore(stats: NumberStats[], config: LotteryConfig)
   normalizeAndRank(scored);
   return {
     name: "MultiFactorScore",
-    description: "Algoritmo de pontuação multi-fatorial (antigo XGBoost) com desvio padrão e ciclos",
+    description: "MultiFactorScore: Algoritmo de pontuação multi-fatorial estatístico com desvio padrão e ciclos",
     predictions: scored,
     accuracy: null,
     confidence: 0,
@@ -259,7 +261,7 @@ export function runTemporalPatternScore(stats: NumberStats[], config: LotteryCon
   normalizeAndRank(scored);
   return {
     name: "TemporalPatternScore",
-    description: "Decomposição não-linear (antigo Neural Network/LSTM) com attention em gaps",
+    description: "TemporalPatternScore: Decomposição não-linear estatística com attention em gaps",
     predictions: scored,
     accuracy: null,
     confidence: 0,

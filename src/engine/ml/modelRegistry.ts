@@ -7,33 +7,29 @@ export interface ModelDefinition {
   description: string;
   version: string;
   requiresTrainingData: boolean;
-  predict: (stats: any, config: any) => any;
-  evaluate?: (results: any) => any;
-  train?: (data: any) => any;
+  
+  // Funções core
+  predict: (data: any, config: any) => any;
+  evaluate: (predictions: any, groundTruth: any) => any;
+  train?: (trainingData: any) => Promise<void>;
 }
 
 export class ModelRegistry {
-  private static instance: ModelRegistry;
-  private models: Map<string, ModelDefinition> = new Map();
+  private static models: Map<string, ModelDefinition> = new Map();
 
-  private constructor() {}
-
-  public static getInstance(): ModelRegistry {
-    if (!ModelRegistry.instance) {
-      ModelRegistry.instance = new ModelRegistry();
-    }
-    return ModelRegistry.instance;
-  }
-
-  public register(model: ModelDefinition) {
+  static register(model: ModelDefinition) {
     this.models.set(model.id, model);
   }
 
-  public getModel(id: string): ModelDefinition | undefined {
+  static getModel(id: string): ModelDefinition | undefined {
     return this.models.get(id);
   }
 
-  public getAllModels(): ModelDefinition[] {
+  static getAllModels(): ModelDefinition[] {
     return Array.from(this.models.values());
+  }
+
+  static getModelsByType(type: ModelType): ModelDefinition[] {
+    return this.getAllModels().filter(m => m.type === type);
   }
 }
