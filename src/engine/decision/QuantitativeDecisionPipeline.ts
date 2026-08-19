@@ -57,14 +57,12 @@ export class QuantitativeDecisionPipeline {
     );
 
     // 3. STRESS TEST (Robustness)
-    // Note: In production this would run a specific stress test, 
-    // here we use a simplified version for integration.
     const stressTester = new StressTestEngine(draws, config);
-    // Dummy model function that returns generated numbers for stress test consistency
     const stressResult = await stressTester.runStressTest(
       () => generatedGames[0] || [],
-      { windowSize: 30, step: 5 }
+      { windowSize: 30, testSize: 10, mode: "rolling" }
     );
+
 
     // 4. VERDICT LOGIC
     const verdict = this.calculateVerdict(benchmark, stressResult, request.riskProfile);
