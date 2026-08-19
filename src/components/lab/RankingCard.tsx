@@ -1,15 +1,19 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, ShieldCheck, ShieldAlert } from "lucide-react";
+import { ChevronDown, ChevronUp, ShieldCheck, ShieldAlert, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RankingEntry } from "@/engine/strategy-evolution";
 import { MetricPill, MiniMetric } from "./LabShared";
+import { StrategyDetailDialog } from "./StrategyDetailDialog";
+import { useState } from "react";
 
-export function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }: {
+export function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon, lotteryName }: {
   entry: RankingEntry; pick: number; isExpanded: boolean;
   onToggle: () => void; trendIcon: (t: string) => JSX.Element;
+  lotteryName: string;
 }) {
+  const [showDetailDialog, setShowDetailDialog] = useState(false);
   const scorePercent = Math.min(100, r.metrics.globalScore);
   const gradeColor = r.metrics.globalScore >= 70 ? "text-green-500" :
                      r.metrics.globalScore >= 40 ? "text-amber-500" : "text-destructive";
@@ -87,10 +91,22 @@ export function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }:
               )}
             </div>
           </div>
-          <Button variant="ghost" size="sm" className="h-9 w-9 p-0 shrink-0 rounded-lg" onClick={onToggle}>
-            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          </Button>
+          <div className="flex flex-col gap-1 shrink-0">
+            <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-lg text-primary hover:bg-primary/10" onClick={() => setShowDetailDialog(true)}>
+              <ExternalLink className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-lg" onClick={onToggle}>
+              {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </Button>
+          </div>
         </div>
+
+        <StrategyDetailDialog 
+          entry={r} 
+          lotteryName={lotteryName} 
+          isOpen={showDetailDialog} 
+          onClose={() => setShowDetailDialog(false)} 
+        />
 
         <AnimatePresence>
           {isExpanded && (
