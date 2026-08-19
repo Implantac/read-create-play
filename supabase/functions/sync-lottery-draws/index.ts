@@ -19,6 +19,9 @@ const LOTTERIES = [
   { id: "timemania", apiName: "timemania" },
   { id: "diadesorte", apiName: "diadesorte" },
   { id: "supersete", apiName: "supersete" },
+  { id: "maismilionaria", apiName: "maismilionaria" },
+  { id: "federal", apiName: "federal" },
+  { id: "loteca", apiName: "loteca" },
 ];
 
 interface PrizeTier {
