@@ -210,6 +210,10 @@ serve(async (req) => {
 
         const batchSize = 15; // Increased batch size for faster sync
         for (let batch = startFrom; batch <= endAt; batch += batchSize) {
+          if (Date.now() - startedAt > TIME_BUDGET_MS) {
+            console.warn(`[sync] ${lottery.id}: orçamento de tempo esgotado em ${batch}, retornando parcial`);
+            break;
+          }
           const promises: Promise<CaixaResult | null>[] = [];
           for (let c = batch; c < Math.min(batch + batchSize, endAt + 1); c++) {
             promises.push(
