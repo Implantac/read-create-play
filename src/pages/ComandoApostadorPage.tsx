@@ -35,6 +35,58 @@ export default function ComandoApostadorPage() {
   const navigate = useNavigate();
   const [budget, setBudget] = useState<number>(50);
   const [baseSize, setBaseSize] = useState<number>(lotteryConfig?.pick ? lotteryConfig.pick + 3 : 18);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [decision, setDecision] = useState<QuantitativeDecisionResult | null>(null);
+
+  // Auto-run analysis when data is available
+  useEffect(() => {
+    async function runPipeline() {
+      if (!selectedLottery || !lotteryConfig || !draws || draws.length < 30 || !stats) return;
+      
+      setIsAnalyzing(true);
+      try {
+        // Generate sample games to feed the pipeline
+        const sampleGames = generateGames({
+          lotteryId: selectedLottery,
+          count: 5,
+          riskProfile: "balanced",
+          filters: {
+            avoidSequences: true,
+            balanceParity: true,
+            balanceHighLow: true,
+            prioritizeHot: true,
+            prioritizeCold: false,
+            frameCenter: true,
+            limitRepetition: true,
+          },
+          stats,
+          draws,
+        });
+
+        const result = await QuantitativeDecisionPipeline.execute({
+          lotteryId: selectedLottery,
+          config: lotteryConfig,
+          draws,
+          stats,
+          budget,
+          riskProfile: "balanced",
+          strategyId: "universal-pro",
+          strategyLabel: "TITAN Universal Pro",
+          generatedGames: sampleGames.map(g => g.numbers),
+          historicalPerformance: 1.05 // Baseline improvement
+        });
+
+        setDecision(result);
+      } catch (error) {
+        console.error("Erro no Pipeline Quantitativo:", error);
+        toast.error("Erro ao processar análise avançada.");
+      } finally {
+        setIsAnalyzing(false);
+      }
+    }
+
+    runPipeline();
+  }, [selectedLottery, lotteryConfig, draws, stats]);
 
   // Consenso simples: as N dezenas mais quentes (freq / delay baixo).
   const consensus = useMemo(() => {
@@ -51,6 +103,7 @@ export default function ComandoApostadorPage() {
       budget,
     });
   }, [selectedLottery, baseSize, budget]);
+
 
   if (!lotteryConfig) return null;
 
