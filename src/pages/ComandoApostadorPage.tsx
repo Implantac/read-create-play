@@ -134,16 +134,74 @@ export default function ComandoApostadorPage() {
             pick={lotteryConfig.pick}
           />
         </div>
-        <div>
-          <VereditoApostador 
-            lift={1.08} // Exemplo: integrar com stats reais
-            zScore={2.4} 
-            pValue={0.015} 
-            grade="E3"
-            lotteryName={lotteryConfig.name}
-          />
+        <div className="relative">
+          {isAnalyzing ? (
+            <Card className="h-full flex flex-col items-center justify-center p-8 space-y-4 border-primary/20 bg-primary/5 animate-pulse">
+              <Loader2 className="w-10 h-10 text-primary animate-spin" />
+              <div className="text-center">
+                <p className="text-sm font-bold uppercase italic tracking-tighter">Processando Pipeline</p>
+                <p className="text-[10px] text-muted-foreground">Executando 10k Monte Carlo & Stress Test...</p>
+              </div>
+            </Card>
+          ) : decision ? (
+            <div className="space-y-4">
+              <VereditoApostador 
+                lift={decision.evidence.lift} 
+                zScore={decision.evidence.zScore} 
+                pValue={decision.evidence.pValue} 
+                grade={decision.evidence.grade}
+                lotteryName={lotteryConfig.name}
+              />
+              
+              <Card className="glass-card border-primary/20 overflow-hidden">
+                <div className="bg-primary/10 px-3 py-2 border-b border-primary/20 flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase italic tracking-widest text-primary">Indicadores de Confiança</span>
+                  <ShieldCheck className="w-3 h-3 text-primary" />
+                </div>
+                <CardContent className="p-3 space-y-3">
+                  <div className="flex justify-between items-end">
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold">Data Quality</span>
+                    <span className={`text-xs font-mono font-bold ${decision.dataQuality.score > 90 ? 'text-green-500' : 'text-amber-500'}`}>
+                      {decision.dataQuality.score.toFixed(1)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-muted h-1 rounded-full overflow-hidden">
+                    <div className="bg-green-500 h-full transition-all" style={{ width: `${decision.dataQuality.score}%` }} />
+                  </div>
+
+                  <div className="flex justify-between items-end">
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold">Robustez (Stress)</span>
+                    <span className="text-xs font-mono font-bold text-primary">
+                      {decision.robustness.score.toFixed(0)}/100
+                    </span>
+                  </div>
+                  <div className="w-full bg-muted h-1 rounded-full overflow-hidden">
+                    <div className="bg-primary h-full transition-all" style={{ width: `${decision.robustness.score}%` }} />
+                  </div>
+
+                  <div className="pt-2 flex items-center justify-between">
+                    <Badge variant="outline" className="text-[9px] uppercase font-black bg-primary/5">
+                      Edge: {decision.benchmark.lift > 0 ? '+' : ''}{decision.benchmark.lift.toFixed(2)}%
+                    </Badge>
+                    <button 
+                      onClick={() => toast.info("Relatório detalhado em desenvolvimento.")}
+                      className="text-[9px] text-primary hover:underline flex items-center gap-1 font-bold"
+                    >
+                      <InfoIcon className="w-2.5 h-2.5" /> DETALHES
+                    </button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            <Card className="h-full flex flex-col items-center justify-center p-8 space-y-4 border-dashed border-2">
+              <AlertCircle className="w-8 h-8 text-muted-foreground" />
+              <p className="text-xs text-muted-foreground text-center">Aguardando dados suficientes para veredito quantitativo.</p>
+            </Card>
+          )}
         </div>
       </div>
+
 
       <div className="grid lg:grid-cols-2 gap-4">
         <QuickCompareBet
