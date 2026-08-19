@@ -60,7 +60,7 @@ export function HeroSection({
             animate="visible"
             className="space-y-6 md:space-y-10"
           >
-            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[9.5rem] font-black tracking-tighter uppercase italic leading-[0.8] drop-shadow-2xl text-white">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black tracking-tighter uppercase italic leading-[0.9] drop-shadow-2xl text-white break-words">
               {t('landing.hero.title')}
             </h1>
             <p className="text-lg md:text-2xl text-muted-foreground max-w-3xl mx-auto font-medium italic opacity-70 leading-relaxed px-4 md:px-0">

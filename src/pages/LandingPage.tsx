@@ -154,8 +154,8 @@ export default function LandingPage() {
                 className="text-center p-10 rounded-[3rem] glass-card border-white/5 group hover:border-primary/40 transition-all duration-500 shadow-premium hover:shadow-premium-hover relative overflow-hidden"
               >
                 <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                <p className="text-5xl md:text-7xl font-black tracking-tighter italic gradient-brand-text mb-4 drop-shadow-2xl relative z-10">{stat.value}</p>
-                <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60 italic relative z-10">{stat.label}</p>
+                <p className="text-4xl md:text-6xl font-black tracking-tighter italic gradient-brand-text mb-4 drop-shadow-2xl relative z-10">{stat.value}</p>
+                <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-muted-foreground opacity-60 italic relative z-10">{stat.label}</p>
               </motion.div>
             ))}
           </div>
@@ -191,7 +191,7 @@ export default function LandingPage() {
             <div className="inline-flex items-center px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-[0.4em] bg-primary/10 text-primary border border-primary/20 mb-8 italic drop-shadow-md">
               Sincronização em Tempo Real
             </div>
-            <h2 className="text-4xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.8] mb-10 drop-shadow-2xl text-white">
+            <h2 className="text-3xl md:text-6xl font-black tracking-tighter uppercase italic leading-[1] mb-10 drop-shadow-2xl text-white">
               Central <span className="gradient-brand-text drop-shadow-[0_0_20px_rgba(201,168,76,0.3)]">Neural Titan</span>
             </h2>
             <p className="text-muted-foreground max-w-3xl mx-auto font-medium text-xl opacity-70 italic leading-relaxed px-4">

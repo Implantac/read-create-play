@@ -120,7 +120,7 @@ export function AppSidebar() {
                 <span className="text-2xl">{config?.icon || "🍀"}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-primary truncate leading-tight">{config?.name || "Loteria"}</p>
+                <p className="text-xs font-bold text-primary truncate leading-tight">{config?.name || "Loteria"}</p>
                 <div className="flex items-center gap-1.5 mt-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                   <p className="text-[10px] text-muted-foreground font-medium">Ativa</p>
