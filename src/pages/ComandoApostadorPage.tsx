@@ -66,14 +66,25 @@ export default function ComandoApostadorPage() {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-4">
-        <CycleThermometer draws={draws} totalNumbers={lotteryConfig.numbers} />
-        <WinnerProfilePanel
-          draws={draws}
-          lotteryId={selectedLottery}
-          totalNumbers={lotteryConfig.numbers}
-          pick={lotteryConfig.pick}
-        />
+      <div className="grid lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 grid md:grid-cols-2 gap-4">
+          <CycleThermometer draws={draws} totalNumbers={lotteryConfig.numbers} />
+          <WinnerProfilePanel
+            draws={draws}
+            lotteryId={selectedLottery}
+            totalNumbers={lotteryConfig.numbers}
+            pick={lotteryConfig.pick}
+          />
+        </div>
+        <div>
+          <VereditoApostador 
+            lift={1.08} // Exemplo: integrar com stats reais
+            zScore={2.4} 
+            pValue={0.015} 
+            grade="E3"
+            lotteryName={lotteryConfig.name}
+          />
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-4">
