@@ -155,7 +155,8 @@ export function analyzeCombination(
   const numberFrequency = new Map<number, number>();
   const pairFrequency = new Map<string, number>();
 
-  for (const game of games) {
+  const gamesArray = Array.isArray(games) ? games : [];
+  for (const game of gamesArray) {
     for (const n of game) {
       numberFrequency.set(n, (numberFrequency.get(n) || 0) + 1);
     }
@@ -178,10 +179,10 @@ export function analyzeCombination(
   // Average overlap between game pairs
   let totalOverlap = 0;
   let pairCount = 0;
-  for (let i = 0; i < games.length; i++) {
-    const setA = new Set(games[i]);
-    for (let j = i + 1; j < games.length; j++) {
-      const shared = games[j].filter(n => setA.has(n)).length;
+  for (let i = 0; i < gamesArray.length; i++) {
+    const setA = new Set(gamesArray[i]);
+    for (let j = i + 1; j < gamesArray.length; j++) {
+      const shared = (gamesArray[j] || []).filter(n => setA.has(n)).length;
       totalOverlap += shared;
       pairCount++;
     }
