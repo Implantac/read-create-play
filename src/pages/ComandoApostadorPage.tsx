@@ -152,6 +152,7 @@ export default function ComandoApostadorPage() {
                 grade={decision.evidence.grade}
                 lotteryName={lotteryConfig.name}
               />
+
               
               <Card className="glass-card border-primary/20 overflow-hidden">
                 <div className="bg-primary/10 px-3 py-2 border-b border-primary/20 flex items-center justify-between">
