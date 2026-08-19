@@ -10,9 +10,11 @@
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { NumberStats } from "@/engine/stats/statistics";
 import { validateLotteryData, DataQualityReport } from "@/engine/validation/DataQuality";
+import { LeakageDetector } from "@/engine/validation/leakage-detector";
 import { analyzeEvidence, EvidenceReport } from "@/engine/stats/evidence-engine";
 import { BenchmarkEngine, StrategyBenchmarkResult } from "@/engine/stats/benchmark-engine";
 import { StressTestEngine, StressTestResult } from "@/engine/evidence/StressTestEngine";
+import { AblationEngine } from "@/engine/evidence/ablation-engine";
 import { 
   QuantitativeDecisionResult, 
   DecisionVerdict, 
@@ -40,10 +42,19 @@ export class QuantitativeDecisionPipeline {
   static async execute(request: DecisionRequest): Promise<QuantitativeDecisionResult> {
     const { config, draws, generatedGames, historicalPerformance } = request;
 
-    // 1. DATA QUALITY
+    // 1. DATA QUALITY & LEAKAGE
     const quality = validateLotteryData(draws, config.pick, config.numbers);
-    if (!quality.isValid) {
-      throw new Error(`Dados insuficientes ou corrompidos para análise: ${quality.issues.join(", ")}`);
+    
+    // Leakage detection (Phase 2 integration)
+    const hasLeakage = LeakageDetector.detect(
+      (historicalDraws) => generatedGames[0] || [], // Mock model function for leakage check
+      draws,
+      draws.length - 2
+    );
+
+    if (!quality.isValid || hasLeakage) {
+      const reason = hasLeakage ? "Vazamento de dados detectado (Leakage)" : quality.issues.join(", ");
+      throw new Error(`Dados insuficientes ou corrompidos para análise: ${reason}`);
     }
 
     // 2. EVIDENCE & BENCHMARK
@@ -64,7 +75,16 @@ export class QuantitativeDecisionPipeline {
     );
 
 
-    // 4. VERDICT LOGIC
+    // 4. ABLATION ANALYSIS (Indicator Contribution)
+    const ablationResults = await AblationEngine.runAblation(
+      ["Frequência", "Recência", "Atraso", "Tendência", "Ciclos", "Padrões"],
+      config,
+      draws,
+      benchmark.lift / 100 + 1,
+      generatedGames
+    );
+
+    // 5. VERDICT LOGIC
     const verdict = this.calculateVerdict(benchmark, stressResult, request.riskProfile);
 
     // 5. CONSOLIDATE RESULT
@@ -73,7 +93,8 @@ export class QuantitativeDecisionPipeline {
       lotteryId: request.lotteryId,
       dataQuality: {
         score: quality.qualityScore,
-        isValid: quality.isValid
+        isValid: quality.isValid,
+        hasLeakage
       },
       evidence: {
         metric: "Performance Score",
@@ -102,6 +123,14 @@ export class QuantitativeDecisionPipeline {
         score: stressResult.robustnessScore,
         stabilityIndex: stressResult.stabilityIndex,
         verdict: stressResult.verdict
+      },
+      ablation: {
+        indicators: ablationResults.map(a => a.indicator),
+        impacts: ablationResults.map(a => ({
+          indicator: a.indicator,
+          importance: a.relativeImportance,
+          impact: a.liftContribution
+        }))
       },
       verdict
     };
