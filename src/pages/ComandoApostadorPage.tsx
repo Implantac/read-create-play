@@ -26,7 +26,8 @@ import { pickBestMatrix } from "@/engine/closing/autoMatrix";
 import { toast } from "sonner";
 import { QuantitativeDecisionPipeline } from "@/engine/decision/QuantitativeDecisionPipeline";
 import { QuantitativeDecisionResult } from "@/engine/contracts/quant";
-import { UniversalGameGenerator } from "@/ai/generators/universalGameGenerator";
+import { generateGames } from "@/ai/generators/universalGameGenerator";
+
 
 
 export default function ComandoApostadorPage() {
