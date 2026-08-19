@@ -66,66 +66,73 @@ export function LotteryProvider({ children }: { children: ReactNode }) {
   const config = useMemo(() => LOTTERIES.find(l => l.id === selectedLottery) || LOTTERIES[0], [selectedLottery]);
   const { draws, drawsWithPrizes, loading, syncing, lastSyncAt, syncError, count, syncDraws, syncAllLotteries, addDraw } = useLotteryDraws(selectedLottery, dataOrigin);
 
-  
-  // Implement periodic sync (every 5 minutes)
+
+  // Auto-sync: roda uma vez por loteria (com cooldown) e depois a cada 5 min.
+  // Nunca depende de identidades instáveis para não entrar em loop de render.
+  const lastSyncRef = useRef<Record<string, number>>({});
+  const SYNC_COOLDOWN_MS = 30_000;
+
   useEffect(() => {
     if (loading) return;
 
-    // Trigger immediate sync for ALL lotteries on mount to catch up
-    if (draws.length === 0) {
-      console.log(`[AutoSync] Initial global sync`);
-      syncAllLotteries(); // useLotteryDraws syncAllLotteries will now trigger full sync internally if called via this context if needed, but we rely on syncDraws(true) below
-    } else {
-      console.log(`[AutoSync] Initial sync for ${selectedLottery}`);
-      syncDraws(true);
-    }
+    const runSync = () => {
+      const now = Date.now();
+      const last = lastSyncRef.current[selectedLottery] ?? 0;
+      if (now - last < SYNC_COOLDOWN_MS) return;
+      lastSyncRef.current[selectedLottery] = now;
+      void syncDraws(true);
+    };
 
-    const intervalId = setInterval(() => {
-      console.log(`[AutoSync] Triggering background sync for ${selectedLottery}`);
-      syncDraws(true);
-    }, 60 * 1000); // 60 seconds (1 minute) for professional bettors precision
-
+    runSync();
+    const intervalId = setInterval(runSync, 5 * 60 * 1000);
     return () => clearInterval(intervalId);
-  }, [selectedLottery, syncDraws, draws.length, loading]);
+  }, [selectedLottery, loading, syncDraws]);
 
   const { stats, sumData, hotNumbers, coldNumbers, farol, cycle } = useLotteryStats(draws, config, timeRange, customInterval);
 
+  const handleSetSelectedLottery = useCallback((id: string) => setSelectedLottery(id), []);
+
+  const value = useMemo<LotteryContextType>(() => ({
+    selectedLottery,
+    setSelectedLottery: handleSetSelectedLottery,
+    config,
+    draws,
+    drawsWithPrizes,
+    loading,
+    syncing,
+    lastSyncAt,
+    syncError,
+    count,
+    syncDraws,
+    dataOrigin,
+    setDataOrigin,
+    syncAllLotteries,
+    addDraw,
+    stats,
+    sumData,
+    hotNumbers,
+    coldNumbers,
+    farol,
+    cycle,
+    viewMode,
+    setViewMode,
+    timeRange,
+    setTimeRange,
+    customInterval,
+    setCustomInterval,
+  }), [
+    selectedLottery, handleSetSelectedLottery, config, draws, drawsWithPrizes, loading, syncing,
+    lastSyncAt, syncError, count, syncDraws, dataOrigin, setDataOrigin, syncAllLotteries, addDraw,
+    stats, sumData, hotNumbers, coldNumbers, farol, cycle, viewMode, timeRange, customInterval,
+  ]);
+
   return (
-    <LotteryContext.Provider value={{
-      selectedLottery, 
-      setSelectedLottery: useCallback((id: string) => setSelectedLottery(id), []),
-      config, 
-      draws, 
-      drawsWithPrizes, 
-      loading, 
-      syncing, 
-      lastSyncAt,
-      syncError,
-      count, 
-      syncDraws, 
-      dataOrigin,
-      setDataOrigin,
-
-
-      syncAllLotteries, 
-      addDraw, 
-      stats, 
-      sumData,
-      hotNumbers,
-      coldNumbers,
-      farol,
-      cycle,
-      viewMode,
-      setViewMode,
-      timeRange,
-      setTimeRange,
-      customInterval,
-      setCustomInterval
-    }}>
+    <LotteryContext.Provider value={value}>
       {children}
     </LotteryContext.Provider>
   );
 }
+
 
 export function useLotteryContext() {
   const ctx = useContext(LotteryContext);
