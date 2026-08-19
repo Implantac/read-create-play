@@ -36,6 +36,19 @@ export function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }:
               {r.rank === 1 && (
                 <Badge className="text-[9px] bg-primary/10 text-primary border-primary/20 font-bold">CAMPEÃ</Badge>
               )}
+              {r.metrics.evidenceGrade && (
+                <Badge 
+                  variant="outline" 
+                  className={`text-[9px] font-bold ${
+                    r.metrics.evidenceGrade === 'E4' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-500' :
+                    r.metrics.evidenceGrade === 'E3' ? 'bg-blue-500/10 border-blue-500 text-blue-500' :
+                    r.metrics.evidenceGrade === 'E2' ? 'bg-amber-500/10 border-amber-500 text-amber-500' :
+                    'bg-muted border-muted-foreground/30 text-muted-foreground'
+                  }`}
+                >
+                  GRAU {r.metrics.evidenceGrade}
+                </Badge>
+              )}
               {r.metrics.consistency > 0.7 && (
                 <Badge variant="outline" className="text-[9px] border-green-500/30 text-green-500 bg-green-500/5">
                   ✓ Confiável
@@ -46,7 +59,7 @@ export function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }:
                   r.stressResult.robustnessScore > 60 ? 'border-emerald-500/30 text-emerald-500 bg-emerald-500/5' : 'border-amber-500/30 text-amber-500 bg-amber-500/5'
                 }`}>
                   {r.stressResult.robustnessScore > 60 ? <ShieldCheck className="w-2.5 h-2.5" /> : <ShieldAlert className="w-2.5 h-2.5" />}
-                  {r.stressResult.verdict.toUpperCase()}
+                  {r.stressResult.verdict.toUpperCase()} ({r.stressResult.robustnessScore.toFixed(0)}%)
                 </Badge>
               )}
             </div>
@@ -87,7 +100,12 @@ export function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }:
               exit={{ height: 0, opacity: 0 }}
               className="mt-4 pt-4 border-t border-border space-y-3 overflow-hidden"
             >
-              <p className="text-xs text-muted-foreground leading-relaxed">{r.explanation}</p>
+              <div className="flex flex-col gap-1">
+                <p className="text-xs text-muted-foreground leading-relaxed">{r.explanation}</p>
+                {r.metrics.evidenceExplanation && (
+                  <p className="text-[10px] text-primary/70 italic font-medium">Verdict: {r.metrics.evidenceExplanation}</p>
+                )}
+              </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <MiniMetric label="Diversidade" value={`${r.metrics.diversityScore.toFixed(0)}%`} />
                 <MiniMetric label="Cobertura" value={`${r.metrics.coverageScore.toFixed(0)}%`} />
