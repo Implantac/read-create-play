@@ -45,8 +45,14 @@ export interface QuantitativeDecisionResult {
     score: number;
     isValid: boolean;
   };
-  evidence: EvidenceResult & { grade: EvidenceGrade; explanation: string };
+  evidence: EvidenceResult & { 
+    grade: EvidenceGrade; 
+    explanation: string;
+    lift: number;
+    zScore: number;
+  };
   benchmark: {
+
     lift: number;
     zScore: number;
     pValue: number;
