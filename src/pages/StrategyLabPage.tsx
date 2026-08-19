@@ -42,7 +42,7 @@ import {
 import { QuantMasterOrchestrator } from "@/engine/core/QuantMasterOrchestrator";
 import { PortfolioOutput } from "@/engine/portfolio/PortfolioEngine";
 import { StrategyBenchmarkResult } from "@/engine/stats/benchmark-engine";
-
+import { AblationEngine, AblationImpact } from "@/engine/evidence/ablation-engine";
 import { EvidenceEngine } from "@/engine/evidence/EvidenceEngine";
 import { runFrequencyTrendScore } from "@/engine/ai/ml-models";
 
@@ -84,7 +84,7 @@ export default function StrategyLabPage() {
   const [configOpen, setConfigOpen] = useState(true);
   const [customDrawRange, setCustomDrawRange] = useState<[number, number] | null>(null);
   const [enableShuffledBacktest, setEnableShuffledBacktest] = useState(true);
-  const [ablationResults, setAblationResults] = useState<any[]>([]);
+  const [ablationResults, setAblationResults] = useState<AblationImpact[]>([]);
   const [runningAblation, setRunningAblation] = useState(false);
   const [monteCarloIterations, setMonteCarloIterations] = useState<number>(100000);
   const [portfolioResult, setPortfolioResult] = useState<(PortfolioOutput & { benchmark?: StrategyBenchmarkResult }) | null>(null);
@@ -260,6 +260,31 @@ export default function StrategyLabPage() {
       setOptimizingPortfolio(false);
     }
   }, [result, draws, config, gamesPerStrategy, riskProfile, stats]);
+
+  const runAblationAnalysis = useCallback(async () => {
+    if (!result || !draws) return;
+    setRunningAblation(true);
+    try {
+      const indicators = ["Frequência", "Recência", "Atraso", "Tendência", "Ciclos", "Correlação", "Entropia"];
+      const bestStrategy = result.rankings[0];
+      const allGames = result.generatedGames.flatMap(sg => sg.games);
+      
+      const impacts = await AblationEngine.runAblation(
+        indicators,
+        config,
+        draws,
+        bestStrategy.metrics.globalScore / 10,
+        allGames
+      );
+      setAblationResults(impacts);
+      toast.success("Análise de ablação concluída!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro na análise de ablação");
+    } finally {
+      setRunningAblation(false);
+    }
+  }, [result, draws, config]);
 
   const handleExportCSV = useCallback(() => {
     if (rankedGames.length === 0) return;
