@@ -53,13 +53,15 @@ export class QuantMasterOrchestrator {
     indicators: string[],
     lotteryConfig: LotteryConfig,
     draws: DrawResult[],
-    performance: number
+    performance: number,
+    games: number[][]
   ): Promise<{ ablation: AblationImpact[] }> {
     const ablation = await AblationEngine.runAblation(
       indicators,
       lotteryConfig,
       draws,
-      performance
+      performance,
+      games
     );
 
     return { ablation };
