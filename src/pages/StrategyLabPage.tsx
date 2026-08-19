@@ -233,17 +233,23 @@ export default function StrategyLabPage() {
     setOptimizingPortfolio(true);
     try {
       const allGames = result.generatedGames.flatMap(sg => sg.games);
+      
+      // Obtemos a média histórica da melhor estratégia para o benchmark
+      const bestRank = result.rankings[0];
+      const historicalAvg = bestRank?.metrics.avgHits || 0;
+
       const portfolio = await QuantMasterOrchestrator.prepareProfessionalPortfolio(
         {
           lotteryId: config.id,
           candidateGames: allGames,
-          budget: 100, // Exemplo
+          budget: 100,
           gameCost: LOTTERY_BET_COST[config.id] || 3.5,
           targetGamesCount: gamesPerStrategy,
           riskProfile: riskProfile
         },
         stats,
-        draws
+        draws,
+        historicalAvg
       );
       setPortfolioResult(portfolio);
       toast.success("Portfólio quantitativo otimizado com sucesso!");
