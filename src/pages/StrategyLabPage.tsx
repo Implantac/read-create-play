@@ -36,7 +36,7 @@ import {
   Settings2,
   Activity, CircleDot, Brain, FileDown, RefreshCw,
   Microscope, Database, Binary, Search, Wallet,
-  ShieldCheck, ArrowRightLeft, Percent, Scale
+  ShieldCheck, ArrowRightLeft, Percent, Scale, ShieldAlert
 } from "lucide-react";
 
 import { QuantMasterOrchestrator } from "@/engine/core/QuantMasterOrchestrator";
