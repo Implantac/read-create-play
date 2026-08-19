@@ -15,13 +15,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Command, Trophy, Wallet, Target, TrendingUp, Info as InfoIcon, Loader2, ShieldCheck, AlertCircle } from "lucide-react";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { Command, Trophy, Wallet, Target, TrendingUp, Info as InfoIcon, Loader2, ShieldCheck, AlertCircle, Search } from "lucide-react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { CycleThermometer } from "@/components/lottery/analysis/CycleThermometer";
 import { WinnerProfilePanel } from "@/components/lottery/analysis/WinnerProfilePanel";
 import { QuickCompareBet } from "@/components/lottery/QuickCompareBet";
 import { EnginePerformancePanel } from "@/components/dashboards/EnginePerformancePanel";
 import { VereditoApostador } from "@/components/lab/VereditoApostador";
+import { DecisionAuditDialog } from "@/components/lab/DecisionAuditDialog";
 import { pickBestMatrix } from "@/engine/closing/autoMatrix";
 import { toast } from "sonner";
 import { QuantitativeDecisionPipeline } from "@/engine/decision/QuantitativeDecisionPipeline";
@@ -184,12 +186,16 @@ export default function ComandoApostadorPage() {
                     <Badge variant="outline" className="text-[9px] uppercase font-black bg-primary/5">
                       Edge: {decision.benchmark.lift > 0 ? '+' : ''}{decision.benchmark.lift.toFixed(2)}%
                     </Badge>
-                    <button 
-                      onClick={() => toast.info("Relatório detalhado em desenvolvimento.")}
-                      className="text-[9px] text-primary hover:underline flex items-center gap-1 font-bold"
-                    >
-                      <InfoIcon className="w-2.5 h-2.5" /> DETALHES
-                    </button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <button 
+                          className="text-[9px] text-primary hover:underline flex items-center gap-1 font-bold"
+                        >
+                          <Search className="w-2.5 h-2.5" /> AUDITAR DECISÃO
+                        </button>
+                      </DialogTrigger>
+                      <DecisionAuditDialog decision={decision} lotteryName={lotteryConfig.name} />
+                    </Dialog>
                   </div>
                 </CardContent>
               </Card>
