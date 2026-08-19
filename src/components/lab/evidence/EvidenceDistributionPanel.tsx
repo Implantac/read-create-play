@@ -123,11 +123,11 @@ export function EvidenceDistributionPanel({ rankings, onIterationsChange, curren
               <div className="space-y-2">
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
                   {isSignificant 
-                    ? `Este gráfico mostra a distribuição de performance de 1.000 simulações aleatórias. O desempenho real (${topStrategy.metrics.lift.toFixed(2)}x) está fora da zona de ruído.`
-                    : "ALERTA: O desempenho observado está DENTRO da zona de ruído aleatório. Não existe evidência estatística suficiente para validar este sinal."}
+                    ? `VALOR P: Este gráfico confirma que a performance real (${topStrategy.metrics.lift.toFixed(2)}x) está fora da zona de ruído aleatório. O sinal possui significância estatística validada.`
+                    : "ALERTA CRÍTICO: O desempenho observado está DENTRO da zona de ruído aleatório. Não existe evidência estatística suficiente para validar este sinal (Hipótese Nula não rejeitada)."}
                 </p>
                 <p className="text-[10px] text-amber-500/80 italic">
-                  Nota: Desempenho histórico não é garantia de resultados futuros. A variância aleatória pode simular ganhos temporários sem vantagem real.
+                  DISCLAIMER: Performance histórica não é garantia de resultados futuros. A variância aleatória pode simular ganhos temporários sem vantagem matemática real.
                 </p>
               </div>
             </div>
@@ -280,8 +280,8 @@ export function EvidenceDistributionPanel({ rankings, onIterationsChange, curren
               </div>
               <span className="text-[10px] text-center opacity-70 leading-tight">
                 {isSignificant 
-                  ? `A performance observada (${topStrategy.metrics.lift.toFixed(2)}x) supera a variância simulada com alta confiança.`
-                  : "A performance observada está dentro da variância esperada para seleções aleatórias. RISCO DE OVERFITTING."}
+                  ? `ANÁLISE: A performance (${topStrategy.metrics.lift.toFixed(2)}x) supera a variância simulada em 100k iterações com alta confiança. Sinal validado contra o acaso.`
+                  : "ANÁLISE: A performance está dentro da variância esperada para seleções aleatórias. ALTO RISCO DE OVERFITTING E RUÍDO."}
               </span>
             </div>
           </CardContent>
