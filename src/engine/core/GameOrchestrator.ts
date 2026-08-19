@@ -33,7 +33,9 @@ export class GameOrchestrator {
    * Útil para garantir diversidade na carteira.
    */
   static calculateHammingDistance(gameA: number[], gameB: number[]): number {
-    return GameSimilarityEngine.calculateHammingDistance(gameA, gameB);
+    const setA = new Set(gameA);
+    const overlap = gameB.filter(n => setA.has(n)).length;
+    return gameA.length - overlap;
   }
 
   /**
