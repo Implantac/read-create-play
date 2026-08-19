@@ -30,12 +30,12 @@ export class LotofacilEngine {
     
     // 1. Frame vs Center (Ideal 10:5 ou 9:6)
     const frameCount = game.filter(n => this.FRAME_NUMBERS.has(n)).length;
-    if (frameCount === 10 || frameCount === 9) score += 25;
+    if (frameCount === 10 || frameCount === 9) score += 30; // Reforçado para alinhar com StructureAnalyzer
     else if (frameCount === 11 || frameCount === 8) score += 15;
     
     // 2. Repetição do Anterior (Ideal 8-10)
     const repeats = game.filter(n => lastDraw.includes(n)).length;
-    if (repeats >= 8 && repeats <= 10) score += 25;
+    if (repeats >= 8 && repeats <= 10) score += 30; // Reforçado
     else if (repeats === 7 || repeats === 11) score += 15;
     
     // 3. Paridade (Ideal 7:8 ou 8:7)
@@ -59,13 +59,16 @@ export class LotofacilEngine {
    * Verifica se o jogo atende aos critérios mínimos de "Integridade Matemática".
    */
   static validateIntegrity(game: number[]): boolean {
-    if (game.length !== 15) return false;
+    if (game.length < 15 || game.length > 20) return false;
     
     const sum = game.reduce((a, b) => a + b, 0);
-    if (sum < 120 || sum > 270) return false; // Filtro extremo de soma
+    // Filtro de integridade absoluta para Lotofácil (15-20 dezenas)
+    if (sum < 120 || sum > 350) return false;
     
     const evens = game.filter(n => n % 2 === 0).length;
-    if (evens < 4 || evens > 11) return false; // Filtro extremo de paridade
+    const minEvens = Math.floor(game.length * 0.3);
+    const maxEvens = Math.ceil(game.length * 0.7);
+    if (evens < minEvens || evens > maxEvens) return false;
     
     return true;
   }

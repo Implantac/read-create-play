@@ -8,8 +8,8 @@ export class MegaSenaEngine {
     if (game.length < 6 || game.length > 15) return false;
     const sum = game.reduce((a, b) => a + b, 0);
     // Mega-Sena range 1-60. 6 numbers.
-    // Min sum: 1+2+3+4+5+6 = 21. Max: 55+56+57+58+59+60 = 345.
-    if (sum < 21 || sum > 345) return false;
+    // Min sum: 21. Max sum for 15 numbers: 765.
+    if (sum < 21 || sum > 765) return false;
     return true;
   }
 
@@ -46,8 +46,8 @@ export class QuinaEngine {
   static validateIntegrity(game: number[]): boolean {
     if (game.length < 5 || game.length > 15) return false;
     const sum = game.reduce((a, b) => a + b, 0);
-    // Quina 1-80. Min: 1+2+3+4+5 = 15. Max: 76+77+78+79+80 = 390.
-    if (sum < 15 || sum > 390) return false;
+    // Quina 1-80. Min: 15. Max sum for 15 numbers: 1100.
+    if (sum < 15 || sum > 1100) return false;
     return true;
   }
 
@@ -101,10 +101,20 @@ export class LotomaniaEngine {
 
 /**
  * Motor Quantitativo Especializado para Dupla Sena.
+ * Regras: 50 números no universo (1-50), aposta de 6 a 15 dezenas.
  */
 export class DuplaSenaEngine {
   static validateIntegrity(game: number[]): boolean {
-    return game.length >= 6 && game.length <= 15;
+    if (game.length < 6 || game.length > 15) return false;
+    const sum = game.reduce((a, b) => a + b, 0);
+    if (sum < 21 || sum > 650) return false;
+    return true;
+  }
+
+  static analyze(game: number[]) {
+    const evens = game.filter(n => n % 2 === 0).length;
+    const sum = game.reduce((a, b) => a + b, 0);
+    return { parity: `${game.length - evens}I:${evens}P`, sum };
   }
 
   static compareSorteios(game: number[], s1: number[], s2: number[]) {
@@ -135,6 +145,16 @@ export class TimemaniaEngine {
 export class DiaDeSorteEngine {
   static validateIntegrity(game: number[]): boolean {
     return game.length >= 7 && game.length <= 15;
+  }
+
+  static analyze(game: number[]) {
+    const months = new Set([
+      "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+      "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+    ]);
+    const evens = game.filter(n => n % 2 === 0).length;
+    const sum = game.reduce((a, b) => a + b, 0);
+    return { parity: `${game.length - evens}I:${evens}P`, sum };
   }
 }
 
