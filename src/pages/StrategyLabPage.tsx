@@ -35,8 +35,13 @@ import {
   Star, Hash, Dices,
   Settings2,
   Activity, CircleDot, Brain, FileDown, RefreshCw,
-  Microscope, Database, Binary, Search
+  Microscope, Database, Binary, Search, Wallet,
+  ShieldCheck, ArrowRightLeft, Percent, Scale
 } from "lucide-react";
+
+import { QuantMasterOrchestrator } from "@/engine/core/QuantMasterOrchestrator";
+import { PortfolioOutput } from "@/engine/portfolio/PortfolioEngine";
+import { StrategyBenchmarkResult } from "@/engine/stats/benchmark-engine";
 
 import { EvidenceEngine } from "@/engine/evidence/EvidenceEngine";
 import { runFrequencyTrendScore } from "@/engine/ai/ml-models";
@@ -82,6 +87,9 @@ export default function StrategyLabPage() {
   const [ablationResults, setAblationResults] = useState<any[]>([]);
   const [runningAblation, setRunningAblation] = useState(false);
   const [monteCarloIterations, setMonteCarloIterations] = useState<number>(100000);
+  const [portfolioResult, setPortfolioResult] = useState<(PortfolioOutput & { benchmark?: StrategyBenchmarkResult }) | null>(null);
+  const [optimizingPortfolio, setOptimizingPortfolio] = useState(false);
+  const [riskProfile, setRiskProfile] = useState<'CONSERVADOR' | 'EQUILIBRADO' | 'AGRESSIVO'>('EQUILIBRADO');
 
 
 
@@ -219,6 +227,33 @@ export default function StrategyLabPage() {
       setRunning(false);
     }, 200);
   }, [draws, config, selectedStrategies, gamesPerStrategy, drawRange, profile]);
+
+  const runQuantPortfolio = useCallback(async () => {
+    if (!result || !draws) return;
+    setOptimizingPortfolio(true);
+    try {
+      const allGames = result.generatedGames.flatMap(sg => sg.games);
+      const portfolio = await QuantMasterOrchestrator.prepareProfessionalPortfolio(
+        {
+          lotteryId: config.id,
+          candidateGames: allGames,
+          budget: 100, // Exemplo
+          gameCost: LOTTERY_BET_COST[config.id] || 3.5,
+          targetGamesCount: gamesPerStrategy,
+          riskProfile: riskProfile
+        },
+        stats,
+        draws
+      );
+      setPortfolioResult(portfolio);
+      toast.success("Portfólio quantitativo otimizado com sucesso!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao otimizar portfólio");
+    } finally {
+      setOptimizingPortfolio(false);
+    }
+  }, [result, draws, config, gamesPerStrategy, riskProfile, stats]);
 
   const handleExportCSV = useCallback(() => {
     if (rankedGames.length === 0) return;
@@ -695,15 +730,20 @@ export default function StrategyLabPage() {
               {/* Main Tabs */}
               <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <div className="overflow-x-auto -mx-1 px-1 scrollbar-thin">
-                  <TabsList className="inline-flex w-full min-w-[700px] sm:min-w-0 sm:grid sm:grid-cols-10 h-11">
-                    <TabsTrigger value="evidence" className="text-xs gap-1 data-[state=active]:shadow-sm">
-                      <Microscope className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Evidência</span>
+                  <TabsList className="inline-flex w-full min-w-[900px] sm:min-w-0 sm:grid sm:grid-cols-11 h-11">
+                    <TabsTrigger value="ranking" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all">Ranking</TabsTrigger>
+                    <TabsTrigger value="backtest" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all">Backtest</TabsTrigger>
+                    <TabsTrigger value="portfolio" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all flex items-center gap-1.5">
+                      <Wallet className="w-3 h-3" /> Carteira
                     </TabsTrigger>
-                    <TabsTrigger value="hypotheses" className="text-xs gap-1 data-[state=active]:shadow-sm">
-                      <Search className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Hipóteses</span>
-                    </TabsTrigger>
+                    <TabsTrigger value="evidence" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all">Evidência</TabsTrigger>
+                    <TabsTrigger value="hypotheses" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all">Hipóteses</TabsTrigger>
+                    <TabsTrigger value="ablation" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all">Ablação</TabsTrigger>
+                    <TabsTrigger value="charts" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all">Gráficos</TabsTrigger>
+                    <TabsTrigger value="suggestions" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all">Sugestões</TabsTrigger>
+                    <TabsTrigger value="bestgames" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all">Melhores</TabsTrigger>
+                    <TabsTrigger value="allgames" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all">Gerados</TabsTrigger>
+                    <TabsTrigger value="comparison" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all">Comparar</TabsTrigger>
                     <TabsTrigger value="backtest" className="text-xs gap-1 data-[state=active]:shadow-sm">
                       <FlaskConical className="w-3.5 h-3.5" />
                       <span className="hidden sm:inline">Backtest</span>
@@ -1103,6 +1143,7 @@ export default function StrategyLabPage() {
                   )}
                 </TabsContent>
 
+
                 {/* Evolution Suggestions Tab */}
                 <TabsContent value="suggestions" className="space-y-2.5 mt-4">
                   {result.suggestions.length === 0 ? (
@@ -1195,6 +1236,158 @@ export default function StrategyLabPage() {
                     />
                   </div>
                   <ComparisonTablePanel rankings={result.rankings} pick={config.pick} />
+                </TabsContent>
+                <TabsContent value="portfolio" className="space-y-6 mt-4">
+                  <div className="flex justify-between items-center bg-card/40 p-6 rounded-[2rem] border border-border/50 backdrop-blur-xl">
+                    <div className="space-y-1">
+                      <h3 className="text-xl font-black italic uppercase tracking-tighter">Otimizador de Portfólio Quantitativo</h3>
+                      <p className="text-xs text-muted-foreground italic">Maximiza diversidade e minimiza correlação entre jogos baseada na distância de Hamming.</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Select value={riskProfile} onValueChange={(v: any) => setRiskProfile(v)}>
+                        <SelectTrigger className="w-40 bg-background/50 border-white/5 rounded-xl h-10">
+                          <SelectValue placeholder="Perfil de Risco" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="CONSERVADOR">Conservador</SelectItem>
+                          <SelectItem value="EQUILIBRADO">Equilibrado</SelectItem>
+                          <SelectItem value="AGRESSIVO">Agressivo</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button 
+                        onClick={runQuantPortfolio} 
+                        disabled={!result || optimizingPortfolio}
+                        className="rounded-xl gradient-brand font-black uppercase italic tracking-widest text-[10px] h-10 gap-2 px-6"
+                      >
+                        {optimizingPortfolio ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Layers className="w-3 h-3" />}
+                        Otimizar Carteira
+                      </Button>
+                    </div>
+                  </div>
+
+                  {portfolioResult && (
+                    <div className="grid lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                      <Card className="bg-card/80 border-border/50 rounded-[2rem] overflow-hidden">
+                        <CardHeader className="pb-2 border-b border-border/10">
+                          <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2 italic">
+                            <Scale className="w-3.5 h-3.5 text-primary" /> Métricas do Portfólio
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-6 space-y-6">
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-[10px] uppercase font-black italic tracking-widest text-muted-foreground">
+                              <span>Diversidade</span>
+                              <span className="text-foreground">{portfolioResult.diversityScore.toFixed(1)}%</span>
+                            </div>
+                            <Progress value={portfolioResult.diversityScore} className="h-1.5" />
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-[10px] uppercase font-black italic tracking-widest text-muted-foreground">
+                              <span>Cobertura</span>
+                              <span className="text-foreground">{portfolioResult.coverageScore.toFixed(1)}%</span>
+                            </div>
+                            <Progress value={portfolioResult.coverageScore} className="h-1.5" />
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-[10px] uppercase font-black italic tracking-widest text-muted-foreground">
+                              <span>Concentração</span>
+                              <span className="text-foreground text-amber-500">{portfolioResult.concentrationScore.toFixed(1)}%</span>
+                            </div>
+                            <Progress value={portfolioResult.concentrationScore} className="h-1.5 bg-muted/20" />
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="lg:col-span-2 bg-card/80 border-border/50 rounded-[2rem] overflow-hidden">
+                        <CardHeader className="pb-2 border-b border-border/10 flex flex-row items-center justify-between">
+                          <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2 italic">
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" /> Veredito de Significância
+                          </CardTitle>
+                          {portfolioResult.benchmark && (
+                            <Badge variant={portfolioResult.benchmark.isStatisticallySignificant ? "default" : "secondary"} className="text-[9px] font-black italic tracking-tighter rounded-full px-3 py-1 bg-emerald-500/10 text-emerald-500 border-emerald-500/20">
+                              {portfolioResult.benchmark.isStatisticallySignificant ? "SINAL VALIDADO" : "RUÍDO DETECTADO"}
+                            </Badge>
+                          )}
+                        </CardHeader>
+                        <CardContent className="p-6">
+                          {portfolioResult.benchmark ? (
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                              <div className="p-4 rounded-2xl bg-muted/20 border border-white/5 space-y-1">
+                                <p className="text-[9px] uppercase font-black text-muted-foreground italic">P-Value</p>
+                                <p className={`text-xl font-black font-mono ${portfolioResult.benchmark.pValue < 0.05 ? 'text-emerald-500' : 'text-amber-500'}`}>
+                                  {portfolioResult.benchmark.pValue.toFixed(4)}
+                                </p>
+                              </div>
+                              <div className="p-4 rounded-2xl bg-muted/20 border border-white/5 space-y-1">
+                                <p className="text-[9px] uppercase font-black text-muted-foreground italic">Z-Score</p>
+                                <p className="text-xl font-black font-mono text-primary">
+                                  {portfolioResult.benchmark.zScore.toFixed(2)}
+                                </p>
+                              </div>
+                              <div className="p-4 rounded-2xl bg-muted/20 border border-white/5 space-y-1">
+                                <p className="text-[9px] uppercase font-black text-muted-foreground italic">Lift Final</p>
+                                <p className="text-xl font-black font-mono text-emerald-500">
+                                  {portfolioResult.benchmark.lift.toFixed(2)}x
+                                </p>
+                              </div>
+                              <div className="p-4 rounded-2xl bg-muted/20 border border-white/5 space-y-1">
+                                <p className="text-[9px] uppercase font-black text-muted-foreground italic">Vantagem Titan</p>
+                                <p className="text-xl font-black font-mono text-foreground">
+                                  {portfolioResult.benchmark.advantage > 0 ? "+" : ""}{portfolioResult.benchmark.advantage.toFixed(3)}
+                                </p>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="h-24 flex items-center justify-center text-xs text-muted-foreground italic">
+                              Benchmark pendente...
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+
+                      <Card className="lg:col-span-3 bg-card/80 border-border/50 rounded-[2rem] overflow-hidden">
+                         <CardHeader className="pb-2 border-b border-border/10">
+                          <CardTitle className="text-xs font-black uppercase tracking-widest flex items-center gap-2 italic">
+                            <Layers className="w-3.5 h-3.5 text-primary" /> Jogos Otimizados na Carteira ({portfolioResult.selectedGames.length})
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                          <div className="max-h-[400px] overflow-y-auto">
+                            <table className="w-full text-left border-collapse">
+                              <thead className="sticky top-0 bg-background/95 backdrop-blur-md z-10">
+                                <tr className="border-b border-white/5">
+                                  <th className="px-6 py-4 text-[9px] font-black uppercase tracking-widest text-muted-foreground italic">#</th>
+                                  <th className="px-6 py-4 text-[9px] font-black uppercase tracking-widest text-muted-foreground italic">Combinação</th>
+                                  <th className="px-6 py-4 text-[9px] font-black uppercase tracking-widest text-muted-foreground italic text-right">Ação</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {portfolioResult.selectedGames.map((game, idx) => (
+                                  <tr key={idx} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
+                                    <td className="px-6 py-4 text-[10px] font-mono text-muted-foreground">{idx + 1}</td>
+                                    <td className="px-6 py-4">
+                                      <div className="flex flex-wrap gap-1.5">
+                                        {game.map((num, nidx) => (
+                                          <span key={nidx} className="w-7 h-7 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-[10px] font-black text-primary italic shadow-inner">
+                                            {num.toString().padStart(2, '0')}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                      <Button variant="ghost" size="sm" className="rounded-lg h-8 text-[9px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity italic">
+                                        Fixar
+                                      </Button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  )}
                 </TabsContent>
               </Tabs>
             </motion.div>
