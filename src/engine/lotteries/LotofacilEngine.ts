@@ -57,19 +57,25 @@ export class LotofacilEngine {
 
   /**
    * Verifica se o jogo atende aos critérios mínimos de "Integridade Matemática".
+   * Implementação rigorosa da Fase 1 do Plano Mestre.
    */
   static validateIntegrity(game: number[]): boolean {
+    // 1. Limite de dezenas permitido pela Caixa (15 a 20)
     if (game.length < 15 || game.length > 20) return false;
     
+    // 2. Filtro de Soma (120-350 para 15-20 dezenas)
     const sum = game.reduce((a, b) => a + b, 0);
-    // Filtro de integridade absoluta para Lotofácil (15-20 dezenas)
     if (sum < 120 || sum > 350) return false;
     
+    // 3. Filtro de Paridade (mínimo 30% e máximo 70% de pares)
     const evens = game.filter(n => n % 2 === 0).length;
     const minEvens = Math.floor(game.length * 0.3);
     const maxEvens = Math.ceil(game.length * 0.7);
     if (evens < minEvens || evens > maxEvens) return false;
     
+    // 4. Verificação de Duplicatas (Set implícita na geração, mas checagem de segurança)
+    if (new Set(game).size !== game.length) return false;
+
     return true;
   }
 }

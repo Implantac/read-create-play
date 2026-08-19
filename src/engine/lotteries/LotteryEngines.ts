@@ -7,9 +7,11 @@ export class MegaSenaEngine {
   static validateIntegrity(game: number[]): boolean {
     if (game.length < 6 || game.length > 15) return false;
     const sum = game.reduce((a, b) => a + b, 0);
-    // Mega-Sena range 1-60. 6 numbers.
-    // Min sum: 21. Max sum for 15 numbers: 765.
-    if (sum < 21 || sum > 765) return false;
+    // Mega-Sena range 1-60. 6-20 numbers.
+    const sum = game.reduce((a, b) => a + b, 0);
+    if (sum < 21 || sum > 1000) return false;
+    const evens = game.filter(n => n % 2 === 0).length;
+    if (evens < 1 || evens > game.length - 1) return false; // Evita all-even/all-odd extremo
     return true;
   }
 
@@ -47,7 +49,10 @@ export class QuinaEngine {
     if (game.length < 5 || game.length > 15) return false;
     const sum = game.reduce((a, b) => a + b, 0);
     // Quina 1-80. Min: 15. Max sum for 15 numbers: 1100.
+    const sum = game.reduce((a, b) => a + b, 0);
     if (sum < 15 || sum > 1100) return false;
+    const evens = game.filter(n => n % 2 === 0).length;
+    if (evens < 1 || evens > game.length - 1) return false;
     return true;
   }
 
@@ -144,7 +149,10 @@ export class TimemaniaEngine {
  */
 export class DiaDeSorteEngine {
   static validateIntegrity(game: number[]): boolean {
-    return game.length >= 7 && game.length <= 15;
+    if (game.length < 7 || game.length > 15) return false;
+    const sum = game.reduce((a, b) => a + b, 0);
+    if (sum < 28 || sum > 450) return false;
+    return true;
   }
 
   static analyze(game: number[]) {

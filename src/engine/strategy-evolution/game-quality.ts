@@ -30,6 +30,10 @@ export interface CombinationAnalysis {
   avgOverlap: number;     // avg shared numbers between any 2 games
 }
 
+/**
+ * ScoreGame — Fase 4 do Plano Mestre.
+ * Calcula métricas de qualidade para cada jogo gerado com pesos calibrados.
+ */
 export function scoreGame(
   game: number[],
   config: LotteryConfig,
@@ -98,12 +102,13 @@ export function scoreGame(
     }
   }
 
+  // Pesos recalibrados conforme Plano Mestre (Qualidade vs Variância)
   const overallScore = Math.min(100,
-    parityBalance * 0.20 +
-    rangeBalance * 0.22 +
-    sumScore * 0.18 +
-    consecutiveScore * 0.15 +
-    frequencyScore * 0.15 +
+    parityBalance * 0.18 +
+    rangeBalance * 0.20 +
+    sumScore * 0.15 +
+    consecutiveScore * 0.12 +
+    frequencyScore * 0.25 + // Aumentado peso de frequência
     gapScore * 0.10
   );
 
