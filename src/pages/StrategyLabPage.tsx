@@ -296,15 +296,31 @@ export default function StrategyLabPage() {
       const bestStrategy = result.rankings[0];
       const engine = new StressTestEngine(draws, config);
       
-      // Criamos uma função de modelo fake que retorna os números da melhor estratégia
-      // para o motor de estresse testar contra janelas diferentes.
       const modelFn = () => bestStrategy.metrics.hitDistribution ? Object.keys(bestStrategy.metrics.hitDistribution).map(Number) : [];
 
       const stress = await engine.runStressTest(
         modelFn as any, 
         { windowSize: 50, testSize: 30, mode: 'rolling' }
       );
+      
       setStressResult(stress);
+      
+      // Update the best strategy in the result with the stress result
+      setResult(prev => {
+        if (!prev) return null;
+        const newRankings = [...prev.rankings];
+        if (newRankings[0]) {
+          newRankings[0] = {
+            ...newRankings[0],
+            stressResult: {
+              robustnessScore: stress.robustnessScore,
+              verdict: stress.verdict
+            }
+          };
+        }
+        return { ...prev, rankings: newRankings };
+      });
+
       toast.success("Teste de estresse concluído!");
     } catch (err) {
       console.error(err);
