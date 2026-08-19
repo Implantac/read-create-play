@@ -44,6 +44,7 @@ import { PortfolioOutput } from "@/engine/portfolio/PortfolioEngine";
 import { StrategyBenchmarkResult } from "@/engine/stats/benchmark-engine";
 import { AblationEngine, AblationImpact } from "@/engine/evidence/ablation-engine";
 import { EvidenceEngine } from "@/engine/evidence/EvidenceEngine";
+import { StressTestEngine, StressTestResult } from "@/engine/evidence/StressTestEngine";
 import { runFrequencyTrendScore } from "@/engine/ai/ml-models";
 
 import { generateRandomGames } from "@/engine/stats/baseline-benchmark";
@@ -90,6 +91,8 @@ export default function StrategyLabPage() {
   const [portfolioResult, setPortfolioResult] = useState<(PortfolioOutput & { benchmark?: StrategyBenchmarkResult }) | null>(null);
   const [optimizingPortfolio, setOptimizingPortfolio] = useState(false);
   const [riskProfile, setRiskProfile] = useState<'CONSERVADOR' | 'EQUILIBRADO' | 'AGRESSIVO'>('EQUILIBRADO');
+  const [stressResult, setStressResult] = useState<StressTestResult | null>(null);
+  const [runningStress, setRunningStress] = useState(false);
 
 
 
@@ -283,6 +286,31 @@ export default function StrategyLabPage() {
       toast.error("Erro na análise de ablação");
     } finally {
       setRunningAblation(false);
+    }
+  }, [result, draws, config]);
+
+  const runStressTest = useCallback(async () => {
+    if (!result || !draws || result.rankings.length === 0) return;
+    setRunningStress(true);
+    try {
+      const bestStrategy = result.rankings[0];
+      const engine = new StressTestEngine(draws, config);
+      
+      // Criamos uma função de modelo fake que retorna os números da melhor estratégia
+      // para o motor de estresse testar contra janelas diferentes.
+      const modelFn = () => bestStrategy.metrics.hitDistribution ? Object.keys(bestStrategy.metrics.hitDistribution).map(Number) : [];
+
+      const stress = await engine.runStressTest(
+        modelFn as any, 
+        { windowSize: 50, testSize: 30, mode: 'rolling' }
+      );
+      setStressResult(stress);
+      toast.success("Teste de estresse concluído!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro no teste de estresse");
+    } finally {
+      setRunningStress(false);
     }
   }, [result, draws, config]);
 
