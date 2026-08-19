@@ -1,5 +1,6 @@
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
-import { EvidenceEngine, EvidenceReport, EvidenceGrade } from "./EvidenceEngine";
+import { EvidenceEngine, EvidenceReport } from "./EvidenceEngine";
+import { EvidenceGrade } from "@/engine/contracts/quant";
 import { WalkForwardBacktest, BacktestOptions } from "./backtest";
 
 export interface StressTestResult {
