@@ -17,6 +17,8 @@ export const LOTTERIES: LotteryConfig[] = [
   { id: "diadesorte", name: "Dia de Sorte", numbers: 31, pick: 7, color: "neon-blue", icon: "☀️" },
   { id: "supersete", name: "Super Sete", numbers: 10, pick: 7, color: "neon-amber", icon: "7️⃣" },
   { id: "maismilionaria", name: "+Milionária", numbers: 50, pick: 6, color: "neon-purple", icon: "💰" },
+  { id: "federal", name: "Federal", numbers: 99999, pick: 1, color: "neon-green", icon: "🏦" },
+  { id: "loteca", name: "Loteca", numbers: 14, pick: 14, color: "neon-blue", icon: "🏟️" },
 ];
 
 export interface DrawResult {
