@@ -121,7 +121,7 @@ export function runBacktest(
   const ruinProbability = history.length > 0 ? ruinCount / history.length : 0;
 
   const totalObservedHits = Object.entries(hitCounts).reduce((acc, [hits, count]) => acc + (Number(hits) * count), 0);
-  const evidence = analyzeEvidence(totalObservedHits, games, sortedDraws, config, 1000);
+  const evidence = analyzeEvidence(totalObservedHits, games, sortedDraws, config, 10000);
 
   // --- Shuffled Backtest (Integrity Check) ---
   let shuffledLift: number | undefined;
@@ -139,7 +139,7 @@ export function runBacktest(
       }
     }
     
-    const shuffledEvidence = analyzeEvidence(shuffledHits, games, shuffledDraws, config, 1000);
+    const shuffledEvidence = analyzeEvidence(shuffledHits, games, shuffledDraws, config, 10000);
     shuffledLift = shuffledEvidence.lift;
     
     // Integrity: If real lift is higher than shuffled lift, it indicates temporal pattern detection.
