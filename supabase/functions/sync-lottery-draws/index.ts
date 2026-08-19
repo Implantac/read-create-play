@@ -125,6 +125,10 @@ serve(async (req) => {
     const results: { lottery: string; inserted: number; errors: number; latest: number }[] = [];
 
     for (const lottery of lotteriesFilter) {
+      if (Date.now() - startedAt > TIME_BUDGET_MS) {
+        console.warn(`[sync] tempo esgotado antes de ${lottery.id}`);
+        break;
+      }
       console.log(`[sync] Processing ${lottery.id}...`);
       let inserted = 0;
       let errors = 0;
