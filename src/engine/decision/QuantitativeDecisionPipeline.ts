@@ -1,0 +1,168 @@
+/**
+ * Quantitative Decision Pipeline (TITAN v7.5 Alpha)
+ * -----------------------------------------------------------------------------
+ * The central brain of Titan. Orchestrates all engines into a single,
+ * deterministic and transparent decision flow.
+ * 
+ * Pipeline: DATA -> QUALITY -> EVIDENCE -> BENCHMARK -> ROBUSTNESS -> VERDICT
+ */
+
+import { DrawResult, LotteryConfig } from "@/data/lotteries";
+import { NumberStats } from "@/engine/stats/statistics";
+import { validateLotteryData, DataQualityReport } from "@/engine/validation/DataQuality";
+import { analyzeEvidence, EvidenceReport } from "@/engine/stats/evidence-engine";
+import { BenchmarkEngine, StrategyBenchmarkResult } from "@/engine/stats/benchmark-engine";
+import { StressTestEngine, StressTestResult } from "@/engine/evidence/StressTestEngine";
+import { 
+  QuantitativeDecisionResult, 
+  DecisionVerdict, 
+  RobustnessReport,
+  EvidenceGrade
+} from "@/engine/contracts/quant";
+
+export interface DecisionRequest {
+  lotteryId: string;
+  config: LotteryConfig;
+  draws: DrawResult[];
+  stats: NumberStats[];
+  budget: number;
+  riskProfile: "conservative" | "balanced" | "aggressive";
+  strategyId: string;
+  strategyLabel: string;
+  generatedGames: number[][];
+  historicalPerformance: number;
+}
+
+export class QuantitativeDecisionPipeline {
+  /**
+   * Run the complete quantitative analysis pipeline.
+   */
+  static async execute(request: DecisionRequest): Promise<QuantitativeDecisionResult> {
+    const { config, draws, generatedGames, historicalPerformance } = request;
+
+    // 1. DATA QUALITY
+    const quality = validateLotteryData(draws, config.pick, config.numbers);
+    if (!quality.isValid) {
+      throw new Error(`Dados insuficientes ou corrompidos para análise: ${quality.issues.join(", ")}`);
+    }
+
+    // 2. EVIDENCE & BENCHMARK
+    const benchmark = await BenchmarkEngine.runBenchmark(
+      request.strategyId,
+      request.strategyLabel,
+      config,
+      draws,
+      generatedGames,
+      historicalPerformance
+    );
+
+    // 3. STRESS TEST (Robustness)
+    // Note: In production this would run a specific stress test, 
+    // here we use a simplified version for integration.
+    const stressTester = new StressTestEngine(draws, config);
+    // Dummy model function that returns generated numbers for stress test consistency
+    const stressResult = await stressTester.runStressTest(
+      () => generatedGames[0] || [],
+      { windowSize: 30, step: 5 }
+    );
+
+    // 4. VERDICT LOGIC
+    const verdict = this.calculateVerdict(benchmark, stressResult, request.riskProfile);
+
+    // 5. CONSOLIDATE RESULT
+    return {
+      timestamp: Date.now(),
+      lotteryId: request.lotteryId,
+      dataQuality: {
+        score: quality.qualityScore,
+        isValid: quality.isValid
+      },
+      evidence: {
+        metric: "Performance Score",
+        observed: benchmark.lift / 100 + 1,
+        baseline: 1.0,
+        effectSize: benchmark.zScore,
+        confidenceInterval: benchmark.confidenceInterval,
+        pValue: benchmark.pValue,
+        sampleSize: benchmark.sampleSize,
+        method: "Monte Carlo (100k) + OOS",
+        conclusion: this.mapLiftToGrade(benchmark.lift / 100 + 1, benchmark.pValue),
+        grade: this.mapLiftToGrade(benchmark.lift / 100 + 1, benchmark.pValue),
+        explanation: this.getGradeExplanation(this.mapLiftToGrade(benchmark.lift / 100 + 1, benchmark.pValue))
+      },
+      benchmark: {
+        lift: benchmark.lift,
+        zScore: benchmark.zScore,
+        pValue: benchmark.pValue,
+        advantage: benchmark.advantage
+      },
+      robustness: {
+        score: stressResult.robustnessScore,
+        stabilityIndex: stressResult.stabilityIndex,
+        verdict: stressResult.verdict
+      },
+      verdict
+    };
+  }
+
+  private static mapLiftToGrade(lift: number, pValue: number): EvidenceGrade {
+    if (pValue >= 0.10 || lift <= 1.0) return "E0";
+    if (pValue >= 0.05) return "E1";
+    if (lift > 1.05 && pValue < 0.01) return "E4";
+    if (lift > 1.03 && pValue < 0.05) return "E3";
+    return "E2";
+  }
+
+  private static getGradeExplanation(grade: EvidenceGrade): string {
+    const explanations: Record<EvidenceGrade, string> = {
+      E0: "Sem evidência: Nenhuma vantagem detectada em relação ao acaso.",
+      E1: "Sinal exploratório: Resultado interessante, mas estatisticamente inconclusivo.",
+      E2: "Evidência moderada: Resultado consistente em parte dos testes.",
+      E3: "Evidência forte: Resultado consistente com baixo p-valor.",
+      E4: "Evidência robusta: Vantagem preditiva replicada com alta confiança."
+    };
+    return explanations[grade];
+  }
+
+  private static calculateVerdict(
+    benchmark: StrategyBenchmarkResult,
+    stress: StressTestResult,
+    risk: string
+  ): DecisionVerdict {
+    const positive: string[] = [];
+    const negative: string[] = [];
+
+    if (benchmark.lift > 5) positive.push(`Lift superior a 5% (${benchmark.lift.toFixed(1)}%)`);
+    if (benchmark.isStatisticallySignificant) positive.push("Significância estatística confirmada (p < 0.05)");
+    if (stress.robustnessScore > 70) positive.push(`Alta robustez estrutural (${stress.robustnessScore.toFixed(0)}/100)`);
+    
+    if (benchmark.pValue > 0.1) negative.push("Baixa significância estatística");
+    if (stress.stabilityIndex < 0.5) negative.push("Instabilidade detectada em diferentes janelas");
+    if (benchmark.lift < 2) negative.push("Vantagem marginal sobre o acaso");
+
+    let action: DecisionVerdict["action"] = "OBSERVAR";
+    let conclusion = "Recomenda-se cautela. Os sinais são mistos ou insuficientes.";
+
+    const score = (benchmark.lift > 0 ? 1 : 0) + (benchmark.isStatisticallySignificant ? 2 : 0) + (stress.robustnessScore / 25);
+    
+    if (score >= 5 && benchmark.lift > 3) {
+      action = risk === "aggressive" ? "APOSTAR" : "APOSTAR_REDUZIDO";
+      conclusion = "Sinais favoráveis e robustos. Estratégia demonstra vantagem consistente.";
+    } else if (score >= 3) {
+      action = "APOSTAR_REDUZIDO";
+      conclusion = "Há evidência de sinal, mas a volatilidade sugere exposição moderada.";
+    } else if (benchmark.lift <= 0 || benchmark.pValue > 0.2) {
+      action = "NAO_APOSTAR";
+      conclusion = "Evidência insuficiente. Risco de ruído estatístico elevado.";
+    }
+
+    return {
+      action,
+      rationale: {
+        positive,
+        negative,
+        conclusion
+      }
+    };
+  }
+}
