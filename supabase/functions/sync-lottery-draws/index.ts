@@ -112,8 +112,11 @@ serve(async (req) => {
     const targetLottery = typeof body.lottery_id === "string" ? body.lottery_id : null;
     const rawFrom = Number(body.from_concurso);
     const rawTo = body.to_concurso == null ? null : Number(body.to_concurso);
-    const fromConcurso = Number.isInteger(rawFrom) && rawFrom > 0 ? rawFrom : 1;
+    // null quando não informado — nunca assumir 1, senão todo sync refaz o histórico inteiro
+    const fromConcurso = Number.isInteger(rawFrom) && rawFrom > 0 ? rawFrom : null;
     const toConcurso = rawTo != null && Number.isInteger(rawTo) && rawTo > 0 ? rawTo : null;
+    const startedAt = Date.now();
+    const TIME_BUDGET_MS = 100_000; // devolve resultado parcial antes do timeout da função
 
     const lotteriesFilter = targetLottery
       ? LOTTERIES.filter((l) => l.id === targetLottery)
@@ -122,6 +125,10 @@ serve(async (req) => {
     const results: { lottery: string; inserted: number; errors: number; latest: number }[] = [];
 
     for (const lottery of lotteriesFilter) {
+      if (Date.now() - startedAt > TIME_BUDGET_MS) {
+        console.warn(`[sync] tempo esgotado antes de ${lottery.id}`);
+        break;
+      }
       console.log(`[sync] Processing ${lottery.id}...`);
       let inserted = 0;
       let errors = 0;
@@ -190,10 +197,10 @@ serve(async (req) => {
 
         const lastStored = existing?.[0]?.concurso || 0;
         console.log(`[sync] ${lottery.id}: last stored concurso: ${lastStored}, latest API: ${latestConcurso}`);
-        const startFrom = fromConcurso || (lastStored + 1);
+        const startFrom = fromConcurso ?? (lastStored + 1);
         const requestedEnd = toConcurso || latestConcurso;
-        
-        // Increase range significantly for initial syncs
+
+        // Backfill amplo só quando o banco está vazio ou em full_sync explícito
         const RANGE = (lastStored === 0 || body.full_sync) ? 2000 : MAX_RANGE;
         const endAt = Math.min(requestedEnd, latestConcurso, startFrom + RANGE - 1);
 
@@ -207,6 +214,10 @@ serve(async (req) => {
 
         const batchSize = 15; // Increased batch size for faster sync
         for (let batch = startFrom; batch <= endAt; batch += batchSize) {
+          if (Date.now() - startedAt > TIME_BUDGET_MS) {
+            console.warn(`[sync] ${lottery.id}: orçamento de tempo esgotado em ${batch}, retornando parcial`);
+            break;
+          }
           const promises: Promise<CaixaResult | null>[] = [];
           for (let c = batch; c < Math.min(batch + batchSize, endAt + 1); c++) {
             promises.push(
