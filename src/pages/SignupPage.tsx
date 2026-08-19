@@ -174,7 +174,7 @@ export default function SignupPage() {
                 Criar <span className="gradient-brand-text">Conta</span>
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                7 dias grátis • Comece agora
+                Acesso gratuito • 3 jogos por loteria
               </p>
             </div>
           </CardHeader>
