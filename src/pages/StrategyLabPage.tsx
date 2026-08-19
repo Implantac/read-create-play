@@ -1130,6 +1130,7 @@ export default function StrategyLabPage() {
                           isExpanded={showDetails === r.strategyId}
                           onToggle={() => setShowDetails(showDetails === r.strategyId ? null : r.strategyId)}
                           trendIcon={trendIcon}
+                          lotteryName={config.name}
                         />
                       </motion.div>
                     ))}
