@@ -67,7 +67,7 @@ export function FeaturesSection({ featuresRef, featuresRotateX, fadeUp }: Featur
           <div className="inline-flex items-center px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.4em] bg-primary/10 text-primary border border-primary/20 italic">
             Tecnologia de Elite
           </div>
-          <h2 className="text-4xl md:text-7xl font-black tracking-tighter uppercase italic leading-[0.8] drop-shadow-2xl text-white">
+          <h2 className="text-3xl md:text-6xl lg:text-7xl font-black tracking-tighter uppercase italic leading-[1] drop-shadow-2xl text-white">
             CENTRO DE <span className="gradient-brand-text drop-shadow-[0_0_20px_rgba(201,168,76,0.3)]">INTELIGÊNCIA</span> TITAN
           </h2>
           <p className="text-muted-foreground max-w-3xl mx-auto font-medium text-xl opacity-70 italic leading-relaxed px-4">

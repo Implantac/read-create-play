@@ -151,6 +151,18 @@
     @apply bg-background text-foreground antialiased overflow-x-hidden;
     font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
     font-feature-settings: "ss01", "cv11";
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Font size refinements to prevent "gigantic" text and clipping */
+  html {
+    font-size: 16px;
+  }
+  
+  @media (max-width: 640px) {
+    html { font-size: 14px; }
   }
 
   /* A11y: visible keyboard focus */
@@ -170,7 +182,13 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Space Grotesk', system-ui, sans-serif;
     letter-spacing: -0.02em;
+    @apply leading-tight break-words; /* Prevent word cutting */
   }
+
+  h1 { @apply text-4xl md:text-5xl lg:text-6xl; }
+  h2 { @apply text-3xl md:text-4xl; }
+  h3 { @apply text-2xl md:text-3xl; }
+
 
   code, .font-mono {
     font-family: 'JetBrains Mono', 'Space Grotesk', monospace;
