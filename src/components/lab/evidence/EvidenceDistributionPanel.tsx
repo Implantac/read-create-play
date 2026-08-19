@@ -66,8 +66,8 @@ export function EvidenceDistributionPanel({ rankings, onIterationsChange, curren
                 <TrendingUp className="w-4 h-4 text-primary" />
                 Distribuição Monte Carlo: {topStrategy.strategyName}
               </CardTitle>
-              <Badge variant={isSignificant ? "default" : "outline"} className={isSignificant ? "bg-emerald-500/20 text-emerald-500 border-emerald-500/30" : ""}>
-                {isSignificant ? "Sinal Superior ao Acaso" : "Ruído Estatístico"}
+              <Badge variant={isSignificant ? "default" : "outline"} className={isSignificant ? "bg-emerald-500/20 text-emerald-500 border-emerald-500/30 font-black italic" : "bg-destructive/10 text-destructive border-destructive/20 font-black italic"}>
+                {isSignificant ? "Sinal Validado" : "Atenção: Ruído Estatístico"}
               </Badge>
             </div>
           </CardHeader>
@@ -112,15 +112,22 @@ export function EvidenceDistributionPanel({ rankings, onIterationsChange, curren
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-            <div className="mt-6 p-4 rounded-xl bg-muted/20 border border-border/50 flex items-start gap-3">
-              <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+            <div className={`mt-6 p-4 rounded-xl border flex items-start gap-3 ${
+              isSignificant ? "bg-muted/20 border-border/50" : "bg-destructive/5 border-destructive/20"
+            }`}>
+              {isSignificant ? (
+                <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+              ) : (
+                <ShieldAlert className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+              )}
               <div className="space-y-2">
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Este gráfico mostra a distribuição de performance de 1.000 simulações aleatórias pareadas contra os mesmos concursos.
-                  A linha <span className="text-primary font-bold">Real ({topStrategy.metrics.lift.toFixed(2)}x)</span> indica o desempenho observado.
+                  {isSignificant 
+                    ? `Este gráfico mostra a distribuição de performance de 1.000 simulações aleatórias. O desempenho real (${topStrategy.metrics.lift.toFixed(2)}x) está fora da zona de ruído.`
+                    : "ALERTA: O desempenho observado está DENTRO da zona de ruído aleatório. Não existe evidência estatística suficiente para validar este sinal."}
                 </p>
                 <p className="text-[10px] text-amber-500/80 italic">
-                  Nota: A distribuição observada acima da referência simulada indica correlação histórica, mas não constitui garantia de vantagem preditiva futura.
+                  Nota: Desempenho histórico não é garantia de resultados futuros. A variância aleatória pode simular ganhos temporários sem vantagem real.
                 </p>
               </div>
             </div>
@@ -259,22 +266,22 @@ export function EvidenceDistributionPanel({ rankings, onIterationsChange, curren
             </div>
 
             <div className={`p-4 rounded-xl border flex flex-col items-center justify-center gap-2 ${
-              isSignificant ? "bg-emerald-500/10 border-emerald-500/20" : "bg-amber-500/10 border-amber-500/20"
+              isSignificant ? "bg-emerald-500/10 border-emerald-500/20" : "bg-destructive/10 border-destructive/20"
             }`}>
               <div className="flex items-center gap-2">
                 {isSignificant ? (
                   <CheckCircle2 className="w-5 h-5 text-emerald-500" />
                 ) : (
-                  <ShieldAlert className="w-5 h-5 text-amber-500" />
+                  <ShieldAlert className="w-5 h-5 text-destructive" />
                 )}
-                <span className="text-xs font-bold uppercase tracking-tighter">
-                  {isSignificant ? "Sinal Superior ao Acaso" : "Sem Vantagem Estatística"}
+                <span className={`text-xs font-black uppercase tracking-tighter italic ${isSignificant ? "text-emerald-500" : "text-destructive"}`}>
+                  {isSignificant ? "Veredito: Sinal Validado" : "Veredito: Ruído Detectado"}
                 </span>
               </div>
               <span className="text-[10px] text-center opacity-70 leading-tight">
                 {isSignificant 
-                  ? `A performance observada (${topStrategy.metrics.lift.toFixed(2)}x) supera a variância simulada com p < 0.05.`
-                  : "A performance observada está dentro da variância esperada para seleções aleatórias."}
+                  ? `A performance observada (${topStrategy.metrics.lift.toFixed(2)}x) supera a variância simulada com alta confiança.`
+                  : "A performance observada está dentro da variância esperada para seleções aleatórias. RISCO DE OVERFITTING."}
               </span>
             </div>
           </CardContent>

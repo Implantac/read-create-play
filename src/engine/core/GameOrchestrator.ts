@@ -28,6 +28,38 @@ export interface OrchestratorConfig {
  */
 export class GameOrchestrator {
   /**
+   * Calcula a Distância de Hamming entre dois jogos (quantidade de números diferentes).
+   * Útil para garantir diversidade na carteira.
+   */
+  static calculateHammingDistance(gameA: number[], gameB: number[]): number {
+    const setA = new Set(gameA);
+    const overlap = gameB.filter(n => setA.has(n)).length;
+    return gameA.length - overlap;
+  }
+
+  /**
+   * Filtra uma lista de jogos para garantir diversidade mínima (Portfolio Diversification).
+   */
+  static diversifyPortfolio(games: OrchestratedGame[], minDistance: number): OrchestratedGame[] {
+    if (games.length <= 1) return games;
+    
+    const diversified: OrchestratedGame[] = [games[0]];
+    
+    for (let i = 1; i < games.length; i++) {
+      const current = games[i];
+      const isRedundant = diversified.some(d => 
+        this.calculateHammingDistance(d.numbers, current.numbers) < minDistance
+      );
+      
+      if (!isRedundant) {
+        diversified.push(current);
+      }
+    }
+    
+    return diversified;
+  }
+
+  /**
    * Converte LotteryRules (AI) para LotteryConfig (UI/Data) para compatibilidade de tipos.
    */
   private static getLotteryConfig(lotteryId: string): LotteryConfig {
@@ -82,10 +114,14 @@ export class GameOrchestrator {
 
     // 3. Filtragem por score mínimo e ordenação
     const minScore = config.minScore ?? 40;
-    return orchestrated
+    const sorted = orchestrated
       .filter(g => g.titanScore >= minScore)
-      .sort((a, b) => b.titanScore - a.titanScore)
-      .slice(0, config.count);
+      .sort((a, b) => b.titanScore - a.titanScore);
+
+    // 4. Diversificação de Portfolio (evita redundância)
+    // Para lotofacil (15), minDistance 4-5 é saudável.
+    const minDistance = Math.max(3, Math.floor(lotteryConfig.pick * 0.25));
+    return this.diversifyPortfolio(sorted, minDistance).slice(0, config.count);
   }
 
   /**

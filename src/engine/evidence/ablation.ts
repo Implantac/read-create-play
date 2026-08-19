@@ -8,6 +8,8 @@ export interface AblationReport {
   significanceImpact: number;
   confidenceGain: number;
   relativeImportance: number;
+  robustnessGrade: 'High' | 'Medium' | 'Low';
+  pValueImpact: number;
 }
 
 /**
@@ -47,12 +49,21 @@ export class FeatureAblation {
       const confidenceGain = (baseline.report.lift / (baseline.report.confidenceInterval[1] - baseline.report.confidenceInterval[0])) -
                              (result.report.lift / (result.report.confidenceInterval[1] - result.report.confidenceInterval[0]));
       
+      const pValueImpact = result.report.pValue - baseline.report.pValue;
+      
+      // Robustness: High if removing it significantly hurts significance and lift
+      let robustnessGrade: 'High' | 'Medium' | 'Low' = 'Low';
+      if (liftContribution > 0.02 && pValueImpact > 0.01) robustnessGrade = 'High';
+      else if (liftContribution > 0.005 || pValueImpact > 0.005) robustnessGrade = 'Medium';
+
       reports.push({
         indicator: feature,
         liftContribution,
         significanceImpact,
         confidenceGain,
-        relativeImportance: 0 // Will be calculated after all features
+        relativeImportance: 0,
+        robustnessGrade,
+        pValueImpact
       });
     }
     
