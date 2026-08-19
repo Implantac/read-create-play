@@ -58,7 +58,7 @@ export function AppHeader({
 
         <div className="w-px h-5 bg-border/60 hidden sm:block" aria-hidden="true" />
 
-        <div className="flex-1 flex items-center min-w-0 overflow-hidden px-2">
+        <div className="flex-1 flex items-center min-w-0 px-2 overflow-x-auto no-scrollbar">
           <LotterySelector selected={selectedLottery} onSelect={setSelectedLottery} />
         </div>
 
