@@ -92,7 +92,16 @@ export function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon, l
             </div>
           </div>
           <div className="flex flex-col gap-1 shrink-0">
-            <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-lg text-primary hover:bg-primary/10" onClick={() => setShowDetailDialog(true)}>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-9 w-9 p-0 rounded-lg text-primary hover:bg-primary/10 transition-colors" 
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowDetailDialog(true);
+              }}
+              title="Ver Evidências Detalhadas"
+            >
               <ExternalLink className="w-4 h-4" />
             </Button>
             <Button variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-lg" onClick={onToggle}>

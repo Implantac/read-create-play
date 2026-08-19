@@ -81,6 +81,8 @@ export default function StrategyLabPage() {
   const [activeTab, setActiveTab] = useState("ranking");
   const [backtestResults, setBacktestResults] = useState<BacktestResult[]>([]);
   const [showDetails, setShowDetails] = useState<string | null>(null);
+  const [detailStrategy, setDetailStrategy] = useState<RankingEntry | null>(null);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [labHistory, setLabHistory] = useState<{ timestamp: number; winner: string; score: number }[]>([]);
   const [configOpen, setConfigOpen] = useState(true);
   const [customDrawRange, setCustomDrawRange] = useState<[number, number] | null>(null);
