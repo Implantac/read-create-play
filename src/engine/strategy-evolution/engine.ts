@@ -326,12 +326,14 @@ export function runStrategyLab(
     ? labConfig.strategies.map(id => getStrategy(id)).filter(Boolean) as StrategyDefinition[]
     : available;
 
-  // Split data: 70% Train, 30% Evaluation (Paired)
-  const trainCount = Math.floor(draws.length * 0.7);
-  const trainDraws = draws.slice(0, trainCount);
-  const evalDraws = draws.slice(trainCount);
+  // Split data: 70% Train, 30% Evaluation (Temporal Paired Split)
+  // Ensure we sort draws chronologically if they aren't already
+  const sortedDraws = [...draws].sort((a, b) => a.concurso - b.concurso);
+  const trainCount = Math.floor(sortedDraws.length * 0.7);
+  const trainDraws = sortedDraws.slice(0, trainCount);
+  const evalDraws = sortedDraws.slice(trainCount);
 
-  // Compute stats only from Train data to avoid leakage
+  // Compute stats ONLY from Train data to avoid future data leakage
   const trainStats = computeFrequencyStats(trainDraws, config.numbers);
 
   // Generate games and backtest each strategy on Eval data
