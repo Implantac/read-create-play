@@ -8,14 +8,14 @@
  *   4. Performance do Motor (histórico de presets)
  *   5. Sugestão de Fechamento Automático (base × orçamento)
  */
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Command, Trophy, Wallet, Target, TrendingUp, Info as InfoIcon } from "lucide-react";
+import { Command, Trophy, Wallet, Target, TrendingUp, Info as InfoIcon, Loader2, ShieldCheck, AlertCircle } from "lucide-react";
 import { useLotteryContext } from "@/contexts/LotteryContext";
 import { CycleThermometer } from "@/components/lottery/analysis/CycleThermometer";
 import { WinnerProfilePanel } from "@/components/lottery/analysis/WinnerProfilePanel";
@@ -24,6 +24,10 @@ import { EnginePerformancePanel } from "@/components/dashboards/EnginePerformanc
 import { VereditoApostador } from "@/components/lab/VereditoApostador";
 import { pickBestMatrix } from "@/engine/closing/autoMatrix";
 import { toast } from "sonner";
+import { QuantitativeDecisionPipeline } from "@/engine/decision/QuantitativeDecisionPipeline";
+import { QuantitativeDecisionResult } from "@/engine/contracts/quant";
+import { UniversalGameGenerator } from "@/ai/generators/universalGameGenerator";
+
 
 export default function ComandoApostadorPage() {
   const { selectedLottery, config: lotteryConfig, draws, stats } = useLotteryContext();
