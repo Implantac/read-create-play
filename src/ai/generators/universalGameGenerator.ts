@@ -68,8 +68,8 @@ export function generateGames(config: GeneratorConfig): ScoredGame[] {
   const sortedByPost = [...posterior.entries()].sort((a, b) => b[1] - a[1]);
   const coreCount = Math.max(1, Math.ceil(sortedByPost.length * 0.4));
   const coreSet = new Set(sortedByPost.slice(0, coreCount).map(([n]) => n));
-  // mínimo de números do core dentro de cada jogo (≈60% do pick)
-  const minCoreInGame = Math.max(2, Math.ceil(rules.pick * 0.6));
+  // mínimo de números do core dentro de cada jogo (≈50-55% do pick para flexibilidade)
+  const minCoreInGame = Math.max(2, Math.floor(rules.pick * 0.55));
 
   // Build weighted pool (posterior amplifica os pesos)
   const pool = buildWeightedPool(config.stats, strategy.filters, config.filters, recencyBoost, affinityBoost, posterior);

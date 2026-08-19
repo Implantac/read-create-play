@@ -63,7 +63,7 @@ export function analyzeEvidence(
   games: number[][],
   draws: DrawResult[],
   config: LotteryConfig,
-  iterations: number = 100000
+  iterations: number = 10000
 ): EvidenceReport {
   const sampleSize = games.length * draws.length;
   if (sampleSize === 0) {
