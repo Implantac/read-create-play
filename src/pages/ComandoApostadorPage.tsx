@@ -21,6 +21,7 @@ import { CycleThermometer } from "@/components/lottery/analysis/CycleThermometer
 import { WinnerProfilePanel } from "@/components/lottery/analysis/WinnerProfilePanel";
 import { QuickCompareBet } from "@/components/lottery/QuickCompareBet";
 import { EnginePerformancePanel } from "@/components/dashboards/EnginePerformancePanel";
+import { VereditoApostador } from "@/components/lab/VereditoApostador";
 import { pickBestMatrix } from "@/engine/closing/autoMatrix";
 import { toast } from "sonner";
 
