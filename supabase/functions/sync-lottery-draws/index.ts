@@ -112,8 +112,11 @@ serve(async (req) => {
     const targetLottery = typeof body.lottery_id === "string" ? body.lottery_id : null;
     const rawFrom = Number(body.from_concurso);
     const rawTo = body.to_concurso == null ? null : Number(body.to_concurso);
-    const fromConcurso = Number.isInteger(rawFrom) && rawFrom > 0 ? rawFrom : 1;
+    // null quando não informado — nunca assumir 1, senão todo sync refaz o histórico inteiro
+    const fromConcurso = Number.isInteger(rawFrom) && rawFrom > 0 ? rawFrom : null;
     const toConcurso = rawTo != null && Number.isInteger(rawTo) && rawTo > 0 ? rawTo : null;
+    const startedAt = Date.now();
+    const TIME_BUDGET_MS = 100_000; // devolve resultado parcial antes do timeout da função
 
     const lotteriesFilter = targetLottery
       ? LOTTERIES.filter((l) => l.id === targetLottery)
