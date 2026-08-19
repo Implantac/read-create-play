@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/collapsible";
 import {
   runStrategyLab, getStrategiesForLottery,
-  LabConfig, LabResult, EvolutionProfile,
+  LabConfig, LabResult, EvolutionProfile, RankingEntry
 } from "@/engine/strategy-evolution";
 import { rankAllGames, exportGamesCSV, analyzeCombination, CombinationAnalysis } from "@/engine/strategy-evolution/game-quality";
 import { toast } from "sonner";
