@@ -86,7 +86,7 @@ export function useLotteryDraws(lotteryId: string, origin: DataOrigin = "officia
   const syncAllLotteries = useCallback(async () => {
     setSyncing(true);
     try {
-      await LotteryService.syncLottery(undefined, true);
+      await LotteryService.syncLottery(undefined, false);
       queryClient.invalidateQueries({ queryKey: ["lottery-draws"] });
       toast.success("Sincronização iniciada");
     } catch (e) {
