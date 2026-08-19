@@ -193,10 +193,10 @@ serve(async (req) => {
 
         const lastStored = existing?.[0]?.concurso || 0;
         console.log(`[sync] ${lottery.id}: last stored concurso: ${lastStored}, latest API: ${latestConcurso}`);
-        const startFrom = fromConcurso || (lastStored + 1);
+        const startFrom = fromConcurso ?? (lastStored + 1);
         const requestedEnd = toConcurso || latestConcurso;
-        
-        // Increase range significantly for initial syncs
+
+        // Backfill amplo só quando o banco está vazio ou em full_sync explícito
         const RANGE = (lastStored === 0 || body.full_sync) ? 2000 : MAX_RANGE;
         const endAt = Math.min(requestedEnd, latestConcurso, startFrom + RANGE - 1);
 
