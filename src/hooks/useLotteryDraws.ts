@@ -1,5 +1,5 @@
 import { DrawResult } from "@/data/lotteries";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { LotteryService, DrawResultWithPrizes, DrawPrizeData, PrizeTierInfo } from "@/services/lottery/lottery.service";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -65,14 +65,21 @@ export function useLotteryDraws(lotteryId: string, origin: DataOrigin = "officia
     onSettled: () => setSyncing(false),
   });
 
+  // Keep a stable reference to the mutation so `syncDraws` never changes identity
+  // (an unstable identity re-triggers auto-sync effects on every render → loop).
+  const mutateRef = useRef(syncMutation.mutateAsync);
+  useEffect(() => {
+    mutateRef.current = syncMutation.mutateAsync;
+  }, [syncMutation.mutateAsync]);
+
   const syncDraws = useCallback(async (isSilent = false) => {
     try {
-      const result = await syncMutation.mutateAsync(isSilent);
+      const result = await mutateRef.current(isSilent);
       return { success: true, result };
     } catch (error) {
       return { success: false, error: error instanceof Error ? error.message : "Erro" };
     }
-  }, [syncMutation]);
+  }, []);
 
   const syncAllLotteries = useCallback(async () => {
     setSyncing(true);
@@ -98,9 +105,12 @@ export function useLotteryDraws(lotteryId: string, origin: DataOrigin = "officia
     });
   }, [queryClient, lotteryId]);
 
+  const draws = useMemo(() => data?.draws ?? [], [data?.draws]);
+  const drawsWithPrizes = useMemo(() => data?.drawsWithPrizes ?? [], [data?.drawsWithPrizes]);
+
   return {
-    draws: data?.draws || [],
-    drawsWithPrizes: data?.drawsWithPrizes || [],
+    draws,
+    drawsWithPrizes,
     loading,
     syncing,
     lastSyncAt,
