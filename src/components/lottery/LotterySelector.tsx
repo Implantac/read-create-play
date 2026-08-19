@@ -9,7 +9,7 @@ interface Props {
 
 export function LotterySelector({ selected, onSelect }: Props) {
   return (
-    <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2 mask-fade-right max-w-full lg:max-w-3xl">
+    <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2 mask-fade-right w-full lg:max-w-[70vw]">
       {LOTTERIES.map((lottery) => {
         const isActive = selected === lottery.id;
         return (
