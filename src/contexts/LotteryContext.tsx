@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useMemo, useCallback, ReactNode, useEffect } from "react";
+import { createContext, useContext, useState, useMemo, useCallback, ReactNode, useEffect, useRef } from "react";
 import { LOTTERIES, DrawResult } from "@/data/lotteries";
 import { computeFrequencyStats, computeSumDistribution, NumberStats } from "@/engine/stats/statistics";
 import { FarolStats, CycleStats } from "@/engine/stats/farol-engine";
