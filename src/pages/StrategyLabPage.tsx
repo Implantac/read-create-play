@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/collapsible";
 import {
   runStrategyLab, getStrategiesForLottery,
-  LabConfig, LabResult, EvolutionProfile,
+  LabConfig, LabResult, EvolutionProfile, RankingEntry
 } from "@/engine/strategy-evolution";
 import { rankAllGames, exportGamesCSV, analyzeCombination, CombinationAnalysis } from "@/engine/strategy-evolution/game-quality";
 import { toast } from "sonner";
@@ -81,6 +81,8 @@ export default function StrategyLabPage() {
   const [activeTab, setActiveTab] = useState("ranking");
   const [backtestResults, setBacktestResults] = useState<BacktestResult[]>([]);
   const [showDetails, setShowDetails] = useState<string | null>(null);
+  const [detailStrategy, setDetailStrategy] = useState<RankingEntry | null>(null);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [labHistory, setLabHistory] = useState<{ timestamp: number; winner: string; score: number }[]>([]);
   const [configOpen, setConfigOpen] = useState(true);
   const [customDrawRange, setCustomDrawRange] = useState<[number, number] | null>(null);
@@ -1130,6 +1132,7 @@ export default function StrategyLabPage() {
                           isExpanded={showDetails === r.strategyId}
                           onToggle={() => setShowDetails(showDetails === r.strategyId ? null : r.strategyId)}
                           trendIcon={trendIcon}
+                          lotteryName={config.name}
                         />
                       </motion.div>
                     ))}
