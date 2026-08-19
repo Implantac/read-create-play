@@ -4,11 +4,11 @@ import { analyzeEvidence } from "@/engine/stats/evidence-engine";
 
 export interface AblationImpact {
   indicator: string;
-  originalScore: number;
-  removedScore: number;
-  impact: number;
-  confidence: number;
-  robustnessGrade: 'HIGH' | 'MEDIUM' | 'LOW';
+  liftContribution: number;
+  significanceImpact: number;
+  confidenceGain: number;
+  relativeImportance: number;
+  robustnessGrade: 'High' | 'Medium' | 'Low';
   pValueImpact: number;
 }
 
