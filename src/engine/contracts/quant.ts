@@ -44,6 +44,7 @@ export interface QuantitativeDecisionResult {
   dataQuality: {
     score: number;
     isValid: boolean;
+    hasLeakage: boolean;
   };
   evidence: EvidenceResult & { 
     grade: EvidenceGrade; 
@@ -52,13 +53,16 @@ export interface QuantitativeDecisionResult {
     zScore: number;
   };
   benchmark: {
-
     lift: number;
     zScore: number;
     pValue: number;
     advantage: number;
   };
   robustness: RobustnessReport;
+  ablation?: {
+    indicators: string[];
+    impacts: { indicator: string; importance: number; impact: number }[];
+  };
   verdict: DecisionVerdict;
 }
 

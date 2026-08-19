@@ -3,6 +3,7 @@ import { NumberStats } from "@/engine/stats/statistics";
 import { generateGames } from "@/ai/generators/universalGameGenerator";
 import { scoreGame } from "@/ai/engines/rankingEngine";
 import { evaluateBetQuality, BetQualityReport } from "@/engine/stats/bet-quality";
+import { GameSimilarityEngine } from "@/engine/portfolio/GameSimilarityEngine";
 import type { RiskProfile, IntentFilters, ScoredGame } from "@/ai/core/aiTypes";
 import { getLotteryRules } from "@/ai/knowledge/lotteriesKnowledge";
 
@@ -39,17 +40,23 @@ export class GameOrchestrator {
 
   /**
    * Filtra uma lista de jogos para garantir diversidade mínima (Portfolio Diversification).
+   * Refinado para garantir que a sobreposição de núcleos não exceda 55%.
    */
   static diversifyPortfolio(games: OrchestratedGame[], minDistance: number): OrchestratedGame[] {
     if (games.length <= 1) return games;
     
     const diversified: OrchestratedGame[] = [games[0]];
+    const maxOverlap = 0.55; // Limite de 55% de sobreposição (Fase 3)
     
     for (let i = 1; i < games.length; i++) {
       const current = games[i];
-      const isRedundant = diversified.some(d => 
-        this.calculateHammingDistance(d.numbers, current.numbers) < minDistance
-      );
+      const isRedundant = diversified.some(d => {
+        const distance = this.calculateHammingDistance(d.numbers, current.numbers);
+        const overlap = (d.numbers.length - distance) / d.numbers.length;
+        
+        // Se a distância for muito pequena OU a sobreposição muito alta, descarta
+        return distance < minDistance || overlap > maxOverlap;
+      });
       
       if (!isRedundant) {
         diversified.push(current);
