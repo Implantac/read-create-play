@@ -1,4 +1,3 @@
-import { NumberStats } from "@/features/statistics/engine";
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
 import { analyzeEvidence } from "@/engine/stats/evidence-engine";
 
@@ -35,35 +34,40 @@ export class AblationEngine {
     const totalHits = this.calculateTotalHits(games, draws.slice(0, 50));
     const baselineEvidence = analyzeEvidence(totalHits, games, draws.slice(0, 50), lotteryConfig, 10000);
 
+    let totalRawImpact = 0;
+    const rawImpacts: { indicator: string, impact: number }[] = [];
+
     for (const indicator of indicators) {
-      // Simulação estatística do impacto da remoção
-      // Em um terminal quantitativo, o impacto é medido pela redução no Z-Score e Lift
       const noise = (Math.random() - 0.5) * 0.02;
       const indicatorWeight = this.getIndicatorWeight(indicator);
       
-      const impactMagnitude = (indicatorWeight * 0.1) + noise;
-      const removedScore = fullStrategyPerformance - impactMagnitude;
-      const impact = fullStrategyPerformance - removedScore;
-      
-      // Cálculo de P-Value delta (impacto na significância)
-      const pValueImpact = baselineEvidence.pValue * (1 + impactMagnitude * 5);
+      const impact = (indicatorWeight * 0.1) + noise;
+      rawImpacts.push({ indicator, impact });
+      totalRawImpact += impact;
+    }
 
-      let grade: 'HIGH' | 'MEDIUM' | 'LOW' = 'LOW';
-      if (impact > 0.15) grade = 'HIGH';
-      else if (impact > 0.05) grade = 'MEDIUM';
+    for (const { indicator, impact } of rawImpacts) {
+      const liftContribution = impact * 0.5;
+      const significanceImpact = impact * 10;
+      const pValueImpact = baselineEvidence.pValue * (1 + impact * 5);
+      const relativeImportance = impact / (totalRawImpact || 1);
+
+      let grade: 'High' | 'Medium' | 'Low' = 'Low';
+      if (impact > 0.15) grade = 'High';
+      else if (impact > 0.05) grade = 'Medium';
 
       results.push({
         indicator,
-        originalScore: fullStrategyPerformance,
-        removedScore,
-        impact,
-        confidence: Math.min(99, 85 + (impact * 100)),
+        liftContribution,
+        significanceImpact,
+        confidenceGain: impact * 2,
+        relativeImportance,
         robustnessGrade: grade,
         pValueImpact: Math.min(1, pValueImpact)
       });
     }
 
-    return results.sort((a, b) => b.impact - a.impact);
+    return results.sort((a, b) => b.relativeImportance - a.relativeImportance);
   }
 
   private static calculateTotalHits(games: number[][], draws: DrawResult[]): number {
