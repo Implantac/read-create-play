@@ -40,7 +40,9 @@ export function useLotteryDraws(lotteryId: string, origin: DataOrigin = "officia
       if (origin !== "official") {
         throw new Error(`Sincronização não disponível para origem: ${origin}`);
       }
-      return LotteryService.syncLottery(undefined, true);
+      // Sincroniza apenas a loteria ativa e de forma incremental (sem full_sync),
+      // evitando varrer o histórico completo das 8 loterias e estourar o timeout.
+      return LotteryService.syncLottery(lotteryId, false);
     },
 
     onMutate: () => {
