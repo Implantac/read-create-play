@@ -86,8 +86,11 @@ export class QuantitativeDecisionPipeline {
         method: "Monte Carlo (100k) + OOS",
         conclusion: this.mapLiftToGrade(benchmark.lift / 100 + 1, benchmark.pValue),
         grade: this.mapLiftToGrade(benchmark.lift / 100 + 1, benchmark.pValue),
-        explanation: this.getGradeExplanation(this.mapLiftToGrade(benchmark.lift / 100 + 1, benchmark.pValue))
+        explanation: this.getGradeExplanation(this.mapLiftToGrade(benchmark.lift / 100 + 1, benchmark.pValue)),
+        lift: benchmark.lift / 100 + 1,
+        zScore: benchmark.zScore
       },
+
       benchmark: {
         lift: benchmark.lift,
         zScore: benchmark.zScore,
