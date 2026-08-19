@@ -1,6 +1,7 @@
 /**
  * Strategy Evolution Engine — Core
  * Backtesting, ranking, auto-evolution and recommendations
+ * Implements Quantitative Ranking (Evidence E0-E4, Significance, Robustness)
  */
 
 import { DrawResult, LotteryConfig } from "@/data/lotteries";
@@ -147,7 +148,34 @@ function buildRanking(
   results: { def: StrategyDefinition; metrics: StrategyMetrics }[],
   lotteryId: string,
 ): RankingEntry[] {
-  const sorted = [...results].sort((a, b) => b.metrics.globalScore - a.metrics.globalScore);
+  // Quantitative Ranking Engine (Phase 11-12)
+  // Sort by multiple dimensions:
+  // 1. Evidence Grade (E4 > E3 > E2 > E1 > E0)
+  // 2. Statistical Significance (P-Value)
+  // 3. Global Score (Performance/Consistency composite)
+  const gradeWeight: Record<string, number> = {
+    'E4': 10000,
+    'E3': 8000,
+    'E2': 6000,
+    'E1': 4000,
+    'E0': 0
+  };
+
+  const sorted = [...results].sort((a, b) => {
+    // Evidence Grade Priority
+    const gradeA = gradeWeight[a.metrics.evidenceGrade || 'E0'] || 0;
+    const gradeB = gradeWeight[b.metrics.evidenceGrade || 'E0'] || 0;
+    
+    if (gradeA !== gradeB) return gradeB - gradeA;
+
+    // Statistical Significance (P-Value)
+    const pA = a.metrics.pValue || 1;
+    const pB = b.metrics.pValue || 1;
+    if (Math.abs(pA - pB) > 0.0001) return pA - pB;
+
+    // Global Score tie-breaker
+    return b.metrics.globalScore - a.metrics.globalScore;
+  });
 
   return sorted.map((r, idx) => ({
     rank: idx + 1,
