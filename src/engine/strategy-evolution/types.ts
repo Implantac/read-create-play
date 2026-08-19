@@ -84,6 +84,10 @@ export interface RankingEntry {
   strategyName: string;
   lotteryId: string;
   metrics: StrategyMetrics;
+  stressResult?: {
+    robustnessScore: number;
+    verdict: string;
+  };
   trend: "up" | "down" | "stable";
   executions: number;
   lastTestedAt: number;

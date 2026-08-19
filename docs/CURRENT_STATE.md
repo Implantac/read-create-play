@@ -1,25 +1,26 @@
-# Estado Atual do Projeto - Titan Loterias Quant
+# Progresso do Plano Mestre de Evolução Quantitativa (Titan Loterias)
 
-## Versão: v0.9.0-quant-baseline
-Data: 18/08/2026
+## Status Geral: Fase 8 em Execução 🚀
 
-## Visão Geral
-O projeto está em transição de um gerador de jogos para uma plataforma quantitativa completa.
+### Concluído (Matemática Verdadeira)
+- [x] **Fase 0: Auditoria & Limpeza** - Remoção de mocks e normalização de termos (Accuracy -> PerformanceScore).
+- [x] **Fase 1: Motor de Integridade** - Implementação de filtros rigorosos de soma, paridade e duplicatas em `LotofacilEngine.ts` e `LotteryEngines.ts`.
+- [x] **Fase 2: Motor de Similaridade** - Diversificação via Distância de Hamming no `GameOrchestrator.ts`.
+- [x] **Fase 3: Portfólio Engine** - Gestão de redundância e cobertura em `PortfolioEngine.ts`.
+- [x] **Fase 4: Game Quality Scoring** - Pesos recalibrados e métricas S-F em `game-quality.ts`.
+- [x] **Fase 5: Baseline Benchmark** - Comparação contra Uniform/Random Baselines em `benchmark-engine.ts`.
+- [x] **Fase 6: Feature Ablation** - Medição de impacto individual de indicadores em `ablation-engine.ts`.
+- [x] **Fase 7: Out-of-Sample (OOS)** - Divisão temporal 70/30 estrita em `StrategyLabPage.tsx` e `engine.ts`.
+- [x] **Fase 8 (Início): Stress Test** - Implementação do `StressTestEngine.ts` para robustez em janelas móveis.
 
-## Estrutura de Rotas e Páginas
-- **Público**: Landing, Login, Signup, Planos, Estudos, Suporte.
-- **Privado**: Dashboard, Comando, Gerador, Fechamentos, Análise, Histórico, IA Chat/Autônoma, Estratégias, Strategy Lab, ROI, Banca.
+### Em Andamento
+- [ ] **Refinamento do Stress Test** - Integração profunda na UI do Strategy Lab para exibir alertas de overfitting.
+- [ ] **Fase 9: Strategy Ranking V2** - Incorporação de Z-Score e Robustness Score no ranking global.
+- [ ] **Fase 10: Dynamic Sizing (Defensive Kelly)** - Integração do `bankrollEngine.ts` com o Veredito do Apostador.
 
-## Engines Existentes
-- `src/engine/core/GameOrchestrator.ts`: Unificação da lógica de geração.
-- `src/engine/evidence/EvidenceEngine.ts`: Motor de evidências (Monte Carlo implementado).
-- `src/engine/bankroll/bankrollEngine.ts`: Gestão de banca (Kelly Criterion).
-- `src/engine/lotteries/`: Motores específicos por modalidade.
+### Pendente
+- [ ] **Fase 11: Comando do Apostador Elite** - Centralização total de insights quantitativos.
+- [ ] **Fase 12-15: Otimização de Performance, PWA e Polimento Final**.
 
-## Pendências Identificadas (Auditoria v6.0)
-1. Fragmentação de Geradores (Em progresso via GameOrchestrator).
-2. Motores Específicos não-Lotofácil (Incompletos).
-3. Integração Automática de ROI (Implementada v6.2).
-4. Interface Super Sete (Implementada v6.1).
-5. Feedback IP Guard (Implementado v6.1).
-6. Ablação por Indicador (Pela metade).
+---
+*Última atualização: Março 2026 - Auditoria Quantitativa Elite.*

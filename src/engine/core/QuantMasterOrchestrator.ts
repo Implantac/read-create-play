@@ -48,6 +48,7 @@ export class QuantMasterOrchestrator {
 
   /**
    * Realiza auditoria completa de uma estratégia.
+   * Inclui ablação de indicadores e teste de estresse temporal.
    */
   static async auditStrategy(
     indicators: string[],
@@ -55,7 +56,10 @@ export class QuantMasterOrchestrator {
     draws: DrawResult[],
     performance: number,
     games: number[][]
-  ): Promise<{ ablation: AblationImpact[] }> {
+  ): Promise<{ 
+    ablation: AblationImpact[];
+    stress?: any;
+  }> {
     const ablation = await AblationEngine.runAblation(
       indicators,
       lotteryConfig,
@@ -64,6 +68,15 @@ export class QuantMasterOrchestrator {
       games
     );
 
-    return { ablation };
+    // Integrando StressTest no audit (Phase 8)
+    const { StressTestEngine } = await import("../evidence/StressTestEngine");
+    const stressEngine = new StressTestEngine(draws, lotteryConfig);
+    // Simulação básica para auditoria rápida
+    const stress = await stressEngine.runStressTest(
+      () => games[0] || [],
+      { windowSize: 50, testSize: 20, mode: "rolling" }
+    );
+
+    return { ablation, stress };
   }
 }

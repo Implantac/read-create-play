@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, ShieldCheck, ShieldAlert } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RankingEntry } from "@/engine/strategy-evolution";
 import { MetricPill, MiniMetric } from "./LabShared";
@@ -39,6 +39,14 @@ export function RankingCard({ entry: r, pick, isExpanded, onToggle, trendIcon }:
               {r.metrics.consistency > 0.7 && (
                 <Badge variant="outline" className="text-[9px] border-green-500/30 text-green-500 bg-green-500/5">
                   ✓ Confiável
+                </Badge>
+              )}
+              {r.stressResult && (
+                <Badge variant="outline" className={`text-[9px] gap-1 ${
+                  r.stressResult.robustnessScore > 60 ? 'border-emerald-500/30 text-emerald-500 bg-emerald-500/5' : 'border-amber-500/30 text-amber-500 bg-amber-500/5'
+                }`}>
+                  {r.stressResult.robustnessScore > 60 ? <ShieldCheck className="w-2.5 h-2.5" /> : <ShieldAlert className="w-2.5 h-2.5" />}
+                  {r.stressResult.verdict.toUpperCase()}
                 </Badge>
               )}
             </div>

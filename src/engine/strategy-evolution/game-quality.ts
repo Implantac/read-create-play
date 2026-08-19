@@ -30,6 +30,10 @@ export interface CombinationAnalysis {
   avgOverlap: number;     // avg shared numbers between any 2 games
 }
 
+/**
+ * ScoreGame — Fase 4 do Plano Mestre.
+ * Calcula métricas de qualidade para cada jogo gerado com pesos calibrados.
+ */
 export function scoreGame(
   game: number[],
   config: LotteryConfig,
@@ -98,12 +102,13 @@ export function scoreGame(
     }
   }
 
+  // Pesos recalibrados conforme Plano Mestre (Qualidade vs Variância)
   const overallScore = Math.min(100,
-    parityBalance * 0.20 +
-    rangeBalance * 0.22 +
-    sumScore * 0.18 +
-    consecutiveScore * 0.15 +
-    frequencyScore * 0.15 +
+    parityBalance * 0.18 +
+    rangeBalance * 0.20 +
+    sumScore * 0.15 +
+    consecutiveScore * 0.12 +
+    frequencyScore * 0.25 + // Aumentado peso de frequência
     gapScore * 0.10
   );
 
@@ -150,7 +155,8 @@ export function analyzeCombination(
   const numberFrequency = new Map<number, number>();
   const pairFrequency = new Map<string, number>();
 
-  for (const game of games) {
+  const gamesArray = Array.isArray(games) ? games : [];
+  for (const game of gamesArray) {
     for (const n of game) {
       numberFrequency.set(n, (numberFrequency.get(n) || 0) + 1);
     }
@@ -173,10 +179,10 @@ export function analyzeCombination(
   // Average overlap between game pairs
   let totalOverlap = 0;
   let pairCount = 0;
-  for (let i = 0; i < games.length; i++) {
-    const setA = new Set(games[i]);
-    for (let j = i + 1; j < games.length; j++) {
-      const shared = games[j].filter(n => setA.has(n)).length;
+  for (let i = 0; i < gamesArray.length; i++) {
+    const setA = new Set(gamesArray[i]);
+    for (let j = i + 1; j < gamesArray.length; j++) {
+      const shared = (gamesArray[j] || []).filter(n => setA.has(n)).length;
       totalOverlap += shared;
       pairCount++;
     }

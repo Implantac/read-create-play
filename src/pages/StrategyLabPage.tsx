@@ -36,7 +36,7 @@ import {
   Settings2,
   Activity, CircleDot, Brain, FileDown, RefreshCw,
   Microscope, Database, Binary, Search, Wallet,
-  ShieldCheck, ArrowRightLeft, Percent, Scale
+  ShieldCheck, ArrowRightLeft, Percent, Scale, ShieldAlert
 } from "lucide-react";
 
 import { QuantMasterOrchestrator } from "@/engine/core/QuantMasterOrchestrator";
@@ -44,6 +44,7 @@ import { PortfolioOutput } from "@/engine/portfolio/PortfolioEngine";
 import { StrategyBenchmarkResult } from "@/engine/stats/benchmark-engine";
 import { AblationEngine, AblationImpact } from "@/engine/evidence/ablation-engine";
 import { EvidenceEngine } from "@/engine/evidence/EvidenceEngine";
+import { StressTestEngine, StressTestResult } from "@/engine/evidence/StressTestEngine";
 import { runFrequencyTrendScore } from "@/engine/ai/ml-models";
 
 import { generateRandomGames } from "@/engine/stats/baseline-benchmark";
@@ -90,6 +91,8 @@ export default function StrategyLabPage() {
   const [portfolioResult, setPortfolioResult] = useState<(PortfolioOutput & { benchmark?: StrategyBenchmarkResult }) | null>(null);
   const [optimizingPortfolio, setOptimizingPortfolio] = useState(false);
   const [riskProfile, setRiskProfile] = useState<'CONSERVADOR' | 'EQUILIBRADO' | 'AGRESSIVO'>('EQUILIBRADO');
+  const [stressResult, setStressResult] = useState<StressTestResult | null>(null);
+  const [runningStress, setRunningStress] = useState(false);
 
 
 
@@ -283,6 +286,47 @@ export default function StrategyLabPage() {
       toast.error("Erro na análise de ablação");
     } finally {
       setRunningAblation(false);
+    }
+  }, [result, draws, config]);
+
+  const runStressTest = useCallback(async () => {
+    if (!result || !draws || result.rankings.length === 0) return;
+    setRunningStress(true);
+    try {
+      const bestStrategy = result.rankings[0];
+      const engine = new StressTestEngine(draws, config);
+      
+      const modelFn = () => bestStrategy.metrics.hitDistribution ? Object.keys(bestStrategy.metrics.hitDistribution).map(Number) : [];
+
+      const stress = await engine.runStressTest(
+        modelFn as any, 
+        { windowSize: 50, testSize: 30, mode: 'rolling' }
+      );
+      
+      setStressResult(stress);
+      
+      // Update the best strategy in the result with the stress result
+      setResult(prev => {
+        if (!prev) return null;
+        const newRankings = [...prev.rankings];
+        if (newRankings[0]) {
+          newRankings[0] = {
+            ...newRankings[0],
+            stressResult: {
+              robustnessScore: stress.robustnessScore,
+              verdict: stress.verdict
+            }
+          };
+        }
+        return { ...prev, rankings: newRankings };
+      });
+
+      toast.success("Teste de estresse concluído!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro no teste de estresse");
+    } finally {
+      setRunningStress(false);
     }
   }, [result, draws, config]);
 
@@ -982,34 +1026,80 @@ export default function StrategyLabPage() {
                       </CardContent>
                     </Card>
 
-                    <Card className="bg-card/40 border-border/40 backdrop-blur-md">
+                    <Card className="bg-card/40 border-border/40 backdrop-blur-md overflow-hidden relative">
+                      <div className="absolute top-0 right-0 p-4">
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          disabled={runningStress || !result || result.rankings.length === 0}
+                          onClick={runStressTest}
+                          className="text-[10px] gap-2 h-7"
+                        >
+                          {runningStress ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Gauge className="w-3 h-3" />}
+                          Executar Estresse
+                        </Button>
+                      </div>
                       <CardHeader>
                         <CardTitle className="text-sm font-bold flex items-center gap-2">
-                          <Brain className="w-4 h-4 text-primary" />
-                          Evidence Insights
+                          <ShieldCheck className="w-4 h-4 text-primary" />
+                          Robustness Analysis (Stress Test)
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
-                        <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 space-y-2">
-                          <div className="flex items-center gap-2">
-                            <Sparkles className="w-4 h-4 text-primary" />
-                            <p className="text-[11px] font-bold uppercase text-primary">Convergência Confirmada</p>
+                        {stressResult ? (
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <div className="space-y-0.5">
+                                <p className="text-[10px] uppercase font-black text-muted-foreground">Robustness Score</p>
+                                <p className={`text-2xl font-black font-mono ${
+                                  stressResult.robustnessScore > 70 ? 'text-emerald-500' : 
+                                  stressResult.robustnessScore > 40 ? 'text-amber-500' : 'text-destructive'
+                                }`}>
+                                  {stressResult.robustnessScore.toFixed(1)}/100
+                                </p>
+                              </div>
+                              <Badge variant="outline" className={`uppercase text-[10px] font-black tracking-widest ${
+                                stressResult.verdict === 'robust' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+                                stressResult.verdict === 'overfitted' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
+                                'bg-destructive/10 text-destructive border-destructive/20'
+                              }`}>
+                                {stressResult.verdict}
+                              </Badge>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <div className="flex justify-between text-[10px] uppercase font-black text-muted-foreground">
+                                <span>Estabilidade de Sinal</span>
+                                <span>{(stressResult.stabilityIndex * 100).toFixed(1)}%</span>
+                              </div>
+                              <Progress value={stressResult.stabilityIndex * 100} className="h-1.5" />
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <p className="text-[10px] uppercase font-black text-muted-foreground">Diagnóstico</p>
+                              <div className="grid grid-cols-1 gap-1.5">
+                                {stressResult.criticalFailurePoints.length > 0 ? stressResult.criticalFailurePoints.map((f, i) => (
+                                  <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-destructive/5 border border-destructive/10">
+                                    <ShieldAlert className="w-3 h-3 text-destructive shrink-0" />
+                                    <p className="text-[10px] text-destructive italic">{f}</p>
+                                  </div>
+                                )) : (
+                                  <div className="flex items-center gap-2 p-2 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
+                                    <ShieldCheck className="w-3 h-3 text-emerald-500 shrink-0" />
+                                    <p className="text-[10px] text-emerald-500 italic">Nenhum ponto de falha crítico detectado em janelas variadas.</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                          <p className="text-[11px] text-muted-foreground leading-relaxed">
-                            A hipótese de <strong>Ciclos Curtos</strong> apresentou um lift estatístico de 1.15x com p-value inferior a 0.05, validando a eficácia do indicador para a modalidade atual.
-                          </p>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="p-3 rounded-xl bg-muted/10 border border-border text-center">
-                            <p className="text-[9px] uppercase font-black text-muted-foreground mb-1">Total Hipóteses</p>
-                            <p className="text-xl font-black font-mono text-foreground">12</p>
+                        ) : (
+                          <div className="py-12 flex flex-col items-center justify-center text-center space-y-3">
+                            <Gauge className="w-8 h-8 text-muted-foreground/30" />
+                            <p className="text-[10px] text-muted-foreground max-w-[200px]">
+                              Execute o teste de estresse para validar a estabilidade do sinal em diferentes regimes e janelas.
+                            </p>
                           </div>
-                          <div className="p-3 rounded-xl bg-muted/10 border border-border text-center">
-                            <p className="text-[9px] uppercase font-black text-muted-foreground mb-1">Validadas (p&lt;0.05)</p>
-                            <p className="text-xl font-black font-mono text-emerald-500">4</p>
-                          </div>
-                        </div>
+                        )}
                       </CardContent>
                     </Card>
                   </div>

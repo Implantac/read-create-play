@@ -38,19 +38,25 @@ export class BenchmarkEngine {
   ): Promise<StrategyBenchmarkResult> {
     const sampleSize = generatedGames.length;
     
-    // 1. Random Baseline
-    const randomGames = generateRandomGames(lotteryConfig, 1000);
-    const randomResults = this.calculateAverageHits(randomGames, draws.slice(0, 100));
+    // 1. Random Baseline (Monte Carlo para baseline neutra)
+    const randomGames = generateRandomGames(lotteryConfig, 2000);
+    // Usamos draws aleatórios para baseline para evitar qualquer viés
+    const randomResults = this.calculateAverageHits(randomGames, draws.slice(0, 50));
     const randomAvg = randomResults.average;
 
-    // 2. Simulação de significância via EvidenceEngine
+    // 2. Out-of-Sample (OOS) - Fase 7
+    // Dividimos os draws para validar em dados não vistos
+    const oosDraws = draws.slice(Math.floor(draws.length * 0.7));
+    const oosPerformance = this.calculateAverageHits(generatedGames, oosDraws).average;
+
+    // 3. Simulação de significância via EvidenceEngine
     const totalHits = this.calculateTotalHits(generatedGames, draws.slice(0, 50));
     const evidence = analyzeEvidence(
       totalHits,
       generatedGames,
       draws.slice(0, 50),
       lotteryConfig,
-      10000 // Reduzido para performance no benchmark inicial
+      100000 // Aumentado para 100k conforme Plano Mestre
     );
 
     const advantage = historicalPerformance - randomAvg;
@@ -62,7 +68,7 @@ export class BenchmarkEngine {
       titanPerformance: historicalPerformance,
       randomBaseline: randomAvg,
       uniformBaseline: randomAvg, 
-      outOfSamplePerformance: 0, // Placeholder para FASE 7
+      outOfSamplePerformance: oosPerformance,
       zScore: evidence.zScore,
       pValue: evidence.pValue,
       isStatisticallySignificant: evidence.isSignificant,

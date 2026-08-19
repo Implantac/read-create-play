@@ -175,6 +175,7 @@ function parityDist(games: number[][]): Record<number, number> {
 
 function sumDist(games: number[][], buckets = 10): { bucket: string; count: number }[] {
   const sums = games.map(g => g.reduce((a, b) => a + b, 0));
+  if (sums.length === 0) return [];
   const min = Math.min(...sums), max = Math.max(...sums);
   const step = Math.max(1, (max - min) / buckets);
   const out: { bucket: string; count: number }[] = [];
