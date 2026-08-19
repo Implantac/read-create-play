@@ -128,6 +128,26 @@ export function getPrizeTiers(lotteryId: string): { hits: number; label: string;
         { hits: 12, label: "12 acertos", estimatedPrize: "R$ 14,00" },
         { hits: 11, label: "11 acertos", estimatedPrize: "R$ 7,00" },
       ];
+    case "maismilionaria":
+      return [
+        { hits: 6, label: "6 acertos + 2 trevos", estimatedPrize: "Variável" },
+        { hits: 6, label: "6 acertos + 1 ou 0 trevo", estimatedPrize: "Variável" },
+        { hits: 5, label: "5 acertos + 2 trevos", estimatedPrize: "Variável" },
+        { hits: 5, label: "5 acertos + 1 ou 0 trevo", estimatedPrize: "Variável" },
+      ];
+    case "federal":
+      return [
+        { hits: 1, label: "1º Prêmio", estimatedPrize: "Variável" },
+        { hits: 1, label: "2º Prêmio", estimatedPrize: "Variável" },
+        { hits: 1, label: "3º Prêmio", estimatedPrize: "Variável" },
+        { hits: 1, label: "4º Prêmio", estimatedPrize: "Variável" },
+        { hits: 1, label: "5º Prêmio", estimatedPrize: "Variável" },
+      ];
+    case "loteca":
+      return [
+        { hits: 14, label: "14 acertos", estimatedPrize: "Variável" },
+        { hits: 13, label: "13 acertos", estimatedPrize: "Variável" },
+      ];
     default:
       return [
         { hits: 6, label: "Faixa 1", estimatedPrize: "Variável" },
