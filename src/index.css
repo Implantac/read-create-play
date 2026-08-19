@@ -332,26 +332,7 @@
   display: none !important;
 }
 
-/* Custom UI Tweaks */
-.glass-panel {
-  @apply bg-black/80 backdrop-blur-2xl border-white/10 shadow-2xl;
-}
-
-.glass-card {
-  @apply bg-black/50 backdrop-blur-2xl border border-white/5 transition-all duration-500;
-  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
-}
-
-.glass-card:hover {
-  @apply border-primary/50 shadow-premium-hover -translate-y-2;
-}
-
 /* Typography refinements */
 .font-mono {
   font-feature-settings: "tnum", "lnum";
-}
-
-/* A11y & Focus */
-*:focus-visible {
-  @apply outline-none ring-2 ring-primary/60 ring-offset-2 ring-offset-background rounded-sm;
 }
