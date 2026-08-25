@@ -148,11 +148,7 @@ export function PlanCard({ plan, index, isCurrent, isUpgrade, isLoading, onCheck
           <CardContent className="flex-1 pt-2">
             {/* Saved bets limit */}
             <div
-              className={`flex items-center gap-2 mb-5 px-3 py-2.5 rounded-lg text-xs font-semibold ${
-                plan.id === "free"
-                  ? "bg-destructive/10 text-destructive border border-destructive/20"
-                  : "bg-primary/10 text-primary border border-primary/20"
-              }`}
+              className="flex items-center gap-2 mb-5 px-3 py-2.5 rounded-lg text-xs font-semibold bg-primary/10 text-primary border border-primary/20"
             >
               <Save className="w-3.5 h-3.5 shrink-0" />
               {plan.savedBetsLimit}
@@ -180,15 +176,13 @@ export function PlanCard({ plan, index, isCurrent, isUpgrade, isLoading, onCheck
                   : ""
               }`}
               variant={isCurrent ? "secondary" : plan.highlight ? "default" : "outline"}
-              disabled={isCurrent || plan.id === "free" || isLoading}
+              disabled={isCurrent || isLoading}
               onClick={() => isUpgrade && onCheckout(plan.id)}
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : isCurrent ? (
                 "Plano atual"
-              ) : plan.id === "free" ? (
-                "Gratuito"
               ) : (
                 <>
                   {plan.cta}
