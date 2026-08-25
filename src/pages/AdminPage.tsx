@@ -20,7 +20,7 @@ import {
 import {
   Users, Crown, TrendingUp, Search, Shield, Loader2, RefreshCw, Ban, CheckCircle2,
   ShieldCheck, AlertTriangle, History, UserCog, Eye, Grid3X3, DollarSign,
-  ArrowUpRight, Target, FlaskConical, Smartphone
+  ArrowUpRight, Target, FlaskConical, Smartphone, UserPlus
 } from "lucide-react";
 import { AdminBacktestPanel } from "@/components/admin/AdminBacktestPanel";
 import { PWAAnalyticsPanel } from "@/components/admin/PWAAnalyticsPanel";
@@ -33,6 +33,7 @@ import { profileService } from "@/services/profiles/profileService";
 import { adminService } from "@/services/admin/adminService";
 import { UserRow } from "@/components/admin/UserRow";
 import { AuditLogTable } from "@/components/admin/AuditLogTable";
+import { AccountManager } from "@/components/admin/AccountManager";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 
@@ -332,8 +333,9 @@ export default function AdminPage() {
       </div>
 
       <Tabs defaultValue="users" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-6 max-w-3xl">
+        <TabsList className="flex flex-wrap h-auto w-full justify-start gap-1">
           <TabsTrigger value="users" className="gap-1.5"><Users className="w-4 h-4" /> Usuários</TabsTrigger>
+          <TabsTrigger value="accounts" className="gap-1.5"><UserPlus className="w-4 h-4" /> Contas</TabsTrigger>
           <TabsTrigger value="revenue" className="gap-1.5"><DollarSign className="w-4 h-4" /> Receita</TabsTrigger>
           <TabsTrigger value="usage" className="gap-1.5"><TrendingUp className="w-4 h-4" /> Uso</TabsTrigger>
           <TabsTrigger value="audit" className="gap-1.5"><History className="w-4 h-4" /> Auditoria</TabsTrigger>
@@ -341,6 +343,10 @@ export default function AdminPage() {
           <TabsTrigger value="backtest" className="gap-1.5"><FlaskConical className="w-4 h-4" /> Backtest</TabsTrigger>
         </TabsList>
 
+
+        <TabsContent value="accounts">
+          <AccountManager profiles={profiles} onChanged={fetchData} />
+        </TabsContent>
 
         {/* USERS TAB */}
         <TabsContent value="pwa">
