@@ -91,49 +91,58 @@ export function analyzeEvidence(
 
   // Simulation-based P-Value (Paired Permutation Test)
   // We compare the strategy's hits against hits from random games on the SAME draws.
+  // Work is bounded so the main thread never blocks for long: total random-game
+  // generations are capped, which keeps the estimate stable while staying responsive.
+  const MAX_GENERATIONS = 1_500_000;
+  const perIteration = Math.max(1, draws.length * games.length);
+  const effectiveIterations = Math.max(
+    500,
+    Math.min(iterations, Math.floor(MAX_GENERATIONS / perIteration))
+  );
+
+  const drawSets = draws.map(d => new Set(d.numbers));
   let extremeCount = 0;
   const simulationLifts: number[] = [];
 
-  for (let i = 0; i < iterations; i++) {
+  for (let i = 0; i < effectiveIterations; i++) {
     let simHits = 0;
-    for (let d = 0; d < draws.length; d++) {
-      const drawSet = new Set(draws[d].numbers);
+    for (let d = 0; d < drawSets.length; d++) {
+      const drawSet = drawSets[d];
       for (let g = 0; g < games.length; g++) {
         // Generate a random game for this slot
         const randomGame = generateRandomGame(config);
-        const hits = randomGame.filter(n => drawSet.has(n)).length;
-        simHits += hits;
+        for (const n of randomGame) if (drawSet.has(n)) simHits++;
       }
     }
-    
+
     const simP = simHits / (sampleSize * config.pick);
     const simLift = simP / (p_null || 0.0001);
     simulationLifts.push(simLift);
     if (simHits >= observedHits) extremeCount++;
   }
 
-  const pValue = Math.max(0.0001, extremeCount / iterations);
-  
+  const pValue = Math.max(1 / (effectiveIterations + 1), extremeCount / effectiveIterations);
+
   // Calculate Z-Score from the simulation distribution
-  const simMean = simulationLifts.reduce((a, b) => a + b, 0) / iterations;
-  const simVar = simulationLifts.reduce((a, b) => a + (b - simMean) ** 2, 0) / iterations;
+  const simMean = simulationLifts.reduce((a, b) => a + b, 0) / effectiveIterations;
+  const simVar = simulationLifts.reduce((a, b) => a + (b - simMean) ** 2, 0) / effectiveIterations;
   const simStdev = Math.sqrt(simVar) || 0.0001;
   const zScore = (lift - simMean) / simStdev;
 
   // Confidence Interval (Bootstrap percentile method from simulations)
   simulationLifts.sort((a, b) => a - b);
   const ci: [number, number] = [
-    simulationLifts[Math.floor(iterations * 0.025)] || lift,
-    simulationLifts[Math.floor(iterations * 0.975)] || lift
+    simulationLifts[Math.floor(effectiveIterations * 0.025)] || lift,
+    simulationLifts[Math.floor(effectiveIterations * 0.975)] || lift
   ];
 
   const grade = calculateGrade(pValue, lift);
 
   // Advanced Monte Carlo Baseline Stats
-  const mean = simulationLifts.reduce((a, b) => a + b, 0) / iterations;
-  const median = simulationLifts[Math.floor(iterations * 0.5)];
-  const p5 = simulationLifts[Math.floor(iterations * 0.05)];
-  const p95 = simulationLifts[Math.floor(iterations * 0.95)];
+  const mean = simMean;
+  const median = simulationLifts[Math.floor(effectiveIterations * 0.5)];
+  const p5 = simulationLifts[Math.floor(effectiveIterations * 0.05)];
+  const p95 = simulationLifts[Math.floor(effectiveIterations * 0.95)];
 
   return {
     metric: "Performance Score",
@@ -143,7 +152,7 @@ export function analyzeEvidence(
     confidenceInterval: ci,
     pValue,
     sampleSize,
-    method: "Paired Permutation Test (100k)",
+    method: `Paired Permutation Test (${effectiveIterations.toLocaleString("pt-BR")} iter.)`,
     conclusion: grade,
     isSignificant: pValue < 0.05 && lift > 1.0,
     lift,
@@ -155,7 +164,7 @@ export function analyzeEvidence(
       median,
       p5,
       p95,
-      iterations
+      iterations: effectiveIterations
     }
   };
 }

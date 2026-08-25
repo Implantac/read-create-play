@@ -8,7 +8,7 @@
  *   4. Performance do Motor (histórico de presets)
  *   5. Sugestão de Fechamento Automático (base × orçamento)
  */
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -40,10 +40,23 @@ export default function ComandoApostadorPage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [decision, setDecision] = useState<QuantitativeDecisionResult | null>(null);
 
-  // Auto-run analysis when data is available
+  // Auto-run analysis when data is available.
+  // Deferred + de-duplicated: the pipeline is CPU heavy, so it runs at most once
+  // per (loteria, tamanho do histórico) and only after the UI has painted.
+  const lastRunRef = useRef<string | null>(null);
+
   useEffect(() => {
+    if (!selectedLottery || !lotteryConfig || !draws || draws.length < 30 || !stats?.length) return;
+
+    const signature = `${selectedLottery}:${draws.length}:${stats.length}`;
+    if (lastRunRef.current === signature) return;
+    lastRunRef.current = signature;
+
+    let cancelled = false;
+
     async function runPipeline() {
-      if (!selectedLottery || !lotteryConfig || !draws || draws.length < 30 || !stats) return;
+      if (!selectedLottery || !lotteryConfig || !stats) return;
+
       
       setIsAnalyzing(true);
       try {
@@ -78,17 +91,23 @@ export default function ComandoApostadorPage() {
           historicalPerformance: 1.05 // Baseline improvement
         });
 
-        setDecision(result);
+        if (!cancelled) setDecision(result);
       } catch (error) {
         console.error("Erro no Pipeline Quantitativo:", error);
         toast.error("Erro ao processar análise avançada.");
       } finally {
-        setIsAnalyzing(false);
+        if (!cancelled) setIsAnalyzing(false);
       }
     }
 
-    runPipeline();
-  }, [selectedLottery, lotteryConfig, draws, stats]);
+    // Yield to the browser so the page paints before the heavy computation.
+    const timer = window.setTimeout(runPipeline, 300);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedLottery, draws.length, stats?.length]);
 
   // Consenso simples: as N dezenas mais quentes (freq / delay baixo).
   const consensus = useMemo(() => {
