@@ -58,16 +58,8 @@ export default function LoginPage() {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    const redirectTo = `${window.location.origin}${nextPath}`;
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo },
-    });
-    if (error) {
-      toast({ title: "Erro", description: error.message, variant: "destructive" });
-    }
-  };
+
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 relative overflow-hidden">
