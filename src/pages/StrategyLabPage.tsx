@@ -806,8 +806,8 @@ export default function StrategyLabPage() {
 
               {/* Main Tabs */}
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <div className="overflow-x-auto -mx-1 px-1 scrollbar-thin">
-                  <TabsList className="inline-flex w-full min-w-[900px] sm:min-w-0 sm:grid sm:grid-cols-11 h-11">
+                <div className="-mx-1 px-1">
+                  <TabsList className="flex flex-wrap w-full h-auto gap-1 p-1 justify-start">
                     <TabsTrigger value="ranking" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all">Ranking</TabsTrigger>
                     <TabsTrigger value="backtest" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all">Backtest</TabsTrigger>
                     <TabsTrigger value="portfolio" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all flex items-center gap-1.5">
@@ -819,44 +819,9 @@ export default function StrategyLabPage() {
                     <TabsTrigger value="charts" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all">Gráficos</TabsTrigger>
                     <TabsTrigger value="suggestions" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all">Sugestões</TabsTrigger>
                     <TabsTrigger value="bestgames" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all">Melhores</TabsTrigger>
-                    <TabsTrigger value="allgames" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all">Gerados</TabsTrigger>
+                    <TabsTrigger value="games" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all">Jogos</TabsTrigger>
+                    <TabsTrigger value="analysis" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all">Análise</TabsTrigger>
                     <TabsTrigger value="comparison" className="text-[10px] font-black uppercase tracking-widest italic data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all">Comparar</TabsTrigger>
-                    <TabsTrigger value="backtest" className="text-xs gap-1 data-[state=active]:shadow-sm">
-                      <FlaskConical className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Backtest</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="bestgames" className="text-xs gap-1 data-[state=active]:shadow-sm">
-                      <Star className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Melhores</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="ranking" className="text-xs gap-1 data-[state=active]:shadow-sm">
-                      <Trophy className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Ranking</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="games" className="text-xs gap-1 data-[state=active]:shadow-sm">
-                      <Dices className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Jogos</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="analysis" className="text-xs gap-1 data-[state=active]:shadow-sm">
-                      <Target className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Análise</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="charts" className="text-xs gap-1 data-[state=active]:shadow-sm">
-                      <BarChart3 className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Gráficos</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="suggestions" className="text-xs gap-1 data-[state=active]:shadow-sm">
-                      <Brain className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Evolução</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="evidence" className="text-xs gap-1 data-[state=active]:shadow-sm">
-                      <Binary className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Evidência</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="comparison" className="text-xs gap-1 data-[state=active]:shadow-sm">
-                      <Layers className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Tabela</span>
-                    </TabsTrigger>
                   </TabsList>
                 </div>
 
