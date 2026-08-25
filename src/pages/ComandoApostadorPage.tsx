@@ -8,7 +8,7 @@
  *   4. Performance do Motor (histórico de presets)
  *   5. Sugestão de Fechamento Automático (base × orçamento)
  */
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -91,17 +91,23 @@ export default function ComandoApostadorPage() {
           historicalPerformance: 1.05 // Baseline improvement
         });
 
-        setDecision(result);
+        if (!cancelled) setDecision(result);
       } catch (error) {
         console.error("Erro no Pipeline Quantitativo:", error);
         toast.error("Erro ao processar análise avançada.");
       } finally {
-        setIsAnalyzing(false);
+        if (!cancelled) setIsAnalyzing(false);
       }
     }
 
-    runPipeline();
-  }, [selectedLottery, lotteryConfig, draws, stats]);
+    // Yield to the browser so the page paints before the heavy computation.
+    const timer = window.setTimeout(runPipeline, 300);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedLottery, draws.length, stats?.length]);
 
   // Consenso simples: as N dezenas mais quentes (freq / delay baixo).
   const consensus = useMemo(() => {
