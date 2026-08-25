@@ -4,8 +4,10 @@
  * Cancelamento é feito pelo main thread via terminate().
  */
 
-import { generateClosing } from "@/engine/closing";
-import type { ClosingRequest, ClosingStrategy } from "@/engine/closing";
+// Importa direto dos módulos concretos (não do barrel) para evitar arrastar
+// dependências de browser (ex.: cliente do backend que usa localStorage) para o worker.
+import { generateClosing } from "@/engine/closing/core/ClosingEngine";
+import type { ClosingRequest, ClosingStrategy } from "@/engine/closing/core/types";
 
 type InMsg =
   | { type: "generate"; id: string; request: ClosingRequest }
