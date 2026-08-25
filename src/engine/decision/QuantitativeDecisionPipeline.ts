@@ -43,7 +43,9 @@ export class QuantitativeDecisionPipeline {
     const { config, draws, generatedGames, historicalPerformance } = request;
 
     // 1. DATA QUALITY & LEAKAGE
-    const quality = validateLotteryData(draws, config.pick, config.numbers);
+    // NOTE: pass null so the engine infers the real drawn-ball count from history
+    // (config.pick is the bettor's minimum marking, not the amount drawn).
+    const quality = validateLotteryData(draws, null, config.numbers);
     
     // Leakage detection (Phase 2 integration)
     const hasLeakage = LeakageDetector.detect(
