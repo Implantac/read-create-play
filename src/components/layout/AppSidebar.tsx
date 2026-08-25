@@ -59,7 +59,9 @@ const accountItems = [
   { title: "Upgrade Vitalício", url: "/planos", icon: Crown },
 ];
 
-const adminItems: any[] = [];
+const adminItems: { title: string; url: string; icon: any }[] = [
+  { title: "Painel Admin", url: "/admin", icon: ShieldCheck },
+];
 
 
 const PLAN_LABELS: Record<string, string> = {
