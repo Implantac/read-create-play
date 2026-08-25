@@ -63,7 +63,7 @@ const adminItems: any[] = [];
 
 
 const PLAN_LABELS: Record<string, string> = {
-  free: "Gratuito",
+  free: "Sem acesso",
   premium: "Premium",
   professional: "Profissional",
   lifetime: "Vitalício",

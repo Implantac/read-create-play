@@ -11,7 +11,7 @@ interface PlanGateProps {
   fallbackMessage?: string;
 }
 
-const PLAN_LABELS = { free: "Gratuito", premium: "Premium", professional: "Profissional", lifetime: "Vitalício" };
+const PLAN_LABELS = { free: "Sem acesso", premium: "Premium", professional: "Profissional", lifetime: "Vitalício" };
 
 export function PlanGate({ feature, children, fallbackMessage }: PlanGateProps) {
   const { hasAccess, getMinPlan } = usePlanAccess();

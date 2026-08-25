@@ -2,25 +2,25 @@ import { Check, X } from "lucide-react";
 import { motion } from "framer-motion";
 
 const features = [
-  { name: "Dashboard estatístico", free: true, premium: true, pro: true },
-  { name: "Gerador básico", free: true, premium: true, pro: true },
-  { name: "Histórico de concursos", free: true, premium: true, pro: true },
-  { name: "Conferidor de apostas", free: true, premium: true, pro: true },
-  { name: "Jogos salvos ilimitados", free: false, premium: true, pro: true },
-  { name: "Geradores avançados (Extremo, IA, Evolutivo)", free: false, premium: true, pro: true },
-  { name: "Gerador Profissional", free: false, premium: true, pro: true },
-  { name: "Fechamentos inteligentes", free: false, premium: true, pro: true },
-  { name: "Simulações (Monte Carlo, Backtesting)", free: false, premium: true, pro: true },
-  { name: "Exportação PDF", free: false, premium: true, pro: true },
-  { name: "Estratégias (Padrões, Comparação)", free: false, premium: true, pro: true },
-  { name: "Dashboard de ROI", free: false, premium: true, pro: true },
-  { name: "Machine Learning preditivo", free: false, premium: false, pro: true },
-  { name: "Motor HP Matemático", free: false, premium: false, pro: true },
-  { name: "Analytics avançado", free: false, premium: false, pro: true },
-  { name: "Algoritmo Genético + SA", free: false, premium: false, pro: true },
-  { name: "IA Autônoma", free: false, premium: false, pro: true },
-  { name: "AI Analyst (Chat IA)", free: false, premium: false, pro: true },
-  { name: "Suporte prioritário", free: false, premium: false, pro: true },
+  { name: "Dashboard estatístico", premium: true, pro: true },
+  { name: "Gerador básico", premium: true, pro: true },
+  { name: "Histórico de concursos", premium: true, pro: true },
+  { name: "Conferidor de apostas", premium: true, pro: true },
+  { name: "Jogos salvos ilimitados", premium: true, pro: true },
+  { name: "Geradores avançados (Extremo, IA, Evolutivo)", premium: true, pro: true },
+  { name: "Gerador Profissional", premium: true, pro: true },
+  { name: "Fechamentos inteligentes", premium: true, pro: true },
+  { name: "Simulações (Monte Carlo, Backtesting)", premium: true, pro: true },
+  { name: "Exportação PDF", premium: true, pro: true },
+  { name: "Estratégias (Padrões, Comparação)", premium: true, pro: true },
+  { name: "Dashboard de ROI", premium: true, pro: true },
+  { name: "Machine Learning preditivo", premium: false, pro: true },
+  { name: "Motor HP Matemático", premium: false, pro: true },
+  { name: "Analytics avançado", premium: false, pro: true },
+  { name: "Algoritmo Genético + SA", premium: false, pro: true },
+  { name: "IA Autônoma", premium: false, pro: true },
+  { name: "AI Analyst (Chat IA)", premium: false, pro: true },
+  { name: "Suporte prioritário", premium: false, pro: true },
 ];
 
 function CellIcon({ available }: { available: boolean }) {
@@ -51,8 +51,7 @@ export function PlanComparisonTable() {
             <thead>
               <tr className="border-b border-border/30 bg-muted/30">
                 <th className="text-left px-5 py-3.5 font-semibold text-foreground">Funcionalidade</th>
-                <th className="text-center px-4 py-3.5 font-semibold text-foreground w-24">Gratuito</th>
-                <th className="text-center px-4 py-3.5 font-semibold text-primary w-24">Premium</th>
+                                <th className="text-center px-4 py-3.5 font-semibold text-primary w-24">Premium</th>
                 <th className="text-center px-4 py-3.5 font-semibold text-foreground w-24">Pro</th>
               </tr>
             </thead>
@@ -60,8 +59,7 @@ export function PlanComparisonTable() {
               {features.map((f, i) => (
                 <tr key={f.name} className={`border-b border-border/20 ${i % 2 === 0 ? "" : "bg-muted/10"}`}>
                   <td className="px-5 py-3 text-foreground/80">{f.name}</td>
-                  <td className="px-4 py-3"><CellIcon available={f.free} /></td>
-                  <td className="px-4 py-3 bg-primary/[0.03]"><CellIcon available={f.premium} /></td>
+                                    <td className="px-4 py-3 bg-primary/[0.03]"><CellIcon available={f.premium} /></td>
                   <td className="px-4 py-3"><CellIcon available={f.pro} /></td>
                 </tr>
               ))}

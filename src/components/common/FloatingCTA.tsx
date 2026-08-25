@@ -40,7 +40,7 @@ export function FloatingCTA() {
             onClick={handleClick}
             className="gradient-brand text-primary-foreground shadow-2xl shadow-primary/30 gap-2 px-6 h-12 text-sm font-semibold"
           >
-            Testar Gratuitamente <ArrowRight className="w-4 h-4" />
+            Acesso Vitalício R$ 99,90 <ArrowRight className="w-4 h-4" />
           </Button>
         </motion.div>
       )}

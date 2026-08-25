@@ -15,9 +15,9 @@ const faqCategories = [
     title: "Conta e Acesso",
     icon: Users,
     faqs: [
-      { q: "Como criar minha conta?", a: "Acesse a página de cadastro, preencha seu nome, e-mail, telefone e senha. Após o cadastro, você terá 7 dias de acesso gratuito a todas as funcionalidades." },
+      { q: "Como criar minha conta?", a: "Acesse a página de cadastro, preencha seu nome, e-mail, telefone e senha. Após o cadastro, ative o Acesso Vitalício para liberar todas as funcionalidades." },
       { q: "Esqueci minha senha, como recuperar?", a: "Na página de login, clique em \"Esqueci minha senha\". Enviaremos um link de recuperação para o e-mail cadastrado." },
-      { q: "Como funciona o período de teste gratuito?", a: "Ao criar sua conta, você recebe 7 dias de acesso completo sem nenhum custo. Após esse período, escolha um dos nossos planos para continuar usando." },
+      { q: "Existe plano gratuito ou período de teste?", a: "Não trabalhamos com plano gratuito. O acesso é liberado com o pagamento único do Acesso Vitalício, com reembolso integral em até 7 dias." },
       { q: "Posso usar a mesma conta em vários dispositivos?", a: "Sim! Sua conta pode ser acessada de qualquer dispositivo com navegador. Seus dados ficam sincronizados automaticamente." },
     ],
   },
