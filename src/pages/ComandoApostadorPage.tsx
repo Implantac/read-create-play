@@ -40,10 +40,23 @@ export default function ComandoApostadorPage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [decision, setDecision] = useState<QuantitativeDecisionResult | null>(null);
 
-  // Auto-run analysis when data is available
+  // Auto-run analysis when data is available.
+  // Deferred + de-duplicated: the pipeline is CPU heavy, so it runs at most once
+  // per (loteria, tamanho do histórico) and only after the UI has painted.
+  const lastRunRef = useRef<string | null>(null);
+
   useEffect(() => {
+    if (!selectedLottery || !lotteryConfig || !draws || draws.length < 30 || !stats?.length) return;
+
+    const signature = `${selectedLottery}:${draws.length}:${stats.length}`;
+    if (lastRunRef.current === signature) return;
+    lastRunRef.current = signature;
+
+    let cancelled = false;
+
     async function runPipeline() {
-      if (!selectedLottery || !lotteryConfig || !draws || draws.length < 30 || !stats) return;
+      if (!selectedLottery || !lotteryConfig || !stats) return;
+
       
       setIsAnalyzing(true);
       try {
