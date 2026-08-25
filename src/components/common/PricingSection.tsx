@@ -1,4 +1,4 @@
-import { Crown, CheckCircle2, Loader2, ShieldCheck, Gem, TrendingUp, Zap, Users, Brain, Shield } from "lucide-react";
+import { Crown, CheckCircle2, Loader2, ShieldCheck, Gem, TrendingUp, Zap, Users, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
@@ -40,22 +40,6 @@ export function PricingSection() {
 
   const plans = [
     {
-      name: "Plano Grátis",
-      price: "R$ 0",
-      description: "Conheça a plataforma sem custo.",
-      features: [
-        "Acesso a todas as loterias oficiais",
-        "Limite de 3 jogos salvos por cada modalidade",
-        "Gerador básico com estatística essencial",
-        "Resultados oficiais em tempo real",
-        "Conferidor de apostas ilimitado",
-      ],
-      cta: "Criar Conta Grátis",
-      popular: false,
-      color: "bg-muted/50 border-white/5",
-      icon: Shield
-    },
-    {
       name: "Acesso Vitalício",
       price: LAUNCH_PRICE,
       description: "O ecossistema Titan completo — pagamento único.",
@@ -95,11 +79,11 @@ export function PricingSection() {
             PLANOS <span className="gradient-brand-text drop-shadow-[0_0_20px_rgba(201,168,76,0.3)]">TITAN</span>
           </h2>
           <p className="text-muted-foreground max-w-3xl mx-auto font-medium text-xl italic opacity-70 leading-relaxed px-4">
-            Um pagamento único, acesso vitalício de elite. Sem mensalidades, sem renovações, sem burocracia.
+            Um pagamento único, acesso vitalício de elite. Sem mensalidades, sem renovações, sem plano gratuito.
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div className="grid gap-8 max-w-2xl mx-auto">
           {plans.map((plan, idx) => (
             <motion.div
               key={plan.name}
@@ -136,7 +120,7 @@ export function PricingSection() {
                   <div className="flex items-baseline gap-1">
                     <span className="text-6xl font-black font-mono tracking-tighter italic">{plan.price}</span>
                     <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-40 ml-1">
-                      {plan.price === "R$ 0" ? "/ sempre" : "/ pagamento único"}
+                      {"/ pagamento único"}
                     </span>
                   </div>
                 </div>
@@ -151,10 +135,10 @@ export function PricingSection() {
                 </ul>
 
                 <Button 
-                  onClick={plan.price === "R$ 0" ? () => navigate("/signup") : handleCheckout}
-                  onMouseEnter={() => prefetchRoute(plan.price === "R$ 0" ? "/signup" : session ? "/planos" : "/login")}
-                  onFocus={() => prefetchRoute(plan.price === "R$ 0" ? "/signup" : session ? "/planos" : "/login")}
-                  onTouchStart={() => prefetchRoute(plan.price === "R$ 0" ? "/signup" : session ? "/planos" : "/login")}
+                  onClick={handleCheckout}
+                  onMouseEnter={() => prefetchRoute(session ? "/planos" : "/login")}
+                  onFocus={() => prefetchRoute(session ? "/planos" : "/login")}
+                  onTouchStart={() => prefetchRoute(session ? "/planos" : "/login")}
                   disabled={loadingPlan}
                   className={`w-full h-16 rounded-2xl text-base font-black uppercase tracking-widest transition-all ${plan.popular ? 'gradient-brand text-primary-foreground shadow-xl shadow-primary/20 hover:scale-[1.02]' : 'bg-background hover:bg-muted border-2 border-white/10'}`}
                 >

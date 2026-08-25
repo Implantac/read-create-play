@@ -174,7 +174,7 @@ export default function SignupPage() {
                 Criar <span className="gradient-brand-text">Conta</span>
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Acesso gratuito • 3 jogos por loteria
+                Crie sua conta e ative o Acesso Vitalício
               </p>
             </div>
           </CardHeader>
@@ -253,7 +253,7 @@ export default function SignupPage() {
             <CardFooter className="flex flex-col gap-3 pt-2">
               <Button type="submit" variant="premium" size="lg" className="w-full" disabled={loading}>
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                Criar conta grátis
+                Criar minha conta
                 {!loading && <ArrowRight className="w-4 h-4" />}
               </Button>
               <p className="text-sm text-center text-muted-foreground pt-2">
