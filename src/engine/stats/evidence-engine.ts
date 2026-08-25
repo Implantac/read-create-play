@@ -164,7 +164,7 @@ export function analyzeEvidence(
       median,
       p5,
       p95,
-      iterations
+      iterations: effectiveIterations
     }
   };
 }
