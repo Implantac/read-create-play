@@ -31,13 +31,11 @@ export function GamificationCard() {
         
       if (error) return null;
       if (!data) {
-        // Create initial record if not exists
-        const { data: newData } = await supabase
-          .from("user_gamification")
-          .insert({ user_id: user.id })
-          .select()
-          .single();
-        return newData;
+        // Client writes are denied by design: the record is initialized server-side.
+        const { data: created } = await supabase
+          .rpc("ensure_user_gamification")
+          .maybeSingle();
+        return created;
       }
       return data;
     },
