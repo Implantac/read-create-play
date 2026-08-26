@@ -48,7 +48,7 @@ export function ClosingConstraintsPanel({ value, onChange }: Props) {
       onChange(value.filter(v => v.id !== id));
     } else {
       const def = CONSTRAINT_REGISTRY[id];
-      onChange([...value, { id, params: structuredClone(def.defaultParams) }]);
+      onChange([...value, { id, params: JSON.parse(JSON.stringify(def.defaultParams)) }]);
     }
   };
 
@@ -59,7 +59,7 @@ export function ClosingConstraintsPanel({ value, onChange }: Props) {
   };
 
   const applyPreset = (preset: PresetKey) => {
-    onChange(CONSTRAINT_PRESETS[preset].map(c => ({ ...c, params: structuredClone(c.params) })));
+    onChange(CONSTRAINT_PRESETS[preset].map(c => ({ ...c, params: JSON.parse(JSON.stringify(c.params)) })));
   };
 
   const clearAll = () => onChange([]);
