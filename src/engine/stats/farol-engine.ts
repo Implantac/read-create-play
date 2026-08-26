@@ -112,14 +112,25 @@ export function computeFarolStats(
     // Titan Score Algorithm (Proprietary v5.0)
     // Weights: Frequency(25%), Delay(20%), Trend(20%), Cycle(15%), Correlation(10%), Logistics(10%)
     
+    // Guard: with empty/partial history these ratios can be NaN or Infinity.
+    const safe = (value: number, fallback = 0) =>
+      Number.isFinite(value) ? value : fallback;
+
     // 1. Freq Score (How often it appears)
-    const freqScore = Math.min(100, (s.percentage / (config.pick / config.numbers * 100)) * 50);
-    
+    const expectedShare = (config.pick / config.numbers) * 100;
+    const freqScore = Math.min(
+      100,
+      expectedShare > 0 ? safe((s.percentage / expectedShare) * 50) : 0
+    );
+
     // 2. Delay Score (How 'due' it is)
-    const delayScore = Math.min(100, (currentDelay / s.avgGap) * 100);
-    
+    const delayScore = Math.min(
+      100,
+      s.avgGap > 0 ? safe((currentDelay / s.avgGap) * 100) : 0
+    );
+
     // 3. Trend Score (Recent momentum)
-    const trendScore = Math.min(100, Math.max(0, 50 + s.trend));
+    const trendScore = Math.min(100, Math.max(0, 50 + safe(s.trend)));
     
     // 4. Cycle Score (Cycle closing pressure)
     const cycleScoreVal = cycleStats.missingNumbers.includes(n) ? 100 : 25;
