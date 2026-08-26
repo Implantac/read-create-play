@@ -140,7 +140,10 @@ export function computeFarolStats(
       .map(([num, count]) => ({ number: num, percentage: (count / (s.frequency || 1)) * 100 }))
       .sort((a, b) => b.percentage - a.percentage)
       .slice(0, 10);
-    const correlationScore = correlations.length > 0 ? correlations[0].percentage : 50;
+    const correlationScore = Math.min(
+      100,
+      correlations.length > 0 ? safe(correlations[0].percentage, 50) : 50
+    );
 
     // 6. Logistics Score (Dynamic movement patterns)
     // If the number was in the last draw, its logistics score might be lower unless it's a "repeater" trend
