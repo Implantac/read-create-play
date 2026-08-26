@@ -31,25 +31,16 @@ export function AffiliateDashboard() {
       }
       
       if (!data) {
-        // Create initial affiliate record with unique code
-        const code = `TITAN-${user.id.substring(0, 4)}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
-        const { data: newData, error: insertError } = await supabase
-          .from("affiliate_program")
-          .insert({ 
-            user_id: user.id, 
-            referral_code: code,
-            total_referrals: 0,
-            total_earned: 0,
-            balance_available: 0
-          })
-          .select()
-          .single();
-          
-        if (insertError) {
-          console.error("Error creating affiliate record:", insertError);
+        // Client writes are denied by design: the record is created server-side.
+        const { data: created, error: rpcError } = await supabase
+          .rpc("ensure_affiliate_program")
+          .maybeSingle();
+
+        if (rpcError) {
+          console.error("Error creating affiliate record:", rpcError);
           return null;
         }
-        return newData;
+        return created;
       }
       return data;
     },
