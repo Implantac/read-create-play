@@ -26,18 +26,25 @@ export function DrawNotificationChecker() {
   const [matches, setMatches] = useState<MatchResult[]>([]);
   const [dismissed, setDismissed] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const [lastCheckedConcurso, setLastCheckedConcurso] = useState<number>(0);
   const { permission, supported, requestPermission, sendNotification } = useNotificationPermission();
   const notifiedConcursos = useRef<Set<string>>(new Set());
+  // Refs keep the check idempotent: never re-trigger state updates for the same input.
+  const lastCheckedKeyRef = useRef<string>("");
+
+  const latestConcurso = draws.length ? draws[0].concurso : 0;
+  const betsSignature = savedBets.map((b) => b.id).join(",");
 
   const checkMatches = useCallback(() => {
     if (!draws.length || !savedBets.length) {
-      setMatches([]);
+      setMatches((prev) => (prev.length ? [] : prev));
       return;
     }
 
     const latestDraw = draws[0];
-    if (latestDraw.concurso === lastCheckedConcurso) return;
+    const checkKey = `${selectedLottery}-${latestDraw.concurso}-${betsSignature}`;
+    if (lastCheckedKeyRef.current === checkKey) return;
+    lastCheckedKeyRef.current = checkKey;
+
 
     // Use a Set for faster lookups
     const drawSet = new Set(latestDraw.numbers);
@@ -59,7 +66,6 @@ export function DrawNotificationChecker() {
       .sort((a, b) => b.matchCount - a.matchCount);
 
     setMatches(results);
-    setLastCheckedConcurso(latestDraw.concurso);
     setDismissed(false);
 
     // Send browser push notification
@@ -87,7 +93,8 @@ export function DrawNotificationChecker() {
         }
       );
     }
-  }, [draws, savedBets, config.pick, lastCheckedConcurso, selectedLottery, sendNotification]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [latestConcurso, betsSignature, config.pick, selectedLottery]);
 
   useEffect(() => {
     checkMatches();
