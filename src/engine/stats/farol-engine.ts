@@ -149,14 +149,16 @@ export function computeFarolStats(
     // If the number was in the last draw, its logistics score might be lower unless it's a "repeater" trend
     const logisticsScore = repeatLast ? (s.trend > 0 ? 80 : 40) : (currentDelay > s.avgGap ? 90 : 60);
 
-    const titanScore = Math.round(
-      freqScore * 0.25 + 
-      delayScore * 0.20 + 
-      trendScore * 0.20 + 
-      cycleScoreVal * 0.15 + 
-      correlationScore * 0.10 +
-      logisticsScore * 0.10
-    );
+    const titanScore = Math.max(0, Math.min(100, Math.round(
+      safe(
+        freqScore * 0.25 +
+        delayScore * 0.20 +
+        trendScore * 0.20 +
+        cycleScoreVal * 0.15 +
+        correlationScore * 0.10 +
+        logisticsScore * 0.10
+      )
+    )));
 
 
     const titanGrade = 
