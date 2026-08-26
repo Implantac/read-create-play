@@ -66,7 +66,6 @@ export function DrawNotificationChecker() {
       .sort((a, b) => b.matchCount - a.matchCount);
 
     setMatches(results);
-    setLastCheckedConcurso(latestDraw.concurso);
     setDismissed(false);
 
     // Send browser push notification
