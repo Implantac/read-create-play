@@ -93,7 +93,8 @@ export function DrawNotificationChecker() {
         }
       );
     }
-  }, [draws, savedBets, config.pick, lastCheckedConcurso, selectedLottery, sendNotification]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [latestConcurso, betsSignature, config.pick, selectedLottery]);
 
   useEffect(() => {
     checkMatches();
