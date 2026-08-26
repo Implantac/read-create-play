@@ -1131,6 +1131,24 @@ export type Database = {
     }
     Functions: {
       check_phone_exists: { Args: { _phone: string }; Returns: boolean }
+      ensure_affiliate_program: {
+        Args: never
+        Returns: {
+          active_subscriptions: number | null
+          balance_available: number | null
+          created_at: string | null
+          referral_code: string
+          total_earned: number | null
+          total_referrals: number | null
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "affiliate_program"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       get_shared_closing: {
         Args: { _share_id: string }
         Returns: {
