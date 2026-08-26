@@ -16,7 +16,8 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    target: "esnext",
+    // Alvos amplos: Safari/iOS 14+, Chrome 87+, Firefox 78+, Edge 88+
+    target: ["es2020", "safari14", "chrome87", "firefox78", "edge88"],
     minify: "esbuild",
     cssMinify: true,
     rollupOptions: {
