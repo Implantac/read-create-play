@@ -1149,6 +1149,26 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      ensure_user_gamification: {
+        Args: never
+        Returns: {
+          created_at: string | null
+          level: number | null
+          rank_position: number | null
+          total_games_generated: number | null
+          total_games_won: number | null
+          total_points: number | null
+          updated_at: string | null
+          user_id: string
+          xp: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "user_gamification"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       get_shared_closing: {
         Args: { _share_id: string }
         Returns: {
