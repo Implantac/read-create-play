@@ -15,6 +15,8 @@ import { ReferralSystem } from "@/lib/referral-system";
 import { AutoInstallPrompt } from "@/components/pwa/AutoInstallPrompt";
 import * as Sentry from "@sentry/react";
 import { Button } from "@/components/ui/button";
+import { useRoutePerformance } from "@/hooks/useRoutePerformance";
+import { useIdlePrefetch } from "@/hooks/useIdlePrefetch";
 
 const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
 const GeradorPage = lazy(() => import("@/pages/GeradorPage"));
