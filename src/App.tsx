@@ -15,6 +15,8 @@ import { ReferralSystem } from "@/lib/referral-system";
 import { AutoInstallPrompt } from "@/components/pwa/AutoInstallPrompt";
 import * as Sentry from "@sentry/react";
 import { Button } from "@/components/ui/button";
+import { useRoutePerformance } from "@/hooks/useRoutePerformance";
+import { useIdlePrefetch } from "@/hooks/useIdlePrefetch";
 
 const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
 const GeradorPage = lazy(() => import("@/pages/GeradorPage"));
@@ -113,6 +115,15 @@ const ErrorFallback = ({ error, resetError }: { error: any; resetError: () => vo
 
 const AppContent = () => {
   const location = useLocation();
+
+  // Métricas de performance por rota (route-initial / route-change).
+  useRoutePerformance();
+
+  // Pré-carrega em idle os destinos públicos mais prováveis a partir da landing.
+  useIdlePrefetch([
+    () => import("@/pages/LoginPage"),
+    () => import("@/pages/PlanosPage"),
+  ]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);

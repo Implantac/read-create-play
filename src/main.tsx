@@ -5,6 +5,9 @@ import * as Sentry from "@sentry/react";
 import App from "./App.tsx";
 import "./index.css";
 import "./lovable-badge-hide.css";
+import { initPerformanceMetrics } from "./lib/performance-metrics";
+
+void initPerformanceMetrics();
 import "./i18n";
 import { registerServiceWorker } from "./pwa/registerSW";
 
