@@ -116,6 +116,15 @@ const ErrorFallback = ({ error, resetError }: { error: any; resetError: () => vo
 const AppContent = () => {
   const location = useLocation();
 
+  // Métricas de performance por rota (route-initial / route-change).
+  useRoutePerformance();
+
+  // Pré-carrega em idle os destinos públicos mais prováveis a partir da landing.
+  useIdlePrefetch([
+    () => import("@/pages/LoginPage"),
+    () => import("@/pages/PlanosPage"),
+  ]);
+
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const ref = params.get("ref");
